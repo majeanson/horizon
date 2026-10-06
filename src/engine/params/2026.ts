@@ -90,8 +90,11 @@ const QC_EXPENDITURES_2020 = src(
   { note: 'Texte officiel, p. C.20 et C.22.' },
 )
 const QC_FICHE = src('https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110111.asp', "Dépenses fiscales — Crédit d'impôt en raison de l'âge", {
+  note: 'Édition « Dépenses fiscales 2025 », relue le 2026-10-06 : « converti, au taux de 14 % (15 % avant 2023), en un crédit d’impôt qui est partageable entre les conjoints » ; seuil de réduction 42 955 $ et montant en raison de l’âge 3 986 $ pour 2026.',
+})
+const QC_WORKERS = src('https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110906.asp', 'Dépenses fiscales — Déduction pour les travailleurs', {
   verify:
-    'Le taux de conversion en crédit (14 %, 15 % avant 2023) n’a été lu que dans un RÉSUMÉ de cette fiche (le site refuse l’accès automatisé) ; l’édition 2020, lue textuellement, donne 15 % pour 2017–2022. À confirmer sur le guide TP-1.G ou l’annexe B.',
+    'Le taux de 6 % est celui de la Loi sur les impôts, art. 358.0.3 (« le moindre de 1 420 $ et de 6 % de son revenu de travail admissible », guide des mesures fiscales du CFFP, Université de Sherbrooke) ; la fiche officielle l’énonce aussi mais a refusé la lecture automatisée le jour du relevé. Le maximum de 2026 est, lui, lu dans le PDF officiel de Finances Québec.',
 })
 const QC_LINE_361 = src(
   'https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/350-a-398-1-credits-dimpot-non-remboursables/ligne-361/',
@@ -245,14 +248,15 @@ export const P2026 = {
     retirementIncomeAmount: c(3_541, 'cpi', { ...QC_PARAMS, note: '« – Montant pour revenus de retraite 3 470 3 541 ».' }, 1),
     reductionThreshold: c(42_955, 'cpi', { ...QC_PARAMS, note: '« – Seuil de réduction du crédit d’impôt pour personne vivant seule, en raison de l’âge et pour revenus de retraite 42 090 42 955 » — rounded to the nearest $5.' }, 5),
     reductionRate: c(0.1875, 'fixed', {
-      ...QC_EXPENDITURES_2020,
-      note: '« Le taux de cette réduction est de 18,75 % … pour chaque dollar de revenu familial … qui excède le seuil de réduction applicable » — une seule réduction pour l’ensemble de ces montants.',
-      verify: 'Texte officiel de l’édition 2020, lu textuellement ; la fiche 2025 qui le reconduit n’a été lue que par résumé.',
+      ...QC_FICHE,
+      note: '« Le taux de cette réduction est de 18,75 % pour chaque dollar de revenu familial du particulier … qui excède le seuil de réduction applicable » — une seule réduction pour l’ensemble de ces montants (édition 2025 ; l’édition 2020 le dit de même).',
     }),
     retirementIncomeMultiple: c(1.25, 'fixed', { ...QC_EXPENDITURES_2020, note: '« … égal au moins élevé du montant maximal des revenus de retraite … et du produit de la multiplication de 1,25 par le montant correspondant à l’ensemble des revenus de retraite admissibles ».' }),
     ageMinAge: c(65, 'fixed', QC_LINE_361),
     splitMinAge: c(65, 'fixed', { ...QC_EXPENDITURES_2020, note: '« l’auteur du fractionnement doit avoir atteint l’âge de 65 ans avant la fin de l’année » ; l’âge du conjoint n’importe pas. La rente du RRQ et la pension de la SV ne sont pas admissibles.' }),
     splitMaxShare: c(0.5, 'fixed', { ...QC_EXPENDITURES_2020, note: '« un montant n’excédant pas 50 % de l’ensemble de ses revenus de retraite admissibles au fractionnement ».' }),
+    workerDeductionRate: c(0.06, 'fixed', { ...QC_WORKERS, note: '6 % du revenu de travail admissible (salaire, revenu net d’entreprise, subventions de recherche…), sans réduction selon le revenu.' }),
+    workerDeductionMax: c(1_450, 'cpi', { ...QC_PARAMS, note: '« – Montant maximal de la déduction pour les travailleurs 1 420 1 450 » (2025, 2026).' }, 10),
   },
 
   accounts: {

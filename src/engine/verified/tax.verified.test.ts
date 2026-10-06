@@ -119,7 +119,7 @@ describe('federal — the credits', () => {
 })
 
 describe('Québec — DERIVED worked examples (exact arithmetic from the official 2026 parameters, not published answers)', () => {
-  const single = (netIncome: number, age: number, retirement: number) => ({ age, netIncome, taxableIncome: netIncome, eligibleRetirement: retirement })
+  const single = (netIncome: number, age: number, retirement: number, employment = 0) => ({ age, netIncome, taxableIncome: netIncome, eligibleRetirement: retirement, employment })
 
   it('example 1 — single, under 65, taxable 60 000 $: tax 8 682.75 $, basic credit 2 653.28 $, tax after 6 029.47 $', () => {
     const r = quebecTax([single(60_000, 40, 0)], P.quebec).persons[0]
@@ -172,6 +172,54 @@ describe('Québec — DERIVED worked examples (exact arithmetic from the officia
     const q = quebecTax([single(10_000, 70, 10_000), single(0, 70, 0)], P.quebec)
     expect(q.persons.map((p) => p.tax)).toEqual([0, 0])
     expect(q.persons.reduce((s, p) => s + p.sharedCreditApplied, 0)).toBeLessThanOrEqual(q.sharedCredit)
+  })
+
+  // LINE 431 — Finances Québec: spouses may transfer « la partie inutilisée de la plupart des crédits d'impôt non
+  // remboursables »; the basic personal amount is not among the exceptions. Household payable tax is then
+  // max(0, T0 + T1 − 2 × basic credit − shared credit) — here the shared credit is nil (both under 65, not alone).
+  it('line 431 — a one-income couple: the spouse with no tax hands over the whole of their basic credit (2 653.28 $)', () => {
+    const q = quebecTax([single(60_000, 40, 0), single(0, 40, 0)], P.quebec)
+    const t0 = 54_345 * 0.14 + (60_000 - 54_345) * 0.19 // 8 682.75
+    const basic = 18_952 * 0.14 // 2 653.28
+    expect(q.persons[0].taxOnIncome).toBeCloseTo(t0, 2)
+    expect(q.persons[0].transferredCredit).toBeCloseTo(basic, 2)
+    expect(q.persons[0].tax).toBeCloseTo(t0 - 2 * basic, 2) // 3 376.19 — without the transfer it was 6 029.47
+    expect(q.persons[1].tax).toBe(0)
+    expect(q.persons[1].transferredCredit).toBe(0)
+  })
+
+  it('line 431 — nothing moves between two spouses who both owe more than their own basic credit', () => {
+    const q = quebecTax([single(60_000, 40, 0), single(45_000, 40, 0)], P.quebec)
+    expect(q.persons.map((p) => p.transferredCredit)).toEqual([0, 0])
+    expect(q.persons[0].tax).toBeCloseTo(8_682.75 - 18_952 * 0.14, 2)
+  })
+
+  it('line 431 — a partly unused basic credit moves only as far as the other spouse has tax to absorb', () => {
+    // Spouse B owes 1 000 $ of tax before credits: 1 653.28 $ of their basic credit is unused. Spouse A owes 1 500 $ after theirs.
+    const small = quebecTax([single(60_000, 40, 0), single(1_000 / 0.14, 40, 0)], P.quebec)
+    expect(small.persons[0].transferredCredit).toBeCloseTo(18_952 * 0.14 - 1_000, 2)
+    expect(small.persons[1].tax).toBe(0)
+  })
+
+  it('a single person has no spouse to transfer to', () => {
+    expect(quebecTax([single(5_000, 40, 0)], P.quebec).persons[0].transferredCredit).toBe(0)
+  })
+
+  // The worker deduction (line 201): the lesser of 1 450 $ and 6 % of work income, taken in computing NET income.
+  it('the worker deduction is 6 % of work income, capped at 1 450 $ — and lowers taxable income by exactly that', () => {
+    const low = quebecTax([single(10_000, 40, 0, 10_000)], P.quebec).persons[0]
+    expect(low.taxOnIncome).toBeCloseTo((10_000 - 600) * 0.14, 2)
+    const capped = quebecTax([single(60_000, 40, 0, 60_000)], P.quebec).persons[0]
+    expect(capped.taxOnIncome).toBeCloseTo(54_345 * 0.14 + (60_000 - 1_450 - 54_345) * 0.19, 2)
+  })
+
+  it('the worker deduction does not apply to income that is not work income', () => {
+    expect(quebecTax([single(60_000, 40, 0, 0)], P.quebec).persons[0].taxOnIncome).toBeCloseTo(8_682.75, 2)
+  })
+
+  it('it also lowers the FAMILY income the credit reduction reads: 50 000 $ of work income reduces from 48 550 $', () => {
+    const q = quebecTax([single(50_000, 70, 0, 50_000)], P.quebec)
+    expect(q.reduction).toBeCloseTo(0.1875 * (50_000 - 1_450 - 42_955), 2)
   })
 })
 

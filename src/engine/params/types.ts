@@ -145,6 +145,9 @@ export interface YearParams {
     ageMinAge: Cited
     splitMinAge: Cited
     splitMaxShare: Cited
+    /** The worker deduction (line 201) is this share of work income, up to `workerDeductionMax`. */
+    workerDeductionRate: Cited
+    workerDeductionMax: Cited
   }
 
   /** Registered accounts — Canada Revenue Agency. */

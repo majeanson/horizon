@@ -126,6 +126,7 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
       age: p.age,
       netIncome,
       taxableIncome: netIncome,
+      employment: p.employment,
       eligibleRetirement: eligibleQuebec(p, splitIn, splitOut),
     })),
     rules.quebec,

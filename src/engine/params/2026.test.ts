@@ -129,11 +129,13 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'quebec.livingAloneAmount': [2_172, QC_PDF],
   'quebec.retirementIncomeAmount': [3_541, QC_PDF],
   'quebec.reductionThreshold': [42_955, QC_PDF],
-  'quebec.reductionRate': [0.1875, QC_2020],
+  'quebec.reductionRate': [0.1875, 'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110111.asp'],
   'quebec.retirementIncomeMultiple': [1.25, QC_2020],
   'quebec.ageMinAge': [65, 'https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/350-a-398-1-credits-dimpot-non-remboursables/ligne-361/'],
   'quebec.splitMinAge': [65, QC_2020],
   'quebec.splitMaxShare': [0.5, QC_2020],
+  'quebec.workerDeductionRate': [0.06, 'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110906.asp'],
+  'quebec.workerDeductionMax': [1_450, QC_PDF],
 
   // ── Registered accounts ─────────────────────────────────────────────────────────────────────
   'accounts.rrspLimit': [33_810, 'https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html'],

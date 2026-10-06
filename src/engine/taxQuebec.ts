@@ -26,8 +26,10 @@ export interface QuebecPerson {
   age: number
   /** Net income (line 275). */
   netIncome: number
-  /** Taxable income (line 299). */
+  /** Taxable income (line 299), BEFORE the worker deduction, which this module takes. */
   taxableIncome: number
+  /** Employment income of the year, which the worker deduction (line 201) is a share of. */
+  employment: number
   /** Retirement income that qualifies for the retirement-income amount (after any splitting). */
   eligibleRetirement: number
 }
@@ -39,6 +41,8 @@ export interface QuebecPersonResult {
   basicCredit: number
   /** The part of the shared credit applied against this person's tax. */
   sharedCreditApplied: number
+  /** The unused basic credit of the OTHER spouse, transferred against this person's tax (line 431). */
+  transferredCredit: number
   /** What the person pays Québec. */
   tax: number
 }
@@ -71,13 +75,16 @@ export function quebecTax(persons: readonly QuebecPerson[], r: QuebecRules): Que
     const a = quebecAmounts(p, livesAlone, r)
     amountsTotal += a.age + a.livingAlone + a.retirement
   }
-  const familyIncome = persons.reduce((s, p) => s + p.netIncome, 0)
+  // The worker deduction (line 201) is taken in computing Québec NET income, so it lowers the family income the
+  // reduction reads as well as the taxable income the brackets read.
+  const deductions = persons.map((p) => Math.min(r.workerDeductionMax, r.workerDeductionRate * Math.max(0, p.employment)))
+  const familyIncome = persons.reduce((s, p, i) => s + p.netIncome - deductions[i], 0)
   // ONE reduction for the family: 18.75 % of what its net income exceeds the threshold by.
   const reduction = r.reductionRate * Math.max(0, familyIncome - r.reductionThreshold)
   const sharedCredit = Math.max(0, amountsTotal - reduction) * r.creditRate
 
-  const base = persons.map((p) => {
-    const taxOnIncome = taxFromBrackets(Math.max(0, p.taxableIncome), r.brackets)
+  const base = persons.map((p, i) => {
+    const taxOnIncome = taxFromBrackets(Math.max(0, p.taxableIncome - deductions[i]), r.brackets)
     const basicCredit = r.bpa * r.creditRate
     return { taxOnIncome, basicCredit, remaining: Math.max(0, taxOnIncome - basicCredit) }
   })
@@ -92,12 +99,26 @@ export function quebecTax(persons: readonly QuebecPerson[], r: QuebecRules): Que
     pool -= use
   }
 
+  // Line 431 — the unused portion of a spouse's non-refundable credits goes to the other. Finances Québec: spouses
+  // may transfer « la partie inutilisée de la plupart des crédits d'impôt non remboursables », and the basic personal
+  // amount is not among the exceptions. What can be left unused here is the BASIC credit (a spouse with little or no
+  // tax); the shared credit has no unused part while the other spouse still owes (it is spent against them above).
+  // So whatever tax a spouse still owes is met from the other's unused basic credit — which makes the household's
+  // total exactly max(0, T0 + T1 − 2 × basic credit − shared credit), the figure the Act's transfer produces.
+  const transferred = base.map((b, i) => {
+    if (persons.length !== 2) return 0
+    const other = base[1 - i]
+    const unusedOfOther = Math.max(0, other.basicCredit - other.taxOnIncome)
+    return Math.min(Math.max(0, b.remaining - applied[i]), unusedOfOther)
+  })
+
   return {
     persons: base.map((b, i) => ({
       taxOnIncome: roundTo(b.taxOnIncome, 0.01),
       basicCredit: roundTo(b.basicCredit, 0.01),
       sharedCreditApplied: roundTo(applied[i], 0.01),
-      tax: roundTo(Math.max(0, b.remaining - applied[i]), 0.01),
+      transferredCredit: roundTo(transferred[i], 0.01),
+      tax: roundTo(Math.max(0, b.remaining - applied[i] - transferred[i]), 0.01),
     })),
     amountsTotal: roundTo(amountsTotal, 0.01),
     reduction: roundTo(reduction, 0.01),

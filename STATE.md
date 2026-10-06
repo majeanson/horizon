@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
+| **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (92 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -55,7 +55,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `params/2026.ts` — every leaf from its official page; the 6,30 % splits 5,3 base + 1,0 first additional (settled)
 - [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
-- [ ] Eleven figures carry a `verify` reason (Revenu Québec pages read through an archive, one derived total): confirm each on an openable page and lower the ratchet in `cited.test.ts`
+- [ ] Ten figures carry a `verify` reason (the six GIS knees and divisors derived from the Act — the knees now confirmed there, the divisors still derived; Revenu Québec's bracket rates and line 361 read through an archive; the Québec worker-deduction rate; one derived TFSA total): confirm each on an openable page and lower the ratchet in `cited.test.ts`
 
 ### Phase 2 — RRQ
 
