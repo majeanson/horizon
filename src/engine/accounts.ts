@@ -55,6 +55,15 @@ export function grow(start: number, netFlow: number, rate: number): number {
   return roundTo(start * (1 + rate) + netFlow * (1 + rate) ** 0.5, 0.01)
 }
 
+/**
+ * The most that can leave an account in a year without `grow` taking it below zero. Under a negative
+ * return the mid-year convention ends the year with start × (1 + r) − out × (1 + r)^½, which is negative
+ * for any `out` above start × (1 + r)^½; at a return of zero or more the whole balance is available.
+ */
+export function maxWithdraw(balance: number, rate: number): number {
+  return Math.max(0, balance) * Math.min(1, (1 + rate) ** 0.5)
+}
+
 // ── TFSA ──────────────────────────────────────────────────────────────────────────────────────────
 
 export interface TfsaState {

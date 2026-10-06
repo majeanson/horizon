@@ -1,4 +1,4 @@
-import { ageAtJan1, firstRrifYear, grow, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, tfsaNextRoom, type NonRegState } from './accounts.ts'
+import { ageAtJan1, firstRrifYear, grow, maxWithdraw, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, tfsaNextRoom, type NonRegState } from './accounts.ts'
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { gisCategory, gisCountedIncome, gisMonthly, oasYear, type GisCategoryName, type OasPerson } from './oas.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
@@ -171,7 +171,7 @@ function simulateYear(
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, states[i].rrsp), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, rrspC, tfsaC, nonRegC }
+    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, a.returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, rrspC, tfsaC, nonRegC }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -236,7 +236,9 @@ function simulateYear(
   if (need > 0.005) {
     for (const kind of a.withdrawalOrder) {
       if (need <= 0.005) break
-      const room = people.map((_, i) => (kind === 'rrsp' ? states[i].rrsp - fixed[i].rrifMin : kind === 'tfsa' ? states[i].tfsa : states[i].nonReg.balance))
+      const room = people.map((_, i) =>
+        kind === 'rrsp' ? maxWithdraw(states[i].rrsp, a.returns.rrsp) - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, a.returns.tfsa) : maxWithdraw(states[i].nonReg.balance, a.returns.nonReg),
+      )
       const available = sum(room.map((x) => Math.max(0, x)))
       if (available <= 0.005) continue
 
@@ -339,7 +341,10 @@ function simulateYear(
     const rrspNext = grow(s.rrsp, fixed[i].rrspC - rrspOut, a.returns.rrsp)
     const tfsaNext = grow(s.tfsa, tfsaIn - draw.tfsa[i], a.returns.tfsa)
     const afterWithdrawal = nonRegContribute(w.state, nonRegIn)
-    const nonRegBalance = grow(w.state.balance, nonRegIn - 0, a.returns.nonReg)
+    // Mid-year like the other two accounts (accounts.ts « convention for flows »): the balance grows from its
+    // JANUARY level and half a year on the net flow. The gain realized by the withdrawal is still measured against
+    // the January balance and cost base, which is what `nonRegWithdraw` does.
+    const nonRegBalance = grow(s.nonReg.balance, nonRegIn - w.taken, a.returns.nonReg)
 
     // Rooms for next January.
     const earned = fixed[i].employment

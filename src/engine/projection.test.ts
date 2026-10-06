@@ -84,6 +84,30 @@ describe('projection — the books always balance', () => {
   })
 })
 
+describe('projection — a falling market never takes an account below zero', () => {
+  // The mid-year convention ends a year with start × (1 + r) − out × (1 + r)^½; under a negative return,
+  // emptying an account used to overshoot to a negative balance, a negative RRIF minimum and a negative withdrawal.
+  const falling = [
+    { returns: -0.05, inflation: 0.08 },
+    { returns: -0.2, inflation: 0.02 },
+    { returns: -0.5, inflation: 0 },
+  ]
+  it.each(falling)('returns $returns, inflation $inflation: every balance, withdrawal and RRIF minimum stays at or above zero', ({ returns, inflation }) => {
+    const rows = project(H, { ...A, inflation, returns: { nonReg: returns, rrsp: returns, tfsa: returns } }, {})
+    for (const r of rows) {
+      for (const p of people(r)) {
+        for (const v of [...Object.values(p.balancesEnd), ...Object.values(p.withdrawals), p.rrifMinimum]) {
+          expect(Number.isFinite(v), `${r.year}`).toBe(true)
+          expect(v, `${r.year}`).toBeGreaterThanOrEqual(-0.005)
+        }
+      }
+      expect(r.household.netWorthEnd, `${r.year}`).toBeGreaterThanOrEqual(-0.005)
+      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+      expect(r.household.grossIncome - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
+    }
+  })
+})
+
 describe('projection — a household living on pensions alone, checked against the pieces', () => {
   // Born June 1964, leaves on the 62nd birthday (June 2026), RREGOP from 62, no savings, nothing else.
   const solo: Person = {
@@ -114,7 +138,10 @@ describe('projection — a household living on pensions alone, checked against t
   })
 
   it('with no savings, the tax is the single person\'s tax on that pension, and any gap is the shortfall', () => {
-    for (const r of rows.filter((x) => x.year >= 2028 && x.year <= 2029)) {
+    // Spending that no year's income can beat, so no surplus is ever saved (2026 already spends the RETIRED figure:
+    // the person leaves in June). « No savings » is then true by construction, not by the rounding of a trickle.
+    const lean = project({ ...house, spending: { workingToday: 200_000, retiredToday: 200_000 } }, { ...A, pensionSplitting: false }, {})
+    for (const r of lean.filter((x) => x.year >= 2028 && x.year <= 2029)) {
       const P = paramsFor(r.year, { inflation: A.inflation, wageGrowth: A.wageGrowth })
       const db = r.persons.self!.db
       expect(r.persons.self!.withdrawals).toEqual({ nonReg: 0, rrsp: 0, tfsa: 0 })
