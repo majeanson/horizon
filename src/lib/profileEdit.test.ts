@@ -2,11 +2,12 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { presetOf } from '../engine/assumptionPresets.ts'
 import { makeRrqRules } from '../engine/rrqRules.ts'
 import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears, rrqEstimate } from './earnings.ts'
 import {
-  addChild, addPension, addSpouse, blankPension, hasSpouse, mapPerson, moveInOrder, removeChild, removePension, removeSpouse,
+  addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, moveInOrder, removeChild, removePension, removeSpouse,
   setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { profileGaps } from './profileGaps.ts'
@@ -165,5 +166,18 @@ describe('earnings helpers', () => {
     expect(rrqEstimate({ ...p, retirementAge: 55 }, TODAY, 65, rules)).toBe(at65)
     // …and a person with no current salary gets only what their typed history earned.
     expect(rrqEstimate({ ...p, salaryToday: 0 }, TODAY, 65, rules)).toBeLessThan(at65)
+  })
+})
+
+describe('applying a ready-made scenario', () => {
+  it('lays the preset over the assumptions, keeps spending and the rest, stays valid, and is a no-op the second time', () => {
+    const p = golden()
+    const bold = applyPreset(p, 'bold')
+    expect(presetOf(bold.assumptions)).toBe('bold')
+    expect(bold.household).toBe(p.household)
+    expect(bold.assumptions.withdrawalOrder).toEqual(p.assumptions.withdrawalOrder)
+    valid(bold)
+    expect(applyPreset(bold, 'bold')).toBe(bold)
+    expect(presetOf(setReturn(bold, 'rrsp', 0.07).assumptions)).toBeNull()
   })
 })

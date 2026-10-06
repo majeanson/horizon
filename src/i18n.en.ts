@@ -49,6 +49,7 @@ export const EN: typeof FR = {
     infoWhere: 'Where to find it',
     infoLabel: 'Exact wording',
     infoOpen: 'Open the official page',
+    infoOpenReference: 'Open the reference (not a government page)',
     infoNoPage: 'No official page: this number comes from your own statements.',
   },
 
@@ -177,6 +178,31 @@ export const EN: typeof FR = {
   assumptions: {
     title: 'Assumptions',
     subtitle: 'What you suppose about the future. These are your assumptions, not official figures.',
+    presets: {
+      title: 'Scenario',
+      hint: 'A starting point: it fills in inflation, wage growth, returns and the horizon at once. Change anything afterwards and the scenario becomes “Custom”.',
+      label: 'Choose a scenario',
+      prudent: 'Conservative',
+      neutral: 'Neutral',
+      bold: 'Aggressive',
+      custom: 'Custom',
+      blurb: {
+        prudent: 'Lower returns, higher inflation, a longer life: a plan that holds here has room to spare.',
+        neutral: 'The middle of the road: the 2026 projection assumptions of FP Canada and the Institute of Financial Planning.',
+        bold: 'Higher returns, inflation at target, a shorter life: the most favourable plan one can reasonably assume.',
+        custom: 'Your own numbers. Pick a scenario to return to a starting point.',
+      },
+      summary: (inflation: string, wages: string, returns: string, horizon: number) =>
+        `Inflation ${inflation} · wages ${wages} · returns ${returns} · until age ${horizon}`,
+      links: [
+        { label: 'Projection Assumption Guidelines (Institute of Financial Planning)', url: 'https://institutpf.org/en/projection-assumption-guidelines' },
+        { label: 'Inflation target (Bank of Canada)', url: 'https://www.bankofcanada.ca/core-functions/monetary-policy/inflation-control-target/' },
+        { label: 'Life expectancy (Statistics Canada)', url: 'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401' },
+      ],
+      sourceTitle: 'Where these figures come from',
+      source:
+        'Neutral: inflation 2.1%, Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2%, YMPE growth 3.1% (FP Canada and the Institute of Financial Planning, 2026 guidelines) — about 5.1% for a 60 / 40 mix, less an estimated 0.6 point of fees. Conservative and Aggressive move those figures by a fixed margin. These are assumptions, neither official figures nor forecasts.',
+    },
     spending: {
       title: 'Household spending',
       working: 'Yearly spending while anyone is working',
@@ -280,6 +306,8 @@ export const EN: typeof FR = {
       horizon: (age: number) => `Until age ${age}`,
       delta: (points: number) => (points === 0 ? 'as set' : `${points > 0 ? '+' : '−'}${Math.abs(points)} pt`),
       none: '—',
+      presetsTitle: 'Under three scenarios',
+      presetsHint: 'The same household, with each scenario’s assumptions in place of yours.',
       note: 'Each cell is the lowest retirement age that lasts.',
     },
     params: {
@@ -463,6 +491,31 @@ export const EN: typeof FR = {
       label: '',
       url: '',
       note: 'Without tax: Horizon calculates it.',
+    },
+    inflation: {
+      where: 'The Bank of Canada’s official target is 2%, the midpoint of a 1% to 3% range. For your own inflation, compare your spending from one year to the next.',
+      label: '',
+      url: 'https://www.bankofcanada.ca/core-functions/monetary-policy/inflation-control-target/',
+      note: 'The Neutral scenario uses 2.1% (the 2026 projection guidelines of FP Canada and the Institute of Financial Planning), Conservative 2.5% and Aggressive 2.0%.',
+    },
+    wageGrowth: {
+      where: 'Retraite Québec publishes each year’s maximum pensionable earnings (MPE), from 1966 to 2026: $74,600 in 2026. The ratio between two years gives wage growth.',
+      label: '',
+      url: 'https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions',
+      note: 'From 2016 ($54,900) to 2026 ($74,600) the MPE grew about 3.1% a year; the 2026 guidelines use 3.1% too, and so does the Neutral scenario.',
+    },
+    returns: {
+      where: 'Each account’s return is on the annual statement from your broker or insurer (“personal rate of return” or annualised rate); their fees are on the annual fee report.',
+      label: '',
+      url: 'https://institutpf.org/en/projection-assumption-guidelines',
+      reference: true,
+      note: 'For a projection, use a return net of fees. The 2026 guidelines give returns before fees (Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2%) and say the fees paid must be subtracted. The Institute is a professional body, not a government department.',
+    },
+    horizonAge: {
+      where: 'No document prints it: it is a prudent choice. Statistics Canada publishes life expectancy by province and sex in its table 13-10-0114-01.',
+      label: '',
+      url: 'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401',
+      note: 'The table gives an average: half of people live longer. Hence a horizon beyond the average; Conservative goes to 100, Neutral 95, Aggressive 90.',
     },
   },
 }

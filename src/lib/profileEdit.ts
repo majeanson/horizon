@@ -1,3 +1,4 @@
+import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
 import type { AccountKind, DbPension, Person, PersonId } from '../engine/types.ts'
 import { blankPerson, type Profile, type StoredAssumptions } from './schema.ts'
 
@@ -22,6 +23,12 @@ export function setSpending(p: Profile, patch: Partial<Profile['household']['spe
 
 export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): Profile {
   return { ...p, assumptions: { ...p.assumptions, ...patch } }
+}
+
+/** Lay a ready-made set of assumptions over the profile's; the same object back when it is already exactly that set. */
+export function applyPreset(p: Profile, key: PresetKey): Profile {
+  if (presetOf(p.assumptions) === key) return p
+  return { ...p, assumptions: withPreset(p.assumptions, key) }
 }
 
 export function setReturn(p: Profile, kind: AccountKind, value: number): Profile {

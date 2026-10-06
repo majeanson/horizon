@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { FR } from '../i18n'
+import { FR, type InfoEntry } from '../i18n'
 import { EN } from '../i18n.en'
 import { blankComments, sourceFiles } from './buildGuardScan'
 
@@ -28,7 +28,16 @@ const OFFICIAL_HOSTS = new Set([
   'www.revenuquebec.ca',
   'www.quebec.ca',
   'www.legisquebec.gouv.qc.ca',
+  // Public institutions that publish the reference an ASSUMPTION is anchored on (the inflation target, life tables).
+  'www.bankofcanada.ca',
+  'www.banqueducanada.ca',
+  'www150.statcan.gc.ca',
 ])
+
+// A professional body is not the government. Its link is allowed ONLY for the assumptions it publishes guidelines for,
+// and the entry must say so (`reference: true`, which makes the link read « pas une page gouvernementale »).
+const REFERENCE_HOSTS: Record<string, readonly string[]> = { 'institutpf.org': ['returns'] }
+const ASSUMPTION = 'an assumption about the future, not a figure printed on a statement: the note names the reference it is anchored on'
 
 const OWN_STATEMENTS = 'the figure lives on the person’s own statements, which no official page reproduces'
 const NO_PRINTED_FIGURE = 'a choice or an estimate: no document prints the figure, so there is no wording to quote'
@@ -52,6 +61,10 @@ const ALLOWED_NO_LABEL: Record<string, string> = {
   nonRegBalance: OWN_STATEMENTS,
   spendingWorking: OWN_STATEMENTS,
   spendingRetired: OWN_STATEMENTS,
+  inflation: ASSUMPTION,
+  wageGrowth: ASSUMPTION,
+  returns: ASSUMPTION,
+  horizonAge: ASSUMPTION,
   dbRules: 'each plan words its own booklet: nothing single to quote',
 }
 
@@ -97,7 +110,9 @@ describe('« où trouver ce chiffre » — the ⓘ copy', () => {
           if (!e.url) continue
           const u = new URL(e.url)
           expect(u.protocol, `${id}`).toBe('https:')
-          expect(OFFICIAL_HOSTS.has(u.hostname), `${id}: ${u.hostname} is not an official host`).toBe(true)
+          const isReference = REFERENCE_HOSTS[u.hostname]?.includes(id) === true
+          expect(OFFICIAL_HOSTS.has(u.hostname) || isReference, `${id}: ${u.hostname} is not an official host`).toBe(true)
+          expect(Boolean((e as InfoEntry).reference), `${id}: a non-government link must say so (reference: true), and only it may`).toBe(isReference)
         }
       })
 
@@ -126,6 +141,20 @@ describe('« où trouver ce chiffre » — the ⓘ copy', () => {
       expect(Boolean(en.url), `${id}: link`).toBe(Boolean(fr.url))
       expect(Boolean(en.label), `${id}: wording`).toBe(Boolean(fr.label))
     }
+  })
+
+  it('the scenario picker’s source links are https, on a government or a named reference host, and the same pages in both languages', () => {
+    const hosts = (links: readonly { url: string }[]) => links.map((l) => new URL(l.url).hostname)
+    for (const links of [FR.assumptions.presets.links, EN.assumptions.presets.links]) {
+      for (const l of links) {
+        const u = new URL(l.url)
+        expect(u.protocol).toBe('https:')
+        expect(OFFICIAL_HOSTS.has(u.hostname) || u.hostname in REFERENCE_HOSTS, u.hostname).toBe(true)
+      }
+    }
+    expect(hosts(EN.assumptions.presets.links).map((h) => h.replace('banqueducanada', 'bankofcanada'))).toEqual(
+      hosts(FR.assumptions.presets.links).map((h) => h.replace('banqueducanada', 'bankofcanada')),
+    )
   })
 
   it('every excuse names an entry that exists', () => {

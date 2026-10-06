@@ -710,3 +710,39 @@
   font-size: var(--text-sm);
   color: var(--ink-soft);
 }
+
+/* ── Desktop: nothing stretches to fill the width it is given ─────────────────────────────────────────────────────
+   Measured at 1440 px: a two-character percent sat in a 52 rem box, the Moi / Conjoint·e pill ran the whole card, a
+   lone toggle chip filled its row, and the page hugged the sidebar with a third of the screen empty on the right.
+   Each rule below is a no-op on a phone (the thing is already narrower than its cap). */
+.field-row__control {
+  max-width: 26rem;
+}
+.profile-section__body > .chip {
+  align-self: flex-start;
+}
+@media (min-width: 860px) {
+  .shell__main {
+    margin-inline: auto;
+  }
+  .subtabs-row .subtabs,
+  .profile-section .subtabs {
+    max-width: 30rem;
+  }
+}
+/* A mouse needs to see what a click will land on; a touch screen has no hover and keeps the flat look. */
+@media (hover: hover) and (pointer: fine) {
+  .subtabs__opt:not(.is-on):hover,
+  .chip:not(.is-on):not(:disabled):hover {
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    color: var(--ink);
+  }
+}
+.info-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}

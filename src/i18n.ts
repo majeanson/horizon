@@ -12,8 +12,10 @@ export type Lang = 'fr' | 'en'
 export interface InfoEntry {
   where: string
   label: string
-  /** The official page, or '' when the figure lives on the person's own statements (see fieldInfoCopy.test.ts). */
+  /** The page, or '' when the figure lives on the person's own statements (see fieldInfoCopy.test.ts). */
   url: string
+  /** True when the link is a professional body's reference, not a government page (the note says so). */
+  reference?: boolean
   note: string
 }
 
@@ -63,6 +65,7 @@ export const FR = {
     infoWhere: 'Où le trouver',
     infoLabel: 'Libellé exact',
     infoOpen: 'Ouvrir la page officielle',
+    infoOpenReference: 'Ouvrir la référence (pas une page gouvernementale)',
     infoNoPage: 'Aucune page officielle : ce chiffre vient de vos propres relevés.',
   },
 
@@ -191,6 +194,31 @@ export const FR = {
   assumptions: {
     title: 'Hypothèses',
     subtitle: 'Ce que vous supposez de l’avenir. Ce sont vos hypothèses, pas des chiffres officiels.',
+    presets: {
+      title: 'Scénario',
+      hint: 'Un point de départ : il remplit d’un coup l’inflation, la hausse des salaires, les rendements et l’horizon. Changez ensuite ce que vous voulez : le scénario devient « Personnalisé ».',
+      label: 'Choisir un scénario',
+      prudent: 'Prudent',
+      neutral: 'Neutre',
+      bold: 'Audacieux',
+      custom: 'Personnalisé',
+      blurb: {
+        prudent: 'Rendements plus bas, inflation plus haute, vie plus longue : un plan qui tient ici a de la marge.',
+        neutral: 'Le milieu de la route : les hypothèses de projection 2026 de FP Canada et de l’Institut de planification financière.',
+        bold: 'Rendements plus hauts, inflation à la cible, vie plus courte : le plan le plus favorable qu’on puisse raisonnablement poser.',
+        custom: 'Vos propres chiffres. Choisissez un scénario pour revenir à un point de départ.',
+      },
+      summary: (inflation: string, wages: string, returns: string, horizon: number) =>
+        `Inflation ${inflation} · salaires ${wages} · rendements ${returns} · jusqu’à ${horizon} ans`,
+      links: [
+        { label: 'Normes d’hypothèses de projection (Institut de planification financière)', url: 'https://institutpf.org/normes-hypotheses-projection' },
+        { label: 'Cible d’inflation (Banque du Canada)', url: 'https://www.banqueducanada.ca/grandes-fonctions/politique-monetaire/ententes-relatives-cible-maitrise-inflation/' },
+        { label: 'Espérance de vie (Statistique Canada)', url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1310011401' },
+      ],
+      sourceTitle: 'D’où viennent ces chiffres ?',
+      source:
+        'Neutre : inflation 2,1 %, actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 %, croissance du MGA 3,1 % (FP Canada et Institut de planification financière, normes 2026), soit environ 5,1 % pour un mélange 60 / 40, moins 0,6 point de frais estimés. Prudent et Audacieux déplacent ces chiffres d’une marge fixe. Ce sont des hypothèses, ni des chiffres officiels ni des prévisions.',
+    },
     spending: {
       title: 'Dépenses du ménage',
       working: 'Dépenses annuelles tant que quelqu’un travaille',
@@ -294,6 +322,8 @@ export const FR = {
       horizon: (age: number) => `Jusqu’à ${age} ans`,
       delta: (points: number) => (points === 0 ? 'prévu' : `${points > 0 ? '+' : '−'}${Math.abs(points)} pt`),
       none: '—',
+      presetsTitle: 'Selon trois scénarios',
+      presetsHint: 'Le même ménage, avec les hypothèses de chaque scénario à la place des vôtres.',
       note: 'Chaque case est le plus bas âge de départ qui tient.',
     },
     params: {
@@ -479,6 +509,31 @@ export const FR = {
       label: '',
       url: '',
       note: 'Sans l’impôt : Horizon le calcule.',
+    },
+    inflation: {
+      where: 'La cible officielle de la Banque du Canada est de 2 %, au milieu d’une fourchette de 1 % à 3 %. Pour votre propre inflation, comparez vos dépenses d’une année à l’autre.',
+      label: '',
+      url: 'https://www.banqueducanada.ca/grandes-fonctions/politique-monetaire/ententes-relatives-cible-maitrise-inflation/',
+      note: 'Le scénario Neutre retient 2,1 % (normes de projection 2026 de FP Canada et de l’Institut de planification financière), Prudent 2,5 % et Audacieux 2,0 %.',
+    },
+    wageGrowth: {
+      where: 'Retraite Québec publie le maximum des gains admissibles (MGA) de chaque année, de 1966 à 2026 : 74 600 $ en 2026. Le rapport entre deux années donne la hausse des salaires.',
+      label: '',
+      url: 'https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions',
+      note: 'De 2016 (54 900 $) à 2026 (74 600 $), le MGA a crû d’environ 3,1 % par année ; les normes 2026 retiennent 3,1 % aussi, et le scénario Neutre de même. La page est en anglais.',
+    },
+    returns: {
+      where: 'Le rendement de chaque compte figure sur le relevé annuel de votre courtier ou de votre assureur (« rendement personnel » ou taux annualisé) ; leurs frais, sur le rapport annuel sur les frais.',
+      label: '',
+      url: 'https://institutpf.org/normes-hypotheses-projection',
+      reference: true,
+      note: 'Pour projeter, utilisez un rendement net des frais. Les normes 2026 donnent des rendements avant frais (actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 %) et demandent d’en soustraire les frais payés. L’Institut est un organisme professionnel, pas un ministère.',
+    },
+    horizonAge: {
+      where: 'Aucun document ne l’imprime : c’est un choix prudent. Statistique Canada publie l’espérance de vie, par province et par sexe, dans sa table 13-10-0114-01.',
+      label: '',
+      url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1310011401',
+      note: 'La table donne une moyenne : la moitié des gens vivent plus longtemps. D’où un horizon plus loin que la moyenne ; Prudent va jusqu’à 100 ans, Neutre 95, Audacieux 90.',
     },
   } satisfies Record<string, InfoEntry>,
 }

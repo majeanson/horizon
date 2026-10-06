@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { useT, type InfoId } from '../i18n'
+import { useT, type InfoEntry, type InfoId } from '../i18n'
 import { Icon } from './Icon'
 
 // « Où trouver ce chiffre » — the ⓘ beside every number the person has to type. It opens, in place, a short
@@ -16,7 +16,7 @@ export function FieldInfo({ id, label }: { id: InfoId; label?: string }) {
   const t = useT()
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const entry = t.info[id]
+  const entry: InfoEntry = t.info[id]
   const name = label ? `${t.common.whereToFind} : ${label}` : t.common.whereToFind
   return (
     <>
@@ -43,7 +43,7 @@ export function FieldInfo({ id, label }: { id: InfoId; label?: string }) {
         {entry.note && <p className="info-note__extra">{entry.note}</p>}
         {entry.url ? (
           <a className="info-note__link" href={entry.url} target="_blank" rel="noopener noreferrer">
-            {t.fields.infoOpen}
+            {entry.reference ? t.fields.infoOpenReference : t.fields.infoOpen}
             <Icon name="arrow-up-right-bold" size={14} />
           </a>
         ) : (

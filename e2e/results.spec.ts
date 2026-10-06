@@ -95,7 +95,12 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await expect(page.getByRole('button', { name: 'Calculer' })).toBeEnabled({ timeout: 60_000 })
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0)
   // 27 cells, each an age or a dash; the base cell of the 95-year grid is the plain verdict.
-  await expect(page.locator('.sensitivity tbody td')).toHaveCount(27)
+  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
+  // …and the three ready-made scenarios read prudent ≥ neutral ≥ bold (a more prudent future never retires earlier).
+  const scenarios = (await page.locator('.sensitivity > .table-wrap tbody td').allTextContents()).map((x) => (x === '—' ? Infinity : Number(x)))
+  expect(scenarios).toHaveLength(3)
+  expect(scenarios[0]).toBeGreaterThanOrEqual(scenarios[1])
+  expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
   const base = grids.nth(1).locator('td.is-base')
   await expect(base).toHaveText('60')
   // A worse future never retires earlier than a better one: down the return axis, the ages do not fall.

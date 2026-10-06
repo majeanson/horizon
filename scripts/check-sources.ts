@@ -47,6 +47,15 @@ for (const [lang, dict] of [['fr', FR], ['en', EN]] as const) {
   }
 }
 
+// …and the scenario picker's « d'où viennent ces chiffres » links.
+for (const [lang, dict] of [['fr', FR], ['en', EN]] as const) {
+  for (const link of dict.assumptions.presets.links) {
+    const e = urls.get(link.url) ?? { title: link.label, uses: [] }
+    e.uses.push({ path: `assumptions.presets.links.${lang}`, retrieved: '' })
+    urls.set(link.url, e)
+  }
+}
+
 type Verdict = 'ok' | 'blocked' | 'GONE' | 'ERROR'
 
 // Hosts that refuse or stall every non-browser client — a fact about them, not about the page. Revenu Québec answers

@@ -417,3 +417,33 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
     }
   })
 }
+
+// A ready-made scenario fills the economy in at once, the picker follows any hand edit back to « Personnalisé », and on a
+// wide desktop screen no control stretches to fill the width it is given (measured at 1440 px: a percent in a 52 rem box).
+test('the scenario picker sets the economy, follows a hand edit, and the desktop layout caps what should not stretch', async ({ page }) => {
+  await seedProfile(page, EXAMPLE)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/hypotheses')
+  const picker = page.getByRole('tablist', { name: 'Choisir un scénario' })
+  await picker.getByRole('tab', { name: 'Prudent' }).click()
+  await expect(picker.getByRole('tab', { name: 'Prudent' })).toHaveAttribute('aria-selected', 'true')
+  await expect.poll(async () => (await savedProfile(page)).assumptions).toMatchObject({ inflation: 0.025, wageGrowth: 0.025, horizonAge: 100, returns: { rrsp: 0.03, tfsa: 0.03, nonReg: 0.025 } })
+
+  const rrsp = page.getByRole('textbox', { name: 'REER' })
+  await rrsp.fill('7')
+  await rrsp.press('Enter')
+  await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveAttribute('aria-selected', 'true')
+  await picker.getByRole('tab', { name: 'Neutre' }).click()
+  await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveCount(0)
+  await expect.poll(async () => (await savedProfile(page)).assumptions.returns.rrsp).toBe(0.045)
+
+  // Desktop: the field box and the pill stay a readable size, and the page is not glued to one side.
+  const box = await page.locator('.field-row__control').first().boundingBox()
+  expect(box!.width, 'a field box stretched across the card').toBeLessThanOrEqual(26 * 16 + 1)
+  const pill = await picker.boundingBox()
+  expect(pill!.width, 'the segmented control ran the whole card').toBeLessThanOrEqual(30 * 16 + 1)
+  const main = await page.locator('.shell__main').boundingBox()
+  const nav = await page.locator('.shell__nav').boundingBox()
+  expect(main!.x, 'the content hugs the sidebar with the empty space all on the right').toBeGreaterThanOrEqual(nav!.x + nav!.width)
+  await expectNoHorizontalOverflow(page)
+})
