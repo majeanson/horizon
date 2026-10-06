@@ -1,0 +1,46 @@
+{
+  "name": "horizon",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Quand la retraite ? — Québec/Canada retirement-date planner. Local-only data; CF Worker serves static assets.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:engine": "vitest run src/engine",
+    "e2e": "playwright test",
+    "e2e:ci": "playwright test --workers=1 --retries=0 --forbid-only",
+    "e2e:sw": "playwright test -c e2e/sw.config.ts",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "sources": "node scripts/gen-sources.ts",
+    "knip": "knip",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@fontsource/baloo-2": "^5.3.0",
+    "@fontsource/hanken-grotesk": "^5.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4",
+    "recharts": "^3.0.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@cloudflare/workers-types": "^5.20260929.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "happy-dom": "^20.14.5",
+    "knip": "^6.38.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.143.1"
+  }
+}

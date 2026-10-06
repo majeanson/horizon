@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Browser zoom stays ENABLED on purpose: this is a planner read and corrected by people
+         who may need large type, and pinch-zoom is the substitute for everything the in-app
+         text-size setting (115 % / 130 %) does not reach. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- FIRST PAINT ONLY. lib/theme.ts rewrites the unscoped tag from the painted --paper as
+         soon as it runs, so the chrome tracks the in-app theme. These two media-scoped tags
+         just avoid a cream flash on a phone already in dark mode. -->
+    <meta name="theme-color" content="#FBF3E4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1b1712" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FBF3E4" />
+    <meta name="description" content="Horizon — à quel âge pouvez-vous prendre votre retraite ? Un planificateur pour le Québec, calculé sur les paramètres officiels, dont les données restent sur votre appareil." />
+    <title>Horizon</title>
+    <meta property="og:title" content="Horizon" />
+    <meta property="og:description" content="Quand pouvez-vous prendre votre retraite ? Calculé sur les paramètres officiels du Québec et du Canada ; vos données ne quittent jamais votre appareil." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Horizon" />
+    <meta property="og:locale" content="fr_CA" />
+    <meta name="twitter:card" content="summary" />
+    <!-- PWA: installable, offline app shell via /sw.js (registered in src/lib/registerSw.ts,
+         prod builds only). Fonts are self-hosted (@fontsource, bundled): not one request
+         leaves the origin. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Horizon" />
+    <!-- Set the theme (and the accessibility profile) before React mounts so a reload never
+         flashes the wrong surface. -->
+    <script src="/theme-bootstrap.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+/* Horizon styles — split into ordered chunks (src/styles/*) purely for navigability. The
+   @import order IS the cascade order: later chunks may rely on earlier ones winning
+   specificity ties, so never reorder this list; append new chunks at the end of it. Vite
+   inlines these at build — runtime cost is zero. */
+/* Fonts first: an @import after any other rule is ignored by the browser. */
+@import './styles/fonts.css';
+@import './styles/core.css';
+@import './styles/fields.css';
+/* Shared "kit" primitives (EmptyState, Chip, Modal, Disclosure, …) — uniquely named, so
+   cascade position is immaterial. */
+@import './styles/kit.css';
+@import './styles/horizon.css';
+/* The dev-only component gallery (/dev/kit) is NOT imported here: pages/DevKit.tsx imports
+   its own stylesheet as a side effect, so the shell never pays for it. */

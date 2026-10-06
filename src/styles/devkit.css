@@ -1,0 +1,46 @@
+/* The dev-only component gallery (/dev/kit). Imported as a side effect by pages/DevKit.tsx
+   and by nothing else, so it lives in the gallery's own lazy chunk and never in the shell. */
+.devkit {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1rem var(--gutter) 4rem;
+}
+.devkit__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.devkit__back {
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+}
+.devkit__cat > h2 {
+  margin: 1.5rem 0 0.75rem;
+}
+.devkit__entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.devkit__entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.devkit__entry-head h3 {
+  margin: 0;
+}
+.devkit__demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.devkit__demo-label {
+  color: var(--ink-faint);
+  font-size: var(--text-xs);
+}

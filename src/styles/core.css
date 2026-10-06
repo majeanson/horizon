@@ -1,0 +1,1015 @@
+/* Horizon — single design-token stylesheet (Babillard's « Pip » tokens, kept as is). No framework, no CSS-in-JS.
+   Day palette = :root; night = :root[data-theme='night'].
+
+   Design system: PIP — a warm risograph / cut-paper family planner. Paper-cream
+   grounds, a marigold-led earthy palette (sage = done, sky = calm, berry = play,
+   terracotta = food), chunky-friendly Baloo 2 headlines, Caveat handwriting for
+   toddler delight, and soft offset "printed" shadows — never a glow-lift. This
+   is the look that's pretty to a parent AND friendly to a toddler, while the
+   calm tenets keep it from tipping into dopamine: no streaks/points, deterministic
+   acknowledgments (NFR-CALM-2), opacity/transform-only reveals, no nags.
+
+   Token names below preserve Babillard's existing semantic vars (--accent,
+   --surface, --line…) so every component keeps working, and ADD the full Pip
+   palette so new surfaces can use it directly.
+
+   CLASS NAMING (CSS-5) — for NEW CSS, use BEM: `.block`, `.block__element`,
+   `.block--modifier` / `.block__element--modifier`. State flips that aren't a
+   variant stay as the established `.is-on` / `.is-active` / `.is-flagged` helper
+   classes (not `--on`). Existing files mix `__`, single-`-`, and camelCase from
+   before this rule — don't retro-rename a working class just to conform (it churns
+   selectors for zero gain); converge a family only when already rewriting it. The
+   calm-tenet names are off-limits regardless: never coin a `.streak`/`.points`/
+   `.badge` class. */
+
+:root {
+  /* ---- Pip brand palette (riso inks on warm paper) ---- */
+  --paper: #fbf3e4;
+  --paper-deep: #f4e8d2;
+  --card: #fffcf5;
+  --ink: #2c2722;
+  --ink-soft: #6b6258;
+  /* Faint tier — hints + `.act .when` time labels. Darkened from #a99e8e (~2.6:1 on the
+     cream --card, an always-on AA fail) to clear 4.5:1 for small text, keeping the warm
+     taupe identity (AUJOURDHUI §5 P2, base-day contrast). Darkened again #7a7060 →
+     #6e6455 (bmad/08 A-10): the daypart papers shift warmer than --card, and the old
+     value slid to 4.18:1 on the dusk --paper — this one clears 4.5:1 on every daypart
+     paper AND paper-deep, worst case 4.6:1. */
+  --ink-faint: #6e6455;
+
+  --marigold: #f2a03d;
+  /* Deep tier — glyphs/accents on their wash (identity discs, feature tiles). Bar:
+     3:1 non-text contrast (WCAG 1.4.11) on the matching wash — marigold and sky were
+     the two day-side fails (2.37:1 / 2.80:1) and are darkened just past the bar
+     (bmad/08 A-10). Text NEVER uses a -deep on a wash: that's what the -ink tier
+     below is for (4.5:1). */
+  --marigold-deep: #be7424; /* 3.02:1 on --marigold-wash (was #d9842a, 2.37:1) */
+  --terracotta: #e0724e;
+  --terracotta-deep: #c2563a;
+  --sage: #88a36f;
+  --sage-deep: #6b8a52;
+  --sky: #7bb0c9;
+  --sky-deep: #548aa4; /* 3.06:1 on --sky-wash (was #5891ac, 2.80:1) */
+  --berry: #b06a93;
+  --berry-deep: #95527a;
+  --teal: #34b3a6; /* turquoise — Le cercle's accent */
+  --teal-deep: #2a8f85;
+  --butter: #fbd66b;
+
+  --marigold-wash: #fbe6c8;
+  --terracotta-wash: #f6dace;
+  --sage-wash: #e2ead6;
+  --sky-wash: #d8eaf1;
+  --berry-wash: #efdce8;
+  --teal-wash: #d4ece9;
+
+  /* ---- Section INK tier (bmad/08 A-10 — the text-safe section colours) ----
+     One per hub section, tuned per THEME to ≥4.5:1 (WCAG AA small text) on that
+     section's wash — and, day-side, also ≥5:1 on --paper/--card. This is what
+     SECTION_TINT.ink resolves to, so anywhere a section colour lands on TEXT
+     (the active Réglages tab label, a guide link) it reads AA by construction.
+     The brighter -deep tier above stays for pure glyphs (3:1 bar). */
+  --marigold-ink: #945a1d; /* 4.61:1 on wash */
+  --terracotta-ink: #a24830; /* 4.52:1 */
+  --sage-ink: #566f42; /* 4.53:1 */
+  --sky-ink: #426d82; /* 4.53:1 */
+  --berry-ink: #8f4f75; /* 4.54:1 */
+  --teal-ink: #22736a; /* 4.55:1 */
+
+  /* ---- Babillard-compat semantic aliases (map onto Pip) ---- */
+  --paper-2: var(--paper-deep);
+  --surface: var(--card);
+  --line: #e8dac0;
+  --line-strong: #dcc8a6;
+  /* A faint surface tint + a hairline, both theme-aware. Previously UNDEFINED, so the
+     ~8 callers fell back to drifting hardcoded black-alphas (rgba(0,0,0,0.02–0.08)) that
+     read invisible/wrong on a dark night card. Derived from --ink so they adapt: a
+     subtle dark wash in day, a subtle light lift at night. */
+  --surface-2: color-mix(in srgb, var(--ink) 5%, transparent);
+  --hairline: color-mix(in srgb, var(--ink) 8%, transparent);
+  --accent: var(--marigold); /* PRIMARY is marigold */
+  --accent-soft: var(--marigold-wash);
+  --accent-ink: #3a2a12; /* warm-dark text on marigold */
+  --warn: var(--terracotta-deep);
+  --clay-soft: var(--terracotta-wash);
+  --primary: var(--marigold);
+  --primary-press: var(--marigold-deep);
+  --on-primary: #3a2a12;
+  --success: var(--sage-deep);
+
+  /* ---- type ---- */
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+  --sans: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display: 'Baloo 2', ui-rounded, system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Hanken Grotesk', cursive;
+  /* legacy aliases used by older rules */
+  --font-display: var(--display);
+  --font-body: var(--sans);
+
+  /* ---- type scale (UNIFORMIZING.md:212) ----
+     One tokenized rem ladder for the sizes that already cluster across the system,
+     so type stops drifting between near-identical one-offs (0.78/0.82/0.85/0.95…).
+     Values are the EXISTING most-common sizes — adopting a token must not shift a
+     pixel. xs/sm/md are the "small label → body/control" band; lg/xl/2xl are
+     emphasis → display. The broad 44-file sweep is deferred (UNIFORMIZING.md:212);
+     core.css + kit.css are converted here to establish the tokens. Off-ladder
+     one-offs (0.72/0.74/0.8/0.82/0.88/0.92rem, px chrome) stay literal until the
+     sweep decides their tier — don't force-fit. */
+  --text-xs: 0.78rem; /* small hints / zone titles / chip-group labels */
+  --text-sm: 0.85rem; /* secondary text, field labels, compact buttons */
+  --text-md: 0.95rem; /* default body / control label */
+  --text-lg: 1.1rem; /* emphasis / lead */
+  --text-xl: 1.5rem; /* small display (tonight meal) */
+  --text-2xl: 2.4rem; /* large display (board clock) */
+
+  /* ---- focus ring (a11y) ----
+     A dedicated focus-visible colour rather than --accent: marigold on the cream
+     day surfaces lands ~1.8:1 (below the 3:1 non-text-contrast minimum), so it
+     would be a near-invisible ring. --ink is the on-surface text colour, defined
+     per-theme, so it's guaranteed-readable in day AND night, on cream or on a
+     marigold-filled active tab. */
+  --focus-ring: var(--ink);
+
+  /* ---- radii (soft, pebble-like) ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+  --radius: var(--radius-md);
+  --gap: 1rem;
+
+  /* ---- sizing ---- */
+  --touch-target: 44px; /* min hit area for tappable controls (a11y) */
+  /* The side margin of a COMMITTED surface — a bottom sheet, a full-screen scene.
+     One number so the ＋ sheet, the scene head and the scene body can't drift
+     apart, and one place to buy content width back on a small phone: 22px each
+     side costs 44px of a 390px screen, which is most of a composer's clipped
+     placeholder. Browse surfaces (.hub__body and the pages inside it) keep their
+     own spacing — this is about the surfaces you open to DO something. */
+  --gutter: 22px;
+
+  /* ---- elevation (warm offset "printed" shadows — never gray) ----
+     The house look: paper laid on paper, lit from the top-left. Everything that sits
+     ON the page uses these. */
+  --shadow-sm: 2px 3px 0 rgba(72, 54, 30, 0.08);
+  --shadow-md: 3px 5px 0 rgba(72, 54, 30, 0.1), 0 2px 8px rgba(72, 54, 30, 0.06);
+  --shadow-lg: 5px 8px 0 rgba(72, 54, 30, 0.1), 0 10px 24px rgba(72, 54, 30, 0.1);
+  --shadow-press: 1px 1px 0 rgba(72, 54, 30, 0.12);
+
+  /* ---- elevation, FLOATING (neutral drop shadows for things lifted OFF the page) ----
+     A second family on purpose, not drift (bmad/12 #10, 2026-08-27). The warm offset
+     shadows above say "this sheet rests on that sheet"; they do not read at all on a
+     surface hovering over a dimmed backdrop or following a finger. Five hand-rolled
+     values had grown for exactly that case — a companion speech bubble, a raised kid
+     tile, the drag ghost, a print block, the tour coachmark — so it gets tokens rather
+     than being forced onto a scale that means something else.
+     Which to reach for: does the thing sit on the page, or above it? */
+  --shadow-float: 0 4px 14px rgb(0 0 0 / 0.16); /* a bubble, a small lifted card */
+  --shadow-float-md: 0 10px 30px rgb(0 0 0 / 0.16); /* a raised tile, a dragged ghost */
+  --shadow-float-lg: 0 16px 48px rgb(0 0 0 / 0.32); /* a coachmark / dialog over a scrim */
+  /* Deliberately NOT tokenised: the two UPWARD shadows (cercle.css, sheets/flyer.css,
+     both `0 -Npx`) are not elevation at all — they are an edge cue on a sticky bottom
+     bar, telling you content scrolls UNDER it. Two values doing one job that no other
+     surface needs; a token there would be tidiness, not clarity. */
+
+  /* ---- motion ---- */
+  --ease-soft: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+}
+
+/* Night: the wall tablet dims after dark (A5). Pip is a daytime palette; here we
+   sink it onto warm-dark stock, keep the inks (they read fine bright on dark),
+   and darken the washes so colour-coded tiles still hold. */
+:root[data-theme='night'] {
+  --paper: #1b1712;
+  --paper-deep: #221d16;
+  --card: #25201a;
+  --ink: #ece6d8;
+  --ink-soft: #a59d8c;
+  /* MEASURED 2026-08-27 (bmad/12 #8). The old #786f61 failed on the dark washes —
+     2.65:1 on marigold, 2.77 sage, 2.87 teal, 2.88 terracotta, 2.89 sky — i.e. below
+     even the 3:1 NON-text floor, for text. On --card it managed 3.26, still short of
+     the 4.5 body-text bar. Lifted until the WORST ground clears 4.5:1:
+       card 5.60 · paper 6.18 · marigold 4.54 · terracotta 4.93 · sage 4.75
+       sky 4.97 · berry 5.32 · teal 4.92
+     (--ink and --ink-soft were audited at the same time and pass everywhere —
+     --ink-soft is 4.87–6.62 — so the item's original worry was the wrong token.)
+
+     THE TRADE, said out loud: at night the faint tier now sits close to --ink-soft
+     (ΔL 0.026), so the three-step ink ramp is really two after dark. That is the
+     honest outcome — a bottom tier that cannot be read is not a tier. Day keeps all
+     three, since it has the headroom.
+     The alternative, if the flattened ramp ever bothers: darken every night wash by
+     14 and set --ink-faint #91887a, which restores a visible gap (ΔL 0.090) with
+     everything ≥4.51:1. It repaints the night palette's warmth, so it wants eyes on
+     it rather than a solo call. */
+  --ink-faint: #a09789;
+  --line: #38322a;
+  --line-strong: #4a4239;
+
+  --marigold-wash: #3a2f1c;
+  --terracotta-wash: #3a261e;
+  --sage-wash: #28301f;
+  --sky-wash: #1f2c33;
+  --berry-wash: #321f2c;
+  --teal-wash: #1d2e2c;
+
+  /* Berry was the one night-side glyph-on-wash fail (2.75:1) — lifted past 3:1. */
+  --berry-deep: #9a5a81; /* 3.04:1 on night --berry-wash */
+
+  /* Section ink tier on the dark washes: the BASE inks (not the deeps) already
+     read bright-on-dark; berry alone needed a lift. All ≥4.5:1 on their wash. */
+  --marigold-ink: #f2a03d; /* 6.16:1 */
+  --terracotta-ink: #e0724e; /* 4.53:1 */
+  --sage-ink: #88a36f; /* 4.90:1 */
+  --sky-ink: #7bb0c9; /* 6.07:1 */
+  --berry-ink: #b8789d; /* 4.54:1 */
+  --teal-ink: #34b3a6; /* 5.51:1 */
+
+  --accent-ink: #1b1712;
+  --on-primary: #1b1712;
+}
+
+/* --- Accessibility profile (#36) ----------------------------------------- */
+/* A high-contrast palette + a larger base text size, opt-in from Réglages ▸
+   Affichage, orthogonal to theme/daypart/audience. DOM-attribute driven on
+   <html> like data-theme (see src/lib/accessibility.ts). Absence = the base
+   presentation; presence overrides a few tokens / the root size only — no new
+   surfaces, so every component inherits it for free.
+
+   High contrast: deepen the inks and firm up the hairlines so text + dividers
+   read from across the room (and for low vision). Kept on-palette — this is
+   "sharper Pip", not a stark black-on-white theme that would break the warm,
+   calm look. Day rides the light palette; night gets its own brighter inks. */
+:root[data-contrast='high']:not([data-theme='night']) {
+  --card: #fffdf7;
+  --ink: #16120c;
+  --ink-soft: #4a4339;
+  --ink-faint: #756b5d;
+  --line: #d2bd96;
+  --line-strong: #b59a6b;
+}
+:root[data-contrast='high'][data-theme='night'] {
+  --ink: #fdfaf0;
+  --ink-soft: #cfc6b2;
+  --ink-faint: #9b917e;
+  --line: #4f463a;
+  --line-strong: #6a5f4f;
+}
+
+/* OS-level contrast preference (bmad/08 A-10): someone who asked their DEVICE for
+   more contrast gets the same "sharper Pip" bump without finding the Réglages
+   toggle. Only when no explicit in-app choice was made (no data-contrast
+   attribute) — the app toggle, once touched, wins either way. Same token values
+   as the blocks above; keep the two in sync. */
+@media (prefers-contrast: more) {
+  :root:not([data-contrast]):not([data-theme='night']) {
+    --card: #fffdf7;
+    --ink: #16120c;
+    --ink-soft: #4a4339;
+    --ink-faint: #756b5d;
+    --line: #d2bd96;
+    --line-strong: #b59a6b;
+  }
+  :root:not([data-contrast])[data-theme='night'] {
+    --ink: #fdfaf0;
+    --ink-soft: #cfc6b2;
+    --ink-faint: #9b917e;
+    --line: #4f463a;
+    --line-strong: #6a5f4f;
+  }
+}
+
+/* Larger text: the root font-size is unset (browser default ~16px), so most of
+   the type — which is sized in rem — scales together from one knob. Px-sized
+   bits (~20% of declarations) stay put, which keeps tight chrome from
+   overflowing while the readable body/labels grow. */
+/* THE CHROME COMPENSATOR. The ramp works by growing the root font-size, so EVERYTHING
+   sized in rem grows — including fixed-count chrome that has no room to grow into: the
+   six-up mobile nav, and the header's round button cluster that the greeting sizes
+   itself against. Those don't get more space at 130%, they get the same space with
+   bigger contents, so they clip.
+   That is not theory. Shot at 360px (2026-09-15, the first time anyone photographed the
+   enlarged app): at the SHIPPED 115% step « Réglages » was already cut to « Réglag… »,
+   and at 130% the page title went to « La l… » because the button cluster had eaten the
+   container the greeting measures.
+   So: content scales, NAVIGATION CHROME DOES NOT. `--chrome-scale` is the exact inverse
+   of each step, and the handful of chrome rules that must hold their size multiply by
+   it — staying in rem and in the token, rather than getting hard-coded px that would
+   then be wrong for everyone. Use it ONLY where a fixed-count row has no room; it is a
+   brake on the accessibility feature, and every use is a place a low-vision reader does
+   not get bigger text. */
+:root {
+  --chrome-scale: 1;
+}
+:root[data-text-scale='large'] {
+  font-size: 115%;
+  --chrome-scale: 0.87; /* 1 / 1.15 */
+}
+/* THE THIRD STEP, shipped 2026-09-15 after the one thing blocking it was measured
+   rather than eyeballed. It exists because this app removed the browser's own zoom
+   (index.html), which makes this knob the only way left to make text bigger.
+   It was HELD for half a day: the board greeting clipped to « Bon après- » at 360px.
+   The cause was not the ramp — it was ONE uncompensated child of the header's fixed
+   button cluster (`.help-toggle`, styles/sheets/help.css). Compensated, the cluster
+   holds 197px at every scale and the greeting reads whole at 390 AND 360. Measured:
+   the container it sizes against went 69px → 79px, back over the nowrap threshold.
+   130%, not more: past roughly here the px-sized chrome stops keeping pace. The
+   `simple` lens below goes to 140%, but that is a different PRESENTATION (giant
+   tiles, fewer words), not the same screen at a bigger size. */
+:root[data-text-scale='x-large'] {
+  font-size: 130%;
+  --chrome-scale: 0.77; /* 1 / 1.30 */
+}
+
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* Lock browser zoom (pairs with viewport user-scalable=no): pan-x/pan-y keeps
+     scrolling but disallows the pinch-zoom gesture that made fixed overlays
+     shimmer; it also drops double-tap-to-zoom. In-app zoom stays tap-to-
+     fullscreen (ZoomableImg). */
+  /* App-shell scroll lock. The document itself NEVER scrolls — #root is the one
+     scroller (and within it a page may have its own, e.g. .hub__body). Without
+     this the 100vh hub sits taller than the iOS visual viewport, so the page
+     could be dragged behind the toolbar UNDERNEATH the inner scroller — the "two
+     layers of scrolling" you feel. height:100% tracks the REAL viewport, not the
+     100vh phantom. */
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  /* Stop iOS from re-inflating text (and rescaling the whole layout) on a
+     landscape→portrait rotate — the "zoomed weirdly after rotating" bug. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Kiosk/PWA feel: no accidental text selection or the iOS long-press
+     callout when tapping/dragging the UI. Real editable fields opt back in
+     below so typing, caret placement, and copy still work where it matters. */
+}
+/* Re-enable selection where a human is actually editing or reading text they'd
+   want to copy. Keep this list in sync with any new text-entry primitive. */
+input,
+textarea,
+select,
+[contenteditable='true'],
+[contenteditable=''],
+.allow-select {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+/* Paper grain: a fixed, static fractal-noise wash so surfaces read as printed
+   riso stock rather than flat #fff (Pip). multiply at low opacity keeps it a
+   faint tooth on the cream; pointer-events:none so it never eats a tap. No
+   motion — it's texture, not a TV effect. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+#root {
+  position: relative;
+  z-index: 1;
+  /* The single document-level scroller. Pages that don't manage their own height
+     (auth, setup, marketing) scroll HERE; the hub fills it exactly so only
+     .hub__body scrolls. overflow-x:hidden also kills any stray horizontal
+     overflow, the usual trigger for the iPad rotate-rescale. */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  /* Reserve the scrollbar's space always, so the scroll lock below (overflow
+     :hidden) can't reclaim a gutter and nudge content sideways on desktop
+     classic-scrollbar browsers. No-op where scrollbars overlay (touch). */
+  scrollbar-gutter: stable;
+}
+/* Modal scroll lock (useModal). The document never scrolls — these two are the
+   only scrollers — so freezing THEM is what actually stops the page drifting
+   behind an open sheet/dialog. overflow:hidden keeps their scrollTop, so the
+   content holds its place and a touch gesture has nowhere to leak but the open
+   sheet (which then scrolls its own overflow, instead of moving the page). */
+html.scroll-locked #root {
+  overflow: hidden;
+}
+.mono {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+a {
+  color: inherit;
+}
+/* Bare buttons (icon-tile cards, today-hero / bigtile, setup choices, profile
+   faces, cat-pick, the toddler tiles) must follow the theme ink — NOT the UA
+   `ButtonText` system colour, which stays dark and turns their label dark-on-dark
+   in night mode. Class-styled buttons that set their own colour (.btn--primary,
+   active .subtabs__opt / .operator__tab, .tdl-start…) still win on specificity. */
+button {
+  color: inherit;
+}
+
+/* --- Primitives ----------------------------------------------------------- */
+.surface {
+  background: var(--card);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+/* A 390px phone (and narrower) gives the gutter back to the content: 16px a side
+   instead of 22px is +12px of typing width in every sheet and scene — measured
+   against « Ajouter un… », the clipped placeholder that started this pass. */
+@media (max-width: 400px) {
+  :root {
+    --gutter: 16px;
+  }
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  /* A comfortable thumb target everywhere — incl. the small icon-only ghost
+     buttons (✕, ＋, 📖) that would otherwise be ~30px and easy to miss. */
+  min-height: var(--touch-target);
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: var(--text-md);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--dur-fast) var(--ease-soft),
+    box-shadow var(--dur-fast) ease,
+    background var(--dur-fast) ease;
+}
+.btn:hover {
+  background: var(--paper);
+}
+.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-press);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* On the dark ground a 0.45-opacity marigold still reads as a rich, tappable
+   amber — desaturate + dim it further so a disabled primary (empty login/signup)
+   clearly reads inert at night, matching the muted look it has in day. */
+:root[data-theme='night'] .btn:disabled {
+  opacity: 0.4;
+  filter: grayscale(0.55);
+}
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+.btn--primary:hover {
+  background: var(--accent);
+  filter: brightness(0.96);
+}
+/* Icon-only square button — a compact, symbol-only action with no text label.
+   Always pair with aria-label + title (the symbol is the only cue). Keeps the
+   44px thumb target and never stretches. */
+.btn--icon {
+  width: 44px;
+  min-width: var(--touch-target);
+  padding: 0;
+  gap: 0;
+  flex: 0 0 auto;
+}
+.btn--ghost {
+  border-color: var(--line);
+  background: transparent;
+  padding: 0.4rem 0.7rem;
+}
+.btn--ghost.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* A de-emphasised, compact button for secondary on-page actions (e.g. Liste's
+   "Vider") — visually small and auto-width so it never competes with the content,
+   while keeping a comfortable tap target. */
+.btn--sm {
+  min-height: 38px;
+  padding: 0.3rem 0.8rem;
+  font-size: var(--text-sm);
+  box-shadow: none;
+}
+/* A full-width, roomy CTA — the one action a surface exists to commit (a bottom
+   sheet's "Ajouter", a lone "Nouvelle routine"). Opt IN per button. This used to
+   be an implicit context rule (`.sheet .btn`), which stretched EVERY button a
+   sheet happened to contain — including the mic inside a field box and the small
+   chips of a segmented row. A variant can't leak that way. */
+.btn--block {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.05rem;
+}
+/* The destructive confirm button (in-app confirm dialog). Warn ink with white
+   text — the one place delete is meant to read as a deliberate, weighty action,
+   unlike the quiet recede of an inline row delete. */
+.btn--danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--warn);
+  color: #fff;
+  border-color: var(--warn);
+  box-shadow: var(--shadow-md);
+}
+.btn--danger:hover {
+  /* Re-assert the warn ground: the generic `.btn:hover` (higher specificity via the
+     pseudo-class) would otherwise flip the background to --paper under the white
+     text — an unreadable washed-out hover. Mirrors .btn--primary:hover. */
+  background: var(--warn);
+  filter: brightness(0.96);
+}
+/* When viewportVars (lib/viewportVars.ts) scrolls a focused field to
+   block:'start' — so what you type stays above the on-screen keyboard — leave a
+   small gap above it instead of hugging the very top edge. Applies to EVERY
+   editable surface, not just `.input`, so fields with their own class
+   (recipe title, paste boxes, contentEditable) get the same breathing room. */
+input,
+textarea,
+[contenteditable] {
+  scroll-margin-top: 12px;
+}
+
+.input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  /* Finger-sized + never below 16px: a short input is hard to tap and to read
+     the text you typed, and a sub-16px field makes iOS Safari zoom on focus
+     (then leaves the page scrolled). 44px is the comfortable touch minimum. */
+  min-height: var(--touch-target);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+}
+/* A multi-line field grows from its rows; keep the min as a floor, not a fixed
+   height, so notes/paste boxes still expand. */
+textarea.input {
+  min-height: 3rem;
+  height: auto;
+}
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+/* Native date/time inputs (and selects) paint their placeholder text + picker
+   chrome from `color-scheme`, NOT our `color`. Without it iOS assumes a light
+   scheme and renders an EMPTY `type=date`/`type=time`'s placeholder ("jj/mm/aaaa",
+   "--:--") in a dark grey that's invisible on the app's dark themes — the field
+   just reads as an empty box (Marc, 2026-07-03). Bind the scheme to the active
+   theme so the native placeholder + picker flip light↔dark with the palette.
+   Scoped to `.input` (not :root) so no app surface gets a native repaint. */
+.input {
+  color-scheme: light;
+}
+:root[data-theme='night'] .input {
+  color-scheme: dark;
+}
+.tag {
+  font-family: var(--mono);
+  /* Type floor (bmad/08 A-10): nothing readable below --text-xs (~12.5px). */
+  font-size: var(--text-xs);
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.tag--on {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.tag--off {
+  color: var(--warn);
+  border-color: var(--warn);
+}
+/* A tag that's also the on/off control (the IA switch in the Réglages header):
+   inherits the pill look but behaves as a tappable button. */
+.tag--btn {
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tag--btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.eyebrow {
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--text-xs); /* type floor (A-10) — was 0.74rem */
+  margin: 0 0 0.5rem;
+}
+.error {
+  color: var(--warn);
+}
+.lead {
+  color: var(--ink-soft);
+  max-width: 50ch;
+}
+.loading {
+  padding: 2rem;
+  color: var(--ink-soft);
+}
+
+/* --- Skeleton (components/Skeleton.tsx) ----------------------------------- */
+/* The waiting state for a surface whose shape is already known: reserve the space
+   the rows/cards are about to take, so the first paint is the right size and
+   nothing jumps under a thumb already moving toward it.
+
+   NO SHIMMER, NO PULSE — deliberately. A shimmering placeholder performs, and this
+   app's stance is that a screen may not ask for attention it hasn't earned
+   (NFR-CALM). Opacity alone says "something is coming". Generalized from the
+   board's own ghost tiles, which now ride this family instead of a private copy. */
+.skeleton {
+  display: grid;
+  gap: var(--space-3, 12px);
+  margin-top: 0.75rem;
+}
+.skeleton__block {
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  opacity: 0.55;
+}
+/* A stacked list: one row's typical height, full width. */
+.skeleton--row .skeleton__block {
+  height: 56px;
+}
+/* A responsive grid of tiles, the same rhythm as the board masonry. */
+.skeleton--card {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.skeleton--card .skeleton__block {
+  height: 152px;
+}
+
+/* --- Layout --------------------------------------------------------------- */
+.page {
+  /* Fill the #root scroller (not 100vh — that's the iOS phantom height that
+     let the document scroll behind inner scrollers). Content taller than the
+     viewport scrolls #root; the hub overrides this with its own fixed height. */
+  min-height: 100%;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.topbar__brand {
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.topbar__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.narrow {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 22rem;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.field__label {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+/* The sub-tab nav + its contextual "?" help toggle on one row; the segmented
+   control flexes to fill, the round toggle sits beside it (matches the board). */
+.subtabs-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 1.25rem;
+  /* The row carries a trailing slot (a launch button, a collapsible search loupe),
+     and a hand-rolled non-wrapping flex row of controls is the exact shape that
+     overflows silently here — #root/.hub__body clip it, so the eye and a
+     scrollWidth check both read "fine" (CLAUDE.md § Horizontal overflow). Let it
+     take a second line instead: at normal widths nothing moves, and when the
+     trailing control EXPANDS (SearchField's open state) the row grows down rather
+     than off the right edge. */
+  flex-wrap: wrap;
+}
+.subtabs-row .subtabs {
+  flex: 1;
+  margin: 0;
+}
+/* In-page section switch (Repas · Garde-manger · Recettes): one job at a time so
+   the kitchen isn't a five-section scroll. Mirrors the board's segmented control. */
+.subtabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  margin: 0 0 1.25rem;
+  border-radius: var(--radius-pill);
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+  /* Graceful scroll when the segments can't all fit (e.g. Le cercle's five
+     icon+word sections on a 360px phone) — the tabs keep their full labels and the
+     row scrolls sideways instead of clipping the last one off-screen. A no-op when
+     they fit (the common 3-tab case): overflow-x:auto only scrolls on overflow. This
+     folds the old bespoke .cercle-sectionswitch behaviour into the shared primitive. */
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox — keep the pill clean */
+}
+.subtabs::-webkit-scrollbar {
+  display: none; /* WebKit/Blink — no scrollbar rail under the pill */
+}
+.subtabs__opt {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: var(--text-md);
+  cursor: pointer;
+  /* Keep each label on one line — a hyphenated label like « Garde-manger » was
+     breaking mid-word and making the whole pill row two lines tall. If nowrap ever
+     makes the segments exceed the width, the row scrolls (see .subtabs) rather than
+     wrapping. */
+  white-space: nowrap;
+}
+.subtabs__opt.is-on {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+/* Mouse affordance for an overflowing pill row. `.subtabs` hides its scrollbar, and a
+   mouse wheel only emits deltaY — which no browser maps onto a horizontal scroller —
+   so a wide row (Réglages ▸ Système's nine subs) had its right-hand tabs unreachable
+   with a mouse. <SubTabs> renders these ONLY while the row actually overflows; the
+   wheel is translated by useHScroll and the keyboard already has ←/→ on the tablist.
+   Fine pointer only: on a touch surface you swipe the row, and two chevrons would eat
+   the pill's width on a phone. */
+.subtabs-row__arrow {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper-deep);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .subtabs-row__arrow {
+    display: inline-flex;
+  }
+}
+.subtabs-row__arrow:hover:not(:disabled) {
+  color: var(--ink);
+}
+.subtabs-row__arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* --- Row primitives: Cluster & Rail --------------------------------------- */
+/* The two sanctioned ways to lay out a horizontal row of things (buttons, chips,
+   controls) so it NEVER bleeds off the right edge on a narrow phone. Reach for one
+   of these before hand-rolling a flex row — a bespoke row with a fixed `flex-basis`
+   is the #1 source of x-overflow here, because a basis smaller than the item's
+   content makes flexbox keep everything on one line and overflow instead of wrapping.
+   See <Cluster> / <Rail> in components/Layout.tsx and the /dev/kit gallery.
+
+   Choose by intent:
+   • CLUSTER — the item order doesn't matter and the row MAY wrap to more lines when
+     it doesn't fit (action bars, chip/tag rows, filter buttons). The default.
+   • RAIL — the items form one continuous sequence that must stay on a single line
+     (a segmented control, a timeline, a filmstrip); when it can't fit, it SCROLLS
+     sideways rather than wrapping. Same idea as .subtabs. */
+
+/* CLUSTER — wrap-safe flex row. Children shrink to their content and drop to the
+   next line when they run out of room. min-width:0 on every child so a long word /
+   flex item can shrink past its content-min instead of forcing the row wider. */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster-gap, 0.5rem);
+  min-width: 0;
+}
+.cluster > * {
+  min-width: 0;
+}
+/* Grow each child to share the row evenly, still wrapping when they can't fit.
+   `flex: 1 1 auto` — basis AUTO (tracks the content) is what keeps wrapping honest;
+   a fixed basis (e.g. `1 1 6rem`) is the trap that overflows instead of wrapping. */
+.cluster--fill > * {
+  flex: 1 1 auto;
+}
+.cluster--between {
+  justify-content: space-between;
+}
+.cluster--end {
+  justify-content: flex-end;
+}
+
+/* RAIL — one-line row that scrolls sideways on overflow instead of clipping the last
+   item (generalises the .subtabs behaviour). Children keep their size and stay in a
+   row; the momentum scroll is touch-friendly and the scrollbar is hidden for calm. */
+.rail {
+  display: flex;
+  align-items: center;
+  gap: var(--cluster-gap, 0.5rem);
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+.rail::-webkit-scrollbar {
+  display: none; /* WebKit/Blink */
+}
+.rail > * {
+  flex: 0 0 auto; /* never shrink — that's what makes it scroll, not squish */
+}
+
+/* ==== "This row continues" — the edge fade =================================
+   Every side-scrolling row here hides its scrollbar (calm), and the ‹ › chevrons
+   only appear on a fine pointer — so on a PHONE a cut-off rail looked like a rail
+   that simply ended: the Réglages tab rail hid five tabs, and a sort chip read as
+   the meaningless « R… » (UX review 2026-07-14). A soft fade at whichever edge has
+   more content is the quiet, universal cue that there IS more.
+
+   Driven purely by the attributes `useHScroll` stamps (lib/hscroll.ts), so any row
+   that adopts the hook gets this for free — `.rail`, `.subtabs`, the Réglages tab
+   rail, DrawPad's tool rows. No layout change: a mask only paints. */
+[data-hs] {
+  --hs-fade: 28px;
+  /* Both edges start opaque; the two rules below open whichever side can scroll. */
+  --hs-l: 0px;
+  --hs-r: 0px;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--hs-l),
+    #000 calc(100% - var(--hs-r)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--hs-l),
+    #000 calc(100% - var(--hs-r)),
+    transparent 100%
+  );
+}
+[data-hs-start] {
+  --hs-l: var(--hs-fade); /* content is hidden to the LEFT */
+}
+[data-hs-end] {
+  --hs-r: var(--hs-fade); /* …and/or to the RIGHT */
+}
+
+.kitchen__day-empty {
+  font-size: var(--text-md);
+  opacity: 0.7;
+}
+/* "💡 Léa" — a kid suggested this supper into an empty slot. Quiet, so it reads as
+   a note beside the meal, not a second meal. */
+.kitchen__day-sugg {
+  /* Its OWN line below the meal (the .kitchen__day wrap was always meant to drop
+     it here). Beside the title it competed for width and — because flex shrinks
+     the larger-content item hardest — collapsed the title into a one-letter-per-
+     line column. Full-basis takes it out of that fight; a long name ellipsizes. */
+  flex: 0 0 100%;
+  min-width: 0;
+  max-width: max-content;
+  font-size: var(--text-xs);
+  color: var(--terracotta-deep);
+  background: var(--terracotta-wash);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Focus-visible rings (a11y) ------------------------------------------- */
+/* Keyboard / switch / desktop-operator + guest users need a visible focus cue on
+   every core tappable, not just .input. One consistent ring across the system:
+   2px solid --focus-ring, offset 2px so it clears the pill / rounded corners and
+   reads even on a marigold-filled active control. Additive — the :active press
+   feedback (translate + shadow) is untouched; this only paints for keyboard
+   focus. Kit / hub primitives carry the same rule in their own files. */
+.btn:focus-visible,
+.tag--btn:focus-visible,
+.subtabs__opt:focus-visible,
+.board__list-item:focus-visible,
+/* .chip is defined across kitchen/almanac/cercle — the shared ring lives HERE
+   (affordance audit 2026-07-14: chips are primary nav yet had no focus cue). */
+.chip:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Screen-reader-only text: present to AT, invisible on screen. The standard clip
+   recipe (not display:none / visibility:hidden, which AT skips entirely). Used by
+   polite live regions that announce a move an on-screen cue already conveys —
+   e.g. the routine player's step position, where the TTS narration (which is NOT a
+   screen reader) leaves an AT user with silence. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A MINI segmented control keeps its segments; the row's other furniture wraps.
+   Maison's view switch is `mini` AND shares its row with a search loupe and the
+   « Notre monde » launcher. With `.subtabs { flex: 1 }` the segmented control was the
+   only thing that shrank, so at 360px its third segment (« Arbre ») sat entirely
+   off-screen with no cue — photographed 2026-09-10, the first time the sweep shot a
+   narrow phone. Chevrons are not the answer here: they cost ~72px of a 320px line and
+   left ONE segment visible where two had been (measured, then reverted).
+   `flex: 0 1 auto` lets the control size to its content — `.subtabs-row` already wraps,
+   so the trailing controls drop to a second line instead, which is what Cluster would
+   have done. The full-size rows are untouched: they are the tab's primary nav and are
+   meant to page.
+   And it is scoped to the narrow case ON PURPOSE: unscoped, the trailing controls
+   wrapped at 390px too and cost 43px of chrome at the most common width — the
+   contentTopPx ratchet caught that within a minute (417px against a 411 budget), which
+   is exactly the trade it exists to refuse. Below 380px there is no such trade: the
+   choice there is a wrapped line or an invisible segment. */
+@media (max-width: 380px) {
+  .subtabs-row .subtabs--mini {
+    flex: 0 1 auto;
+  }
+}
+

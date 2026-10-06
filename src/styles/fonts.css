@@ -1,0 +1,55 @@
+/* Self-hosted fonts (the files ship in the @fontsource packages; Vite bundles and hashes
+   them, the service worker precaches them): the headline face (Baloo 2) and the body face
+   (Hanken Grotesk). WOFF2 only — every browser that can run the app reads it, and the
+   packages' own CSS also emits a WOFF fallback that would double the precache for nothing.
+   Latin subset only: it covers every French accent, the guillemets and the typographic
+   apostrophe. font-display: swap, so text paints at once in the system face. */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('@fontsource/baloo-2/files/baloo-2-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/baloo-2/files/baloo-2-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url('@fontsource/baloo-2/files/baloo-2-latin-800-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2') format('woff2');
+}

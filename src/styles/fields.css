@@ -1,0 +1,172 @@
+/* --- EditField: the ONE add/edit text box (src/components/EditField.tsx) ----
+   The clear ✕ and the mic live INSIDE a bordered box that looks like an input,
+   so a row reads as "field + at most one or two compact actions" instead of the
+   old tall stack of full-width buttons. Secondary actions demote to a quiet chip
+   row below. Touch targets stay ≥40px for a wall tablet / toddler thumb. */
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-basis: 100%;
+  min-width: 0;
+}
+.edit-field__row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  /* The size container the CTA rule below queries — the ROW, never .edit-field
+     (see the block for why). */
+  container: edit-field / inline-size;
+}
+/* The box owns the border + focus ring; the input inside is borderless so the
+   clear/mic buttons sit flush with the text as one field. */
+.edit-field__box {
+  /* A shrink-friendly basis for the ordinary row (box + one or two 44px icons).
+     A LABELED CTA overrides it to 100% under a narrow container — that pairing is
+     what used to squeeze the text; see « A labeled CTA never squeezes the text »
+     below, and src/styles/field-fit.test.ts, which forbids any OTHER host from
+     re-introducing a fixed basis here. */
+  flex: 1 1 10rem;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-height: var(--touch-target);
+  padding-right: 0.25rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+.edit-field__box:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.edit-field__input.input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+/* The glyph already provides the left inset — don't double it. */
+.edit-field__lead + .edit-field__input.input {
+  padding-left: 0.4rem;
+}
+.edit-field__input.input:focus {
+  outline: none;
+}
+/* ── A labeled CTA never squeezes the text ────────────────────────────────────
+   The rule this file exists to state: a composer you deliberately OPENED spends
+   its width on content. Lean is about the chrome you scroll past on a browse
+   surface (LEAN.md); once a field is on screen because you asked for it, the
+   opposite applies — full width, the button underneath, room to read what you
+   typed.
+
+   It used to fail exactly the other way. A labeled submit rode BESIDE the box on
+   one line and could never wrap, because `flex: 1 1 10rem` under-reports the
+   box's width — the fixed-flex-basis trap CLAUDE.md names under « Horizontal
+   overflow ». On a 390px phone the ＋ sheet's « Restants » row spent ~178px on
+   « ＋ À finir bientôt », left the box on its 160px basis, and the mic + caret ate
+   ~90px of THAT: ~60px of typing width, placeholder clipped to « Ajouter un ».
+
+   So under 30rem of row the box takes the whole line and the CTA drops beneath it.
+   `flex: 1 1 10rem` on the button (not `width: 100%`) so it still shares that
+   second line with a trailing ✕ / 🔍 / a second CTA when they fit, and grows to
+   full width when it's alone. Wider hosts — a settings form, the 40rem kiosk
+   sheet — keep the compact inline row they were designed for.
+
+   The container is the ROW, not `.edit-field`: a row's width always comes from
+   its parent (it stretches inside the field's flex column), so inline-size
+   containment can never change the width it measures. Rows without a labeled CTA
+   (an icon-only ✓, the deck word row, an inline row editor) carry no `--cta` and
+   are untouched — they were never the problem.
+
+   This replaces `.bento .edit-field__box { flex-basis: 100% }`, the same fix
+   applied once by hand for board cards; every host now gets it by width. */
+@container edit-field (max-width: 30rem) {
+  .edit-field--cta .edit-field__box {
+    flex-basis: 100%;
+  }
+  .edit-field--cta .edit-field__submit {
+    flex: 1 1 10rem;
+  }
+}
+/* The in-box affordance budget. Every icon INSIDE the box — the clear ✕, the mic,
+   the 📎, the combobox caret — is a 44px touch target (a11y floor: never shrink
+   one), so three of them spend 132px of the field before a character is typed.
+   Once the box owns its whole line that is affordable; in a genuinely tight host
+   (a ~300px board card, a narrow phone) it isn't. The decorative leading glyph is
+   what goes: it is aria-hidden, the field's own aria-label carries the meaning,
+   and its ~29px is the difference between reading the placeholder and guessing at
+   it. Deliberately a smaller threshold than the stack above — it should fire only
+   where the width is actually scarce, not on every phone. */
+@container edit-field (max-width: 22rem) {
+  .edit-field__lead {
+    display: none;
+  }
+}
+/* The inline clear ✕ / icon submit / trash — a quiet icon button, mirroring
+   the row-actions affordance so the whole app shares one look. Sized to the
+   shared 44px touch target (E-40 a11y pass). */
+.edit-field__icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+.edit-field__icon-btn:hover,
+.edit-field__icon-btn:focus-visible {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+.edit-field__icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.edit-field__icon-btn--danger:hover,
+.edit-field__icon-btn--danger:focus-visible {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+}
+/* A quiet decorative glyph inside the box, left of the text (the ✎ / 🥕 / ❄ the
+   ＋ sheet's old hand-rolled `.sheet__field` drew). Never interactive. */
+.edit-field__lead {
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding-left: 0.55rem;
+  color: var(--ink-faint);
+}
+.edit-field__submit {
+  flex: none;
+}
+/* Past the soft length cap (EditField / EntityCombobox `limit`): the box stays
+   typable, THIS line says the save would cut the text, and the submit is off
+   until it's trimmed — instead of the server slicing the tail silently after the
+   write. .status-msg is a nowrap flex line by default; wrap it here so the live
+   count can drop to a second line on a phone rather than push the row wide
+   (no horizontal overflow — standing rule). */
+.edit-field__over {
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+.edit-field__over span[aria-hidden] {
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* A thin wrapped row of secondary actions (Choisir une recette, Restants…) —
+   quiet chips under the field, never the old full-width stacked buttons. */
+.edit-field__secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

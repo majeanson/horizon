@@ -1,0 +1,16 @@
+# Horizon — one Worker that serves the built SPA. No D1, no R2, no AI, no secrets, no cron:
+# a household's profile lives in the browser and nothing here could read it if it tried.
+name = "horizon"
+main = "worker/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Unknown paths fall back to index.html so client-side routes survive a reload. (worker/index.ts
+# turns that fallback into a 404 for /assets/*, where a page is always the wrong answer.)
+not_found_handling = "single-page-application"
+
+[observability]
+enabled = true
