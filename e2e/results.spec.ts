@@ -113,6 +113,32 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   expect(problems).toEqual([])
 })
 
+// « Paramètres utilisés » is where a stranger checks the engine against the government: it must send a French reader to the
+// French page and an English reader to the English one, write numbers the way each language does, and say plainly when the
+// agency publishes a page in one language only.
+test('« Paramètres utilisés » follows the reader\'s language: the page, the number, and an honest label when there is no edition', async ({ page }) => {
+  await page.goto('/resultats')
+  await page.getByRole('button', { name: 'Paramètres utilisés' }).click()
+  const row = (name: RegExp) => page.getByRole('row', { name })
+
+  // French reader: the French edition, « 1 507,65 », and a French-only page needs no label.
+  await expect(row(/rrq\.maxPension65/)).toContainText(/1\s507,65/)
+  await expect(row(/rrq\.maxPension65/).getByRole('link')).toHaveAttribute('href', /retraitequebec\.gouv\.qc\.ca\/fr\//)
+  await expect(row(/quebec\.creditRate/)).not.toContainText('page en anglais seulement')
+  await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTFR_/)
+
+  await page.getByRole('button', { name: 'EN', exact: true }).click()
+  if (!(await page.getByRole('row', { name: /rrq\.maxPension65/ }).isVisible())) await page.getByRole('button', { name: 'Parameters used' }).click()
+
+  // English reader: the English edition, « 1,507.65 », the English parameters PDF, and an honest label on the fiche that
+  // exists in French only.
+  await expect(row(/rrq\.maxPension65/)).toContainText('1,507.65')
+  await expect(row(/rrq\.maxPension65/).getByRole('link')).toHaveAttribute('href', /retraitequebec\.gouv\.qc\.ca\/en\//)
+  await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTEN_/)
+  await expect(row(/quebec\.creditRate/)).toContainText('French-language page only')
+  await expect(row(/quebec\.creditRate/).getByRole('link')).toHaveAttribute('lang', 'fr')
+})
+
 test('no chart or table runs past the right edge on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
   await page.goto('/resultats')

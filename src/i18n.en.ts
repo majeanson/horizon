@@ -320,6 +320,8 @@ export const EN: typeof FR = {
       retrieved: (date: string) => `retrieved ${date}`,
       toVerify: 'to confirm',
       count: (n: number) => (n === 1 ? '1 figure' : `${n} figures`),
+      entries: (n: number) => `${n} entries`,
+      pageIn: (lang: 'fr' | 'en'): string => (lang === 'fr' ? 'French-language page only' : 'English-language page only'),
     },
   },
 

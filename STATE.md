@@ -116,6 +116,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] Every page names the browser tab (`Résultats · Horizon`); a blank profile says where to start
 - [x] `.github/workflows/sources.yml`: every cited page — the figures' AND the ⓘ links, in both languages — is opened weekly; a gone or erroring page fails the job; a page that refuses bots (Revenu Québec, legisquebec) is reported as blocked, never fatal
 - [x] Deployed to https://horizon.marc-jeanson.workers.dev with `npm run deploy` (local `wrangler login`)
+- [ ] Language, what is still one-language: the « Paramètres utilisés » figure column shows the engine's ids (`rrq.mga`) in both languages — a human label per figure (96 × 2) is open; `SOURCES.md` is French (it lists both editions of each page); `index.html`'s description / Open Graph tags and the install manifest are French (a static file cannot follow the reader); 7 cited pages exist in one language only (`twins.ts` says which and why)
 - [ ] **Deploy on push**: add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets (Settings ▸ Secrets and variables ▸ Actions). Until then CI skips the deploy job cleanly and a deploy is `npm run deploy` from a logged-in machine
 
 ## 5. Lessons carried over from Babillard

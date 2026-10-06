@@ -143,6 +143,24 @@ describe('« où trouver ce chiffre » — the ⓘ copy', () => {
     }
   })
 
+  // A FRENCH reader sent to an English page (or the reverse) is the quietest way for a « où trouver ce chiffre » note to fail:
+  // the link works, the page is real, and the person cannot read it. The French note for wage growth linked the English
+  // Retraite Québec page — and said so in its own text — while the French edition was one link away.
+  // The agencies say their language in the address: /fr/ · /fra/ and /en/ · /eng/. An address that says neither is not judged.
+  it('every link goes to a page in ITS dictionary\'s language: no /en/ page in the French notes, no /fr/ page in the English ones', () => {
+    const frenchWord = /\/(fr|fra)\//
+    const englishWord = /\/(en|eng)\//
+    for (const [id, e] of Object.entries(FR.info as Record<string, { url: string }>)) if (e.url) expect(englishWord.test(e.url), `FR ${id} links an English page: ${e.url}`).toBe(false)
+    for (const [id, e] of Object.entries(EN.info as Record<string, { url: string }>)) if (e.url) expect(frenchWord.test(e.url), `EN ${id} links a French page: ${e.url}`).toBe(false)
+    for (const l of FR.assumptions.presets.links) expect(englishWord.test(l.url), `FR preset link ${l.url}`).toBe(false)
+    for (const l of EN.assumptions.presets.links) expect(frenchWord.test(l.url), `EN preset link ${l.url}`).toBe(false)
+    // …and the detector sees both families of address.
+    expect(englishWord.test('https://www.canada.ca/en/x')).toBe(true)
+    expect(englishWord.test('https://laws-lois.justice.gc.ca/eng/acts/x')).toBe(true)
+    expect(frenchWord.test('https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action')).toBe(true)
+    expect(frenchWord.test('https://laws-lois.justice.gc.ca/fra/lois/x')).toBe(true)
+  })
+
   it('the scenario picker’s source links are https, on a government or a named reference host, and the same pages in both languages', () => {
     const hosts = (links: readonly { url: string }[]) => links.map((l) => new URL(l.url).hostname)
     for (const links of [FR.assumptions.presets.links, EN.assumptions.presets.links]) {

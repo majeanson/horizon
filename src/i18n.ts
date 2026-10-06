@@ -336,6 +336,9 @@ export const FR = {
       retrieved: (date: string) => `consulté le ${date}`,
       toVerify: 'à confirmer',
       count: (n: number) => (n === 1 ? '1 chiffre' : `${n} chiffres`),
+      entries: (n: number) => `${n} valeurs`,
+      // The page a French reader is sent to when the agency publishes no French edition of it (or the reverse).
+      pageIn: (lang: 'fr' | 'en'): string => (lang === 'fr' ? 'page en français seulement' : 'page en anglais seulement'),
     },
   },
 
@@ -519,8 +522,8 @@ export const FR = {
     wageGrowth: {
       where: 'Retraite Québec publie le maximum des gains admissibles (MGA) de chaque année, de 1966 à 2026 : 74 600 $ en 2026. Le rapport entre deux années donne la hausse des salaires.',
       label: '',
-      url: 'https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions',
-      note: 'De 2016 (54 900 $) à 2026 (74 600 $), le MGA a crû d’environ 3,1 % par année ; les normes 2026 retiennent 3,1 % aussi, et le scénario Neutre de même. La page est en anglais.',
+      url: 'https://www.retraitequebec.gouv.qc.ca/fr/programmes/regime-rentes-quebec/travail-et-cotisations/revenus-travail-admissibles-et-cotisations',
+      note: 'De 2016 (54 900 $) à 2026 (74 600 $), le MGA a crû d’environ 3,1 % par année ; les normes 2026 retiennent 3,1 % aussi, et le scénario Neutre de même.',
     },
     returns: {
       where: 'Le rendement de chaque compte figure sur le relevé annuel de votre courtier ou de votre assureur (« rendement personnel » ou taux annualisé) ; leurs frais, sur le rapport annuel sur les frais.',

@@ -1,5 +1,6 @@
 import { citedLeaves } from '../src/engine/params/cited.ts'
 import { KNOWN, SERIES } from '../src/engine/params/index.ts'
+import { TWINS } from '../src/engine/params/twins.ts'
 import { FR } from '../src/i18n.ts'
 import { EN } from '../src/i18n.en.ts'
 
@@ -34,6 +35,15 @@ for (const { path, cited } of leaves) {
   const e = urls.get(cited.source.url) ?? { title: cited.source.title, uses: [] }
   e.uses.push({ path, retrieved: cited.source.retrieved })
   urls.set(cited.source.url, e)
+}
+
+// …and every page's TWIN in the other language (engine/params/twins.ts): the French UI links the French edition, so a
+// French link that has gone is as broken for a French reader as an English one is for an English reader.
+for (const [primary, entry] of Object.entries(TWINS)) {
+  if (!entry.twin) continue
+  const e = urls.get(entry.twin.url) ?? { title: entry.twin.title, uses: [] }
+  e.uses.push({ path: `twin (${entry.lang === 'en' ? 'fr' : 'en'}) of ${primary.split('/').slice(-1)[0]}`, retrieved: '' })
+  urls.set(entry.twin.url, e)
 }
 
 // …and the pages the ⓘ « où trouver ce chiffre » notes send a person to, in both languages: a dead link there sends

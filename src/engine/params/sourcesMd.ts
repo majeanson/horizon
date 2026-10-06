@@ -1,4 +1,5 @@
 import { citedLeaves, type Bracket, type Cited } from './cited.ts'
+import { TWINS } from './twins.ts'
 
 // SOURCES.md, rendered from the params files — never hand-written.
 //
@@ -57,7 +58,10 @@ const INDEX_LABEL: Record<Cited['index'], string> = {
 
 function rows(leaves: { path: string; cited: Cited<unknown> }[]): string[] {
   return leaves.map(({ path, cited: c }) => {
-    const page = `[${cell(c.source.title)}](${c.source.url})`
+    // …and the same page in the OTHER language when the agency publishes one (twins.ts), so a check can start in either.
+    const entry = TWINS[c.source.url]
+    const twin = entry?.twin ? ` · [${entry.lang === 'en' ? 'version française' : 'English version'}](${entry.twin.url})` : ''
+    const page = `[${cell(c.source.title)}](${c.source.url})${twin}`
     const idx = INDEX_LABEL[c.index] + (c.round === undefined ? '' : ` · arrondi ${c.round}`)
     const note = [c.source.verify ? `**⚠ À VÉRIFIER :** ${c.source.verify}` : '', c.source.note ?? ''].filter(Boolean).join(' ')
     return `| \`${path}\` | ${cell(renderValue(c.value))} | ${page} | ${c.source.retrieved} | ${idx} | ${cell(note)} |`
@@ -77,7 +81,8 @@ export function renderSourcesMd({ years, series }: SourcesInput): string {
   out.push('> qu’imprimés), le jour de la lecture, et la façon dont elle évolue d’une année à l’autre quand aucune page')
   out.push('> officielle ne couvre encore l’année visée (*prix* = indexée à l’IPC, *salaires* = indexée aux salaires,')
   out.push('> *fixe* = constante légale, *observation* = série historique, jamais projetée).')
-  out.push('> **Pour contre-vérifier :** ouvrez le lien, trouvez la ligne citée, comparez la valeur.')
+  out.push('> **Pour contre-vérifier :** ouvrez le lien, trouvez la ligne citée, comparez la valeur. Quand l’organisme publie la page')
+  out.push('> dans l’autre langue, la seconde édition est liée à côté (« version française » / « English version »).')
   out.push('> Une ligne marquée **⚠ À VÉRIFIER** n’a pas pu être confirmée sur une page que vous pouvez ouvrir et comparer (copie archivée,')
   out.push('> valeur dérivée par calcul, résumé plutôt que page) : la raison est écrite sur la ligne.')
   out.push('')
