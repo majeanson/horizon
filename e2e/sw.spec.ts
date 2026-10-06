@@ -180,8 +180,10 @@ test('offline, the saved profile is intact and the results — the chart and the
   await page.getByRole('button', { name: /Et si l’avenir est un peu moins bon/ }).click()
   await page.getByRole('button', { name: 'Calculer' }).click()
   await expect(page.getByRole('button', { name: 'Calculer' })).toBeEnabled({ timeout: 90_000 })
-  await expect(page.locator('.sensitivity tbody td')).toHaveCount(27)
-  await expect(page.locator('.sensitivity td.is-base').nth(1)).toHaveText('60')
+  // 27 cells = three 3 × 3 grids. The panel also holds the scenarios table above them (prudent / neutral / bold), which is
+  // not part of the count: scope to the grids, as results.spec.ts does.
+  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
+  await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('60')
 
   expect(failed, 'nothing the offline app asked for failed').toEqual([])
   expect(consoleErrors).toEqual([])
