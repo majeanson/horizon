@@ -121,7 +121,7 @@ npm run e2e:sw         # the service-worker offline harness on the PROD bundle
 npm run deploy         # build + wrangler deploy
 ```
 
-Run one file or one test: `npx vitest run src/engine/rrq.test.ts` · `npx vitest run -t "drop-out"`.
+Run one file or one test: `npx vitest run src/engine/rrq.props.test.ts` · `npx vitest run -t "drop-out"`.
 
 CI (`.github/workflows/ci.yml`) runs typecheck → test → build → check:bundle → knip on every
 push; on `main` it then deploys. E2E (`e2e.yml`) chains off a green CI and never blocks the

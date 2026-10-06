@@ -19,7 +19,7 @@
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
 | **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (96 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
-| **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
+| **Live** | https://horizon.marc-jeanson.workers.dev · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
 ## 2. The document map
@@ -31,7 +31,7 @@
 | `CLAUDE.md` | the law: how to write code here, the guards, the commands |
 | `ENGINE.md` | the calculation contract: conventions, what is official vs simplified, how trust is earned |
 | `COMPONENTS.md` | the shared-UI inventory, paired with the `/dev/kit` gallery |
-| `SOURCES.md` | *generated* — every government parameter, its official page and retrieval date *(arrives in Phase 1)* |
+| `SOURCES.md` | *generated* (`npm run sources`) — every government parameter, its official page and retrieval date |
 
 **The checkbox convention** (repo-wide): `- [ ]` is **open work**, and lives only in this file ·
 `- [x]` done, with what settles it · `- [~]` parked, with the why · `❓` an open question.
@@ -55,14 +55,15 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `params/2026.ts` — every leaf from its official page; the 6,30 % splits 5,3 base + 1,0 first additional (settled)
 - [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
-- [ ] Ten figures carry a `verify` reason (the six GIS knees and divisors derived from the Act — the knees now confirmed there, the divisors still derived; Revenu Québec's bracket rates and line 361 read through an archive; the Québec worker-deduction rate; one derived TFSA total): confirm each on an openable page and lower the ratchet in `cited.test.ts`
+- [ ] Eight figures carry a `verify` reason — the four GIS divisors derived from the Act's wording; Revenu Québec's bracket rates and its line-361 age rule (read through an archive: the host blocks bots); the Québec worker-deduction rate (read in the statute's wording, the fiche refused a robot); one derived TFSA total. Confirm each on an openable page and lower the ratchet in `cited.test.ts`
+- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the Québec bracket rates page and the TP-1.G wording behind the retirement-income age rule; the QPP Act's rounding of the 15 % drop-out (nearest vs up); the QPP contribution boundary at 72; RREGOP's deferred-member (left-before-pension) reduction rule; the CRA's T5008 « case 20 » caveat page; the OAS estimator's residence wording
 
 ### Phase 2 — RRQ
 
 - [x] Contributions; contributory period, 15 % drop-out and the base 25 % — the leaflet's worked example to the cent; a full career yields the published $1 441.25 base maximum
 - [x] The two additional components (phase-in 15/30/50/75 %, 480 months) — the published 2026 maximum $1 507.65 reproduced
 - [x] Early / late adjustment (the sliding 0,5–0,6 % rule, settled; the 72-year cap)
-- [ ] RRQ property tests (monotone in earnings, linear below the ceiling, zero career → zero)
+- [x] RRQ property tests (monotone in earnings, linear below the ceiling, zero career → zero) — `engine/rrq.props.test.ts`
 
 ### Phase 3 — OAS and GIS
 

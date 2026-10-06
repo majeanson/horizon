@@ -205,13 +205,11 @@ export const P2026 = {
       },
       topUpStartSingle: c(2_000, 'fixed', {
         ...OAS_ACT,
-        note: 's. 12.1(1): the top-up falls with income « in excess of $2,000 » (a single pensioner).',
-        verify: 'Montant lu dans le texte de la Loi ; certaines sources le disent indexé, mais aucune page canada.ca consultée ne donne sa valeur actuelle. Il ne sert qu’à placer le coude de la courbe du SRG.',
+        note: 's. 12.1(1): the top-up falls with income « in excess of $2,000 » (a single pensioner). s. 12.1(3) adjusts only the amount « A » to the cost of living — never these thresholds — and the published top-up cut-off reconstructs from a $2,000 knee exactly.',
       }),
       topUpStartCouple: c(4_000, 'fixed', {
         ...OAS_ACT,
-        note: 's. 12.1(1)(b), (2): for a couple, « in excess of $4,000 » of the combined income.',
-        verify: 'Même réserve que pour une personne seule : montant lu dans la Loi, valeur actuelle non confirmée sur une page canada.ca.',
+        note: 's. 12.1(1)(b), (2): for a couple, « in excess of $4,000 » of the combined income. Not indexed either (s. 12.1(3) adjusts only « A »).',
       }),
       baseDivisorSingle: c(24, 'fixed', {
         ...OAS_ACT,

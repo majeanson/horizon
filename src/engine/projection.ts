@@ -26,8 +26,6 @@ import type { AccountKind, Assumptions, Household, Person, PersonId, PersonYear,
 // Everything in a row is in THAT YEAR's dollars: inflation grows spending, savings and the cost-of-living
 // parameters; wage growth grows salaries.
 
-const ACCOUNTS: readonly AccountKind[] = ['nonReg', 'rrsp', 'tfsa']
-
 interface PersonState {
   rrsp: number
   rrspRoom: number
@@ -48,7 +46,6 @@ interface ResolvedPerson {
   earnings: Record<number, number>
 }
 
-const emptyAccounts = (): Record<AccountKind, number> => ({ nonReg: 0, rrsp: 0, tfsa: 0 })
 const sum = (xs: readonly number[]): number => xs.reduce((s, x) => s + x, 0)
 
 /** The wage-grown salary a person earns in a year, before the retirement date cuts it off. */
@@ -342,7 +339,7 @@ function simulateYear(
   }
 
   // The tax is final: let splitting pick its best allocation for the incomes actually received.
-  const { persons: finalIncomes, realized } = incomes()
+  const { persons: finalIncomes } = incomes()
   // …but never worse than the split the withdrawals were solved against (it may sit between two 5 % steps of the search).
   const searchedTax = householdTax(finalIncomes, rules, { splitting: a.pensionSplitting })
   const heldTax = householdTaxWithSplit(finalIncomes, rules, fixedSplit())
@@ -389,7 +386,7 @@ function simulateYear(
 
     // Rooms for next January.
     const earned = fixed[i].employment
-    const pa = pensionAdjustment(r.p.pensions, salaryAt(r.p, year, a) * workFractionOf(r, year), r.p.pensions.length > 0 && fixed[i].employment > 0, P.accounts)
+    const pa = pensionAdjustment(r.p.pensions, earned, r.p.pensions.length > 0 && earned > 0, P.accounts)
     next.push({
       rrsp: rrspNext,
       rrspRoom: rrspNextRoom(Math.max(0, s.rrspRoom - fixed[i].rrspC), earned, pa, nextParams.accounts, nextParams.accounts.rrspLimit),
@@ -417,7 +414,6 @@ function simulateYear(
       quebecTax: t.quebec.tax,
       balancesEnd: { nonReg: nonRegBalance, rrsp: rrspNext, tfsa: tfsaNext },
     }
-    void realized
   })
 
   const grossIncome = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
@@ -433,14 +429,5 @@ function simulateYear(
     },
     projected: P.projected,
   }
-  void ACCOUNTS
-  void emptyAccounts
   return { row, next }
-}
-
-/** The fraction of the year worked, for the pension adjustment. */
-function workFractionOf(r: ResolvedPerson, year: number): number {
-  if (year < r.leaving.year) return 1
-  if (year === r.leaving.year) return (r.leaving.month - 1) / 12
-  return 0
 }

@@ -21,7 +21,7 @@ const isOfficialHost = (host: string) => OFFICIAL.some((h) => host === h || host
 
 // The ratchet: figures whose source carries a `verify` reason. Lower it in the commit that
 // confirms one on an openable page; never raise it without writing the reason on the source.
-const MAX_UNVERIFIED = 10 // 11 → 10: quebec.creditRate and quebec.reductionRate were re-read on the fetchable fiche; quebec.workerDeductionRate (read in the statute's wording, not on the host's blocked page) joined
+const MAX_UNVERIFIED = 8 // 11 → 8: quebec.creditRate and quebec.reductionRate re-read on the fetchable fiche; the two GIS knees confirmed on OAS Act s. 12.1(3) (only « A » is indexed); quebec.workerDeductionRate (the statute's wording, the host's page blocked) joined
 
 const INDEX_RULES = ['cpi', 'wage', 'fixed', 'none']
 
