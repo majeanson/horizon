@@ -36,6 +36,29 @@ const careers = (n: number, seed = SEED): Career[] =>
 
 const N = 400
 
+describe('RRQ — the additional components, like the base plan, begin the month after the 18th birthday', () => {
+  // Born June 2005: 18 in June 2023, so the reference period begins in July 2023 — the year they turn 18 is a PARTIAL
+  // year of 6 months, whose pensionable ceiling is pro-rated (leaflet 1036-1f: $71 300 × 11 ÷ 12 for 11 months).
+  const birth = { year: 2005, month: 6 }
+  const startAge = 60
+  const earnings = { 2023: 40_000 } // more than half of the 2023 ceiling: the pro-rated cap must bite
+  const at = rrqStart(birth, startAge)
+
+  it('the first additional component caps the partial year at its months of the ceiling', () => {
+    const ampe = (RULES.mga(at.year - 4) + RULES.mga(at.year - 3) + RULES.mga(at.year - 2) + RULES.mga(at.year - 1) + RULES.mga(at.year)) / 5
+    const capped = RULES.mga(2023) * (6 / 12)
+    expect(40_000).toBeGreaterThan(capped)
+    const expected = Math.round(((RULES.firstRate * ((capped * ampe) / RULES.mga(2023))) / RULES.additionalMonths) * 100) / 100
+    expect(rrqPension({ birth, earnings, startAge }, RULES).additionalFirst).toBe(expected)
+  })
+
+  it('so the partial year can never count for more than its 6 months of ceiling: a full ceiling and half of it give the same component', () => {
+    const half = rrqPension({ birth, earnings: { 2023: RULES.mga(2023) / 2 }, startAge }, RULES).additionalFirst
+    const full = rrqPension({ birth, earnings: { 2023: RULES.mga(2023) }, startAge }, RULES).additionalFirst
+    expect(full).toBe(half)
+  })
+})
+
 describe('RRQ properties — earnings', () => {
   it('more earnings in any one year never LOWER any component of the pension', () => {
     for (const { input, label } of careers(N)) {

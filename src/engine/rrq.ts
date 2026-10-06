@@ -168,8 +168,11 @@ interface BaseResult {
   excludedTotal: number
 }
 
+/** The first month of the reference period: the month after the 18th birthday. */
+const careerStartIndex = (input: RrqPensionInput, rules: RrqRules): number => monthIndex({ year: input.birth.year + rules.careerStartAge, month: input.birth.month }) + 1
+
 function basePension(input: RrqPensionInput, rules: RrqRules, startIdx: number, ampe: number): BaseResult {
-  const careerStart = monthIndex({ year: input.birth.year + rules.careerStartAge, month: input.birth.month }) + 1
+  const careerStart = careerStartIndex(input, rules)
   const careerEnd = Math.min(startIdx - 1, monthIndex({ year: input.birth.year + rules.careerMaxAge, month: input.birth.month }))
   if (careerEnd < careerStart) return { pension: 0, months: 0, excluded: 0, adjustedTotal: 0, excludedTotal: 0 }
 
@@ -208,7 +211,9 @@ function basePension(input: RrqPensionInput, rules: RrqRules, startIdx: number, 
 
 /** First additional component: 8.33 % × (phase-in-weighted adjusted earnings from 2019) ÷ 480. */
 function firstAdditional(input: RrqPensionInput, rules: RrqRules, startIdx: number, ampe: number): number {
-  const from = monthIndex({ year: rules.firstFrom, month: 1 })
+  // The component's own start (1 January 2019), but never before the month after the 18th birthday: for someone who
+  // turns 18 later, the year they do is a PARTIAL year, with its ceiling pro-rated by its months, as in the base plan.
+  const from = Math.max(monthIndex({ year: rules.firstFrom, month: 1 }), careerStartIndex(input, rules))
   const end = startIdx - 1
   if (end < from) return 0
   const blocks = monthsByYear(from, end).map(({ year, months }) => {
@@ -223,7 +228,7 @@ function firstAdditional(input: RrqPensionInput, rules: RrqRules, startIdx: numb
 
 /** Second additional component: 33.33 % × (adjusted earnings between the ceiling and the additional ceiling, from 2024) ÷ 480. */
 function secondAdditional(input: RrqPensionInput, rules: RrqRules, startIdx: number, ampe: number): number {
-  const from = monthIndex({ year: rules.secondFrom, month: 1 })
+  const from = Math.max(monthIndex({ year: rules.secondFrom, month: 1 }), careerStartIndex(input, rules))
   const end = startIdx - 1
   if (end < from) return 0
   const blocks = monthsByYear(from, end).map(({ year, months }) => {
