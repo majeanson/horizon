@@ -17,6 +17,13 @@ import { blankComments, sourceFiles } from './buildGuardScan'
 //
 // FAIL-CLOSED: every file with an `autoFocus` attribute is listed below with the reason it is
 // on the right side of that line. A new one fails the build until someone writes the reason.
+//
+// A KNOWN HOLE, named so a green run is not read as more than it is: this guard sees the JSX
+// `autoFocus` ATTRIBUTE only. The same bug written imperatively — `ref={(el) => el?.focus()}`, or
+// `.focus()` inside a `useEffect` that runs on mount — summons the keyboard exactly as `autoFocus`
+// does and passes. Telling a mount-time `.focus()` from one in an event handler needs a parse, not
+// a grep, so it is not attempted: review is what holds that line, and a new `.focus()` call outside
+// a click/keydown handler should be read as a new `autoFocus`.
 
 const srcDir = join(dirname(fileURLToPath(import.meta.url)), '..')
 

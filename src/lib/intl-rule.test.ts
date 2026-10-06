@@ -29,12 +29,17 @@ interface Site {
   line: number
 }
 
+// `new Intl.X(…)`, and `Intl.X(…)` WITHOUT `new` — NumberFormat, DateTimeFormat and the others are callable as functions
+// and construct all the same, so a guard that only knew `new` was one keystroke from silent.
+const INTL_CONSTRUCTION = /new\s+Intl\.|(?<!new\s+)(?<![\w.])Intl\.(?:NumberFormat|DateTimeFormat|PluralRules|RelativeTimeFormat|ListFormat|Collator|DisplayNames|Segmenter)\s*\(/g
+const TO_LOCALE = /\.toLocale(?:Date|Time)?String\(/g
+
 function intlConstructions(): Site[] {
   const out: Site[] = []
   for (const root of ROOTS) {
     for (const f of sourceFiles(root)) {
       const src = readScanned(f)
-      for (const m of src.matchAll(/new\s+Intl\./g)) {
+      for (const m of src.matchAll(INTL_CONSTRUCTION)) {
         out.push({
           file: relative(rootDir, f).split(sep).join('/'),
           line: src.slice(0, m.index).split('\n').length,
@@ -46,6 +51,20 @@ function intlConstructions(): Site[] {
 }
 
 describe('the formatter rule (Intl construction only in the cached-formatter homes)', () => {
+  // The canary: the detectors pinned against every spelling, and the look-alikes they must leave alone.
+  it('the detectors see every construction spelling and none of its look-alikes', () => {
+    const fixture = [
+      `const a = new Intl.NumberFormat('fr-CA')`, // 1
+      `const b = Intl.DateTimeFormat('fr-CA')`, // 2 ← no `new`
+      `const c = Intl.NumberFormat ('en')`, // 3 ← a space before the paren
+      `const d = new Intl.PluralRules('fr')`, // 4
+      `const e = cache.Intl.get('x')`, // not the global
+      `const f = formatDecimal(x)`, // not Intl
+    ].join('\n')
+    expect([...fixture.matchAll(INTL_CONSTRUCTION)].map((m) => fixture.slice(0, m.index).split('\n').length)).toEqual([1, 2, 3, 4])
+    expect([...`d.toLocaleDateString()\nd.toLocaleString()\nd.toLocaleTimeString()\nd.toLocaleUpperCase()`.matchAll(TO_LOCALE)]).toHaveLength(3)
+  })
+
   const sites = intlConstructions()
 
   it('found Intl constructions to classify (the scanner still works)', () => {
@@ -68,8 +87,10 @@ describe('the formatter rule (Intl construction only in the cached-formatter hom
 
   it('toLocale*String call sites do not appear (ratchet: zero, may never rise)', () => {
     let count = 0
-    for (const f of sourceFiles(srcDir)) {
-      count += [...readScanned(f).matchAll(/\.toLocale(?:Date|Time)?String\(/g)].length
+    // The SAME roots as the construction scan: a `toLocaleDateString` in the Worker is the same ~100 µs, in the one place
+    // with a CPU budget — and the old loop never looked there.
+    for (const root of ROOTS) {
+      for (const f of sourceFiles(root)) count += [...readScanned(f).matchAll(TO_LOCALE)].length
     }
     expect(count, 'use a cached lib/format.ts or lib/money.ts helper').toBeLessThanOrEqual(0)
   })

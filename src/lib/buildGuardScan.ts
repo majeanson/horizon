@@ -2,20 +2,24 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 // Shared plumbing for this repo's fail-closed, build-gating GREP TESTS — the ones
-// CLAUDE.md calls "the best thing in this codebase": write-rule.test.ts,
-// parallel-array-rule.test.ts, and (in spirit, not this file — see below)
-// nested-interactive.test.ts. Each scans src/ for a pattern a prose rule alone
-// couldn't hold in place.
+// CLAUDE.md calls the best thing in this codebase. Each scans src/ (or worker/, or
+// index.html) for a pattern a prose rule alone could not hold in place. The ones that
+// import this file: `noNetwork` · `intl-rule` · `chip-rule` · `autofocus` ·
+// `enginePurity` · `chartBoundary` · `fieldInfoCopy` · `numberFieldBounds`
+// (`buildGuardScan.test.ts` pins the helpers themselves). The rest —
+// `devkitParity`, `i18nParity`, `docs`, `cited`, `sourcesMd`, `schemaVersion` — read
+// other shapes (the gallery, the dictionaries, the markdown, the params, the schema).
 //
-// Extracted 2026-09-03: a third guard (parallel-array-rule.test.ts) had just
-// reimplemented write-rule.test.ts's tree-walk and comment-blanking byte-for-byte —
-// the exact "prose rule drifts" failure these guards exist to prevent, reproduced
-// in their own shared plumbing. Converging is safe here because the two
-// implementations were IDENTICAL; nested-interactive.test.ts's version genuinely
-// differs (it scans only .tsx, and its comment-strip also blanks jsdoc `*`
-// continuation lines for JSX-adjacent prose), so it is deliberately left as its own
-// — retrofitting a shared helper onto an already-trusted guard for cosmetic reuse,
-// with no bug behind it, is not a trade worth the risk of changing what it catches.
+// A guard that scans a tree is only as honest as the tree it walks, so every one of them
+// carries the same four things: a CANARY (the detector pinned against a fixture with
+// every spelling it must catch and the look-alikes it must not), a FLOOR (a count that
+// an empty walk cannot meet), an ALLOWED map whose every entry says WHY, and a
+// stale-entry check. And a new one is run against the bug it was written for before it
+// is trusted — see CLAUDE.md.
+//
+// Scaffolded from Babillard, whose guards (write-rule, parallel-array-rule,
+// nested-interactive, tour-rule, docCounts) do not exist here: the stories below that
+// name them are that repo's lessons, kept because the traps are real in any grep guard.
 
 // Every non-test .ts/.tsx file under `dir`, recursively.
 export function sourceFiles(dir: string): string[] {
