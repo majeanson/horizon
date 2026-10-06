@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **4 — taxes done**; accounts and defined-benefit pensions next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (84 cited figures for 2026) and the RRQ engine are verified against Retraite Québec's own worked example. No page uses the engine yet. |
+| **Phase** | **6 — the engine is complete**; the store, the profile pages and the chart come next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household. No page uses the engine yet. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -55,7 +55,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `params/2026.ts` — every leaf from its official page; the 6,30 % splits 5,3 base + 1,0 first additional (settled)
 - [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
-- [ ] Seven figures carry a `verify` reason (Revenu Québec pages read through an archive, one derived total): confirm each on an openable page and lower the ratchet in `cited.test.ts`
+- [ ] Eleven figures carry a `verify` reason (Revenu Québec pages read through an archive, one derived total): confirm each on an openable page and lower the ratchet in `cited.test.ts`
 
 ### Phase 2 — RRQ
 
@@ -79,14 +79,17 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 5 — accounts and defined-benefit pensions
 
-- [ ] RRIF minimum factors row by row; TFSA room; non-registered ACB and realized gain
-- [ ] Generic DB pension and the RREGOP preset ❓ reduction %, the 35-year rule, indexation
+- [x] RRIF minimum factors row by row; TFSA / RRSP room; non-registered ACB and realized gain (`verified/accounts.verified.test.ts`)
+- [x] Generic DB pension and the cited RREGOP preset, reproducing Retraite Québec's worked examples; the pension adjustment (`verified/rregop.verified.test.ts`, six planted bugs red)
+- [ ] RREGOP: the three indexation tiers by service period, the pro-rated first indexation, the 35-years-at-any-age minimum (unconfirmed), and a pension already in pay for a retired person ❓ the statement's own figure
 
 ### Phase 6 — projection, `retireAt`, the golden household
 
-- [ ] Year-by-year projection (row identity to the cent), withdrawal order with gross-up
-- [ ] Couple, splitting, RRIF-minimum surplus → TFSA; `retireAt`, `compare`, the sensitivity grid
-- [ ] `golden/` committed and reviewed
+- [x] Year-by-year projection: the cash identity holds to the cent every year; withdrawal order with a gross-up solved against the tax function (`projection.test.ts`, twelve planted bugs red)
+- [x] Couple, splitting, RRIF minimum, GIS and OAS recovery wired in; `retireAt`, `compare`, the sensitivity grid
+- [x] `golden/` committed (`golden.projection.json`, `golden.retireAt.json`) — reviewed for plausibility: the DB steps down at 65, RRQ/OAS start, the drawdown order is respected
+- [ ] The sensitivity grid takes ≈ 4 s for 27 cells: run it on demand (a disclosure), off the main thread if it becomes a first-paint cost
+- [ ] Survivor scenarios (one spouse dies) — v2
 
 ### Phase 7 — store, profile, assumptions, `FieldInfo`
 

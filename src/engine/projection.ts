@@ -247,14 +247,18 @@ function simulateYear(
           draw[kind][0] = Math.min(x, Math.max(0, room[0]))
           return
         }
-        const chunks = 24
-        const size = x / chunks
+        const size = x / 24
         const taxable = people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i])
-        for (let c = 0; c < chunks; c++) {
-          const order = [0, 1].filter((i) => draw[kind][i] + size <= Math.max(0, room[i]) + 1e-9).sort((i, j) => taxable[i] - taxable[j])
-          const i = order[0] ?? (room[0] - draw[kind][0] >= room[1] - draw[kind][1] ? 0 : 1)
-          const take = Math.min(size, Math.max(0, room[i] - draw[kind][i]))
+        let left = x
+        // Each pass gives one chunk to whoever has the lower taxable income AND still has money in this account;
+        // a pass either places a whole chunk (at most 24) or empties one person's account (at most 2), so it ends.
+        for (let pass = 0; pass < 64 && left > 1e-9; pass++) {
+          const open = [0, 1].filter((i) => room[i] - draw[kind][i] > 1e-9).sort((i, j) => taxable[i] - taxable[j])
+          if (open.length === 0) break
+          const i = open[0]
+          const take = Math.min(size, left, room[i] - draw[kind][i])
           draw[kind][i] += take
+          left -= take
           if (kind === 'rrsp') taxable[i] += take
           else if (kind === 'nonReg') taxable[i] += take * 0.5
         }
@@ -270,7 +274,7 @@ function simulateYear(
       // coarsely for the first amount that covers the need, then refine inside that step by bisection.
       let lo = 0
       let hi = -1
-      const steps = 32
+      const steps = 16
       for (let s = 1; s <= steps; s++) {
         const x = (available * s) / steps
         if (gain(x) >= need) {
@@ -283,7 +287,7 @@ function simulateYear(
         allocate(available)
         need -= gain(available)
       } else {
-        for (let it = 0; it < 40 && hi - lo > 0.005; it++) {
+        for (let it = 0; it < 40 && hi - lo > 0.01; it++) {
           const mid = (lo + hi) / 2
           if (gain(mid) >= need) hi = mid
           else lo = mid
@@ -296,7 +300,10 @@ function simulateYear(
 
   // The tax is final: let splitting pick its best allocation for the incomes actually received.
   const { persons: finalIncomes, realized } = incomes()
-  const finalTax = householdTax(finalIncomes, rules, { splitting: a.pensionSplitting })
+  // …but never worse than the split the withdrawals were solved against (it may sit between two 5 % steps of the search).
+  const searchedTax = householdTax(finalIncomes, rules, { splitting: a.pensionSplitting })
+  const heldTax = householdTaxWithSplit(finalIncomes, rules, fixedSplit())
+  const finalTax = heldTax.total < searchedTax.total ? heldTax : searchedTax
   const finalGis = gisFor(finalIncomes, finalTax.persons.map((t) => t.netIncomeBeforeAdjustments))
   const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
   const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
