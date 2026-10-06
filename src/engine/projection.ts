@@ -276,18 +276,23 @@ function simulateYear(
       // coarsely for the first amount that covers the need, then refine inside that step by bisection.
       let lo = 0
       let hi = -1
+      // If nothing in the scan covers the need, draw the amount that nets the MOST cash — which is not always the
+      // whole account when the marginal rate (tax + GIS lost) passes 100 % — and never let a negative gain raise the need.
+      let best = { x: 0, g: 0 }
       const steps = 16
       for (let s = 1; s <= steps; s++) {
         const x = (available * s) / steps
-        if (gain(x) >= need) {
+        const g = gain(x)
+        if (g >= need) {
           hi = x
           break
         }
+        if (g > best.g) best = { x, g }
         lo = x
       }
       if (hi < 0) {
-        allocate(available)
-        need -= gain(available)
+        allocate(best.x)
+        need -= best.g
       } else {
         for (let it = 0; it < 40 && hi - lo > 0.01; it++) {
           const mid = (lo + hi) / 2

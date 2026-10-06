@@ -197,6 +197,90 @@ describe('projection — the accounts behave', () => {
   })
 })
 
+describe('projection — the withdrawal solver is precise and shares a couple fairly, over many households', () => {
+  // These pin the solver's internals directly. Before them, a ×100 looser bisection tolerance and a flipped
+  // couple-allocation weight were caught only by the golden snapshot — which is regenerated, not argued with.
+  const SEED = 20261007
+  const NO_SPLIT = { ...A, pensionSplitting: false }
+  const sample = cases(SEED, 14, (r, i) => {
+    const scale = between(r, 0.15, 0.9)
+    const h: Household = {
+      persons: H.persons.map((p) => ({
+        ...p,
+        accounts: {
+          rrsp: { ...p.accounts.rrsp, balance: Math.round(p.accounts.rrsp.balance * scale * 6) },
+          tfsa: { ...p.accounts.tfsa, balance: Math.round(p.accounts.tfsa.balance * scale * 6) },
+          nonReg: { ...p.accounts.nonReg, balance: Math.round(p.accounts.nonReg.balance * scale * 12), acb: Math.round(p.accounts.nonReg.acb * scale * 12) },
+        },
+      })),
+      spending: { workingToday: intBetween(r, 50_000, 90_000), retiredToday: intBetween(r, 45_000, 85_000) },
+    }
+    const self = intBetween(r, 55, 63)
+    const spouse = intBetween(r, 55, 66)
+    return { h, scenario: { retirementAge: { self, spouse } }, label: `seed ${SEED} household ${i} (retire ${self}/${spouse})` }
+  })
+
+  /** What each person drew by choice this year (the RRIF minimum was forced, not chosen), per account kind. */
+  const voluntary = (r: YearRow) => ({
+    nonReg: people(r).reduce((s, p) => s + p.withdrawals.nonReg, 0),
+    rrsp: people(r).reduce((s, p) => s + (p.withdrawals.rrsp - p.rrifMinimum), 0),
+    tfsa: people(r).reduce((s, p) => s + p.withdrawals.tfsa, 0),
+  })
+  const retired = (r: YearRow) => people(r).every((p) => p.employment === 0)
+
+  it('a year that drew by choice and met its need to the cent saves no more than a couple of cents of overshoot', () => {
+    let checked = 0
+    for (const { h, scenario, label } of sample) {
+      for (const r of project(h, NO_SPLIT, scenario)) {
+        const v = voluntary(r)
+        if (!retired(r) || r.household.shortfall !== 0 || v.nonReg + v.rrsp + v.tfsa <= 1) continue
+        checked++
+        // Retired people have no committed savings, so anything put away was surplus: the amount the solver overshot by.
+        const saved = people(r).reduce((s, p) => s + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+        expect(saved, `${label}, ${r.year}`).toBeLessThanOrEqual(0.03)
+      }
+    }
+    expect(checked, 'the sample must contain solved years').toBeGreaterThan(40)
+  })
+
+  // The couple's allocation hands each chunk to whoever has the LOWER taxable income and still has money in that
+  // account; a non-registered dollar counts for half (only its gain is taxed). So, while neither person's account is
+  // empty, whoever ends HIGHER can have drawn only if they are within one chunk (a 24th of the draw) of the other.
+  const fairness = (kind: 'rrsp' | 'nonReg', weight: number) => {
+    let checked = 0
+    for (const { h, scenario, label } of sample) {
+      const rows = project(h, NO_SPLIT, scenario)
+      for (const [i, r] of rows.entries()) {
+        const v = voluntary(r)
+        const others = kind === 'rrsp' ? v.nonReg + v.tfsa : v.rrsp + v.tfsa
+        if (!retired(r) || v[kind] <= 1 || others > 0.01) continue
+        const [a, b] = people(r)
+        if (!a || !b) continue
+        // An account the year's draw EMPTIED hands its chunks to the other spouse by necessity, not by the rule: skip it.
+        // (Judged against the January balance — the year-end one carries mid-year growth and is never zero.)
+        const january = Object.entries(r.persons).map(([id]) => (i > 0 ? rows[i - 1].persons[id as PersonId]!.balancesEnd[kind] : h.persons.find((p) => p.id === id)!.accounts[kind].balance))
+        const took = [a, b].map((p) => (kind === 'rrsp' ? p.withdrawals.rrsp : p.withdrawals.nonReg))
+        if (took.some((t, k) => t >= january[k] - 0.05)) continue
+        const drawn = (p: typeof a) => (kind === 'rrsp' ? p.withdrawals.rrsp - p.rrifMinimum : p.withdrawals.nonReg)
+        const taxable = (p: typeof a) => p.rrq + p.oas + p.db + p.rrifMinimum + weight * drawn(p)
+        const [higher, lower] = taxable(a) >= taxable(b) ? [a, b] : [b, a]
+        if (drawn(higher) <= 0.01) continue
+        checked++
+        expect(taxable(higher) - taxable(lower), `${label}, ${r.year}: the higher-income spouse took a ${kind} chunk`).toBeLessThanOrEqual((weight * v[kind]) / 24 + 0.05)
+      }
+    }
+    return checked
+  }
+
+  it('RRSP: a spouse who ends with the higher taxable income took a chunk only while within one chunk of the other', () => {
+    expect(fairness('rrsp', 1), 'the sample must contain shared RRSP draws').toBeGreaterThan(0)
+  })
+
+  it('non-registered: the same, counting a dollar as half taxable', () => {
+    expect(fairness('nonReg', 0.5), 'the sample must contain shared non-registered draws').toBeGreaterThan(0)
+  })
+})
+
 describe('projection — more is never worse, over many households', () => {
   // The profile's own savings doubled can never push the date the plan first works LATER.
   const SEED = 20261006
