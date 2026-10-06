@@ -53,16 +53,37 @@ jobs:
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      # Credentials are optional: a repo without the two secrets (a fork, a fresh clone) must not
+      # turn the whole workflow RED — e2e.yml chains on this workflow's conclusion, so a failed
+      # deploy would silently cancel the browser suite too. Secrets cannot be read in an `if:`,
+      # so one step turns their presence into an output the rest key off.
+      - name: Is Cloudflare configured?
+        id: cf
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Deploy skipped::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID are not set on this repo."
+          fi
       - uses: actions/checkout@v7
+        if: steps.cf.outputs.ready == 'true'
       - uses: actions/setup-node@v7
+        if: steps.cf.outputs.ready == 'true'
         with:
           node-version: 26
           cache: npm
       - run: npm ci
+        if: steps.cf.outputs.ready == 'true'
       # `npm run deploy` == build (tsc + vite) then `wrangler deploy`. Wrangler reads the API
       # token + account id from these env vars. There are no bindings and no runtime secrets to
       # configure: the Worker only serves static files.
       - name: Deploy
+        if: steps.cf.outputs.ready == 'true'
         shell: bash
         run: npm run deploy
         env:
