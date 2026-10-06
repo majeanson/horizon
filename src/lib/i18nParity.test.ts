@@ -58,8 +58,11 @@ describe('FR ↔ EN parity (runtime)', () => {
     expect(bad).toEqual([])
   })
 
-  it('has no empty string on either side', () => {
-    const empty = [...fr, ...en].filter(([, v]) => render(v).trim() === '').map(([k]) => k)
+  it('has no empty string on either side — except an ⓘ entry\'s label or url, where empty means « none »', () => {
+    // info.<id>.label / .url are '' when no document prints the figure or no official page exists. That is data, not a
+    // missing translation, and fieldInfoCopy.test.ts holds every such blank to a named reason (a ratchet that only falls).
+    const none = /^info\.[A-Za-z0-9]+\.(label|url)$/
+    const empty = [...fr, ...en].filter(([k, v]) => !none.test(k) && render(v).trim() === '').map(([k]) => k)
     expect(empty, 'an empty translation renders as a blank in the UI').toEqual([])
   })
 

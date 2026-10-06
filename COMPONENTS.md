@@ -53,6 +53,9 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | Component | File | Purpose |
 | --- | --- | --- |
 | **EditField** | `src/components/EditField.tsx` | The ONE text box: input or textarea, clear ✕ inside the box, optional submit / cancel / leading glyph / trailing unit. `NumberField` (profile amounts) wraps it. |
+| **NumberField** | `src/components/NumberField.tsx` | The number box: owns the TEXT while it is typed and hands the page a NUMBER only when the text means one (FR-CA comma rules, `lib/money.ts`). Kinds `money` / `percent` / `decimal` / `year` / `int`; committed on Enter or blur; an out-of-range text stays on screen with its reason. `allowEmpty` makes an optional figure a number or `null`. |
+| **FieldRow** | `src/components/FieldRow.tsx` | One labelled field: label tied to the box, the box with its ⓘ, a quiet hint read with it. The control is a render function that receives the ids to wire — the caller never invents them. |
+| **FieldInfo** | `src/components/FieldInfo.tsx` | The ⓘ « where to find this number »: an inline note (not a popover) with WHERE the figure is, the document's own wording for it, and the official page. Wording lives in `FR.info.<id>`; `fieldInfoCopy.test.ts` holds every id to an entry and every link to an official host. |
 | **Chip** · ChipGroup | `src/components/Chip.tsx` | The ONE pill — toggle (`selected`), action (`onClick`), link (`to`), static label, expander. A test (`chip-rule.test.ts`) fails the build on a hand-rolled `className="chip"`. |
 | **SubTabs** | `src/components/SubTabs.tsx` | The segmented « one job at a time » control; keyboard-complete tablist, wheel-mapped, paging chevrons on a fine pointer. |
 
@@ -61,6 +64,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | Component | File | Purpose |
 | --- | --- | --- |
 | **SectionHeader** | `src/components/SectionHeader.tsx` | An optional icon, a title, a subtitle, a trailing action. One anatomy for every section. |
+| **PageHead** | `src/components/PageHead.tsx` | The top of a page: its ONE `<h1>` and a quiet line under it. (A `SectionHeader` names a section inside a page.) |
 | **EmptyState** | `src/components/EmptyState.tsx` | The calm « nothing here » line (`role="status"`). |
 | **Disclosure** | `src/components/Disclosure.tsx` | A collapsed-by-default expander (caret + label + optional count) for secondary, space-hungry groups: the per-year table, the parameters behind a figure. |
 
@@ -79,8 +83,8 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 
 Pages compose the primitives above and own data and routing; a specimen of a page is a
 screenshot, and the e2e suite takes those. They are listed so nobody looks for them here:
-`src/pages/Home.tsx` (the scaffold's landing page, replaced by the profile in Phase 7) and
-`src/pages/DevKit.tsx` (the gallery itself).
+`src/pages/Profil.tsx`, `Hypotheses.tsx`, `Resultats.tsx`, `Donnees.tsx` (the four destinations; their sections are
+`src/components/profile/*`) and `src/pages/DevKit.tsx` (the gallery itself).
 
 ## CSS design system (condensed)
 

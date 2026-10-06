@@ -8,7 +8,8 @@ import { expect, type Locator, type Page } from '@playwright/test'
 // this measures each visible descendant's right edge against the viewport, which sees straight
 // through the clip.
 //
-// Elements inside a deliberately scrolling region (`.rail`, `.subtabs`) are exempt: they are
+// Elements inside a deliberately scrolling region (`.rail`, `.subtabs`, `.table-wrap` — a focusable, scrollable
+// table region) are exempt: they are
 // SUPPOSED to extend past the edge, and `useHScroll` makes them reachable.
 export async function expectNoHorizontalOverflow(page: Page, root: Locator | string = 'body'): Promise<void> {
   const target = typeof root === 'string' ? page.locator(root) : root
@@ -20,7 +21,7 @@ export async function expectNoHorizontalOverflow(page: Page, root: Locator | str
       if (r.width === 0 || r.height === 0) continue
       const style = getComputedStyle(node)
       if (style.visibility === 'hidden' || style.display === 'none') continue
-      if (node.closest('.rail, .subtabs, .sr-only, svg')) continue
+      if (node.closest('.rail, .subtabs, .table-wrap, .sr-only, svg')) continue
       if (r.right > limit) {
         const cls = typeof node.className === 'string' && node.className ? '.' + node.className.trim().split(/\s+/).join('.') : ''
         out.push(`${node.tagName.toLowerCase()}${cls} right=${Math.round(r.right)} > ${Math.round(limit)}`)

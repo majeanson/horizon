@@ -1,8 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useLang, useT } from '../i18n'
+import { useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { Icon, type IconName } from './Icon'
+import { Loading } from './Loading'
+import { StatusMessage } from './StatusMessage'
 
 // The chrome around every page: a top bar (name, language, day/night) and the main
 // navigation — a bottom bar on a phone, a left rail on a wide screen. The switch between the
@@ -22,6 +25,8 @@ export function AppShell() {
   const t = useT()
   const { lang, setLang } = useLang()
   const [theme, setThemeState] = useState<Theme>(getTheme)
+  // A browser that will not keep the profile (private mode) must say so on EVERY page, not only where it is exported.
+  const storageIssue = useStorageIssue()
 
   return (
     <div className="shell">
@@ -53,7 +58,11 @@ export function AppShell() {
         ))}
       </nav>
       <main className="shell__main">
-        <Outlet />
+        {storageIssue === 'unavailable' && <StatusMessage tone="info">{t.data.issue.unavailable}</StatusMessage>}
+        {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched. */}
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   )

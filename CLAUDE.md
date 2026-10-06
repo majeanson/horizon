@@ -56,7 +56,11 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 
 | Need | Use | Where |
 | --- | --- | --- |
-| Type / edit text, with clear and submit | **`EditField`** (amounts: **`NumberField`**) | `components/EditField.tsx` |
+| Type / edit text, with clear and submit | **`EditField`** | `components/EditField.tsx` |
+| A number (dollars, %, a year, an age) | **`NumberField`** inside a **`FieldRow`** — the row ties label, box, hint and ⓘ together; the box owns the TEXT until it means a number (`lib/numberInput.ts`) | `components/NumberField.tsx`, `FieldRow.tsx` |
+| Where to find a number | **`FieldInfo`** — wording in `FR.info.<id>`, held to official hosts by `fieldInfoCopy.test.ts` | `components/FieldInfo.tsx` |
+| The top of a page | **`PageHead`** — the ONE `<h1>` | `components/PageHead.tsx` |
+| A card of fields on a page | **`Section`** | `components/profile/shared.tsx` |
 | A small pill (toggle · action · link · label · expander) | **`Chip`** — shape chosen by props; a test fails a hand-rolled `className="chip"` | `components/Chip.tsx` |
 | Segmented « one job at a time » control | **`SubTabs`** | `components/SubTabs.tsx` |
 | A horizontal row of buttons / chips | **`Cluster`** (wraps) / **`Rail`** (scrolls one line) — never a bespoke flex row | `components/Layout.tsx` |
@@ -69,7 +73,6 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | A one-line « done » notice | **`useNotice`** | `lib/toast.tsx` |
 | An icon | **`Icon`** / `InlineIcon` (Phosphor, never an emoji) | `components/Icon.tsx` |
 | Format a number / money / percent | the **cached** helpers in `lib/format.ts` / `lib/money.ts` | — |
-| Explain where a number comes from | **`FieldInfo`** under the field | `components/FieldInfo.tsx` |
 | A chart | **`LineChart`** from `components/charts` — the only file that touches the chart library | `components/charts/` |
 
 **When you add a shared component:** register it in `src/pages/DevKit.tsx` and add its row to
@@ -85,11 +88,15 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | Copy | `useT()`; FR first, then EN — `typeof FR` is the parity contract | a string literal in a component; a French string pasted into EN (`i18nParity.test.ts`) |
 | Register of French | Québécois: *courriel*, *REER*, *CELI*, *rente*, *retraite* | France French |
 | Local state that must survive a reload | the versioned store in `lib/store.ts` | a bare `localStorage` write; a schema edit without a version bump (`schemaVersion.test.ts`) |
+| Changing the profile | a pure `(profile) => profile` function in `lib/profileEdit.ts`, applied with `updateProfile` — it returns the SAME object when nothing changes | building a profile by hand in a page; mutating the one in the store |
+| A confirm button | `confirmLabel` that names the act (« Importer », « Retirer ») | the default « Supprimer » on an action that is not a deletion |
 | A text field taking focus | only when the tap that revealed it asked to type | `autoFocus` because a screen or dialog OPENED (`autofocus.test.ts`) |
 | A container that holds buttons | a plain `<div onClick>` (mouse convenience) | `role="button"` + `tabIndex` on it — a control inside a control |
 | Horizontal overflow | `Cluster` / `Rail` | `overflow-x: hidden` to *mask* a wide row — it hides the bug from the eye and the guard |
 | Touch-only actions | give every swipe / long-press a mouse and keyboard mirror | a gesture as the only path |
 | Docs | `- [ ]` only in `STATE.md`; copy-me checklists get bullets | an open checkbox anywhere else (`docs.test.ts`) |
+| Writing a file with a backslash in it (a regex, `\s`, `\d`) | the **Write** / **Edit** tools | a shell heredoc or `node -e` string: the shell layer HALVES backslashes, and `/\s/` silently becomes `/s/` |
+| Pushing | check the run on GitHub afterwards (`gh run list`) | assuming green because the local suite was: `knip` only runs in CI |
 
 **Every UI change must be mobile-friendly, tablet-friendly and desktop-friendly, every time.**
 Browser zoom stays enabled (no `user-scalable=no`): this is read by people who may need large
@@ -153,8 +160,8 @@ canary (the detector is pinned against a fixture), an `ALLOWED` map whose entrie
 *why*, a stale-entry check, and where it counts something, a ratchet that only falls.
 
 `noNetwork` · `intl-rule` · `chip-rule` · `autofocus` · `devkitParity` · `i18nParity` · `docs` ·
-and, as they land: `enginePurity` · `cited` · `verifiedHeader` · `sourcesMd` · `schemaVersion` ·
-`fieldInfoCopy` · `chartBoundary`.
+`enginePurity` · `cited` · `sourcesMd` · `schemaVersion` · `fieldInfoCopy` ·
+and, as it lands: `chartBoundary`.
 
 > **A new guard must be run against the bug it was written for before it is trusted.** A green
 > grep test proves nothing on its own — plant the violation (or stash the fix), watch the guard

@@ -39,5 +39,4 @@ export function knownYear(year: number): Plain<YearParams> {
   return plain(y)
 }
 
-export const FIRST_KNOWN_YEAR = Math.min(...Object.keys(KNOWN).map(Number))
 export const LAST_KNOWN_YEAR = Math.max(...Object.keys(KNOWN).map(Number))

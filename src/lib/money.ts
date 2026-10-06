@@ -30,8 +30,9 @@ export function formatMoney(dollars: number | null | undefined, lang: Lang, opts
   return currency(lang, opts.cents === true).format(dollars)
 }
 
-// A free-typed dollar amount → dollars. Tolerates spaces (plain and non-breaking), a
-// leading "$", and either separator. Empty/invalid/negative → null.
+// A free-typed number → a number. The workhorse behind parseMoney and every other typed field (a
+// percentage, a count of years): tolerates spaces (plain and non-breaking), a leading "$", and either
+// separator. Empty/invalid → null; a negative number is refused unless `negative` is set.
 //
 // THE COMMA IS AMBIGUOUS, and this app is FR-CA first: « 812,82 » is eight hundred twelve
 // dollars and eighty-two cents, while « 15,000 » is fifteen thousand. Reading every comma as
@@ -41,7 +42,7 @@ export function formatMoney(dollars: number | null | undefined, lang: Lang, opts
 //   * any other comma is grouping and is stripped;
 //   * a dot stays the decimal mark;
 //   * if BOTH appear, the LAST one is the decimal mark ("1.234,56" and "1,234.56").
-export function parseMoney(input: string): number | null {
+export function parseDecimal(input: string, opts: { negative?: boolean; places?: number } = {}): number | null {
   const cleaned = input.replace(/[^0-9.,-]/g, '').replace(/\s/g, '')
   if (!cleaned) return null
 
@@ -58,9 +59,13 @@ export function parseMoney(input: string): number | null {
   }
 
   const n = Number(normalized)
-  if (!Number.isFinite(n) || n < 0) return null
-  // Round to the cent by moving the decimal point in the EXPONENT, not by multiplying:
+  if (!Number.isFinite(n) || (n < 0 && !opts.negative)) return null
+  // Round by moving the decimal point in the EXPONENT, not by multiplying:
   // 1.005 * 100 is 100.49999999999999 in binary floating point and would round DOWN to 1.00,
   // while Number('1.005e2') is exactly 100.5. A typed amount means what its digits say.
-  return Number(Math.round(Number(normalized + 'e2')) + 'e-2')
+  const places = opts.places ?? 2
+  return Number(Math.round(Number(normalized + 'e' + places)) + 'e-' + places)
 }
+
+// A free-typed dollar amount → dollars, to the cent. Empty/invalid/negative → null.
+export const parseMoney = (input: string): number | null => parseDecimal(input)

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { test, expect, type Page } from '@playwright/test'
+import { EXAMPLE, seedProfile } from './seed'
 
 // Accessibility, as a gate: axe-core runs over every page in the display states a reader can
 // actually be in — day and night, normal and high contrast, and the largest text size. A
@@ -43,15 +44,27 @@ async function violations(page: Page): Promise<string[]> {
   )
 }
 
+// Every route, in every display state, with the example household loaded — and with EVERY ⓘ note and EVERY
+// disclosure open, because the colours that matter most (a note on its tinted ground, a table row marked short)
+// only exist once something is opened.
+const PAGES = [
+  ['the profile (me)', '/', '.page-head__title'],
+  ['the profile (spouse)', '/?person=spouse', '.page-head__title'],
+  ['the assumptions', '/hypotheses', '.page-head__title'],
+  ['the results', '/resultats', '.page-head__title'],
+  ['the data page', '/donnees', '.page-head__title'],
+  ['the component gallery', '/dev/kit', '.devkit'],
+] as const
+
 for (const s of STATES) {
-  for (const [label, path, ready] of [
-    ['the shell', '/', '.shell__brand'],
-    ['the component gallery', '/dev/kit', '.devkit'],
-  ] as const) {
+  for (const [label, path, ready] of PAGES) {
     test(`${label} has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
       await setState(page, s)
+      await seedProfile(page, EXAMPLE)
       await page.goto(path)
       await page.locator(ready).waitFor()
+      for (const b of await page.locator('.info-btn').all()) await b.click()
+      for (const d of await page.locator('.disclosure__summary').all()) await d.click()
       expect(await violations(page)).toEqual([])
     })
   }
@@ -65,6 +78,7 @@ test('the gallery stays accessible with its dialog open', async ({ page }) => {
 })
 
 test('the whole shell is reachable by keyboard, in a sensible order', async ({ page }) => {
+  await seedProfile(page, EXAMPLE)
   await page.goto('/')
   const order: string[] = []
   for (let i = 0; i < 8; i++) {

@@ -90,12 +90,18 @@
   --accent: var(--marigold); /* PRIMARY is marigold */
   --accent-soft: var(--marigold-wash);
   --accent-ink: #3a2a12; /* warm-dark text on marigold */
-  --warn: var(--terracotta-deep);
+  /* MEASURED 2026-10-06 (axe, WCAG AA). Babillard's --warn (#c2563a) was 4.37:1 on the card and 4.48:1 under white
+     button text — a hair under 4.5 — and its --success (the sage deep, #6b8a52) 3.8:1 on the card. Neither had ever been
+     axed there. Day: --warn #a8452d is 5.77 on the card, 5.36 on paper, and carries white text at 5.91; --success
+     #566f42 is 5.47 on the card, 5.08 on paper. TEXT and FILL are separate tokens on purpose: at night the text must go
+     LIGHT (see the night block) while a button's fill must stay DARK enough to carry its white label. */
+  --warn: #a8452d;
+  --warn-fill: #a8452d;
   --clay-soft: var(--terracotta-wash);
   --primary: var(--marigold);
   --primary-press: var(--marigold-deep);
   --on-primary: #3a2a12;
-  --success: var(--sage-deep);
+  --success: #566f42;
 
   /* ---- type ---- */
   --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
@@ -232,6 +238,10 @@
 
   --accent-ink: #1b1712;
   --on-primary: #1b1712;
+
+  /* Night text on the dark card/paper: warn 5.14/5.68, success 5.78/6.38 (the day values are 3.6 and 4.1 here). */
+  --warn: #e0724e;
+  --success: #88a36f;
 }
 
 /* --- Accessibility profile (#36) ----------------------------------------- */
@@ -550,16 +560,16 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: var(--warn);
+  background: var(--warn-fill);
   color: #fff;
-  border-color: var(--warn);
+  border-color: var(--warn-fill);
   box-shadow: var(--shadow-md);
 }
 .btn--danger:hover {
   /* Re-assert the warn ground: the generic `.btn:hover` (higher specificity via the
      pseudo-class) would otherwise flip the background to --paper under the white
      text — an unreadable washed-out hover. Mirrors .btn--primary:hover. */
-  background: var(--warn);
+  background: var(--warn-fill);
   filter: brightness(0.96);
 }
 /* When viewportVars (lib/viewportVars.ts) scrolls a focused field to

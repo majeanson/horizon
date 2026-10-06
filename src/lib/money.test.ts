@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney, parseMoney } from './money'
+import { formatMoney, parseMoney, parseDecimal } from './money'
 
 // Plain, narrow and non-breaking spaces all print as a space: the Intl data uses U+00A0 / U+202F
 // between groups and before « $ », and a test full of invisible characters is a test nobody can
@@ -61,5 +61,31 @@ describe('parseMoney (the comma is a decimal mark in FR-CA)', () => {
   it('rounds to the cent', () => {
     expect(parseMoney('1.005')).toBeCloseTo(1.01, 2)
     expect(parseMoney('0.126')).toBe(0.13)
+  })
+})
+
+describe('parseDecimal (the same reading rules, for any typed number)', () => {
+  it('reads a negative only when told to', () => {
+    expect(parseDecimal('-1,5')).toBeNull()
+    expect(parseDecimal('-1,5', { negative: true })).toBe(-1.5)
+  })
+
+  it('rounds to the places asked, by the exponent (never by multiplying)', () => {
+    expect(parseDecimal('1.005', { places: 2 })).toBe(1.01)
+    expect(parseDecimal('12.3456', { places: 2 })).toBe(12.35)
+    expect(parseDecimal('12.3456', { places: 3 })).toBe(12.346)
+    expect(parseDecimal('7', { places: 0 })).toBe(7)
+  })
+
+  it('uses the FR-CA comma rule: a trailing comma pair is the decimal mark, other commas are grouping', () => {
+    expect(parseDecimal('5,25')).toBe(5.25)
+    expect(parseDecimal('15,000')).toBe(15000)
+    expect(parseDecimal('1.234,56')).toBe(1234.56)
+  })
+
+  it('empty or junk is nothing, not zero', () => {
+    expect(parseDecimal('')).toBeNull()
+    expect(parseDecimal('abc')).toBeNull()
+    expect(parseDecimal('1-2')).toBeNull()
   })
 })

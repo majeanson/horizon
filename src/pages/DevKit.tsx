@@ -4,9 +4,13 @@ import { Chip, ChipGroup } from '../components/Chip'
 import { Disclosure } from '../components/Disclosure'
 import { EditField } from '../components/EditField'
 import { EmptyState } from '../components/EmptyState'
+import { FieldInfo } from '../components/FieldInfo'
+import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Modal } from '../components/Modal'
+import { NumberField } from '../components/NumberField'
+import { PageHead } from '../components/PageHead'
 import { Cluster, Rail } from '../components/Layout'
 import { SectionHeader } from '../components/SectionHeader'
 import { Skeleton } from '../components/Skeleton'
@@ -62,6 +66,38 @@ function EditFieldSpecimen() {
         <EditField value={w} onChange={setW} onSubmit={setW} submitLabel="Ajouter" ariaLabel="Montant" />
       </Demo>
     </>
+  )
+}
+
+function NumberFieldSpecimen() {
+  const [money, setMoney] = useState(1507.65)
+  const [pct, setPct] = useState(0.0525)
+  const [year, setYear] = useState(1978)
+  const [age, setAge] = useState(65)
+  const [optional, setOptional] = useState<number | null>(null)
+  return (
+    <>
+      <Demo label="dollars (« 1 507,65 » ou « 1507.65 » : la virgule décimale se lit à la québécoise)">
+        <NumberField kind="money" value={money} onChange={setMoney} ariaLabel="Montant" />
+      </Demo>
+      <Demo label="pourcentage (stocké 0,0525, saisi 5,25)">
+        <NumberField kind="percent" min={-0.2} max={0.3} value={pct} onChange={setPct} ariaLabel="Taux" />
+      </Demo>
+      <Demo label="année · entier avec unité · facultatif (vide = rien)">
+        <NumberField kind="year" min={1900} max={2100} value={year} onChange={setYear} ariaLabel="Année" />
+        <NumberField kind="int" min={60} max={72} unit="ans" value={age} onChange={setAge} ariaLabel="Âge" />
+        <NumberField kind="money" allowEmpty value={optional} onChange={setOptional} ariaLabel="Facultatif" />
+      </Demo>
+    </>
+  )
+}
+
+function FieldRowSpecimen() {
+  const [v, setV] = useState(7000)
+  return (
+    <FieldRow label="Droits de cotisation inutilisés (CELI)" infoId="tfsaRoom" hint="Un indice discret sous le champ, lu avec lui.">
+      {(w) => <NumberField kind="money" value={v} onChange={setV} id={w.id} ariaDescribedBy={w.describedBy} />}
+    </FieldRow>
   )
 }
 
@@ -184,6 +220,20 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Saisie', name: 'EditField', file: 'src/components/EditField.tsx', kw: 'champ texte saisie input', render: () => <EditFieldSpecimen /> },
+    { cat: 'Saisie', name: 'NumberField', file: 'src/components/NumberField.tsx', kw: 'nombre montant pourcentage année âge saisie', render: () => <NumberFieldSpecimen /> },
+    { cat: 'Saisie', name: 'FieldRow', file: 'src/components/FieldRow.tsx', kw: 'champ étiquette indice libellé', render: () => <FieldRowSpecimen /> },
+    {
+      cat: 'Saisie',
+      name: 'FieldInfo',
+      file: 'src/components/FieldInfo.tsx',
+      kw: 'ⓘ où trouver ce chiffre aide libellé page officielle',
+      render: () => (
+        <div className="field-row__control">
+          <span>Un chiffre à trouver sur un relevé</span>
+          <FieldInfo id="earnings" label="Revenus de travail admissibles" />
+        </div>
+      ),
+    },
     { cat: 'Saisie', name: 'Chip', file: 'src/components/Chip.tsx', exports: ['Chip', 'ChipGroup'], kw: 'pastille filtre bascule', render: () => <ChipSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     {
@@ -193,6 +243,7 @@ function ENTRIES(): Entry[] {
       kw: 'titre section en-tête',
       render: () => <SectionHeader title="Régime de rentes du Québec" subtitle="Retraite Québec" icon="info-bold" />,
     },
+    { cat: 'Affichage', name: 'PageHead', file: 'src/components/PageHead.tsx', kw: 'titre page h1 en-tête', render: () => <PageHead title="Résultats" subtitle="Le titre unique d’une page, et une ligne discrète dessous." /> },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },
     {

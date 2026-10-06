@@ -43,10 +43,6 @@ export interface DbPension {
   startAge: number
 }
 
-export interface TaxableAccount {
-  balance: number
-}
-
 export interface Person {
   id: PersonId
   /** Shown in the UI only; never read by a formula. */

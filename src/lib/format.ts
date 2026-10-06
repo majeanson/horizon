@@ -20,6 +20,13 @@ export function formatInt(n: number | null | undefined, lang: Lang): string {
   return nf(lang, 'int', { maximumFractionDigits: 0 }).format(n)
 }
 
+// 12.5 → "12,5" / "12.5": a plain number with up to `digits` fraction digits and no unit — what goes INSIDE a
+// number field, where the unit is drawn beside the text. Grouped (« 15 000 »).
+export function formatDecimal(n: number | null | undefined, lang: Lang, digits = 2): string {
+  if (n == null || !Number.isFinite(n)) return ''
+  return nf(lang, `dec${digits}`, { minimumFractionDigits: 0, maximumFractionDigits: digits }).format(n)
+}
+
 // A year prints WITHOUT a grouping separator: « 2 026 » would be a bug, not a number.
 export function formatYear(n: number | null | undefined, lang: Lang): string {
   if (n == null || !Number.isFinite(n)) return ''

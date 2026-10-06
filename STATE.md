@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **6 — the engine is complete**; the store, the profile pages and the chart come next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household. No page uses the engine yet. |
+| **Phase** | **7 — the profile, assumptions, results and data pages work end to end**; the chart (Phase 8) and the offline/deploy proof (Phase 9) remain. The parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -93,9 +93,12 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 7 — store, profile, assumptions, `FieldInfo`
 
-- [ ] `lib/schema.ts`, `migrations.ts`, `store.ts`, JSON export / import, `schemaVersion.test.ts`
-- [ ] `FieldInfo`, `NumberField`, `FieldRow`, `fieldInfoCopy.test.ts` ❓ the exact statement labels, from Marc's own statements
-- [ ] Profil, Hypothèses, Données pages; `e2e/profile.spec.ts`
+- [x] `lib/schema.ts` (the validator every outside file passes through), `migrations.ts`, `store.ts`, JSON export / import, `schemaVersion.test.ts` — planted: a range edit, a bump without a migration, a missing fixture each turn it red; a comment-only edit stays green
+- [x] `FieldInfo`, `NumberField`, `FieldRow`, `fieldInfoCopy.test.ts` — the labels were READ on the official pages (research below); planted: a dead id, a non-official host, a dropped link, a stale excuse each turn it red
+- [x] Profil, Hypothèses, Résultats (verdict, comparison chips, per-year table, parameters used), Données; `e2e/profile.spec.ts` (22), axe on every route in every display state with every ⓘ and disclosure open
+- [ ] ❓ Statement wording still UNCONFIRMED (the ⓘ quotes none rather than guess): the RRQ relevé's per-age columns for the 60/65 estimate and its contributory-years label; the OAS estimator's residence question (behind a script-driven page); whether Revenu Québec shows any registered-savings room (revenuquebec.ca blocks automated clients — open its « Avis de cotisation » in a browser)
+- [ ] A couple retires at ONE age in the comparison (everyone at the tried age). Two separate ages per person is a v2 control
+- [ ] A person already retired cannot yet enter a pension in pay (their salary is back-projected): add « rente en cours » figures
 
 ### Phase 8 — chart and results
 
@@ -110,6 +113,9 @@ official page, and any guard it added has been **planted against its own bug** a
 ## 5. Lessons carried over from Babillard
 
 - **Plant the bug before trusting a guard** — a green grep test proves nothing alone.
+- **Look at the CI run after every push.** Three engine commits sat red on `knip` (an unused export, an unused type) because only the local suite was watched; `knip` cannot run on a memory-tight Windows box.
+- **A shell heredoc halves backslashes**, so a regex written through one is silently a different regex. Write files with the Write / Edit tools.
+- **axe finds what no one looked at**: Babillard's `--warn` and `--success` text tokens were under 4.5:1 on a card; they had never been run through it there.
 - **Measure, don't reason**, for layout: screenshot the first screen at 390 px and look.
 - **A budget that keeps its old ceiling after a win is a memory of one** — ratchets fall.
 - **`manualChunks` is a shim under Vite 8** — use `codeSplitting` groups.

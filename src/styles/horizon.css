@@ -145,7 +145,7 @@
   animation: toast-in var(--dur-base) var(--ease-out);
 }
 .toast--error {
-  background: var(--warn);
+  background: var(--warn-fill);
   color: #fff;
 }
 @keyframes toast-in {
@@ -165,4 +165,404 @@
   .toast-region {
     bottom: 1.5rem;
   }
+}
+
+/* ── Page head ───────────────────────────────────────────────────────────── */
+.page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.page-head__title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--text-xl);
+  letter-spacing: -0.01em;
+}
+.page-head__sub {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-md);
+}
+
+/* ── A section of a form (profile, assumptions, data) ────────────────────── */
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  min-width: 0;
+}
+.profile-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+/* ── One labelled field: label, control + ⓘ, hint ────────────────────────── */
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.field-row__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.field-row__control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.4rem;
+}
+.field-row__box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.field-row__hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.num-unit {
+  padding-inline: 0 0.6rem;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+/* The ⓘ and its note. The button is a full touch target; the note spans the row under the field. */
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.info-btn:hover,
+.info-btn.is-on {
+  color: var(--ink);
+  background: var(--accent-soft);
+}
+.info-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+.info-note {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+.info-note[hidden] {
+  display: none;
+}
+.info-note p {
+  margin: 0;
+}
+.info-note__extra {
+  color: var(--ink-soft);
+}
+.info-note__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-start;
+  min-height: 2.75rem;
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* A row that holds an ⓘ next to a single action (the earnings tools, a plan's rules). */
+.earnings__tools {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.4rem;
+}
+.earnings__tools .chip {
+  justify-self: start;
+}
+.earnings__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.6rem;
+}
+.earnings__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.earnings__year {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.earnings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.rrq-check {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+}
+.rrq-check__line {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+/* ── A group of accounts, an employer plan ───────────────────────────────── */
+.account-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.account-group__title {
+  padding: 0 0.4rem;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.plan-card__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.5rem;
+}
+.plan-card__name {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.plan-card__summary {
+  margin: 0.15rem 0 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.plan-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-top: 0.6rem;
+}
+.family__children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── The order of withdrawals ────────────────────────────────────────────── */
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.order-list__item {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.order-list__pos {
+  color: var(--ink-soft);
+}
+
+/* ── Données ─────────────────────────────────────────────────────────────── */
+.import-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.import-errors__list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: var(--text-xs);
+}
+.data-foot {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+/* ── Résultats ───────────────────────────────────────────────────────────── */
+.results-gaps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+.results-gaps ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.verdict {
+  padding: 1rem 1.2rem;
+}
+.verdict__line {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 5.5vw, var(--text-2xl));
+  line-height: 1.15;
+}
+.verdict__note {
+  margin: 0.4rem 0 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.compare {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.scenarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.scenario {
+  --series: var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.8rem 1rem;
+  border-top: 4px solid var(--series);
+}
+.scenario--sky {
+  --series: var(--sky-deep);
+}
+.scenario--sage {
+  --series: var(--sage-deep);
+}
+.scenario--berry {
+  --series: var(--berry-deep);
+}
+.scenario__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-weight: 700;
+}
+.scenario__swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--series);
+}
+.scenario__verdict {
+  margin: 0;
+}
+.scenario__verdict--short {
+  color: var(--warn);
+  font-weight: 600;
+}
+.scenario__worth {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.year-table,
+.params {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+.year-table__title {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.table-wrap:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.table-wrap th,
+.table-wrap td {
+  padding: 0.4rem 0.6rem;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hairline);
+}
+.table-wrap thead th {
+  position: sticky;
+  top: 0;
+  background: var(--paper-deep);
+  font-weight: 600;
+}
+.table-wrap th[scope='row'],
+.table-wrap thead th:first-child {
+  text-align: left;
+}
+.table-wrap tr.is-short th,
+.table-wrap tr.is-short td {
+  background: var(--clay-soft);
+}
+.params .table-wrap td {
+  text-align: left;
+  white-space: normal;
+}
+.params__value {
+  min-width: 10rem;
+  max-width: 24rem;
+  overflow-wrap: anywhere;
+}
+.projected,
+.params__verify {
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
 }
