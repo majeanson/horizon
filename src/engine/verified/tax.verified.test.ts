@@ -23,9 +23,9 @@ const P = knownYear(2026)
 const RULES: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas }
 
 const person = (over: Partial<PersonIncome> = {}): PersonIncome => ({
-  age: 50, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, rrspDeduction: 0, ...over,
+  age: 50, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, payrollPremiums: 0, rrspDeduction: 0, ...over,
 })
-const fed = (over: Partial<FederalInput> = {}): FederalInput => ({ age: 50, netIncome: 0, taxableIncome: 0, employment: 0, eligiblePension: 0, qppBase: 0, ...over })
+const fed = (over: Partial<FederalInput> = {}): FederalInput => ({ age: 50, netIncome: 0, taxableIncome: 0, employment: 0, eligiblePension: 0, qppBase: 0, payrollPremiums: 0, ...over })
 
 describe('federal — the brackets and Finance Canada\'s test case', () => {
   it('taxable income $60 000, basic personal amount only: tax on income $8 496, credit $2 303, net $6 193', () => {

@@ -150,6 +150,16 @@ export interface YearParams {
     workerDeductionMax: Cited
   }
 
+  /** Employee premiums on employment income: Employment Insurance (the Québec rate) and the QPIP. */
+  payroll: {
+    /** The EI employee premium rate for a Québec worker (lower than elsewhere, because the QPIP pays parental benefits). */
+    eiRate: Cited
+    eiMaxInsurable: Cited
+    /** The QPIP employee premium rate. */
+    qpipRate: Cited
+    qpipMaxInsurable: Cited
+  }
+
   /** Registered accounts — Canada Revenue Agency. */
   accounts: {
     rrspLimit: Cited

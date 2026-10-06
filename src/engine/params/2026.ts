@@ -74,7 +74,23 @@ const CRA_PA = src('https://www.canada.ca/en/revenue-agency/services/forms-publi
 })
 const CRA_RRSP_FORMULA = src(`${CRA}/topics/rrsps-related-plans/contributing-a-rrsp-prpp/contributions-affect-your-rrsp-prpp-deduction-limit.html`, 'How contributions affect your RRSP/PRPP deduction limit')
 
+const CRA_EI = src(
+  'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html',
+  'EI premium rates and maximums – Calculate payroll deductions and contributions',
+  { note: 'Table for employees in Québec, row 2026: « $68,900 | 1.30 | $895.70 | $1,253.98 » (maximum insurable earnings, employee rate, maximum employee premium, employer maximum).' },
+)
+
 // ── Revenu Québec / Finances Québec ──────────────────────────────────────────────────────────────
+const QC_QPIP_RATES = src(
+  'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations',
+  'Taux de cotisations au Régime québécois d’assurance parentale (RQAP)',
+  { note: 'Salarié, 2026 : « Taux de cotisation : 0,430 % », cotisation maximale 442,90 $ (0,494 % et 484,12 $ en 2025) ; baisse de 13 % le 1er janvier 2026.' },
+)
+const QC_QPIP_MAX = src(
+  'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable',
+  'Revenu maximal assurable aux fins du Régime québécois d’assurance parentale (RQAP)',
+  { note: '« Le revenu maximal assurable … s’établit à 98 000 $ pour 2025 et à 103 000 $ pour 2026. » (103 000 × 0,430 % = 442,90 $, la cotisation maximale publiée.)' },
+)
 const QC_PARAMS = src(
   'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf',
   "Paramètres du régime d'imposition des particuliers pour l'année d'imposition 2026",
@@ -257,6 +273,13 @@ export const P2026 = {
     splitMaxShare: c(0.5, 'fixed', { ...QC_EXPENDITURES_2020, note: '« un montant n’excédant pas 50 % de l’ensemble de ses revenus de retraite admissibles au fractionnement ».' }),
     workerDeductionRate: c(0.06, 'fixed', { ...QC_WORKERS, note: '6 % du revenu de travail admissible (salaire, revenu net d’entreprise, subventions de recherche…), sans réduction selon le revenu.' }),
     workerDeductionMax: c(1_450, 'cpi', { ...QC_PARAMS, note: '« – Montant maximal de la déduction pour les travailleurs 1 420 1 450 » (2025, 2026).' }, 10),
+  },
+
+  payroll: {
+    eiRate: c(0.013, 'fixed', { ...CRA_EI, note: 'Employee rate for Québec, 2026: 1.30 % (1.31 % in 2025). Held flat in projection: the Commission resets it yearly.' }),
+    eiMaxInsurable: c(68_900, 'wage', CRA_EI, 100),
+    qpipRate: c(0.0043, 'fixed', QC_QPIP_RATES),
+    qpipMaxInsurable: c(103_000, 'wage', QC_QPIP_MAX, 1_000),
   },
 
   accounts: {

@@ -136,6 +136,11 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'quebec.splitMaxShare': [0.5, QC_2020],
   'quebec.workerDeductionRate': [0.06, 'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110906.asp'],
   'quebec.workerDeductionMax': [1_450, QC_PDF],
+  // ── Employee premiums ───────────────────────────────────────────────────────────────────────
+  'payroll.eiRate': [0.013, 'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html'],
+  'payroll.eiMaxInsurable': [68_900, 'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html'],
+  'payroll.qpipRate': [0.0043, 'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations'],
+  'payroll.qpipMaxInsurable': [103_000, 'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable'],
 
   // ── Registered accounts ─────────────────────────────────────────────────────────────────────
   'accounts.rrspLimit': [33_810, 'https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html'],

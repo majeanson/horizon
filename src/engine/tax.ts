@@ -43,6 +43,8 @@ export interface PersonIncome {
   /** The employee's RRQ contributions on the year's employment income. */
   rrqBase: number
   rrqEnhanced: number
+  /** The employee's EI and QPIP premiums on the year's employment income (federal credits only — Québec gives none). */
+  payrollPremiums: number
   /** RRSP contributions deducted this year (line 20800). The caller keeps them within the person's deduction room. */
   rrspDeduction: number
 }
@@ -134,7 +136,7 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
 
   const results: PersonTax[] = out.map(({ p, income, before, recovery, netIncome, splitIn, splitOut }, i) => {
     const federal = federalTax(
-      { age: p.age, netIncome, taxableIncome: netIncome, employment: p.employment, eligiblePension: eligibleFederal(p, splitIn, splitOut, rules.federal.pensionMinAge), qppBase: p.rrqBase },
+      { age: p.age, netIncome, taxableIncome: netIncome, employment: p.employment, eligiblePension: eligibleFederal(p, splitIn, splitOut, rules.federal.pensionMinAge), qppBase: p.rrqBase, payrollPremiums: p.payrollPremiums },
       rules.federal,
     )
     const q = quebec.persons[i]

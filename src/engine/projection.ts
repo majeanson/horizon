@@ -1,6 +1,7 @@
 import { ageAtJan1, firstRrifYear, grow, maxWithdraw, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, tfsaNextRoom, type NonRegState } from './accounts.ts'
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { gisCategory, gisCountedIncome, gisMonthly, oasYear, type GisCategoryName, type OasPerson } from './oas.ts'
+import { payrollContribution } from './payroll.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
 import { roundTo, type Indexation } from './params/project.ts'
 import { rrqContribution, rrqPension, type RrqPension, type RrqRules } from './rrq.ts'
@@ -99,6 +100,8 @@ interface FixedIncome {
   db: number
   rrifMin: number
   rrqC: { base: number; enhanced: number; total: number }
+  /** EI + QPIP premiums on the year's employment income. */
+  payrollC: number
   rrspC: number
   tfsaC: number
   nonRegC: number
@@ -165,13 +168,15 @@ function simulateYear(
 
     const rrqC = working && age < 72 ? rrqContribution(employment, rrqContributionRulesFor(year, indexation)) : { base: 0, additionalFirst: 0, additionalSecond: 0, total: 0 }
 
+    const payrollC = working ? payrollContribution(employment, P.payroll).total : 0
+
     // Savings the person has decided to make while still working, in today's dollars, grown with prices.
     const acct = r.p.accounts
     const rrspC = working && age <= 71 ? Math.min(acct.rrsp.annualContribution * inflate, states[i].rrspRoom) : 0
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, a.returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, rrspC, tfsaC, nonRegC }
+    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, a.returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rrspC, tfsaC, nonRegC }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -195,6 +200,7 @@ function simulateYear(
         capitalGains: realized[i],
         rrqBase: fixed[i].rrqC.base,
         rrqEnhanced: fixed[i].rrqC.enhanced,
+        payrollPremiums: fixed[i].payrollC,
         rrspDeduction: fixed[i].rrspC,
       })),
     }
@@ -217,7 +223,7 @@ function simulateYear(
     const tax = householdTaxWithSplit(persons, rules, split)
     const gis = gisFor(persons, tax.persons.map((t) => t.netIncomeBeforeAdjustments))
     const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + gis[i]))
-    const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
+    const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].payrollC + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
     return { tax, gis, realized, cash: cashIn - tax.total - out }
   }
 
@@ -342,7 +348,7 @@ function simulateYear(
   const heldTax = householdTaxWithSplit(finalIncomes, rules, fixedSplit())
   const finalTax = heldTax.total < searchedTax.total ? heldTax : searchedTax
   const finalGis = gisFor(finalIncomes, finalTax.persons.map((t) => t.netIncomeBeforeAdjustments))
-  const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
+  const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].payrollC + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
   const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
   const cash = cashIn - finalTax.total - out
   const shortfall = roundTo(Math.max(0, spending - cash), 0.01)
@@ -404,6 +410,7 @@ function simulateYear(
       withdrawals: { nonReg: roundTo(draw.nonReg[i], 0.01), rrsp: roundTo(rrspOut, 0.01), tfsa: roundTo(draw.tfsa[i], 0.01) },
       contributions: { nonReg: roundTo(nonRegIn, 0.01), rrsp: roundTo(fixed[i].rrspC, 0.01), tfsa: roundTo(tfsaIn, 0.01) },
       rrqContribution: fixed[i].rrqC.total,
+      payrollContribution: fixed[i].payrollC,
       netIncome: t.netIncome,
       oasRecovery: t.oasRecovery,
       federalTax: t.federal.tax,

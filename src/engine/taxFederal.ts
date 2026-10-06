@@ -9,7 +9,7 @@ import type { YearParams } from './params/types.ts'
 //   − non-refundable credits (each credit AMOUNT × the lowest rate, 14 % in 2026):
 //       the basic personal amount (phased down above the 29 % bracket), the age amount (65+, reduced
 //       by 15 % of net income above a threshold), the pension income amount (≤ $2 000), the Canada
-//       employment amount, and the BASE part of QPP contributions
+//       employment amount, the BASE part of QPP contributions, and the EI and QPIP premiums
 //   = « basic federal tax » (line 42900, never below zero)
 //   − the Québec abatement, 16.5 % of that basic federal tax (line 44000).
 //
@@ -35,13 +35,15 @@ export interface FederalInput {
   eligiblePension: number
   /** The BASE part of the employee's QPP contributions (the enhanced part is a deduction, not a credit). */
   qppBase: number
+  /** The employee's EI and QPIP premiums: both are non-refundable credits (lines 31200 and 31205). */
+  payrollPremiums: number
 }
 
 export interface FederalResult {
   /** Tax on taxable income, by the brackets, before any credit. */
   taxOnIncome: number
   /** Each credit AMOUNT (before the 14 % conversion). */
-  amounts: { basic: number; age: number; pension: number; employment: number; qppBase: number }
+  amounts: { basic: number; age: number; pension: number; employment: number; qppBase: number; payroll: number }
   /** What the credits take off the tax: Σ amounts × the credit rate. */
   creditValue: number
   /** Line 42900: tax after credits, never below zero. */
@@ -94,8 +96,9 @@ export function federalTax(i: FederalInput, r: FederalRules): FederalResult {
     pension: Math.min(r.pensionAmountMax, Math.max(0, i.eligiblePension)),
     employment: Math.min(r.employmentAmount, Math.max(0, i.employment)),
     qppBase: Math.max(0, i.qppBase),
+    payroll: Math.max(0, i.payrollPremiums),
   }
-  const creditValue = (amounts.basic + amounts.age + amounts.pension + amounts.employment + amounts.qppBase) * r.creditRate
+  const creditValue = (amounts.basic + amounts.age + amounts.pension + amounts.employment + amounts.qppBase + amounts.payroll) * r.creditRate
   const basicTax = Math.max(0, taxOnIncome - creditValue)
   const abatement = basicTax * r.quebecAbatement
   return {

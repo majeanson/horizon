@@ -13,7 +13,7 @@
 
 ## 2026
 
-92 paramètres, dont **10 à vérifier**.
+96 paramètres, dont **10 à vérifier**.
 
 | Paramètre | Valeur | Page officielle | Relevé le | Évolue avec | Note |
 | --- | --- | --- | --- | --- | --- |
@@ -100,6 +100,10 @@
 | `quebec.splitMaxShare` | 0.5 | [Dépenses fiscales - Édition 2020 : Description des mesures](https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/documents/Depenses_fiscales_2020_Description_mesures.pdf) | 2026-10-06 | fixe | « un montant n’excédant pas 50 % de l’ensemble de ses revenus de retraite admissibles au fractionnement ». |
 | `quebec.workerDeductionRate` | 0.06 | [Dépenses fiscales — Déduction pour les travailleurs](https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110906.asp) | 2026-10-06 | fixe | **⚠ À VÉRIFIER :** Le taux de 6 % est celui de la Loi sur les impôts, art. 358.0.3 (« le moindre de 1 420 $ et de 6 % de son revenu de travail admissible », guide des mesures fiscales du CFFP, Université de Sherbrooke) ; la fiche officielle l’énonce aussi mais a refusé la lecture automatisée le jour du relevé. Le maximum de 2026 est, lui, lu dans le PDF officiel de Finances Québec. 6 % du revenu de travail admissible (salaire, revenu net d’entreprise, subventions de recherche…), sans réduction selon le revenu. |
 | `quebec.workerDeductionMax` | 1 450 | [Paramètres du régime d'imposition des particuliers pour l'année d'imposition 2026](https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf) | 2026-10-06 | prix (IPC) · arrondi 10 | « – Montant maximal de la déduction pour les travailleurs 1 420 1 450 » (2025, 2026). |
+| `payroll.eiRate` | 0.013 | [EI premium rates and maximums – Calculate payroll deductions and contributions](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html) | 2026-10-06 | fixe | Employee rate for Québec, 2026: 1.30 % (1.31 % in 2025). Held flat in projection: the Commission resets it yearly. |
+| `payroll.eiMaxInsurable` | 68 900 | [EI premium rates and maximums – Calculate payroll deductions and contributions](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html) | 2026-10-06 | salaires · arrondi 100 | Table for employees in Québec, row 2026: « $68,900 \| 1.30 \| $895.70 \| $1,253.98 » (maximum insurable earnings, employee rate, maximum employee premium, employer maximum). |
+| `payroll.qpipRate` | 0.0043 | [Taux de cotisations au Régime québécois d’assurance parentale (RQAP)](https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations) | 2026-10-06 | fixe | Salarié, 2026 : « Taux de cotisation : 0,430 % », cotisation maximale 442,90 $ (0,494 % et 484,12 $ en 2025) ; baisse de 13 % le 1er janvier 2026. |
+| `payroll.qpipMaxInsurable` | 103 000 | [Revenu maximal assurable aux fins du Régime québécois d’assurance parentale (RQAP)](https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable) | 2026-10-06 | salaires · arrondi 1000 | « Le revenu maximal assurable … s’établit à 98 000 $ pour 2025 et à 103 000 $ pour 2026. » (103 000 × 0,430 % = 442,90 $, la cotisation maximale publiée.) |
 | `accounts.rrspLimit` | 33 810 | [MP, DB, RRSP, DPSP, ALDA, TFSA limits, YMPE and the YAMPE](https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html) | 2026-10-06 | salaires · arrondi 10 | Row 2026: RRSP dollar limit $33,810 (2027: $35,390). Every limit on the page is a multiple of 10. |
 | `accounts.rrspRate` | 0.18 | [How contributions affect your RRSP/PRPP deduction limit](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/contributing-a-rrsp-prpp/contributions-affect-your-rrsp-prpp-deduction-limit.html) | 2026-10-06 | fixe | « The lesser of … 18% of your earned income in the previous year; the annual RRSP limit ». |
 | `accounts.tfsaLimit` | 7 000 | [Before you contribute to a TFSA](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributing/before.html) | 2026-10-06 | prix (IPC) · arrondi 500 | Annual limit 2026: $7,000; « indexed to inflation and rounded to the nearest $500 ». |
@@ -133,7 +137,7 @@
 
 ## Pages consultées
 
-35 pages officielles. Une page citée par beaucoup de chiffres est une page à relire en premier.
+38 pages officielles. Une page citée par beaucoup de chiffres est une page à relire en premier.
 
 | Page officielle | Chiffres | Dernière lecture |
 | --- | --- | --- |
@@ -148,6 +152,7 @@
 | [Maximum Benefit Amounts and Related Figures - Canada Pension Plan (2026) and Old Age Security (October to December 2026)](https://www.canada.ca/en/employment-social-development/programs/pensions/pension/statistics/2026-quarterly-october-december.html) | 12 | 2026-10-06 |
 | [Pension Adjustment Guide](https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html) | 2 | 2026-10-06 |
 | [Chart - Prescribed factors](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/completing-slips-summaries/t4rsp-t4rif-information-returns/payments/chart-prescribed-factors.html) | 2 | 2026-10-06 |
+| [EI premium rates and maximums – Calculate payroll deductions and contributions](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html) | 2 | 2026-10-06 |
 | [Indexation adjustment for personal income tax and benefit amounts - Canada.ca](https://www.canada.ca/en/revenue-agency/services/tax/individuals/frequently-asked-questions-individuals/adjustment-personal-income-tax-benefit-amounts.html) | 4 | 2026-10-06 |
 | [Current year tax rates and income brackets (2026) - Personal income tax - Canada.ca](https://www.canada.ca/en/revenue-agency/services/tax/individuals/tax-rates-brackets/current-year.html) | 1 | 2026-10-06 |
 | [Line 30100 - Age amount](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30100-amount.html) | 1 | 2026-10-06 |
@@ -162,6 +167,8 @@
 | [Repayment of Old Age Security pension - Canada.ca](https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/repayment.html) | 1 | 2026-10-06 |
 | [Old Age Security - When to start your retirement pension - Canada.ca](https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/when-start.html) | 4 | 2026-10-06 |
 | [Act respecting the Government and Public Employees Retirement Plan (chapter R-10)](https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf) | 4 | 2026-10-06 |
+| [Revenu maximal assurable aux fins du Régime québécois d’assurance parentale (RQAP)](https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable) | 1 | 2026-10-06 |
+| [Taux de cotisations au Régime québécois d’assurance parentale (RQAP)](https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations) | 1 | 2026-10-06 |
 | [Calculation of Your Retirement Pension Under the Québec Pension Plan](https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/applying-your-retirement-pension/retirement-pension-quebec-pension-plan/calculation-your-retirement-pension) | 5 | 2026-10-06 |
 | [The additional plan](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/additional-plan) | 4 | 2026-10-06 |
 | [Québec Pension Plan Figures](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/quebec-pension-plan-figures) | 5 | 2026-10-06 |

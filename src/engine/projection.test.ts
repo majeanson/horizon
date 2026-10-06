@@ -3,6 +3,7 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from './golden/household.fixture
 import { dbStart, dbYear } from './dbPension.ts'
 import { gisCategory, gisCountedIncome, gisMonthly } from './oas.ts'
 import { paramsFor } from './params/index.ts'
+import { payrollContribution } from './payroll.ts'
 import { project } from './projection.ts'
 import { rregopPension } from './presets.ts'
 import { householdTax } from './tax.ts'
@@ -33,7 +34,7 @@ describe('projection — the books always balance', () => {
   it('every year: everything received − tax − what is put away = what is spent − what could not be met', () => {
     for (const r of rows) {
       const received = r.household.grossIncome
-      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
       expect(received - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
     }
   })
@@ -69,6 +70,22 @@ describe('projection — the books always balance', () => {
     expect(project(H, A, {})).toEqual(rows)
   })
 
+  it('a working year pays the EI and QPIP premiums on its employment income; a year with none pays none', () => {
+    let worked = 0
+    for (const r of rows) {
+      const P = paramsFor(r.year, { inflation: A.inflation, wageGrowth: A.wageGrowth })
+      for (const p of people(r)) {
+        expect(p.payrollContribution, `${r.year}`).toBeCloseTo(payrollContribution(p.employment, P.payroll).total, 1)
+        if (p.employment === 0) expect(p.payrollContribution, `${r.year}`).toBe(0)
+        else {
+          worked++
+          expect(p.payrollContribution, `${r.year}`).toBeGreaterThan(0)
+        }
+      }
+    }
+    expect(worked, 'the golden household works for years').toBeGreaterThan(10)
+  })
+
   it('spending grows with inflation, and drops to the retired figure only once EVERYONE has retired', () => {
     const base = (y: number, today: number) => today * (1 + A.inflation) ** (y - A.today.year)
     for (const r of rows) {
@@ -102,7 +119,7 @@ describe('projection — a falling market never takes an account below zero', ()
         }
       }
       expect(r.household.netWorthEnd, `${r.year}`).toBeGreaterThanOrEqual(-0.005)
-      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
       expect(r.household.grossIncome - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
     }
   })
@@ -145,7 +162,7 @@ describe('projection — a household living on pensions alone, checked against t
       const P = paramsFor(r.year, { inflation: A.inflation, wageGrowth: A.wageGrowth })
       const db = r.persons.self!.db
       expect(r.persons.self!.withdrawals).toEqual({ nonReg: 0, rrsp: 0, tfsa: 0 })
-      const tax = householdTax([{ age: r.persons.self!.age, employment: 0, rrq: 0, oas: 0, db, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, rrspDeduction: 0 }], { federal: P.federal, quebec: P.quebec, oas: P.oas })
+      const tax = householdTax([{ age: r.persons.self!.age, employment: 0, rrq: 0, oas: 0, db, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, payrollPremiums: 0, rrspDeduction: 0 }], { federal: P.federal, quebec: P.quebec, oas: P.oas })
       expect(r.household.tax).toBeGreaterThan(0)
       expect(r.household.tax, `${r.year}`).toBeCloseTo(tax.total, 1)
       expect(r.household.shortfall, `${r.year}`).toBeCloseTo(Math.max(0, r.household.spending - (db + r.persons.self!.gis - r.household.tax)), 1)
@@ -196,7 +213,7 @@ describe('projection — committed savings yield to spending', () => {
     for (const r of rows) {
       const p = r.persons.self!
       expect(p.contributions.rrsp).toBeLessThanOrEqual(2_000 * (1 + A.inflation) ** (r.year - A.today.year) + 0.01)
-      const putAway = p.rrqContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa
+      const putAway = p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa
       expect(r.household.grossIncome - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
     }
   })
@@ -382,7 +399,7 @@ describe('projection — more is never worse, over many households', () => {
   it('every row of every sampled household balances', () => {
     for (const { h, label } of sample.slice(0, 8)) {
       for (const r of project(h, A, { retirementAge: { self: 60, spouse: 62 } })) {
-        const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+        const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
         expect(r.household.grossIncome - r.household.tax - putAway, `${label} ${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
       }
     }

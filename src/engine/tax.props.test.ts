@@ -14,7 +14,7 @@ const P = knownYear(2026)
 const RULES: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas }
 const SEED = 20260930
 
-const blank = (age: number): PersonIncome => ({ age, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, rrspDeduction: 0 })
+const blank = (age: number): PersonIncome => ({ age, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, payrollPremiums: 0, rrspDeduction: 0 })
 
 // A random person: an age, and each income source present or not with a plausible size.
 function randomPerson(r: () => number): PersonIncome {

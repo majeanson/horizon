@@ -124,6 +124,8 @@ export interface PersonYear {
   withdrawals: Record<AccountKind, number>
   contributions: Record<AccountKind, number>
   rrqContribution: number
+  /** EI and QPIP premiums paid on this year's employment income. */
+  payrollContribution: number
   /** Net income (line 23600): what the tax and the credits read. */
   netIncome: number
   oasRecovery: number
