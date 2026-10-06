@@ -93,6 +93,16 @@ export interface YearParams {
       /** Income above which the top-up starts to fall: a single person's, and a couple's combined. */
       topUpStartSingle: Cited
       topUpStartCouple: Cited
+      /**
+       * The statutory slopes of the GIS, as divisors: the monthly GIS falls by $1 for every
+       * (divisor) dollars of ANNUAL income. Single: 24 (one dollar per two dollars of monthly income).
+       * A couple's combined income: 48. The TOP-UP falls by $1 per (divisor) dollars above its start:
+       * 48 for a single pensioner, 96 for a couple's combined income.
+       */
+      baseDivisorSingle: Cited
+      baseDivisorCouple: Cited
+      topUpDivisorSingle: Cited
+      topUpDivisorCouple: Cited
       /** Employment income fully exempt from the GIS income test. */
       employmentExemptionFull: Cited
       /** The band above it in which half of employment income still counts. */

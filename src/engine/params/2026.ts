@@ -191,6 +191,26 @@ export const P2026 = {
         note: 's. 12.1(1)(b), (2): for a couple, « in excess of $4,000 » of the combined income.',
         verify: 'Même réserve que pour une personne seule : montant lu dans la Loi, valeur actuelle non confirmée sur une page canada.ca.',
       }),
+      baseDivisorSingle: c(24, 'fixed', {
+        ...OAS_ACT,
+        note: 's. 12: the supplement is the maximum « minus one dollar for each full two dollars of the pensioner’s monthly base income »; s. 12(6)(a): a single pensioner’s monthly base income is « one-twelfth of the income » of the year → $1 per 2 × 12 = 24 annual dollars.',
+        verify: 'Dérivé du texte de la Loi par calcul (aucune page canada.ca ne l’énonce en « cents par dollar »). Contre-vérifié par un test contre les seuils publiés des quatre trimestres de 2026 (le revenu limite implicite concorde à quelques dizaines de dollars près).',
+      }),
+      baseDivisorCouple: c(48, 'fixed', {
+        ...OAS_ACT,
+        note: 's. 12(6)(c)(ii): for a couple who both receive a pension, the monthly base income is « one twenty-fourth of the aggregate of the incomes » → $1 per 2 × 24 = 48 dollars of the couple’s COMBINED annual income, for each spouse.',
+        verify: 'Dérivé du texte de la Loi par calcul, comme le diviseur d’une personne seule ; mêmes contre-vérifications.',
+      }),
+      topUpDivisorSingle: c(48, 'fixed', {
+        ...OAS_ACT,
+        note: 's. 12.1(1)(a): the top-up is « A × B − C/4 » with C = « 1/12 of the pensioner’s income … in excess of $2,000 » → it falls $1 per 4 × 12 = 48 annual dollars above its start.',
+        verify: 'Dérivé du texte de la Loi par calcul. Contre-vérifié : (seuil du supplément − 2 000 $) ÷ 48 redonne ≈ 177 $, le même supplément maximal pour une personne seule et pour un conjoint sans pension.',
+      }),
+      topUpDivisorCouple: c(96, 'fixed', {
+        ...OAS_ACT,
+        note: 's. 12.1(1)(b), (2): C = « 1/24 of the aggregate of the incomes … in excess of $4,000 » → $1 per 4 × 24 = 96 dollars of combined annual income above its start.',
+        verify: 'Dérivé du texte de la Loi par calcul. Contre-vérifié : (8 800 − 4 000) ÷ 96 = 50 $, le « A = $50 » de la Loi pour un conjoint qui reçoit la pleine pension.',
+      }),
       employmentExemptionFull: c(5_000, 'fixed', { ...OAS_ACT, note: 's. 2, « income », (b.1): the first $5,000 of employment income is exempt; « you can earn up to $5,000 with no reduction ». No 2026 change found.' }),
       employmentExemptionBand: c(10_000, 'fixed', { ...OAS_ACT, note: '…then half of the next $10,000 (to $15,000 of earnings) is exempt — a maximum exemption of $10,000.' }),
     },

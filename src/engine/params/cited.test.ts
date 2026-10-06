@@ -21,7 +21,7 @@ const isOfficialHost = (host: string) => OFFICIAL.some((h) => host === h || host
 
 // The ratchet: figures whose source carries a `verify` reason. Lower it in the commit that
 // confirms one on an openable page; never raise it without writing the reason on the source.
-const MAX_UNVERIFIED = 7
+const MAX_UNVERIFIED = 11 // 7 from Phase 1, + the 4 statutory GIS divisors derived from the Act (Phase 3)
 
 const INDEX_RULES = ['cpi', 'wage', 'fixed', 'none']
 

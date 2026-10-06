@@ -81,6 +81,10 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'oas.gis.spouseNone.topUpCutoff': [20_992, Q4],
   'oas.gis.topUpStartSingle': [2_000, ACT],
   'oas.gis.topUpStartCouple': [4_000, ACT],
+  'oas.gis.baseDivisorSingle': [24, ACT],
+  'oas.gis.baseDivisorCouple': [48, ACT],
+  'oas.gis.topUpDivisorSingle': [48, ACT],
+  'oas.gis.topUpDivisorCouple': [96, ACT],
   'oas.gis.employmentExemptionFull': [5_000, ACT],
   'oas.gis.employmentExemptionBand': [10_000, ACT],
 

@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **2 — RRQ done**; OAS/GIS next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (84 cited figures for 2026) and the RRQ engine are verified against Retraite Québec's own worked example. No page uses the engine yet. |
+| **Phase** | **3 — OAS and GIS done**; taxes next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (84 cited figures for 2026) and the RRQ engine are verified against Retraite Québec's own worked example. No page uses the engine yet. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -66,8 +66,9 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 3 — OAS and GIS
 
-- [ ] Residence proration, deferral (+36 % at 70), the 75-and-over increase
-- [ ] Recovery tax against the canada.ca example; GIS against three table rows with a declared tolerance
+- [x] Residence proration, deferral (+36 % at 70), the 75-and-over increase — against the « when to start » table
+- [x] Recovery tax against the canada.ca example (100 000 $ → 981.90 $); GIS through every published figure of the four 2026 quarters, the statutory slopes cross-checked across them
+- [ ] Confirm the four derived GIS divisors against the OAS Benefits Estimator (Service Canada's own calculator) and lower the `verify` ratchet
 
 ### Phase 4 — taxes
 
