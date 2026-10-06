@@ -35,6 +35,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **Inputs** | `Saisie` |
 | **Display / content** | `Affichage` |
 | **Feedback / chrome** | `Feedback` |
+| **Charts** | `Graphiques` |
 
 > **Every row here either has a live specimen in `/dev/kit`, or says why not** — the marker
 > `*(no specimen: <reason>)*` at the end of its Purpose cell. The parity test fails the build on
@@ -67,6 +68,12 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **PageHead** | `src/components/PageHead.tsx` | The top of a page: its ONE `<h1>` and a quiet line under it. (A `SectionHeader` names a section inside a page.) |
 | **EmptyState** | `src/components/EmptyState.tsx` | The calm « nothing here » line (`role="status"`). |
 | **Disclosure** | `src/components/Disclosure.tsx` | A collapsed-by-default expander (caret + label + optional count) for secondary, space-hungry groups: the per-year table, the parameters behind a figure. |
+
+### Charts
+
+| Component | File | Purpose |
+| --- | --- | --- |
+| **LineChart** | `src/components/charts/LineChart.tsx` | The ONE chart: plain `ChartSeries` in, a line chart out, in the app's own colour tokens. A thin adapter — only `components/charts/*` may import the chart library (`chartBoundary.test.ts`), and it rides in its own lazy chunk. A picture: `role="img"` with a name, the per-year table beside it is its text. |
 
 ### Feedback / chrome
 

@@ -57,7 +57,7 @@ test('the component gallery opens and renders every category', async ({ page }) 
   const problems = watchConsole(page)
   await page.goto('/dev/kit')
   await expect(page.getByRole('heading', { name: 'Galerie des composants' })).toBeVisible()
-  for (const cat of ['Fondations', 'Saisie', 'Affichage', 'Feedback']) {
+  for (const cat of ['Fondations', 'Saisie', 'Affichage', 'Graphiques', 'Feedback']) {
     await expect(page.getByRole('heading', { name: cat, level: 2 })).toBeVisible()
   }
   expect(problems).toEqual([])

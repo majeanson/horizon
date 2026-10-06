@@ -73,7 +73,8 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | A one-line « done » notice | **`useNotice`** | `lib/toast.tsx` |
 | An icon | **`Icon`** / `InlineIcon` (Phosphor, never an emoji) | `components/Icon.tsx` |
 | Format a number / money / percent | the **cached** helpers in `lib/format.ts` / `lib/money.ts` | — |
-| A chart | **`LineChart`** from `components/charts` — the only file that touches the chart library | `components/charts/` |
+| A chart | **`LineChart`** from `components/charts` — the only folder that touches the chart library (`chartBoundary.test.ts`); build `ChartSeries` in `lib/chartData.ts` | `components/charts/` |
+| Heavy work (a long loop of projections) | a **web worker** (`lib/sensitivity.worker.ts` + `useSensitivity`) that streams results — never a multi-second loop on the page's thread | `lib/` |
 
 **When you add a shared component:** register it in `src/pages/DevKit.tsx` and add its row to
 `COMPONENTS.md` — `devkitParity.test.ts` fails the build on either half missing.

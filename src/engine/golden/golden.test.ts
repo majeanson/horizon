@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { project } from '../projection.ts'
 import { compare, everyoneAt, retireAt } from '../retireAt.ts'
-import { sensitivity } from '../simulate.ts'
+import { sensitivity, sensitivityCells } from '../simulate.ts'
 import type { Household } from '../types.ts'
 import { GOLDEN_ASSUMPTIONS as A, GOLDEN_HOUSEHOLD as H } from './household.fixture.ts'
 
@@ -102,6 +102,10 @@ describe('sensitivity', () => {
     expect(at(-0.01, 95)!).toBeGreaterThanOrEqual(base)
     expect(at(0.01, 95)!).toBeLessThanOrEqual(base)
     expect(at(0, 100)!).toBeGreaterThanOrEqual(base)
+  })
+
+  it('the streamed cells are the grid, in the same order', () => {
+    expect([...sensitivityCells(H, A, { returnsDeltas: [-0.01, 0, 0.01], inflationDeltas: [0], horizonAges: [95, 100] })]).toEqual(cells)
   })
 
   it('one row per combination, deterministically', () => {

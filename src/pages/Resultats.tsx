@@ -1,22 +1,28 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Disclosure } from '../components/Disclosure'
 import { Rail } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
+import { ChartPanel } from '../components/results/ChartPanel'
+import { ParamsPanel } from '../components/results/ParamsPanel'
+import { SensitivityPanel } from '../components/results/SensitivityPanel'
+import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
 import { retireAt } from '../engine/retireAt'
 import { useLang, useT } from '../i18n'
+import type { Dollars, Metric } from '../lib/chartData'
 import { formatMoney } from '../lib/money'
-import { paramRows, knownYears } from '../lib/paramsView'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, formatSelections, parseSelections, runSelections, toggleSelection, type Selection } from '../lib/resultsModel'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
 
-// The answer. A verdict first — the earliest age at which the plan lasts — then the comparison the person
-// chooses (« my plan », or one age for everyone), and the year-by-year detail and the parameters behind it for
-// whoever wants to check. Nothing is shown until the profile holds enough to mean something (profileGaps).
+// The answer. A verdict first — the earliest age at which the plan lasts — then the comparison the person chooses
+// (« my plan », or one age for everyone) as scenario cards and a chart, and the detail behind it for whoever wants to
+// check: the year-by-year table, the parameters, and how fragile the verdict is. Nothing is shown until the profile
+// holds enough to mean something (profileGaps). Every choice lives in the address (`?ages=&metric=&dollars=`), so a
+// view can be bookmarked and the back button means what it says.
 
 const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
@@ -27,10 +33,25 @@ export function Resultats() {
   const profile = useProfile()
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
-  const now = { year, month }
   const selections = parseSelections(params.get('ages'))
+  const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
+  const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
-  const assumptions = assumptionsOf(profile, now)
+  const assumptions = assumptionsOf(profile, { year, month })
+
+  const setParam = useCallback(
+    (key: string, value: string | null) =>
+      setParams(
+        (p) => {
+          const next = new URLSearchParams(p)
+          if (value === null) next.delete(key)
+          else next.set(key, value)
+          return next
+        },
+        { replace: true },
+      ),
+    [setParams],
+  )
 
   const earliest = useMemo(
     () => (gaps.length > 0 ? null : retireAt(profile.household, assumptionsOf(profile, { year, month }), { stopAtFirstOk: true }).earliestOk),
@@ -42,17 +63,17 @@ export function Resultats() {
     [profile, gaps.length, year, month, picked],
   )
 
-  // On a phone the rail shows only its first chips: bring the ones already switched on into view, once, so the
-  // page never opens looking as if nothing were selected.
+  // On a phone the rail shows only its first chips: bring the ones already switched on into view, once, so the page
+  // never opens looking as if nothing were selected.
   const compareRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     compareRef.current?.querySelector<HTMLElement>('[aria-pressed="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' })
   }, [gaps.length])
 
-  const oldest = Math.max(...profile.household.persons.map((p) => now.year - p.birth.year))
+  const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
   const ages = Array.from({ length: MAX_AGE - Math.max(MIN_AGE, oldest) + 1 }, (_, i) => Math.max(MIN_AGE, oldest) + i)
-  const toggle = (s: Selection) => setParams({ ages: formatSelections(toggleSelection(selections, s)) }, { replace: true })
-  const label = (s: Selection) => (s === 'plan' ? r.compare.plan : r.compare.age(s))
+  const toggle = (s: Selection) => setParam('ages', formatSelections(toggleSelection(selections, s)))
+  const label = useCallback((s: Selection) => (s === 'plan' ? r.compare.plan : r.compare.age(s)), [r])
 
   if (gaps.length > 0) {
     return (
@@ -116,83 +137,30 @@ export function Resultats() {
         ))}
       </ul>
 
+      {runs.length > 0 && (
+        <ChartPanel
+          runs={runs}
+          household={profile.household}
+          todayYear={year}
+          inflation={assumptions.inflation}
+          metric={metric}
+          dollars={dollars}
+          onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}
+          onDollars={(d) => setParam('dollars', d === 'today' ? null : d)}
+          label={label}
+        />
+      )}
+
       <Disclosure label={r.table.title} count={runs.length}>
-        {runs.map(({ selection, result }) => (
-          <div key={String(selection)} className="year-table">
-            <h3 className="year-table__title">{r.scenario.retireAt(label(selection))}</h3>
-            <div className="table-wrap" role="region" aria-label={`${r.table.title} — ${label(selection)}`} tabIndex={0}>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">{r.table.year}</th>
-                    <th scope="col">{r.table.ages}</th>
-                    <th scope="col">{r.table.income}</th>
-                    <th scope="col">{r.table.tax}</th>
-                    <th scope="col">{r.table.spending}</th>
-                    <th scope="col">{r.table.shortfall}</th>
-                    <th scope="col">{r.table.netWorth}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.rows.map((row) => (
-                    <tr key={row.year} className={row.household.shortfall > 0 ? 'is-short' : undefined}>
-                      <th scope="row">
-                        {row.year}
-                        {row.projected && <span className="projected mono"> {t.common.projected}</span>}
-                      </th>
-                      <td>{Object.values(row.persons).map((p) => p.age).join(' / ')}</td>
-                      <td>{formatMoney(row.household.grossIncome, lang)}</td>
-                      <td>{formatMoney(row.household.tax, lang)}</td>
-                      <td>{formatMoney(row.household.spending, lang)}</td>
-                      <td>{row.household.shortfall > 0 ? formatMoney(row.household.shortfall, lang) : '—'}</td>
-                      <td>{formatMoney(row.household.netWorthEnd, lang)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ))}
+        <YearTables runs={runs} label={label} />
+      </Disclosure>
+
+      <Disclosure label={r.sensitivity.title}>
+        <SensitivityPanel household={profile.household} assumptions={assumptions} />
       </Disclosure>
 
       <Disclosure label={r.params.title}>
-        <p className="field-row__hint">{r.params.note}</p>
-        {knownYears().map((year) => {
-          const rows = paramRows(year)
-          return (
-            <div key={year} className="params">
-              <h3 className="year-table__title">
-                {r.params.year(year)} · {r.params.count(rows.length)}
-              </h3>
-              <div className="table-wrap" role="region" aria-label={r.params.year(year)} tabIndex={0}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">{r.params.figure}</th>
-                      <th scope="col">{r.params.value}</th>
-                      <th scope="col">{r.params.source}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row) => (
-                      <tr key={row.path}>
-                        <th scope="row" className="mono">{row.path}</th>
-                        <td className="params__value">{row.value}</td>
-                        <td>
-                          <a href={row.url} target="_blank" rel="noopener noreferrer">
-                            {row.title}
-                          </a>{' '}
-                          <span className="mono">{r.params.retrieved(row.retrieved)}</span>
-                          {row.verify && <span className="params__verify mono"> · {r.params.toVerify}</span>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )
-        })}
+        <ParamsPanel />
       </Disclosure>
     </section>
   )

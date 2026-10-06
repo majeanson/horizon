@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip, ChipGroup } from '../components/Chip'
 import { Disclosure } from '../components/Disclosure'
@@ -19,6 +19,7 @@ import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type TextScale } from '../lib/accessibility'
 import { useConfirm } from '../lib/confirm'
+import { formatCompactMoney, formatMoney } from '../lib/money'
 import { getTheme, setTheme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import '../styles/devkit.css'
@@ -98,6 +99,31 @@ function FieldRowSpecimen() {
     <FieldRow label="Droits de cotisation inutilisés (CELI)" infoId="tfsaRoom" hint="Un indice discret sous le champ, lu avec lui.">
       {(w) => <NumberField kind="money" value={v} onChange={setV} id={w.id} ariaDescribedBy={w.describedBy} />}
     </FieldRow>
+  )
+}
+
+// The chart library is lazy here too: the gallery is online-only, and the library is the heaviest thing in the app.
+const LineChart = lazy(() => import('../components/charts').then((m) => ({ default: m.LineChart })))
+
+function LineChartSpecimen() {
+  const { lang } = useLang()
+  const years = Array.from({ length: 31 }, (_, i) => 2030 + i)
+  const series = [
+    { id: 'a', label: '60 ans', colour: 'accent' as const, points: years.map((x, i) => ({ x, y: 40_000 * Math.sin(i / 9) ** 2 * (i + 4) * 4 })) },
+    { id: 'b', label: '65 ans', colour: 'sky' as const, points: years.map((x, i) => ({ x, y: 22_000 * (i + 2) + 9_000 * i * Math.cos(i / 7) })) },
+  ]
+  return (
+    <Suspense fallback={<Loading />}>
+      <LineChart
+        series={series}
+        markers={[{ x: 2038, label: '60 ans', colour: 'accent' }, { x: 2043, label: '65 ans', colour: 'sky' }]}
+        yFormat={(y) => formatCompactMoney(y, lang)}
+        yDetail={(y) => formatMoney(y, lang)}
+        xTitle={(x) => String(x)}
+        ariaLabel="Deux courbes d’exemple, de 2030 à 2060."
+        height={240}
+      />
+    </Suspense>
   )
 }
 
@@ -243,6 +269,7 @@ function ENTRIES(): Entry[] {
       kw: 'titre section en-tête',
       render: () => <SectionHeader title="Régime de rentes du Québec" subtitle="Retraite Québec" icon="info-bold" />,
     },
+    { cat: 'Graphiques', name: 'LineChart', file: 'src/components/charts/LineChart.tsx', exports: ['LineChart'], kw: 'graphique courbe ligne série recharts', render: () => <LineChartSpecimen /> },
     { cat: 'Affichage', name: 'PageHead', file: 'src/components/PageHead.tsx', kw: 'titre page h1 en-tête', render: () => <PageHead title="Résultats" subtitle="Le titre unique d’une page, et une ligne discrète dessous." /> },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },

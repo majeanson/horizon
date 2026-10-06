@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { EXAMPLE, seedProfile } from './seed'
 
 // The service-worker offline app shell, end to end. The promise: an installed Horizon REOPENS
 // with no network and still boots — and, because the profile lives in the browser, with the
@@ -143,4 +144,45 @@ test('with no network AND no cached shell, a navigation shows the last page rath
   await expect(page.getByRole('heading', { name: 'Horizon' })).toBeVisible()
   await expect(page.getByText('Pas de réseau')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Réessayer' })).toBeVisible()
+})
+
+test('offline, the saved profile is intact and the results — the chart and the worker included — are computed from the cache', async ({ page }) => {
+  // The promise this app is built on: no network is needed, ever, for anything a person did. Reopen offline and the
+  // profile is still there, the verdict is re-derived, the chart's lazy chunk comes from the cache, and the
+  // « what if » grid runs in a worker whose script is also from the cache.
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  await waitControlled(page)
+  await expect(page.getByText('Au plus tôt : 60 ans')).toBeVisible()
+
+  const consoleErrors: string[] = []
+  page.on('console', (m) => {
+    if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 200))
+  })
+  page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message.slice(0, 200)))
+  const failed: string[] = []
+  page.on('response', (r) => {
+    if (r.status() >= 400) failed.push(`${r.status()} ${new URL(r.url()).pathname}`)
+  })
+
+  await page.context().setOffline(true)
+  await page.reload()
+  await expect(page.getByText('Au plus tôt : 60 ans')).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('figure.chart')).toBeVisible()
+  await expect(page.locator('path.recharts-line-curve')).toHaveCount(2)
+
+  // The profile page, offline, still holds what was saved.
+  await page.getByRole('link', { name: 'Profil' }).click()
+  await expect(page.getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
+
+  // …and the worker runs offline.
+  await page.getByRole('link', { name: 'Résultats' }).click()
+  await page.getByRole('button', { name: /Et si l’avenir est un peu moins bon/ }).click()
+  await page.getByRole('button', { name: 'Calculer' }).click()
+  await expect(page.getByRole('button', { name: 'Calculer' })).toBeEnabled({ timeout: 90_000 })
+  await expect(page.locator('.sensitivity tbody td')).toHaveCount(27)
+  await expect(page.locator('.sensitivity td.is-base').nth(1)).toHaveText('60')
+
+  expect(failed, 'nothing the offline app asked for failed').toEqual([])
+  expect(consoleErrors).toEqual([])
 })

@@ -32,18 +32,29 @@ export function shifted(a: Assumptions, returnsDelta: number, inflationDelta: nu
   }
 }
 
-export function sensitivity(h: Household, a: Assumptions, options: SensitivityOptions = {}): SensitivityCell[] {
-  const returnsDeltas = options.returnsDeltas ?? [-0.01, 0, 0.01]
-  const inflationDeltas = options.inflationDeltas ?? [-0.01, 0, 0.01]
-  const horizonAges = options.horizonAges ?? [90, a.horizonAge, 100]
-  const cells: SensitivityCell[] = []
-  for (const horizonAge of [...new Set(horizonAges)]) {
+/** The three axes of the grid — the page lays its tables out from the same lists the engine walks. */
+export function sensitivityAxes(a: Assumptions, options: SensitivityOptions = {}): { returnsDeltas: number[]; inflationDeltas: number[]; horizonAges: number[] } {
+  return {
+    returnsDeltas: [...(options.returnsDeltas ?? [-0.01, 0, 0.01])],
+    inflationDeltas: [...(options.inflationDeltas ?? [-0.01, 0, 0.01])],
+    horizonAges: [...new Set(options.horizonAges ?? [90, a.horizonAge, 100])],
+  }
+}
+
+/**
+ * The grid, one cell at a time. A generator, so a caller that cannot afford to block (the page, which runs this in a
+ * web worker) can show each cell the moment it is known instead of waiting for all of them.
+ */
+export function* sensitivityCells(h: Household, a: Assumptions, options: SensitivityOptions = {}): Generator<SensitivityCell> {
+  const { returnsDeltas, inflationDeltas, horizonAges } = sensitivityAxes(a, options)
+  for (const horizonAge of horizonAges) {
     for (const returnsDelta of returnsDeltas) {
       for (const inflationDelta of inflationDeltas) {
         const earliestOk = retireAt(h, shifted(a, returnsDelta, inflationDelta, horizonAge), { ...options, stopAtFirstOk: true }).earliestOk
-        cells.push({ returnsDelta, inflationDelta, horizonAge, earliestOk })
+        yield { returnsDelta, inflationDelta, horizonAge, earliestOk }
       }
     }
   }
-  return cells
 }
+
+export const sensitivity = (h: Household, a: Assumptions, options: SensitivityOptions = {}): SensitivityCell[] => [...sensitivityCells(h, a, options)]

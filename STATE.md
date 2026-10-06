@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **7 — the profile, assumptions, results and data pages work end to end**; the chart (Phase 8) and the offline/deploy proof (Phase 9) remain. The parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
+| **Phase** | **8 — the chart and the « what if » grid are in**; the last pass (Phase 9: keyboard path, final snapshot, the weekly sources check) remains. The parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -102,12 +102,16 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 8 — chart and results
 
-- [ ] `components/charts/*` (Recharts behind an adapter), `chartBoundary.test.ts`, a DevKit specimen
-- [ ] Résultats: scenario chips, chart, verdict line, per-year table, « Paramètres utilisés »; bundle caps set from the real build; `e2e/results.spec.ts`
+- [x] `components/charts/*` (Recharts behind an adapter), `chartBoundary.test.ts` (planted: an import from a page → red; in a comment → green; the door's own import removed → red), a DevKit specimen
+- [x] Résultats: verdict, comparison chips, scenario cards, the chart (net worth or guaranteed income, in today's or the year's dollars, all in the address), per-year table, « Paramètres utilisés », and the sensitivity grid in a web worker; `e2e/results.spec.ts` (7)
+- [x] Bundle caps set from the real build (the chart library is 347 KB raw / 103 KB gzip, lazy, off the door; a lowered cap and a static `Résultats` import each turn `check:bundle` red)
+- [ ] The chart library is the biggest thing in the app. If 103 KB gzip on the first Résultats visit matters, the adapter lets a ~5 KB hand-drawn SVG replace it by editing one folder
 
 ### Phase 9 — offline proof and deploy
 
-- [ ] `e2e/sw.config.ts` + `offline.spec.ts`; axe on every route; keyboard path through the profile
+- [x] The offline harness (`e2e:sw`, 6 tests): the shell, a deep link, the grey-screen trap, AND a saved profile + the results page with the chart and the worker, reopened with the network off
+- [x] axe on every route in five display states with every ⓘ and disclosure open
+- [ ] A keyboard-only path through the whole profile (Tab order across a section, Enter to commit, ⓘ by Space) — the shell's order is tested; a form walk is not
 - [ ] Cloudflare Worker, GitHub secrets, deploy on push; this file's snapshot updated in the same commit
 
 ## 5. Lessons carried over from Babillard

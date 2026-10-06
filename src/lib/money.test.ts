@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney, parseMoney, parseDecimal } from './money'
+import { formatCompactMoney, formatMoney, parseMoney, parseDecimal } from './money'
 
 // Plain, narrow and non-breaking spaces all print as a space: the Intl data uses U+00A0 / U+202F
 // between groups and before « $ », and a test full of invisible characters is a test nobody can
@@ -87,5 +87,21 @@ describe('parseDecimal (the same reading rules, for any typed number)', () => {
     expect(parseDecimal('')).toBeNull()
     expect(parseDecimal('abc')).toBeNull()
     expect(parseDecimal('1-2')).toBeNull()
+  })
+})
+
+describe('formatCompactMoney (the chart axis)', () => {
+  const plain = (s: string) => s.split(String.fromCharCode(0xa0)).join(' ').split(String.fromCharCode(0x202f)).join(' ')
+
+  it('shortens thousands and millions, in both languages', () => {
+    expect(plain(formatCompactMoney(1_200_000, 'fr'))).toMatch(/^1,2 ?M ?\$$/)
+    expect(formatCompactMoney(1_200_000, 'en')).toBe('$1.2M')
+    expect(formatCompactMoney(85_000, 'en')).toBe('$85K')
+  })
+
+  it('leaves small numbers whole, and nothing as nothing', () => {
+    expect(formatCompactMoney(950, 'en')).toBe('$950')
+    expect(formatCompactMoney(null, 'fr')).toBe('')
+    expect(formatCompactMoney(Number.NaN, 'en')).toBe('')
   })
 })

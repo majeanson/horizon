@@ -33,7 +33,11 @@ const EAGER_CHUNKS = [
 // Chunks that are lazy AND deliberately un-precached (see ONLINE_ONLY_CHUNKS in vite.config.ts).
 const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // Chunks that DO need precaching but are too big for the generic per-chunk budget.
-const LAZY_CAPS = []
+// MEASURED from the real build (2026-10-06): the chart library is 347 KB raw / 103 KB gzip — Recharts 3 with d3 and its
+// state store. It is lazy, precached once, and never on the first screen (NOT_IN_DOOR below). The cap sits just above
+// today's size, so a dependency bump that grows it fails here; it comes DOWN after any win, never back up. (If the
+// library is ever swapped, that is a one-folder change: components/charts/, chartBoundary.test.ts.)
+const LAZY_CAPS = [{ re: /^charts-[^.]*\.js$/, cap: 360 * KB }]
 
 // The door.
 const CLOSURE_CHUNK_CAP = 6
@@ -42,7 +46,13 @@ const CLOSURE_BUDGET = 330 * KB
 // into boot.
 const EAGER_MEMBER_CAP = 32 * KB
 // Modules that must have a chunk of their own and be reachable only through lazy().
-const LAZY_BY_NAME = []
+const LAZY_BY_NAME = [
+  'src/pages/Profil.tsx',
+  'src/pages/Hypotheses.tsx',
+  'src/pages/Resultats.tsx',
+  'src/pages/Donnees.tsx',
+  'src/components/charts/index.ts',
+]
 // Chunks that must never ride the door, with the reason.
 const NOT_IN_DOOR = [{ re: /^charts-/, why: 'the chart library is reachable only from the lazy results page; the door is the shell' }]
 

@@ -30,6 +30,18 @@ export function formatMoney(dollars: number | null | undefined, lang: Lang, opts
   return currency(lang, opts.cents === true).format(dollars)
 }
 
+// dollars → "1,2 M$" / "$1.2M": the short form a chart axis has room for. Whole numbers under a thousand stay whole.
+const compactCache = new Map<Lang, Intl.NumberFormat>()
+export function formatCompactMoney(dollars: number | null | undefined, lang: Lang): string {
+  if (dollars == null || !Number.isFinite(dollars)) return ''
+  let f = compactCache.get(lang)
+  if (!f) {
+    f = new Intl.NumberFormat(lang === 'en' ? 'en-CA' : 'fr-CA', { style: 'currency', currency: 'CAD', notation: 'compact', maximumFractionDigits: 1 })
+    compactCache.set(lang, f)
+  }
+  return f.format(dollars)
+}
+
 // A free-typed number → a number. The workhorse behind parseMoney and every other typed field (a
 // percentage, a count of years): tolerates spaces (plain and non-breaking), a leading "$", and either
 // separator. Empty/invalid → null; a negative number is refused unless `negative` is set.
