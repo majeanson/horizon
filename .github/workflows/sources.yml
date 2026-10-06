@@ -1,0 +1,28 @@
+name: Sources (official pages still there)
+
+# Every government figure in this app cites an official page. Pages move: a federal reorganisation, a renamed
+# program, a retired PDF. Once a week this opens every cited URL and FAILS if one is gone or in error, so a dead
+# source is found by a schedule and not by a person trying to counter-verify a number and meeting a 404.
+#
+# A page that refuses AUTOMATED clients (Revenu Québec answers 403 to everything that is not a browser) is reported
+# as « blocked », not as a failure: it cannot be checked from here, and STATE.md keeps those open for a human.
+# Also runnable on demand from the Actions tab.
+
+on:
+  schedule:
+    - cron: '17 11 * * 1' # Mondays, 11:17 UTC
+  workflow_dispatch:
+
+jobs:
+  sources:
+    name: Cited pages resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      # Exits non-zero only on a page that is gone or errors — see scripts/check-sources.ts.
+      - run: npm run sources:check

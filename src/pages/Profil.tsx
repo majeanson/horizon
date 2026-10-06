@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { FamilySection } from '../components/profile/FamilySection'
 import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
@@ -9,6 +9,7 @@ import { SubTabs } from '../components/SubTabs'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
 import { hasSpouse, mapPerson } from '../lib/profileEdit'
+import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 
 // The profile: the household, then one person at a time (« Moi » / « Conjoint·e », `?person=`). Every field
@@ -24,6 +25,16 @@ export function Profil() {
   return (
     <section className="page-body">
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
+      {profileGaps(profile).includes('income') && (
+        // First visit: a blank form is a wall. Say where to start, and offer a finished example to look at instead.
+        <aside className="welcome surface">
+          <h2 className="welcome__title">{t.profile.welcome.title}</h2>
+          <p className="welcome__body">{t.profile.welcome.body}</p>
+          <Link className="btn btn--sm btn--ghost" to="/donnees">
+            {t.profile.welcome.example}
+          </Link>
+        </aside>
+      )}
       <FamilySection />
       {spouse && (
         <SubTabs

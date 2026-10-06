@@ -18,7 +18,7 @@ function watchConsole(page: Page): string[] {
 test('boots, renders the shell, and prints nothing to the console', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/')
-  await expect(page).toHaveTitle('Horizon')
+  await expect(page).toHaveTitle(/Horizon$/)
   await expect(page.locator('.shell__brand')).toHaveText('Horizon')
   await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
   await expect(page.locator('.shell__tab')).toHaveCount(4)

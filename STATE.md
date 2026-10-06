@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **8 — the chart and the « what if » grid are in**; the last pass (Phase 9: keyboard path, final snapshot, the weekly sources check) remains. The parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
+| **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (90 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -111,8 +111,11 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] The offline harness (`e2e:sw`, 6 tests): the shell, a deep link, the grey-screen trap, AND a saved profile + the results page with the chart and the worker, reopened with the network off
 - [x] axe on every route in five display states with every ⓘ and disclosure open
-- [ ] A keyboard-only path through the whole profile (Tab order across a section, Enter to commit, ⓘ by Space) — the shell's order is tested; a form walk is not
-- [ ] Cloudflare Worker, GitHub secrets, deploy on push; this file's snapshot updated in the same commit
+- [x] A keyboard-only path (`e2e/keyboard.spec.ts`, 8): reach a field, type, Enter commits, Space opens the ⓘ, Enter opens a disclosure, the people tabs are a real tablist, a confirmation traps focus and gives it back; on every page focus moves in reading order, always shows where it is, and no positive `tabindex` fights the order — planted: a removed focus ring and a `tabIndex={3}` each turn it red. It also found the field's focus ring was marigold on paper (≈ 1.9:1): now the ink ring
+- [x] Every page names the browser tab (`Résultats · Horizon`); a blank profile says where to start
+- [x] `.github/workflows/sources.yml`: every cited page — the figures' AND the ⓘ links, in both languages — is opened weekly; a gone or erroring page fails the job; a page that refuses bots (Revenu Québec, legisquebec) is reported as blocked, never fatal
+- [x] Deployed to https://horizon.marc-jeanson.workers.dev with `npm run deploy` (local `wrangler login`)
+- [ ] **Deploy on push**: add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets (Settings ▸ Secrets and variables ▸ Actions). Until then CI skips the deploy job cleanly and a deploy is `npm run deploy` from a logged-in machine
 
 ## 5. Lessons carried over from Babillard
 

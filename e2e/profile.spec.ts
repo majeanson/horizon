@@ -156,6 +156,30 @@ test.describe('a blank profile', () => {
   })
 })
 
+test.describe('first visit', () => {
+  test('a blank profile says where to start, and the note goes away once something is entered', async ({ page }) => {
+    await seedProfile(page, blankSeed())
+    await page.goto('/')
+    const welcome = page.getByRole('complementary')
+    await expect(welcome).toContainText('Entrez votre année de naissance et votre revenu de travail')
+    await expect(welcome.getByRole('link', { name: 'Voir un exemple' })).toHaveAttribute('href', '/donnees')
+    const salary = box(page, 'Revenu de travail annuel actuel')
+    await salary.fill('70000')
+    await salary.press('Enter')
+    await expect(welcome).toBeHidden()
+  })
+
+  test('every page names the tab, so history and bookmarks are not all « Horizon »', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    for (const [path, title] of [['/', 'Profil · Horizon'], ['/hypotheses', 'Hypothèses · Horizon'], ['/resultats', 'Résultats · Horizon'], ['/donnees', 'Données · Horizon']] as const) {
+      await page.goto(path)
+      await expect(page).toHaveTitle(title)
+    }
+    await page.getByRole('button', { name: 'EN' }).click()
+    await expect(page).toHaveTitle('Data · Horizon')
+  })
+})
+
 test.describe('the example household', () => {
   test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 

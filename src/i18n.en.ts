@@ -55,6 +55,11 @@ export const EN: typeof FR = {
   profile: {
     title: 'Profile',
     subtitle: 'Your numbers, typed by hand. They stay on this device.',
+    welcome: {
+      title: 'To begin',
+      body: 'Enter your birth year and your work income; the rest can wait. Every number you have to type has an ⓘ that says where to find it, and nothing you write leaves this device.',
+      example: 'See an example',
+    },
     persons: 'Person',
     self: 'Me',
     spouse: 'Spouse',

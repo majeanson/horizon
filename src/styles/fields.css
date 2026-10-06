@@ -39,7 +39,9 @@
   background: var(--paper);
 }
 .edit-field__box:focus-within {
-  outline: 2px solid var(--accent);
+  /* The ink ring, like every other control: a marigold ring on warm paper is about 1.9:1, under the 3:1 a focus
+     indicator needs to be seen. */
+  outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }
 .edit-field__input.input {

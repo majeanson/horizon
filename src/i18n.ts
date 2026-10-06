@@ -69,6 +69,11 @@ export const FR = {
   profile: {
     title: 'Profil',
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
+    welcome: {
+      title: 'Pour commencer',
+      body: 'Entrez votre année de naissance et votre revenu de travail ; le reste peut attendre. Chaque chiffre à saisir a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
+      example: 'Voir un exemple',
+    },
     persons: 'Personne',
     self: 'Moi',
     spouse: 'Conjoint·e',

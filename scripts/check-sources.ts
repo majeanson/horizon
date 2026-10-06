@@ -1,5 +1,7 @@
 import { citedLeaves } from '../src/engine/params/cited.ts'
 import { KNOWN, SERIES } from '../src/engine/params/index.ts'
+import { FR } from '../src/i18n.ts'
+import { EN } from '../src/i18n.en.ts'
 
 // `npm run sources:check` — do the pages this repo cites still exist, and how old are the readings?
 //
@@ -34,8 +36,31 @@ for (const { path, cited } of leaves) {
   urls.set(cited.source.url, e)
 }
 
+// …and the pages the ⓘ « où trouver ce chiffre » notes send a person to, in both languages: a dead link there sends
+// someone looking for their own statement to nothing, which is worse than a stale figure.
+for (const [lang, dict] of [['fr', FR], ['en', EN]] as const) {
+  for (const [id, entry] of Object.entries(dict.info)) {
+    if (!entry.url) continue
+    const e = urls.get(entry.url) ?? { title: `ⓘ ${id}`, uses: [] }
+    e.uses.push({ path: `info.${id}.${lang}`, retrieved: '' })
+    urls.set(entry.url, e)
+  }
+}
+
 type Verdict = 'ok' | 'blocked' | 'GONE' | 'ERROR'
+
+// Hosts that refuse or stall every non-browser client — a fact about them, not about the page. Revenu Québec answers
+// 403; legisquebec lets a bot's request hang until it times out (a browser gets the PDF at once). For these, a timeout
+// or a refusal means « cannot be checked from here », reported as blocked and never fatal; a 404 still is GONE.
+const BOT_HOSTILE = new Set(['www.revenuquebec.ca', 'www.legisquebec.gouv.qc.ca'])
+
 async function check(url: string): Promise<{ verdict: Verdict; detail: string }> {
+  const verdict = await checkRaw(url)
+  if (verdict.verdict === 'ERROR' && BOT_HOSTILE.has(new URL(url).hostname)) return { verdict: 'blocked', detail: verdict.detail.slice(0, 4) || 'bot' }
+  return verdict
+}
+
+async function checkRaw(url: string): Promise<{ verdict: Verdict; detail: string }> {
   try {
     const res = await fetch(url, { redirect: 'follow', headers: { 'user-agent': UA, accept: 'text/html,application/pdf,*/*' }, signal: AbortSignal.timeout(30_000) })
     await res.body?.cancel()
