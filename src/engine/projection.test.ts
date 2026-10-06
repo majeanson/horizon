@@ -159,6 +159,49 @@ describe('projection — a household living on pensions alone, checked against t
   })
 })
 
+describe('projection — committed savings yield to spending', () => {
+  // The review's reproduction: 30 k$ of salary, 25 k$ of spending, and 2 000 $ + 2 000 $ of yearly savings entered.
+  // The engine used to draw 3 464 $ out of the RRSP — taxed — to fund a 2 000 $ RRSP contribution the same year.
+  const eager: Person = {
+    ...H.persons[0],
+    id: 'self',
+    birth: { year: 1990, month: 1 },
+    retirementAge: 65,
+    salaryToday: 30_000,
+    accounts: {
+      rrsp: { balance: 20_000, room: 30_000, annualContribution: 2_000 },
+      tfsa: { balance: 5_000, room: 30_000, annualContribution: 2_000 },
+      nonReg: { balance: 0, acb: 0, annualContribution: 0 },
+    },
+    pensions: [],
+  }
+  const house: Household = { persons: [eager], spending: { workingToday: 25_000, retiredToday: 25_000 } }
+  const rows = project(house, { ...A, pensionSplitting: false }, {})
+
+  it('no year both takes money out of an account and puts money into one', () => {
+    let cut = 0
+    for (const r of rows) {
+      const p = r.persons.self!
+      // A forced RRIF minimum is not a choice (it can exceed spending, and then the surplus is saved): count only what was chosen.
+      const out = p.withdrawals.nonReg + (p.withdrawals.rrsp - p.rrifMinimum) + p.withdrawals.tfsa
+      const into = p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa
+      if (out > 0.01) expect(into, `${r.year}: withdrew ${out} and saved ${into}`).toBeLessThanOrEqual(0.01)
+      const committed = 4_000 * (1 + A.inflation) ** (r.year - A.today.year)
+      if (p.employment > 0 && into < committed - 0.01) cut++
+    }
+    expect(cut, 'the scenario must reach a working year where the savings had to be cut').toBeGreaterThan(0)
+  })
+
+  it('the RRSP deduction follows what was actually contributed, and the books still balance', () => {
+    for (const r of rows) {
+      const p = r.persons.self!
+      expect(p.contributions.rrsp).toBeLessThanOrEqual(2_000 * (1 + A.inflation) ** (r.year - A.today.year) + 0.01)
+      const putAway = p.rrqContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa
+      expect(r.household.grossIncome - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
+    }
+  })
+})
+
 describe('projection — the accounts behave', () => {
   it('after the year they turn 71 a person is forced to take at least the RRIF minimum from the RRSP, and gets it taxed', () => {
     const rich = withPerson(H, 'self', { accounts: { ...H.persons[0].accounts, rrsp: { balance: 3_000_000, room: 0, annualContribution: 0 } } })
@@ -202,15 +245,16 @@ describe('projection — the withdrawal solver is precise and shares a couple fa
   // couple-allocation weight were caught only by the golden snapshot — which is regenerated, not argued with.
   const SEED = 20261007
   const NO_SPLIT = { ...A, pensionSplitting: false }
-  const sample = cases(SEED, 14, (r, i) => {
+  const sample = cases(SEED, 30, (r, i) => {
     const scale = between(r, 0.15, 0.9)
     const h: Household = {
       persons: H.persons.map((p) => ({
         ...p,
         accounts: {
-          rrsp: { ...p.accounts.rrsp, balance: Math.round(p.accounts.rrsp.balance * scale * 6) },
+          // Large RRSPs and small non-registered accounts, so a long stretch of years draws the RRSP alone for BOTH spouses.
+          rrsp: { ...p.accounts.rrsp, balance: Math.round(p.accounts.rrsp.balance * scale * 12) },
           tfsa: { ...p.accounts.tfsa, balance: Math.round(p.accounts.tfsa.balance * scale * 6) },
-          nonReg: { ...p.accounts.nonReg, balance: Math.round(p.accounts.nonReg.balance * scale * 12), acb: Math.round(p.accounts.nonReg.acb * scale * 12) },
+          nonReg: { ...p.accounts.nonReg, balance: Math.round(p.accounts.nonReg.balance * scale * 5), acb: Math.round(p.accounts.nonReg.acb * scale * 5) },
         },
       })),
       spending: { workingToday: intBetween(r, 50_000, 90_000), retiredToday: intBetween(r, 45_000, 85_000) },

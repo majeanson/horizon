@@ -222,13 +222,43 @@ function simulateYear(
   }
 
   // The split worth making given the incomes that need no decision; held fixed while withdrawals are solved.
-  const baseIncomes = incomes().persons
-  const baseBest = a.pensionSplitting && couple ? householdTax(baseIncomes, rules, { splitting: true }).split : { from: null, amount: 0 }
+  let baseIncomes = incomes().persons
+  let baseBest = a.pensionSplitting && couple ? householdTax(baseIncomes, rules, { splitting: true }).split : { from: null, amount: 0 }
   const fixedSplit = (): Split => {
     if (baseBest.from === null) return baseBest
     const from = baseIncomes[baseBest.from]
     const eligible = from.age >= 65 ? from.db + from.registered : 0
     return { from: baseBest.from, amount: Math.min(baseBest.amount, eligible * 0.5) }
+  }
+
+  // ── 2b. committed savings yield to spending ───────────────────────────────────────────────────
+  // Spending is a need; a contribution is a choice. If the year's cash cannot cover both, the household does not
+  // make a taxable RRSP withdrawal to fund a contribution (tax paid to move money from one pocket to another): it
+  // saves less. Cut the account with no tax effect first (non-registered, then TFSA), the RRSP last — cutting it
+  // also loses its deduction, so each key is cut by the LARGEST share of its contribution the need still allows.
+  if (spending - evaluate(fixedSplit()).cash > 0.005) {
+    for (const key of ['nonRegC', 'tfsaC', 'rrspC'] as const) {
+      const original = fixed.map((f) => f[key])
+      if (sum(original) <= 0) continue
+      const withShare = (s: number) => {
+        original.forEach((o, i) => (fixed[i][key] = o * s))
+        return evaluate(fixedSplit()).cash - spending
+      }
+      if (withShare(1) >= -0.005) break
+      if (withShare(0) < -0.005) continue // cutting all of it is still not enough: take all, and move to the next key
+      let lo = 0
+      let hi = 1
+      for (let it = 0; it < 40 && hi - lo > 1e-6; it++) {
+        const mid = (lo + hi) / 2
+        if (withShare(mid) >= -0.005) lo = mid
+        else hi = mid
+      }
+      withShare(lo)
+      break
+    }
+    // Contributions changed the incomes (the RRSP deduction), so the split worth making is chosen again.
+    baseIncomes = incomes().persons
+    baseBest = a.pensionSplitting && couple ? householdTax(baseIncomes, rules, { splitting: true }).split : { from: null, amount: 0 }
   }
 
   // ── 3–4. draw on the accounts, in order, until the need is met ────────────────────────────────
