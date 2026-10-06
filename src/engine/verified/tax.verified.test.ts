@@ -23,7 +23,7 @@ const P = knownYear(2026)
 const RULES: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas }
 
 const person = (over: Partial<PersonIncome> = {}): PersonIncome => ({
-  age: 50, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, ...over,
+  age: 50, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, rrspDeduction: 0, ...over,
 })
 const fed = (over: Partial<FederalInput> = {}): FederalInput => ({ age: 50, netIncome: 0, taxableIncome: 0, employment: 0, eligiblePension: 0, qppBase: 0, ...over })
 

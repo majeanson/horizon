@@ -13,7 +13,7 @@
 
 ## 2026
 
-88 paramètres, dont **11 à vérifier**.
+90 paramètres, dont **11 à vérifier**.
 
 | Paramètre | Valeur | Page officielle | Relevé le | Évolue avec | Note |
 | --- | --- | --- | --- | --- | --- |
@@ -104,6 +104,8 @@
 | `accounts.tfsaCumulativeSince2009` | 109 000 | [Before you contribute to a TFSA](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributing/before.html) | 2026-10-06 | observation | **⚠ À VÉRIFIER :** Total calculé par addition de la table officielle des limites annuelles : aucune page de l’ARC ne l’imprime. Chaque personne doit plutôt lire ses droits réels dans son compte de l’ARC. Σ of the annual limits 2009–2026 in the page’s history table, for someone 18+ and resident since 2009 with no contributions. |
 | `accounts.rrifFactors` | 25 entries: 71 → 0.0528 … 95 → 0.2 | [Chart - Prescribed factors](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/completing-slips-summaries/t4rsp-t4rif-information-returns/payments/chart-prescribed-factors.html) | 2026-10-06 | fixe | Column « All other RRIFs ». Under 71: 1 ÷ (90 − age). |
 | `accounts.rrifDivisor` | 90 | [Chart - Prescribed factors](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/completing-slips-summaries/t4rsp-t4rif-information-returns/payments/chart-prescribed-factors.html) | 2026-10-06 | fixe | « If the age is 70 years or younger, the prescribed factor is calculated as follows: 1 divided by (90 minus the age). » |
+| `accounts.pensionAdjustmentFactor` | 9 | [Pension Adjustment Guide](https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html) | 2026-10-06 | fixe | « (9 × benefit earned) − $600 = pension credit » for a defined-benefit provision; « If the result is negative, the pension credit is zero » (the offset has been $600 since 1997). |
+| `accounts.pensionAdjustmentOffset` | 600 | [Pension Adjustment Guide](https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html) | 2026-10-06 | fixe | « (9 × benefit earned) − $600 = pension credit » for a defined-benefit provision; « If the result is negative, the pension credit is zero » (the offset has been $600 since 1997). |
 | `accounts.rrifConversionAge` | 71 | [RRSP options when you turn 71](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/rrsp-options-when-you-turn-71.html) | 2026-10-06 | fixe | « December 31 of the year you turn 71 years old is the last day that you can contribute to your RRSPs. » That year the RRSP must be withdrawn, transferred to a RRIF or used to buy an annuity. |
 
 ## Séries historiques
@@ -112,10 +114,24 @@
 | --- | --- | --- | --- | --- | --- |
 | `rrq.mgaHistory` | 61 entries: 1966 → 5 000 … 2026 → 74 600 | [Pensionable earnings and contributions](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions) | 2026-10-06 | observation | Column « Maximum (MPE) », 1966 to 2026; the page shows no 2027 row. Copied as printed. |
 | `rrq.yampeHistory` | 2024: 73 200 · 2025: 81 200 · 2026: 85 000 | [Pensionable earnings and contributions](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions) | 2026-10-06 | observation | Additional maximum annual pensionable earnings: 2024 73 200 $, 2025 81 200 $, 2026 85 000 $. |
+| `plan.rregop.accrualRate` | 0.02 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | « Years of service credited for calculation purposes (maximum 40) × Pension accrual rate (2%) × Average pensionable salary of the 5 best-paid years of service = Pension ». |
+| `plan.rregop.maxServiceYears` | 40 | [Act respecting the Government and Public Employees Retirement Plan (chapter R-10)](https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf) | 2026-10-06 | fixe | s. 34.2: « the employee’s years of credited service taken into account must not exceed 40 ». |
+| `plan.rregop.averagingYears` | 5 | [When can you receive your pension under RREGOP and how much will you receive?](https://www.retraitequebec.gouv.qc.ca/en/your-first-paycheck-retirement/quebec-public-service-education-health-social-services-sectors/when-can-you-receive-your-pension-rregop-how-much-will-you-receive) | 2026-10-06 | fixe | « the average salary of the five years during which you earned the most money. Those five years do not need to be consecutive. » |
+| `plan.rregop.coordinationRate` | 0.007 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | « number of years of service since 1 January 1966 (maximum 35 years) used to calculate your basic pension × QPP annual pension integration rate (0.7%) × the lesser of your average pensionable salary for your last 5 years of service and your average maximum pensionable earnings (MPE) for your last 5 years of service ». |
+| `plan.rregop.coordinationFromAge` | 65 | [Act respecting the Government and Public Employees Retirement Plan (chapter R-10)](https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf) | 2026-10-06 | fixe | s. 39: « From the month following the sixty-fifth birthday of a pensioner … the pension is reduced by the amount obtained by multiplying … 0.7% … ». It applies even if the RRQ pension is taken at 60. |
+| `plan.rregop.coordinationMaxYears` | 35 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | « maximum 35 years » of service since 1 January 1966; « after 35 years of service, you accrue 2% of average salary for each year that is added, without a reduction of 0.7% being applied as of age 65 ». |
+| `plan.rregop.earliestAge` | 55 | [Act respecting the Government and Public Employees Retirement Plan (chapter R-10)](https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf) | 2026-10-06 | fixe | s. 33(3) / 38: a pension is available from age 55, reduced. |
+| `plan.rregop.unreducedAge` | 61 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | « You are at least age 61 » — one of three routes to a pension without reduction (statute s. 33(1)). |
+| `plan.rregop.unreducedServiceYears` | 35 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | « You have at least 35 years of service credited for eligibility purposes » (statute s. 33(2), no minimum age stated). |
+| `plan.rregop.factorMinAge` | 60 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | « You are at least age 60 and you meet the 90 factor requirement (age + years of service credited for eligibility purposes) » (statute s. 33(2.1)). |
+| `plan.rregop.factorTotal` | 90 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe |  |
+| `plan.rregop.earlyReductionPerYear` | 0.06 | [Act respecting the Government and Public Employees Retirement Plan (chapter R-10)](https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf) | 2026-10-06 | fixe | s. 38: reduced « by 1/2 of 1% per month » between the date the pension is granted and the nearest date it would have been granted without reduction = 0.5 % a month, 6 % a year. Example of Jacques (59, unreduced at 61): 24 months × 0.5 % = 12 %. Before 1 July 2020 the penalty was 4 % a year (estimator help page, not traced in the statute). |
+| `plan.rregop.indexationShare` | 0.5 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | For service since 1 January 2000: « the more advantageous of … 50% of the rate of increase of the Pension Index, the rate of increase of the Pension Index minus 3% » (statute s. 77(3)). |
+| `plan.rregop.indexationMinus` | 0.03 | [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 2026-10-06 | fixe | Service from 1 July 1982 to 31 December 1999 is indexed at the rate minus 3 % and service before 1 July 1982 at the full rate: the engine applies the post-1999 rule to the whole pension (ENGINE.md §2). |
 
 ## Pages consultées
 
-30 pages officielles. Une page citée par beaucoup de chiffres est une page à relire en premier.
+34 pages officielles. Une page citée par beaucoup de chiffres est une page à relire en premier.
 
 | Page officielle | Chiffres | Dernière lecture |
 | --- | --- | --- |
@@ -127,6 +143,7 @@
 | [Quebec Abatement - Canada.ca](https://www.canada.ca/en/department-finance/programs/federal-transfers/quebec-abatement.html) | 1 | 2026-10-06 |
 | [Report on the Impact of Reducing the Lowest Marginal Personal Income Tax Rate on Non-Refundable Tax Credits](https://www.canada.ca/en/department-finance/services/publications/report-impact-reducing-lowest-marginal-personal-income-tax-rate-non-refundable-tax-credits.html) | 1 | 2026-10-06 |
 | [Maximum Benefit Amounts and Related Figures - Canada Pension Plan (2026) and Old Age Security (October to December 2026)](https://www.canada.ca/en/employment-social-development/programs/pensions/pension/statistics/2026-quarterly-october-december.html) | 12 | 2026-10-06 |
+| [Pension Adjustment Guide](https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html) | 2 | 2026-10-06 |
 | [Chart - Prescribed factors](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/completing-slips-summaries/t4rsp-t4rif-information-returns/payments/chart-prescribed-factors.html) | 2 | 2026-10-06 |
 | [Indexation adjustment for personal income tax and benefit amounts - Canada.ca](https://www.canada.ca/en/revenue-agency/services/tax/individuals/frequently-asked-questions-individuals/adjustment-personal-income-tax-benefit-amounts.html) | 4 | 2026-10-06 |
 | [Current year tax rates and income brackets (2026) - Personal income tax - Canada.ca](https://www.canada.ca/en/revenue-agency/services/tax/individuals/tax-rates-brackets/current-year.html) | 1 | 2026-10-06 |
@@ -141,10 +158,13 @@
 | [MP, DB, RRSP, DPSP, ALDA, TFSA limits, YMPE and the YAMPE](https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html) | 1 | 2026-10-06 |
 | [Repayment of Old Age Security pension - Canada.ca](https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/repayment.html) | 1 | 2026-10-06 |
 | [Old Age Security - When to start your retirement pension - Canada.ca](https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/when-start.html) | 4 | 2026-10-06 |
+| [Act respecting the Government and Public Employees Retirement Plan (chapter R-10)](https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf) | 4 | 2026-10-06 |
 | [Calculation of Your Retirement Pension Under the Québec Pension Plan](https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/applying-your-retirement-pension/retirement-pension-quebec-pension-plan/calculation-your-retirement-pension) | 5 | 2026-10-06 |
 | [The additional plan](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/additional-plan) | 4 | 2026-10-06 |
 | [Québec Pension Plan Figures](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/quebec-pension-plan-figures) | 5 | 2026-10-06 |
 | [Pensionable earnings and contributions](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions) | 3 | 2026-10-06 |
+| [RREGOP](https://www.retraitequebec.gouv.qc.ca/en/publications/public-sector-pension-plans/rregop) | 9 | 2026-10-06 |
+| [When can you receive your pension under RREGOP and how much will you receive?](https://www.retraitequebec.gouv.qc.ca/en/your-first-paycheck-retirement/quebec-public-service-education-health-social-services-sectors/when-can-you-receive-your-pension-rregop-how-much-will-you-receive) | 1 | 2026-10-06 |
 | [Retirement pension paid as of age 65 and 1 month (1036-1-RRQ, 2025-06)](https://www.retraitequebec.gouv.qc.ca/sites/default/files/SiteCollectionDocuments/RetraiteQuebec/en/publications/nos-programmes/regime-de-rentes/retraite/1036-1f-Methode-calcul-rente-2025.pdf) | 11 | 2026-10-06 |
 | [Retirement pension paid as of age 68 and 1 month (1036-3-RRQ, 2025-06)](https://www.retraitequebec.gouv.qc.ca/sites/default/files/SiteCollectionDocuments/RetraiteQuebec/en/publications/nos-programmes/regime-de-rentes/retraite/1036-3a-Calcul-rente-68-ans-2025.pdf) | 1 | 2026-10-06 |
 | [Income Tax Rates](https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/income-tax-rates/) | 1 | 2026-10-06 |

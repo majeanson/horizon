@@ -69,6 +69,9 @@ const CRA_RRIF = src(
   { note: 'Column « All other RRIFs ». Under 71: 1 ÷ (90 − age).' },
 )
 const CRA_71 = src(`${CRA}/topics/rrsps-related-plans/rrsp-options-when-you-turn-71.html`, 'RRSP options when you turn 71')
+const CRA_PA = src('https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html', 'Pension Adjustment Guide', {
+  note: '« (9 × benefit earned) − $600 = pension credit » for a defined-benefit provision; « If the result is negative, the pension credit is zero » (the offset has been $600 since 1997).',
+})
 const CRA_RRSP_FORMULA = src(`${CRA}/topics/rrsps-related-plans/contributing-a-rrsp-prpp/contributions-affect-your-rrsp-prpp-deduction-limit.html`, 'How contributions affect your RRSP/PRPP deduction limit')
 
 // ── Revenu Québec / Finances Québec ──────────────────────────────────────────────────────────────
@@ -271,6 +274,8 @@ export const P2026 = {
       CRA_RRIF,
     ),
     rrifDivisor: c(90, 'fixed', { ...CRA_RRIF, note: '« If the age is 70 years or younger, the prescribed factor is calculated as follows: 1 divided by (90 minus the age). »' }),
+    pensionAdjustmentFactor: c(9, 'fixed', CRA_PA),
+    pensionAdjustmentOffset: c(600, 'fixed', CRA_PA),
     rrifConversionAge: c(71, 'fixed', { ...CRA_71, note: '« December 31 of the year you turn 71 years old is the last day that you can contribute to your RRSPs. » That year the RRSP must be withdrawn, transferred to a RRIF or used to buy an annuity.' }),
   },
 } satisfies YearParams

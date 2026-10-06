@@ -158,5 +158,8 @@ export interface YearParams {
     /** Below 71 the factor is 1 ÷ (this − age). */
     rrifDivisor: Cited
     rrifConversionAge: Cited
+    /** A defined-benefit plan's pension adjustment is (this × the benefit earned in the year) − the offset, never below zero. */
+    pensionAdjustmentFactor: Cited
+    pensionAdjustmentOffset: Cited
   }
 }

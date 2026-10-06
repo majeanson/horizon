@@ -9,7 +9,8 @@ import { quebecTax, type QuebecPersonResult, type QuebecRules } from './taxQuebe
 // ORDER OF OPERATIONS, as the two returns make it:
 //   1. Each person's income: employment + RRQ + OAS + defined-benefit pension + RRSP/RRIF withdrawals +
 //      the TAXABLE half of capital gains, ± any pension income split to or from the spouse.
-//   2. Less the ENHANCED part of the QPP contribution (a deduction, line 22215 / 248).
+//   2. Less the ENHANCED part of the QPP contribution (a deduction, line 22215 / 248) and the RRSP
+//      contributions deducted this year (line 20800).
 //      = « net income before adjustments » (line 23400 federal, the figure the OAS recovery reads).
 //   3. Less the OAS recovery tax (line 23500): 15 % of the part above the threshold, never more than the
 //      pension received. = net income (line 23600 / 275) = taxable income (no other deduction is modelled).
@@ -42,6 +43,8 @@ export interface PersonIncome {
   /** The employee's RRQ contributions on the year's employment income. */
   rrqBase: number
   rrqEnhanced: number
+  /** RRSP contributions deducted this year (line 20800). The caller keeps them within the person's deduction room. */
+  rrspDeduction: number
 }
 
 export interface TaxRules {
@@ -91,12 +94,17 @@ function eligiblePension(p: PersonIncome, splitIn: number, splitOut: number): nu
   return Math.max(0, p.db + (p.age >= 65 ? p.registered : 0) + splitIn - splitOut)
 }
 
+/** The household's tax for ONE given allocation of pension income (none, or an amount from one spouse to the other). */
+export function householdTaxWithSplit(persons: readonly PersonIncome[], rules: TaxRules, split: Split): HouseholdTax {
+  return evaluate(persons, rules, split)
+}
+
 function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Split): HouseholdTax {
   const out = persons.map((p, i) => {
     const splitOut = split.from === i ? split.amount : 0
     const splitIn = split.from !== null && split.from !== i ? split.amount : 0
     const income = p.employment + p.rrq + p.oas + p.db + p.registered + p.capitalGains * rules.federal.capitalGainsInclusion + splitIn - splitOut
-    const before = income - p.rrqEnhanced
+    const before = income - p.rrqEnhanced - p.rrspDeduction
     const recovery = oasRecovery(before, p.oas, rules.oas)
     return { p, income, before, recovery, netIncome: before - recovery, splitIn, splitOut }
   })

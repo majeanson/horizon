@@ -1,4 +1,5 @@
-import { plain, type Cited, type Plain } from './cited.ts'
+import { citedLeaves, plain, type Cited, type Plain } from './cited.ts'
+import { PLAN_RREGOP } from './plans.ts'
 import { resolveYear, type Indexation } from './project.ts'
 import { P2026 } from './2026.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
@@ -16,6 +17,8 @@ export const KNOWN: Readonly<Record<number, YearParams>> = { 2026: P2026 }
 export const SERIES: ReadonlyArray<{ name: string; cited: Cited<unknown> }> = [
   { name: 'rrq.mgaHistory', cited: RRQ_MGA_HISTORY },
   { name: 'rrq.yampeHistory', cited: RRQ_YAMPE_HISTORY },
+  // The rules of the pension plans the app can pre-fill (not a tax year's figures: they change by legislation).
+  ...citedLeaves(PLAN_RREGOP, 'plan.rregop').map((l) => ({ name: l.path, cited: l.cited as Cited<unknown> })),
 ]
 
 export type PlainYear = Plain<YearParams> & { projected: boolean }

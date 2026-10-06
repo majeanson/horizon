@@ -14,7 +14,7 @@ const P = knownYear(2026)
 const RULES: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas }
 const SEED = 20260930
 
-const blank = (age: number): PersonIncome => ({ age, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0 })
+const blank = (age: number): PersonIncome => ({ age, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, rrspDeduction: 0 })
 
 // A random person: an age, and each income source present or not with a plausible size.
 function randomPerson(r: () => number): PersonIncome {
@@ -194,6 +194,12 @@ describe('tax properties — what is the same, and what is not', () => {
     for (const income of range(10_000, 90_000, 10_000)) {
       expect(householdTax([{ ...blank(66), db: income }], RULES).total).toBeLessThanOrEqual(householdTax([{ ...blank(64), db: income }], RULES).total)
     }
+  })
+
+  it('an RRSP deduction never raises the tax, and lowers it once the person owes any', () => {
+    const t = (d: number) => householdTax([{ ...blank(45), employment: 90_000, rrspDeduction: d }], RULES).total
+    for (const d of range(0, 30_000, 2_500)) expect(t(d + 2_500)).toBeLessThanOrEqual(t(d) + 0.01)
+    expect(t(10_000)).toBeLessThan(t(0) - 2_000)
   })
 
   it('more enhanced QPP contributions never raise the tax (it is a deduction)', () => {

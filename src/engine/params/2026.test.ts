@@ -150,6 +150,8 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   ],
   'accounts.rrifDivisor': [90, 'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/completing-slips-summaries/t4rsp-t4rif-information-returns/payments/chart-prescribed-factors.html'],
   'accounts.rrifConversionAge': [71, `${CRA}/topics/rrsps-related-plans/rrsp-options-when-you-turn-71.html`],
+  'accounts.pensionAdjustmentFactor': [9, 'https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html'],
+  'accounts.pensionAdjustmentOffset': [600, 'https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html'],
 }
 
 const leaves = new Map(citedLeaves(P2026).map((l) => [l.path, l.cited]))
