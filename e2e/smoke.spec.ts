@@ -73,6 +73,29 @@ test('the gallery dialog opens, traps Escape, and returns focus to its opener', 
   await expect(opener).toBeFocused()
 })
 
+test('while a dialog is open the page behind it is inert — no Tab, no screen reader — and live again after', async ({ page }) => {
+  await page.goto('/dev/kit')
+  const root = page.locator('#root')
+  await expect(root).not.toHaveAttribute('inert', '')
+  await page.getByRole('button', { name: 'Ouvrir le dialogue' }).click()
+  await expect(root).toHaveAttribute('inert', '')
+  // Tab many times: focus must never leave the dialog for the page behind it.
+  for (let i = 0; i < 6; i++) {
+    await page.keyboard.press('Tab')
+    expect(await page.evaluate(() => !!document.activeElement?.closest('.kit-modal')), 'focus stayed inside the dialog').toBe(true)
+  }
+  await page.keyboard.press('Escape')
+  await expect(root).not.toHaveAttribute('inert', '')
+})
+
+test('a confirm dialog is inert-backed too, and resolves false on Cancel and true on confirm', async ({ page }) => {
+  await page.goto('/dev/kit')
+  await page.getByRole('button', { name: 'Demander confirmation' }).click()
+  await expect(page.locator('#root')).toHaveAttribute('inert', '')
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Annuler' }).click()
+  await expect(page.locator('#root')).not.toHaveAttribute('inert', '')
+})
+
 test('a confirm dialog resolves false on Cancel and true on confirm', async ({ page }) => {
   await page.goto('/dev/kit')
   const ask = page.getByRole('button', { name: 'Demander confirmation' })

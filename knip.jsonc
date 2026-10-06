@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["scripts/*.mjs", "e2e/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}", "worker/**/*.ts", "scripts/**/*.{mjs,ts}"],
+  // A planner's exports are checked for real, but an export used only INSIDE its own module is a
+  // superfluous `export` keyword, not dead code — and that noise is what makes a report get skimmed.
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    // Fonts are consumed from CSS — `url('@fontsource/…/files/….woff2')` in src/styles/fonts.css —
+    // and knip does not follow url() references out of a stylesheet.
+    "@fontsource/baloo-2",
+    "@fontsource/hanken-grotesk"
+  ]
+}

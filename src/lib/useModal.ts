@@ -44,6 +44,27 @@ function unlockScroll(): void {
   document.documentElement.classList.remove('scroll-locked')
 }
 
+// While a modal is open the page behind it must not be reachable — by Tab, by a screen reader,
+// or by a stray tap — so the app root goes `inert`. That is the platform's own mechanism: it
+// removes the subtree from the focus order AND the accessibility tree, which is exactly what
+// `aria-modal="true"` promises but, on its own, does not enforce everywhere (and the focus trap
+// below only catches Tab). It also stops an accessibility audit from judging the dimmed page
+// behind a dialog as if a reader could still use it.
+//
+// Ref-counted, like the scroll lock, so a dialog opened over a dialog does not un-inert the page
+// when only the top one closes. Applied only when the modal lives OUTSIDE #root (the Modal and
+// the confirm dialog are both portalled to <body>): inerting an ancestor of the dialog would
+// inert the dialog.
+let inertCount = 0
+function inertBackground(modal: HTMLElement): (() => void) | null {
+  const root = document.getElementById('root')
+  if (!root || root.contains(modal)) return null
+  if (inertCount++ === 0) root.setAttribute('inert', '')
+  return () => {
+    if (--inertCount === 0) root.removeAttribute('inert')
+  }
+}
+
 // Only the top-most open modal reacts to Escape, so a flyer over the cashier
 // closes the flyer alone — not both at once.
 const escStack: Array<() => void> = []
@@ -78,6 +99,14 @@ export function useModal(
     lockScroll()
     return unlockScroll
   }, [open])
+
+  // Background inert. DECLARED BEFORE the focus trap on purpose: on close, effect cleanups run in
+  // declaration order, so the page is live again by the time the trap hands focus back to the
+  // opener — focusing an element inside an inert subtree silently does nothing.
+  useEffect(() => {
+    if (!open || !ref.current) return
+    return inertBackground(ref.current) ?? undefined
+  }, [open, ref])
 
   // Focus trap + restore.
   useEffect(() => {

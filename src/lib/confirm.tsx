@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { useT } from '../i18n'
 import { useModal } from './useModal'
 import { Icon } from '../components/Icon'
@@ -51,30 +52,34 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const dialog = req && (
+    <>
+      <div className="confirm-backdrop" onClick={cancel} aria-hidden="true" />
+      <div ref={dialogRef} className="confirm" role="alertdialog" aria-modal="true" aria-label={req.title ?? t.common.confirmTitle}>
+        <p className="confirm__msg">{req.message}</p>
+        <div className="confirm__actions">
+          <button type="button" className="btn btn--ghost" onClick={cancel}>
+            {req.cancelLabel ?? t.common.cancel}
+          </button>
+          <button
+            type="button"
+            className={'btn' + (req.tone === 'default' ? ' btn--primary' : ' btn--danger')}
+            onClick={() => settle(true)}
+          >
+            {req.tone !== 'default' && <Icon name="trash-bold" size={16} />}
+            {req.confirmLabel ?? t.common.delete}
+          </button>
+        </div>
+      </div>
+    </>
+  )
+
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
-      {req && (
-        <>
-          <div className="confirm-backdrop" onClick={cancel} aria-hidden="true" />
-          <div ref={dialogRef} className="confirm" role="alertdialog" aria-modal="true" aria-label={req.title ?? t.common.confirmTitle}>
-            <p className="confirm__msg">{req.message}</p>
-            <div className="confirm__actions">
-              <button type="button" className="btn btn--ghost" onClick={cancel}>
-                {req.cancelLabel ?? t.common.cancel}
-              </button>
-              <button
-                type="button"
-                className={'btn' + (req.tone === 'default' ? ' btn--primary' : ' btn--danger')}
-                onClick={() => settle(true)}
-              >
-                {req.tone !== 'default' && <Icon name="trash-bold" size={16} />}
-                {req.confirmLabel ?? t.common.delete}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      {/* Portalled to <body>, like Modal: useModal makes #root inert while a dialog is open, which
+          must not include the dialog itself. */}
+      {dialog && createPortal(dialog, document.body)}
     </ConfirmContext.Provider>
   )
 }

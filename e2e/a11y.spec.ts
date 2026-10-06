@@ -1,0 +1,77 @@
+import AxeBuilder from '@axe-core/playwright'
+import { test, expect, type Page } from '@playwright/test'
+
+// Accessibility, as a gate: axe-core runs over every page in the display states a reader can
+// actually be in — day and night, normal and high contrast, and the largest text size. A
+// planner read by people who may need large type and strong contrast is judged by exactly these
+// states, so a colour pair that passes only in the default theme is a defect here, not an
+// edge case.
+//
+// Rules: WCAG 2.0/2.1 A and AA, which is what « accessible » means in law and in practice.
+// Best-practice rules are out of scope on purpose: they are advice, and a gate made of advice
+// gets disabled.
+
+const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
+
+interface State {
+  name: string
+  theme: 'day' | 'night'
+  contrast?: 'high'
+  scale?: 'x-large'
+}
+
+const STATES: State[] = [
+  { name: 'day', theme: 'day' },
+  { name: 'night', theme: 'night' },
+  { name: 'day + high contrast', theme: 'day', contrast: 'high' },
+  { name: 'night + high contrast', theme: 'night', contrast: 'high' },
+  { name: 'day + largest text', theme: 'day', scale: 'x-large' },
+]
+
+async function setState(page: Page, s: State): Promise<void> {
+  await page.addInitScript((st) => {
+    localStorage.setItem('horizon-theme', st.theme)
+    if (st.contrast) localStorage.setItem('horizon-contrast', st.contrast)
+    if (st.scale) localStorage.setItem('horizon-text-scale', st.scale)
+  }, s)
+}
+
+async function violations(page: Page): Promise<string[]> {
+  const results = await new AxeBuilder({ page }).withTags(TAGS).analyze()
+  return results.violations.map(
+    (v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`,
+  )
+}
+
+for (const s of STATES) {
+  for (const [label, path, ready] of [
+    ['the shell', '/', '.shell__brand'],
+    ['the component gallery', '/dev/kit', '.devkit'],
+  ] as const) {
+    test(`${label} has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
+      await setState(page, s)
+      await page.goto(path)
+      await page.locator(ready).waitFor()
+      expect(await violations(page)).toEqual([])
+    })
+  }
+}
+
+test('the gallery stays accessible with its dialog open', async ({ page }) => {
+  await page.goto('/dev/kit')
+  await page.getByRole('button', { name: 'Ouvrir le dialogue' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  expect(await violations(page)).toEqual([])
+})
+
+test('the whole shell is reachable by keyboard, in a sensible order', async ({ page }) => {
+  await page.goto('/')
+  const order: string[] = []
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press('Tab')
+    order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
+  }
+  // The top bar first (name, language, theme), then the four destinations.
+  expect(order.slice(0, 3)).toEqual(['Horizon', 'EN', ''])
+  expect(order.slice(3, 7)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
+})

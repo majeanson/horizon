@@ -106,7 +106,7 @@ npm test               # vitest run — the engine, the guards, the helpers
 npm run test:engine    # vitest run src/engine only
 npm run sources        # regenerate SOURCES.md from the params files
 npm run check:bundle   # size budgets + the offline precache check (needs dist/)
-npm run knip           # dead-code gate
+npm run knip           # dead-code gate (CI only: its parser needs a >4 GiB buffer that a memory-tight Windows box refuses)
 npm run e2e            # Playwright against Vite, profile seeded into localStorage
 npm run e2e:ci         # …in CI's shape (1 worker, 0 retries) — run THIS before pushing shared machinery
 npm run e2e:sw         # the service-worker offline harness on the PROD bundle
@@ -136,7 +136,13 @@ the local run, and **which test flaked is the whole signal**; never dismiss one 
   (a stale shell asking for a gone chunk must not receive HTML as JavaScript).
 - **PWA / offline** — `vite.config.ts` generates `dist/sw.js` with the real hashed asset list, so
   the app reopens offline *with the profile intact*. Bump `SW_POLICY` when the caching rules
-  change; keep `ONLINE_ONLY_CHUNKS` ↔ `check-bundle.mjs` in sync.
+  change; keep `ONLINE_ONLY_CHUNKS` ↔ `check-bundle.mjs` in sync. Chrome logs a benign « A preload
+  … cross-world service worker resource mismatch » *warning* on a service-worker-controlled
+  navigation (the speculative parser preloads before the worker controls the page); it costs two
+  redundant cache hits and is not an error — the SW harness asserts on errors only.
+- **Dialogs** are portalled to `<body>` and `useModal` makes `#root` `inert` while one is open
+  (ref-counted): no Tab, no screen-reader reach, no stray tap behind it. A new overlay must be
+  portalled too — inerting an ancestor of the dialog would inert the dialog.
 - **Chunking** uses `codeSplitting` groups, **not** `manualChunks` — under Vite 8 / Rolldown
   `manualChunks` is a shim that silently folds groups away.
 
