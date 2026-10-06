@@ -397,15 +397,15 @@ export const FR = {
       note: 'Avant 65 ans la rente est réduite de 0,5 % à 0,6 % par mois ; après 65 ans, elle augmente de 0,7 % par mois, jusqu’à 72 ans.',
     },
     oasResidence: {
-      where: 'Le nombre d’années vécues au Canada depuis vos 18 ans : 40 ans donnent la pension complète, chaque année en vaut 1/40. L’Estimateur des prestations de la Sécurité de la vieillesse de Service Canada vous le demande sous « historique de résidence ».',
+      where: 'Le nombre d’années vécues au Canada depuis vos 18 ans : 40 ans donnent la pension complète, chaque année en vaut 1/40. L’Estimateur des prestations de la Sécurité de la vieillesse de Service Canada vous le demande dans sa section sur la résidence.',
       label: '',
       url: 'https://www.canada.ca/fr/services/prestations/pensionspubliques/securite-vieillesse/montant-prestation.html',
       note: 'Il faut au moins 10 ans de résidence (20 si vous vivez à l’étranger) pour toucher une pension.',
     },
     oasStartAge: {
-      where: 'C’est votre choix, de 65 à 70 ans : aucune pièce ne l’imprime. La page officielle explique la pension et le report.',
+      where: 'C’est votre choix, de 65 à 70 ans : aucune pièce ne l’imprime. La page officielle « Quand commencer à recevoir votre pension » explique le report.',
       label: '',
-      url: 'https://www.canada.ca/fr/services/prestations/pensionspubliques/securite-vieillesse/montant-prestation.html',
+      url: 'https://www.canada.ca/fr/services/prestations/pensionspubliques/securite-vieillesse/quand-debut.html',
       note: 'Chaque mois de report augmente la pension de 0,6 %, jusqu’à 36 % à 70 ans.',
     },
     salary: {

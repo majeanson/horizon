@@ -381,15 +381,15 @@ export const EN: typeof FR = {
       note: 'Before 65 the pension is reduced by 0.5% to 0.6% a month; after 65 it grows by 0.7% a month, up to age 72.',
     },
     oasResidence: {
-      where: 'The number of years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40. Service Canada’s Old Age Security Benefits Estimator asks for it as your “residence history”.',
+      where: 'The number of years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40. Service Canada’s Old Age Security Benefits Estimator asks for it in its residence section.',
       label: '',
       url: 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/benefit-amount.html',
       note: 'At least 10 years of residence (20 if you live abroad) are needed to receive a pension.',
     },
     oasStartAge: {
-      where: 'It is your choice, from 65 to 70: no document prints it. The official page explains the pension and deferral.',
+      where: 'It is your choice, from 65 to 70: no document prints it. The official page “When to start your retirement pension” explains deferral.',
       label: '',
-      url: 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/benefit-amount.html',
+      url: 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/when-start.html',
       note: 'Each month deferred raises the pension by 0.6%, up to 36% at 70.',
     },
     salary: {
