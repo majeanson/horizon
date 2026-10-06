@@ -89,9 +89,21 @@ export function splittablePension(p: PersonIncome): number {
   return p.age >= 65 ? p.db + p.registered : 0
 }
 
-/** Pension income that qualifies for the pension / retirement-income credits (the 65 rule applies to registered income only). */
-function eligiblePension(p: PersonIncome, splitIn: number, splitOut: number): number {
+/** Pension income that qualifies for the Québec retirement-income amount (the 65 rule applies to registered income only). */
+function eligibleQuebec(p: PersonIncome, splitIn: number, splitOut: number): number {
   return Math.max(0, p.db + (p.age >= 65 ? p.registered : 0) + splitIn - splitOut)
+}
+
+/**
+ * Pension income that qualifies for the FEDERAL pension income amount (line 31400). RRIF and RRSP-annuity income
+ * qualify only from the minimum age — and so does a split-in amount: the transferor is always 65+, but the
+ * allocation qualifies for the RECIPIENT only if what it is made of would have qualified for them, and the pool
+ * mixes defined-benefit and registered income. An under-65 recipient therefore gets nothing for it (ENGINE.md §2:
+ * a defined-benefit share would qualify federally at any age, so this errs toward more tax, by at most $2 000 × 14 %).
+ */
+function eligibleFederal(p: PersonIncome, splitIn: number, splitOut: number, minAge: number): number {
+  const registered = p.age >= minAge ? p.registered + splitIn : 0
+  return Math.max(0, p.db + registered - splitOut)
 }
 
 /** The household's tax for ONE given allocation of pension income (none, or an amount from one spouse to the other). */
@@ -114,14 +126,14 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
       age: p.age,
       netIncome,
       taxableIncome: netIncome,
-      eligibleRetirement: eligiblePension(p, splitIn, splitOut),
+      eligibleRetirement: eligibleQuebec(p, splitIn, splitOut),
     })),
     rules.quebec,
   )
 
   const results: PersonTax[] = out.map(({ p, income, before, recovery, netIncome, splitIn, splitOut }, i) => {
     const federal = federalTax(
-      { age: p.age, netIncome, taxableIncome: netIncome, employment: p.employment, eligiblePension: eligiblePension(p, splitIn, splitOut), qppBase: p.rrqBase },
+      { age: p.age, netIncome, taxableIncome: netIncome, employment: p.employment, eligiblePension: eligibleFederal(p, splitIn, splitOut, rules.federal.pensionMinAge), qppBase: p.rrqBase },
       rules.federal,
     )
     const q = quebec.persons[i]

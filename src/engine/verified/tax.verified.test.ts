@@ -15,7 +15,7 @@
 //   (2026 amounts); https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf (Québec 2026).
 import { describe, expect, it } from 'vitest'
 import { knownYear } from '../params/index.ts'
-import { householdTax, splittablePension, type PersonIncome, type TaxRules } from '../tax.ts'
+import { householdTax, householdTaxWithSplit, splittablePension, type PersonIncome, type TaxRules } from '../tax.ts'
 import { ageAmount, basicPersonalAmount, federalTax, taxFromBrackets, type FederalInput } from '../taxFederal.ts'
 import { quebecAmounts, quebecTax } from '../taxQuebec.ts'
 
@@ -258,6 +258,18 @@ describe('the household — splitting, recovery, deductions', () => {
 
   it('never splits the RRQ or the OAS (they are not eligible pension income)', () => {
     expect(splittablePension(person({ age: 70, rrq: 15_000, oas: 8_000 }))).toBe(0)
+  })
+
+  it('split RRIF income earns the federal pension amount only for a recipient who is 65 or over (line 31400)', () => {
+    // CRA: « the pension that qualifies for the transferring spouse does not necessarily qualify for the receiving
+    // spouse … because eligibility can depend on age » — an under-65 recipient of RRIF income gets no pension amount.
+    const giver = person({ age: 70, registered: 40_000 })
+    const under = householdTaxWithSplit([giver, person({ age: 62 })], RULES, { from: 0, amount: 20_000 })
+    const over = householdTaxWithSplit([giver, person({ age: 66 })], RULES, { from: 0, amount: 20_000 })
+    expect(under.persons[1].federal.amounts.pension).toBe(0)
+    expect(over.persons[1].federal.amounts.pension).toBe(2_000)
+    // The giver keeps their own: 40 000 − 20 000 = 20 000 of eligible income, capped at 2 000.
+    expect(under.persons[0].federal.amounts.pension).toBe(2_000)
   })
 
   it('a split reduces the pension credit of the giver and gives one to the receiver, but not above 2 000 $ each', () => {
