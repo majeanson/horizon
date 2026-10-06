@@ -279,7 +279,7 @@ test.describe('data stays on this device', () => {
     await page.goto('/donnees')
     const before = await savedProfile(page)
     await page.locator('input[type=file]').setInputFiles({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ app: 'horizon', version: 1, household: { persons: [] } })) })
-    await expect(page.getByRole('alert').first()).toContainText('Problèmes trouvés dans le fichier')
+    await expect(page.getByRole('alert').first()).toContainText('Ce fichier semble incomplet ou modifié')
     await expect(page.getByText(/household\.persons — nombre non permis/)).toBeVisible()
     await page.locator('input[type=file]').setInputFiles({ name: 'y.json', mimeType: 'application/json', buffer: Buffer.from('not json') })
     await expect(page.getByText('n’est pas un document JSON lisible')).toBeVisible()
@@ -317,6 +317,35 @@ test.describe('data stays on this device', () => {
       await page.waitForLoadState('networkidle')
     }
     expect(foreign).toEqual([])
+  })
+})
+
+test.describe('an unreadable stored profile', () => {
+  const BROKEN = '{ "app": "horizon", "version": 2, "household": '
+
+  test('is announced on EVERY page, kept on the device, handed back byte for byte, and forgotten with « tout effacer »', async ({ page }) => {
+    await page.addInitScript((text) => {
+      if (sessionStorage.getItem('e2e-seeded')) return
+      sessionStorage.setItem('e2e-seeded', '1')
+      localStorage.setItem('horizon-profile', text)
+    }, BROKEN)
+    await page.goto('/')
+    // On the Profil page — not only on Données — a person who finds a blank profile is told why.
+    const banner = page.getByRole('status').filter({ hasText: 'était illisible' })
+    await expect(banner).toBeVisible()
+    await page.getByRole('link', { name: 'Hypothèses' }).click()
+    await expect(banner).toBeVisible()
+
+    await page.getByRole('link', { name: 'Données' }).click()
+    const downloading = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Télécharger la copie illisible' }).click()
+    const file = await downloading
+    expect(readFileSync((await file.path())!, 'utf8')).toBe(BROKEN)
+
+    await page.getByRole('button', { name: 'Tout effacer' }).click()
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Tout effacer' }).click()
+    await expect(page.getByRole('button', { name: 'Télécharger la copie illisible' })).toHaveCount(0)
+    await expect(banner).toHaveCount(0)
   })
 })
 

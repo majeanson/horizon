@@ -72,6 +72,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
                 <NumberField
                   kind="money"
                   allowEmpty
+                  max={1e9}
                   value={person.earningsHistory[year] ?? null}
                   onChange={(v) => edit((x) => setEarning(x, year, v))}
                   ariaLabel={r.earningsYear(year)}
@@ -84,12 +85,12 @@ export function RrqSection({ person, edit }: PersonEditor) {
 
       <FieldRow label={r.statement65} infoId="rrqEstimate65" hint={r.statementHint}>
         {(w) => (
-          <NumberField kind="money" allowEmpty value={person.rrq.statementAt65 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt65: v ?? undefined }) }))} id={w.id} ariaDescribedBy={w.describedBy} />
+          <NumberField kind="money" allowEmpty max={100_000} value={person.rrq.statementAt65 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt65: v ?? undefined }) }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
       <FieldRow label={r.statement60} infoId="rrqEstimate60">
         {(w) => (
-          <NumberField kind="money" allowEmpty value={person.rrq.statementAt60 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt60: v ?? undefined }) }))} id={w.id} />
+          <NumberField kind="money" allowEmpty max={100_000} value={person.rrq.statementAt60 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt60: v ?? undefined }) }))} id={w.id} />
         )}
       </FieldRow>
 

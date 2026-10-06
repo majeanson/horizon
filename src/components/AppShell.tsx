@@ -25,7 +25,8 @@ export function AppShell() {
   const t = useT()
   const { lang, setLang } = useLang()
   const [theme, setThemeState] = useState<Theme>(getTheme)
-  // A browser that will not keep the profile (private mode) must say so on EVERY page, not only where it is exported.
+  // Whatever stops the profile from being kept — or read — must be said on EVERY page: a person who lost their plan to a
+  // refused profile and finds a blank one on Profil would otherwise think the app simply forgot them.
   const storageIssue = useStorageIssue()
 
   return (
@@ -58,7 +59,7 @@ export function AppShell() {
         ))}
       </nav>
       <main className="shell__main">
-        {storageIssue === 'unavailable' && <StatusMessage tone="info">{t.data.issue.unavailable}</StatusMessage>}
+        {storageIssue && <StatusMessage tone={storageIssue === 'unsaved' ? 'error' : 'info'}>{t.data.issue[storageIssue]}</StatusMessage>}
         {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched. */}
         <Suspense fallback={<Loading />}>
           <Outlet />

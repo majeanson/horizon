@@ -48,13 +48,13 @@ function RegisteredGroup({ kind, person, edit, info }: PersonEditor & { kind: Re
   return (
     <Group title={a[kind]}>
       <FieldRow label={a.balance} infoId={info.balance}>
-        {(w) => <NumberField kind="money" value={account.balance} onChange={(balance) => set({ balance })} id={w.id} />}
+        {(w) => <NumberField kind="money" max={1e9} value={account.balance} onChange={(balance) => set({ balance })} id={w.id} />}
       </FieldRow>
       <FieldRow label={a.room} infoId={info.room}>
-        {(w) => <NumberField kind="money" value={account.room} onChange={(room) => set({ room })} id={w.id} />}
+        {(w) => <NumberField kind="money" max={1e9} value={account.room} onChange={(room) => set({ room })} id={w.id} />}
       </FieldRow>
       <FieldRow label={a.contribution} hint={a.contributionHint}>
-        {(w) => <NumberField kind="money" value={account.annualContribution} onChange={(annualContribution) => set({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
+        {(w) => <NumberField kind="money" max={1e9} value={account.annualContribution} onChange={(annualContribution) => set({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
     </Group>
   )
@@ -71,13 +71,13 @@ export function AccountsSection({ person, edit }: PersonEditor) {
       <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} />
       <Group title={a.nonReg}>
         <FieldRow label={a.balance} infoId="nonRegBalance">
-          {(w) => <NumberField kind="money" value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
+          {(w) => <NumberField kind="money" max={1e9} value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
         </FieldRow>
         <FieldRow label={a.acb} infoId="nonRegAcb" hint={a.acbHint}>
-          {(w) => <NumberField kind="money" value={nonReg.acb} onChange={(acb) => setNonReg({ acb })} id={w.id} ariaDescribedBy={w.describedBy} />}
+          {(w) => <NumberField kind="money" max={1e9} value={nonReg.acb} onChange={(acb) => setNonReg({ acb })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
         <FieldRow label={a.contribution} hint={a.contributionHint}>
-          {(w) => <NumberField kind="money" value={nonReg.annualContribution} onChange={(annualContribution) => setNonReg({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
+          {(w) => <NumberField kind="money" max={1e9} value={nonReg.annualContribution} onChange={(annualContribution) => setNonReg({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
       </Group>
     </Section>

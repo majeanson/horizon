@@ -55,6 +55,10 @@ export function formatCompactMoney(dollars: number | null | undefined, lang: Lan
 //   * a dot stays the decimal mark;
 //   * if BOTH appear, the LAST one is the decimal mark ("1.234,56" and "1,234.56").
 export function parseDecimal(input: string, opts: { negative?: boolean; places?: number } = {}): number | null {
+  // A LETTER IS NEVER PART OF A NUMBER. Dropping it made « 12e5 » read as 125 and « 1a2b3 » as 123: a typo became a
+  // confidently wrong figure in a retirement plan. Symbols a person may add around an amount (« $ », « % », spaces) are
+  // still ignored below; anything spelled with letters is refused, and the box says so.
+  if (/\p{L}/u.test(input)) return null
   const cleaned = input.replace(/[^0-9.,-]/g, '').replace(/\s/g, '')
   if (!cleaned) return null
 

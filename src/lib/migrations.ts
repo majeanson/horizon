@@ -34,7 +34,7 @@ export function readProfileJson(text: string): ReadResult {
   return migrateProfile(raw)
 }
 
-export function migrateProfile(raw: unknown): ReadResult {
+export function migrateProfile(raw: unknown, migrations: readonly ((profile: Raw) => Raw)[] = MIGRATIONS): ReadResult {
   let current = raw
   if (typeof raw === 'object' && raw !== null && !Array.isArray(raw)) {
     const from = (raw as Raw).version
@@ -42,9 +42,15 @@ export function migrateProfile(raw: unknown): ReadResult {
       return { ok: false, reason: 'newer', problems: [{ path: 'version', problem: 'range' }] }
     }
     if (typeof from === 'number' && Number.isInteger(from) && from >= 1) {
-      let step = raw as Raw
-      for (let v = from; v < SCHEMA_VERSION; v++) step = { ...MIGRATIONS[v - 1](step), version: v + 1 }
-      current = step
+      // A step runs on RAW, unvalidated input. One that throws on a shape nobody foresaw must not take the app down:
+      // load() runs this at module start, so a throw here is a white screen with the person's profile held hostage.
+      try {
+        let step = raw as Raw
+        for (let v = from; v < SCHEMA_VERSION; v++) step = { ...migrations[v - 1](step), version: v + 1 }
+        current = step
+      } catch {
+        return { ok: false, reason: 'invalid', problems: [{ path: 'profile', problem: 'type' }] }
+      }
     }
   }
   const result = validateProfile(current)

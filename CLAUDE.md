@@ -161,8 +161,9 @@ canary (the detector is pinned against a fixture), an `ALLOWED` map whose entrie
 *why*, a stale-entry check, and where it counts something, a ratchet that only falls.
 
 `noNetwork` · `intl-rule` · `chip-rule` · `autofocus` · `devkitParity` · `i18nParity` · `docs` ·
-`enginePurity` · `cited` · `sourcesMd` · `schemaVersion` · `fieldInfoCopy` ·
-and, as it lands: `chartBoundary`.
+`enginePurity` · `cited` · `sourcesMd` · `schemaVersion` · `fieldInfoCopy` · `chartBoundary` ·
+`numberFieldBounds` (every `NumberField` declares the `max` the saved profile's schema will accept —
+a box without one can commit a figure that blanks the plan at the next launch).
 
 > **A new guard must be run against the bug it was written for before it is trusted.** A green
 > grep test proves nothing on its own — plant the violation (or stash the fix), watch the guard

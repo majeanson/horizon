@@ -8,8 +8,19 @@ import { useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { exampleProfile } from '../lib/example'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
-import { clearProfile, exportFileName, exportProfileJson, getProfile, replaceProfile, useStorageIssue } from '../lib/store'
+import { clearProfile, exportFileName, exportProfileJson, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { useNotice } from '../lib/toast'
+
+/** Hand a text to the browser as a file. */
+function saveAsFile(text: string, name: string): void {
+  const blob = new Blob([text], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 // Where the data goes — which is nowhere. Export a file to keep, import one back, load the fictional example,
 // or erase this device's copy. Every action that replaces the profile asks first, in words that say what is lost.
@@ -18,37 +29,45 @@ export function Donnees() {
   const d = t.data
   const confirm = useConfirm()
   const notice = useNotice()
-  const issue = useStorageIssue()
+  // Subscribed for its RE-RENDERS: the store announces a clear, a reload or a new unreadable copy through it, and the
+  // rescue section below reads storage afresh each time. (The banner itself lives in the shell, on every page.)
+  useStorageIssue()
+  const copies = unreadableCopies()
   const fileInput = useRef<HTMLInputElement>(null)
   const [failure, setFailure] = useState<Extract<ReadResult, { ok: false }> | null>(null)
 
   const download = () => {
-    const blob = new Blob([exportProfileJson(getProfile())], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = exportFileName()
-    a.click()
-    URL.revokeObjectURL(url)
+    saveAsFile(exportProfileJson(getProfile()), exportFileName())
     notice(d.export.done)
   }
 
   const onFile = async (file: File | undefined) => {
     if (!file) return
     setFailure(null)
-    const result = readProfileJson(await file.text())
-    if (!result.ok) return setFailure(result)
-    if (await confirm({ message: d.import.confirm, confirmLabel: d.import.confirmLabel, tone: 'default' })) {
-      replaceProfile(result.profile)
-      notice(d.import.done)
+    try {
+      let text: string
+      try {
+        text = await file.text()
+      } catch {
+        // A file the browser cannot read (removed, or a permission) is a file that is not JSON, as far as this person goes.
+        return setFailure({ ok: false, reason: 'json', problems: [] })
+      }
+      const result = readProfileJson(text)
+      if (!result.ok) return setFailure(result)
+      if (await confirm({ message: d.import.confirm, confirmLabel: d.import.confirmLabel, tone: 'default' })) {
+        replaceProfile(result.profile)
+        notice(d.import.done)
+      }
+    } finally {
+      // Always: an input that keeps its file does not fire `change` when the SAME file is chosen again, so a refused
+      // file could never be retried after it was mended.
+      if (fileInput.current) fileInput.current.value = ''
     }
-    if (fileInput.current) fileInput.current.value = ''
   }
 
   return (
     <section className="page-body">
       <PageHead title={d.title} subtitle={d.privacy} />
-      {issue && <StatusMessage tone="info">{issue === 'unavailable' ? d.issue.unavailable : d.issue.unreadable}</StatusMessage>}
 
       <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
         <Cluster>
@@ -57,6 +76,18 @@ export function Donnees() {
           </button>
         </Cluster>
       </Section>
+
+      {copies.length > 0 && (
+        <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
+          <Cluster>
+            {copies.map((text, i) => (
+              <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, `horizon-illisible${i === 0 ? '' : '-precedent'}.json`)}>
+                {i === 0 ? d.rescue.button : d.rescue.older}
+              </button>
+            ))}
+          </Cluster>
+        </Section>
+      )}
 
       <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">
         <Cluster>

@@ -311,7 +311,7 @@ export const EN: typeof FR = {
       done: 'File imported',
       notJson: 'This file is not a readable JSON document.',
       newer: 'This file comes from a newer version of Horizon.',
-      problems: 'Problems found in the file:',
+      problems: 'This file looks incomplete or edited. Here is what the app could not read (technical field name — problem):',
       problem: {
         missing: 'missing',
         type: 'wrong kind of value',
@@ -338,7 +338,16 @@ export const EN: typeof FR = {
     },
     issue: {
       unavailable: 'This browser does not keep data (private browsing?). Export your profile before closing the page.',
-      unreadable: 'The saved profile was unreadable. A copy is kept on this device, and a blank profile was loaded.',
+      unreadable: 'The saved profile was unreadable. A copy is kept on this device (Data page: “Unreadable copy”), and a blank profile was loaded.',
+      newer: 'The saved profile comes from a newer version of Horizon, so it could not be read here. A copy is kept on this device (Data page: “Unreadable copy”), and a blank profile was loaded.',
+      unsaved: 'A figure is outside the allowed limits: the profile was not saved. Correct the figure concerned.',
+      conflict: 'Another tab saved while you were typing: its version was taken, and your last change was not kept.',
+    },
+    rescue: {
+      title: 'Unreadable copy',
+      hint: 'The profile this device could not read was left in place. Download it before erasing anything: a file like this can often be mended by hand.',
+      button: 'Download the unreadable copy',
+      older: 'Download the previous unreadable copy',
     },
     build: (version: string) => `Version ${version}`,
     kit: 'Component gallery',

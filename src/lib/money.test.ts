@@ -88,6 +88,18 @@ describe('parseDecimal (the same reading rules, for any typed number)', () => {
     expect(parseDecimal('abc')).toBeNull()
     expect(parseDecimal('1-2')).toBeNull()
   })
+
+  it('a letter is refused, never dropped: « 12e5 » is not 125 and « 1a2b3 » is not 123', () => {
+    for (const typo of ['12e5', '1e3', '1a2b3', '12 ans', '5 k', '１２e５', 'O5', '1 000 CAD']) expect(parseDecimal(typo), typo).toBeNull()
+    expect(parseDecimal('12e5', { negative: true })).toBeNull()
+  })
+
+  it('but the symbols a person puts around an amount are still ignored: $, %, spaces (plain and non-breaking)', () => {
+    expect(parseDecimal('5,25 %')).toBe(5.25)
+    expect(parseDecimal('$1 000')).toBe(1000)
+    expect(parseDecimal('1 000 $')).toBe(1000)
+    expect(parseDecimal('1' + String.fromCharCode(0xa0) + '000')).toBe(1000)
+  })
 })
 
 describe('formatCompactMoney (the chart axis)', () => {

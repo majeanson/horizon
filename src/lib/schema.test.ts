@@ -3,9 +3,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { exampleProfile } from './example.ts'
-import { readProfileJson } from './migrations.ts'
+import { migrateProfile, readProfileJson } from './migrations.ts'
 import { SCHEMA_VERSION, blankPerson, defaultProfile, validateProfile, type Profile } from './schema.ts'
-import { clearProfile, exportProfileJson, flushProfile, getProfile, getStorageIssue, reloadProfile, replaceProfile, updateProfile } from './store.ts'
+import { mapPerson } from './profileEdit.ts'
+import { clearProfile, exportProfileJson, flushProfile, getProfile, getStorageIssue, reloadProfile, replaceProfile, unreadableCopies, updateProfile } from './store.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 const fixture = (): Profile => JSON.parse(readFileSync(join(dir, 'fixtures', `profile.v${SCHEMA_VERSION}.json`), 'utf8'))
@@ -118,6 +119,15 @@ describe('migrations — a version-1 file opens in version 2 with « lives alone
     expect(result.ok && result.profile.household.livesAlone).toBe(false)
   })
 
+  it('a migration that throws on a shape nobody foresaw is reported as an invalid file, never thrown to the caller', () => {
+    const explode = (): never => {
+      throw new Error('boom')
+    }
+    expect(migrateProfile(oldFixture(1), [explode])).toMatchObject({ ok: false, reason: 'invalid', problems: [{ path: 'profile', problem: 'type' }] })
+    // and the same call without the failing step still works: the guard is not swallowing good files
+    expect(migrateProfile(oldFixture(1)).ok).toBe(true)
+  })
+
   it('a v1 file whose household is not even an object is reported, not thrown on', () => {
     const raw = { ...v1(), household: 'nope' }
     expect(readProfileJson(JSON.stringify(raw))).toMatchObject({ ok: false, reason: 'invalid' })
@@ -170,13 +180,78 @@ describe('the store — one profile on this device', () => {
     expect(getProfile().household.persons).toHaveLength(1)
   })
 
-  it('« effacer » removes the profile and the unreadable copy, and leaves a blank one', () => {
+  it('« effacer » removes the profile and the unreadable copies, and leaves a blank one', () => {
     replaceProfile(fixture())
     localStorage.setItem('horizon-profile-unreadable', 'x')
+    localStorage.setItem('horizon-profile-unreadable-older', 'y')
     clearProfile()
     expect(localStorage.getItem('horizon-profile')).toBeNull()
     expect(localStorage.getItem('horizon-profile-unreadable')).toBeNull()
+    expect(localStorage.getItem('horizon-profile-unreadable-older')).toBeNull()
     expect(getProfile().household.persons).toHaveLength(1)
+    expect(getStorageIssue()).toBeNull()
+  })
+
+  // THE REVIEW'S WORST FINDING: « 150 000 » in the RRQ statement box (the schema stops at 100 000) saved without a word,
+  // and the NEXT launch refused the whole profile, stashed it, and showed a blank one.
+  it('never writes a profile that would not read back: the figure outside its limits is refused, the last good profile stays', () => {
+    replaceProfile(fixture())
+    const good = localStorage.getItem('horizon-profile')
+    updateProfile((p) => mapPerson(p, 'self', (x) => ({ ...x, rrq: { ...x.rrq, statementAt60: 150_000 } })))
+    flushProfile()
+    expect(localStorage.getItem('horizon-profile')).toBe(good)
+    expect(getStorageIssue()).toBe('unsaved')
+    // Correcting the figure saves again, and clears the notice.
+    updateProfile((p) => mapPerson(p, 'self', (x) => ({ ...x, rrq: { ...x.rrq, statementAt60: 15_000 } })))
+    flushProfile()
+    expect(JSON.parse(localStorage.getItem('horizon-profile')!).household.persons[0].rrq.statementAt60).toBe(15_000)
+    expect(getStorageIssue()).toBeNull()
+    // …and what was stored reads back: reload and compare.
+    reloadProfile()
+    expect(getStorageIssue()).toBeNull()
+    expect(getProfile().household.persons[0].rrq.statementAt60).toBe(15_000)
+  })
+
+  it('a profile from a NEWER version says so (not just « unreadable »), and its copy is kept', () => {
+    const text = JSON.stringify({ ...fixture(), version: SCHEMA_VERSION + 1 })
+    localStorage.setItem('horizon-profile', text)
+    reloadProfile()
+    expect(getStorageIssue()).toBe('newer')
+    expect(unreadableCopies()).toEqual([text])
+  })
+
+  it('a second unreadable profile does not erase the first one\'s copy: it is kept a generation back, newest first', () => {
+    localStorage.setItem('horizon-profile', '{ first')
+    reloadProfile()
+    localStorage.setItem('horizon-profile', '{ second')
+    reloadProfile()
+    expect(unreadableCopies()).toEqual(['{ second', '{ first'])
+    // the same text seen twice is not a new incident
+    reloadProfile()
+    expect(unreadableCopies()).toEqual(['{ second', '{ first'])
+  })
+
+  it('another tab saving while this one has an edit waiting says so, instead of silently dropping the edit', () => {
+    replaceProfile(fixture())
+    const other = fixture()
+    other.household.spending.workingToday = 12_345
+    updateProfile((p) => ({ ...p, household: { ...p.household, spending: { ...p.household.spending, workingToday: 99 } } })) // pending
+    localStorage.setItem('horizon-profile', JSON.stringify(other))
+    window.dispatchEvent(new StorageEvent('storage', { key: 'horizon-profile' }))
+    expect(getProfile().household.spending.workingToday).toBe(12_345)
+    expect(getStorageIssue()).toBe('conflict')
+    // The waiting write must not come back later and overwrite the other tab's profile with a stale one.
+    flushProfile()
+    expect(JSON.parse(localStorage.getItem('horizon-profile')!).household.spending.workingToday).toBe(12_345)
+  })
+
+  it('another tab saving while this one is idle just takes its profile, with nothing to report', () => {
+    replaceProfile(fixture())
+    const other = fixture()
+    other.household.spending.workingToday = 12_345
+    localStorage.setItem('horizon-profile', JSON.stringify(other))
+    window.dispatchEvent(new StorageEvent('storage', { key: 'horizon-profile' }))
+    expect(getProfile().household.spending.workingToday).toBe(12_345)
     expect(getStorageIssue()).toBeNull()
   })
 })

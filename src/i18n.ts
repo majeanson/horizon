@@ -325,7 +325,7 @@ export const FR = {
       done: 'Fichier importé',
       notJson: 'Ce fichier n’est pas un document JSON lisible.',
       newer: 'Ce fichier vient d’une version plus récente d’Horizon.',
-      problems: 'Problèmes trouvés dans le fichier :',
+      problems: 'Ce fichier semble incomplet ou modifié. Voici ce que l’application n’a pas pu lire (nom technique du champ — problème) :',
       problem: {
         missing: 'manquant',
         type: 'mauvais type de valeur',
@@ -352,7 +352,16 @@ export const FR = {
     },
     issue: {
       unavailable: 'Ce navigateur ne conserve pas les données (navigation privée ?). Exportez votre profil avant de fermer la page.',
-      unreadable: 'Le profil enregistré était illisible. Une copie en est gardée sur cet appareil, et un profil vierge a été chargé.',
+      unreadable: 'Le profil enregistré était illisible. Une copie en est gardée sur cet appareil (page Données : « Copie illisible »), et un profil vierge a été chargé.',
+      newer: 'Le profil enregistré vient d’une version plus récente d’Horizon : il n’a pas pu être lu ici. Une copie en est gardée sur cet appareil (page Données : « Copie illisible »), et un profil vierge a été chargé.',
+      unsaved: 'Un chiffre dépasse les limites permises : le profil n’a pas été enregistré. Corrigez le chiffre en cause.',
+      conflict: 'Un autre onglet a enregistré pendant votre saisie : sa version a été reprise, et votre dernière modification n’a pas été conservée.',
+    },
+    rescue: {
+      title: 'Copie illisible',
+      hint: 'Le profil que cet appareil n’a pas pu lire est resté sur place. Téléchargez-le avant d’effacer quoi que ce soit : un fichier de cette sorte se répare souvent à la main.',
+      button: 'Télécharger la copie illisible',
+      older: 'Télécharger la copie illisible précédente',
     },
     build: (version: string) => `Version ${version}`,
     kit: 'Galerie des composants',
