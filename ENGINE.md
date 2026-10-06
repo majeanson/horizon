@@ -11,7 +11,7 @@ These are **laws**, and where a test enforces one it is named.
 
 - **Pure and deterministic.** No React, DOM, `Date`, `Math.random`, `Intl`, `localStorage` or
   `fetch`, and no import that escapes `src/engine/`. "Today" is an *input*
-  (`Assumptions.today`), never read from a clock. *(`engine/purity.test.ts`)*
+  (`Assumptions.today`), never read from a clock. *(`lib/enginePurity.test.ts`)*
 - **Money is a `number`, in dollars, nominal.** Rounded to cents only at module *outputs*; to
   the dollar where the official rule rounds to the dollar (brackets, TFSA room). Doubles carry
   ~15.9 significant digits; the largest magnitude here is under 10⁹ and the longest chain is
@@ -43,8 +43,8 @@ simplification · `⬜` = not yet built (see `STATE.md` for the phase).
 
 | Module | Status | Official rule | v1 simplification (flagged) |
 | --- | --- | --- | --- |
-| `params/` | ⬜ | per-year tables, each value cited | future years projected from the last known year by the parameter's index rule |
-| `rrq.ts` | ⬜ | contributory months, 15 % drop-out, base 25 %, two enhancement tiers, early/late factors, cap | child-rearing and disability drop-outs ignored |
+| `params/` | ✅ | per-year tables, each value cited to an official page; 84 figures for 2026 | future years projected from the last known year by each figure's index rule, cumulatively (`round(last × (1+i)^n)`); verified to reproduce the officially published 2025 → 2026 indexation to within $1 (federal) and exactly (Québec) |
+| `rrq.ts` | ✅ | contributory months, 15 % drop-out, base 25 %, two additional components over 480 months with phase-in, the sliding early-start factor, +0.7 %/month late, the post-2024 « highest of two calculations » | reproduces the leaflet's worked example to the cent and the published 2026 maximum pensions; child-rearing and disability drop-outs ignored; earnings after the pension starts (the retirement-pension supplement) ignored |
 | `oas.ts` | ⬜ | 40-year residence proration, deferral +0.6 %/mo to 60 months, +10 % at 75, 15 % recovery tax | recovery uses same-year net income (the real rule uses the prior year, from July) |
 | `gis` (in `oas.ts`) | ⬜ | income-tested table with an employment exemption | formula approximation of the table, tolerance declared in the verified test |
 | `taxFederal.ts` | ⬜ | brackets, BPA with high-income phase-down, age and pension-income amounts, QPP credit, Québec abatement | enhancement contributions treated as a credit rather than a deduction |

@@ -30,7 +30,7 @@ second. Mobile-first, then tablet, then desktop.
 
 1. **Engine purity.** `src/engine/` is plain TypeScript: no React, DOM, `Date`, `Math.random`,
    `Intl`, `localStorage`, `fetch`, and no import from outside `src/engine/`. Time is an input.
-   *(`engine/purity.test.ts`)*
+   *(`lib/enginePurity.test.ts`)*
 2. **Every government number is cited.** A figure from an official page lives in
    `src/engine/params/` as a `Cited` value — value, source URL, page title, retrieval date,
    index rule — and the engine reads it through `plain()`. After any params change run
@@ -153,7 +153,7 @@ canary (the detector is pinned against a fixture), an `ALLOWED` map whose entrie
 *why*, a stale-entry check, and where it counts something, a ratchet that only falls.
 
 `noNetwork` · `intl-rule` · `chip-rule` · `autofocus` · `devkitParity` · `i18nParity` · `docs` ·
-and, as they land: `purity` · `cited` · `verifiedHeader` · `sourcesMd` · `schemaVersion` ·
+and, as they land: `enginePurity` · `cited` · `verifiedHeader` · `sourcesMd` · `schemaVersion` ·
 `fieldInfoCopy` · `chartBoundary`.
 
 > **A new guard must be run against the bug it was written for before it is trusted.** A green

@@ -17,6 +17,7 @@
     "e2e:sw": "playwright test -c e2e/sw.config.ts",
     "check:bundle": "node scripts/check-bundle.mjs",
     "sources": "node scripts/gen-sources.ts",
+    "sources:check": "node scripts/check-sources.ts",
     "knip": "knip",
     "deploy": "npm run build && wrangler deploy"
   },

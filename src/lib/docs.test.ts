@@ -28,7 +28,7 @@ const CLAUDE_BUDGET = 220
 
 describe('the docs stay a map', () => {
   it('finds the root markdown files (a floor, so an empty listing cannot pass)', () => {
-    expect(ROOT_MD).toEqual(expect.arrayContaining(['CLAUDE.md', 'STATE.md', 'COMPONENTS.md', 'ENGINE.md']))
+    expect(ROOT_MD).toEqual(expect.arrayContaining(['CLAUDE.md', 'STATE.md', 'COMPONENTS.md', 'ENGINE.md', 'SOURCES.md']))
   })
 
   it('`- [ ]` appears in STATE.md only — an open checkbox elsewhere is invisible work', () => {

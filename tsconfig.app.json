@@ -16,6 +16,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    // The engine's params files are also RUN by Node (npm run sources → scripts/gen-sources.ts),
+    // which strips types natively. That only works for erasable syntax (no enums, namespaces or
+    // parameter properties) and for `import type` where an import is type-only.
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
     "types": ["vite/client", "vitest/globals", "node"]
   },
   "include": ["src"]

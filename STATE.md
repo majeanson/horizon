@@ -18,7 +18,8 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **0 — scaffold** (this commit). The shell, the primitives, the guards and the pipeline exist; the engine and the pages do not. |
+| **Phase** | **2 — RRQ done**; OAS/GIS next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (84 cited figures for 2026) and the RRQ engine are verified against Retraite Québec's own worked example. No page uses the engine yet. |
+| **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
 ## 2. The document map
@@ -46,20 +47,22 @@ official page, and any guard it added has been **planted against its own bug** a
 ### Phase 0 — scaffold and CI
 
 - [x] Repo, tooling, primitives, i18n contract, guards (`noNetwork`, `intl-rule`, `chip-rule`, `autofocus`, `devkitParity`, `i18nParity`, `docs`), Worker, service worker, `check-bundle`
-- [ ] CI green on GitHub (`ci.yml`), first deploy to Cloudflare, `e2e/smoke.spec.ts` green
+- [x] CI green on GitHub (`ci.yml`), first deploy to Cloudflare (local `wrangler deploy`), `e2e/smoke.spec.ts`, `a11y.spec.ts` and the service-worker harness green in CI
 
 ### Phase 1 — parameters for 2026, with their sources
 
-- [ ] `Cited` / `Plain` types, `plain()`, `paramsFor()` and the projection of future years
-- [ ] `params/2026.ts` — every leaf from its official page, with today's `retrieved` date ❓ base-rate split (6,30 %?), federal age-amount figures, Québec combined amounts
-- [ ] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `purity.test.ts` — each planted red
-- [ ] `scripts/gen-sources.ts` + `SOURCES.md` + `sourcesMd.test.ts`
+- [x] `Cited` / `Plain` types, `plain()`, `paramsFor()` and the projection of future years (`params/machinery.test.ts`)
+- [x] `params/2026.ts` — every leaf from its official page; the 6,30 % splits 5,3 base + 1,0 first additional (settled)
+- [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
+- [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
+- [ ] Seven figures carry a `verify` reason (Revenu Québec pages read through an archive, one derived total): confirm each on an openable page and lower the ratchet in `cited.test.ts`
 
 ### Phase 2 — RRQ
 
-- [ ] Contributions; contributory period, 15 % drop-out and the base 25 % — verified: a full career at or above the MGA yields the published maximum ❓ MGA window
-- [ ] The two enhancement tiers ❓ phase-in weights and the 480-month rule
-- [ ] Early / late adjustment ❓ the sliding 0,5–0,6 % rule; the 72-year cap; property tests
+- [x] Contributions; contributory period, 15 % drop-out and the base 25 % — the leaflet's worked example to the cent; a full career yields the published $1 441.25 base maximum
+- [x] The two additional components (phase-in 15/30/50/75 %, 480 months) — the published 2026 maximum $1 507.65 reproduced
+- [x] Early / late adjustment (the sliding 0,5–0,6 % rule, settled; the 72-year cap)
+- [ ] RRQ property tests (monotone in earnings, linear below the ceiling, zero career → zero)
 
 ### Phase 3 — OAS and GIS
 
