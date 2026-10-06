@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **3 — OAS and GIS done**; taxes next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (84 cited figures for 2026) and the RRQ engine are verified against Retraite Québec's own worked example. No page uses the engine yet. |
+| **Phase** | **4 — taxes done**; accounts and defined-benefit pensions next. The shell, primitives, guards and pipeline exist and are deployed; the parameters (84 cited figures for 2026) and the RRQ engine are verified against Retraite Québec's own worked example. No page uses the engine yet. |
 | **Live** | https://horizon.marc-jeanson.workers.dev (Phase-0 shell) · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -72,9 +72,10 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 4 — taxes
 
-- [ ] Federal brackets, BPA phase-down, abatement; age, pension-income and QPP credits
-- [ ] Québec brackets, BPA, the combined age / living-alone / retirement amount
-- [ ] `householdTax` and 50 % pension splitting; flag FSS, RAMQ, prior-year OAS basis
+- [x] Federal brackets, BPA phase-down, abatement; age, pension-income and QPP credits — Finance Canada's test case reproduced
+- [x] Québec brackets, BPA, the shared age / living-alone / retirement amount — DERIVED examples (Revenu Québec publishes none readable)
+- [x] `householdTax` and pension splitting; the top marginal rate 53.31 % and the lowest 25.69 % reproduced; FSS, RAMQ, prior-year OAS basis flagged in ENGINE.md
+- [ ] Re-check against Revenu Québec's TP-1.G guide when readable: the base-QPP-contribution treatment, the 14 % conversion rate, the retirement-income age gate
 
 ### Phase 5 — accounts and defined-benefit pensions
 
