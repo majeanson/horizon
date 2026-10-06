@@ -5,6 +5,10 @@ main = "worker/index.ts"
 compatibility_date = "2026-09-01"
 workers_dev = true
 
+# The public address. A custom domain makes Cloudflare create the DNS record and the certificate itself; the zone
+# (marcportal.com) must be on this account.
+routes = [{ pattern = "retraite.marcportal.com", custom_domain = true }]
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"

@@ -3,7 +3,7 @@
 A web app that answers one question for a **Québec** household: *at what age can you retire, and
 what does it look like at 60 versus 65?*
 
-**Try it:** https://horizon.marc-jeanson.workers.dev — « Données ▸ Charger l'exemple » fills in a fictional
+**Try it:** https://retraite.marcportal.com — « Données ▸ Charger l'exemple » fills in a fictional
 couple so you can see a result before typing a single number of your own.
 
 You enter, by hand, the numbers the government already holds about you — the Retraite Québec
