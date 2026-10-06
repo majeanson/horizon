@@ -270,6 +270,19 @@ describe('GIS — what counts as income: the employment exemption (Act s. 2, « 
   it('never goes below zero', () => {
     expect(gisCountedIncome(2_000, 20_000, RULES)).toBe(0)
   })
+
+  it('the half-exempt band is its own figure, not twice the full exemption', () => {
+    const wide: OasRules = { ...RULES, gis: { ...RULES.gis, employmentExemptionBand: 20_000 } }
+    // 5 000 in full, then half of the next 20 000 (capped at 10 000 of exemption): 30 000 of earnings → 15 000 exempt.
+    expect(gisCountedIncome(30_000, 30_000, wide)).toBe(30_000 - 15_000)
+  })
+})
+
+describe('under the residence minimum there is no pension — and so no GIS', () => {
+  it('a person with 8 years of residence at the start is paid nothing, in no month', () => {
+    const p: OasPerson = { birth: { year: 1961, month: 6 }, startAge: 65, residentSince: 2018 }
+    expect(oasYear(2027, p, RULES)).toEqual({ pension: 0, months: 0 })
+  })
 })
 
 describe('which category', () => {

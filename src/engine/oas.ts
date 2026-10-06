@@ -81,6 +81,9 @@ export function oasYear(year: number, person: OasPerson, rules: OasRules): OasYe
   const startIdx = monthIndex(start)
   const idx75 = monthIndex({ year: person.birth.year + 75, month: person.birth.month }) + 1
   const fraction = residenceFraction(person, start.year, rules)
+  // Under the residence minimum there is no pension, so no month is « paid » — and the GIS, which
+  // needs a pension in pay, must not be reached through `months`.
+  if (fraction === 0) return { pension: 0, months: 0 }
   const base = rules.monthly65to74 * fraction * deferralMultiplier(person.startAge, rules)
   let months = 0
   let total = 0
@@ -117,7 +120,7 @@ export function oasFullRecoveryIncome(oasReceived: number, rules: OasRules): num
 export function gisCountedIncome(incomeWithoutOas: number, employmentIncome: number, rules: OasRules): number {
   const e = Math.max(0, employmentIncome)
   const g = rules.gis
-  const exempt = Math.min(g.employmentExemptionFull, e) + Math.min(g.employmentExemptionFull, Math.max(0, e - g.employmentExemptionFull) / 2)
+  const exempt = Math.min(g.employmentExemptionFull, e) + Math.min(g.employmentExemptionBand / 2, Math.max(0, e - g.employmentExemptionFull) / 2)
   return Math.max(0, incomeWithoutOas - exempt)
 }
 

@@ -262,6 +262,25 @@ describe('projection — the income-tested benefits are wired in', () => {
     expect(p.withdrawals.tfsa).toBeGreaterThan(0)
   })
 
+  it('someone with under ten years of residence has no OAS, and therefore no GIS — however little they live on', () => {
+    const recent: Person = {
+      ...H.persons[0],
+      id: 'self',
+      birth: { year: 1961, month: 6 },
+      retirementAge: 65,
+      salaryToday: 0,
+      earningsHistory: {},
+      oas: { startAge: 65, residentSince: 2018 },
+      accounts: { rrsp: { balance: 0, room: 0, annualContribution: 0 }, tfsa: { balance: 120_000, room: 0, annualContribution: 0 }, nonReg: { balance: 0, acb: 0, annualContribution: 0 } },
+      pensions: [],
+    }
+    const rows = project({ persons: [recent], spending: { workingToday: 30_000, retiredToday: 30_000 } }, { ...A, today: { year: 2026, month: 1 } }, {})
+    for (const r of rows.filter((x) => x.year >= 2026 && x.year <= 2035)) {
+      expect(r.persons.self!.oas, `${r.year}`).toBe(0)
+      expect(r.persons.self!.gis, `${r.year}`).toBe(0)
+    }
+  })
+
   it('a large RRIF pushes net income over the threshold: part of the OAS is recovered, never more than the OAS itself', () => {
     const rich = withPerson(H, 'self', { accounts: { ...H.persons[0].accounts, rrsp: { balance: 3_000_000, room: 0, annualContribution: 0 } } })
     const rows = project(rich, A, {})
