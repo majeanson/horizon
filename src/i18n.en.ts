@@ -58,6 +58,7 @@ export const EN: typeof FR = {
     welcome: {
       title: 'To begin',
       body: 'Enter your birth year and your work income; the rest can wait. Every number you have to type has an ⓘ that says where to find it, and nothing you write leaves this device.',
+      start: 'Start',
       example: 'See an example',
     },
     persons: 'Person',
@@ -224,7 +225,8 @@ export const EN: typeof FR = {
     },
     verdict: {
       ok: (age: number) => `Earliest: ${age}`,
-      none: 'No age from 50 to 70 lasts to the horizon.',
+      none: (from: number, to: number) => `No age from ${from} to ${to} lasts to the horizon.`,
+      caveat: 'Under these assumptions — an estimate, not financial advice.',
       explain: (horizon: number) => `“Lasts” means: spending is covered every year, until the youngest person is ${horizon}.`,
       together: 'Everyone in the household retires at that age.',
     },
@@ -243,8 +245,8 @@ export const EN: typeof FR = {
       incomeHint: 'Work, plan pension, QPP, OAS and GIS, before tax — without drawing on savings.',
       netWorthHint: 'Everything the household owns at year end: RRSPs, TFSAs and non-registered accounts.',
       dollars: 'Dollars',
-      today: 'of today',
-      nominal: 'of the year',
+      today: 'Today’s dollars',
+      nominal: 'Each year’s dollars',
       todayHint: 'Each year is brought back to today’s purchasing power: you see what the money will really be worth.',
       nominalHint: 'The dollars of each year, with no correction for inflation.',
       figure: (metric: string, from: number, to: number, names: string) => `${metric} from ${from} to ${to} for: ${names}.`,

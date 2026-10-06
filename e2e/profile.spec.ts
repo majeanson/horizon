@@ -180,7 +180,11 @@ test.describe('first visit', () => {
     const welcome = page.getByRole('complementary')
     await expect(welcome).toContainText('Entrez votre année de naissance et votre revenu de travail')
     await expect(welcome.getByRole('link', { name: 'Voir un exemple' })).toHaveAttribute('href', '/donnees')
+    // The card names two fields that sit a screen below it: « Commencer » takes the reader to them, without opening a keyboard.
     const salary = box(page, 'Revenu de travail annuel actuel')
+    await welcome.getByRole('button', { name: 'Commencer' }).click()
+    await expect(salary).toBeInViewport()
+    await expect(salary).not.toBeFocused()
     await salary.fill('70000')
     await salary.press('Enter')
     await expect(welcome).toBeHidden()
@@ -204,10 +208,13 @@ test.describe('the example household', () => {
     const problems = watchConsole(page)
     await page.goto('/resultats')
     await expect(page.getByText('Au plus tôt : 60 ans')).toBeVisible()
+    // The verdict says what it is, on the card itself: an estimate under assumptions, not advice.
+    await expect(page.locator('.verdict').getByText('Selon ces hypothèses — une estimation, pas un conseil financier.')).toBeVisible()
+    // It opens on the household's OWN plan beside 65 — not on a pair the profile never mentioned.
     const chips = page.getByRole('group', { name: 'Comparer des âges de départ' })
-    await expect(chips.getByRole('button', { name: '60 ans', pressed: true })).toBeVisible()
+    await expect(chips.getByRole('button', { name: 'Mon plan', pressed: true })).toBeVisible()
     await expect(chips.getByRole('button', { name: '65 ans', pressed: true })).toBeVisible()
-    await expect(page.getByText('Départ : 60 ans')).toBeVisible()
+    await expect(page.getByText('Départ : Mon plan')).toBeVisible()
     await expect(page.getByText('Tient jusqu’à l’horizon').first()).toBeVisible()
 
     // A fifth comparison is refused.
@@ -215,7 +222,7 @@ test.describe('the example household', () => {
     await expect(page.getByText('Quatre comparaisons au plus')).toBeVisible()
     await chips.getByRole('button', { name: '57 ans' }).click()
     await expect(chips.getByRole('button', { name: '57 ans', pressed: false })).toBeVisible()
-    await expect(page).toHaveURL(/ages=60%2C65%2C55%2C56|ages=60,65,55,56/)
+    await expect(page).toHaveURL(/ages=plan%2C65%2C55%2C56|ages=plan,65,55,56/)
 
     await page.getByRole('button', { name: /Détail année par année/ }).click()
     await expect(page.getByRole('table').first()).toBeVisible()
@@ -348,6 +355,54 @@ test.describe('an unreadable stored profile', () => {
     await expect(banner).toHaveCount(0)
   })
 })
+
+// THE LARGEST TEXT STEP is the one a low-vision reader chooses, and the one nobody sees: at 360 px the chart's « Dollars »
+// sub-tab row ran 42 px past the screen (its flex item would not shrink, so its own scroll never engaged) and the bottom nav's
+// « Hypothèses » and « Résultats » touched. The page-wide check above never ran at that size.
+for (const width of [360, 390]) {
+  test(`at the largest text size and ${width}px the page fits, each nav label stays inside its tab, and the chart's controls are reachable`, async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.addInitScript(() => localStorage.setItem('horizon-text-scale', 'x-large'))
+    await page.setViewportSize({ width, height: 800 })
+    for (const path of ['/', '/hypotheses', '/resultats']) {
+      await page.goto(path)
+      await page.locator('.page-head__title').waitFor()
+      expect(await page.evaluate(() => document.documentElement.getAttribute('data-text-scale')), 'the large step really applied').toBe('x-large')
+      await expectNoHorizontalOverflow(page)
+      const labelsOutside = await page.locator('.shell__tab').evaluateAll((tabs) =>
+        tabs.flatMap((tab) => {
+          const t = tab.getBoundingClientRect()
+          const s = tab.querySelector('span')!.getBoundingClientRect()
+          return s.left < t.left - 0.5 || s.right > t.right + 0.5 ? [tab.textContent ?? ''] : []
+        }),
+      )
+      expect(labelsOutside, 'these nav labels are wider than their tab').toEqual([])
+    }
+    // On the chart, the sub-tab pill must be able to SCROLL (its content wider than it) rather than push its row off the screen.
+    await page.goto('/resultats')
+    const pill = page.locator('.chart-panel .subtabs').nth(1)
+    await pill.waitFor()
+    const room = await pill.evaluate((el) => ({ client: el.clientWidth, scroll: el.scrollWidth, right: el.getBoundingClientRect().right, viewport: document.documentElement.clientWidth }))
+    expect(room.right, 'the pill stays on screen').toBeLessThanOrEqual(room.viewport)
+    expect(room.scroll, 'and what does not fit is reachable by scrolling it').toBeGreaterThanOrEqual(room.client)
+  })
+
+  test(`every control a thumb must hit is at least 44 px tall at ${width}px: chips, small buttons, disclosures, ⓘ`, async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.setViewportSize({ width, height: 800 })
+    for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
+      await page.goto(path)
+      await page.locator('.page-head__title').waitFor()
+      const small = await page.locator('.chip, .btn--sm, .disclosure__summary, .info-btn').evaluateAll((els) =>
+        els.flatMap((el) => {
+          const r = el.getBoundingClientRect()
+          return r.width > 0 && r.height > 0 && r.height < 43.5 ? [`${el.className} ${Math.round(r.height)}px “${(el.textContent ?? '').trim().slice(0, 24)}”`] : []
+        }),
+      )
+      expect(small, `${path}: controls under 44 px`).toEqual([])
+    }
+  })
+}
 
 for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 820], ['desktop', 1280]] as const) {
   test(`no page runs past the right edge at ${name} width (${width}px), with the example loaded and every ⓘ open`, async ({ page }) => {

@@ -72,6 +72,7 @@ export const FR = {
     welcome: {
       title: 'Pour commencer',
       body: 'Entrez votre année de naissance et votre revenu de travail ; le reste peut attendre. Chaque chiffre à saisir a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
+      start: 'Commencer',
       example: 'Voir un exemple',
     },
     persons: 'Personne',
@@ -238,7 +239,8 @@ export const FR = {
     },
     verdict: {
       ok: (age: number) => `Au plus tôt : ${age} ans`,
-      none: 'Aucun âge de 50 à 70 ans ne tient jusqu’à l’horizon.',
+      none: (from: number, to: number) => `Aucun âge de ${from} à ${to} ans ne tient jusqu’à l’horizon.`,
+      caveat: 'Selon ces hypothèses — une estimation, pas un conseil financier.',
       explain: (horizon: number) => `« Tient » veut dire : les dépenses sont couvertes chaque année, jusqu’à ce que la personne la plus jeune ait ${horizon} ans.`,
       together: 'Toutes les personnes du ménage prennent leur retraite à cet âge.',
     },
@@ -257,8 +259,8 @@ export const FR = {
       incomeHint: 'Travail, rentes du régime, RRQ, PSV et SRG, avant impôt — sans puiser dans l’épargne.',
       netWorthHint: 'Tout ce que le ménage possède en fin d’année : REER, CELI et comptes non enregistrés.',
       dollars: 'Dollars',
-      today: 'd’aujourd’hui',
-      nominal: 'de l’année',
+      today: 'Dollars d’aujourd’hui',
+      nominal: 'Dollars de l’année',
       todayHint: 'Chaque année est ramenée au pouvoir d’achat d’aujourd’hui : on voit ce que l’argent vaudra vraiment.',
       nominalHint: 'Les dollars de chaque année, sans correction pour l’inflation.',
       figure: (metric: string, from: number, to: number, names: string) => `${metric} de ${from} à ${to} pour : ${names}.`,

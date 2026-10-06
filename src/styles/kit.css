@@ -151,6 +151,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  /* The primary door to the year-by-year table, the parameters and the sensitivity grid: a thumb-sized target. */
+  min-height: 2.75rem;
   padding: 0.4rem 0.75rem 0.4rem 0.5rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
@@ -220,8 +222,8 @@
   font-size: var(--text-sm);
   padding: 0.4rem 0.75rem;
   /* Chips ARE the navigation here (scenario picker, toggles) — keep them a
-     comfortable thumb height, not a 32px sliver. */
-  min-height: 40px;
+     comfortable thumb height, not a 32px sliver: 44px, the size the subtabs and the ⓘ buttons already are. */
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: transparent;

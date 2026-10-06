@@ -14,7 +14,7 @@ import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
-import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, formatSelections, parseSelections, runSelections, toggleSelection, type Selection } from '../lib/resultsModel'
+import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, parseSelections, runSelections, toggleSelection, type Selection } from '../lib/resultsModel'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
 
@@ -33,7 +33,7 @@ export function Resultats() {
   const profile = useProfile()
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
-  const selections = parseSelections(params.get('ages'))
+  const selections = parseSelections(params.get('ages'), defaultSelections(profile.household))
   const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
@@ -59,7 +59,7 @@ export function Resultats() {
   )
   const picked = formatSelections(selections)
   const runs = useMemo(
-    () => (gaps.length > 0 ? [] : runSelections(profile, { year, month }, parseSelections(picked))),
+    () => (gaps.length > 0 ? [] : runSelections(profile, { year, month }, parseSelections(picked, []))),
     [profile, gaps.length, year, month, picked],
   )
 
@@ -71,7 +71,8 @@ export function Resultats() {
   }, [gaps.length])
 
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
-  const ages = Array.from({ length: MAX_AGE - Math.max(MIN_AGE, oldest) + 1 }, (_, i) => Math.max(MIN_AGE, oldest) + i)
+  const firstAge = Math.max(MIN_AGE, oldest)
+  const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   const toggle = (s: Selection) => setParam('ages', formatSelections(toggleSelection(selections, s)))
   const label = useCallback((s: Selection) => (s === 'plan' ? r.compare.plan : r.compare.age(s)), [r])
 
@@ -102,8 +103,10 @@ export function Resultats() {
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
 
       <div className="verdict surface" aria-live="polite">
-        <p className="verdict__line">{earliest === null ? r.verdict.none : r.verdict.ok(earliest)}</p>
+        <p className="verdict__line">{earliest === null ? r.verdict.none(firstAge, MAX_AGE) : r.verdict.ok(earliest)}</p>
         {earliest !== null && profile.household.persons.length > 1 && <p className="verdict__note">{r.verdict.together}</p>}
+        {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
+        <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
 
       <div className="compare" ref={compareRef}>

@@ -57,7 +57,9 @@
   padding: 0.35rem 0.25rem;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: var(--text-xs);
+  /* Four tabs share a 360 px bar, so each gets 90 px whatever the text size: « Hypothèses » and « Résultats » touched at
+     the largest step. This is the case --chrome-scale (core.css) exists for — fixed-count chrome with no room to grow. */
+  font-size: calc(var(--text-xs) * var(--chrome-scale, 1));
   text-decoration: none;
   text-align: center;
 }
@@ -383,6 +385,10 @@
   flex-direction: column;
   gap: 0.6rem;
 }
+/* « Commencer » scrolls a section to the top: keep it clear of the sticky top bar. */
+.profile-section[id] {
+  scroll-margin-top: 4.5rem;
+}
 .family__alone {
   display: flex;
   flex-direction: column;
@@ -527,6 +533,14 @@
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
+  /* A table wider than its box scrolls sideways, and on a phone the scrollbar is a thin overlay that is gone until
+     touched — nothing said « there is more ». A soft shadow on the edge that still has columns behind it does, and
+     disappears at the end. The two `local` layers (the page colour) cover the `scroll` shadows once that edge is reached. */
+  background:
+    linear-gradient(to right, var(--paper) 30%, transparent) left center / 2.5rem 100% no-repeat local,
+    linear-gradient(to left, var(--paper) 30%, transparent) right center / 2.5rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--ink) 22%, transparent), transparent) left center / 0.9rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--ink) 22%, transparent), transparent) right center / 0.9rem 100% no-repeat scroll;
 }
 .table-wrap:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -585,6 +599,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+/* Each control is a flex item, and a flex item will not shrink below its content's minimum width unless told it may.
+   « Dollars de l'année » at the largest text step is wider than a 360 px phone, so without this the ROW stayed 403 px
+   wide (measured) however its pill behaved; with it the row fits, and the pill inside scrolls. */
+.chart-panel__controls > * {
+  min-width: 0;
+  max-width: 100%;
 }
 .chart-slot {
   min-height: 19rem;

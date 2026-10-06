@@ -4,11 +4,12 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
 import { project } from '../engine/projection.ts'
-import { DEFAULT_SELECTIONS, MAX_SELECTIONS, assumptionsOf, formatSelections, parseSelections, runSelections, scenarioOf, selectionAge, toggleSelection } from './resultsModel.ts'
-import type { Profile } from './schema.ts'
+import { MAX_SELECTIONS, assumptionsOf, defaultSelections, formatSelections, parseSelections, runSelections, scenarioOf, selectionAge, toggleSelection } from './resultsModel.ts'
+import { SCHEMA_VERSION, type Profile } from './schema.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
-const profile = (): Profile => JSON.parse(readFileSync(join(dir, 'fixtures', 'profile.v1.json'), 'utf8'))
+const profile = (): Profile => JSON.parse(readFileSync(join(dir, 'fixtures', `profile.v${SCHEMA_VERSION}.json`), 'utf8'))
+const NONE: readonly never[] = []
 const TODAY = { year: 2026, month: 10 }
 
 describe('the profile becomes the engine\'s inputs, exactly', () => {
@@ -30,22 +31,32 @@ describe('the profile becomes the engine\'s inputs, exactly', () => {
 })
 
 describe('the chips in the address bar', () => {
-  it('no parameter means the default pair', () => {
-    expect(parseSelections(null)).toEqual([...DEFAULT_SELECTIONS])
+  // THE PAGE OPENS ON THE HOUSEHOLD'S OWN PLAN. It used to open on « 60 and 65 » whatever the profile said, so a household
+  // planning to retire at 55 saw neither its plan nor its date until it found the « Mon plan » chip.
+  it('no parameter means the household\'s own plan beside 65 — or beside 60 when the plan already is 65', () => {
+    expect(defaultSelections(GOLDEN_HOUSEHOLD)).toEqual(['plan', 65]) // the golden couple retires at 60 and 62
+    const at65 = { ...GOLDEN_HOUSEHOLD, persons: GOLDEN_HOUSEHOLD.persons.map((p) => ({ ...p, retirementAge: 65 })) }
+    expect(defaultSelections(at65)).toEqual(['plan', 60]) // two identical cards would compare nothing
+    expect(parseSelections(null, defaultSelections(GOLDEN_HOUSEHOLD))).toEqual(['plan', 65])
+  })
+
+  it('an address that names nothing readable stays empty: the default is for NO address, not for a bad one', () => {
+    expect(parseSelections('', ['plan', 65])).toEqual([])
+    expect(parseSelections('abc', ['plan', 65])).toEqual([])
   })
 
   it('reads « plan » and ages, drops what is unreadable or out of range, and de-duplicates', () => {
-    expect(parseSelections('plan,60,65')).toEqual(['plan', 60, 65])
-    expect(parseSelections('49,71,abc,60,60,6')).toEqual([60])
-    expect(parseSelections('')).toEqual([])
+    expect(parseSelections('plan,60,65', NONE)).toEqual(['plan', 60, 65])
+    expect(parseSelections('49,71,abc,60,60,6', NONE)).toEqual([60])
+    expect(parseSelections('', NONE)).toEqual([])
   })
 
   it('never more than four', () => {
-    expect(parseSelections('55,56,57,58,59,60')).toEqual([55, 56, 57, 58])
+    expect(parseSelections('55,56,57,58,59,60', NONE)).toEqual([55, 56, 57, 58])
   })
 
   it('round-trips', () => {
-    expect(parseSelections(formatSelections(['plan', 58, 66]))).toEqual(['plan', 58, 66])
+    expect(parseSelections(formatSelections(['plan', 58, 66]), NONE)).toEqual(['plan', 58, 66])
   })
 
   it('a chip toggles; a fifth is refused; the order of the others is kept', () => {

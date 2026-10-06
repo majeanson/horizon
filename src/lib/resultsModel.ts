@@ -11,7 +11,13 @@ export type Selection = 'plan' | number
 export const MIN_AGE = 50
 export const MAX_AGE = 70
 export const MAX_SELECTIONS = 4
-export const DEFAULT_SELECTIONS: readonly Selection[] = [60, 65]
+
+/**
+ * What the page opens on when the address names no comparison: the household's OWN plan, beside one common
+ * alternative — 65, or 60 when the plan already is 65 (two identical cards compare nothing). It used to open on
+ * « 60 and 65 » whatever the profile said, so a household planning to retire at 55 saw neither its plan nor its date.
+ */
+export const defaultSelections = (household: Household): Selection[] => ['plan', household.persons[0].retirementAge === 65 ? 60 : 65]
 
 export const assumptionsOf = (profile: Profile, today: { year: number; month: number }): Assumptions => ({ ...profile.assumptions, today })
 
@@ -32,9 +38,9 @@ export function runSelections(profile: Profile, today: { year: number; month: nu
   }))
 }
 
-/** `?ages=plan,60,65` → selections. Anything unreadable is dropped; nothing readable → the default pair. */
-export function parseSelections(text: string | null): Selection[] {
-  if (text === null) return [...DEFAULT_SELECTIONS]
+/** `?ages=plan,60,65` → selections. Anything unreadable is dropped; no address at all → `fallback` (the household's defaults). */
+export function parseSelections(text: string | null, fallback: readonly Selection[]): Selection[] {
+  if (text === null) return [...fallback]
   const out: Selection[] = []
   for (const token of text.split(',')) {
     const sel: Selection | null = token === 'plan' ? 'plan' : /^\d{2}$/.test(token) && Number(token) >= MIN_AGE && Number(token) <= MAX_AGE ? Number(token) : null

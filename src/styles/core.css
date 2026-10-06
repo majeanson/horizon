@@ -538,7 +538,7 @@ button {
    "Vider") — visually small and auto-width so it never competes with the content,
    while keeping a comfortable tap target. */
 .btn--sm {
-  min-height: 38px;
+  min-height: 44px;
   padding: 0.3rem 0.8rem;
   font-size: var(--text-sm);
   box-shadow: none;
@@ -765,6 +765,10 @@ textarea.input {
 .subtabs-row .subtabs {
   flex: 1;
   margin: 0;
+  /* A flex item will not shrink below its content unless told it may. Without this the pill kept its full width at
+     large text sizes, ran past the viewport (42 px at 360 px / x-large, measured) and its own overflow-x: auto never
+     engaged, so the scroll that useHScroll maps the wheel onto had nothing to scroll. */
+  min-width: 0;
 }
 /* In-page section switch (Repas · Garde-manger · Recettes): one job at a time so
    the kitchen isn't a five-section scroll. Mirrors the board's segmented control. */

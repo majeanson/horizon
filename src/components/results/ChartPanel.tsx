@@ -70,8 +70,8 @@ export function ChartPanel({
           value={dollars}
           onSelect={onDollars}
           options={[
-            { key: 'today', label: `${c.dollars} ${c.today}` },
-            { key: 'nominal', label: `${c.dollars} ${c.nominal}` },
+            { key: 'today', label: c.today },
+            { key: 'nominal', label: c.nominal },
           ]}
         />
       </div>

@@ -12,9 +12,9 @@ export interface PersonEditor {
 
 // The card every section sits in: a header, then the fields. The section is named by its own title, so a
 // screen reader lists the form by its parts.
-export function Section({ title, subtitle, icon, children }: { title: string; subtitle?: ReactNode; icon?: IconName; children: ReactNode }) {
+export function Section({ id, title, subtitle, icon, children }: { id?: string; title: string; subtitle?: ReactNode; icon?: IconName; children: ReactNode }) {
   return (
-    <section className="profile-section surface" aria-label={title}>
+    <section id={id} className="profile-section surface" aria-label={title}>
       <SectionHeader title={title} subtitle={subtitle} icon={icon} />
       <div className="profile-section__body">{children}</div>
     </section>

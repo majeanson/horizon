@@ -4,6 +4,7 @@ import { FamilySection } from '../components/profile/FamilySection'
 import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
+import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { SubTabs } from '../components/SubTabs'
 import type { PersonId } from '../engine/types'
@@ -30,9 +31,16 @@ export function Profil() {
         <aside className="welcome surface">
           <h2 className="welcome__title">{t.profile.welcome.title}</h2>
           <p className="welcome__body">{t.profile.welcome.body}</p>
-          <Link className="btn btn--sm btn--ghost" to="/donnees">
-            {t.profile.welcome.example}
-          </Link>
+          <Cluster>
+            {/* The fields the card names sit a screen below it, under « Famille »: take the reader there. Scroll only —
+                a tap that asks « where do I start » does not ask for the keyboard. */}
+            <button type="button" className="btn btn--sm" onClick={() => document.getElementById('profile-about')?.scrollIntoView({ block: 'start' })}>
+              {t.profile.welcome.start}
+            </button>
+            <Link className="btn btn--sm btn--ghost" to="/donnees">
+              {t.profile.welcome.example}
+            </Link>
+          </Cluster>
         </aside>
       )}
       <FamilySection />
