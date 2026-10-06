@@ -383,6 +383,12 @@
   flex-direction: column;
   gap: 0.6rem;
 }
+.family__alone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
 
 /* ── The order of withdrawals ────────────────────────────────────────────── */
 .order-list {

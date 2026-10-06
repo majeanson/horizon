@@ -67,9 +67,12 @@ export function quebecAmounts(p: QuebecPerson, livesAlone: boolean, r: QuebecRul
   }
 }
 
-/** One household (one or two adults). The shared credit is applied where it does the most good. */
-export function quebecTax(persons: readonly QuebecPerson[], r: QuebecRules): QuebecHouseholdResult {
-  const livesAlone = persons.length === 1
+/**
+ * One household (one or two adults). The shared credit is applied where it does the most good. `livesAloneIfOne` says
+ * whether a ONE-adult household lives alone (the default): a couple never does, and a person who shares a dwelling does not.
+ */
+export function quebecTax(persons: readonly QuebecPerson[], r: QuebecRules, livesAloneIfOne = true): QuebecHouseholdResult {
+  const livesAlone = persons.length === 1 && livesAloneIfOne
   let amountsTotal = 0
   for (const p of persons) {
     const a = quebecAmounts(p, livesAlone, r)

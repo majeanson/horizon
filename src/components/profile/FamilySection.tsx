@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
-import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse } from '../../lib/profileEdit'
+import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip, ChipGroup } from '../Chip'
@@ -49,6 +49,15 @@ export function FamilySection() {
           </button>
         )}
       </Cluster>
+
+      {!spouse && (
+        <div className="family__alone">
+          <Chip selected={profile.household.livesAlone ?? true} onClick={() => updateProfile((p) => setLivesAlone(p, !(p.household.livesAlone ?? true)))}>
+            {f.livesAlone}
+          </Chip>
+          <p className="field-row__hint">{f.livesAloneHint}</p>
+        </div>
+      )}
 
       <div className="family__children">
         <p className="field-row__hint">{f.childrenHint}</p>

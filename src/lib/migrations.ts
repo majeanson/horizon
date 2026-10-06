@@ -6,7 +6,17 @@ import { SCHEMA_VERSION, validateProfile, type Profile, type ProfileProblem } fr
 // of the OLD shape to src/lib/fixtures/ — `schemaVersion.test.ts` fails until all three are done.
 
 type Raw = Record<string, unknown>
-export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = []
+export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
+  // v1 → v2: Québec's living-alone amount became a stated fact (`household.livesAlone`) instead of an inference from
+  // the head count. A v1 file was always computed as « one adult lives alone », so that is what it is given. A household
+  // that is not an object is left for the validator to report.
+  (profile) => {
+    const household = profile.household
+    if (typeof household !== 'object' || household === null || Array.isArray(household)) return profile
+    const persons = (household as Raw).persons
+    return { ...profile, household: { ...(household as Raw), livesAlone: Array.isArray(persons) && persons.length === 1 } }
+  },
+]
 
 export type ReadResult =
   | { ok: true; profile: Profile }

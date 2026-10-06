@@ -2,19 +2,20 @@ import { readFileSync } from 'node:fs'
 import type { Page } from '@playwright/test'
 
 // Horizon has no API to stub: a spec « logs in » by putting a profile into localStorage BEFORE first paint, which
-// is exactly where the app itself keeps it. The example is the golden couple (src/lib/fixtures/profile.v1.json) —
+// is exactly where the app itself keeps it. The example is the golden couple (src/lib/fixtures/profile.v2.json) —
 // the same file the unit tests migrate and the golden snapshots are built from, so what a browser sees here is
-// what the engine tests pin.
+// what the engine tests pin. (When the schema moves on, point this at the new fixture: `schemaVersion.test.ts`
+// keeps one per version.)
 
 export const PROFILE_KEY = 'horizon-profile'
 
 export type SeedProfile = Record<string, unknown>
 
-export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v1.json', 'utf8'))
+export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v2.json', 'utf8'))
 
 /** A blank single person with the defaults the app itself would start from. */
 export function blankSeed(): SeedProfile {
-  const e = structuredClone(EXAMPLE) as { household: { persons: Record<string, unknown>[]; spending: Record<string, number> }; children: number[] }
+  const e = structuredClone(EXAMPLE) as { household: { livesAlone: boolean; persons: Record<string, unknown>[]; spending: Record<string, number> }; children: number[] }
   const self = e.household.persons[0]
   Object.assign(self, {
     name: '',
@@ -32,6 +33,7 @@ export function blankSeed(): SeedProfile {
     pensions: [],
   })
   e.household.persons = [self]
+  e.household.livesAlone = true
   e.household.spending = { workingToday: 0, retiredToday: 0 }
   e.children = []
   return e as unknown as SeedProfile

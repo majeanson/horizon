@@ -76,6 +76,12 @@ export interface Person {
 }
 
 export interface Household {
+  /**
+   * Whether the household is ONE adult who lives alone — the condition for Québec's living-alone amount. Ignored for a
+   * couple (it is never alone). Absent means « one adult lives alone », which is what the engine assumed before it was
+   * a stated fact; a saved profile always carries it (schema v2).
+   */
+  livesAlone?: boolean
   persons: Person[]
   spending: {
     /** Household spending while anyone still works, in today's dollars. */

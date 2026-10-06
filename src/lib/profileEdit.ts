@@ -32,14 +32,21 @@ export function setReturn(p: Profile, kind: AccountKind, value: number): Profile
 
 export const hasSpouse = (p: Profile): boolean => p.household.persons.some((x) => x.id === 'spouse')
 
+// A couple never « lives alone »; when the spouse goes, the household is a person living alone again — the default,
+// which the person can untick (a roommate disqualifies them from Québec's living-alone amount).
 export function addSpouse(p: Profile, today: { year: number }): Profile {
   if (hasSpouse(p)) return p
-  return { ...p, household: { ...p.household, persons: [...p.household.persons, blankPerson('spouse', today)] } }
+  return { ...p, household: { ...p.household, livesAlone: false, persons: [...p.household.persons, blankPerson('spouse', today)] } }
 }
 
 export function removeSpouse(p: Profile): Profile {
   if (!hasSpouse(p)) return p
-  return { ...p, household: { ...p.household, persons: p.household.persons.filter((x) => x.id !== 'spouse') } }
+  return { ...p, household: { ...p.household, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse') } }
+}
+
+/** Whether a one-adult household lives alone (Québec's living-alone amount). A couple is unaffected. */
+export function setLivesAlone(p: Profile, value: boolean): Profile {
+  return p.household.livesAlone === value ? p : { ...p, household: { ...p.household, livesAlone: value } }
 }
 
 export function addChild(p: Profile, birthYear: number): Profile {

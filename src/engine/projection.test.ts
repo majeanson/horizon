@@ -169,6 +169,20 @@ describe('projection — a household living on pensions alone, checked against t
     }
   })
 
+  it('a person who does not live alone pays exactly that year\'s living-alone credit more Québec tax (indexed amount × 14 %)', () => {
+    // Spending no year can meet, so nothing is ever saved or drawn: the only thing that differs is the credit.
+    const lean = { ...house, spending: { workingToday: 200_000, retiredToday: 200_000 } }
+    const alone = project({ ...lean, livesAlone: true }, { ...A, pensionSplitting: false }, {})
+    const shares = project({ ...lean, livesAlone: false }, { ...A, pensionSplitting: false }, {})
+    for (const year of [2028, 2029]) {
+      const q = paramsFor(year, { inflation: A.inflation, wageGrowth: A.wageGrowth }).quebec
+      const a = alone.find((r) => r.year === year)!.persons.self!.quebecTax
+      const s = shares.find((r) => r.year === year)!.persons.self!.quebecTax
+      expect(q.livingAloneAmount, 'the amount is indexed past 2 172 $').toBeGreaterThan(2_172)
+      expect(s - a, `${year}`).toBeCloseTo(q.livingAloneAmount * q.creditRate, 1)
+    }
+  })
+
   it('a household that spends more than its income and has no savings shows the gap, never a negative balance', () => {
     const poor = project({ ...house, spending: { workingToday: 90_000, retiredToday: 90_000 } }, A, {})
     expect(poor.some((r) => r.household.shortfall > 1_000)).toBe(true)

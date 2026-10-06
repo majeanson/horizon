@@ -10,7 +10,7 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId }
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 export type StoredAssumptions = Omit<Assumptions, 'today'>
 
@@ -54,7 +54,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
 export const defaultProfile = (today: { year: number }): Profile => ({
   app: 'horizon',
   version: SCHEMA_VERSION,
-  household: { persons: [blankPerson('self', today)], spending: { workingToday: 0, retiredToday: 0 } },
+  household: { livesAlone: true, persons: [blankPerson('self', today)], spending: { workingToday: 0, retiredToday: 0 } },
   children: [],
   assumptions: {
     inflation: 0.02,
@@ -172,11 +172,15 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
   const earningsHistory: Record<number, number> = {}
   for (const [k, val] of Object.entries(history)) {
     const year = Number(k)
-    if (!Number.isInteger(year) || year < 1966 || year > 2100) r.count(`${path}.earningsHistory.${k}`)
+    // The key must BE the year's canonical spelling: « 0x7CF », « 1999.0 » and « 1.999e3 » all read as 1999 and would
+    // silently overwrite the real figure.
+    if (!Number.isInteger(year) || String(year) !== k || year < 1966 || year > 2100) r.count(`${path}.earningsHistory.${k}`)
     else earningsHistory[year] = r.num(val, `${path}.earningsHistory.${k}`, 0, 1e9)
   }
-  const pensions = (r.arr(o.pensions, `${path}.pensions`) ?? []).map((p, i) => readPension(r, p, `${path}.pensions[${i}]`))
-  if (pensions.length > 8) r.count(`${path}.pensions`)
+  // Counted BEFORE they are read: a file with a million plans must be refused, not parsed a million times.
+  const rawPensions = r.arr(o.pensions, `${path}.pensions`) ?? []
+  if (rawPensions.length > 8) r.count(`${path}.pensions`)
+  const pensions = rawPensions.slice(0, 8).map((p, i) => readPension(r, p, `${path}.pensions[${i}]`))
   return {
     id: r.oneOf(o.id, `${path}.id`, [expected]),
     name: r.str(o.name, `${path}.name`, 60),
@@ -219,9 +223,11 @@ export function validateProfile(raw: unknown): ProfileResult {
     workingToday: r.num(spending.workingToday, 'household.spending.workingToday', 0, 1e8),
     retiredToday: r.num(spending.retiredToday, 'household.spending.retiredToday', 0, 1e8),
   }
+  const livesAlone = r.bool(household.livesAlone, 'household.livesAlone')
 
-  const children = (r.arr(root.children, 'children') ?? []).map((c, i) => r.num(c, `children[${i}]`, 1950, 2100, true))
-  if (children.length > 12) r.count('children')
+  const rawChildren = r.arr(root.children, 'children') ?? []
+  if (rawChildren.length > 12) r.count('children')
+  const children = rawChildren.slice(0, 12).map((c, i) => r.num(c, `children[${i}]`, 1950, 2100, true))
 
   const a = r.obj(root.assumptions, 'assumptions') ?? {}
   const returns = r.obj(a.returns, 'assumptions.returns') ?? {}
@@ -242,5 +248,5 @@ export function validateProfile(raw: unknown): ProfileResult {
   }
 
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { persons, spending: spendingNow }, children, assumptions } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow }, children, assumptions } }
 }

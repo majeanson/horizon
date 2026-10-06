@@ -65,6 +65,7 @@ const spouse: Person = {
 }
 
 export const GOLDEN_HOUSEHOLD: Household = {
+  livesAlone: false, // a couple never does; a saved profile always states it
   persons: [self, spouse],
   spending: { workingToday: 88_000, retiredToday: 100_000 },
 }

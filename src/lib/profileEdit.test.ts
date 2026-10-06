@@ -7,13 +7,13 @@ import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears, rrqEstimate } from './earnings.ts'
 import {
   addChild, addPension, addSpouse, blankPension, hasSpouse, mapPerson, moveInOrder, removeChild, removePension, removeSpouse,
-  setAssumptions, setEarning, setReturn, setSpending, updatePension,
+  setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { profileGaps } from './profileGaps.ts'
-import { defaultProfile, validateProfile, type Profile } from './schema.ts'
+import { defaultProfile, SCHEMA_VERSION, validateProfile, type Profile } from './schema.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
-const golden = (): Profile => JSON.parse(readFileSync(join(dir, 'fixtures', 'profile.v1.json'), 'utf8'))
+const golden = (): Profile => JSON.parse(readFileSync(join(dir, 'fixtures', `profile.v${SCHEMA_VERSION}.json`), 'utf8'))
 const TODAY = { year: 2026 }
 const valid = (p: Profile) => expect(validateProfile(p).ok, JSON.stringify(validateProfile(p))).toBe(true)
 
@@ -29,6 +29,21 @@ describe('profile edits are pure, and never produce a profile the validator woul
     expect(removeSpouse(couple).household.persons.map((x) => x.id)).toEqual(['self'])
     expect(removeSpouse(solo)).toBe(solo)
     expect(solo.household.persons).toHaveLength(1) // the original is untouched
+  })
+
+  it('« lives alone »: a couple never does, a person who loses their spouse does again, and the person can untick it', () => {
+    const solo = defaultProfile(TODAY)
+    expect(solo.household.livesAlone).toBe(true)
+    const couple = addSpouse(solo, TODAY)
+    expect(couple.household.livesAlone).toBe(false)
+    const alone = removeSpouse(couple)
+    expect(alone.household.livesAlone).toBe(true)
+    const shares = setLivesAlone(alone, false)
+    expect(shares.household.livesAlone).toBe(false)
+    valid(shares)
+    expect(setLivesAlone(shares, false)).toBe(shares) // same object when nothing changes
+    // Removing a spouse resets it: ticking it off for a couple would otherwise silently carry over.
+    expect(removeSpouse(addSpouse(shares, TODAY)).household.livesAlone).toBe(true)
   })
 
   it('children: kept sorted, capped at 12, removable by position', () => {

@@ -53,6 +53,8 @@ export interface TaxRules {
   federal: FederalRules
   quebec: QuebecRules
   oas: OasRules
+  /** Whether a one-adult household lives alone (Québec's living-alone amount). Absent: it does. A couple never does. */
+  livesAlone?: boolean
 }
 
 export interface PersonTax {
@@ -132,6 +134,7 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
       eligibleRetirement: eligibleQuebec(p, splitIn, splitOut),
     })),
     rules.quebec,
+    rules.livesAlone ?? true,
   )
 
   const results: PersonTax[] = out.map(({ p, income, before, recovery, netIncome, splitIn, splitOut }, i) => {

@@ -110,6 +110,23 @@ test.describe('a blank profile', () => {
     await expect.poll(async () => (await savedProfile(page)).household.persons.length).toBe(1)
   })
 
+  test('« Je vis seul·e » is on for one adult, can be unticked (and says why), and is gone — and false — for a couple', async ({ page }) => {
+    await page.goto('/')
+    const alone = page.getByRole('button', { name: 'Je vis seul·e' })
+    await expect(alone).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByText('Seul·e dans un logement distinct, toute l’année')).toBeVisible()
+    await alone.click()
+    await expect(alone).toHaveAttribute('aria-pressed', 'false')
+    await expect.poll(async () => (await savedProfile(page)).household.livesAlone).toBe(false)
+    await alone.click()
+    await expect.poll(async () => (await savedProfile(page)).household.livesAlone).toBe(true)
+
+    // A couple is never alone: the toggle disappears and the saved fact is false.
+    await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
+    await expect(page.getByRole('button', { name: 'Je vis seul·e' })).toHaveCount(0)
+    await expect.poll(async () => (await savedProfile(page)).household.livesAlone).toBe(false)
+  })
+
   test('children are birth years: added, shown as removable chips, validated', async ({ page }) => {
     await page.goto('/')
     const year = page.getByRole('textbox', { name: 'Année de naissance de l’enfant' })

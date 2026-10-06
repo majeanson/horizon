@@ -148,7 +148,7 @@ function simulateYear(
   indexation: Indexation,
 ): { row: YearRow; next: PersonState[] } {
   const P = paramsOf(year)
-  const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas }
+  const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, livesAlone: h.livesAlone }
   const inflate = (1 + a.inflation) ** (year - a.today.year)
   const couple = people.length === 2
 

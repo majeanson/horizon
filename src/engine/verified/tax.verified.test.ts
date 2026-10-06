@@ -201,6 +201,20 @@ describe('Québec — DERIVED worked examples (exact arithmetic from the officia
     expect(small.persons[1].tax).toBe(0)
   })
 
+  it('the living-alone amount (2 172 $) goes to one adult who lives alone — not to one who shares a dwelling, and never to a couple', () => {
+    const p = single(30_000, 40, 0)
+    const alone = quebecTax([p], P.quebec, true)
+    const shares = quebecTax([p], P.quebec, false)
+    expect(alone.amountsTotal - shares.amountsTotal).toBe(2_172)
+    expect(shares.persons[0].tax - alone.persons[0].tax).toBeCloseTo(2_172 * 0.14, 2)
+    // A couple is never alone, whatever the flag says.
+    const couple = [single(30_000, 40, 0), single(30_000, 40, 0)]
+    expect(quebecTax(couple, P.quebec, true).amountsTotal).toBe(quebecTax(couple, P.quebec, false).amountsTotal)
+    expect(quebecTax(couple, P.quebec).amountsTotal).toBe(0)
+    // The default is « lives alone »: what the engine assumed before the flag existed.
+    expect(quebecTax([p], P.quebec).amountsTotal).toBe(alone.amountsTotal)
+  })
+
   it('a single person has no spouse to transfer to', () => {
     expect(quebecTax([single(5_000, 40, 0)], P.quebec).persons[0].transferredCredit).toBe(0)
   })
