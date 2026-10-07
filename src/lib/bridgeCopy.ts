@@ -26,6 +26,9 @@ export interface BridgeCopy {
   strategyName: Record<StrategyKey, string>
   strategyLine: Record<StrategyKey, string>
   custom: string
+  /** After a card writes the profile: what changed and from what — with the one-tap way back beside it. */
+  applied: (f: { name: string | null; rrq: string; oas: string; prevRrq: string; prevOas: string; both: boolean }) => string
+  appliedUndo: string
   /** The scorecard. */
   lowestNestLabel: string
   selectedName: string
@@ -114,6 +117,9 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       both: 'Comme le pont, mais l’autre personne reporte aussi son RRQ et sa PSV à 70 ans.',
     },
     custom: 'Vos choix ne correspondent à aucune de ces façons : ils sont montrés sous « Mon plan ».',
+    applied: ({ name, rrq, oas, prevRrq, prevOas, both }) =>
+      `Profil mis à jour${name ? ` pour ${name}` : ''} : RRQ à ${rrq}, PSV à ${oas} (avant : RRQ à ${prevRrq}, PSV à ${prevOas}).${both ? ' L’autre personne suit les mêmes âges.' : ''}`,
+    appliedUndo: 'Annuler ce changement',
     lowestNestLabel: 'Nid le plus bas, de 60 à 70 ans',
     selectedName: 'Votre choix actuel',
     worth85: 'Valeur nette à 85 ans',
@@ -211,6 +217,9 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       both: 'Like the bridge, but the other person also defers their QPP and OAS to 70.',
     },
     custom: 'Your choices match none of these: they are shown under “My plan”.',
+    applied: ({ name, rrq, oas, prevRrq, prevOas, both }) =>
+      `Profile updated${name ? ` for ${name}` : ''}: QPP at ${rrq}, OAS at ${oas} (before: QPP at ${prevRrq}, OAS at ${prevOas}).${both ? ' The other person follows the same ages.' : ''}`,
+    appliedUndo: 'Undo this change',
     lowestNestLabel: 'Lowest nest egg, ages 60 to 70',
     selectedName: 'Your current choice',
     worth85: 'Net worth at 85',

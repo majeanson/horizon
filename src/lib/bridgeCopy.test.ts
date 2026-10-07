@@ -39,6 +39,7 @@ function texts(c: BridgeCopy): [string, string][] {
       if (k === 'why') c.why(whyArgs(c === en ? 'en' : 'fr')).forEach((line, i) => out.push([`why.${i}`, line]))
       else if (k === 'verdict') VERDICTS.forEach((verdict, i) => out.push([`verdict.${i}`, c.verdict(verdict)]))
       else if (k === 'nestHint') out.push([k, c.nestHint(65, 70)])
+      else if (k === 'applied') out.push([k, c.applied({ name: 'Camille', rrq: c.age(70), oas: c.age(70), prevRrq: c.age(65), prevOas: c.age(65), both: true })])
       else if (k === 'tooltip') out.push([k, c.tooltip(62, 2054)])
       else if (k === 'barsFigure' || k === 'nestFigure') out.push([k, (v as (a: number, b: number) => string)(60, 70)])
       else out.push([k, (v as (a: never, b: never) => string)(7 as never, 8 as never)])

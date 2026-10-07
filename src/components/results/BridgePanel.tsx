@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { BridgeLevers, BridgeView, StrategyCard, StrategyKey } from '../../engine/bridge'
 import { leversFor, profileLevers, strategyKeysFor } from '../../engine/bridge'
@@ -26,6 +26,7 @@ import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
+import { StatusMessage } from '../StatusMessage'
 import { SubTabs } from '../SubTabs'
 
 // « Mes années 60 à 70 » — the strategy view. For the person looked at: the plan year by year across the bridge years
@@ -39,6 +40,18 @@ const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineC
 const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m.StackedBarChart })))
 
 const STATUS_MARK = { covered: '✓', drawing: '↓', short: '!' } as const
+
+// What the last card tap wrote into the profile, kept so the line under the cards can say it
+// happened — a card looks like a view toggle, but it IS a profile edit — and take it back.
+interface AppliedChange {
+  id: PersonId
+  prevRrq: number
+  prevOas: number
+  prevBoth: boolean
+  rrq: number
+  oas: number
+  both: boolean
+}
 
 function StrategyCards({
   view,
@@ -305,12 +318,28 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household)
     write({ levers: { ...cur.levers, ...patch }, window: win ?? cur.window })
   }
-  const pickPerson = (id: PersonId) => write({ levers: profileLevers(household, id), window: parseBridgeParams(new URLSearchParams(window.location.search), household).window })
+  const [applied, setApplied] = useState<AppliedChange | null>(null)
+  const pickPerson = (id: PersonId) => {
+    setApplied(null)
+    write({ levers: profileLevers(household, id), window: parseBridgeParams(new URLSearchParams(window.location.search), household).window })
+  }
   const apply = (key: StrategyKey) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household).levers
     const l = leversFor(key, household, cur.id, cur.retirementAge)
     updateProfile((p) => mapPerson(p, cur.id, (x) => (x.rrq.startAge === l.rrqStartAge && x.oas.startAge === l.oasStartAge ? x : { ...x, rrq: { ...x.rrq, startAge: l.rrqStartAge }, oas: { ...x.oas, startAge: l.oasStartAge } })))
     change({ both: l.both === true })
+    // A card tap edits the stored profile (the house rule: the ages live in ONE place). The part a
+    // comparison control must not do silently is the edit — so remember what changed, say so, and
+    // keep a way back on screen until the next tap.
+    const next: AppliedChange = { id: cur.id, prevRrq: cur.rrqStartAge, prevOas: cur.oasStartAge, prevBoth: cur.both === true, rrq: l.rrqStartAge, oas: l.oasStartAge, both: l.both === true }
+    setApplied(next.rrq === next.prevRrq && next.oas === next.prevOas && next.both === next.prevBoth ? null : next)
+  }
+  const undoApply = () => {
+    if (applied === null) return
+    const a = applied
+    updateProfile((p) => mapPerson(p, a.id, (x) => (x.rrq.startAge === a.prevRrq && x.oas.startAge === a.prevOas ? x : { ...x, rrq: { ...x.rrq, startAge: a.prevRrq }, oas: { ...x.oas, startAge: a.prevOas } })))
+    change({ both: a.prevBoth })
+    setApplied(null)
   }
 
   // Everything below the controls describes the levers the data was computed FOR (lib/bridgeModel.ts, shownPlan).
@@ -354,6 +383,21 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
           <h3 className="deferral__title">{copy.strategyTitle}</h3>
           {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
           <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} />
+          {applied !== null && (
+            <Cluster className="bridge__applied">
+              <StatusMessage tone="success">
+                {copy.applied({
+                  name: household.persons.length > 1 ? (names[Math.max(0, household.persons.findIndex((p) => p.id === applied.id))] ?? null) : null,
+                  rrq: copy.age(applied.rrq),
+                  oas: copy.age(applied.oas),
+                  prevRrq: copy.age(applied.prevRrq),
+                  prevOas: copy.age(applied.prevOas),
+                  both: applied.both,
+                })}
+              </StatusMessage>
+              <Chip onClick={undoApply}>{copy.appliedUndo}</Chip>
+            </Cluster>
+          )}
           <p className="field-row__hint">{copy.todayNote}</p>
 
           <div className="bridge__window">
