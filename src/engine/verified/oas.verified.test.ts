@@ -386,3 +386,16 @@ describe('the Allowance and the pensioner\'s GIS beside it, row by row against t
     expect(allowanceMonthly(20_000 * 1.05, later)).toBeCloseTo(allowanceMonthly(20_000, RULES) * 1.05, 1)
   })
 })
+
+// ── The same estimator, for a couple with a 60–64 spouse (Jean 66 on the OAS since 65, Lise 63; his income 10 000 $ without the OAS, hers 0) ──
+// It printed « At this time: $1,398.07 a month — $762.50 OAS, $635.57 GIS » for him and « Until age 65, your partner could receive
+// $774.07 from the Allowance »; then, once she is 65, « $1,190.07 — $762.50 OAS, $427.57 GIS » for each of them.
+describe('the OAS Benefits Estimator, Oct–Dec 2026, a couple with a 63-year-old spouse (combined income 10 000 $)', () => {
+  it('the Allowance is $774.07 and the pensioner\'s GIS beside it $635.57: within the estimator\'s $1 a month', () => {
+    expect(Math.abs(allowanceMonthly(10_000, RULES) - 774.07)).toBeLessThan(1.01)
+    expect(Math.abs(gisWithAllowanceSpouseMonthly(10_000, RULES) - 635.57)).toBeLessThan(1)
+  })
+  it('once she is 65 both are pensioners: the ordinary couple\'s GIS at the same income, $427.57 each', () => {
+    expect(Math.abs(gisMonthly(10_000, gisCategory({ present: true, receivesOas: true }), RULES) - 427.57)).toBeLessThan(1)
+  })
+})
