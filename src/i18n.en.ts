@@ -7,6 +7,16 @@ export const EN: typeof FR = {
   appName: 'Horizon',
   tagline: 'When can you retire?',
 
+  next: {
+    toAssumptions: 'Next: my assumptions',
+    toResults: 'See my results',
+    toProfile: 'Complete my profile',
+    toData: 'Keep a copy of my profile',
+    profileReady: 'Your profile is complete enough. What is left is choosing what you assume about the future.',
+    assumptionsReady: 'A scenario is chosen. The results follow every change.',
+    resultsHint: 'Your profile never leaves this device: export it to keep it or share it.',
+  },
+
   mode: {
     full: 'Full',
     hint: 'Full view: every field, table and source. Off: the essentials only, the rest one tap away.',
@@ -201,7 +211,7 @@ export const EN: typeof FR = {
     subtitle: 'What you suppose about the future. These are your assumptions, not official figures.',
     presets: {
       title: 'Scenario',
-      hint: 'A starting point: it fills in inflation, wage growth, returns and the horizon at once. Change anything afterwards and the scenario becomes “Custom”.',
+      hint: 'A starting point: inflation, wages, returns and horizon at once. Change any figure and the scenario becomes “Custom”.',
       label: 'Choose a scenario',
       prudent: 'Conservative',
       neutral: 'Neutral',
@@ -305,14 +315,21 @@ export const EN: typeof FR = {
       toAssumptions: 'Go to the assumptions',
     },
     verdict: {
-      ok: (age: number) => `Earliest: ${age}`,
-      none: (from: number, to: number) => `No age from ${from} to ${to} lasts to the horizon.`,
+      headline: {
+        now: 'You can already retire.',
+        at: (age: number, together: boolean) => `You can retire at ${age}${together ? ', both of you' : ''}.`,
+        none: (to: number) => `Under these assumptions, retiring does not work before ${to}.`,
+        holds: (horizon: number) => `And the money lasts to age ${horizon}.`,
+        earlier: (age: number, year: number) => `At ${age}, the money would run short from ${year}.`,
+        tryThis: 'Try lowering spending in retirement, or saving more.',
+        separately: 'Each on their own:',
+      },
       caveat: 'Under these assumptions — an estimate, not financial advice.',
-      explain: (horizon: number) => `“Lasts” means: spending is covered every year, until the youngest person is ${horizon}.`,
+      explain: (horizon: number) => `“Lasts”: spending is covered every year, until the youngest person is ${horizon}.`,
       together: 'Everyone in the household retires at that age.',
       each: {
         title: 'Each on their own',
-        hint: 'For each person, the earliest they can leave if the other leaves at the age shown (the one in your profile). These are not two departures to combine: if both leave early at once, two incomes are missing — compare the pair with “Each at their own age”.',
+        hint: 'The earliest each person can leave if the other leaves at their profile age. The two answers do not add up to a plan: check the pair with “Each at their own age”.',
         line: (name: string, age: number, other: string, held: number) => `${name}: from age ${age}, if ${other} leaves at ${held}`,
         none: (name: string, to: number, other: string, held: number) => `${name}: no age up to ${to} lasts, if ${other} leaves at ${held}`,
         compare: 'Compare',

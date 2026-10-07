@@ -23,6 +23,16 @@ export const FR = {
   appName: 'Horizon',
   tagline: 'Quand pouvez-vous prendre votre retraite ?',
 
+  next: {
+    toAssumptions: 'Suivant : mes hypothèses',
+    toResults: 'Voir mes résultats',
+    toProfile: 'Compléter mon profil',
+    toData: 'Garder une copie de mon profil',
+    profileReady: 'Votre profil est assez complet. Reste à choisir ce que vous supposez de l’avenir.',
+    assumptionsReady: 'Un scénario est choisi. Les résultats suivent chaque changement.',
+    resultsHint: 'Votre profil ne quitte jamais cet appareil : exportez-le pour le garder ou le partager.',
+  },
+
   mode: {
     full: 'Complet',
     hint: 'Affichage complet : tous les champs, tableaux et sources. Désactivé : l’essentiel seulement, le reste reste à un clic.',
@@ -217,7 +227,7 @@ export const FR = {
     subtitle: 'Ce que vous supposez de l’avenir. Ce sont vos hypothèses, pas des chiffres officiels.',
     presets: {
       title: 'Scénario',
-      hint: 'Un point de départ : il remplit d’un coup l’inflation, la hausse des salaires, les rendements et l’horizon. Changez ensuite ce que vous voulez : le scénario devient « Personnalisé ».',
+      hint: 'Un point de départ : inflation, salaires, rendements et horizon d’un coup. Si vous modifiez un chiffre, le scénario devient « Personnalisé ».',
       label: 'Choisir un scénario',
       prudent: 'Prudent',
       neutral: 'Neutre',
@@ -321,14 +331,21 @@ export const FR = {
       toAssumptions: 'Aller aux hypothèses',
     },
     verdict: {
-      ok: (age: number) => `Au plus tôt : ${age} ans`,
-      none: (from: number, to: number) => `Aucun âge de ${from} à ${to} ans ne tient jusqu’à l’horizon.`,
+      headline: {
+        now: 'Vous pouvez déjà prendre votre retraite.',
+        at: (age: number, together: boolean) => `Vous pouvez prendre votre retraite à ${age} ans${together ? ', tous les deux' : ''}.`,
+        none: (to: number) => `Avec ces hypothèses, la retraite ne tient pas avant ${to} ans.`,
+        holds: (horizon: number) => `Et l’argent dure jusqu’à ${horizon} ans.`,
+        earlier: (age: number, year: number) => `À ${age} ans, l’argent viendrait à manquer dès ${year}.`,
+        tryThis: 'Essayez de baisser les dépenses à la retraite, ou d’épargner davantage.',
+        separately: 'Chacun de son côté :',
+      },
       caveat: 'Selon ces hypothèses — une estimation, pas un conseil financier.',
-      explain: (horizon: number) => `« Tient » veut dire : les dépenses sont couvertes chaque année, jusqu’à ce que la personne la plus jeune ait ${horizon} ans.`,
+      explain: (horizon: number) => `« Tient » : les dépenses sont couvertes chaque année, jusqu’aux ${horizon} ans de la personne la plus jeune.`,
       together: 'Toutes les personnes du ménage prennent leur retraite à cet âge.',
       each: {
         title: 'Chacun de son côté',
-        hint: 'Pour chaque personne, le plus tôt où elle peut partir si l’autre part à l’âge indiqué (celui de votre profil). Ce ne sont pas deux départs à combiner : si les deux partent tôt en même temps, il manque deux revenus — comparez la paire avec « Chacun son âge ».',
+        hint: 'Le plus tôt où chacun peut partir si l’autre part à l’âge de son profil. Les deux réponses ne se combinent pas : comparez la paire avec « Chacun son âge ».',
         line: (name: string, age: number, other: string, held: number) => `${name} : dès ${age} ans, si ${other} part à ${held} ans`,
         none: (name: string, to: number, other: string, held: number) => `${name} : aucun âge jusqu’à ${to} ans ne tient, si ${other} part à ${held} ans`,
         compare: 'Comparer',

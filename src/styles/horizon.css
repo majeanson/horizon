@@ -775,3 +775,23 @@
   padding: 0;
   list-style: none;
 }
+
+/* ── The next step, at the foot of a page ────────────────────────────────────────────────────────────────────── */
+.next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 1rem;
+  border-left: 4px solid var(--accent);
+}
+.next__hint {
+  flex: 1 1 16rem;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+.next__hint p {
+  margin: 0;
+}

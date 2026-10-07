@@ -33,7 +33,7 @@ test.describe('a blank profile', () => {
     await page.getByRole('link', { name: 'Résultats' }).click()
     await expect(page.getByText('Il manque des chiffres pour un résultat fiable')).toBeVisible()
     await expect(page.getByText('aucun revenu, régime ni compte n’est saisi')).toBeVisible()
-    await expect(page.getByText('Au plus tôt')).toHaveCount(0)
+    await expect(page.getByText(/Vous pouvez prendre votre retraite/)).toHaveCount(0)
     expect(problems).toEqual([])
   })
 
@@ -207,7 +207,7 @@ test.describe('the example household', () => {
   test('the results page gives a verdict, four comparisons at most, and the year-by-year table', async ({ page }) => {
     const problems = watchConsole(page)
     await page.goto('/resultats')
-    await expect(page.getByText('Au plus tôt : 60 ans')).toBeVisible()
+    await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
     // The verdict says what it is, on the card itself: an estimate under assumptions, not advice.
     await expect(page.locator('.verdict').getByText('Selon ces hypothèses — une estimation, pas un conseil financier.')).toBeVisible()
     // It opens on the household's OWN plan beside 65 — not on a pair the profile never mentioned.

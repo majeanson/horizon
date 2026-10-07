@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Disclosure } from '../components/Disclosure'
 import { Rail } from '../components/Layout'
+import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { ChartPanel } from '../components/results/ChartPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
@@ -14,6 +15,7 @@ import { StatusMessage } from '../components/StatusMessage'
 import { retireAt } from '../engine/retireAt'
 import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
+import { headlineOf } from '../lib/headline'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, type Selection } from '../lib/resultsModel'
@@ -82,6 +84,10 @@ export function Resultats() {
 
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
   const firstAge = Math.max(MIN_AGE, oldest)
+  const headline = useMemo(
+    () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, oldest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, oldest)),
+    [profile, gaps.length, earliest, firstAge, oldest, year, month],
+  )
   const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
   // re-rendered, and a quick second tap must build on the first, not on the stale list.
@@ -165,8 +171,31 @@ export function Resultats() {
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
 
       <div className="verdict surface" aria-live="polite">
-        <p className="verdict__line">{earliest === null ? r.verdict.none(firstAge, MAX_AGE) : r.verdict.ok(earliest)}</p>
-        {earliest !== null && profile.household.persons.length > 1 && <p className="verdict__note">{r.verdict.together}</p>}
+        <p className="verdict__line">
+          {headline.kind === 'none' ? r.verdict.headline.none(MAX_AGE) : headline.kind === 'now' ? r.verdict.headline.now : r.verdict.headline.at(headline.age!, isCouple)}
+        </p>
+        {headline.kind === 'none' ? (
+          <p className="verdict__note">{r.verdict.headline.tryThis}</p>
+        ) : (
+          <>
+            <p className="verdict__note">{r.verdict.headline.holds(assumptions.horizonAge)}</p>
+            {headline.earlierAge !== null && headline.earlierShortfallYear !== null && <p className="verdict__note">{r.verdict.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}</p>}
+          </>
+        )}
+        {/* Simple hides the « Chacun de son côté » panel: one line keeps each person's own answer in view. */}
+        {!full && isCouple && earliestEachAnswer && (
+          <p className="verdict__note">
+            {r.verdict.headline.separately}{' '}
+            {earliestEachAnswer
+              .filter((a) => a.other)
+              .map((a) => {
+                const name = names[profile.household.persons.findIndex((p) => p.id === a.id)] ?? ''
+                const other = names[profile.household.persons.findIndex((p) => p.id === a.other!.id)] ?? ''
+                return a.earliestOk === null ? r.verdict.each.none(name, MAX_AGE, other, a.other!.heldAt) : r.verdict.each.line(name, a.earliestOk, other, a.other!.heldAt)
+              })
+              .join(' · ')}
+          </p>
+        )}
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
@@ -228,6 +257,10 @@ export function Resultats() {
 
       {/* Simple keeps the verdict, the comparison and the chart; the rest folds into one « Voir les détails ». */}
       {full ? details : <Disclosure label={t.mode.details}>{earliestBlock}{details}</Disclosure>}
+
+      <NextStep to="/donnees" label={t.next.toData}>
+        <p>{t.next.resultsHint}</p>
+      </NextStep>
     </section>
   )
 }

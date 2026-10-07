@@ -4,6 +4,7 @@ import { Chip, ChipGroup } from '../components/Chip'
 import { Advanced } from '../components/Advanced'
 import { Disclosure } from '../components/Disclosure'
 import { ModeSwitch } from '../components/ModeSwitch'
+import { NextStep } from '../components/NextStep'
 import { EditField } from '../components/EditField'
 import { EmptyState } from '../components/EmptyState'
 import { FieldInfo } from '../components/FieldInfo'
@@ -290,6 +291,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },
     { cat: 'Affichage', name: 'Advanced', file: 'src/components/Advanced.tsx', kw: 'simple complet détails optionnel', render: () => <Advanced><p className="field-row__hint">Un groupe optionnel : visible tel quel en mode Complet, replié sous « Voir les détails » en mode Simple.</p></Advanced> },
+    { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/hypotheses" label="Suivant : mes hypothèses"><p>Votre profil est assez complet.</p></NextStep> },
     { cat: 'Affichage', name: 'ModeSwitch', file: 'src/components/ModeSwitch.tsx', kw: 'simple complet mode bascule', render: () => <ModeSwitch /> },
     {
       cat: 'Feedback',

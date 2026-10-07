@@ -153,7 +153,7 @@ test('offline, the saved profile is intact and the results — the chart and the
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
   await waitControlled(page)
-  await expect(page.getByText('Au plus tôt : 60 ans')).toBeVisible()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
 
   const consoleErrors: string[] = []
   page.on('console', (m) => {
@@ -167,7 +167,7 @@ test('offline, the saved profile is intact and the results — the chart and the
 
   await page.context().setOffline(true)
   await page.reload()
-  await expect(page.getByText('Au plus tôt : 60 ans')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('figure.chart')).toBeVisible()
   await expect(page.locator('path.recharts-line-curve')).toHaveCount(2)
 

@@ -6,6 +6,7 @@ import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
 import { ImpactMeter } from '../components/ImpactMeter'
+import { NextStep } from '../components/NextStep'
 import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
@@ -17,6 +18,7 @@ import { useLang, useT } from '../i18n'
 import { formatPct } from '../lib/format'
 import { applyPreset, moveInOrder, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
 import { useMode } from '../lib/mode'
+import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 
 // What the household assumes about the future, and what it spends. These are the person's own numbers: nothing
@@ -24,7 +26,9 @@ import { updateProfile, useProfile } from '../lib/store'
 export function Hypotheses() {
   const t = useT()
   const a = t.assumptions
-  const { assumptions, household } = useProfile()
+  const profile = useProfile()
+  const { assumptions, household } = profile
+  const gaps = profileGaps(profile)
   const { lang } = useLang()
   const full = useMode() === 'full'
   const active = presetOf(assumptions)
@@ -161,6 +165,16 @@ export function Hypotheses() {
         <p className="field-row__hint">{a.splitting.hint}</p>
       </Section>
       </Advanced>
+
+      {gaps.length === 0 ? (
+        <NextStep to="/resultats" label={t.next.toResults}>
+          <p>{t.next.assumptionsReady}</p>
+        </NextStep>
+      ) : (
+        <NextStep to="/" label={t.next.toProfile}>
+          <p>{t.results.gaps.lead} {gaps.map((g) => t.results.gaps[g]).join(' ')}</p>
+        </NextStep>
+      )}
     </section>
   )
 }

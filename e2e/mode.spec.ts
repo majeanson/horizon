@@ -33,7 +33,7 @@ test('Simple results keep the verdict and the chart, and fold the rest behind on
   await seedProfile(page, EXAMPLE)
   await useSimple(page)
   await page.goto('/resultats')
-  await expect(page.getByText(/Au plus tôt/)).toBeVisible()
+  await expect(page.getByText(/Vous pouvez prendre votre retraite/)).toBeVisible()
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
   await expect(page.getByRole('button', { name: /Détail année par année/ })).toHaveCount(0)
   await expect(page.getByRole('button', { name: /Paramètres utilisés/ })).toHaveCount(0)
@@ -76,4 +76,25 @@ test('Simple assumptions show the scenarios and what they assume, not the indivi
   await expect(page.getByLabel('Inflation annuelle')).toHaveCount(0)
   await page.getByRole('button', { name: 'Voir les détails' }).click()
   await expect(page.getByLabel('Inflation annuelle').first()).toBeVisible()
+})
+
+test('the results lead with a plain sentence, and every page ends with its one next step', async ({ page }) => {
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
+  await expect(page.getByText('À 59 ans, l’argent viendrait à manquer dès')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Garder une copie de mon profil' })).toBeVisible()
+
+  await page.goto('/')
+  await page.getByRole('link', { name: 'Suivant : mes hypothèses' }).click()
+  await expect(page).toHaveURL(/\/hypotheses$/)
+  await page.getByRole('link', { name: 'Voir mes résultats' }).click()
+  await expect(page).toHaveURL(/\/resultats$/)
+})
+
+test('with nothing entered, the next step says what is missing and sends you back to the profile', async ({ page }) => {
+  await page.goto('/hypotheses')
+  await expect(page.getByText(/Il manque des chiffres pour un résultat fiable/)).toBeVisible()
+  await page.getByRole('link', { name: 'Compléter mon profil' }).click()
+  await expect(page).toHaveURL(/\/$/)
 })

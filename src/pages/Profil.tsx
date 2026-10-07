@@ -5,6 +5,7 @@ import { AccountsSection, OasSection } from '../components/profile/OasAccountsSe
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
 import { Cluster } from '../components/Layout'
+import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { SubTabs } from '../components/SubTabs'
 import type { PersonId } from '../engine/types'
@@ -22,6 +23,7 @@ export function Profil() {
   const spouse = hasSpouse(profile)
   const id: PersonId = spouse && params.get('person') === 'spouse' ? 'spouse' : 'self'
   const person = profile.household.persons.find((x) => x.id === id)
+  const gaps = profileGaps(profile)
 
   return (
     <section className="page-body">
@@ -59,6 +61,9 @@ export function Profil() {
         // Keyed by person: switching tabs remounts the fields, so no typed-but-uncommitted text crosses over.
         <PersonFields key={id} id={id} />
       )}
+      <NextStep to="/hypotheses" label={t.next.toAssumptions}>
+        {gaps.length === 0 ? <p>{t.next.profileReady}</p> : <p>{t.results.gaps.lead} {gaps.map((g) => t.results.gaps[g]).join(' ')}</p>}
+      </NextStep>
     </section>
   )
 }

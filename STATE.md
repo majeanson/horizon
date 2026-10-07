@@ -127,6 +127,7 @@ official page, and any guard it added has been **planted against its own bug** a
 ### Phase 10 — Simple / Full, clarity, questions
 
 - [x] One Simple ↔ Full switch in the top bar (`lib/mode.ts`, `Advanced`, `ModeSwitch`): a new device starts Simple, a device that already holds a profile starts Full; Simple folds the optional / expert groups behind « Voir les détails » and loses nothing (`e2e/mode.spec.ts`, axe in both modes)
+- [x] A plain headline on Résultats (« Vous pouvez prendre votre retraite à 60 ans, tous les deux. » + why: the year money runs short one age earlier — `lib/headline.ts`); one `NextStep` at the foot of each page (Profil → Hypothèses → Résultats → Données, with what is missing); the longest hints shortened
 
 ## 5. Lessons carried over from Babillard
 
