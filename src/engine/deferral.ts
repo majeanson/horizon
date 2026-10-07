@@ -1,6 +1,9 @@
+import { oasStart } from './oas.ts'
 import { paramsFor } from './params/index.ts'
 import { project } from './projection.ts'
 import { everyoneAt, retireAt } from './retireAt.ts'
+import { ampe5, rrqStart, type YearMonth } from './rrq.ts'
+import { makeRrqRules } from './rrqRules.ts'
 import type { Assumptions, Household, PersonId, Scenario, YearRow } from './types.ts'
 
 // « When should I START my pension? » — the same household run once per start age, one lever at a time.
@@ -31,12 +34,20 @@ export interface StartOption {
   monthly: number
   /** Against starting at 65 by the rule alone (see `startLevel`), as a fraction: 0.42 is 42 % more, −0.36 is 36 % less; 0 at 65. */
   versus65: number
+  /** The change in the monthly amount actually shown (`monthly`, today's dollars) against starting at 65: for the QPP it differs from `versus65` because a later start is calculated on higher wages (the economy's part). */
+  change: number
   /**
    * For a start after 65: the age (reached in that year) at which the cumulative pension, in today's dollars and before
    * tax, has caught up with starting at 65. For a start before 65: the age at which starting at 65 has caught up with
    * starting early. `null` at 65, when the pension is nil, or when it does not happen before the plan's horizon.
    */
   breakEven: number | null
+  /**
+   * True when this start age is already behind the person (the pension would have begun in an earlier year than today's):
+   * it can no longer be chosen. The figures are still the rule's own — what it would have paid — and the payments already
+   * made are counted in the break-even, so a late start is compared with what starting at 65 really paid.
+   */
+  passed: boolean
   /** The household's plan when only this start age changes (everything else as in the profile). */
   plan: {
     ok: boolean
@@ -58,6 +69,9 @@ export interface PersonDeferral {
 }
 
 export interface DeferralFacts {
+  /** What each month of waiting after 65 adds: the QPP's 0.007 and the OAS's 0.006. */
+  rrqPerMonth: number
+  oasPerMonth: number
   /** The most the QPP grows by waiting, from 65: 0.588 at 72. */
   rrqLateMax: number
   /** The most the OAS grows by waiting, from 65: 0.36 at 70. */
@@ -77,39 +91,48 @@ const inflator = (a: Assumptions) => (year: number) => (1 + a.inflation) ** (yea
 const annual = (rows: readonly YearRow[], id: PersonId, kind: Kind): { year: number; amount: number }[] =>
   rows.map((r) => ({ year: r.year, amount: r.persons[id]?.[kind] ?? 0 }))
 
-/**
- * The monthly pension in today's dollars: the first FULL calendar year after the pension began, over 12, deflated to
- * today (a pension indexed to prices keeps its real amount). A plan that ends within a year of the start falls back to
- * the first year's figure over 12 — an under-statement, only for horizons the app does not offer.
- */
-function monthlyToday(rows: readonly YearRow[], id: PersonId, kind: Kind, deflate: (year: number) => number): number {
-  const years = annual(rows, id, kind)
+/** The row of the first FULL calendar year of a pension that began in `startYear`: today's own row when it began earlier (that year is whole), else the year after the start (the start year is partial). A plan that ends within a year of the start falls back to the first paying row. */
+function fullRow(years: readonly { year: number; amount: number }[], startYear: number): { year: number; amount: number } | null {
   const first = years.findIndex((y) => y.amount > 0)
-  if (first < 0) return 0
-  const full = years[first + 1] ?? years[first]
-  return full.amount / 12 / deflate(full.year)
+  if (first < 0) return null
+  if (startYear < years[0].year) return years[0]
+  return years[first + 1] ?? years[first]
+}
+
+/**
+ * The monthly pension in today's dollars: the first FULL calendar year after the pension began (today's, for one that
+ * began earlier), over 12, deflated to today (a pension indexed to prices keeps its real amount).
+ */
+function monthlyToday(rows: readonly YearRow[], id: PersonId, kind: Kind, deflate: (year: number) => number, startYear: number): number {
+  const full = fullRow(annual(rows, id, kind), startYear)
+  return full ? full.amount / 12 / deflate(full.year) : 0
 }
 
 /**
  * The pension the start age earned by the rule alone, comparable across start ages: the monthly amount in the dollars
- * of the year the pension began — and, for the QPP, divided by the growth of average wages since today, because the
- * QPP is calculated on earnings revalued by WAGES up to the start (a later start is calculated on a later, higher
- * wage index: that part is the economy, not the choice). Divided by this, 70 against 65 is the rule's +42 %, not +49 %.
+ * of the year the pension began — divided, for the QPP, by the growth of the average ceiling (AMPE5, the same one the
+ * calculation uses: observed to 2026, then moved by wage growth) between today and that year, because the QPP is
+ * calculated on earnings revalued up to the start (a later start is calculated on a later, higher index: that part is
+ * the economy, not the choice); for the OAS, by prices. Divided by this, 70 against 65 is the rule's +42 %, not +49 % —
+ * and it stays the rule's figure for a person whose 65 is already behind them (the start year, not today, is the base).
  */
-function startLevel(rows: readonly YearRow[], id: PersonId, kind: Kind, a: Assumptions): number {
-  const years = annual(rows, id, kind)
-  const first = years.findIndex((y) => y.amount > 0)
-  if (first < 0) return 0
-  const full = years[first + 1] ?? years[first]
-  const stepsFromStart = years[first + 1] ? 1 : 0
-  const atStart = full.amount / 12 / (1 + a.inflation) ** stepsFromStart
-  return kind === 'rrq' ? atStart / (1 + a.wageGrowth) ** (years[first].year - a.today.year) : atStart / (1 + a.inflation) ** (years[first].year - a.today.year)
+function startLevel(rows: readonly YearRow[], id: PersonId, kind: Kind, a: Assumptions, startYear: number, ampe: (year: number) => number): number {
+  const full = fullRow(annual(rows, id, kind), startYear)
+  if (!full) return 0
+  const atStart = full.amount / 12 / (1 + a.inflation) ** (full.year - startYear)
+  return kind === 'rrq' ? atStart / (ampe(startYear) / ampe(a.today.year)) : atStart / (1 + a.inflation) ** (startYear - a.today.year)
 }
 
-/** Cumulative pension received up to and including each year, in today's dollars. */
-function cumulative(rows: readonly YearRow[], id: PersonId, kind: Kind, deflate: (year: number) => number): Map<number, number> {
+/** The payments already made before this year's January, in today's dollars: a pension that began earlier paid them, the projection (which starts today) does not show them. */
+function missedPayments(start: YearMonth, monthlyReal: number, today: { year: number }): number {
+  const months = (today.year - start.year) * 12 - (start.month - 1)
+  return months > 0 ? months * monthlyReal : 0
+}
+
+/** Cumulative pension received up to and including each year, in today's dollars — `offset` is what was received before the projection began. */
+function cumulative(rows: readonly YearRow[], id: PersonId, kind: Kind, deflate: (year: number) => number, offset: number): Map<number, number> {
   const out = new Map<number, number>()
-  let sum = 0
+  let sum = offset
   for (const y of annual(rows, id, kind)) {
     sum += y.amount / deflate(y.year)
     out.set(y.year, sum)
@@ -133,6 +156,8 @@ const scenarioFor = (id: PersonId, kind: Kind, age: number): Scenario => (kind =
 /** The deferral comparison for every person in the household. Seconds of arithmetic for a couple: run it off the page's thread. */
 export function deferralView(h: Household, a: Assumptions): DeferralView {
   const deflate = inflator(a)
+  const rules = makeRrqRules({ inflation: a.inflation, wageGrowth: a.wageGrowth })
+  const ampe = (year: number) => ampe5(year, rules)
   const netWorthAt = (rows: readonly YearRow[], birthYear: number, age: number): number | null => {
     const row = rows.find((r) => r.year === birthYear + age)
     return row ? row.household.netWorthEnd / deflate(row.year) : null
@@ -141,19 +166,25 @@ export function deferralView(h: Household, a: Assumptions): DeferralView {
   const persons = h.persons.map((p): PersonDeferral => {
     const optionsOf = (kind: Kind, ages: readonly number[]): StartOption[] => {
       const runs = new Map(ages.map((age) => [age, project(h, a, scenarioFor(p.id, kind, age))]))
+      const startOf = (age: number): YearMonth => (kind === 'rrq' ? rrqStart(p.birth, age) : oasStart(p.birth, age))
       const baselineRows = runs.get(65)!
-      const baselineLevel = startLevel(baselineRows, p.id, kind, a)
-      const baselineCum = cumulative(baselineRows, p.id, kind, deflate)
+      const baselineStart = startOf(65)
+      const baselineMonthly = monthlyToday(baselineRows, p.id, kind, deflate, baselineStart.year)
+      const baselineLevel = startLevel(baselineRows, p.id, kind, a, baselineStart.year, ampe)
+      const baselineCum = cumulative(baselineRows, p.id, kind, deflate, missedPayments(baselineStart, baselineMonthly, a.today))
       return ages.map((age) => {
         const rows = runs.get(age)!
-        const monthly = monthlyToday(rows, p.id, kind, deflate)
+        const start = startOf(age)
+        const monthly = monthlyToday(rows, p.id, kind, deflate, start.year)
         const bad = rows.find((r) => r.household.shortfall > 0)
         const earliest = retireAt(h, a, { stopAtFirstOk: true, scenario: (retire) => ({ ...everyoneAt(h, retire), ...scenarioFor(p.id, kind, age) }) }).earliestOk
         return {
           age,
           monthly,
-          versus65: baselineLevel > 0 ? startLevel(rows, p.id, kind, a) / baselineLevel - 1 : 0,
-          breakEven: breakEven(cumulative(rows, p.id, kind, deflate), baselineCum, age, p.birth.year),
+          change: baselineMonthly > 0 ? monthly / baselineMonthly - 1 : 0,
+          versus65: baselineLevel > 0 ? startLevel(rows, p.id, kind, a, start.year, ampe) / baselineLevel - 1 : 0,
+          breakEven: breakEven(cumulative(rows, p.id, kind, deflate, missedPayments(start, monthly, a.today)), baselineCum, age, p.birth.year),
+          passed: start.year < a.today.year,
           plan: { ok: !bad, firstShortfallYear: bad ? bad.year : null, netWorth85: netWorthAt(rows, p.birth.year, 85), netWorth95: netWorthAt(rows, p.birth.year, 95), earliestOk: earliest },
         }
       })
@@ -162,5 +193,5 @@ export function deferralView(h: Household, a: Assumptions): DeferralView {
   })
 
   const P = paramsFor(a.today.year, { inflation: a.inflation, wageGrowth: a.wageGrowth })
-  return { persons, facts: { rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths, oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths } }
+  return { persons, facts: { rrqPerMonth: P.rrq.latePerMonth, oasPerMonth: P.oas.deferralPerMonth, rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths, oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths } }
 }

@@ -161,12 +161,12 @@ describe('the strategies side by side', () => {
   })
 
   it('a good-sized nest can defer to 70; a small one retiring early runs out sooner when it defers than when it does not', () => {
-    // Retiring at 58 on the golden nest: starting at 65 runs out at 97, deferring to 72/70 lasts to the horizon.
-    const big = view(H, { ...profileLevers(H, 'self'), retirementAge: 58 })
+    // Retiring at 57 on the golden nest: starting at 65 runs out at 98, deferring to 72/70 lasts to the horizon.
+    const big = view(H, { ...profileLevers(H, 'self'), retirementAge: 57 })
     expect(card(big, 'standard').summary.ok).toBe(false)
     expect(card(big, 'max').summary.ok).toBe(true)
-    // Retiring at 56 on 70 % of that nest: both fail, and the deferral fails FIRST — the bridge years cannot be carried.
-    const small = view(withNest(0.7), { ...profileLevers(H, 'self'), retirementAge: 56 })
+    // Retiring at 55 on 70 % of that nest: both fail, and the deferral fails FIRST (68 against 73) — the bridge years cannot be carried.
+    const small = view(withNest(0.7), { ...profileLevers(H, 'self'), retirementAge: 55 })
     expect(card(small, 'standard').summary.ok).toBe(false)
     expect(card(small, 'max').summary.ok).toBe(false)
     expect(card(small, 'max').summary.firstShortfallAge!).toBeLessThan(card(small, 'standard').summary.firstShortfallAge!)

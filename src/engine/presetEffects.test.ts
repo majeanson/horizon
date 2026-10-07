@@ -51,7 +51,7 @@ describe('the starting point is the same under every set — only compounding se
       for (const r of at(60, a)) {
         const todays = r.household.spending / (1 + a.inflation) ** (r.year - a.today.year)
         // retired figure once both have left work, the working figure before — never anything else
-        expect([88_000, 100_000].some((v) => Math.abs(todays - v) < 1), `${k} ${r.year}`).toBe(true)
+        expect([88_000, 90_000].some((v) => Math.abs(todays - v) < 1), `${k} ${r.year}`).toBe(true)
       }
     }
   })
@@ -194,8 +194,8 @@ describe('applying a set', () => {
     }
   })
 
-  it('the golden household\'s own assumptions are none of the three (so the page shows « personnalisé » for them)', () => {
-    expect(presetOf(GOLDEN_ASSUMPTIONS)).toBeNull()
+  it('the golden household\'s own assumptions ARE the Neutre set (the example opens as « Neutre »: the headline, the scenario table and the bridge matrix all speak about one set — before, it matched none and the headline said 60 while Neutre said 61)', () => {
+    expect(presetOf(GOLDEN_ASSUMPTIONS)).toBe('neutral')
   })
 })
 
@@ -206,9 +206,9 @@ describe('the verdict under each set', () => {
     }
   })
 
-  it('golden household snapshot: prudent 66 · neutral 61 · bold 58 — an 8-year spread is the expected size of the difference', () => {
+  it('golden household snapshot: prudent 63 · neutral 59 · bold 57 — a 6-year spread is the expected size of the difference', () => {
     const v = Object.fromEntries([...presetVerdicts(H, GOLDEN_ASSUMPTIONS)].map((x) => [x.preset, x.earliestOk]))
-    expect(v).toEqual({ prudent: 66, neutral: 61, bold: 58 })
+    expect(v).toEqual({ prudent: 63, neutral: 59, bold: 57 })
   })
 
   it('a verdict is the first age with no shortfall, and the years after a failing age fail at or before the horizon', () => {
@@ -223,10 +223,10 @@ describe('the verdict under each set', () => {
 describe('the sensitivity grid', () => {
   it('shifted moves every return by the same amount and inflation by its own, leaving the rest alone', () => {
     const s = shifted(GOLDEN_ASSUMPTIONS, 0.01, -0.005, 90)
-    expect(s.returns.nonReg).toBeCloseTo(0.055, 12)
-    expect(s.returns.rrsp).toBeCloseTo(0.06, 12)
-    expect(s.returns.tfsa).toBeCloseTo(0.06, 12)
-    expect(s.inflation).toBeCloseTo(0.015, 12)
+    expect(s.returns.nonReg).toBeCloseTo(0.05, 12)
+    expect(s.returns.rrsp).toBeCloseTo(0.055, 12)
+    expect(s.returns.tfsa).toBeCloseTo(0.055, 12)
+    expect(s.inflation).toBeCloseTo(0.016, 12)
     expect(s.horizonAge).toBe(90)
     expect(s.wageGrowth).toBe(GOLDEN_ASSUMPTIONS.wageGrowth)
     expect(s.withdrawalOrder).toEqual(GOLDEN_ASSUMPTIONS.withdrawalOrder)

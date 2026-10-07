@@ -116,16 +116,28 @@ export const blankPension = (): DbPension => ({
 export const inPayPension = (): DbPension => ({ ...blankPension(), inPay: { annual: 0 } })
 
 /**
+ * Is this pension built on RREGOP's rules? Read from the RULES themselves (the accrual, the best-5 average, the coordination,
+ * the unreduced routes, the early reduction, the indexation) — NOT from the label, which is free text: renaming the plan
+ * must not lose the notice, and a hand-entered plan that merely carries the word « RREGOP » must not be given RREGOP's rule.
+ * The person's own figures (service years, start age, the in-pay amount) are not part of it.
+ */
+export const isRregopRules = (p: DbPension): boolean => {
+  const r = rregopPension({ serviceYearsToDate: 0, startAge: 60 })
+  const rules = (x: DbPension) => JSON.stringify([x.accrualRate, x.maxServiceYears, x.averagingYears, x.coordination, x.earliestAge, x.unreduced, x.earlyReductionPerYear, x.bridge, x.indexation])
+  return rules(p) === rules(r)
+}
+
+/**
  * A RREGOP pension saved before the plan's DEFERRED rule existed (schema v4) is still calculated the old way: reduced from
  * the earliest unreduced date, with no full indexation while waiting. It matters only to a member who leaves BEFORE the
  * plan's earliest age. This says when the rule is missing for that person; `applyDeferredRule` adds it. Never done silently:
  * the page asks first, because the figure changes.
  */
-export const needsDeferredRule = (leavingAge: number, p: DbPension): boolean => p.label === 'RREGOP' && !p.inPay && !p.deferred && leavingAge < p.earliestAge
+export const needsDeferredRule = (leavingAge: number, p: DbPension): boolean => isRregopRules(p) && !p.inPay && !p.deferred && leavingAge < p.earliestAge
 
 /** The same pension with the RREGOP deferred rule added — the SAME object when it is not a RREGOP pension, is in pay, or already has the rule. */
 export const applyDeferredRule = (p: DbPension): DbPension =>
-  p.label !== 'RREGOP' || p.inPay || p.deferred ? p : { ...p, deferred: rregopPension({ serviceYearsToDate: p.serviceYearsToDate, startAge: p.startAge }).deferred }
+  !isRregopRules(p) || p.inPay || p.deferred ? p : { ...p, deferred: rregopPension({ serviceYearsToDate: p.serviceYearsToDate, startAge: p.startAge }).deferred }
 
 export function addPension(person: Person, pension: DbPension): Person {
   return person.pensions.length >= 8 ? person : { ...person, pensions: [...person.pensions, pension] }

@@ -169,7 +169,7 @@
     ],
     "spending": {
       "workingToday": 88000,
-      "retiredToday": 100000
+      "retiredToday": 90000
     }
   },
   "children": [
@@ -177,12 +177,12 @@
     2015
   ],
   "assumptions": {
-    "inflation": 0.02,
-    "wageGrowth": 0.03,
+    "inflation": 0.021,
+    "wageGrowth": 0.031,
     "returns": {
-      "nonReg": 0.045,
-      "rrsp": 0.05,
-      "tfsa": 0.05
+      "nonReg": 0.04,
+      "rrsp": 0.045,
+      "tfsa": 0.045
     },
     "horizonAge": 95,
     "withdrawalOrder": [

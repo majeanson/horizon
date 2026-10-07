@@ -192,7 +192,7 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
 
 /**
  * A pension already in pay: the stated annual amount is what is received from January of today's year (every month of
- * this year counts), with no formula, reduction, coordination or bridge — the statement's figure already includes them —
+ * this year counts — or, when a start month THIS year is stated, from that month), with no formula, reduction, coordination or bridge — the statement's figure already includes them —
  * and the plan's indexation applies each January from the next one. `today` is the inflation base, so the figure is
  * in the dollars of the current year, exactly as every other « today's dollars » input.
  */
@@ -210,7 +210,8 @@ function inPayStart(p: DbPension, input: DbInput): DbStart {
     earlyReduction: 0,
     annualBeforeCoordination: annual,
     coordinationAnnual: 0,
-    startIndex: input.today.year * 12,
+    // A pension that began this year was paid only from its start month; one that began earlier (or has no stated start) is paid all twelve.
+    startIndex: first ? since!.year * 12 + (since!.month - 1) : input.today.year * 12,
     coordinationIndex: null,
     bridgeAnnual: 0,
     bridgeEndIndex: null,

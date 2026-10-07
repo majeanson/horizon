@@ -51,3 +51,17 @@ describe('the extra yearly saving that makes retiring at X work', () => {
     expect(more.spending.retiredToday).toBe(H.spending.retiredToday)
   })
 })
+
+describe('the rounded answer is always one that works and never more than can be moved', () => {
+  it('for a working-years spending that is not a multiple of $50, every answer works and stays within it', () => {
+    const odd = structuredClone(H)
+    odd.spending.workingToday = 61_975
+    for (let back = 1; back <= 12; back++) {
+      const age = earliest - back
+      const { extraPerYear } = savingsNeeded(odd, A, age)
+      if (extraPerYear === null) continue
+      expect(extraPerYear, `age ${age}`).toBeLessThanOrEqual(odd.spending.workingToday)
+      expect(runScenario(withExtraSavings(odd, extraPerYear), A, everyoneAt(odd, age), age).ok, `age ${age}`).toBe(true)
+    }
+  })
+})

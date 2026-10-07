@@ -8,7 +8,7 @@ import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears, rrqEstimate } from './earnings.ts'
 import {
   addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, moveInOrder, removeChild, removePension, removeSpouse,
-  applyDeferredRule, needsDeferredRule, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
+  applyDeferredRule, isRregopRules, needsDeferredRule, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { profileGaps } from './profileGaps.ts'
 import { defaultProfile, SCHEMA_VERSION, validateProfile, type Profile } from './schema.ts'
@@ -71,7 +71,7 @@ describe('profile edits are pure, and never produce a profile the validator woul
     const p = golden()
     expect(setSpending(p, { retiredToday: 90_000 }).household.spending).toEqual({ workingToday: 88_000, retiredToday: 90_000 })
     expect(setAssumptions(p, { horizonAge: 100 }).assumptions.horizonAge).toBe(100)
-    expect(setReturn(p, 'rrsp', 0.06).assumptions.returns).toEqual({ nonReg: 0.045, rrsp: 0.06, tfsa: 0.05 })
+    expect(setReturn(p, 'rrsp', 0.06).assumptions.returns).toEqual({ nonReg: 0.04, rrsp: 0.06, tfsa: 0.045 })
   })
 
   it('the withdrawal order moves one step, and stays a permutation at the ends', () => {
@@ -192,7 +192,11 @@ describe('the deferred rule on a RREGOP pension saved without it', () => {
     expect(needsDeferredRule(40, saved)).toBe(true)
     expect(needsDeferredRule(55, saved)).toBe(false)
     expect(needsDeferredRule(40, rregopPension({ serviceYearsToDate: 10, startAge: 60 }))).toBe(false)
-    expect(needsDeferredRule(40, { ...saved, label: 'Mon régime' })).toBe(false)
+    // The rules decide, not the label: a renamed RREGOP plan keeps the offer; a hand-entered plan named « RREGOP » never gets it.
+    expect(needsDeferredRule(40, { ...saved, label: 'Mon régime' })).toBe(true)
+    expect(needsDeferredRule(40, { ...blankPension(), label: 'RREGOP' })).toBe(false)
+    expect(needsDeferredRule(40, { ...saved, accrualRate: 0.015 })).toBe(false)
+    expect(isRregopRules(rregopPension({ serviceYearsToDate: 3, startAge: 62 }))).toBe(true)
     expect(needsDeferredRule(40, { ...saved, inPay: { annual: 12_000 } })).toBe(false)
   })
 
@@ -201,8 +205,10 @@ describe('the deferred rule on a RREGOP pension saved without it', () => {
     expect(next.deferred).toEqual(rregopPension({ serviceYearsToDate: 10, startAge: 60 }).deferred)
     expect({ ...next, deferred: undefined }).toEqual({ ...saved, deferred: undefined })
     expect(applyDeferredRule(next)).toBe(next)
-    const mine = { ...saved, label: 'Mon régime' }
+    const mine = { ...blankPension(), label: 'RREGOP' }
     expect(applyDeferredRule(mine)).toBe(mine)
+    const renamed = { ...saved, label: 'Mon régime' }
+    expect(applyDeferredRule(renamed).deferred).toEqual(rregopPension({ serviceYearsToDate: 10, startAge: 60 }).deferred)
     const paying = { ...saved, inPay: { annual: 12_000 } }
     expect(applyDeferredRule(paying)).toBe(paying)
   })

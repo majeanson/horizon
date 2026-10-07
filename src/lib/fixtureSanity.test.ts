@@ -93,7 +93,10 @@ function violations(h: Household, children: readonly number[] = []): string[] {
   const gross = h.persons.reduce((s, p) => s + (p.retirementAge > age(p.birth.year) ? p.salaryToday : 0), 0)
   const saved = h.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
   if (gross > 0 && h.spending.workingToday + saved > 0.95 * gross) add('spending-vs-income', 'household', `spends ${h.spending.workingToday} and saves ${saved} on ${gross} gross`)
-  if (h.spending.workingToday > 0 && (h.spending.retiredToday > 1.3 * h.spending.workingToday || h.spending.retiredToday < 0.5 * h.spending.workingToday)) {
+  if (h.spending.workingToday > 0 && (h.spending.retiredToday > 1.05 * h.spending.workingToday || h.spending.retiredToday < 0.5 * h.spending.workingToday)) {
+    // Retirement spends about the same or less (the children are gone, the commute and the saving stop); a retired figure more
+    // than 5 % above the working one is a household nobody described (the old golden couple: 88 000 working, 100 000 retired, with
+    // two children still at home).
     add('retired-spending', 'household', `${h.spending.retiredToday} retired against ${h.spending.workingToday} working`)
   }
 
@@ -116,10 +119,10 @@ const FROZEN =
 
 /** fixture → the rules it is excused from, and why. Only the older files; the latest one and the golden couple are held to all of them. */
 const ALLOWED: Record<string, Record<string, string>> = {
-  'profile.v1.json': { 'earnings-vs-salary': FROZEN },
-  'profile.v2.json': { 'earnings-vs-salary': FROZEN },
-  'profile.v3.json': { 'earnings-vs-salary': FROZEN },
-  'profile.v4.json': { 'earnings-vs-salary': FROZEN },
+  'profile.v1.json': { 'earnings-vs-salary': FROZEN, 'retired-spending': FROZEN },
+  'profile.v2.json': { 'earnings-vs-salary': FROZEN, 'retired-spending': FROZEN },
+  'profile.v3.json': { 'earnings-vs-salary': FROZEN, 'retired-spending': FROZEN },
+  'profile.v4.json': { 'earnings-vs-salary': FROZEN, 'retired-spending': FROZEN },
 }
 
 const SOURCES = [
@@ -182,6 +185,11 @@ describe('the detector is pinned: a household built to break every rule is caugh
     'nonreg-acb', 'db-service', 'db-start', 'spending-vs-income', 'retired-spending', 'child',
   ])('rule « %s » fires', (rule) => {
     expect(found.has(rule), `${rule} did not fire on the broken household`).toBe(true)
+  })
+
+  it('the old golden couple (a retired budget 14 % above the working one) would have been caught', () => {
+    expect(violations({ ...GOLDEN_HOUSEHOLD, spending: { workingToday: 88_000, retiredToday: 100_000 } }).some((v) => v.startsWith('retired-spending'))).toBe(true)
+    expect(violations(GOLDEN_HOUSEHOLD, [2012, 2015]).some((v) => v.startsWith('retired-spending'))).toBe(false)
   })
 
   it('the old golden couple (a 2025 history 18 % under the salary) would have been caught', () => {

@@ -228,8 +228,8 @@ describe('a household with a pension in pay and no work at all', () => {
 
   it('the pension is paid whole from this January, indexed each January after, and is the only thing besides the QPP and the OAS', () => {
     expect(at(rowOf(rows, 2026)).db).toBe(36_000)
-    expect(at(rowOf(rows, 2027)).db).toBeCloseTo(36_000 * 1.02, 2)
-    expect(at(rowOf(rows, 2030)).db).toBeCloseTo(36_000 * 1.02 ** 4, 2)
+    expect(at(rowOf(rows, 2027)).db).toBeCloseTo(36_000 * (1 + A.inflation), 2)
+    expect(at(rowOf(rows, 2030)).db).toBeCloseTo(36_000 * (1 + A.inflation) ** 4, 2)
     for (const r of rows) {
       const p = at(r)
       expect(p.employment, `${r.year}`).toBe(0)

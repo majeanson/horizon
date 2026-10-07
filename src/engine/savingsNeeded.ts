@@ -15,8 +15,8 @@ import type { Assumptions, Household } from './types.ts'
 // what lets us search for the smallest amount that works.
 //
 // SEARCH. Double the amount from $1 000 until the plan works (it cannot exceed the working-years spending), then bisect between the
-// last amount that failed and the first that worked, down to TOLERANCE. The answer is rounded UP to the next $50: the
-// amount shown always works.
+// last amount that failed and the first that worked, down to TOLERANCE. The answer is rounded UP to the next $50 (never
+// above the spending that can be moved) and re-run: the amount shown always works.
 
 const START = 1_000
 const TOLERANCE = 25
@@ -60,5 +60,8 @@ export function savingsNeeded(h: Household, a: Assumptions, age: number): Saving
     if (works(mid)) hi = mid
     else lo = mid
   }
-  return { age, extraPerYear: Math.ceil(hi / STEP) * STEP }
+  // Round UP to the next $50, never above what can be moved, and CHECK the rounded figure (the search found `hi` works; the rounding must not be taken on trust).
+  let answer = Math.min(Math.ceil(hi / STEP) * STEP, most)
+  while (answer < most && !works(answer)) answer = Math.min(answer + STEP, most)
+  return { age, extraPerYear: answer }
 }

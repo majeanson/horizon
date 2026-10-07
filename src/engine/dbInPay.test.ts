@@ -109,10 +109,16 @@ describe('a pension in pay that began THIS year has not had its first indexation
   it('pays only the days-paid share of the first January increase, read from the 1st of the start month', () => {
     const s = dbStart(p({ year: YEAR, month: 5 }), input)
     const share = daysFrom(5) / (leap(YEAR) ? 366 : 365)
-    expect(dbYear(s, YEAR, 0.02)).toBeCloseTo(24_000, 2)
+    expect(dbYear(s, YEAR, 0.02)).toBeCloseTo(24_000 * (8 / 12), 2) // May to December: eight months, not twelve
     expect(dbYear(s, YEAR + 1, 0.02)).toBeCloseTo(24_000 * (1 + 0.02 * share), 2)
     // …and from the second January on it is the full rate.
     expect(dbYear(s, YEAR + 2, 0.02)).toBeCloseTo(24_000 * (1 + 0.02 * share) * 1.02, 2)
+  })
+
+  it('this year pays only the months from the start month: a May start is 8/12 of the yearly figure; January, no start, or an earlier year is all 12', () => {
+    for (const [month, months] of [[1, 12], [5, 8], [12, 1]] as const) expect(dbYear(dbStart(p({ year: YEAR, month }), input), YEAR, 0.02), `month ${month}`).toBeCloseTo((24_000 * months) / 12, 2)
+    expect(dbYear(dbStart(p(), input), YEAR, 0.02)).toBeCloseTo(24_000, 2)
+    expect(dbYear(dbStart(p({ year: YEAR - 1, month: 9 }), input), YEAR, 0.02)).toBeCloseTo(24_000, 2)
   })
 
   it('a January start gets the whole increase; no start, or an earlier year, is the old behaviour', () => {

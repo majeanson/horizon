@@ -1,3 +1,4 @@
+import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
 import { rregopPension } from '../presets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 
@@ -72,15 +73,14 @@ const spouse: Person = {
 export const GOLDEN_HOUSEHOLD: Household = {
   livesAlone: false, // a couple never does; a saved profile always states it
   persons: [self, spouse],
-  spending: { workingToday: 88_000, retiredToday: 100_000 },
+  spending: { workingToday: 88_000, retiredToday: 90_000 },
 }
 
 export const GOLDEN_ASSUMPTIONS: Assumptions = {
   today: GOLDEN_TODAY,
-  inflation: 0.02,
-  wageGrowth: 0.03,
-  returns: { nonReg: 0.045, rrsp: 0.05, tfsa: 0.05 },
-  horizonAge: 95,
+  // EXACTLY the Neutre preset (assumptionPresets.ts): the example a person opens must read « Neutre », not « personnalisé »,
+  // so the headline, the scenario table and the bridge matrix all speak about one set of assumptions.
+  ...ASSUMPTION_PRESETS.neutral,
   withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
   pensionSplitting: true,
 }

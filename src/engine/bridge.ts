@@ -1,5 +1,8 @@
 import { PRESET_KEYS, withPreset, type PresetKey } from './assumptionPresets.ts'
+import { oasStart } from './oas.ts'
+import { paramsFor } from './params/index.ts'
 import { project } from './projection.ts'
+import { rrqStart } from './rrq.ts'
 import type { AccountKind, Assumptions, Household, PersonId, Scenario, YearRow } from './types.ts'
 
 // « Mes années 60 à 70 » — the bridge years, one year at a time.
@@ -52,6 +55,9 @@ export interface BridgeYear {
   gis: number
   /** The QPP + OAS of the person being looked at alone (the household sums above also hold a spouse's). */
   ownPension: number
+  /** The two halves of `ownPension`. */
+  ownRrq: number
+  ownOas: number
   /** DB + QPP + OAS + GIS: income that needs no decision once begun. */
   guaranteed: number
   /** What was drawn from each account (the RRIF minimum is part of the RRSP/RRIF draw). */
@@ -79,9 +85,9 @@ export interface BridgeSummary {
   /** The household's net worth in the year the person turns 85 / 95; null past the plan's horizon. */
   netWorth85: number | null
   netWorth95: number | null
-  /** The smallest nest at the end of any year between the person's 60th and 70th birthdays that the plan covers; null if none. */
+  /** The smallest nest at the end of any year between the person's 60th and 70th birthdays (inclusive) in which the plan is NOT short; null if none. */
   lowestNest: { amount: number; age: number } | null
-  /** Everything received, after tax, over the whole plan: employment, pensions, GIS and what was drawn, less tax. */
+  /** Everything CASHED over the whole plan, after tax: employment, pensions, GIS and what was drawn from the accounts (withdrawals count as income here), less tax. It does not count what is left in the accounts, so it does not rank the strategies the way wealth at 95 does. */
   lifetimeAfterTax: number
   /** The income tax and OAS recovery paid over the whole plan. */
   taxTotal: number
@@ -108,6 +114,18 @@ export interface StrategyCard {
   extraDrawn6070: number
   /** The age (reached in the year) at which the pensions of this strategy have paid back what waiting cost, or the age at which waiting until 65 overtakes; null when it never happens in the plan or the strategy is the baseline. */
   breakEven: number | null
+  /** Which of the two `breakEven` is: « later » (the strategy catches up with the standard) or « earlier » (the standard overtakes the strategy). null with `breakEven`. */
+  breakEvenKind: 'later' | 'earlier' | null
+}
+
+/** The cited rates the copy quotes, so it never types them. */
+export interface BridgeFacts {
+  /** The QPP's gain per month of waiting after 65 (0.007) and its most (0.588, at 72). */
+  rrqPerMonth: number
+  rrqLateMax: number
+  /** The OAS's gain per month of waiting after 65 (0.006) and its most (0.36, at 70). */
+  oasPerMonth: number
+  oasLateMax: number
 }
 
 export type MatrixCell = { ok: boolean; firstShortfallAge: number | null }
@@ -116,6 +134,7 @@ export interface BridgeView {
   /** The plan being tested, year by year. */
   selected: BridgeRun
   strategies: StrategyCard[]
+  facts: BridgeFacts
   /** Under each set of assumptions, per strategy: does the money last? null unless asked for. */
   matrix: Record<StrategyKey, Record<PresetKey, MatrixCell>> | null
 }
@@ -169,6 +188,8 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): Br
     oas: pick((p) => p.oas),
     gis: pick((p) => p.gis),
     ownPension: ((r.persons[id]?.rrq ?? 0) + (r.persons[id]?.oas ?? 0)) / d,
+    ownRrq: (r.persons[id]?.rrq ?? 0) / d,
+    ownOas: (r.persons[id]?.oas ?? 0) / d,
     guaranteed,
     draws,
     drawn,
@@ -177,17 +198,18 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): Br
     saved: pick((p) => p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa),
     shortfall,
     nest: { ...nestParts, total: sum(KINDS.map((k) => nestParts[k])) },
-    status: shortfall > 0.5 ? 'short' : drawn > 1 ? 'drawing' : 'covered',
+    // The verdict's own rule (retireAt, deferral, runScenario): ANY shortfall in the year, in the year's own dollars — so a figure here is never a plan that works there.
+    status: r.household.shortfall > 0 ? 'short' : drawn > 1 ? 'drawing' : 'covered',
   }
 }
 
 function summarise(a: Assumptions, rows: readonly BridgeYear[], raw: readonly YearRow[]): BridgeSummary {
-  const bad = rows.find((r) => r.shortfall > 0.5)
+  const bad = rows.find((r) => r.status === 'short')
   const at = (age: number): number | null => {
     const row = rows.find((r) => r.age === age)
     return row ? row.nest.total : null
   }
-  const bridgeYears = rows.filter((r) => r.age >= 60 && r.age < 70 + 1)
+  const bridgeYears = rows.filter((r) => r.age >= 60 && r.age <= 70 && r.status !== 'short')
   const lowest = bridgeYears.length === 0 ? null : bridgeYears.reduce((lo, r) => (r.nest.total < lo.nest.total ? r : lo))
   const deflate = inflator(a)
   const people = (r: YearRow) => Object.values(r.persons)
@@ -214,10 +236,23 @@ export function bridgeRun(h: Household, a: Assumptions, levers: BridgeLevers): B
   return { levers, rows, summary: summarise(a, rows, raw) }
 }
 
-/** The person's own QPP + OAS received, cumulative by their age, in today's dollars and before tax. */
-function pensionCumulative(rows: readonly BridgeYear[]): Map<number, number> {
+/**
+ * The payments a pension made BEFORE the projection began (a start age already behind the person): the projection starts
+ * today, so those years are not in the rows. They are in today's dollars, `months` of this year's real monthly amount
+ * (a pension indexed to prices keeps its real amount), and `months` runs from the start month to this January.
+ */
+function missedBefore(h: Household, a: Assumptions, rows: readonly BridgeYear[], l: BridgeLevers): number {
+  const p = h.persons.find((x) => x.id === l.id) ?? h.persons[0]
+  const first = rows[0]
+  if (!first) return 0
+  const months = (start: { year: number; month: number }) => Math.max(0, (a.today.year - start.year) * 12 - (start.month - 1))
+  return months(rrqStart(p.birth, l.rrqStartAge)) * (first.ownRrq / 12) + months(oasStart(p.birth, l.oasStartAge)) * (first.ownOas / 12)
+}
+
+/** The person's own QPP + OAS received, cumulative by their age, in today's dollars and before tax — `offset` is what was paid before the plan's first year. */
+function pensionCumulative(rows: readonly BridgeYear[], offset: number): Map<number, number> {
   const out = new Map<number, number>()
-  let s = 0
+  let s = offset
   for (const r of rows) {
     s += r.ownPension
     out.set(r.age, s)
@@ -226,15 +261,21 @@ function pensionCumulative(rows: readonly BridgeYear[]): Map<number, number> {
 }
 
 /**
- * For a strategy that starts the pensions later than 65: the first age at which its cumulative QPP + OAS (today's
- * dollars, before tax) has caught up with starting both at 65. For one that starts earlier: the age at which starting at 65
- * overtakes it. null for the baseline itself, and when it does not happen within the plan.
+ * The first age at which a strategy's cumulative QPP + OAS (today's dollars, before tax) and the baseline's (both at 65)
+ * cross: where the one that started LATER has caught up, or where the one that started EARLIER has been overtaken. The
+ * direction comes from the cumulatives themselves (who is ahead when they first differ), not from the start ages — so a
+ * mixed strategy (QPP at 60, OAS at 70) has an answer too. null when they never cross in the plan or never differ.
  */
-function breakEvenVs(option: Map<number, number>, baseline: Map<number, number>, later: boolean): number | null {
+export function breakEvenOf(option: ReadonlyMap<number, number>, baseline: ReadonlyMap<number, number>): { age: number; kind: 'later' | 'earlier' } | null {
+  let ahead: boolean | null = null
   for (const [age, s] of option) {
     const b = baseline.get(age) ?? 0
-    if (s === 0 && b === 0) continue
-    if (later ? s >= b && s > 0 : b >= s && b > 0) return age
+    if (s === b) continue
+    if (ahead === null) {
+      ahead = s > b
+      continue
+    }
+    if (ahead ? b >= s : s >= b) return { age, kind: ahead ? 'earlier' : 'later' }
   }
   return null
 }
@@ -253,21 +294,28 @@ export function bridgeView(h: Household, a: Assumptions, levers: BridgeLevers, w
     return { key, levers: l, run }
   })
   const base = cards.find((c) => c.key === 'standard')!
-  const baseCum = pensionCumulative(base.run.rows)
+  const baseCum = pensionCumulative(base.run.rows, missedBefore(h, a, base.run.rows, base.levers))
   const strategies: StrategyCard[] = cards.map(({ key, levers: l, run }) => {
-    const later = l.rrqStartAge + l.oasStartAge > 130
-    const earlier = l.rrqStartAge + l.oasStartAge < 130
+    const broke = key === 'standard' ? null : breakEvenOf(pensionCumulative(run.rows, missedBefore(h, a, run.rows, l)), baseCum)
     return {
       key,
       levers: l,
       summary: run.summary,
       nest: run.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total })),
       extraDrawn6070: run.summary.drawn6070 - base.run.summary.drawn6070,
-      breakEven: key === 'standard' || (!later && !earlier) ? null : breakEvenVs(pensionCumulative(run.rows), baseCum, later),
+      breakEven: broke?.age ?? null,
+      breakEvenKind: broke?.kind ?? null,
     }
   })
 
-  return { selected, strategies, matrix: withMatrix ? bridgeMatrix(h, a, levers) : null }
+  const P = paramsFor(a.today.year, { inflation: a.inflation, wageGrowth: a.wageGrowth })
+  const facts: BridgeFacts = {
+    rrqPerMonth: P.rrq.latePerMonth,
+    rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths,
+    oasPerMonth: P.oas.deferralPerMonth,
+    oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths,
+  }
+  return { selected, strategies, facts, matrix: withMatrix ? bridgeMatrix(h, a, levers) : null }
 }
 
 /** For each strategy, whether the money lasts under the prudent, neutral and bold sets of assumptions (fifteen projections). */
