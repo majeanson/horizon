@@ -56,7 +56,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
 - [ ] One figure carries a `verify` reason — the derived TFSA total (the four GIS divisors were confirmed on 2026-10-06 against the OAS Benefits Estimator, ≤ 1 $/month apart; ratchet 5 → 1). (The Québec brackets, the line-361 age rule and the worker-deduction rate were confirmed on 2026-10-06 from a browser screenshot and `docs/TP-1.G(2025-12).pdf`; ratchet 8 → 5.) Confirm each on an openable page and lower the ratchet in `cited.test.ts`
-- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the QPP Act's rounding of the 15 % drop-out (nearest vs up); the QPP contribution boundary at 72; RREGOP's deferred-member (left-before-pension) reduction rule; the CRA's T5008 « case 20 » caveat page; the OAS estimator's residence wording
+- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the QPP Act's rounding of the 15 % drop-out (nearest vs up — Retraite Québec's calculation page says only « jusqu'à 15 % »; the leaflet's worked example rounds 84.6 → 85; the 72nd-birthday-month boundary was confirmed on that page on 2026-10-06); RREGOP's deferred-member (left-before-pension) reduction rule; the CRA's T5008 « case 20 » caveat page; the OAS estimator's residence wording
 
 ### Phase 2 — RRQ
 
