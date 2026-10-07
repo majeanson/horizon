@@ -28,6 +28,15 @@
   }
 }
 
+/* ── Hypothèses: where the scenario figures come from, always on the card ── */
+.preset-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+
 /* ── A pension plan's rules, always on the card ──────────────────────────── */
 .plan-card__rules {
   display: flex;

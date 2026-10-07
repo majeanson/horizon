@@ -1,6 +1,5 @@
 import type { AccountKind } from '../engine/types'
 import { Cluster } from '../components/Layout'
-import { Disclosure } from '../components/Disclosure'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
@@ -10,6 +9,7 @@ import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
+import { SectionHeader } from '../components/SectionHeader'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
@@ -59,7 +59,8 @@ export function Hypotheses() {
         />
         <p className="field-row__hint">{active === null ? a.presets.blurb.custom : a.presets.blurb[active]}</p>
         {active !== null && <p className="field-row__hint mono">{presetSummary(active)}</p>}
-        <Disclosure label={a.presets.sourceTitle}>
+        <div className="preset-sources">
+          <SectionHeader title={a.presets.sourceTitle} />
           <StatusMessage tone="info">{a.presets.source}</StatusMessage>
           <ul className="info-links">
             {a.presets.links.map((l) => (
@@ -71,7 +72,7 @@ export function Hypotheses() {
               </li>
             ))}
           </ul>
-        </Disclosure>
+        </div>
       </Section>
 
       <Section title={a.spending.title} icon="house-bold">
