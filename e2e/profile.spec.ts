@@ -186,15 +186,20 @@ test.describe('first visit', () => {
     const spending = welcome.getByRole('textbox', { name: 'Vos dépenses par année, une fois à la retraite' })
     await spending.fill('40000')
     await spending.press('Enter')
-    await expect(welcome).toBeHidden()
+    // The card does NOT unmount under the typing finger: it stays for this visit, says the three numbers
+    // are in, and finally points at the verdict it promised. It leaves the page on the next visit.
+    await expect(welcome).toContainText('C’est tout ce qu’il faut pour un premier verdict')
     // Three numbers are enough: the results page answers, and says what would refine it.
-    await page.getByRole('link', { name: 'Résultats', exact: true }).click()
+    await welcome.getByRole('link', { name: 'Voir mes résultats' }).click()
     await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)/)).toBeVisible()
     const refine = page.locator('.refine')
     await expect(refine).toContainText('Préciser le calcul')
     await expect(refine).toContainText('relevé RRQ')
     await expect(refine).toContainText('soldes de vos comptes')
     await expect(refine).toContainText('dépenses pendant les années de travail')
+    // A later visit no longer needs the card: it is gone, not re-shown in its success state forever.
+    await page.goto('/')
+    await expect(page.getByRole('complementary')).toBeHidden()
   })
 
   test('every page names the tab, so history and bookmarks are not all « Horizon »', async ({ page }) => {

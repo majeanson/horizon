@@ -84,10 +84,12 @@ export const FR = {
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
     welcome: {
       title: 'Pour commencer',
-      body: 'Trois chiffres suffisent pour un premier verdict ; le reste précise le calcul. Chaque chiffre a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
+      body: 'Trois chiffres suffisent pour un premier verdict ; le reste précise le calcul. Chaque montant a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
       birth: 'Votre année de naissance',
+      birthHint: 'Une valeur par défaut est déjà inscrite : remplacez-la par votre année.',
       salary: 'Votre revenu de travail par année',
       spending: 'Vos dépenses par année, une fois à la retraite',
+      done: 'C’est tout ce qu’il faut pour un premier verdict. Le reste de la page le précisera.',
       example: 'Voir un exemple',
     },
     self: 'Moi',

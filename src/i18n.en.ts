@@ -68,10 +68,12 @@ export const EN: typeof FR = {
     subtitle: 'Your numbers, typed by hand. They stay on this device.',
     welcome: {
       title: 'To begin',
-      body: 'Three numbers are enough for a first verdict; the rest refines it. Every number you have to type has an ⓘ that says where to find it, and nothing you write leaves this device.',
+      body: 'Three numbers are enough for a first verdict; the rest refines it. Every amount has an ⓘ that says where to find it, and nothing you write leaves this device.',
       birth: 'Your birth year',
+      birthHint: 'A default is already filled in: replace it with your own year.',
       salary: 'Your yearly work income',
       spending: 'Your yearly spending, once retired',
+      done: 'That is all a first verdict needs. The rest of the page refines it.',
       example: 'See an example',
     },
     self: 'Me',

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { FamilySection } from '../components/profile/FamilySection'
@@ -10,6 +10,7 @@ import { FieldRow } from '../components/FieldRow'
 import { NextStep } from '../components/NextStep'
 import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
+import { StatusMessage } from '../components/StatusMessage'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
 import { hasSpouse, mapPerson, setSpending } from '../lib/profileEdit'
@@ -25,6 +26,10 @@ export function Profil() {
   const [params, setParams] = useSearchParams()
   const spouse = hasSpouse(profile)
   const gaps = profileGaps(profile)
+  // The welcome card's fate is decided at arrival: a first visit keeps it for the WHOLE visit, so
+  // committing the last number (Enter or blur — possibly in a field inside the card) swaps its
+  // content to « c'est assez » instead of yanking the card, and the focus with it, out of the page.
+  const [welcome] = useState(gaps.length > 0)
 
   // Old deep links named one person (`?person=spouse`); both are on the page now, so the link
   // becomes a scroll to that column, and the key is dropped from the address.
@@ -45,18 +50,30 @@ export function Profil() {
   return (
     <section className="page-body">
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
-      {gaps.length > 0 && (
+      {welcome && (
         // First visit: a blank form is a wall. The three numbers a first verdict needs are typed HERE — a short-form
-        // view of the same stored fields as the form below, gone as soon as the verdict has what it needs.
+        // view of the same stored fields as the form below. Once they are in, the card says so and points at the
+        // verdict it promised; it leaves the page on the next visit, not under the reader's fingers.
         <aside className="welcome surface">
           <h2 className="welcome__title">{t.profile.welcome.title}</h2>
           <p className="welcome__body">{t.profile.welcome.body}</p>
           <QuickStart />
-          <Cluster>
-            <Link className="btn btn--sm btn--ghost" to="/donnees">
-              {t.profile.welcome.example}
-            </Link>
-          </Cluster>
+          {gaps.length === 0 ? (
+            <>
+              <StatusMessage tone="success">{t.profile.welcome.done}</StatusMessage>
+              <Cluster>
+                <Link className="btn btn--sm" to="/resultats">
+                  {t.next.toResults}
+                </Link>
+              </Cluster>
+            </>
+          ) : (
+            <Cluster>
+              <Link className="btn btn--sm btn--ghost" to="/donnees">
+                {t.profile.welcome.example}
+              </Link>
+            </Cluster>
+          )}
         </aside>
       )}
       <FamilySection />
@@ -88,13 +105,15 @@ function QuickStart() {
   const edit = (change: Parameters<typeof mapPerson>[2]) => updateProfile((p) => mapPerson(p, 'self', change))
   return (
     <div className="welcome__fields">
-      <FieldRow label={t.profile.welcome.birth}>
-        {(w) => <NumberField kind="year" min={1900} max={2100} value={self.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} />}
+      <FieldRow label={t.profile.welcome.birth} hint={t.profile.welcome.birthHint}>
+        {(w) => (
+          <NumberField kind="year" min={1900} max={2100} value={self.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} ariaDescribedBy={w.describedBy} />
+        )}
       </FieldRow>
-      <FieldRow label={t.profile.welcome.salary}>
+      <FieldRow label={t.profile.welcome.salary} infoId="salary">
         {(w) => <NumberField kind="money" max={1e8} value={self.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} />}
       </FieldRow>
-      <FieldRow label={t.profile.welcome.spending}>
+      <FieldRow label={t.profile.welcome.spending} infoId="spendingRetired">
         {(w) => <NumberField kind="money" max={1e8} value={profile.household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
       </FieldRow>
     </div>
