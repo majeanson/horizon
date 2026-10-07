@@ -457,13 +457,13 @@ export const FR = {
       note: 'Les années sous 3 500 $ y paraissent à 0 $, et les dernières années peuvent manquer : Revenu Québec les déclare avec du retard.',
     },
     rrqEstimate65: {
-      where: 'Le même relevé, section A : l’estimation de la rente de retraite, par mois, selon l’âge où vous la demandez.',
+      where: 'Le même relevé, « Estimation des prestations » ▸ « Rente de retraite » : la ligne « 60 ans » ou « 65 ans », colonne « Montant projeté ». Le relevé n’écrit pas l’unité de ce tableau ; Horizon la lit comme un montant mensuel.',
       label: 'A – Estimation de votre rente de retraite (« Montant projeté »)',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/emploi-et-regime-rentes-quebec/releve-participation-regime-rentes-quebec',
-      note: 'Le relevé donne deux scénarios : « Montant actuel » (si vous cessiez de cotiser aujourd’hui) et « Montant projeté » (si vous continuiez avec des revenus semblables). Prenez le projeté.',
+      note: 'Le relevé donne deux scénarios : « Montant actuel » (si vous cessiez de cotiser aujourd’hui) et « Montant projeté » (si vous continuiez avec des revenus semblables). Prenez le projeté. Attention : le relevé le dit lui-même, son estimation ne tient compte que du premier volet de la bonification (pas du deuxième, en vigueur depuis 2024), et il n’indique pas en dollars de quelle année sont ses montants : l’écart affiché est un ordre de grandeur, pas une erreur.',
     },
     rrqEstimate60: {
-      where: 'Le même relevé, section A : l’estimation de la rente de retraite, par mois, selon l’âge où vous la demandez.',
+      where: 'Le même relevé, « Estimation des prestations » ▸ « Rente de retraite » : la ligne « 60 ans » ou « 65 ans », colonne « Montant projeté ». Le relevé n’écrit pas l’unité de ce tableau ; Horizon la lit comme un montant mensuel.',
       label: 'A – Estimation de votre rente de retraite (« Montant projeté »)',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/emploi-et-regime-rentes-quebec/releve-participation-regime-rentes-quebec',
       note: 'Si le relevé ne montre pas l’âge de 60 ans, laissez ce champ vide : le chiffre de 65 ans suffit pour vérifier le calcul.',
@@ -514,7 +514,7 @@ export const FR = {
       where: 'Compte de l’ARC ▸ Régimes d’épargne et de pension ▸ Afficher les détails du CELI ▸ Droits de cotisation.',
       label: 'Droits de cotisation',
       url: 'https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/compte-epargne-libre-impot/cotiser/calculer-droits.html',
-      note: 'L’ARC recommande de vérifier avec vos propres relevés : son compte n’est mis à jour qu’une fois par année.',
+      note: 'L’ARC recommande de vérifier avec vos propres relevés : son compte n’est mis à jour qu’une fois par année. Le sommaire du compte écrit « Au 1er janvier » de l’année : les cotisations et retraits faits depuis n’y sont pas.',
     },
     nonRegBalance: {
       where: 'Le relevé de votre institution financière, au dernier jour du mois.',

@@ -438,13 +438,13 @@ export const EN: typeof FR = {
       note: 'Years under $3,500 show as $0, and the latest years may be missing: Revenu Québec reports them late.',
     },
     rrqEstimate65: {
-      where: 'The same statement, section A: the estimated retirement pension, per month, by the age you apply.',
+      where: 'The same statement, “Estimation des prestations” ▸ “Rente de retraite”: the “60 ans” or “65 ans” row, “Montant projeté” column. The statement does not print the unit for this table; Horizon reads it as a monthly amount.',
       label: 'A – Estimate of your retirement pension (“Projected amount”)',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/planning-your-retirement/statement-participation',
-      note: 'The statement gives two scenarios: “Current amount” (if you stopped contributing today) and “Projected amount” (if you kept contributing from similar earnings). Use the projected one.',
+      note: 'The statement gives two scenarios: “Current amount” (if you stopped contributing today) and “Projected amount” (if you kept contributing from similar earnings). Use the projected one. Note: the statement itself says its estimate counts only the first part of the enhancement (not the second, in force since 2024), and it does not say which year’s dollars its amounts are in: the gap shown is an order of magnitude, not an error.',
     },
     rrqEstimate60: {
-      where: 'The same statement, section A: the estimated retirement pension, per month, by the age you apply.',
+      where: 'The same statement, “Estimation des prestations” ▸ “Rente de retraite”: the “60 ans” or “65 ans” row, “Montant projeté” column. The statement does not print the unit for this table; Horizon reads it as a monthly amount.',
       label: 'A – Estimate of your retirement pension (“Projected amount”)',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/planning-your-retirement/statement-participation',
       note: 'If the statement does not show age 60, leave this blank: the age-65 figure is enough to check the calculation.',
@@ -495,7 +495,7 @@ export const EN: typeof FR = {
       where: 'CRA account ▸ Savings and pension plans ▸ View TFSA details ▸ Contribution room.',
       label: 'TFSA contribution room',
       url: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributing/calculate-room.html',
-      note: 'The CRA advises checking against your own records: its account is only updated once a year.',
+      note: 'The CRA advises checking against your own records: its account is only updated once a year. The account summary reads “As of January 1” of the year: contributions and withdrawals made since are not in it.',
     },
     nonRegBalance: {
       where: 'Your financial institution’s statement, as of the last day of the month.',
