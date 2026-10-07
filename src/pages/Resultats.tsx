@@ -23,8 +23,6 @@ import { planGlance, retirementState } from '../engine/ledger'
 import { withPreset } from '../engine/assumptionPresets'
 import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
-import { BRIDGE_COPY } from '../lib/bridgeCopy'
-import { DEFERRAL_COPY } from '../lib/deferralCopy'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { parseBridgeParams } from '../lib/bridgeModel'
 import { presetOf } from '../engine/assumptionPresets'
@@ -207,14 +205,14 @@ export function Resultats() {
   const wantedSaveAge = Number(params.get('age'))
   const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
 
-  // The page's map, in reading order; a section that is not on the page has no chip.
+  // The page's map, in reading order, grouped into its three arcs; a section that is not on the page has no chip.
   const navLinks = [
-    { id: 'verdict', label: rc.nav.verdict },
+    { id: 'verdict', label: rc.nav.verdict, arc: rc.arcs.answer },
     { id: 'comparer', label: rc.nav.comparer },
-    ...(state.pensionsOpen ? [{ id: 'pont', label: rc.nav.pont }, { id: 'rente', label: rc.nav.rente }] : []),
     { id: 'epargner', label: rc.nav.epargner },
     ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
-    { id: 'donnees-calcul', label: rc.nav.donneesCalcul },
+    ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, arc: rc.arcs.pensions }] : []),
+    { id: 'donnees-calcul', label: rc.nav.donneesCalcul, arc: rc.arcs.verify },
     { id: 'tableau', label: rc.nav.tableau },
     { id: 'sensibilite', label: rc.nav.sensibilite },
     { id: 'parametres', label: rc.nav.parametres },
@@ -224,6 +222,10 @@ export function Resultats() {
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
       <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
+
+      {/* Arc 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
+      <section className="arc" aria-label={rc.arcs.answer}>
+      <h2 className="arc__title">{rc.arcs.answer}</h2>
 
       <div id="verdict" className="verdict surface results-section" aria-live="polite">
         <p className="verdict__line">
@@ -329,22 +331,7 @@ export function Resultats() {
       )}
       </section>
 
-      {/* Once every QPP and OAS start is behind the household there is nothing left to choose: the two pension sections are not offered. */}
-      {state.pensionsOpen && (
-        <>
-          <section id="pont" className="results-section" aria-label={BRIDGE_COPY[lang].open}>
-            <SectionHeader title={BRIDGE_COPY[lang].open} />
-            <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
-          </section>
-          {/* The same question seen one pension at a time — it follows the person the bridge looks at. */}
-          <section id="rente" className="results-section" aria-label={DEFERRAL_COPY[lang].title}>
-            <SectionHeader title={DEFERRAL_COPY[lang].title} />
-            <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
-          </section>
-        </>
-      )}
-
-      {/* The two other questions, answered on the same page: views over the same profile and assumptions. */}
+      {/* The two other questions, answered in the same arc: views over the same profile and assumptions. */}
       <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
         <SectionHeader title={rc.questions.tabs.save} />
         <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
@@ -355,6 +342,25 @@ export function Resultats() {
           <StopView names={names} stop={stop} />
         </section>
       )}
+      </section>
+
+      {/* Arc 2 — ONE decision (when to start the QPP and the OAS), two views of it: the strategies' effect on the
+          whole plan, then the rule, pension by pension. Once every start is behind the household, nothing to choose. */}
+      {state.pensionsOpen && (
+        <section className="arc" aria-label={rc.arcs.pensions}>
+          <h2 className="arc__title">{rc.arcs.pensions}</h2>
+          <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
+            <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} />
+            <h3 className="deferral__title">{rc.pensions.planView}</h3>
+            <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
+            <h3 className="deferral__title">{rc.pensions.ruleView}</h3>
+            <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
+          </section>
+        </section>
+      )}
+
+      <section className="arc" aria-label={rc.arcs.verify}>
+      <h2 className="arc__title">{rc.arcs.verify}</h2>
 
       {/* The ages and figures that set the answer, with their calculation and a slider each. */}
       <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
@@ -375,6 +381,7 @@ export function Resultats() {
       <section id="parametres" className="results-section" aria-label={r.params.title}>
         <SectionHeader title={r.params.title} />
         <ParamsPanel />
+      </section>
       </section>
 
       <NextStep to="/donnees" label={t.next.toData}>

@@ -56,6 +56,30 @@
   scroll-margin-top: 7.5rem;
   min-width: 0;
 }
+/* A group label inside the sticky map: reading order only, never a control. */
+.section-nav__arc {
+  align-self: center;
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-inline: 0.25rem;
+}
+/* The page's three story arcs: a quiet heading, then its sections. */
+.arc {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+.arc__title {
+  margin: 0.5rem 0 -0.25rem;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
 /* ── A pension plan's rules, always on the card ──────────────────────────── */
 .plan-card__rules {

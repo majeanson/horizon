@@ -5,12 +5,22 @@
 // typed as the French one, so the two cannot drift apart; lib/resultsCopy.test.ts holds them to non-empty and translated.
 
 const FR_RESULTS = {
+  arcs: {
+    answer: 'La réponse',
+    pensions: 'Vos rentes publiques',
+    verify: 'Vérifier et ajuster',
+  },
+  pensions: {
+    title: 'Quand commencer mes rentes ?',
+    hint: 'Une décision, deux vues : ce que chaque façon de commencer fait à tout le plan, puis la règle, rente par rente.',
+    planView: 'L’effet sur tout le plan',
+    ruleView: 'La règle, rente par rente',
+  },
   nav: {
     label: 'Sections des résultats',
     verdict: 'Verdict',
     comparer: 'Comparer',
-    pont: 'Années 60 à 70',
-    rente: 'Rente : quand ?',
+    rentes: 'Rentes : quand ?',
     epargner: 'Épargner',
     arreter: 'Arrêter',
     donneesCalcul: 'Mes données',
@@ -72,12 +82,22 @@ const FR_RESULTS = {
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
+  arcs: {
+    answer: 'The answer',
+    pensions: 'Your public pensions',
+    verify: 'Check and adjust',
+  },
+  pensions: {
+    title: 'When should my pensions start?',
+    hint: 'One decision, two views: what each way of starting does to the whole plan, then the rule, pension by pension.',
+    planView: 'The effect on the whole plan',
+    ruleView: 'The rule, pension by pension',
+  },
   nav: {
     label: 'Results sections',
     verdict: 'Verdict',
     comparer: 'Compare',
-    pont: 'Ages 60 to 70',
-    rente: 'Pension: when?',
+    rentes: 'Pensions: when?',
     epargner: 'Save',
     arreter: 'Stop',
     donneesCalcul: 'My data',

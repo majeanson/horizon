@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Chip } from './Chip'
 import { Rail } from './Layout'
 
@@ -10,6 +10,8 @@ import { Rail } from './Layout'
 export interface SectionLink {
   id: string
   label: string
+  /** Opens a new group in the map: a quiet label drawn before this chip (the page's story arcs). */
+  arc?: string
 }
 
 export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]; ariaLabel: string }) {
@@ -38,9 +40,16 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
     <nav className="section-nav" aria-label={ariaLabel}>
       <Rail>
         {links.map((l) => (
-          <Chip key={l.id} selected={inView === l.id} onClick={() => document.getElementById(l.id)?.scrollIntoView({ block: 'start' })}>
-            {l.label}
-          </Chip>
+          <Fragment key={l.id}>
+            {l.arc != null && (
+              <span className="section-nav__arc mono" aria-hidden="true">
+                {l.arc}
+              </span>
+            )}
+            <Chip selected={inView === l.id} onClick={() => document.getElementById(l.id)?.scrollIntoView({ block: 'start' })}>
+              {l.label}
+            </Chip>
+          </Fragment>
         ))}
       </Rail>
     </nav>
