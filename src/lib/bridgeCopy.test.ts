@@ -65,8 +65,8 @@ describe('the bridge copy, in both languages', () => {
     for (const [k, v] of texts(en)) if (v.length > 30) expect(v, k).not.toBe(frTexts.get(k))
   })
 
-  it('the five strategies have five different names, in each language', () => {
-    for (const c of [fr, en]) expect(new Set(Object.values(c.strategyName)).size).toBe(5)
+  it('the six strategies have six different names, in each language', () => {
+    for (const c of [fr, en]) expect(new Set(Object.values(c.strategyName)).size).toBe(6)
   })
 
   it('every verdict names the age it speaks of, and the failing ones say what starting at 65 would do', () => {

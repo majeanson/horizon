@@ -28,12 +28,23 @@ describe('what the view keeps in the address bar', () => {
 
   it('writes only what differs from the profile, and reads back what it wrote', () => {
     const own = parseBridgeParams(q(''), H)
-    expect(bridgeQuery(own, H)).toEqual({ bp: null, br: null, bq: null, bo: null, bw: null })
+    expect(bridgeQuery(own, H)).toEqual({ bp: null, br: null, bq: null, bo: null, bb: null, bw: null })
     const custom = { levers: { id: 'spouse', retirementAge: 58, rrqStartAge: 70, oasStartAge: 70 } as BridgeLevers, window: 'plan' as const }
     const written = bridgeQuery(custom, H)
     expect(written.bp).toBe('spouse')
     const url = new URLSearchParams(Object.entries(written).filter(([, v]) => v !== null) as [string, string][])
     expect(parseBridgeParams(url, H)).toEqual(custom)
+  })
+
+  it('« for both » is written as bb=1, read back, and ignored for a household of one', () => {
+    const both = { levers: { ...profileLevers(H, 'self'), rrqStartAge: 70, oasStartAge: 70, both: true }, window: 'bridge' as const }
+    const written = bridgeQuery(both, H)
+    expect(written.bb).toBe('1')
+    const url = new URLSearchParams(Object.entries(written).filter(([, v]) => v !== null) as [string, string][])
+    expect(parseBridgeParams(url, H)).toEqual(both)
+    const solo = structuredClone(H)
+    solo.persons = [solo.persons[0]]
+    expect(parseBridgeParams(q('bb=1'), solo).levers.both).toBeUndefined()
   })
 
   it('a household of one has no « spouse » to look at', () => {
@@ -51,7 +62,9 @@ describe('which strategy a set of levers is', () => {
     expect(strategiesOf({ ...base, rrqStartAge: 60, oasStartAge: 65 }, H)).toEqual(['asap'])
     // the profile’s own 65 / 65 is « my plan » AND « standard »: the same plan, so both are pressed
     expect(strategiesOf({ ...base, rrqStartAge: 65, oasStartAge: 65 }, H)).toEqual(expect.arrayContaining(['mine', 'standard']))
-    // anything else is none of the five
+    // « both at 70 » is the bridge's ages PLUS the other person following: pressing one never presses the other
+    expect(strategiesOf({ ...base, rrqStartAge: 70, oasStartAge: 70, both: true }, H)).toEqual(['both'])
+    // anything else is none of them
     expect(strategiesOf({ ...base, rrqStartAge: 63, oasStartAge: 67 }, H)).toEqual([])
   })
 

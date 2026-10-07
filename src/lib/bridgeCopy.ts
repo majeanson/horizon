@@ -22,6 +22,9 @@ export interface BridgeCopy {
   rrqLabel: string
   oasLabel: string
   leverHint: string
+  /** The couple's « for both of us » toggle. */
+  bothLabel: string
+  bothHint: string
   age: (age: number) => string
   /** The strategies: a name and one line each. */
   strategyTitle: string
@@ -106,18 +109,21 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     retireLabel: 'Âge de la retraite',
     rrqLabel: 'Début du RRQ (rente du Régime de rentes du Québec)',
     oasLabel: 'Début de la PSV (pension de la Sécurité de la vieillesse)',
-    leverHint: 'Le RRQ peut commencer de 60 à 72 ans, la PSV de 65 à 70 ans. Seule la personne choisie change ; l’autre garde les âges de son profil.',
+    leverHint: 'Le RRQ peut commencer de 60 à 72 ans, la PSV de 65 à 70 ans. Seule la personne choisie change ; l’autre garde les âges de son profil, sauf si vous cochez « Pour les deux ».',
+    bothLabel: 'Pour les deux',
+    bothHint: 'L’autre personne commence son RRQ et sa PSV aux mêmes âges ; son âge de retraite reste celui de son profil.',
     age: (age) => `${age} ans`,
-    strategyTitle: 'Cinq façons de commencer vos rentes',
-    strategyName: { mine: 'Mon plan', asap: 'Tout dès que possible', standard: 'Standard', max: 'Reporter au maximum', bridge: 'Pont jusqu’à 70 ans' },
+    strategyTitle: 'Façons de commencer vos rentes',
+    strategyName: { mine: 'Mon plan', asap: 'Tout dès que possible', standard: 'Standard', max: 'Reporter au maximum', bridge: 'Pont jusqu’à 70 ans', both: 'Les deux à 70 ans' },
     strategyLine: {
       mine: 'Les âges de début de votre profil.',
       asap: 'RRQ à 60 ans, PSV à 65 ans : le plus tôt permis.',
       standard: 'RRQ et PSV à 65 ans.',
       max: 'RRQ à 72 ans, PSV à 70 ans : les rentes les plus élevées.',
       bridge: 'Vivre du pécule jusqu’à 70 ans, puis RRQ et PSV à 70 ans.',
+      both: 'Comme le pont, mais l’autre personne reporte aussi son RRQ et sa PSV à 70 ans.',
     },
-    custom: 'Vos choix ne correspondent à aucune de ces cinq façons : ils sont montrés sous « Mon plan ».',
+    custom: 'Vos choix ne correspondent à aucune de ces façons : ils sont montrés sous « Mon plan ».',
     lowestNestLabel: 'Pécule le plus bas, de 60 à 70 ans',
     selectedName: 'Votre choix actuel',
     worth85: 'Valeur nette à 85 ans',
@@ -205,18 +211,21 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     retireLabel: 'Retirement age',
     rrqLabel: 'QPP start (Québec Pension Plan)',
     oasLabel: 'OAS start (Old Age Security pension)',
-    leverHint: 'The QPP can start from 60 to 72, the OAS from 65 to 70. Only the chosen person changes; the other keeps the ages from their profile.',
+    leverHint: 'The QPP can start from 60 to 72, the OAS from 65 to 70. Only the chosen person changes; the other keeps the ages from their profile unless you tick “For both”.',
+    bothLabel: 'For both',
+    bothHint: 'The other person starts their QPP and OAS at the same ages; their retirement age stays the one in their profile.',
     age: (age) => `age ${age}`,
-    strategyTitle: 'Five ways to start your pensions',
-    strategyName: { mine: 'My plan', asap: 'Everything as early as possible', standard: 'Standard', max: 'Defer as far as possible', bridge: 'Bridge to 70' },
+    strategyTitle: 'Ways to start your pensions',
+    strategyName: { mine: 'My plan', asap: 'Everything as early as possible', standard: 'Standard', max: 'Defer as far as possible', bridge: 'Bridge to 70', both: 'Both at 70' },
     strategyLine: {
       mine: 'The start ages in your profile.',
       asap: 'QPP at 60, OAS at 65: the earliest allowed.',
       standard: 'QPP and OAS at 65.',
       max: 'QPP at 72, OAS at 70: the largest pensions.',
       bridge: 'Live on the nest egg until 70, then QPP and OAS at 70.',
+      both: 'Like the bridge, but the other person also defers their QPP and OAS to 70.',
     },
-    custom: 'Your choices match none of these five: they are shown under “My plan”.',
+    custom: 'Your choices match none of these: they are shown under “My plan”.',
     lowestNestLabel: 'Lowest nest egg, ages 60 to 70',
     selectedName: 'Your current choice',
     worth85: 'Net worth at 85',

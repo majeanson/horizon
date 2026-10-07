@@ -42,11 +42,11 @@ for (const mode of ['simple', 'full'] as const) {
     await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à \d\d ans/)
     await expect(page.getByText('Les âges de cette page sont ceux de Camille')).toBeVisible()
     // the golden couple's own plan IS the standard: one card says so instead of two identical ones
-    for (const name of ['Tout dès que possible', 'Standard (c’est aussi votre plan)', 'Reporter au maximum', 'Pont jusqu’à 70 ans']) {
+    for (const name of ['Tout dès que possible', 'Standard (c’est aussi votre plan)', 'Reporter au maximum', 'Pont jusqu’à 70 ans', 'Les deux à 70 ans']) {
       await expect(page.locator('.bridge-card').getByRole('radio', { name, exact: true })).toBeVisible()
     }
-    await expect(page.locator('.bridge-card')).toHaveCount(4)
-    await expect(page.getByRole('radiogroup', { name: 'Cinq façons de commencer vos rentes' })).toBeVisible()
+    await expect(page.locator('.bridge-card')).toHaveCount(5)
+    await expect(page.getByRole('radiogroup', { name: 'Façons de commencer vos rentes' })).toBeVisible()
     // each year of the bridge, as text: ages 60 to 70, with the start of the pensions tagged
     const rows = page.locator('.bridge__table tbody tr')
     await expect(rows).toHaveCount(11)
@@ -82,12 +82,31 @@ test('choosing a way of starting is written in the address, pressed on the chip,
   // a lever on its own leaves the five: the page says so
   await rrq.getByRole('button', { name: '63', exact: true }).click()
   await expect(page).toHaveURL(/bq=63/)
-  await expect(page.getByText('Vos choix ne correspondent à aucune de ces cinq façons')).toBeVisible()
+  await expect(page.getByText('Vos choix ne correspondent à aucune de ces façons')).toBeVisible()
 
   // a link carries the choices: reloading opens the view by itself on the same plan
   await page.reload()
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   await expect(page.getByRole('group', { name: /Début du RRQ/ }).getByRole('button', { name: '63', exact: true })).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('« Pour les deux » makes the other person follow: it is in the address, presses « Les deux à 70 ans », and survives a reload', async ({ page }) => {
+  await page.goto('/resultats')
+  await page.getByRole('button', { name: OPEN }).click()
+  await expect(page.locator('.bridge__verdict')).toBeVisible()
+  const both = page.getByRole('button', { name: 'Pour les deux', exact: true })
+  await expect(both).toHaveAttribute('aria-pressed', 'false')
+  await page.getByRole('group', { name: /Début du RRQ/ }).getByRole('button', { name: '70', exact: true }).click()
+  await page.getByRole('group', { name: /Début de la PSV/ }).getByRole('button', { name: '70', exact: true }).click()
+  await both.click()
+  await expect(page).toHaveURL(/bb=1/)
+  await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Les deux à 70 ans', exact: true })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Pont jusqu’à 70 ans', exact: true })).toHaveAttribute('aria-checked', 'false')
+  await page.reload()
+  await expect(page.getByRole('button', { name: 'Pour les deux', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  // choosing another strategy turns it off
+  await page.locator('.bridge-card').getByRole('radio', { name: 'Reporter au maximum', exact: true }).click()
+  await expect(page).not.toHaveURL(/bb=1/)
 })
 
 test('two quick taps compose: neither one undoes the other', async ({ page }) => {
@@ -142,15 +161,15 @@ test('« jusqu’à l’horizon » shows every year of the plan, and the bridge 
   await expect(page.locator('.bridge__table tbody tr')).toHaveCount(11)
 })
 
-test('the three sets of assumptions: fifteen answers, computed only when that line is opened', async ({ page }) => {
+test('the three sets of assumptions: eighteen answers, computed only when that line is opened', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: OPEN }).click()
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   await expect(page.getByRole('region', { name: 'Sous trois jeux d’hypothèses' })).toHaveCount(0)
   await page.getByRole('button', { name: 'Sous trois jeux d’hypothèses' }).click()
   const matrix = page.getByRole('region', { name: 'Sous trois jeux d’hypothèses' })
-  await expect(matrix.locator('tbody tr')).toHaveCount(5, { timeout: 30_000 })
-  await expect(matrix.locator('tbody td')).toHaveCount(15)
+  await expect(matrix.locator('tbody tr')).toHaveCount(6, { timeout: 30_000 })
+  await expect(matrix.locator('tbody td')).toHaveCount(18)
   await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent', 'Neutre', 'Audacieux'])
   // the neutral set holds for the golden couple; the prudent one does not, and says at what age
   await expect(matrix.locator('tbody tr').first().locator('td').nth(1)).toContainText('Tient')

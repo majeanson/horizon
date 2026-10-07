@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { BridgeLevers, BridgeView, StrategyCard, StrategyKey } from '../../engine/bridge'
-import { leversFor, profileLevers, STRATEGY_KEYS } from '../../engine/bridge'
+import { leversFor, profileLevers, strategyKeysFor } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
@@ -26,7 +26,7 @@ import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
 import { Chip } from '../Chip'
 import { Disclosure } from '../Disclosure'
 import { FieldRow } from '../FieldRow'
-import { Rail } from '../Layout'
+import { Cluster, Rail } from '../Layout'
 import { Loading } from '../Loading'
 import { NumberField } from '../NumberField'
 import { Skeleton } from '../Skeleton'
@@ -266,7 +266,7 @@ function MatrixSection({ household, assumptions, levers, copy, ownerName }: { ho
           </tr>
         </thead>
         <tbody>
-          {STRATEGY_KEYS.map((key) => (
+          {strategyKeysFor(household).map((key) => (
             <tr key={key}>
               <th scope="row">{copy.strategyName[key]}</th>
               {(['prudent', 'neutral', 'bold'] as const).map((k) => {
@@ -314,7 +314,7 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const apply = (key: StrategyKey) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household).levers
     const l = leversFor(key, household, cur.id, cur.retirementAge)
-    change({ rrqStartAge: l.rrqStartAge, oasStartAge: l.oasStartAge })
+    change({ rrqStartAge: l.rrqStartAge, oasStartAge: l.oasStartAge, both: l.both === true })
   }
 
   // Everything below the controls describes the levers the data was computed FOR (lib/bridgeModel.ts, shownPlan).
@@ -366,6 +366,16 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             ))}
           </Rail>
         </div>
+        {household.persons.length > 1 && (
+          <div className="field-row">
+            <Cluster>
+              <Chip selected={levers.both === true} onClick={() => change({ both: levers.both !== true })}>
+                {copy.bothLabel}
+              </Chip>
+            </Cluster>
+            <p className="field-row__hint">{copy.bothHint}</p>
+          </div>
+        )}
         <p className="field-row__hint">{copy.leverHint}</p>
       </div>
 

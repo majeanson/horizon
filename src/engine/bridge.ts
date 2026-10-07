@@ -18,15 +18,19 @@ import type { AccountKind, Assumptions, Household, PersonId, Scenario, YearRow }
 //     possible, the user's own, and « bridge and defer » to 70), each with the numbers a person decides on, and — on
 //     request — whether each one still works under the prudent, neutral and bold sets of assumptions.
 //
-// The levers move ONE person (the one being looked at); the other person, if any, keeps the profile's own ages.
+// The levers move ONE person (the one being looked at); the other person, if any, keeps the profile's own ages — unless
+// `both` is set (a couple's sixth strategy, « both defer to 70 »), which gives the other person the same QPP and OAS start ages.
 // Everything is in today's dollars: a nest of 400 000 $ in 2050 means 400 000 $ of today's buying power.
 //
 // What it does NOT say: a break-even is a bet on how long a life lasts; the model has no survivor's pension (a spouse
 // who outlives the other keeps no extra), no markets that go wrong in a particular order, and no change of spending
 // with age. The page says so beside the numbers.
 
-export type StrategyKey = 'mine' | 'asap' | 'standard' | 'max' | 'bridge'
-export const STRATEGY_KEYS: readonly StrategyKey[] = ['mine', 'asap', 'standard', 'max', 'bridge']
+export type StrategyKey = 'mine' | 'asap' | 'standard' | 'max' | 'bridge' | 'both'
+export const STRATEGY_KEYS: readonly StrategyKey[] = ['mine', 'asap', 'standard', 'max', 'bridge', 'both']
+
+/** The strategies a household is shown: « both defer to 70 » means nothing to one person. */
+export const strategyKeysFor = (h: Household): readonly StrategyKey[] => (h.persons.length > 1 ? STRATEGY_KEYS : STRATEGY_KEYS.filter((k) => k !== 'both'))
 
 /** The three things a person can choose about their own retirement income. */
 export interface BridgeLevers {
@@ -37,6 +41,8 @@ export interface BridgeLevers {
   rrqStartAge: number
   /** The age the OAS starts, 65 to 70. */
   oasStartAge: number
+  /** Every OTHER person in the household starts their QPP and OAS at these same ages (their retirement age stays the profile's). Absent: they keep their own. */
+  both?: boolean
 }
 
 export type YearStatus = 'covered' | 'drawing' | 'short'
@@ -154,6 +160,8 @@ export function leversFor(key: StrategyKey, h: Household, id: PersonId, retireme
       return { id: p.id, retirementAge, rrqStartAge: 72, oasStartAge: 70 }
     case 'bridge':
       return { id: p.id, retirementAge, rrqStartAge: 70, oasStartAge: 70 }
+    case 'both':
+      return { id: p.id, retirementAge, rrqStartAge: 70, oasStartAge: 70, both: true }
     default:
       return { id: p.id, retirementAge, rrqStartAge: p.rrq.startAge, oasStartAge: p.oas.startAge }
   }
@@ -165,7 +173,11 @@ export const profileLevers = (h: Household, id: PersonId): BridgeLevers => {
   return { id: p.id, retirementAge: p.retirementAge, rrqStartAge: p.rrq.startAge, oasStartAge: p.oas.startAge }
 }
 
-const scenarioOf = (l: BridgeLevers): Scenario => ({ retirementAge: { [l.id]: l.retirementAge }, rrqStartAge: { [l.id]: l.rrqStartAge }, oasStartAge: { [l.id]: l.oasStartAge } })
+const scenarioOf = (h: Household, l: BridgeLevers): Scenario => {
+  const ids = l.both ? h.persons.map((p) => p.id) : [l.id]
+  const each = (age: number) => Object.fromEntries(ids.map((id) => [id, age]))
+  return { retirementAge: { [l.id]: l.retirementAge }, rrqStartAge: each(l.rrqStartAge), oasStartAge: each(l.oasStartAge) }
+}
 
 const inflator = (a: Assumptions) => (year: number) => (1 + a.inflation) ** (year - a.today.year)
 
@@ -230,7 +242,7 @@ function summarise(a: Assumptions, rows: readonly BridgeYear[], raw: readonly Ye
 
 /** One plan laid out year by year. Quick for one projection; a couple of seconds for a whole view, so run a view in a worker. */
 export function bridgeRun(h: Household, a: Assumptions, levers: BridgeLevers): BridgeRun {
-  const raw = project(h, a, scenarioOf(levers))
+  const raw = project(h, a, scenarioOf(h, levers))
   const deflate = inflator(a)
   const rows = raw.map((r) => yearOf(r, levers.id, deflate))
   return { levers, rows, summary: summarise(a, rows, raw) }
@@ -280,7 +292,7 @@ export function breakEvenOf(option: ReadonlyMap<number, number>, baseline: Reado
   return null
 }
 
-const sameLevers = (x: BridgeLevers, y: BridgeLevers) => x.retirementAge === y.retirementAge && x.rrqStartAge === y.rrqStartAge && x.oasStartAge === y.oasStartAge
+const sameLevers = (x: BridgeLevers, y: BridgeLevers) => x.retirementAge === y.retirementAge && x.rrqStartAge === y.rrqStartAge && x.oasStartAge === y.oasStartAge && !!x.both === !!y.both
 
 /**
  * The plan being tested and the five strategies beside it. `withMatrix` also asks, for each strategy, whether the money
@@ -288,7 +300,7 @@ const sameLevers = (x: BridgeLevers, y: BridgeLevers) => x.retirementAge === y.r
  */
 export function bridgeView(h: Household, a: Assumptions, levers: BridgeLevers, withMatrix = false): BridgeView {
   const selected = bridgeRun(h, a, levers)
-  const cards = STRATEGY_KEYS.map((key) => {
+  const cards = strategyKeysFor(h).map((key) => {
     const l = leversFor(key, h, levers.id, levers.retirementAge)
     const run = sameLevers(l, levers) ? selected : bridgeRun(h, a, l)
     return { key, levers: l, run }
@@ -318,10 +330,10 @@ export function bridgeView(h: Household, a: Assumptions, levers: BridgeLevers, w
   return { selected, strategies, facts, matrix: withMatrix ? bridgeMatrix(h, a, levers) : null }
 }
 
-/** For each strategy, whether the money lasts under the prudent, neutral and bold sets of assumptions (fifteen projections). */
+/** For each strategy a household is shown (a one-person household has no « both » entry), whether the money lasts under the prudent, neutral and bold sets of assumptions (fifteen projections). */
 export function bridgeMatrix(h: Household, a: Assumptions, levers: BridgeLevers): Record<StrategyKey, Record<PresetKey, MatrixCell>> {
   return Object.fromEntries(
-    STRATEGY_KEYS.map((key) => {
+    strategyKeysFor(h).map((key) => {
       const l = leversFor(key, h, levers.id, levers.retirementAge)
       const cells = Object.fromEntries(
         PRESET_KEYS.map((preset) => {

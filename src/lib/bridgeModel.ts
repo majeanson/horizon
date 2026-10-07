@@ -1,4 +1,4 @@
-import { leversFor, profileLevers, STRATEGY_KEYS, type BridgeLevers, type BridgeSummary, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
+import { leversFor, profileLevers, strategyKeysFor, type BridgeLevers, type BridgeSummary, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
 import type { Household, PersonId } from '../engine/types.ts'
 import { MAX_AGE, MIN_AGE } from './resultsModel.ts'
 
@@ -8,6 +8,7 @@ import { MAX_AGE, MIN_AGE } from './resultsModel.ts'
 //
 //   bp  the person looked at (self | spouse)      br  their retirement age (50–70)
 //   bq  the age their QPP starts (60–72)          bo  the age their OAS starts (65–70)
+//   bb  « 1 » when the other person starts their pensions at the same ages (a couple only)
 //   bw  « plan » to show every year to the horizon (absent: the bridge years, 60 to 70)
 
 export const RRQ_RANGE = { min: 60, max: 72 } as const
@@ -41,6 +42,7 @@ export function parseBridgeParams(search: URLSearchParams, household: Household)
       retirementAge: intIn(search.get('br'), RETIRE_RANGE.min, RETIRE_RANGE.max, Math.min(RETIRE_RANGE.max, Math.max(RETIRE_RANGE.min, own.retirementAge))),
       rrqStartAge: intIn(search.get('bq'), RRQ_RANGE.min, RRQ_RANGE.max, own.rrqStartAge),
       oasStartAge: intIn(search.get('bo'), OAS_RANGE.min, OAS_RANGE.max, own.oasStartAge),
+      ...(search.get('bb') === '1' && household.persons.length > 1 ? { both: true } : {}),
     },
     window: search.get('bw') === 'plan' ? 'plan' : 'bridge',
   }
@@ -55,15 +57,16 @@ export function bridgeQuery(params: BridgeParams, household: Household): Record<
     br: l.retirementAge === Math.min(RETIRE_RANGE.max, Math.max(RETIRE_RANGE.min, own.retirementAge)) ? null : String(l.retirementAge),
     bq: l.rrqStartAge === own.rrqStartAge ? null : String(l.rrqStartAge),
     bo: l.oasStartAge === own.oasStartAge ? null : String(l.oasStartAge),
+    bb: l.both && household.persons.length > 1 ? '1' : null,
     bw: params.window === 'plan' ? 'plan' : null,
   }
 }
 
-/** The strategies whose start ages the levers equal (the retirement age is the one being tested in every strategy). */
+/** The strategies the levers equal: the start ages AND whether the other person follows (the retirement age is the one being tested in every strategy). */
 export function strategiesOf(levers: BridgeLevers, household: Household): StrategyKey[] {
-  return STRATEGY_KEYS.filter((key) => {
+  return strategyKeysFor(household).filter((key) => {
     const l = leversFor(key, household, levers.id, levers.retirementAge)
-    return l.rrqStartAge === levers.rrqStartAge && l.oasStartAge === levers.oasStartAge
+    return l.rrqStartAge === levers.rrqStartAge && l.oasStartAge === levers.oasStartAge && !!l.both === !!levers.both
   })
 }
 

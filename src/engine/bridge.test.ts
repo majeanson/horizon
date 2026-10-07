@@ -111,11 +111,29 @@ describe('the levers move what they say, and only that', () => {
   })
 })
 
+describe('« both defer to 70 » — the other person follows', () => {
+  it('starts the other person’s QPP and OAS at 70 too, and leaves their retirement age alone', () => {
+    const l = leversFor('both', H, 'self', 60)
+    expect(l).toMatchObject({ rrqStartAge: 70, oasStartAge: 70, both: true })
+    const own = bridgeRun(H, A, leversFor('bridge', H, 'self', 60))
+    const both = bridgeRun(H, A, l)
+    // the household's QPP before the 70th birthday of the person looked at differs only if the spouse's own started earlier
+    const early = (r: typeof own) => r.rows.filter((y) => y.age < 70).reduce((s, y) => s + y.rrq + y.oas, 0)
+    expect(early(both)).toBeLessThan(early(own))
+    expect(both.rows[0].spending).toBeCloseTo(own.rows[0].spending, 6)
+  })
+  it('a household of one has no such strategy', () => {
+    const solo = { ...H, persons: [H.persons[0]] }
+    const v = bridgeView(solo, A, profileLevers(solo, 'self'))
+    expect(v.strategies.map((s) => s.key)).not.toContain('both')
+  })
+})
+
 describe('the strategies side by side', () => {
   const view = (h: Household, levers: BridgeLevers, matrix = false) => bridgeView(h, A, levers, matrix)
   const card = (v: ReturnType<typeof view>, key: (typeof STRATEGY_KEYS)[number]) => v.strategies.find((s) => s.key === key)!
 
-  it('lists the five strategies, the selected plan is one of the runs, and « standard » is the baseline', () => {
+  it('lists the strategies a couple is shown, the selected plan is one of the runs, and « standard » is the baseline', () => {
     const v = view(H, profileLevers(H, 'self'))
     expect(v.strategies.map((s) => s.key)).toEqual([...STRATEGY_KEYS])
     expect(card(v, 'standard').extraDrawn6070).toBe(0)
