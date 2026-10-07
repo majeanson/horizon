@@ -1,7 +1,9 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip, ChipGroup } from '../components/Chip'
+import { Advanced } from '../components/Advanced'
 import { Disclosure } from '../components/Disclosure'
+import { ModeSwitch } from '../components/ModeSwitch'
 import { EditField } from '../components/EditField'
 import { EmptyState } from '../components/EmptyState'
 import { FieldInfo } from '../components/FieldInfo'
@@ -287,6 +289,8 @@ function ENTRIES(): Entry[] {
     },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },
+    { cat: 'Affichage', name: 'Advanced', file: 'src/components/Advanced.tsx', kw: 'simple complet détails optionnel', render: () => <Advanced><p className="field-row__hint">Un groupe optionnel : visible tel quel en mode Complet, replié sous « Voir les détails » en mode Simple.</p></Advanced> },
+    { cat: 'Affichage', name: 'ModeSwitch', file: 'src/components/ModeSwitch.tsx', kw: 'simple complet mode bascule', render: () => <ModeSwitch /> },
     {
       cat: 'Feedback',
       name: 'StatusMessage',

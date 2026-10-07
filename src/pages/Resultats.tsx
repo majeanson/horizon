@@ -17,6 +17,7 @@ import type { Dollars, Metric } from '../lib/chartData'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, type Selection } from '../lib/resultsModel'
+import { useMode } from '../lib/mode'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
@@ -34,6 +35,7 @@ export function Resultats() {
   const { lang } = useLang()
   const r = t.results
   const profile = useProfile()
+  const full = useMode() === 'full'
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
@@ -114,6 +116,28 @@ export function Resultats() {
     if (!cur.includes(s)) commit(toggleSelection(cur, s))
   }
 
+  const earliestBlock =
+    isCouple && gaps.length === 0 ? (
+      <div className="surface">
+        <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
+      </div>
+    ) : null
+  const details = (
+    <>
+      <Disclosure label={r.table.title} count={runs.length}>
+        <YearTables runs={runs} label={label} />
+      </Disclosure>
+
+      <Disclosure label={r.sensitivity.title}>
+        <SensitivityPanel household={profile.household} assumptions={assumptions} />
+      </Disclosure>
+
+      <Disclosure label={r.params.title}>
+        <ParamsPanel />
+      </Disclosure>
+    </>
+  )
+
   if (gaps.length > 0) {
     return (
       <section className="page-body">
@@ -147,11 +171,7 @@ export function Resultats() {
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
 
-      {isCouple && gaps.length === 0 && (
-        <div className="surface">
-          <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
-        </div>
-      )}
+      {full && earliestBlock}
 
       <div className="compare" ref={compareRef}>
         <p className="field-row__label" id="compare-label">
@@ -206,17 +226,8 @@ export function Resultats() {
         />
       )}
 
-      <Disclosure label={r.table.title} count={runs.length}>
-        <YearTables runs={runs} label={label} />
-      </Disclosure>
-
-      <Disclosure label={r.sensitivity.title}>
-        <SensitivityPanel household={profile.household} assumptions={assumptions} />
-      </Disclosure>
-
-      <Disclosure label={r.params.title}>
-        <ParamsPanel />
-      </Disclosure>
+      {/* Simple keeps the verdict, the comparison and the chart; the rest folds into one « Voir les détails ». */}
+      {full ? details : <Disclosure label={t.mode.details}>{earliestBlock}{details}</Disclosure>}
     </section>
   )
 }

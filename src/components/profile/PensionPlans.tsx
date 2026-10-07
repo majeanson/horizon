@@ -6,8 +6,10 @@ import { formatDecimal, formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
+import { useMode } from '../../lib/mode'
 import { useNotice } from '../../lib/toast'
 import { today } from '../../lib/today'
+import { Advanced } from '../Advanced'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Disclosure } from '../Disclosure'
@@ -134,6 +136,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
   const confirm = useConfirm()
   const notice = useNotice()
   const p = t.plans
+  const full = useMode() === 'full'
   const add = (pension: DbPension) => edit((x) => addPension(x, pension))
 
   return (
@@ -164,6 +167,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
               </button>
             </header>
             {needsDeferredRule(person.retirementAge, pension) && (
+              <Advanced>
               <div className="plan-card__notice">
                 <p className="field-row__hint">{p.deferredNotice(person.retirementAge)}</p>
                 <Chip
@@ -177,6 +181,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                   {p.deferredApply}
                 </Chip>
               </div>
+              </Advanced>
             )}
             <FieldRow label={p.label}>
               {(w) => <EditField as="div" value={pension.label} onChange={(label) => set((x) => ({ ...x, label }))} submitIcon={null} maxLength={60} id={w.id} ariaLabel={p.label} />}
@@ -235,9 +240,11 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 </FieldRow>
               </>
             )}
-            <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
-              <Rules pension={pension} set={set} />
-            </Disclosure>
+            <Advanced>
+              <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
+                <Rules pension={pension} set={set} />
+              </Disclosure>
+            </Advanced>
           </article>
         )
       })}
@@ -248,9 +255,11 @@ export function PensionPlans({ person, edit }: PersonEditor) {
         <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(blankPension())}>
           {p.addOther}
         </button>
-        <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(inPayPension())}>
-          {p.addInPay}
-        </button>
+        {full && (
+          <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(inPayPension())}>
+            {p.addInPay}
+          </button>
+        )}
       </Cluster>
     </Section>
   )

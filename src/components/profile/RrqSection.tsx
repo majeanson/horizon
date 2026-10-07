@@ -7,6 +7,7 @@ import { formatMoney } from '../../lib/money'
 import { setEarning } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
+import { Advanced } from '../Advanced'
 import { Chip } from '../Chip'
 import { Disclosure } from '../Disclosure'
 import { FieldInfo } from '../FieldInfo'
@@ -56,6 +57,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
         )}
       </FieldRow>
 
+      <Advanced>
       <Disclosure label={r.earnings} count={typed}>
         <div className="earnings">
           <p className="field-row__hint">{r.earningsCount(typed)}. {r.earningsHint}</p>
@@ -109,6 +111,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
           <p className="field-row__hint">{r.checkNote}</p>
         </div>
       )}
+      </Advanced>
     </Section>
   )
 }

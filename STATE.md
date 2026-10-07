@@ -124,6 +124,10 @@ official page, and any guard it added has been **planted against its own bug** a
 - [ ] Language, what is still one-language: `SOURCES.md` is French (it lists both editions of each page); `index.html`'s description / Open Graph tags and the install manifest are French (a static file cannot follow the reader); 7 cited pages exist in one language only (`twins.ts` says which and why)
 - [ ] **Deploy on push**: add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets (Settings ▸ Secrets and variables ▸ Actions). Until then CI skips the deploy job cleanly and a deploy is `npm run deploy` from a logged-in machine
 
+### Phase 10 — Simple / Full, clarity, questions
+
+- [x] One Simple ↔ Full switch in the top bar (`lib/mode.ts`, `Advanced`, `ModeSwitch`): a new device starts Simple, a device that already holds a profile starts Full; Simple folds the optional / expert groups behind « Voir les détails » and loses nothing (`e2e/mode.spec.ts`, axe in both modes)
+
 ## 5. Lessons carried over from Babillard
 
 - **Plant the bug before trusting a guard** — a green grep test proves nothing alone.

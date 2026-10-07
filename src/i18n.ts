@@ -23,6 +23,12 @@ export const FR = {
   appName: 'Horizon',
   tagline: 'Quand pouvez-vous prendre votre retraite ?',
 
+  mode: {
+    full: 'Complet',
+    hint: 'Affichage complet : tous les champs, tableaux et sources. Désactivé : l’essentiel seulement, le reste reste à un clic.',
+    details: 'Voir les détails',
+  },
+
   common: {
     loading: 'Chargement…',
     cancel: 'Annuler',
@@ -272,6 +278,8 @@ export const FR = {
       retired: 'Dépenses annuelles une fois tout le monde à la retraite',
       hint: 'En dollars d’aujourd’hui, impôt non compris. Elles suivent ensuite l’inflation.',
     },
+    impactSummary: 'Ce que ce scénario suppose',
+    impactSummaryHint: 'Où se situe chaque hypothèse, et ce qu’elle change au plan. Pour les modifier une à une : « Complet ».',
     economy: {
       title: 'L’économie',
       inflation: 'Inflation annuelle',

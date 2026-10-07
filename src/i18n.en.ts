@@ -7,6 +7,12 @@ export const EN: typeof FR = {
   appName: 'Horizon',
   tagline: 'When can you retire?',
 
+  mode: {
+    full: 'Full',
+    hint: 'Full view: every field, table and source. Off: the essentials only, the rest one tap away.',
+    details: 'Show details',
+  },
+
   common: {
     loading: 'Loading…',
     cancel: 'Cancel',
@@ -256,6 +262,8 @@ export const EN: typeof FR = {
       retired: 'Yearly spending once everyone has retired',
       hint: 'In today’s dollars, tax not included. It then follows inflation.',
     },
+    impactSummary: 'What this scenario assumes',
+    impactSummaryHint: 'Where each assumption sits, and what it does to the plan. To edit them one by one: “Full”.',
     economy: {
       title: 'The economy',
       inflation: 'Yearly inflation',
