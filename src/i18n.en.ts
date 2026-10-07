@@ -127,6 +127,7 @@ export const EN: typeof FR = {
       statement65: 'Statement’s projected amount, pension at 65 (per month)',
       statement60: 'Statement’s projected amount, pension at 60 (per month)',
       statementHint: 'Optional. Only used to check Horizon’s calculation; it enters no result.',
+      monthlyDoubt: 'That looks high for a MONTHLY pension. The statement prints monthly amounts — did you copy an annual figure?',
       checkTitle: 'Checking the calculation',
       checkHorizon: (age: number, amount: string) => `For a pension starting at ${age}, Horizon calculates ${amount} per month.`,
       checkDiff: (amount: string, pct: string) => `Difference from your statement: ${amount} (${pct}).`,

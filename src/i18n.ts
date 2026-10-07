@@ -143,6 +143,7 @@ export const FR = {
       statement65: 'Montant projeté du relevé, rente à 65 ans (par mois)',
       statement60: 'Montant projeté du relevé, rente à 60 ans (par mois)',
       statementHint: 'Facultatif. Sert seulement à vérifier le calcul d’Horizon ; il n’entre dans aucun résultat.',
+      monthlyDoubt: 'Ce montant semble élevé pour une rente par mois. Le relevé donne des montants mensuels — avez-vous copié un montant annuel ?',
       checkTitle: 'Vérification du calcul',
       checkHorizon: (age: number, amount: string) => `Horizon calcule, pour une rente à ${age} ans : ${amount} par mois.`,
       checkDiff: (amount: string, pct: string) => `Écart avec votre relevé : ${amount} (${pct}).`,

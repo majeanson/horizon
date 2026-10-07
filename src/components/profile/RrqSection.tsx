@@ -19,6 +19,10 @@ import { Section, type PersonEditor } from './shared'
 // counter-check this app is built around — Horizon's own figure set beside the one printed on the relevé.
 
 const SAME_WITHIN = 0.01 // a difference under 1 % reads as « the same »
+// A soft plausibility line, not a validation: the relevé prints MONTHLY amounts but never writes the
+// unit, so the classic mistake is pasting the annual figure. ~2× the published 2026 maximum at 65
+// (1 507,65 $) — no real monthly pension reaches it, every pasted annual one does.
+const MONTHLY_DOUBT = 3_000
 
 export function RrqSection({ person, edit }: PersonEditor) {
   const t = useT()
@@ -121,11 +125,13 @@ export function RrqSection({ person, edit }: PersonEditor) {
           <NumberField kind="money" allowEmpty max={100_000} value={person.rrq.statementAt65 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt65: v ?? undefined }) }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
+      {person.rrq.statementAt65 !== undefined && person.rrq.statementAt65 > MONTHLY_DOUBT && <StatusMessage tone="info">{r.monthlyDoubt}</StatusMessage>}
       <FieldRow label={r.statement60} infoId="rrqEstimate60">
         {(w) => (
           <NumberField kind="money" allowEmpty max={100_000} value={person.rrq.statementAt60 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt60: v ?? undefined }) }))} id={w.id} />
         )}
       </FieldRow>
+      {person.rrq.statementAt60 !== undefined && person.rrq.statementAt60 > MONTHLY_DOUBT && <StatusMessage tone="info">{r.monthlyDoubt}</StatusMessage>}
 
       {checks.length > 0 && (
         <div className="rrq-check" aria-label={r.checkTitle}>
