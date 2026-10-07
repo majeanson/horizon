@@ -33,6 +33,17 @@ describe('the parameters panel shows exactly what the engine reads', () => {
     expect(rows.some((r) => !r.verify)).toBe(true)
   })
 
+  it('a figure whose source is flagged carries its reason through to its row (fixture tree: no real figure is flagged today)', () => {
+    const source = { url: 'https://www.canada.ca/x', title: 'T', retrieved: '2026-10-06' }
+    const tree = {
+      sure: { value: 1, index: 'fixed', source },
+      doubtful: { value: 2, index: 'fixed', source: { ...source, verify: 'Lu sur une copie archivée : la page refuse les robots.' } },
+    }
+    const rows = paramRows(2026, 'fr', FR.results.params.entries, tree)
+    expect(rows.find((r) => r.path === 'doubtful')?.verify).toBe('Lu sur une copie archivée : la page refuse les robots.')
+    expect(rows.find((r) => r.path === 'sure')?.verify).toBeUndefined()
+  })
+
   it('a year with no published figures has no rows', () => {
     expect(fr(1900)).toEqual([])
   })

@@ -60,8 +60,8 @@ export function displayValue(v: unknown, lang: Lang, entries: (n: number) => str
   return String(v)
 }
 
-export function paramRows(year: number, lang: Lang, entries: (n: number) => string): ParamRow[] {
-  const tree = KNOWN[year]
+/** `tree` is for tests: a fixture tree stands in for the year's, so the unconfirmed-figure branch is exercised even while none is flagged. */
+export function paramRows(year: number, lang: Lang, entries: (n: number) => string, tree: object | undefined = KNOWN[year]): ParamRow[] {
   if (!tree) return []
   return citedLeaves(tree).map(({ path, cited }) => {
     const page = pageFor(cited.source, lang)

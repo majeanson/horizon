@@ -42,7 +42,11 @@ export function scenarioOf(household: Household, selection: Selection): Scenario
   return b ? { retirementAge: { [a.id]: first, [b.id]: second } } : everyoneAt(household, first)
 }
 
-/** The age a selection stands for on the chart's axis: the profile's own, for « my plan » (the first person's). */
+/**
+ * The age a selection stands for on the chart's axis: the profile's own, for « my plan » (the first person's retirement age),
+ * and for a « chacun son âge » split the FIRST person's age — whichever of the two stops working earlier, so two selections
+ * can share a marker.
+ */
 export const selectionAge = (household: Household, selection: Selection): number =>
   selection === 'plan' ? household.persons[0].retirementAge : isSplit(selection) ? splitAges(selection)[0] : selection
 

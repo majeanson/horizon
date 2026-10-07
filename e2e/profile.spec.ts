@@ -218,7 +218,10 @@ test.describe('the example household', () => {
     await expect(page.getByText('Tient jusqu’à l’horizon').first()).toBeVisible()
 
     // A fifth comparison is refused.
+    // Clicked back to back ON PURPOSE: the second tap lands before the first one's re-render and must build on it, not on the old list
+    // (it used to be lost 1 run in ~10 under load — Resultats.tsx `pending`).
     for (const age of ['55', '56']) await chips.getByRole('button', { name: `${age} ans` }).click()
+    for (const age of ['55', '56']) await expect(chips.getByRole('button', { name: `${age} ans`, pressed: true })).toBeVisible()
     await expect(page.getByText('Quatre comparaisons au plus')).toBeVisible()
     await chips.getByRole('button', { name: '57 ans' }).click()
     await expect(chips.getByRole('button', { name: '57 ans', pressed: false })).toBeVisible()

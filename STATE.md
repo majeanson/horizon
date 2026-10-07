@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (96 cited figures for 2026, 14 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
+| **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (96 cited figures for 2026, 17 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://retraite.marcportal.com · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -56,7 +56,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
 - [x] No figure carries a `verify` reason any more: the Québec brackets, the line-361 age rule and the worker-deduction rate (browser screenshot + `docs/TP-1.G(2025-12).pdf`), the four GIS divisors (OAS Benefits Estimator, ≤ 1 $/month apart), the TFSA total (the CRA's limits table + a real room history); ratchet 11 → 0 on 2026-10-06
-- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the QPP Act's rounding of the 15 % drop-out (nearest vs up — Retraite Québec's calculation page says only « jusqu'à 15 % »; the leaflet's worked example rounds 84.6 → 85; the 72nd-birthday-month boundary was confirmed on that page on 2026-10-06); RREGOP's deferred-member (left-before-pension) reduction rule; the CRA's T5008 « case 20 » caveat page; (the OAS estimator's residence wording was read on 2026-10-06: step 4 asks only « Since the age of 18, have you only lived in Canada? » Yes/No for you and your partner — no number of years; whether answering No then asks for years is unchecked)
+- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the QPP Act's rounding of the 15 % drop-out (nearest vs up — Retraite Québec's calculation page says only « jusqu'à 15 % »; the leaflet's worked example rounds 84.6 → 85; the 72nd-birthday-month boundary was confirmed on that page on 2026-10-06); the CRA's T5008 « case 20 » caveat page; (the OAS estimator's residence wording was read on 2026-10-06: step 4 asks only « Since the age of 18, have you only lived in Canada? » Yes/No for you and your partner — no number of years; whether answering No then asks for years is unchecked)
 
 ### Phase 2 — RRQ
 
@@ -100,7 +100,7 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] `lib/schema.ts` (the validator every outside file passes through), `migrations.ts`, `store.ts`, JSON export / import, `schemaVersion.test.ts` — planted: a range edit, a bump without a migration, a missing fixture each turn it red; a comment-only edit stays green
 - [x] `FieldInfo`, `NumberField`, `FieldRow`, `fieldInfoCopy.test.ts` — the labels were READ on the official pages (research below); planted: a dead id, a non-official host, a dropped link, a stale excuse each turn it red
-- [x] Profil, Hypothèses, Résultats (verdict, comparison chips, per-year table, parameters used), Données; `e2e/profile.spec.ts` (22), axe on every route in every display state with every ⓘ and disclosure open
+- [x] Profil, Hypothèses, Résultats (verdict, comparison chips, per-year table, parameters used), Données; `e2e/profile.spec.ts` (31), axe on every route in every display state with every ⓘ and disclosure open
 - [x] The RRQ relevé read on 2026-10-06 (a real one): « Estimation des prestations » ▸ « Rente de retraite », rows « 60 ans » / « 65 ans », columns « Montant actuel » / « Montant projeté »; the table prints no unit; the relevé has NO contributory-years line; its estimate counts the first enhancement only
 - [ ] ❓ Statement wording still UNCONFIRMED (the ⓘ quotes none rather than guess): whether Revenu Québec itself shows any registered-savings room (the CRA account does: « Savings and pension plans » shows the RRSP deduction limit and the TFSA room « As of January 1 », read 2026-10-06 ; Revenu Québec's own Avis de cotisation (2023, read 2026-10-06) shows only the REER deduction CLAIMED (line 214) and no room — so room comes from the CRA account alone)
 - [x] A couple can compare two separate retirement ages (« Chacun son âge » on Résultats: `?ages=…,58-64` = the first person at 58, the second at 64; `lib/resultsModel.ts`, `components/results/SplitPicker.tsx`). The verdict line (« Au plus tôt ») still tries ONE age for everyone — a per-person earliest-age search is a v2 question
@@ -109,7 +109,7 @@ official page, and any guard it added has been **planted against its own bug** a
 ### Phase 8 — chart and results
 
 - [x] `components/charts/*` (Recharts behind an adapter), `chartBoundary.test.ts` (planted: an import from a page → red; in a comment → green; the door's own import removed → red), a DevKit specimen
-- [x] Résultats: verdict, comparison chips, scenario cards, the chart (net worth or guaranteed income, in today's or the year's dollars, all in the address), per-year table, « Paramètres utilisés », and the sensitivity grid in a web worker; `e2e/results.spec.ts` (7)
+- [x] Résultats: verdict, comparison chips, scenario cards, the chart (net worth or guaranteed income, in today's or the year's dollars, all in the address), per-year table, « Paramètres utilisés », and the sensitivity grid in a web worker; `e2e/results.spec.ts` (9)
 - [x] Bundle caps set from the real build (the chart library is 347 KB raw / 103 KB gzip, lazy, off the door; a lowered cap and a static `Résultats` import each turn `check:bundle` red)
 - [ ] The chart library is the biggest thing in the app. If 103 KB gzip on the first Résultats visit matters, the adapter lets a ~5 KB hand-drawn SVG replace it by editing one folder
 

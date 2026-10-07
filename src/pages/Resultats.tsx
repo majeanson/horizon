@@ -34,7 +34,8 @@ export function Resultats() {
   const profile = useProfile()
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
-  const selections = parseSelections(params.get('ages'), defaultSelections(profile.household))
+  // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
+  const selections = parseSelections(params.get('ages'), defaultSelections(profile.household)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
   const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
@@ -43,8 +44,10 @@ export function Resultats() {
   const setParam = useCallback(
     (key: string, value: string | null) =>
       setParams(
-        (p) => {
-          const next = new URLSearchParams(p)
+        () => {
+          // Built from the address bar as it is NOW, not from the render's copy: a second click that lands before the
+          // heavy re-render of the first would otherwise start again from the old address and silently undo it.
+          const next = new URLSearchParams(window.location.search)
           if (value === null) next.delete(key)
           else next.set(key, value)
           return next
@@ -74,7 +77,21 @@ export function Resultats() {
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
   const firstAge = Math.max(MIN_AGE, oldest)
   const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
-  const toggle = (s: Selection) => setParam('ages', formatSelections(toggleSelection(selections, s)))
+  // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
+  // re-rendered, and a quick second tap must build on the first, not on the stale list.
+  const pending = useRef<{ text: string; at: number } | null>(null)
+  const agesNow = params.get('ages')
+  useEffect(() => {
+    if (pending.current && agesNow === pending.current.text) pending.current = null
+  }, [agesNow])
+  const latest = (): Selection[] =>
+    pending.current && Date.now() - pending.current.at < 2000 ? parseSelections(pending.current.text, []) : selections
+  const commit = (next: Selection[]) => {
+    const text = formatSelections(next)
+    pending.current = { text, at: Date.now() }
+    setParam('ages', text)
+  }
+  const toggle = (s: Selection) => commit(toggleSelection(latest(), s))
   // A person with no name is « Moi » / « Conjoint·e », as on the profile page.
   const names = profile.household.persons.map((p, i) => p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse))
   const label = useCallback(
@@ -89,7 +106,8 @@ export function Resultats() {
   )
   const addSplit = (first: number, second: number) => {
     const s = splitOf(first, second)
-    if (!selections.includes(s)) setParam('ages', formatSelections(toggleSelection(selections, s)))
+    const cur = latest()
+    if (!cur.includes(s)) commit(toggleSelection(cur, s))
   }
 
   if (gaps.length > 0) {

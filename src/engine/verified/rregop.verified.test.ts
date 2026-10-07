@@ -226,6 +226,24 @@ describe('RREGOP — a DEFERRED pension (« La fin d’emploi avant l’admissib
     expect(paid).toBeCloseTo(monthly * 6, 0) // July to December
   })
 
+  it('the coordination that starts WITH the pension is indexed exactly like the pension — including the pro-rated first January', () => {
+    // Starts at 65 (July 2057): the first indexation (2058) is only the share of the year paid, for the pension AND the coordination cut from it.
+    const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 65 }), leaveAt40)
+    const rate = indexationRate(0.02, rregopPension({ serviceYearsToDate: 15, startAge: 65 }).indexation)
+    const waiting = 1.02 ** (2057 - 2032)
+    const expected = (s.annualBeforeCoordination - s.coordinationAnnual) * waiting * (1 + rate * (s.firstYearShare ?? 1))
+    expect(s.firstYearShare ?? 1).toBeLessThan(1)
+    expect(dbYear(s, 2058, 0.02)).toBeCloseTo(expected, 0)
+  })
+
+  it('a deferred pension started AFTER 65 indexes its coordination from its own start, not from the 65th birthday', () => {
+    const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 67 }), leaveAt40)
+    expect(s.coordinationIndex).toBe(s.startIndex)
+    // Starts July 2059: the start year pays the amounts indexed to that January (27 full indexations since 2032), nothing more on the coordination.
+    const waiting = 1.02 ** (2059 - 2032)
+    expect(dbYear(s, 2059, 0.02)).toBeCloseTo(((s.annualBeforeCoordination - s.coordinationAnnual) * waiting) / 2, 0)
+  })
+
   it('a member who leaves at 55 or later, or with 35 years, is NOT deferred: the active reduction to the unreduced age applies', () => {
     const leaveAt58: DbInput = { ...leaveAt40, leaving: { year: 2050, month: 6 }, today: { year: 2050, month: 6 } }
     expect(dbStart(rregopPension({ serviceYearsToDate: 20, startAge: 58 }), leaveAt58).earlyReduction).toBeCloseTo(0.18, 10) // (61 − 58) × 6 %

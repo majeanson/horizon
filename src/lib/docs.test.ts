@@ -23,8 +23,8 @@ const lineCount = (name: string) => read(name).split('\n').length - 1
 const ROOT_MD = readdirSync(rootDir).filter((n) => n.endsWith('.md'))
 
 // Ratchets. Lower them in the commit that earns it; never raise them.
-const STATE_BUDGET = 200
-const CLAUDE_BUDGET = 220
+const STATE_BUDGET = 160
+const CLAUDE_BUDGET = 190
 
 describe('the docs stay a map', () => {
   it('finds the root markdown files (a floor, so an empty listing cannot pass)', () => {

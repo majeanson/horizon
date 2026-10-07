@@ -54,7 +54,7 @@ const ALLOWED_NO_URL: Record<string, string> = {
 const ALLOWED_NO_LABEL: Record<string, string> = {
   rrqStartAge: NO_PRINTED_FIGURE,
   oasStartAge: NO_PRINTED_FIGURE,
-  oasResidence: 'the estimator’s own question sits behind a script-driven page that could not be read; the wording is unconfirmed, so none is quoted',
+  oasResidence: 'the estimator asks a yes / no question (« only lived in Canada since 18 »), not a number of years, so there is no printed figure to quote; the ⓘ describes the question instead',
   salary: OWN_STATEMENTS,
   rrspBalance: OWN_STATEMENTS,
   tfsaBalance: OWN_STATEMENTS,

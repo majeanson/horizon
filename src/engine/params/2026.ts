@@ -279,7 +279,7 @@ export const P2026 = {
     tfsaLimit: c(7_000, 'cpi', CRA_TFSA, 500),
     tfsaCumulativeSince2009: c(109_000, 'none', {
       ...CRA_TFSA,
-      note: 'Σ of the annual limits 2009–2026 in the page’s history table, for someone 18+ and resident since 2009 with no contributions. 2010–2026 re-derived on 2026-10-06 from a real CRA account’s room history and calculator (room next year = room − contributions + withdrawals + that year’s limit): 5,000 ×3, 5,500 ×2, 10,000, 5,500 ×2, 6,000 ×4, 6,500, 7,000 ×3; 2009 (5,000) is read on the CRA’s limits table (2009–2012 $5,000 · 2013–2014 $5,500 · 2015 $10,000 · 2016–2018 $5,500 · 2019–2022 $6,000 · 2023 $6,500 · 2024–2025 $7,000), and the table sums to 102,000 + the 2026 limit 7,000.',
+      note: 'Σ of the annual limits 2009–2026 in the page’s history table, for someone 18+ and resident since 2009 with no contributions. 2010–2026 re-derived on 2026-10-06 from a real CRA account’s room history and calculator (room next year = room − contributions + withdrawals + that year’s limit): 5,000 ×3 [2010–12], 5,500 ×2 [2013–14], 10,000 [2015], 5,500 ×3 [2016–18], 6,000 ×4 [2019–22], 6,500 [2023], 7,000 ×3 [2024–26]; 2009 (5,000) is read on the CRA’s limits table (2009–2012 $5,000 · 2013–2014 $5,500 · 2015 $10,000 · 2016–2018 $5,500 · 2019–2022 $6,000 · 2023 $6,500 · 2024–2025 $7,000), and the table sums to 102,000 + the 2026 limit 7,000.',
     }),
     rrifFactors: c<Record<number, number>>(
       {

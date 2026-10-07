@@ -179,7 +179,8 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
     annualBeforeCoordination: roundTo(annualBeforeCoordination, 0.01),
     coordinationAnnual: roundTo(coordinationShown, 0.01),
     startIndex,
-    coordinationIndex: p.coordination ? (isDeferred ? Math.min(startIndex, atAge(p.coordination.fromAge)) : atAge(p.coordination.fromAge)) : null,
+    // A deferred pension is coordinated from its own first payment, whenever that is (before OR after 65); any other pension from the plan's age.
+    coordinationIndex: p.coordination ? (isDeferred ? startIndex : atAge(p.coordination.fromAge)) : null,
     bridgeAnnual: p.bridge ? roundTo(p.bridge.share * annualBeforeCoordination, 0.01) : 0,
     bridgeEndIndex: p.bridge ? atAge(p.bridge.untilAge) - 1 : null,
     indexation: p.indexation,
@@ -233,7 +234,8 @@ export function indexationRate(inflation: number, ix: { share: number; minus: nu
  * the pension from then, less the coordination from ITS month (the month after the 65th birthday — even when
  * the RRQ was taken earlier), plus the bridge up to its last month. The pension is indexed each January from the
  * year after it starts — the FIRST of those is only the share of the rate matching the days it was paid that year
- * (`firstYearShare`); the coordination amount, a fixed sum when it first applies, is indexed from the year after THAT.
+ * (`firstYearShare`); the coordination amount, a fixed sum when it first applies, is indexed from the year after THAT — unless it
+ * starts WITH the pension (a deferred pension, or one taken at 65), when it follows the pension's own indexation, first January included.
  * A deferred pension is first indexed, in full, from the January after leaving to the January of its start year.
  */
 export function dbYear(s: DbStart, year: number, inflation: number): number {
@@ -251,7 +253,10 @@ export function dbYear(s: DbStart, year: number, inflation: number): number {
     if (idx < s.startIndex) continue
     let annual = pension
     if (s.coordinationIndex !== null && idx >= s.coordinationIndex) {
-      annual -= s.coordinationAnnual * waiting * (1 + rate) ** Math.max(0, year - Math.floor(s.coordinationIndex / 12))
+      // A coordination that starts WITH the pension is part of it: it is indexed the same way, the pro-rated first January included.
+      // One that starts later (the 65th birthday of a pension taken at 60) is a fixed sum when it first applies, indexed from the year after THAT.
+      const coordGrowth = s.coordinationIndex === s.startIndex ? grown(year - startYear) : (1 + rate) ** Math.max(0, year - Math.floor(s.coordinationIndex / 12))
+      annual -= s.coordinationAnnual * waiting * coordGrowth
     }
     if (s.afterIndex != null && s.afterAnnual !== undefined && idx >= s.afterIndex) annual = s.afterAnnual * grown(year - startYear)
     if (s.bridgeEndIndex !== null && idx <= s.bridgeEndIndex) annual += s.bridgeAnnual
