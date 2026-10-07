@@ -50,8 +50,12 @@ const FR_RESULTS = {
     holds: (horizon: number) => `Et l’argent dure jusqu’à ${horizon} ans.`,
     scenario: (name: string) => `Selon le scénario ${name}.`,
     scenarioCustom: 'Selon vos hypothèses personnalisées.',
-    underPrudent: (age: number | null, name: string, max: number) =>
-      age === null ? `Sous le scénario ${name.toLowerCase()}, aucun âge ne tient, même à ${max} ans.` : `Sous le scénario ${name.toLowerCase()} : ${age} ans.`,
+    /** `parts` is built by the page from the dictionary's own preset names — they are written once, in `assumptions.presets`. */
+    range: (parts: string) => `Selon le scénario — ${parts}.`,
+    rangeAge: (age: number) => `${age} ans`,
+    rangeNone: (max: number) => `aucun âge jusqu’à ${max} ans`,
+    rangeGap: 'L’écart avec le scénario prudent est marqué : « Sensibilité », plus bas, le détaille.',
+    sensitivityDetail: 'Le détail, hypothèse par hypothèse, de la ligne « Selon le scénario » du verdict.',
     earlier: (age: number, year: number) => `À ${age} ans, l’argent viendrait à manquer dès ${year}.`,
     tryThis: 'Essayez de baisser les dépenses à la retraite, ou d’épargner davantage.',
   },
@@ -112,8 +116,11 @@ const EN_RESULTS: typeof FR_RESULTS = {
     none: (to: number) => `Under these assumptions, retiring does not work, even at ${to}.`,
     scenario: (name: string) => `Under the ${name} scenario.`,
     scenarioCustom: 'Under your own assumptions.',
-    underPrudent: (age: number | null, name: string, max: number) =>
-      age === null ? `Under the ${name} scenario no age works, even at ${max}.` : `Under the ${name} scenario: ${age}.`,
+    range: (parts: string) => `By scenario — ${parts}.`,
+    rangeAge: (age: number) => `age ${age}`,
+    rangeNone: (max: number) => `no age up to ${max}`,
+    rangeGap: 'The gap with the conservative scenario is wide: “Sensitivity”, below, breaks it down.',
+    sensitivityDetail: 'The verdict’s “by scenario” line, broken down assumption by assumption.',
     holds: (horizon: number) => `And the money lasts to age ${horizon}.`,
     earlier: (age: number, year: number) => `At ${age}, the money would run short from ${year}.`,
     tryThis: 'Try lowering spending in retirement, or saving more.',

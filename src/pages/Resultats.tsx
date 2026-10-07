@@ -30,7 +30,7 @@ import { parseBridgeParams } from '../lib/bridgeModel'
 import { presetOf } from '../engine/assumptionPresets'
 import { RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
-import { usePresetEarliest } from '../lib/usePresetEarliest'
+import { usePresetRange } from '../lib/usePresetEarliest'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
@@ -135,10 +135,11 @@ export function Resultats() {
     () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest)),
     [profile, gaps.length, earliest, firstAge, youngest, year, month],
   )
-  // Which scenario the answer is under, and — when the prudent one gives a clearly later age — what that age is (off the page's thread).
+  // The answer under each ready-made scenario (off the page's thread): the verdict's own range line, and the
+  // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
   const activePreset = presetOf(assumptions)
-  const prudent = usePresetEarliest(profile.household, assumptions, gaps.length === 0 && activePreset !== 'prudent')
-  const prudentGap = prudentDiffers(prudent, headline.age)
+  const range = usePresetRange(profile.household, assumptions, gaps.length === 0)
+  const prudentGap = prudentDiffers(range?.prudent, headline.age)
   // The verdict's age, put in dates: one cheap main-thread projection.
   const stop = useMemo(
     () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
@@ -245,13 +246,21 @@ export function Resultats() {
             <p className="verdict__note">
               {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
             </p>
-            {(prudentGap || (headline.earlierAge !== null && headline.earlierShortfallYear !== null)) && (
-              <p className="verdict__note">
-                {prudentGap && rc.headline.underPrudent(prudent!, t.assumptions.presets.prudent, MAX_AGE)}{' '}
-                {headline.earlierAge !== null && headline.earlierShortfallYear !== null && rc.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}
-              </p>
+            {headline.earlierAge !== null && headline.earlierShortfallYear !== null && (
+              <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}</p>
             )}
           </>
+        )}
+        {/* The answer's own range — the ONE place the three scenarios' ages are written; « Sensibilité » details it. */}
+        {range !== undefined && !retiredGlance && (
+          <p className="verdict__note">
+            {rc.headline.range(
+              (['prudent', 'neutral', 'bold'] as const)
+                .map((k) => `${t.assumptions.presets[k]} : ${range[k] === null ? rc.headline.rangeNone(MAX_AGE) : rc.headline.rangeAge(range[k]!)}`)
+                .join(' · '),
+            )}
+            {prudentGap && <> {rc.headline.rangeGap}</>}
+          </p>
         )}
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
         <p className="verdict__note">{r.verdict.caveat}</p>
@@ -359,7 +368,7 @@ export function Resultats() {
       </section>
 
       <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
-        <SectionHeader title={r.sensitivity.title} />
+        <SectionHeader title={r.sensitivity.title} subtitle={rc.headline.sensitivityDetail} />
         <SensitivityPanel household={profile.household} assumptions={assumptions} />
       </section>
 

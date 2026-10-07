@@ -41,12 +41,13 @@ describe('the results-page copy, in both languages', () => {
     for (const [k, v] of e) if (v.length > 30) expect(v, k).not.toBe(frTexts.get(k))
   })
 
-  it('says what the engine pins: « even at 70 » (the oldest age tried works for nobody), the prudent scenario by name', () => {
+  it('says what the engine pins: « even at 70 » (the oldest age tried works for nobody), and the range names no preset itself', () => {
     expect(fr.headline.none(70)).toContain('même à 70 ans')
     expect(en.headline.none(70)).toContain('even at 70')
     expect(fr.headline.none(70)).not.toContain('avant 70')
-    expect(fr.headline.underPrudent(null, 'Prudent', 70)).toContain('prudent')
-    expect(en.headline.underPrudent(64, 'Conservative', 70)).toContain('Conservative')
+    // The preset names are written ONCE, in the dictionary: the range line only frames what the page composes.
+    expect(fr.headline.range('Prudent : 62 ans')).toContain('Prudent : 62 ans')
+    expect(en.headline.range('Conservative: age 62')).not.toContain('Prudent')
   })
 
   it('names the tax in the stop-working answer: the pensions are counted AFTER tax', () => {

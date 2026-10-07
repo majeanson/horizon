@@ -11,7 +11,8 @@ async function loadExample(page: Page, name: string) {
   await page.goto('/resultats')
   await expect(page.locator('.verdict__line')).toBeVisible()
 }
-const openLedger = (page: Page) => page.getByRole('button', { name: 'Mes données et leur calcul' }).click()
+// Every panel is on the page now (nothing folds): the ledger only has to be there.
+const openLedger = (page: Page) => expect(page.locator('.ledger')).toBeVisible()
 
 test('the data page offers all seven examples, each with its story', async ({ page }) => {
   await page.goto('/donnees')
@@ -30,7 +31,7 @@ test('modest single: one person, no couple widgets, and the GIS is in the year t
   await expect(page.locator('.verdict__line')).toContainText('64 ans.')
   await expect(page.locator('.verdict__line')).not.toContainText('tous les deux')
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
-  await page.getByRole('button', { name: /Mes années 60 à 70/ }).click()
+  await expect(page.locator('#pont')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Pour les deux' })).toHaveCount(0)
   await expect(page.locator('.bridge__table')).toContainText('SRG')
 })
@@ -49,8 +50,9 @@ test('behind: says so plainly — the plan runs out, and the card names the year
 test('retired couple: no retirement question, no age to compare, no pension start to choose, and the past is not a slider', async ({ page }) => {
   await loadExample(page, 'Couple à la retraite')
   await expect(page.locator('.verdict__line')).toHaveText('Vous êtes déjà tous les deux à la retraite.')
-  await expect(page.getByRole('button', { name: 'Comparer des âges de départ' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: /Mes années 60 à 70/ })).toHaveCount(0)
+  await expect(page.locator('.compare')).toHaveCount(0) // no departure ages to try (the plan's own card and chart stay)
+  await expect(page.locator('#pont')).toHaveCount(0)
+  await expect(page.locator('#rente')).toHaveCount(0)
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
   await openLedger(page)
   const ledger = page.locator('.ledger')

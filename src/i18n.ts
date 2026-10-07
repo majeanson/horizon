@@ -381,8 +381,6 @@ export const FR = {
       horizon: (age: number) => `Jusqu’à ${age} ans`,
       delta: (points: number) => (points === 0 ? 'prévu' : `${points > 0 ? '+' : '−'}${Math.abs(points)} pt`),
       none: '—',
-      presetsTitle: 'Selon trois scénarios',
-      presetsHint: 'Le même ménage, avec les hypothèses de chaque scénario à la place des vôtres.',
       note: 'Chaque case est le plus bas âge de départ qui tient.',
     },
     params: {

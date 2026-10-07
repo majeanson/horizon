@@ -168,21 +168,17 @@ test('offline, the saved profile is intact and the results — the chart and the
   await page.context().setOffline(true)
   await page.reload()
   await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
-  await expect(page.locator('figure.chart')).toBeVisible()
-  await expect(page.locator('path.recharts-line-curve')).toHaveCount(2)
+  await expect(page.locator('.chart-panel figure.chart')).toBeVisible()
+  await expect(page.locator('.chart-panel path.recharts-line-curve')).toHaveCount(2)
 
-  // The profile page, offline, still holds what was saved.
+  // The profile page, offline, still holds what was saved (both people are on the page: scope to the first).
   await page.getByRole('link', { name: 'Profil', exact: true }).click()
-  await expect(page.getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
+  await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
 
-  // …and the worker runs offline.
+  // …and the worker runs offline: the « what if » grid starts by itself and fills from the cache.
   await page.getByRole('link', { name: 'Résultats', exact: true }).click()
-  await page.getByRole('button', { name: /Et si l’avenir est un peu moins bon/ }).click()
-  await page.getByRole('button', { name: 'Calculer' }).click()
-  await expect(page.getByRole('button', { name: 'Calculer' })).toBeEnabled({ timeout: 90_000 })
-  // 27 cells = three 3 × 3 grids. The panel also holds the scenarios table above them (prudent / neutral / bold), which is
-  // not part of the count: scope to the grids, as results.spec.ts does.
-  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
+  // 27 cells = three 3 × 3 grids.
+  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27, { timeout: 90_000 })
   await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('59')
 
   expect(failed, 'nothing the offline app asked for failed').toEqual([])

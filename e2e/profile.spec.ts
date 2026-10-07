@@ -209,11 +209,10 @@ test.describe('the example household', () => {
     // The verdict says what it is, on the card itself: an estimate under assumptions, not advice.
     await expect(page.locator('.verdict').getByText('Selon ces hypothèses — une estimation, pas un conseil financier.')).toBeVisible()
     // It opens on the household's OWN plan beside 65 — not on a pair the profile never mentioned.
-    await page.getByRole('button', { name: 'Comparer des âges de départ' }).click()
     const chips = page.getByRole('group', { name: 'Comparer des âges de départ' })
     await expect(chips.getByRole('button', { name: 'Mon plan', pressed: true })).toBeVisible()
     await expect(chips.getByRole('button', { name: '65 ans', pressed: true })).toBeVisible()
-    await expect(page.getByText('Départ : Mon plan')).toBeVisible()
+    await expect(page.locator('.scenario').getByText('Départ : Mon plan')).toBeVisible()
     await expect(page.getByText('Tient jusqu’à l’horizon').first()).toBeVisible()
 
     // A fifth comparison is refused.
@@ -226,9 +225,9 @@ test.describe('the example household', () => {
     await expect(chips.getByRole('button', { name: '57 ans', pressed: false })).toBeVisible()
     await expect(page).toHaveURL(/ages=plan%2C65%2C55%2C56|ages=plan,65,55,56/)
 
-    await page.getByRole('button', { name: /Détail année par année/ }).click()
-    await expect(page.getByRole('table').first()).toBeVisible()
-    expect(await page.getByRole('table').first().getByRole('row').count()).toBeGreaterThan(40)
+    const yearTable = page.locator('#tableau').getByRole('table').first()
+    await expect(yearTable).toBeVisible()
+    expect(await yearTable.getByRole('row').count()).toBeGreaterThan(40)
     expect(problems).toEqual([])
   })
 

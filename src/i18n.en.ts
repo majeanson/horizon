@@ -365,8 +365,6 @@ export const EN: typeof FR = {
       horizon: (age: number) => `Until age ${age}`,
       delta: (points: number) => (points === 0 ? 'as set' : `${points > 0 ? '+' : '−'}${Math.abs(points)} pt`),
       none: '—',
-      presetsTitle: 'Under three scenarios',
-      presetsHint: 'The same household, with each scenario’s assumptions in place of yours.',
       note: 'Each cell is the lowest retirement age that lasts.',
     },
     params: {

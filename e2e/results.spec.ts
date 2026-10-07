@@ -92,9 +92,11 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
   // 27 cells, each an age or a dash; the base cell of the 95-year grid is the plain verdict.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
-  // …and the three ready-made scenarios read prudent ≥ neutral ≥ bold (a more prudent future never retires earlier).
-  const scenarios = (await page.locator('.sensitivity > .table-wrap tbody td').allTextContents()).map((x) => (x === '—' ? Infinity : Number(x)))
-  expect(scenarios).toHaveLength(3)
+  // …and the verdict's own range line reads prudent ≥ neutre ≥ audacieux (a more prudent future never retires earlier)
+  // — the ONE place the three scenarios' ages are written; the grids detail it.
+  const rangeLine = page.locator('.verdict', { hasText: 'Selon le scénario —' })
+  await expect(rangeLine).toContainText(/Prudent : \d\d ans · Neutre : \d\d ans · Audacieux : \d\d ans/)
+  const scenarios = (await rangeLine.innerText()).match(/: (\d\d) ans/g)!.map((x) => Number(x.slice(2, 4)))
   expect(scenarios[0]).toBeGreaterThanOrEqual(scenarios[1])
   expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
   const base = grids.nth(1).locator('td.is-base')
