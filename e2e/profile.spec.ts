@@ -343,10 +343,10 @@ test.describe('an unreadable stored profile', () => {
     // On the Profil page — not only on Données — a person who finds a blank profile is told why.
     const banner = page.getByRole('status').filter({ hasText: 'était illisible' })
     await expect(banner).toBeVisible()
-    await page.getByRole('link', { name: 'Hypothèses' }).click()
+    await page.getByRole('link', { name: 'Hypothèses', exact: true }).click()
     await expect(banner).toBeVisible()
 
-    await page.getByRole('link', { name: 'Données' }).click()
+    await page.getByRole('link', { name: 'Données', exact: true }).click()
     const downloading = page.waitForEvent('download')
     await page.getByRole('button', { name: 'Télécharger la copie illisible' }).click()
     const file = await downloading

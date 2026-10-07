@@ -42,6 +42,9 @@ async function setState(page: Page, s: State): Promise<void> {
 }
 
 async function violations(page: Page): Promise<string[]> {
+  // Colours mid-transition are neither the day nor the night palette: let every running animation / transition finish before
+  // axe reads a pair (a one-off contrast failure on the results page, night + Simple, did not reproduce in 50 reruns).
+  await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze()
   return results.violations.map(
     (v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`,
