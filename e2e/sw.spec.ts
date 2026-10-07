@@ -172,11 +172,11 @@ test('offline, the saved profile is intact and the results — the chart and the
   await expect(page.locator('path.recharts-line-curve')).toHaveCount(2)
 
   // The profile page, offline, still holds what was saved.
-  await page.getByRole('link', { name: 'Profil' }).click()
+  await page.getByRole('link', { name: 'Profil', exact: true }).click()
   await expect(page.getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
 
   // …and the worker runs offline.
-  await page.getByRole('link', { name: 'Résultats' }).click()
+  await page.getByRole('link', { name: 'Résultats', exact: true }).click()
   await page.getByRole('button', { name: /Et si l’avenir est un peu moins bon/ }).click()
   await page.getByRole('button', { name: 'Calculer' }).click()
   await expect(page.getByRole('button', { name: 'Calculer' })).toBeEnabled({ timeout: 90_000 })

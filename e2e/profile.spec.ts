@@ -30,7 +30,7 @@ test.describe('a blank profile', () => {
     const problems = watchConsole(page)
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'Profil', level: 1 })).toBeVisible()
-    await page.getByRole('link', { name: 'Résultats' }).click()
+    await page.getByRole('link', { name: 'Résultats', exact: true }).click()
     await expect(page.getByText('Il manque des chiffres pour un résultat fiable')).toBeVisible()
     await expect(page.getByText('aucun revenu, régime ni compte n’est saisi')).toBeVisible()
     await expect(page.getByText(/Vous pouvez prendre votre retraite/)).toHaveCount(0)
