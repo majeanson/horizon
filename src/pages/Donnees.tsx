@@ -107,7 +107,7 @@ export function Donnees() {
         <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
           <Cluster>
             {copies.map((text, i) => (
-              <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, `horizon-illisible${i === 0 ? '' : '-precedent'}.json`)}>
+              <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
                 {i === 0 ? d.rescue.button : d.rescue.older}
               </button>
             ))}

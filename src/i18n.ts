@@ -472,6 +472,8 @@ export const FR = {
       hint: 'Le profil que cet appareil n’a pas pu lire est resté sur place. Téléchargez-le avant d’effacer quoi que ce soit : un fichier de cette sorte se répare souvent à la main.',
       button: 'Télécharger la copie illisible',
       older: 'Télécharger la copie illisible précédente',
+      /** One name per copy: three downloads used to collide on « -precedent ». */
+      fileName: (i: number) => (i === 0 ? 'horizon-illisible.json' : `horizon-illisible-${i}.json`),
     },
     undo: {
       offer: 'L’ancien profil est encore récupérable, le temps de cette visite.',

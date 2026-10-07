@@ -134,6 +134,10 @@
   --focus-ring: var(--ink);
 
   /* ---- radii (soft, pebble-like) ---- */
+  /* ---- spacing (the two steps rules already reached for with fallbacks) ---- */
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;

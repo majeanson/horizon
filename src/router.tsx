@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { Loading } from './components/Loading'
 
@@ -21,8 +21,9 @@ export function AppRoutes() {
           <Route path="hypotheses" element={<Hypotheses />} />
           <Route path="resultats" element={<Resultats />} />
           <Route path="donnees" element={<Donnees />} />
-          {/* Unknown paths land on the first page rather than a dead end. */}
-          <Route path="*" element={<Profil />} />
+          {/* Unknown paths land on the first page rather than a dead end — and the ADDRESS follows:
+              rendering Profil under /typo left no nav tab active and a wrong URL to re-bookmark. */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
         {/* A dev-only gallery, outside the shell: it has its own header and toggles. */}
         <Route path="/dev/kit" element={<DevKit />} />

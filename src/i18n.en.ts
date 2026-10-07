@@ -455,6 +455,7 @@ export const EN: typeof FR = {
       hint: 'The profile this device could not read was left in place. Download it before erasing anything: a file like this can often be mended by hand.',
       button: 'Download the unreadable copy',
       older: 'Download the previous unreadable copy',
+      fileName: (i: number) => (i === 0 ? 'horizon-unreadable.json' : `horizon-unreadable-${i}.json`),
     },
     undo: {
       offer: 'The previous profile can still be brought back, for this visit.',

@@ -38,11 +38,11 @@
 }
 
 /* ── Résultats: one scroll, a sticky map of its sections ─────────────────── */
-/* The nav rides under the sticky top bar (3.6rem, same offset as the desktop nav rail) and
+/* The nav rides under the sticky top bar (--bar-h, same offset as the desktop nav rail) and
    stays above the content it scrolls past; a tapped section stops below both. */
 .section-nav {
   position: sticky;
-  top: 3.6rem;
+  top: var(--bar-h);
   z-index: 15;
   margin: 0 calc(-1 * var(--gutter));
   padding: 0.35rem var(--gutter);

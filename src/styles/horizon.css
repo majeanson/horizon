@@ -6,6 +6,12 @@
 /* ── App shell ───────────────────────────────────────────────────────────── */
 /* One markup, two layouts, chosen by CSS alone: on a phone the navigation is a bar fixed to
    the bottom (thumb reach); from 860px it becomes a left rail under the top bar. */
+:root {
+  /* The top bar's height, the ONE number the sticky offsets hang from (the desktop nav rail,
+     the Résultats section map). It was a magic 3.6rem in three places while the real bar sat
+     at ~4rem (44px icon button + 0.6rem×2 padding) — everything sticky tucked ~6px under it. */
+  --bar-h: 4rem;
+}
 .shell {
   min-height: 100%;
   display: grid;
@@ -20,7 +26,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  min-height: var(--bar-h);
   padding: 0.6rem var(--gutter);
+  /* A notched phone in landscape puts a ~48px inset where the 16px gutter was. */
+  padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px));
   background: var(--paper);
   border-bottom: 1px solid var(--line);
 }
@@ -71,6 +80,7 @@
   background: var(--paper);
   border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
 }
 .shell__tab {
   flex: 1 1 0;
@@ -104,6 +114,7 @@
   max-width: 56rem;
   margin: 0 auto;
   padding: 1rem var(--gutter) calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px));
 }
 @media (min-width: 860px) {
   .shell {
@@ -115,7 +126,7 @@
   }
   .shell__nav {
     position: sticky;
-    top: 3.6rem;
+    top: var(--bar-h);
     align-self: start;
     inset: auto;
     flex-direction: column;
@@ -123,7 +134,7 @@
     padding: 1rem 0.75rem;
     border-top: 0;
     border-right: 1px solid var(--line);
-    min-height: calc(100dvh - 3.6rem);
+    min-height: calc(100dvh - var(--bar-h));
   }
   .shell__tab {
     flex: 0 0 auto;

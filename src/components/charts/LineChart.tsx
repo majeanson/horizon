@@ -16,6 +16,9 @@ const COLOUR: Record<SeriesColour, string> = {
   ink: 'var(--ink-faint)',
 }
 
+// One dash pattern per series position (undefined = solid, for the first).
+const DASHES: (string | undefined)[] = [undefined, '7 3', '2 3', '9 3 2 3']
+
 // One row per x, one key per series: the shape the library wants, built from series that may start and stop apart.
 function merge(series: readonly ChartSeries[]): Record<string, number>[] {
   const byX = new Map<number, Record<string, number>>()
@@ -77,8 +80,11 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, markers 
                 label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: '0.78rem' } : undefined}
               />
             ))}
-            {series.map((s) => (
-              <Line key={s.id} type="monotone" dataKey={s.id} stroke={COLOUR[s.colour]} strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
+            {series.map((s, i) => (
+              // Colour is never the ONLY difference between lines: from the second series on,
+              // each wears its own dash pattern, so « 60 vs 65 » survives colour-blindness and
+              // greyscale print at zero cost. The first (the reader's own plan) stays solid.
+              <Line key={s.id} type="monotone" dataKey={s.id} stroke={COLOUR[s.colour]} strokeWidth={2.5} strokeDasharray={DASHES[i % DASHES.length]} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
             ))}
           </RLineChart>
         </ResponsiveContainer>
