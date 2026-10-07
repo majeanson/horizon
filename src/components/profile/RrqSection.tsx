@@ -57,7 +57,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
         )}
       </FieldRow>
 
-      <Advanced>
+      <Advanced what={t.mode.what.statement}>
       <Disclosure label={r.earnings} count={typed}>
         <div className="earnings">
           <p className="field-row__hint">{r.earningsCount(typed)}. {r.earningsHint}</p>

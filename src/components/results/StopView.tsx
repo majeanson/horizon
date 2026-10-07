@@ -1,6 +1,7 @@
 import type { EarliestEach } from '../../engine/retireAt'
 import type { Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
+import { RESULTS_COPY } from '../../lib/resultsCopy'
 import type { Headline } from '../../lib/headline'
 import { formatPct } from '../../lib/format'
 import type { StopWorking } from '../../lib/stopWorking'
@@ -25,19 +26,20 @@ export function StopView({
 }) {
   const t = useT()
   const { lang } = useLang()
-  const q = t.results.questions.stop
+  const rc = RESULTS_COPY[lang]
+  const q = rc.questions.stop
   const couple = household.persons.length === 2
   if (headline.kind === 'none' || stop === null || headline.age === null) {
     return (
       <div className="surface answer" aria-live="polite">
-        <p className="answer__big answer__big--short">{t.results.verdict.headline.none(maxAge)}</p>
-        <p className="answer__note">{t.results.verdict.headline.tryThis}</p>
+        <p className="answer__big answer__big--short">{rc.headline.none(maxAge)}</p>
+        <p className="answer__note">{rc.headline.tryThis}</p>
       </div>
     )
   }
   return (
     <div className="surface answer" aria-live="polite">
-      <p className="answer__big">{headline.kind === 'now' ? t.results.verdict.headline.now : q.age(headline.age, couple)}</p>
+      <p className="answer__big">{headline.kind === 'now' ? rc.headline.now : q.age(headline.age, couple)}</p>
       <ul className="answer__list">
         {stop.years.map((y, i) => (
           <li key={y.id}>{q.when(names[i] ?? '', y.year)}</li>
@@ -47,13 +49,13 @@ export function StopView({
       </ul>
       {couple && each && (
         <p className="answer__note">
-          {t.results.verdict.headline.separately}{' '}
+          {rc.headline.separately}{' '}
           {each
             .filter((a) => a.other)
             .map((a) => {
               const name = names[household.persons.findIndex((p) => p.id === a.id)] ?? ''
               const other = names[household.persons.findIndex((p) => p.id === a.other!.id)] ?? ''
-              return a.earliestOk === null ? t.results.verdict.each.none(name, maxAge, other, a.other!.heldAt) : t.results.verdict.each.line(name, a.earliestOk, other, a.other!.heldAt)
+              return a.earliestOk === null ? rc.each.none(name, maxAge, other, a.other!.heldAt) : rc.each.line(name, a.earliestOk, other, a.other!.heldAt)
             })
             .join(' · ')}
         </p>

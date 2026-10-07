@@ -25,6 +25,10 @@ import { InlineIcon, type IconName } from './Icon'
 //     (the read-only face of a chip that IS a control for an operator — a guest's
 //     inert « quand » badge, an idea row nobody may plan).
 //
+// A toggle that belongs to a CHOOSE-ONE set (a strategy card's name chip: picking one replaces the others, tapping the
+// picked one again does nothing) passes `radio`: it then says `role="radio"` + `aria-checked` instead of `aria-pressed`,
+// because a button announced as « pressed » promises a second press that un-presses it.
+//
 // `expanded` is the fifth, narrower shape: an action chip that OPENS something
 // in place (the meal-idea rows, which unfold a MealPlanPicker under themselves).
 // It says `aria-expanded`, never `aria-pressed` — a disclosure is not a toggle.
@@ -34,6 +38,7 @@ import { InlineIcon, type IconName } from './Icon'
 export function Chip({
   children,
   selected,
+  radio,
   onClick,
   onRemove,
   removeLabel,
@@ -49,6 +54,8 @@ export function Chip({
   children: ReactNode
   /** Present = this chip is a TOGGLE, and this is its state. Omit for an action. */
   selected?: boolean
+  /** With `selected`: one of a choose-one set — announced as a radio, not as a pressed button. */
+  radio?: boolean
   /** The event is passed through for the rare row-nested chip that must stop it. */
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void
   onRemove?: () => void
@@ -111,7 +118,9 @@ export function Chip({
       // Only a TOGGLE says pressed. An action chip that announced
       // `aria-pressed="false"` for ever ("Balayer, toggle button, not pressed")
       // was the bug this shape split fixes.
-      aria-pressed={selected === undefined || onRemove ? undefined : selected}
+      role={radio && selected !== undefined && !onRemove ? 'radio' : undefined}
+      aria-checked={radio && selected !== undefined && !onRemove ? selected : undefined}
+      aria-pressed={selected === undefined || onRemove || radio ? undefined : selected}
       aria-expanded={expanded}
       aria-label={ariaLabel ?? (onRemove ? removeLabel : undefined)}
       title={title}

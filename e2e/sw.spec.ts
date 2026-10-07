@@ -153,7 +153,7 @@ test('offline, the saved profile is intact and the results — the chart and the
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
   await waitControlled(page)
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
 
   const consoleErrors: string[] = []
   page.on('console', (m) => {
@@ -167,7 +167,7 @@ test('offline, the saved profile is intact and the results — the chart and the
 
   await page.context().setOffline(true)
   await page.reload()
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('figure.chart')).toBeVisible()
   await expect(page.locator('path.recharts-line-curve')).toHaveCount(2)
 
@@ -183,7 +183,7 @@ test('offline, the saved profile is intact and the results — the chart and the
   // 27 cells = three 3 × 3 grids. The panel also holds the scenarios table above them (prudent / neutral / bold), which is
   // not part of the count: scope to the grids, as results.spec.ts does.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
-  await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('60')
+  await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('59')
 
   expect(failed, 'nothing the offline app asked for failed').toEqual([])
   expect(consoleErrors).toEqual([])

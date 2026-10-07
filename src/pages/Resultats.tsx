@@ -22,10 +22,13 @@ import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
 import { BRIDGE_COPY } from '../lib/bridgeCopy'
 import { DEFERRAL_COPY } from '../lib/deferralCopy'
-import { headlineOf } from '../lib/headline'
+import { presetOf } from '../engine/assumptionPresets'
+import { RESULTS_COPY } from '../lib/resultsCopy'
+import { headlineOf, prudentDiffers } from '../lib/headline'
+import { usePresetEarliest } from '../lib/usePresetEarliest'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
-import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, type Selection } from '../lib/resultsModel'
+import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
 import { useMode } from '../lib/mode'
 import { stopWorking } from '../lib/stopWorking'
 import { useEarliestEach } from '../lib/useEarliestEach'
@@ -44,6 +47,7 @@ export function Resultats() {
   const t = useT()
   const { lang } = useLang()
   const r = t.results
+  const rc = RESULTS_COPY[lang]
   const profile = useProfile()
   const full = useMode() === 'full'
   const [params, setParams] = useSearchParams()
@@ -92,14 +96,21 @@ export function Resultats() {
   }, [gaps.length])
 
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
+  const youngest = Math.min(...profile.household.persons.map((p) => year - p.birth.year))
   const firstAge = Math.max(MIN_AGE, oldest)
   const headline = useMemo(
-    () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, oldest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, oldest)),
-    [profile, gaps.length, earliest, firstAge, oldest, year, month],
+    // The headline reads two more projections: not worked out for a question that never shows it (« Combien épargner ? »).
+    () => (gaps.length > 0 || question === 'save' ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest)),
+    [profile, gaps.length, question, earliest, firstAge, youngest, year, month],
   )
+  // Which scenario the answer is under, and — when the prudent one gives a clearly later age — what that age is (off the page's thread).
+  const activePreset = presetOf(assumptions)
+  const prudent = usePresetEarliest(profile.household, assumptions, gaps.length === 0 && question === 'when' && activePreset !== 'prudent')
+  const prudentGap = prudentDiffers(prudent, headline.age)
   const stop = useMemo(
-    () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
-    [profile, gaps.length, headline.age, year, month],
+    // One more projection, and only for the question that shows it.
+    () => (gaps.length > 0 || question !== 'stop' || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
+    [profile, gaps.length, question, headline.age, year, month],
   )
   const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
@@ -185,10 +196,10 @@ export function Resultats() {
 
   const pickQuestion = (
     <SubTabs<'when' | 'save' | 'stop'>
-      ariaLabel={r.questions.label}
+      ariaLabel={rc.questions.label}
       value={question}
       onSelect={(k) => setParam('q', k === 'when' ? null : k)}
-      options={(['when', 'save', 'stop'] as const).map((k) => ({ key: k, label: r.questions.tabs[k] }))}
+      options={(['when', 'save', 'stop'] as const).map((k) => ({ key: k, label: rc.questions.tabs[k] }))}
     />
   )
   if (question === 'save') {
@@ -225,26 +236,28 @@ export function Resultats() {
 
       <div className="verdict surface" aria-live="polite">
         <p className="verdict__line">
-          {headline.kind === 'none' ? r.verdict.headline.none(MAX_AGE) : headline.kind === 'now' ? r.verdict.headline.now : r.verdict.headline.at(headline.age!, isCouple)}
+          {headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(headline.age!, isCouple)}
         </p>
         {headline.kind === 'none' ? (
-          <p className="verdict__note">{r.verdict.headline.tryThis}</p>
+          <p className="verdict__note">{rc.headline.tryThis}</p>
         ) : (
           <>
-            <p className="verdict__note">{r.verdict.headline.holds(assumptions.horizonAge)}</p>
-            {headline.earlierAge !== null && headline.earlierShortfallYear !== null && <p className="verdict__note">{r.verdict.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}</p>}
+            <p className="verdict__note">{rc.headline.holds(assumptions.horizonAge)}</p>
+            <p className="verdict__note">{activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}</p>
+            {prudentGap && <p className="verdict__note">{rc.headline.underPrudent(prudent!, t.assumptions.presets.prudent, MAX_AGE)}</p>}
+            {headline.earlierAge !== null && headline.earlierShortfallYear !== null && <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}</p>}
           </>
         )}
         {/* Simple hides the « Chacun de son côté » panel: one line keeps each person's own answer in view. */}
         {!full && isCouple && earliestEachAnswer && (
           <p className="verdict__note">
-            {r.verdict.headline.separately}{' '}
+            {rc.headline.separately}{' '}
             {earliestEachAnswer
               .filter((a) => a.other)
               .map((a) => {
                 const name = names[profile.household.persons.findIndex((p) => p.id === a.id)] ?? ''
                 const other = names[profile.household.persons.findIndex((p) => p.id === a.other!.id)] ?? ''
-                return a.earliestOk === null ? r.verdict.each.none(name, MAX_AGE, other, a.other!.heldAt) : r.verdict.each.line(name, a.earliestOk, other, a.other!.heldAt)
+                return a.earliestOk === null ? rc.each.none(name, MAX_AGE, other, a.other!.heldAt) : rc.each.line(name, a.earliestOk, other, a.other!.heldAt)
               })
               .join(' · ')}
           </p>
@@ -289,7 +302,7 @@ export function Resultats() {
               {r.scenario.retireAt(label(selection))}
             </p>
             <p className={'scenario__verdict' + (result.ok ? '' : ' scenario__verdict--short')}>{result.ok ? r.scenario.works : r.scenario.fails(result.firstShortfallYear!)}</p>
-            <p className="scenario__worth mono">{r.scenario.endWorth(formatMoney(result.netWorthAtHorizon, lang))}</p>
+            <p className="scenario__worth mono">{r.scenario.endWorth(formatMoney(worthAtHorizon(result, dollars, assumptions), lang), dollars === 'today' ? r.chart.today : r.chart.nominal)}</p>
           </li>
         ))}
       </ul>

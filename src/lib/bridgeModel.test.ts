@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { bridgeRun, leversFor, profileLevers, type BridgeLevers } from '../engine/bridge.ts'
+import { bridgeRun, bridgeView, leversFor, profileLevers, type BridgeLevers } from '../engine/bridge.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
-import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, strategiesOf, verdictOf, windowRows } from './bridgeModel.ts'
+import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, shownPlan, strategiesOf, verdictOf, windowRows } from './bridgeModel.ts'
 
 const H = GOLDEN_HOUSEHOLD
 const q = (s: string) => new URLSearchParams(s)
@@ -73,15 +73,15 @@ describe('the verdict says what the numbers say', () => {
   })
 
   it('a plan that runs out names the age, and whether starting at 65 would have avoided it', () => {
-    // Retiring at 58 on this nest: starting at 65 runs out near 97 (deferring, as it happens, would last).
-    const std = run(58, 'standard')
+    // Retiring at 57 on this nest: starting at 65 runs out near 98 (deferring, as it happens, would last).
+    const std = run(57, 'standard')
     expect(std.summary.ok).toBe(false)
     const v = verdictOf(std.levers, std.summary, std.summary, 95)
     expect(v).toMatchObject({ kind: 'fails', defers: false, age: std.summary.firstShortfallAge })
     const small = structuredClone(H)
     for (const p of small.persons) for (const k of ['rrsp', 'tfsa', 'nonReg'] as const) p.accounts[k].balance *= 0.7
-    const a = bridgeRun(small, GOLDEN_ASSUMPTIONS, leversFor('standard', small, 'self', 56))
-    const b = bridgeRun(small, GOLDEN_ASSUMPTIONS, leversFor('max', small, 'self', 56))
+    const a = bridgeRun(small, GOLDEN_ASSUMPTIONS, leversFor('standard', small, 'self', 55))
+    const b = bridgeRun(small, GOLDEN_ASSUMPTIONS, leversFor('max', small, 'self', 55))
     expect(verdictOf(b.levers, b.summary, a.summary, 95)).toMatchObject({ kind: 'fails', defers: true, standardHolds: false, standardAge: a.summary.firstShortfallAge })
   })
 })
@@ -103,5 +103,40 @@ describe('the rows a window shows', () => {
       expect(bar.need).toBeCloseTo(r.spending + r.tax, 6)
       expect(bar.x).toBe(r.age)
     }
+  })
+})
+
+describe('the sentence is about the answer on screen, not about the controls', () => {
+  const A = GOLDEN_ASSUMPTIONS
+  const done = { id: 'self' as const, retirementAge: 58, rrqStartAge: 65, oasStartAge: 65 }
+  const view = bridgeViewOf(done)
+
+  function bridgeViewOf(l: BridgeLevers) {
+    return bridgeView(H, A, l)
+  }
+
+  it('while a deferral is being worked out, the old answer keeps its own levers (verdict, pressed strategy, markers)', () => {
+    const controls = { ...done, rrqStartAge: 72, oasStartAge: 70 } // the person just tapped « reporter au maximum »
+    const plan = shownPlan(view, controls, H, A.horizonAge)
+    expect(plan.shown).toEqual(done)
+    expect(plan.pressed).toContain('standard')
+    expect(plan.pressed).not.toContain('max')
+    expect(plan.verdict).not.toBeNull()
+    expect(plan.verdict!.kind === 'holds' || plan.verdict!.kind === 'fails').toBe(true)
+    // …and it is the verdict of the standard plan that was computed, whatever the controls now say
+    expect(plan.verdict).toEqual(verdictOf(done, view.selected.summary, view.strategies.find((s) => s.key === 'standard')!.summary, plan.endAge))
+  })
+
+  it('with no answer yet, the controls are what is shown and there is no verdict', () => {
+    const plan = shownPlan(null, done, H, 95)
+    expect(plan.shown).toEqual(done)
+    expect(plan.verdict).toBeNull()
+    expect(plan.endAge).toBe(95)
+  })
+
+  it('« until age N » is the age of the person looked at in the plan\'s last year — the age the table and the matrix use', () => {
+    const plan = shownPlan(view, done, H, A.horizonAge)
+    const last = view.selected.rows[view.selected.rows.length - 1]
+    expect(plan.endAge).toBe(last.age)
   })
 })

@@ -85,3 +85,14 @@ export function toggleSelection(selections: readonly Selection[], selection: Sel
   if (selections.includes(selection)) return selections.filter((s) => s !== selection)
   return selections.length >= MAX_SELECTIONS ? [...selections] : [...selections, selection]
 }
+
+/**
+ * The net worth at the end of a run, in the dollars the page is showing. The engine's own figure is NOMINAL (the dollars of
+ * the last year, 2076 or so); the page defaults to today's dollars, and a card that quoted the nominal one beside a chart in
+ * today's dollars showed the same plan as 1,5 M$ and 0,56 M$.
+ */
+export function worthAtHorizon(result: Pick<AgeResult, 'netWorthAtHorizon' | 'rows'>, dollars: 'today' | 'nominal', assumptions: Pick<Assumptions, 'inflation' | 'today'>): number {
+  if (dollars === 'nominal') return result.netWorthAtHorizon
+  const last = result.rows[result.rows.length - 1]
+  return last ? result.netWorthAtHorizon / (1 + assumptions.inflation) ** (last.year - assumptions.today.year) : result.netWorthAtHorizon
+}

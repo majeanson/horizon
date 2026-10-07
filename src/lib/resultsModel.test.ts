@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
 import { project } from '../engine/projection.ts'
-import { MAX_SELECTIONS, assumptionsOf, defaultSelections, formatSelections, parseSelections, runSelections, scenarioOf, selectionAge, toggleSelection } from './resultsModel.ts'
+import { MAX_SELECTIONS, assumptionsOf, defaultSelections, formatSelections, parseSelections, runSelections, scenarioOf, selectionAge, toggleSelection, worthAtHorizon } from './resultsModel.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
@@ -95,5 +95,17 @@ describe('a couple that retires at two different ages', () => {
   it('on a household of one, a split falls back to everyone at its first age', () => {
     const solo = { ...GOLDEN_HOUSEHOLD, persons: [GOLDEN_HOUSEHOLD.persons[0]] }
     expect(scenarioOf(solo, '58-64')).toEqual({ retirementAge: { self: 58 } })
+  })
+})
+
+describe('the net worth on a comparison card is in the dollars the page shows', () => {
+  it('today\'s dollars: the nominal figure deflated from its own year; nominal: the engine\'s figure as it is', () => {
+    const { result } = runSelections(profile(), { year: 2026, month: 10 }, ['plan'])[0]
+    const a = { inflation: GOLDEN_ASSUMPTIONS.inflation, today: { year: 2026, month: 10 } }
+    const last = result.rows[result.rows.length - 1]
+    expect(worthAtHorizon(result, 'nominal', a)).toBe(result.netWorthAtHorizon)
+    expect(worthAtHorizon(result, 'today', a)).toBeCloseTo(result.netWorthAtHorizon / (1 + a.inflation) ** (last.year - 2026), 6)
+    expect(worthAtHorizon(result, 'today', a)).toBeLessThan(result.netWorthAtHorizon) // 50 years of inflation: the two figures are nowhere near each other
+    expect(worthAtHorizon(result, 'today', a)).toBeGreaterThan(0)
   })
 })

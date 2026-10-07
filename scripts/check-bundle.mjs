@@ -28,7 +28,7 @@ const EAGER_CHUNKS = [
   // name pattern → its own budget (all load before first paint)
   { re: /^index-/, cap: 40 * KB, label: 'eager entry' },
   { re: /^react-vendor-/, cap: 280 * KB, label: 'eager react-vendor' },
-  { re: /^i18n-/, cap: 36 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 33 → 36: Simple/Full, the headline, the next steps and the three questions (~3 KB of French). 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
+  { re: /^i18n-/, cap: 33 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 36 → 33: the results-only copy (the three questions, the headline, « each of us ») moved to lib/resultsCopy.ts, fetched with the results page; it was 31.2 KB measured after the move. 33 → 36: Simple/Full, the headline, the next steps and the three questions (~3 KB of French). 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
 ]
 // Chunks that are lazy AND deliberately un-precached (see ONLINE_ONLY_CHUNKS in vite.config.ts).
 const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
@@ -37,9 +37,9 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // state store. It is lazy, precached once, and never on the first screen (NOT_IN_DOOR below). The cap sits just above
 // today's size, so a dependency bump that grows it fails here; it comes DOWN after any win, never back up. (If the
 // library is ever swapped, that is a one-folder change: components/charts/, chartBoundary.test.ts.)
-// 347 → 369 KB raw (108 KB gzip) on 2026-10-07: the stacked bar chart of « Mes années 60 à 70 » brings the library's
+// 347 → 369 KB raw (108 KB gzip) on 2026-10-06: the stacked bar chart of « Mes années 60 à 70 » brings the library's
 // bar and composed-chart parts into the same lazy chunk.
-const LAZY_CAPS = [{ re: /^charts-[^.]*\.js$/, cap: 375 * KB }]
+const LAZY_CAPS = [{ re: /^charts-[^.]*\.js$/, cap: 372 * KB }]
 
 // The door.
 const CLOSURE_CHUNK_CAP = 6

@@ -93,3 +93,21 @@ export const SEGMENT_COLOUR = { work: 'ink', db: 'sky', rrq: 'sage', oas: 'berry
 export function barRows(rows: readonly BridgeYear[]): ({ x: number; need: number } & Record<SegmentId, number>)[] {
   return rows.map((r) => ({ x: r.age, need: r.spending + r.tax, work: r.employment, db: r.db, rrq: r.rrq, oas: r.oas + r.gis, nest: r.drawn }))
 }
+
+/**
+ * What the view says about itself, from the answer that is ON SCREEN. While a new answer is being worked out the old one
+ * stays visible (a tap must not blank the page), so the sentence, the pressed strategy and the markers must be read from
+ * the levers that answer was computed FOR (`view.selected.levers`), never from the controls, which already hold the new ones.
+ */
+export function shownPlan(
+  view: { selected: { levers: BridgeLevers; rows: readonly BridgeYear[]; summary: BridgeSummary }; strategies: readonly { key: StrategyKey; summary: BridgeSummary }[] } | null,
+  levers: BridgeLevers,
+  household: Household,
+  horizonAge: number,
+): { shown: BridgeLevers; pressed: StrategyKey[]; endAge: number; verdict: Verdict | null } {
+  const shown = view ? view.selected.levers : levers
+  const standard = view?.strategies.find((s) => s.key === 'standard')
+  // The plan's last year as the age of the person looked at: the age the table, the matrix and « tient jusqu'à » all use.
+  const endAge = view?.selected.rows[view.selected.rows.length - 1]?.age ?? horizonAge
+  return { shown, pressed: strategiesOf(shown, household), endAge, verdict: view && standard ? verdictOf(shown, view.selected.summary, standard.summary, endAge) : null }
+}

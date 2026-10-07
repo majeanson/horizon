@@ -99,7 +99,7 @@ export function Hypotheses() {
         </Section>
       )}
 
-      <Advanced>
+      <Advanced what={t.mode.what.economy}>
       <Section title={a.economy.title} icon="chart-line-up-bold">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}

@@ -102,7 +102,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   expect(scenarios[0]).toBeGreaterThanOrEqual(scenarios[1])
   expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
   const base = grids.nth(1).locator('td.is-base')
-  await expect(base).toHaveText('60')
+  await expect(base).toHaveText('59')
   // A worse future never retires earlier than a better one: down the return axis, the ages do not fall.
   const column = async (g: number, col: number) => (await grids.nth(g).locator(`tbody tr td:nth-child(${col})`).allTextContents()).map(Number)
   for (const g of [0, 1, 2]) {

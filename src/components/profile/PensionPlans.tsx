@@ -6,7 +6,7 @@ import { formatDecimal, formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
-import { useMode } from '../../lib/mode'
+import { setMode, useMode } from '../../lib/mode'
 import { useNotice } from '../../lib/toast'
 import { today } from '../../lib/today'
 import { Advanced } from '../Advanced'
@@ -166,8 +166,8 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 <Icon name="trash-bold" size={18} />
               </button>
             </header>
+            {/* A correctness warning, so it is NOT folded in Simple mode: the figure changes if it is ignored. */}
             {needsDeferredRule(person.retirementAge, pension) && (
-              <Advanced>
               <div className="plan-card__notice">
                 <p className="field-row__hint">{p.deferredNotice(person.retirementAge)}</p>
                 <Chip
@@ -181,7 +181,6 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                   {p.deferredApply}
                 </Chip>
               </div>
-              </Advanced>
             )}
             <FieldRow label={p.label}>
               {(w) => <EditField as="div" value={pension.label} onChange={(label) => set((x) => ({ ...x, label }))} submitIcon={null} maxLength={60} id={w.id} ariaLabel={p.label} />}
@@ -240,7 +239,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 </FieldRow>
               </>
             )}
-            <Advanced>
+            <Advanced what={t.mode.what.rules}>
               <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
                 <Rules pension={pension} set={set} />
               </Disclosure>
@@ -255,10 +254,14 @@ export function PensionPlans({ person, edit }: PersonEditor) {
         <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(blankPension())}>
           {p.addOther}
         </button>
-        {full && (
+        {full ? (
           <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(inPayPension())}>
             {p.addInPay}
           </button>
+        ) : (
+          <span className="field-row__hint">
+            {p.inPayPointer} <Chip onClick={() => setMode('full')}>{t.mode.details}</Chip>
+          </span>
         )}
       </Cluster>
     </Section>

@@ -856,9 +856,35 @@
   gap: var(--space-3, 0.75rem);
   min-width: 0;
 }
-.bridge--busy {
-  opacity: 0.6;
-  transition: opacity 0.15s;
+/* The old answer stays at FULL contrast while a new one is worked out (a dimmed panel failed contrast checks mid-transition);
+   the cue is a line of text with a thin moving bar — static when the reader asked for no motion. */
+.bridge__updating {
+  position: relative;
+  margin: 0.25rem 0 0.5rem;
+  padding-bottom: 0.4rem;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+.bridge__updating::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 30%;
+  height: 2px;
+  background: var(--accent);
+  animation: bridge-updating 1.1s ease-in-out infinite alternate;
+}
+@keyframes bridge-updating {
+  to {
+    transform: translateX(233%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bridge__updating::after {
+    animation: none;
+    width: 100%;
+  }
 }
 .bridge__levers {
   display: grid;

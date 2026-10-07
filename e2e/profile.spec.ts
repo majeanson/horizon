@@ -207,7 +207,7 @@ test.describe('the example household', () => {
   test('the results page gives a verdict, four comparisons at most, and the year-by-year table', async ({ page }) => {
     const problems = watchConsole(page)
     await page.goto('/resultats')
-    await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
+    await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
     // The verdict says what it is, on the card itself: an estimate under assumptions, not advice.
     await expect(page.locator('.verdict').getByText('Selon ces hypothèses — une estimation, pas un conseil financier.')).toBeVisible()
     // It opens on the household's OWN plan beside 65 — not on a pair the profile never mentioned.
@@ -244,7 +244,7 @@ test.describe('the example household', () => {
     await page.getByRole('tab', { name: 'Conjoint·e' }).click()
     await expect(box(page, 'Revenu de travail annuel actuel')).toHaveValue(/65\D000/)
     await page.goto('/hypotheses')
-    await expect(box(page, 'Inflation annuelle')).toHaveValue('2')
+    await expect(box(page, 'Inflation annuelle')).toHaveValue('2,1')
   })
 
   test('the assumptions page edits the profile, and the order of withdrawals moves', async ({ page }) => {
@@ -282,7 +282,7 @@ test.describe('data stays on this device', () => {
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText('sera remplacé par celui du fichier')
     await dialog.getByRole('button', { name: 'Importer' }).click()
-    await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.02)
+    await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.021)
   })
 
   test('a file that is not a profile is refused, field by field, and nothing changes', async ({ page }) => {

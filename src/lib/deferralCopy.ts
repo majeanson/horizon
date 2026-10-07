@@ -22,9 +22,15 @@ export interface DeferralCopy {
   colWorth95: string
   age: (age: number) => string
   yours: string
+  /** Flags a start age that is already behind the person: it can no longer be chosen. */
+  passed: string
   versusSame: string
   versusMore: (pct: string) => string
   versusLess: (pct: string) => string
+  /** Both figures of a row: the rule's own adjustment, and the change in the amount shown (today's dollars). */
+  versusBoth: (rule: string, actual: string) => string
+  /** One plain sentence under the table saying why the two can differ. */
+  versusNote: (rrqPerMonth: string, oasPerMonth: string) => string
   breakEvenLater: (age: number) => string
   breakEvenEarlier: (age: number) => string
   breakEvenNone: string
@@ -59,11 +65,14 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       colWorth95: 'Valeur nette à 95 ans',
       age: (age: number) => `${age} ans`,
       yours: 'votre plan actuel',
+      passed: 'déjà passé',
       versusSame: 'référence',
       versusMore: (pct: string) => `+${pct}`,
       versusLess: (pct: string) => `−${pct}`,
+      versusBoth: (rule: string, actual: string) => `${rule} selon le barème · ${actual} en dollars d’aujourd’hui`,
+      versusNote: (rrqPerMonth: string, oasPerMonth: string) => `Le barème ajoute ${rrqPerMonth} par mois de report à la rente du RRQ (${oasPerMonth} à la PSV). Le montant par mois, en dollars d’aujourd’hui, monte parfois davantage : la rente du RRQ est calculée sur des gains revalorisés selon les salaires, donc sur un indice plus élevé quand on commence plus tard.`,
       breakEvenLater: (age: number) => `à ${age} ans`,
-      breakEvenEarlier: (age: number) => `le départ à 65 ans rattrape à ${age} ans`,
+      breakEvenEarlier: (age: number) => `attendre 65 ans est rentabilisé à ${age} ans`,
       breakEvenNone: 'après l’horizon du plan',
       breakEvenSelf: '—',
       works: 'Tient',
@@ -72,7 +81,7 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       noWorth: '—',
       whyTitle: 'Pourquoi reporter peut avoir du sens',
       whyLead: (rrqMax: string, oasMax: string) =>
-        `Un revenu à vie plus élevé, indexé aux prix : jusqu’à ${rrqMax} pour la rente du RRQ (à 72 ans) et ${oasMax} pour la PSV (à 70 ans). C’est une assurance contre la longévité : si vous vivez longtemps, c’est elle qui vous empêche de manquer d’argent.`,
+        `Un revenu à vie plus élevé, indexé aux prix : jusqu’à ${rrqMax} de plus pour la rente du RRQ (à 72 ans) et ${oasMax} de plus pour la PSV (à 70 ans). C’est une assurance contre la longévité : si vous vivez longtemps, c’est elle qui vous empêche de manquer d’argent.`,
       why: [
         'Moins de retraits tard dans la vie, au moment où une mauvaise année de marché fait le plus mal.',
         'Les années de « pont » sont payées par vos REER, CELI et placements : le tableau montre si le plan tient encore, et jusqu’à quel âge on peut partir.',
@@ -103,11 +112,14 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       colWorth95: 'Net worth at 95',
       age: (age: number) => `${age}`,
       yours: 'your current plan',
+      passed: 'already behind you',
       versusSame: 'reference',
       versusMore: (pct: string) => `+${pct}`,
       versusLess: (pct: string) => `−${pct}`,
+      versusBoth: (rule: string, actual: string) => `${rule} by the rules · ${actual} in today’s dollars`,
+      versusNote: (rrqPerMonth: string, oasPerMonth: string) => `The rules add ${rrqPerMonth} for each month of deferral to the QPP pension (${oasPerMonth} to the OAS). The monthly amount, in today’s dollars, sometimes rises more: the QPP is calculated on earnings revalued by wages, so on a higher index when it starts later.`,
       breakEvenLater: (age: number) => `at ${age}`,
-      breakEvenEarlier: (age: number) => `starting at 65 catches up at ${age}`,
+      breakEvenEarlier: (age: number) => `waiting until 65 pays off at ${age}`,
       breakEvenNone: 'beyond the plan’s horizon',
       breakEvenSelf: '—',
       works: 'Holds',
@@ -130,4 +142,16 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       ],
       caveat: 'Amounts before tax, in today’s dollars, one pension changed at a time. A life as long as the plan’s horizon is assumed. The survivor’s pension is not modelled: it can count for or against deferring and is not included here.',
   },
+}
+
+/**
+ * What the « against 65 » cell of a row says. At 65, « reference ». Otherwise the rule's own adjustment (`versus65`, the
+ * cited +0.7 % / +0.6 % a month) AND the change in the monthly amount the row shows (`change`, today's dollars) — they differ
+ * for the QPP, where a later start is calculated on a higher wage index — so the percentage printed never contradicts the
+ * two amounts beside it.
+ */
+export function versusCell(d: DeferralCopy, o: { age: number; versus65: number; change: number }, pct: (fraction: number) => string): string {
+  if (o.age === 65) return d.versusSame
+  const signed = (x: number) => (x >= 0 ? d.versusMore(pct(x)) : d.versusLess(pct(-x)))
+  return Math.abs(o.change - o.versus65) < 0.0005 ? signed(o.versus65) : d.versusBoth(signed(o.versus65), signed(o.change))
 }

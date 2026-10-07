@@ -38,10 +38,15 @@ for (const mode of ['simple', 'full'] as const) {
     await open.click()
 
     // the verdict sentence and the five ways of starting
-    await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à 95 ans/)
-    for (const name of ['Mon plan', 'Tout dès que possible', 'Standard', 'Reporter au maximum', 'Pont jusqu’à 70 ans']) {
-      await expect(page.locator('.bridge-card').getByRole('button', { name, exact: true })).toBeVisible()
+    // (the age is the one of the person looked at — Camille, the older one — not the plan's horizon for the younger)
+    await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à \d\d ans/)
+    await expect(page.getByText('Les âges de cette page sont ceux de Camille')).toBeVisible()
+    // the golden couple's own plan IS the standard: one card says so instead of two identical ones
+    for (const name of ['Tout dès que possible', 'Standard (c’est aussi votre plan)', 'Reporter au maximum', 'Pont jusqu’à 70 ans']) {
+      await expect(page.locator('.bridge-card').getByRole('radio', { name, exact: true })).toBeVisible()
     }
+    await expect(page.locator('.bridge-card')).toHaveCount(4)
+    await expect(page.getByRole('radiogroup', { name: 'Cinq façons de commencer vos rentes' })).toBeVisible()
     // each year of the bridge, as text: ages 60 to 70, with the start of the pensions tagged
     const rows = page.locator('.bridge__table tbody tr')
     await expect(rows).toHaveCount(11)
@@ -62,12 +67,12 @@ for (const mode of ['simple', 'full'] as const) {
 test('choosing a way of starting is written in the address, pressed on the chip, and changes the verdict', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: OPEN }).click()
-  const card = (name: string) => page.locator('.bridge-card').getByRole('button', { name, exact: true })
+  const card = (name: string) => page.locator('.bridge-card').getByRole('radio', { name, exact: true })
   await card('Reporter au maximum').click()
   await expect(page).toHaveURL(/bq=72/)
   await expect(page).toHaveURL(/bo=70/)
-  await expect(card('Reporter au maximum')).toHaveAttribute('aria-pressed', 'true')
-  await expect(card('Standard')).toHaveAttribute('aria-pressed', 'false')
+  await expect(card('Reporter au maximum')).toHaveAttribute('aria-checked', 'true')
+  await expect(card('Standard (c’est aussi votre plan)')).toHaveAttribute('aria-checked', 'false')
   await expect(page.locator('.bridge__verdict')).toContainText('Vous pouvez reporter')
   // the levers say the same
   const rrq = page.getByRole('group', { name: /Début du RRQ/ })
@@ -99,8 +104,8 @@ test('a deferral digs into the nest first: the nest at 70 is lower than starting
   await page.goto('/resultats')
   await page.getByRole('button', { name: OPEN }).click()
   await expect(page.locator('.bridge__verdict')).toBeVisible()
-  const std = page.locator('.bridge-card', { has: page.getByRole('button', { name: 'Standard', exact: true }) })
-  const max = page.locator('.bridge-card', { has: page.getByRole('button', { name: 'Reporter au maximum', exact: true }) })
+  const std = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Standard (c’est aussi votre plan)', exact: true }) })
+  const max = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Reporter au maximum', exact: true }) })
   await expect(max.getByText(/de plus tirés du pécule entre 60 et 69 ans que le standard/)).toBeVisible()
   await expect(std.getByText('La référence des comparaisons')).toBeVisible()
   await expect(max.getByText(/rattrapent le standard à \d\d ans/)).toBeVisible()
@@ -146,7 +151,7 @@ test('the three sets of assumptions: fifteen answers, computed only when that li
   const matrix = page.getByRole('region', { name: 'Sous trois jeux d’hypothèses' })
   await expect(matrix.locator('tbody tr')).toHaveCount(5, { timeout: 30_000 })
   await expect(matrix.locator('tbody td')).toHaveCount(15)
-  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudentes', 'Neutres', 'Audacieuses'])
+  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent', 'Neutre', 'Audacieux'])
   // the neutral set holds for the golden couple; the prudent one does not, and says at what age
   await expect(matrix.locator('tbody tr').first().locator('td').nth(1)).toContainText('Tient')
   await expect(matrix.locator('tbody tr').first().locator('td').nth(0)).toContainText(/Manque à \d\d ans/)
@@ -157,7 +162,7 @@ test('English: the view speaks English and keeps the same choices', async ({ pag
   await page.goto('/resultats?bq=70&bo=70')
   await expect(page.locator('.bridge__verdict')).toContainText(/You can defer|Deferring uses up/)
   await expect(page.getByRole('group', { name: /QPP start/ }).getByRole('button', { name: '70', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.locator('.bridge__table thead')).toContainText('Nest at year end')
+  await expect(page.locator('.bridge__table thead')).toContainText('Nest egg at year end')
 })
 
 test('on a phone the view fits the screen: the table scrolls inside its own region, nothing runs off the page', async ({ page }) => {

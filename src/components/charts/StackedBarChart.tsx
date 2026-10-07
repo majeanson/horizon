@@ -38,7 +38,15 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data as unknown as Record<string, number>[]} margin={{ top: 8, right: 12, bottom: 4, left: 0 }} accessibilityLayer={false}>
             <CartesianGrid stroke="var(--hairline)" vertical={false} />
-            <XAxis dataKey="x" type="category" tickLine={false} axisLine={{ stroke: 'var(--line-strong)' }} tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} interval="preserveStartEnd" minTickGap={16} />
+            <XAxis
+              dataKey="x"
+              type="category"
+              tickLine={false}
+              axisLine={{ stroke: 'var(--line-strong)' }}
+              tick={{ fill: 'var(--ink-soft)', fontSize: 12 }}
+              interval="preserveStartEnd"
+              minTickGap={16}
+            />
             <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={(y: number) => yFormat(y)} />
             <Tooltip
               cursor={{ fill: 'var(--hairline)', opacity: 0.5 }}
@@ -59,7 +67,14 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
               }
             />
             {markers.map((m) => (
-              <ReferenceLine key={`${m.colour}-${m.x}-${m.label}`} x={m.x} stroke={COLOUR[m.colour]} strokeDasharray="4 4" strokeOpacity={0.8} label={m.named ? { value: m.label, position: "insideTopRight", fill: "var(--ink-soft)", fontSize: 11 } : undefined} />
+              <ReferenceLine
+                key={`${m.colour}-${m.x}-${m.label}`}
+                x={m.x}
+                stroke={COLOUR[m.colour]}
+                strokeDasharray="4 4"
+                strokeOpacity={0.8}
+                label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: 11 } : undefined}
+              />
             ))}
             {series.map((s) => (
               <Bar key={s.id} dataKey={s.id} stackId="year" fill={COLOUR[s.colour]} isAnimationActive={false} />

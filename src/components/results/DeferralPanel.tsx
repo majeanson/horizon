@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { PersonDeferral, StartOption } from '../../engine/deferral'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
-import { DEFERRAL_COPY } from '../../lib/deferralCopy'
+import { DEFERRAL_COPY, versusCell } from '../../lib/deferralCopy'
 import { formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { useDeferral } from '../../lib/useDeferral'
@@ -27,7 +27,7 @@ function OptionsTable({
   const { lang } = useLang()
   const d = DEFERRAL_COPY[lang]
   const money = (n: number | null) => (n === null ? d.noWorth : formatMoney(n, lang))
-  const versus = (o: StartOption) => (o.age === 65 ? d.versusSame : o.versus65 >= 0 ? d.versusMore(formatPct(o.versus65, lang, 1)) : d.versusLess(formatPct(-o.versus65, lang, 1)))
+  const versus = (o: StartOption) => versusCell(d, o, (x) => formatPct(x, lang, 1))
   const breakEven = (o: StartOption) =>
     o.age === 65 ? d.breakEvenSelf : o.breakEven === null ? d.breakEvenNone : o.age < 65 ? d.breakEvenEarlier(o.breakEven) : d.breakEvenLater(o.breakEven)
   return (
@@ -52,6 +52,7 @@ function OptionsTable({
               <th scope="row">
                 {d.age(o.age)}
                 {o.age === current && <span className="mono deferral__yours"> · {d.yours}</span>}
+                {o.passed && <span className="mono deferral__yours"> · {d.passed}</span>}
               </th>
               <td>{money(o.monthly)}</td>
               <td>{versus(o)}</td>
@@ -104,6 +105,7 @@ export function DeferralPanel({ household, assumptions, names }: { household: Ho
               <li key={line}>{line}</li>
             ))}
           </ul>
+          <p className="field-row__hint">{d.versusNote(formatPct(view.facts.rrqPerMonth, lang, 1), formatPct(view.facts.oasPerMonth, lang, 1))}</p>
           <p className="field-row__hint">{d.caveat}</p>
         </>
       )}

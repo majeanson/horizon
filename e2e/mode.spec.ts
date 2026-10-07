@@ -5,7 +5,7 @@ import { EXAMPLE, seedProfile } from './seed'
 // A device with nothing stored starts Simple; one that already holds a profile starts Full; Simple folds the optional and
 // expert groups behind « Voir les détails » and loses nothing.
 
-const modeChip = (page: import('@playwright/test').Page) => page.getByRole('button', { name: 'Complet', exact: true })
+const modeChip = (page: import('@playwright/test').Page) => page.getByRole('button', { name: 'Affichage complet', exact: true })
 const useSimple = (page: import('@playwright/test').Page) => page.addInitScript(() => {
     // Only on the first load of the tab: a reload must keep what the switch chose.
     if (!sessionStorage.getItem('mode-seeded')) {
@@ -81,8 +81,9 @@ test('Simple assumptions show the scenarios and what they assume, not the indivi
 test('the results lead with a plain sentence, and every page ends with its one next step', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
-  await expect(page.getByText('À 59 ans, l’argent viendrait à manquer dès')).toBeVisible()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
+  await expect(page.getByText('À 58 ans, l’argent viendrait à manquer dès')).toBeVisible()
+  await expect(page.getByText('Selon le scénario Neutre.')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Garder une copie de mon profil' })).toBeVisible()
 
   await page.goto('/')

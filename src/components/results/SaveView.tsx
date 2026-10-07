@@ -1,5 +1,6 @@
 import type { Assumptions, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
+import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { formatMoney } from '../../lib/money'
 import { useSavingsNeeded } from '../../lib/useSavingsNeeded'
 import { FieldRow } from '../FieldRow'
@@ -26,7 +27,7 @@ export function SaveView({
 }) {
   const t = useT()
   const { lang } = useLang()
-  const q = t.results.questions.save
+  const q = RESULTS_COPY[lang].questions.save
   const answer = useSavingsNeeded(household, assumptions, age, true)
   const saving = household.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
   return (

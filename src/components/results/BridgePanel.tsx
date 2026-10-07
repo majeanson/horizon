@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import type { BridgeLevers, BridgeView, StrategyCard, StrategyKey } from '../../engine/bridge'
 import { leversFor, profileLevers, STRATEGY_KEYS } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
 import {
   OAS_AGES,
@@ -14,12 +14,13 @@ import {
   barRows,
   bridgeQuery,
   parseBridgeParams,
-  strategiesOf,
+  shownPlan,
   verdictOf,
   windowRows,
   type BridgeParams,
   type BridgeWindow,
 } from '../../lib/bridgeModel'
+import { formatPct } from '../../lib/format'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
 import { Chip } from '../Chip'
@@ -58,14 +59,17 @@ function StrategyCards({
 }) {
   const { lang } = useLang()
   const standard = view.strategies.find((s) => s.key === 'standard')!
+  // When the person's own start ages ARE the standard, one card says so instead of two identical ones (and « Mon plan » is never compared with itself).
+  const mine = view.strategies.find((s) => s.key === 'mine')!
+  const mineIsStandard = mine.levers.rrqStartAge === standard.levers.rrqStartAge && mine.levers.oasStartAge === standard.levers.oasStartAge
   const money = (n: number | null) => (n === null ? copy.noWorth : formatMoney(n, lang))
   const card = (s: StrategyCard) => {
     const v = verdictOf(s.levers, s.summary, standard.summary, horizonAge)
     const extra = s.extraDrawn6070
     return (
       <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short')}>
-        <Chip selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
-          {copy.strategyName[s.key]}
+        <Chip radio selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
+          {s.key === 'standard' && mineIsStandard ? copy.standardIsMine : copy.strategyName[s.key]}
         </Chip>
         <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>
         <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v)}</p>
@@ -89,12 +93,16 @@ function StrategyCards({
         </dl>
         <p className="field-row__hint">
           {s.key === 'standard' ? copy.breakEvenSelf : extra > 50 ? copy.extraDrawn(formatMoney(extra, lang)) : extra < -50 ? copy.lessDrawn(formatMoney(-extra, lang)) : copy.sameDrawn}
-          {s.key !== 'standard' && ' · ' + (s.breakEven === null ? copy.breakEvenNone : s.levers.rrqStartAge + s.levers.oasStartAge > 130 ? copy.breakEvenLater(s.breakEven) : copy.breakEvenEarlier(s.breakEven))}
+          {s.key !== 'standard' && ' · ' + (s.breakEven === null || s.breakEvenKind === null ? copy.breakEvenNone : s.breakEvenKind === 'later' ? copy.breakEvenLater(s.breakEven) : copy.breakEvenEarlier(s.breakEven))}
         </p>
       </li>
     )
   }
-  return <ul className="bridge-cards">{view.strategies.map(card)}</ul>
+  return (
+    <div role="radiogroup" aria-label={copy.strategyTitle}>
+      <ul className="bridge-cards">{view.strategies.filter((s) => !(s.key === 'mine' && mineIsStandard)).map(card)}</ul>
+    </div>
+  )
 }
 
 function BridgeCharts({ view, span, household, params, copy }: { view: BridgeView; span: BridgeWindow; household: Household; params: BridgeParams; copy: BridgeCopy }) {
@@ -234,19 +242,25 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
   )
 }
 
-function MatrixSection({ household, assumptions, levers, copy }: { household: Household; assumptions: Assumptions; levers: BridgeLevers; copy: BridgeCopy }) {
+function MatrixSection({ household, assumptions, levers, copy, ownerName }: { household: Household; assumptions: Assumptions; levers: BridgeLevers; copy: BridgeCopy; ownerName: string }) {
+  const t = useT()
   const { value, busy } = useBridgeMatrix(household, assumptions, levers)
   if (value === null) return <Skeleton count={3} />
   return (
     <div className="table-wrap" role="region" aria-label={copy.matrixTitle} tabIndex={0} aria-busy={busy}>
-      <p className="field-row__hint">{copy.matrixHint}</p>
+      <p className="field-row__hint">{copy.matrixHint(ownerName)}</p>
+      {busy && (
+        <p className="bridge__updating" role="status">
+          {copy.updating}
+        </p>
+      )}
       <table>
         <thead>
           <tr>
             <th scope="col">{copy.strategyCol}</th>
             {(['prudent', 'neutral', 'bold'] as const).map((k) => (
               <th key={k} scope="col">
-                {copy.presetName[k]}
+                {t.assumptions.presets[k]}
               </th>
             ))}
           </tr>
@@ -279,6 +293,7 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const state = useMemo(() => parseBridgeParams(params, household), [params, household])
   const { levers } = state
   const { value: view, busy } = useBridge(household, assumptions, levers)
+  const ownerName = names[Math.max(0, household.persons.findIndex((p) => p.id === levers.id))] ?? ''
 
   // Every change is built from the address bar as it is NOW (like the comparison chips): two quick taps must compose.
   const write = (next: BridgeParams, resetLevers = false) => {
@@ -302,15 +317,21 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
     change({ rrqStartAge: l.rrqStartAge, oasStartAge: l.oasStartAge })
   }
 
-  const pressed = strategiesOf(levers, household)
+  // Everything below the controls describes the levers the data was computed FOR (lib/bridgeModel.ts, shownPlan).
+  const { shown, pressed, endAge, verdict } = shownPlan(view, levers, household, assumptions.horizonAge)
   const standard = view?.strategies.find((s) => s.key === 'standard')
-  const verdict = view && standard ? verdictOf(levers, view.selected.summary, standard.summary, assumptions.horizonAge) : null
   const windowShown: BridgeWindow = view && windowRows(view.selected.rows, state.window).length === 0 ? 'plan' : state.window
   const money = (n: number) => formatMoney(n, lang)
 
   return (
-    <div className={'bridge' + (busy ? ' bridge--busy' : '')} aria-busy={busy}>
+    <div className="bridge" aria-busy={busy}>
       <p className="field-row__hint">{copy.hint}</p>
+      {busy && view !== null && (
+        <p className="bridge__updating" role="status">
+          {copy.updating}
+        </p>
+      )}
+      {household.persons.length > 1 && <p className="field-row__hint">{copy.ownerLine(ownerName)}</p>}
       {household.persons.length > 1 && (
         <SubTabs ariaLabel={copy.person} value={levers.id} onSelect={pickPerson} options={household.persons.map((p, i) => ({ key: p.id, label: names[i] ?? '' }))} />
       )}
@@ -352,13 +373,14 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
         <Skeleton count={4} />
       ) : (
         <>
-          <p className={'bridge__verdict' + (view.selected.summary.ok ? '' : ' bridge__verdict--short')} aria-live="polite">
+          <p className={'bridge__verdict' + (view.selected.summary.ok ? '' : ' bridge__verdict--short')} aria-live={busy ? 'off' : 'polite'}>
             {copy.verdict(verdict)}
           </p>
 
           <h3 className="deferral__title">{copy.strategyTitle}</h3>
           {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
-          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={assumptions.horizonAge} />
+          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} />
+          <p className="field-row__hint">{copy.todayNote}</p>
 
           <div className="bridge__window">
             <SubTabs
@@ -373,21 +395,21 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             />
           </div>
 
-          <BridgeCharts view={view} span={windowShown} household={household} params={{ levers, window: windowShown }} copy={copy} />
-          <YearTable view={view} span={windowShown} levers={levers} copy={copy} />
+          <BridgeCharts view={view} span={windowShown} household={household} params={{ levers: shown, window: windowShown }} copy={copy} />
+          <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
           <p className="field-row__hint">{copy.householdNote}</p>
 
           <h3 className="deferral__title">{copy.whyTitle}</h3>
           <ul className="deferral__list">
             <li>{standard && view.selected.summary.drawn6070 - standard.summary.drawn6070 > 50 ? copy.whyCost(money(view.selected.summary.drawn6070 - standard.summary.drawn6070)) : copy.whyCostNone}</li>
             <li>{copy.whyGis(money(view.selected.summary.gisTotal), money(view.selected.summary.oasRecoveryTotal))}</li>
-            {copy.why.map((line) => (
+            {copy.why({ rrqPerMonth: formatPct(view.facts.rrqPerMonth, lang, 1), rrqMax: formatPct(view.facts.rrqLateMax, lang, 1), oasPerMonth: formatPct(view.facts.oasPerMonth, lang, 1), oasMax: formatPct(view.facts.oasLateMax, lang, 0) }).map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>
 
           <Disclosure label={copy.matrixTitle}>
-            <MatrixSection household={household} assumptions={assumptions} levers={levers} copy={copy} />
+            <MatrixSection household={household} assumptions={assumptions} levers={levers} copy={copy} ownerName={ownerName} />
           </Disclosure>
 
           <h3 className="deferral__title">{copy.caveatTitle}</h3>

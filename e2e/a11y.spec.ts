@@ -42,8 +42,12 @@ async function setState(page: Page, s: State): Promise<void> {
 }
 
 async function violations(page: Page): Promise<string[]> {
-  // Colours mid-transition are neither the day nor the night palette: let every running animation / transition finish before
-  // axe reads a pair (a one-off contrast failure on the results page, night + Simple, did not reproduce in 50 reruns).
+  // WHY this waits (the one-off contrast failure on the results page, night + Simple, that never reproduced in 50 reruns): the
+  // test opens every disclosure, which starts the bridge / deferral workers, and the bridge panel used to be DIMMED (opacity .6) while
+  // a result was on its way — text at 60 % opacity fails 4.5:1 whenever axe happened to read it before the worker answered. That dimming
+  // is gone (a status line replaces it, at full contrast); the two waits below keep the read deterministic: no panel still busy, and
+  // no colour mid-transition (neither the day nor the night palette).
+  await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 30_000 })
   await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze()
   return results.violations.map(
