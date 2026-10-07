@@ -1,29 +1,48 @@
 import { useMemo, useState } from 'react'
 import { agesLedger, planGlance } from '../../engine/ledger'
-import type { Assumptions, Household, PersonId } from '../../engine/types'
+import type { AccountKind, Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { formatPct } from '../../lib/format'
 import { LEDGER_COPY } from '../../lib/ledgerCopy'
 import { formatMoney } from '../../lib/money'
-import { mapPerson } from '../../lib/profileEdit'
+import { mapPerson, setAssumptions, setReturn, setSpending } from '../../lib/profileEdit'
 import { MAX_AGE, MIN_AGE } from '../../lib/resultsModel'
 import { updateProfile } from '../../lib/store'
 import { Slider } from '../Slider'
 
-// « Mes données et leur calcul »: the three ages a person sets — when the pay stops, when the QPP starts, when the OAS
-// starts — each with the calculation it triggers and the amount it becomes, and what the plan does as the slider moves.
-// An age is saved in the profile when the slider is released (the same place Profil edits), and the verdict above, which
-// reads the profile, follows. While the thumb moves, the panel previews from ONE projection on a copy of the household.
+// « Mes données et leur calcul »: every number that sets the answer, as a slider, with the calculation it triggers and the
+// amount it becomes — and what the plan does as the slider moves. The ages (when the pay stops, when the QPP starts, when
+// the OAS starts), then the spending and the economy (inflation, returns). A value is saved in the profile when the slider
+// is released (the same place Profil edits), and the verdict above, which reads the profile, follows. While the thumb moves,
+// the panel previews from ONE projection on a copy of the household.
 
-type Field = 'retirement' | 'rrq' | 'oas'
-type Preview = Partial<Record<`${PersonId}:${Field}`, number>>
+type AgeField = 'retirement' | 'rrq' | 'oas'
+type SpendKey = 'spend:workingToday' | 'spend:retiredToday'
+type Key = `${PersonId}:${AgeField}` | SpendKey | 'inflation' | `return:${AccountKind}`
+type Preview = Partial<Record<Key, number>>
 
 const RANGES = { retirement: { min: MIN_AGE, max: MAX_AGE }, rrq: { min: 60, max: 72 }, oas: { min: 65, max: 70 } } as const
+const KINDS: readonly AccountKind[] = ['rrsp', 'tfsa', 'nonReg']
 
-const withAge = (h: Household, id: PersonId, field: Field, age: number): Household => ({
-  ...h,
-  persons: h.persons.map((p) => (p.id !== id ? p : field === 'retirement' ? { ...p, retirementAge: age } : field === 'rrq' ? { ...p, rrq: { ...p.rrq, startAge: age } } : { ...p, oas: { ...p.oas, startAge: age } })),
-})
+const isSpend = (key: Key): key is SpendKey => key === 'spend:workingToday' || key === 'spend:retiredToday'
+const spendField = (key: SpendKey) => (key === 'spend:workingToday' ? 'workingToday' : 'retiredToday')
+
+/** The household and assumptions as they would be with one slider at `value` (ages in years, money in dollars, rates in per-mille). */
+function applied(h: Household, a: Assumptions, key: Key, value: number): [Household, Assumptions] {
+  if (isSpend(key)) return [{ ...h, spending: { ...h.spending, [spendField(key)]: value } }, a]
+  if (key === 'inflation') return [h, { ...a, inflation: value / 1000 }]
+  if (key.startsWith('return:')) return [h, { ...a, returns: { ...a.returns, [key.slice(7)]: value / 1000 } }]
+  const [id, field] = key.split(':') as [PersonId, AgeField]
+  return [{ ...h, persons: h.persons.map((p) => (p.id !== id ? p : field === 'retirement' ? { ...p, retirementAge: value } : field === 'rrq' ? { ...p, rrq: { ...p.rrq, startAge: value } } : { ...p, oas: { ...p.oas, startAge: value } })) }, a]
+}
+
+function save(key: Key, value: number): void {
+  if (isSpend(key)) return updateProfile((p) => setSpending(p, { [spendField(key)]: value }))
+  if (key === 'inflation') return updateProfile((p) => setAssumptions(p, { inflation: value / 1000 }))
+  if (key.startsWith('return:')) return updateProfile((p) => setReturn(p, key.slice(7) as AccountKind, value / 1000))
+  const [id, field] = key.split(':') as [PersonId, AgeField]
+  updateProfile((p) => mapPerson(p, id, (x) => (field === 'retirement' ? { ...x, retirementAge: value } : field === 'rrq' ? { ...x, rrq: { ...x.rrq, startAge: value } } : { ...x, oas: { ...x.oas, startAge: value } })))
+}
 
 const monthYear = (ym: { year: number; month: number }) => `${String(ym.month).padStart(2, '0')}/${ym.year}`
 
@@ -33,27 +52,25 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   const [preview, setPreview] = useState<Preview>({})
 
   // What the page would be if the sliders were where they are being held.
-  const shown = useMemo(() => {
+  const [shown, shownA] = useMemo(() => {
     let h = household
-    for (const [key, age] of Object.entries(preview)) {
-      const [id, field] = key.split(':') as [PersonId, Field]
-      h = withAge(h, id, field, age)
-    }
-    return h
-  }, [household, preview])
+    let a = assumptions
+    for (const [key, value] of Object.entries(preview)) [h, a] = applied(h, a, key as Key, value)
+    return [h, a] as const
+  }, [household, assumptions, preview])
 
-  const ledger = useMemo(() => agesLedger(shown, assumptions), [shown, assumptions])
-  const glance = useMemo(() => planGlance(shown, assumptions), [shown, assumptions])
+  const ledger = useMemo(() => agesLedger(shown, shownA), [shown, shownA])
+  const glance = useMemo(() => planGlance(shown, shownA), [shown, shownA])
   // The figures when the panel opened: « what did this change » is read against them.
   const [opened] = useState(() => ({ ledger: agesLedger(household, assumptions), glance: planGlance(household, assumptions) }))
 
   const money = (n: number, cents = false) => formatMoney(n, lang, { cents })
-  const change = (id: PersonId, field: Field, age: number) => {
+  const commit = (key: Key, value: number) => {
     setPreview((p) => {
-      const { [`${id}:${field}` as const]: _gone, ...rest } = p
+      const { [key]: _gone, ...rest } = p
       return rest
     })
-    updateProfile((p) => mapPerson(p, id, (x) => (field === 'retirement' ? { ...x, retirementAge: age } : field === 'rrq' ? { ...x, rrq: { ...x.rrq, startAge: age } } : { ...x, oas: { ...x.oas, startAge: age } })))
+    save(key, value)
   }
   const delta = (now: number, was: number, more: (a: string) => string, less: (a: string) => string) => {
     const d = Math.round(now - was)
@@ -61,57 +78,84 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   }
   const worthDelta = delta(glance.netWorthEnd, opened.glance.netWorthEnd, c.glanceMore, c.glanceLess)
 
+  const slider = (key: Key, label: string, value: number, min: number, max: number, step: number, text: (v: number) => string) => (
+    <Slider
+      label={label}
+      value={value}
+      min={Math.min(min, value)}
+      max={Math.max(max, value)}
+      step={step}
+      valueText={text}
+      onPreview={(v) => setPreview((p) => ({ ...p, [key]: v }))}
+      onCommit={(v) => commit(key, v)}
+    />
+  )
+  const ageSlider = (id: PersonId, field: AgeField, label: string, value: number) => slider(`${id}:${field}`, label, value, RANGES[field].min, RANGES[field].max, 1, (v) => c.age(String(v)))
+  const pct = (perMille: number) => formatPct(perMille / 1000, lang, 1)
+  const spend = (key: SpendKey, label: string) => {
+    const now = shown.spending[spendField(key)]
+    return (
+      <div className="ledger__row">
+        {slider(key, label, household.spending[spendField(key)], 10_000, 250_000, 500, (v) => money(v))}
+        <p className="ledger__calc">{c.spendCalc(money(now), money(now / 12))}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="ledger">
       <p className="field-row__hint">{c.hint}</p>
       {ledger.map((l, i) => {
         const was = opened.ledger.find((x) => x.id === l.id)!
         const name = names[i] ?? ''
-        const slider = (field: Field, label: string, value: number) => (
-          <Slider
-            label={label}
-            value={value}
-            min={Math.min(RANGES[field].min, value)}
-            max={Math.max(RANGES[field].max, value)}
-            valueText={(v) => c.age(String(v))}
-            onPreview={(v) => setPreview((p) => ({ ...p, [`${l.id}:${field}`]: v }))}
-            onCommit={(v) => change(l.id, field, v)}
-          />
-        )
         const p = household.persons[i]
         return (
           <section key={l.id} className="ledger__person" aria-label={c.person(name)}>
             {household.persons.length > 1 && <h3 className="year-table__title">{c.person(name)}</h3>}
             <div className="ledger__row">
-              {slider('retirement', c.retireLabel, p.retirementAge)}
+              {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge)}
               <p className="ledger__calc">{c.retireCalc(monthYear(l.retirement.leaving))}</p>
             </div>
             <div className="ledger__row">
-              {slider('rrq', c.rrqLabel, p.rrq.startAge)}
-              <p className="ledger__calc">{c.rrqCalc(monthYear(l.rrq.start), money(l.rrq.base, true), money(l.rrq.additionalFirst, true), money(l.rrq.additionalSecond, true), formatPct(l.rrq.adjustment, lang, 1), money(l.rrq.monthly, true))}</p>
+              {ageSlider(l.id, 'rrq', c.rrqLabel, p.rrq.startAge)}
               <p className="ledger__result">
-                {c.rrqResult(money(l.rrq.monthlyToday))}{' '}
-                <span className="ledger__delta">{delta(l.rrq.monthlyToday, was.rrq.monthlyToday, c.moreMonth, c.lessMonth)}</span>
+                {c.rrqResult(money(l.rrq.monthlyToday))} <span className="ledger__delta">{delta(l.rrq.monthlyToday, was.rrq.monthlyToday, c.moreMonth, c.lessMonth)}</span>
               </p>
+              <p className="ledger__calc">{c.rrqCalc(monthYear(l.rrq.start), money(l.rrq.base, true), money(l.rrq.additionalFirst, true), money(l.rrq.additionalSecond, true), formatPct(l.rrq.adjustment, lang, 1), money(l.rrq.monthly, true))}</p>
             </div>
             <div className="ledger__row">
-              {slider('oas', c.oasLabel, p.oas.startAge)}
+              {ageSlider(l.id, 'oas', c.oasLabel, p.oas.startAge)}
+              <p className="ledger__result">
+                {c.oasResult(money(l.oas.monthlyToday))} <span className="ledger__delta">{delta(l.oas.monthlyToday, was.oas.monthlyToday, c.moreMonth, c.lessMonth)}</span>
+              </p>
               <p className="ledger__calc">
                 {l.oas.monthly > 0 ? c.oasCalc(monthYear(l.oas.start), money(l.oas.full, true), formatPct(l.oas.residence, lang, 0), formatPct(l.oas.multiplier - 1, lang, 1), money(l.oas.monthly, true)) : c.oasNone(monthYear(l.oas.start))}
-              </p>
-              <p className="ledger__result">
-                {c.oasResult(money(l.oas.monthlyToday))}{' '}
-                <span className="ledger__delta">{delta(l.oas.monthlyToday, was.oas.monthlyToday, c.moreMonth, c.lessMonth)}</span>
               </p>
             </div>
           </section>
         )
       })}
+
+      <section className="ledger__person" aria-label={c.moneyTitle}>
+        <h3 className="year-table__title">{c.moneyTitle}</h3>
+        {spend('spend:workingToday', c.spendWorkLabel)}
+        {spend('spend:retiredToday', c.spendRetLabel)}
+        <div className="ledger__row">
+          {slider('inflation', c.inflationLabel, Math.round(assumptions.inflation * 1000), 0, 60, 1, pct)}
+          <p className="ledger__calc">{c.inflationCalc(pct(Math.round(shownA.inflation * 1000)), money(1000 * (1 + shownA.inflation) ** 10))}</p>
+        </div>
+        {KINDS.map((kind) => (
+          <div key={kind} className="ledger__row">
+            {slider(`return:${kind}`, c.returnLabel[kind], Math.round(assumptions.returns[kind] * 1000), 0, 120, 1, pct)}
+            <p className="ledger__calc">{c.returnCalc(pct(Math.round(shownA.returns[kind] * 1000)), formatPct((1 + shownA.returns[kind]) / (1 + shownA.inflation) - 1, lang, 1))}</p>
+          </div>
+        ))}
+      </section>
+
       <p className={'ledger__glance' + (glance.ok ? '' : ' scenario__verdict--short')} aria-live="polite">
         {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(String(glance.firstShortfallYear))} {worthDelta}
       </p>
       <p className="field-row__hint">{c.glanceNote}</p>
-      <p className="field-row__hint">{c.edits}</p>
     </div>
   )
 }

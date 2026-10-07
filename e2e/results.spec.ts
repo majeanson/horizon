@@ -69,6 +69,7 @@ test('the measure and the dollars are chosen in the address, and the chart follo
 
 test('another comparison adds a line and keeps the other choices', async ({ page }) => {
   await page.goto('/resultats?dollars=nominal')
+  await page.getByRole('button', { name: 'Comparer des âges de départ' }).click()
   await page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans' }).click()
   await expect(page.locator('.chart__legend-item')).toHaveText(['Mon plan', '65 ans', '62 ans'])
   await expect(page.locator('path.recharts-line-curve')).toHaveCount(3)
@@ -184,6 +185,7 @@ test('a couple gets each person\'s own earliest age, worked out off the page\'s 
 test('« when should I start my pension » compares the start ages, flags the plan\'s own row and switches person', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
+  await page.getByRole('button', { name: /Mes années 60 à 70/ }).click()
   await page.getByRole('button', { name: 'Quand commencer ma rente ?' }).click()
   const rrq = page.getByRole('region', { name: /Régime de rentes du Québec \(RRQ\)/ })
   const oas = page.getByRole('region', { name: /Sécurité de la vieillesse \(PSV\)/ })
@@ -199,7 +201,8 @@ test('« when should I start my pension » compares the start ages, flags the pl
   await expect(rrq.getByRole('row', { name: /^65 ans/ })).toContainText('votre plan actuel')
   // The second person has their own comparison.
   const before = await rrq.locator('tbody tr').first().innerText()
-  await page.getByRole('tab', { name: 'Alex' }).click()
+  await page.getByRole('tablist', { name: 'Pour' }).getByRole('tab', { name: 'Alex' }).click()
+  await expect(page.getByRole('heading', { name: 'Pour Alex' })).toBeVisible()
   await expect(rrq.locator('tbody tr').first()).not.toHaveText(before)
   // It says what it leaves out.
   await expect(page.getByText(/rente de conjoint survivant n’est pas modélisée/)).toBeVisible()

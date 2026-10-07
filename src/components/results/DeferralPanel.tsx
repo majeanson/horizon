@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { PersonDeferral, StartOption } from '../../engine/deferral'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
@@ -7,7 +6,6 @@ import { formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { useDeferral } from '../../lib/useDeferral'
 import { Skeleton } from '../Skeleton'
-import { SubTabs } from '../SubTabs'
 
 // « Quand commencer ma rente ? » — for each person, what starting the QPP pension (60 · 65 · 70 · 72) and the OAS (65 · 70)
 // at each age does: the monthly amount, how it compares with 65, when the choice has paid for itself, and what it does
@@ -69,22 +67,19 @@ function OptionsTable({
   )
 }
 
-export function DeferralPanel({ household, assumptions, names }: { household: Household; assumptions: Assumptions; names: readonly string[] }) {
+/** `who` is the person the strategy view above is looking at: one selector for both, so the page never asks « for whom? » twice. */
+export function DeferralPanel({ household, assumptions, who, name }: { household: Household; assumptions: Assumptions; who: PersonId; name: string }) {
   const { lang } = useLang()
   const d = DEFERRAL_COPY[lang]
   const view = useDeferral(household, assumptions)
-  const [who, setWho] = useState<PersonId>(household.persons[0].id)
   const person: PersonDeferral | undefined = view?.persons.find((p) => p.id === who) ?? view?.persons[0]
   return (
     <div className="deferral" aria-busy={view === null}>
       <p className="field-row__hint">{d.hint}</p>
       {household.persons.length > 1 && (
-        <SubTabs
-          ariaLabel={d.person}
-          value={who}
-          onSelect={setWho}
-          options={household.persons.map((p, i) => ({ key: p.id, label: names[i] ?? '' }))}
-        />
+        <h3 className="deferral__title">
+          {d.person} {name}
+        </h3>
       )}
       {view === null || person === undefined ? (
         <Skeleton count={3} />

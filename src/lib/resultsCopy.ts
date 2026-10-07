@@ -43,7 +43,7 @@ const FR_RESULTS = {
   },
   each: {
     title: 'Chacun de son côté',
-    hint: 'Le plus tôt où chacun peut partir si l’autre part à l’âge de son profil. Les deux réponses ne se combinent pas : comparez la paire avec « Chacun son âge ».',
+    hint: 'Le plus tôt où chacun peut partir si l’autre part à l’âge de son profil. Les deux réponses ne se combinent pas : comparez la paire sous « Comparer des âges de départ ».',
     line: (name: string, age: number, other: string, held: number) => `${name} : dès ${age} ans, si ${other} part à ${held} ans`,
     none: (name: string, to: number, other: string, held: number) => `${name} : aucun âge jusqu’à ${to} ans ne tient, si ${other} part à ${held} ans`,
     compare: 'Comparer',
@@ -92,7 +92,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   each: {
     title: 'Each on their own',
-    hint: 'The earliest each person can leave if the other leaves at their profile age. The two answers do not add up to a plan: check the pair with “Each at their own age”.',
+    hint: 'The earliest each person can leave if the other leaves at their profile age. The two answers do not add up to a plan: compare the pair under “Compare retirement ages”.',
     line: (name: string, age: number, other: string, held: number) => `${name}: from age ${age}, if ${other} leaves at ${held}`,
     none: (name: string, to: number, other: string, held: number) => `${name}: no age up to ${to} lasts, if ${other} leaves at ${held}`,
     compare: 'Compare',

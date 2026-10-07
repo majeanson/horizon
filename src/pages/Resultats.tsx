@@ -24,6 +24,7 @@ import type { Dollars, Metric } from '../lib/chartData'
 import { BRIDGE_COPY } from '../lib/bridgeCopy'
 import { DEFERRAL_COPY } from '../lib/deferralCopy'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
+import { parseBridgeParams } from '../lib/bridgeModel'
 import { presetOf } from '../engine/assumptionPresets'
 import { RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
@@ -148,6 +149,7 @@ export function Resultats() {
     if (!cur.includes(s)) commit(toggleSelection(cur, s))
   }
 
+  const deferralWho = parseBridgeParams(params, profile.household).levers.id
   const earliestBlock =
     isCouple && gaps.length === 0 ? (
       <div className="surface">
@@ -156,10 +158,6 @@ export function Resultats() {
     ) : null
   const details = (
     <>
-      <Disclosure label={DEFERRAL_COPY[lang].title}>
-        <DeferralPanel household={profile.household} assumptions={assumptions} names={names} />
-      </Disclosure>
-
       <Disclosure label={r.table.title} count={runs.length}>
         <YearTables runs={runs} label={label} />
       </Disclosure>
@@ -244,10 +242,15 @@ export function Resultats() {
           <p className="verdict__note">{rc.headline.tryThis}</p>
         ) : (
           <>
-            <p className="verdict__note">{rc.headline.holds(assumptions.horizonAge)}</p>
-            <p className="verdict__note">{activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}</p>
-            {prudentGap && <p className="verdict__note">{rc.headline.underPrudent(prudent!, t.assumptions.presets.prudent, MAX_AGE)}</p>}
-            {headline.earlierAge !== null && headline.earlierShortfallYear !== null && <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}</p>}
+            <p className="verdict__note">
+              {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
+            </p>
+            {(prudentGap || (headline.earlierAge !== null && headline.earlierShortfallYear !== null)) && (
+              <p className="verdict__note">
+                {prudentGap && rc.headline.underPrudent(prudent!, t.assumptions.presets.prudent, MAX_AGE)}{' '}
+                {headline.earlierAge !== null && headline.earlierShortfallYear !== null && rc.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}
+              </p>
+            )}
           </>
         )}
         {/* Simple hides the « Chacun de son côté » panel: one line keeps each person's own answer in view. */}
@@ -273,33 +276,33 @@ export function Resultats() {
         <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
       </Disclosure>
 
-      {full && earliestBlock}
-
-      <div className="compare" ref={compareRef}>
-        <p className="field-row__label" id="compare-label">
-          {r.compare.label}
-        </p>
-        <Rail role="group" aria-labelledby="compare-label">
-          <Chip selected={selections.includes('plan')} onClick={() => toggle('plan')}>
-            {r.compare.plan}
-          </Chip>
-          {ages.map((age) => (
-            <Chip key={age} selected={selections.includes(age)} onClick={() => toggle(age)}>
-              {r.compare.age(age)}
+      <Disclosure label={r.compare.label} defaultOpen={params.has('ages')}>
+        <div className="compare" ref={compareRef}>
+          <p className="field-row__label" id="compare-label">
+            {r.compare.label}
+          </p>
+          <Rail role="group" aria-labelledby="compare-label">
+            <Chip selected={selections.includes('plan')} onClick={() => toggle('plan')}>
+              {r.compare.plan}
             </Chip>
-          ))}
-          {selections.filter(isSplit).map((s) => (
-            <Chip key={s} selected onClick={() => toggle(s)}>
-              {label(s)}
-            </Chip>
-          ))}
-        </Rail>
-        {selections.length >= MAX_SELECTIONS && <p className="field-row__hint">{r.compare.max}</p>}
-        {selections.includes('plan') && <p className="field-row__hint">{r.compare.planHint}</p>}
-        {profile.household.persons.length === 2 && (
-          <SplitPicker names={[names[0], names[1]]} defaults={[profile.household.persons[0].retirementAge, profile.household.persons[1].retirementAge === profile.household.persons[0].retirementAge ? Math.min(MAX_AGE, profile.household.persons[0].retirementAge + 5) : profile.household.persons[1].retirementAge]} onAdd={addSplit} disabled={selections.length >= MAX_SELECTIONS} />
-        )}
-      </div>
+            {ages.map((age) => (
+              <Chip key={age} selected={selections.includes(age)} onClick={() => toggle(age)}>
+                {r.compare.age(age)}
+              </Chip>
+            ))}
+            {selections.filter(isSplit).map((s) => (
+              <Chip key={s} selected onClick={() => toggle(s)}>
+                {label(s)}
+              </Chip>
+            ))}
+          </Rail>
+          {selections.length >= MAX_SELECTIONS && <p className="field-row__hint">{r.compare.max}</p>}
+          {selections.includes('plan') && <p className="field-row__hint">{r.compare.planHint}</p>}
+          {profile.household.persons.length === 2 && (
+            <SplitPicker names={[names[0], names[1]]} defaults={[profile.household.persons[0].retirementAge, profile.household.persons[1].retirementAge === profile.household.persons[0].retirementAge ? Math.min(MAX_AGE, profile.household.persons[0].retirementAge + 5) : profile.household.persons[1].retirementAge]} onAdd={addSplit} disabled={selections.length >= MAX_SELECTIONS} />
+          )}
+        </div>
+      </Disclosure>
 
       <ul className="scenarios">
         {runs.map(({ selection, result }, i) => (
@@ -328,10 +331,16 @@ export function Resultats() {
         />
       )}
 
+      {full && earliestBlock}
+
       {/* The strategy view is the main tool for deciding when to start the pensions: it stays one visible line in BOTH modes
           (it computes only when opened — a worker — and opens by itself when the address already carries its choices). */}
-      <Disclosure label={BRIDGE_COPY[lang].open} defaultOpen={['bp', 'br', 'bq', 'bo', 'bw'].some((k) => params.has(k))}>
+      <Disclosure label={BRIDGE_COPY[lang].open} defaultOpen={['bp', 'bb', 'bw'].some((k) => params.has(k))}>
         <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
+        {/* The same question seen one pension at a time: it belongs with the strategies, not as a second top-level line. */}
+        <Disclosure label={DEFERRAL_COPY[lang].title}>
+          <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
+        </Disclosure>
       </Disclosure>
 
       {/* Simple keeps the verdict, the comparison and the chart; the rest folds into one « Voir les détails ». */}

@@ -13,23 +13,19 @@ describe('what the view keeps in the address bar', () => {
     expect(p.window).toBe('bridge')
   })
 
-  it('reads each choice, and falls back to the profile’s own for anything missing, malformed or out of range', () => {
+  it('reads who is looked at and the window from the address; the AGES always come from the profile, whatever the address says', () => {
     const own = profileLevers(H, 'spouse')
-    expect(parseBridgeParams(q('bp=spouse&br=57&bq=70&bo=68&bw=plan'), H)).toEqual({ levers: { id: 'spouse', retirementAge: 57, rrqStartAge: 70, oasStartAge: 68 }, window: 'plan' })
-    for (const bad of ['bq=59', 'bq=73', 'bq=abc', 'bq=65.5', 'bq=', 'bq=-1', 'bq=<script>', 'bq=0070']) {
-      expect(parseBridgeParams(q(`bp=spouse&${bad}`), H).levers.rrqStartAge, bad).toBe(own.rrqStartAge)
-    }
-    expect(parseBridgeParams(q('bp=spouse&bo=64'), H).levers.oasStartAge).toBe(own.oasStartAge)
-    expect(parseBridgeParams(q('bp=spouse&bo=71'), H).levers.oasStartAge).toBe(own.oasStartAge)
-    expect(parseBridgeParams(q('br=49'), H).levers.retirementAge).toBe(profileLevers(H, 'self').retirementAge)
+    expect(parseBridgeParams(q('bp=spouse&bw=plan'), H)).toEqual({ levers: own, window: 'plan' })
+    // the ages are not a thing an address can set any more: an old link with them still opens on the profile's own plan
+    expect(parseBridgeParams(q('bp=spouse&br=57&bq=70&bo=68'), H).levers).toEqual(own)
     expect(parseBridgeParams(q('bp=nobody'), H).levers.id).toBe('self')
     expect(parseBridgeParams(q('bw=whatever'), H).window).toBe('bridge')
   })
 
-  it('writes only what differs from the profile, and reads back what it wrote', () => {
+  it('writes only what differs from the default, and reads back what it wrote', () => {
     const own = parseBridgeParams(q(''), H)
-    expect(bridgeQuery(own, H)).toEqual({ bp: null, br: null, bq: null, bo: null, bb: null, bw: null })
-    const custom = { levers: { id: 'spouse', retirementAge: 58, rrqStartAge: 70, oasStartAge: 70 } as BridgeLevers, window: 'plan' as const }
+    expect(bridgeQuery(own, H)).toEqual({ bp: null, bb: null, bw: null })
+    const custom = { levers: profileLevers(H, 'spouse'), window: 'plan' as const }
     const written = bridgeQuery(custom, H)
     expect(written.bp).toBe('spouse')
     const url = new URLSearchParams(Object.entries(written).filter(([, v]) => v !== null) as [string, string][])
@@ -37,7 +33,7 @@ describe('what the view keeps in the address bar', () => {
   })
 
   it('« for both » is written as bb=1, read back, and ignored for a household of one', () => {
-    const both = { levers: { ...profileLevers(H, 'self'), rrqStartAge: 70, oasStartAge: 70, both: true }, window: 'bridge' as const }
+    const both = { levers: { ...profileLevers(H, 'self'), both: true }, window: 'bridge' as const }
     const written = bridgeQuery(both, H)
     expect(written.bb).toBe('1')
     const url = new URLSearchParams(Object.entries(written).filter(([, v]) => v !== null) as [string, string][])

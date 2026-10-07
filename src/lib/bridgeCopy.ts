@@ -18,10 +18,8 @@ export interface BridgeCopy {
   /** Whose ages the page uses, for a couple: « Âges : ceux de Camille. » */
   ownerLine: (name: string) => string
   /** The three levers. */
-  retireLabel: string
-  rrqLabel: string
-  oasLabel: string
-  leverHint: string
+  /** The ages in force, read from the profile: edited in « Mes données » and Profil, not here. */
+  agesLine: (retire: string, rrq: string, oas: string) => string
   /** The couple's « for both of us » toggle. */
   bothLabel: string
   bothHint: string
@@ -102,14 +100,11 @@ export interface BridgeCopy {
 export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
   fr: {
     open: 'Mes années 60 à 70 : reporter ou prendre tôt ?',
-    hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le pécule doit couvrir, et ce qu’il en reste. Changez l’âge de la retraite et l’âge de début du RRQ et de la PSV pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
+    hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le pécule doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
     updating: 'Mise à jour du calcul…',
     person: 'Pour',
     ownerLine: (name) => `Les âges de cette page sont ceux de ${name}.`,
-    retireLabel: 'Âge de la retraite',
-    rrqLabel: 'Début du RRQ (rente du Régime de rentes du Québec)',
-    oasLabel: 'Début de la PSV (pension de la Sécurité de la vieillesse)',
-    leverHint: 'Le RRQ peut commencer de 60 à 72 ans, la PSV de 65 à 70 ans. Seule la personne choisie change ; l’autre garde les âges de son profil, sauf si vous cochez « Pour les deux ».',
+    agesLine: (retire, rrq, oas) => `Vos âges : retraite à ${retire}, RRQ à ${rrq}, PSV à ${oas}. Choisissez une façon ci-dessous, ou réglez-les dans « Mes données et leur calcul ».`,
     bothLabel: 'Pour les deux',
     bothHint: 'L’autre personne commence son RRQ et sa PSV aux mêmes âges ; son âge de retraite reste celui de son profil.',
     age: (age) => `${age} ans`,
@@ -204,14 +199,11 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
   },
   en: {
     open: 'My years from 60 to 70: defer or take early?',
-    hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg has to cover, and what is left. Change the retirement age and the age the QPP and OAS start to see whether the plan holds. Everything is in today’s dollars.',
+    hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg has to cover, and what is left. Pick a way of starting your pensions to see whether the plan holds. Everything is in today’s dollars.',
     updating: 'Updating the calculation…',
     person: 'For',
     ownerLine: (name) => `The ages on this page are ${name}’s.`,
-    retireLabel: 'Retirement age',
-    rrqLabel: 'QPP start (Québec Pension Plan)',
-    oasLabel: 'OAS start (Old Age Security pension)',
-    leverHint: 'The QPP can start from 60 to 72, the OAS from 65 to 70. Only the chosen person changes; the other keeps the ages from their profile unless you tick “For both”.',
+    agesLine: (retire, rrq, oas) => `Your ages: retire at ${retire}, QPP at ${rrq}, OAS at ${oas}. Pick a way below, or set them in “My data and its calculation”.`,
     bothLabel: 'For both',
     bothHint: 'The other person starts their QPP and OAS at the same ages; their retirement age stays the one in their profile.',
     age: (age) => `age ${age}`,

@@ -4,19 +4,15 @@ import { MAX_AGE, MIN_AGE } from './resultsModel.ts'
 
 // What the « Mes années 60 à 70 » view keeps in the address bar, and the pure helpers around it: which strategy a set of
 // levers is, the rows a window shows, and the one-sentence verdict. Like the comparison chips, every choice lives in the
-// URL (`?bp=&br=&bq=&bo=&bw=`) so a view can be bookmarked and the back button means what it says; nothing is hidden state.
+// URL (`?bp=&bb=&bw=`) so a view can be bookmarked and the back button means what it says; nothing is hidden state. The AGES
+// (retirement, QPP start, OAS start) are not in it: they are the profile's, edited in « Mes données » and Profil, and a
+// strategy card writes them there.
 //
-//   bp  the person looked at (self | spouse)      br  their retirement age (50–70)
-//   bq  the age their QPP starts (60–72)          bo  the age their OAS starts (65–70)
+//   bp  the person looked at (self | spouse)
 //   bb  « 1 » when the other person starts their pensions at the same ages (a couple only)
 //   bw  « plan » to show every year to the horizon (absent: the bridge years, 60 to 70)
 
-export const RRQ_RANGE = { min: 60, max: 72 } as const
-export const OAS_RANGE = { min: 65, max: 70 } as const
 export const RETIRE_RANGE = { min: MIN_AGE, max: MAX_AGE } as const
-/** The start ages offered as chips. */
-export const RRQ_AGES: readonly number[] = Array.from({ length: RRQ_RANGE.max - RRQ_RANGE.min + 1 }, (_, i) => RRQ_RANGE.min + i)
-export const OAS_AGES: readonly number[] = Array.from({ length: OAS_RANGE.max - OAS_RANGE.min + 1 }, (_, i) => OAS_RANGE.min + i)
 
 export type BridgeWindow = 'bridge' | 'plan'
 
@@ -25,13 +21,7 @@ export interface BridgeParams {
   window: BridgeWindow
 }
 
-const intIn = (text: string | null, min: number, max: number, fallback: number): number => {
-  if (text === null || !/^\d{1,3}$/.test(text)) return fallback
-  const n = Number(text)
-  return n >= min && n <= max ? n : fallback
-}
-
-/** The view's choices from the address bar, each one falling back to the profile's own when absent or out of range. */
+/** The view's choices: who is looked at, the window and the other-person toggle from the address bar; the ages from the profile. */
 export function parseBridgeParams(search: URLSearchParams, household: Household): BridgeParams {
   const asked = search.get('bp')
   const id: PersonId = household.persons.find((p) => p.id === asked)?.id ?? household.persons[0].id
@@ -39,9 +29,9 @@ export function parseBridgeParams(search: URLSearchParams, household: Household)
   return {
     levers: {
       id,
-      retirementAge: intIn(search.get('br'), RETIRE_RANGE.min, RETIRE_RANGE.max, Math.min(RETIRE_RANGE.max, Math.max(RETIRE_RANGE.min, own.retirementAge))),
-      rrqStartAge: intIn(search.get('bq'), RRQ_RANGE.min, RRQ_RANGE.max, own.rrqStartAge),
-      oasStartAge: intIn(search.get('bo'), OAS_RANGE.min, OAS_RANGE.max, own.oasStartAge),
+      retirementAge: Math.min(RETIRE_RANGE.max, Math.max(RETIRE_RANGE.min, own.retirementAge)),
+      rrqStartAge: own.rrqStartAge,
+      oasStartAge: own.oasStartAge,
       ...(search.get('bb') === '1' && household.persons.length > 1 ? { both: true } : {}),
     },
     window: search.get('bw') === 'plan' ? 'plan' : 'bridge',
@@ -50,13 +40,9 @@ export function parseBridgeParams(search: URLSearchParams, household: Household)
 
 /** The address-bar keys for a set of levers: only what differs from the profile's own is written, so a link stays short. */
 export function bridgeQuery(params: BridgeParams, household: Household): Record<string, string | null> {
-  const own = profileLevers(household, params.levers.id)
   const l = params.levers
   return {
     bp: l.id === household.persons[0].id ? null : l.id,
-    br: l.retirementAge === Math.min(RETIRE_RANGE.max, Math.max(RETIRE_RANGE.min, own.retirementAge)) ? null : String(l.retirementAge),
-    bq: l.rrqStartAge === own.rrqStartAge ? null : String(l.rrqStartAge),
-    bo: l.oasStartAge === own.oasStartAge ? null : String(l.oasStartAge),
     bb: l.both && household.persons.length > 1 ? '1' : null,
     bw: params.window === 'plan' ? 'plan' : null,
   }

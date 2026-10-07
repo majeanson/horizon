@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
-import { EXAMPLE, seedProfile } from './seed'
+import { EXAMPLE, savedProfile, seedProfile } from './seed'
 
 // « Mes années 60 à 70 » in a real browser: the strategy view sits on the results page in BOTH modes, computes only when
 // opened (off the page's thread), keeps every choice in the address, and shows each year of the bridge as text beside the
@@ -64,30 +64,25 @@ for (const mode of ['simple', 'full'] as const) {
   })
 }
 
-test('choosing a way of starting is written in the address, pressed on the chip, and changes the verdict', async ({ page }) => {
+test('choosing a way of starting saves the ages in the profile, presses the card, and changes the verdict', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: OPEN }).click()
   const card = (name: string) => page.locator('.bridge-card').getByRole('radio', { name, exact: true })
   await card('Reporter au maximum').click()
-  await expect(page).toHaveURL(/bq=72/)
-  await expect(page).toHaveURL(/bo=70/)
+  // the ages are the PROFILE's: the card writes them there, and nothing about them is in the address
+  await expect.poll(async () => (await savedProfile(page)).household.persons[0].rrq.startAge).toBe(72)
+  expect((await savedProfile(page)).household.persons[0].oas.startAge).toBe(70)
+  await expect(page).not.toHaveURL(/bq=|bo=|br=/)
   await expect(card('Reporter au maximum')).toHaveAttribute('aria-checked', 'true')
-  await expect(card('Standard (c’est aussi votre plan)')).toHaveAttribute('aria-checked', 'false')
+  await expect(card('Standard')).toHaveAttribute('aria-checked', 'false')
   await expect(page.locator('.bridge__verdict')).toContainText('Vous pouvez reporter')
-  // the levers say the same
-  const rrq = page.getByRole('group', { name: /Début du RRQ/ })
-  await expect(rrq.getByRole('button', { name: '72', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.getByRole('group', { name: /Début de la PSV/ }).getByRole('button', { name: '70', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.bridge')).toContainText('Vos âges : retraite à 60 ans, RRQ à 72 ans, PSV à 70 ans')
 
-  // a lever on its own leaves the five: the page says so
-  await rrq.getByRole('button', { name: '63', exact: true }).click()
-  await expect(page).toHaveURL(/bq=63/)
-  await expect(page.getByText('Vos choix ne correspondent à aucune de ces façons')).toBeVisible()
-
-  // a link carries the choices: reloading opens the view by itself on the same plan
+  // reloading keeps them: the plan is the profile's
   await page.reload()
+  await page.getByRole('button', { name: OPEN }).click()
   await expect(page.locator('.bridge__verdict')).toBeVisible()
-  await expect(page.getByRole('group', { name: /Début du RRQ/ }).getByRole('button', { name: '63', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Reporter au maximum', exact: true })).toHaveAttribute('aria-checked', 'true')
 })
 
 test('« Pour les deux » makes the other person follow: it is in the address, presses « Les deux à 70 ans », and survives a reload', async ({ page }) => {
@@ -96,8 +91,7 @@ test('« Pour les deux » makes the other person follow: it is in the address, p
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   const both = page.getByRole('button', { name: 'Pour les deux', exact: true })
   await expect(both).toHaveAttribute('aria-pressed', 'false')
-  await page.getByRole('group', { name: /Début du RRQ/ }).getByRole('button', { name: '70', exact: true }).click()
-  await page.getByRole('group', { name: /Début de la PSV/ }).getByRole('button', { name: '70', exact: true }).click()
+  await page.locator('.bridge-card').getByRole('radio', { name: 'Pont jusqu’à 70 ans', exact: true }).click()
   await both.click()
   await expect(page).toHaveURL(/bb=1/)
   await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Les deux à 70 ans', exact: true })).toHaveAttribute('aria-checked', 'true')
@@ -107,16 +101,6 @@ test('« Pour les deux » makes the other person follow: it is in the address, p
   // choosing another strategy turns it off
   await page.locator('.bridge-card').getByRole('radio', { name: 'Reporter au maximum', exact: true }).click()
   await expect(page).not.toHaveURL(/bb=1/)
-})
-
-test('two quick taps compose: neither one undoes the other', async ({ page }) => {
-  await page.goto('/resultats')
-  await page.getByRole('button', { name: OPEN }).click()
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
-  await page.getByRole('group', { name: /Début du RRQ/ }).getByRole('button', { name: '70', exact: true }).click()
-  await page.getByRole('group', { name: /Début de la PSV/ }).getByRole('button', { name: '68', exact: true }).click()
-  await expect(page).toHaveURL(/bq=70/)
-  await expect(page).toHaveURL(/bo=68/)
 })
 
 test('a deferral digs into the nest first: the nest at 70 is lower than starting at 65, and the cost is said in dollars', async ({ page }) => {
@@ -130,24 +114,16 @@ test('a deferral digs into the nest first: the nest at 70 is lower than starting
   await expect(max.getByText(/rattrapent le standard à \d\d ans/)).toBeVisible()
 })
 
-test('the retirement age is a field; a couple has one tab per person, each with their own start ages', async ({ page }) => {
+test('a couple has one tab per person, each with their own ages from the profile', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: OPEN }).click()
   await expect(page.locator('.bridge__verdict')).toBeVisible()
-  const retire = page.getByLabel('Âge de la retraite')
-  await expect(retire).toHaveValue('60')
-  await retire.fill('58')
-  await retire.press('Enter')
-  await expect(page).toHaveURL(/br=58/)
-  await expect(page.locator('.bridge__table tbody tr').first().locator('th')).toContainText('60')
-
+  await expect(page.locator('.bridge')).toContainText('retraite à 60 ans')
   const tabs = page.getByRole('tablist', { name: 'Pour' })
   await expect(tabs.getByRole('tab')).toHaveCount(2)
   await tabs.getByRole('tab').nth(1).click()
   await expect(page).toHaveURL(/bp=spouse/)
-  // the other person's own plan: their retirement age (62) is back, and the earlier choice is not carried over
-  await expect(page.getByLabel('Âge de la retraite')).toHaveValue('62')
-  await expect(page).not.toHaveURL(/br=58/)
+  await expect(page.locator('.bridge')).toContainText('retraite à 62 ans')
 })
 
 test('« jusqu’à l’horizon » shows every year of the plan, and the bridge shows only 60 to 70', async ({ page }) => {
@@ -178,15 +154,18 @@ test('the three sets of assumptions: eighteen answers, computed only when that l
 
 test('English: the view speaks English and keeps the same choices', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats?bq=70&bo=70')
+  await page.goto('/resultats')
+  await page.getByRole('button', { name: /My years from 60 to 70/ }).click()
+  await page.locator('.bridge-card').getByRole('radio', { name: 'Bridge to 70', exact: true }).click()
   await expect(page.locator('.bridge__verdict')).toContainText(/You can defer|Deferring uses up/)
-  await expect(page.getByRole('group', { name: /QPP start/ }).getByRole('button', { name: '70', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.bridge')).toContainText('Your ages: retire at age 60, QPP at age 70, OAS at age 70')
   await expect(page.locator('.bridge__table thead')).toContainText('Nest egg at year end')
 })
 
 test('on a phone the view fits the screen: the table scrolls inside its own region, nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
-  await page.goto('/resultats?bq=70&bo=70')
+  await page.goto('/resultats')
+  await page.getByRole('button', { name: OPEN }).click()
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   await expectNoHorizontalOverflow(page, page.locator('.bridge'))
   await expect(page.locator('.bridge__table')).toHaveAttribute('role', 'region')

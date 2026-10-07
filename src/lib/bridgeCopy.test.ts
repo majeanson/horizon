@@ -96,12 +96,6 @@ describe('the bridge copy, in both languages', () => {
     expect(source).not.toMatch(/0,7 %|58,8 %|0,6 %|36 %|0.7%|58.8%|0.6%|36%/)
   })
 
-  it('says the levers’ ranges as the page offers them (the scenario names come from the Assumptions page itself)', () => {
-    expect(fr.leverHint).toContain('60 à 72')
-    expect(fr.leverHint).toContain('65 à 70')
-    expect(en.leverHint).toContain('60 to 72')
-    expect(en.leverHint).toContain('65 to 70')
-  })
 })
 
 describe('canary: the « not French pasted in » check can fail', () => {

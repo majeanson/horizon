@@ -211,6 +211,7 @@ test.describe('the example household', () => {
     // The verdict says what it is, on the card itself: an estimate under assumptions, not advice.
     await expect(page.locator('.verdict').getByText('Selon ces hypothèses — une estimation, pas un conseil financier.')).toBeVisible()
     // It opens on the household's OWN plan beside 65 — not on a pair the profile never mentioned.
+    await page.getByRole('button', { name: 'Comparer des âges de départ' }).click()
     const chips = page.getByRole('group', { name: 'Comparer des âges de départ' })
     await expect(chips.getByRole('button', { name: 'Mon plan', pressed: true })).toBeVisible()
     await expect(chips.getByRole('button', { name: '65 ans', pressed: true })).toBeVisible()

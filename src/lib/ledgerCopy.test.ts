@@ -6,7 +6,7 @@ import { LEDGER_COPY, type LedgerCopy } from './ledgerCopy.ts'
 
 const { fr, en } = LEDGER_COPY
 const sample = (c: LedgerCopy): [string, string][] =>
-  Object.entries(c).map(([k, v]) => [k, typeof v === 'function' ? (v as (...a: string[]) => string)('A', 'B', 'C', 'D', 'E', 'F') : (v as string)])
+  Object.entries(c).map(([k, v]) => [k, typeof v === 'function' ? (v as (...a: string[]) => string)('A', 'B', 'C', 'D', 'E', 'F') : typeof v === 'object' ? Object.values(v).join(' ') : (v as string)])
 
 describe('the ledger copy', () => {
   it('has the same keys in both languages, every text non-empty', () => {

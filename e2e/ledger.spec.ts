@@ -37,3 +37,20 @@ test('the page has no horizontal overflow at phone width with the panel open', a
   await expect(page.locator('.ledger')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
+
+test('spending and the economy are sliders too: releasing one saves it, and the calculation says what it means', async ({ page }) => {
+  await page.goto('/resultats')
+  await page.getByRole('button', { name: 'Mes données et leur calcul' }).click()
+  const panel = page.locator('.ledger')
+  const infl = panel.getByRole('slider', { name: 'Inflation' })
+  const before = (await savedProfile(page)).assumptions.inflation
+  await infl.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(panel.locator('.ledger__calc').filter({ hasText: 'Les prix montent' })).toBeVisible()
+  await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(before + 0.001, 5)
+  const retired = panel.getByRole('slider', { name: 'Dépenses à la retraite' })
+  const spend = (await savedProfile(page)).household.spending.retiredToday
+  await retired.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect.poll(async () => (await savedProfile(page)).household.spending.retiredToday).toBe(spend + 500)
+})

@@ -6,9 +6,6 @@ import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
 import {
-  OAS_AGES,
-  RETIRE_RANGE,
-  RRQ_AGES,
   SEGMENT_COLOUR,
   SEGMENTS,
   barRows,
@@ -22,13 +19,13 @@ import {
 } from '../../lib/bridgeModel'
 import { formatPct } from '../../lib/format'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
+import { mapPerson } from '../../lib/profileEdit'
+import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
 import { Chip } from '../Chip'
 import { Disclosure } from '../Disclosure'
-import { FieldRow } from '../FieldRow'
-import { Cluster, Rail } from '../Layout'
+import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
-import { NumberField } from '../NumberField'
 import { Skeleton } from '../Skeleton'
 import { SubTabs } from '../SubTabs'
 
@@ -296,25 +293,25 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const ownerName = names[Math.max(0, household.persons.findIndex((p) => p.id === levers.id))] ?? ''
 
   // Every change is built from the address bar as it is NOW (like the comparison chips): two quick taps must compose.
-  const write = (next: BridgeParams, resetLevers = false) => {
+  const write = (next: BridgeParams) => {
     const base = new URLSearchParams(window.location.search)
-    if (resetLevers) for (const k of ['br', 'bq', 'bo']) base.delete(k)
     for (const [k, v] of Object.entries(bridgeQuery(next, household))) {
-      if (resetLevers && (k === 'br' || k === 'bq' || k === 'bo')) continue
       if (v === null) base.delete(k)
       else base.set(k, v)
     }
     setParams(base, { replace: true })
   }
-  const change = (patch: Partial<Omit<BridgeLevers, 'id'>>, win?: BridgeWindow) => {
+  // The ages are the PROFILE's (« Mes données » and Profil edit the same ones): only the other-person toggle and the window live in the address.
+  const change = (patch: Partial<Pick<BridgeLevers, 'both'>>, win?: BridgeWindow) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household)
     write({ levers: { ...cur.levers, ...patch }, window: win ?? cur.window })
   }
-  const pickPerson = (id: PersonId) => write({ levers: profileLevers(household, id), window: parseBridgeParams(new URLSearchParams(window.location.search), household).window }, true)
+  const pickPerson = (id: PersonId) => write({ levers: profileLevers(household, id), window: parseBridgeParams(new URLSearchParams(window.location.search), household).window })
   const apply = (key: StrategyKey) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household).levers
     const l = leversFor(key, household, cur.id, cur.retirementAge)
-    change({ rrqStartAge: l.rrqStartAge, oasStartAge: l.oasStartAge, both: l.both === true })
+    updateProfile((p) => mapPerson(p, cur.id, (x) => (x.rrq.startAge === l.rrqStartAge && x.oas.startAge === l.oasStartAge ? x : { ...x, rrq: { ...x.rrq, startAge: l.rrqStartAge }, oas: { ...x.oas, startAge: l.oasStartAge } })))
+    change({ both: l.both === true })
   }
 
   // Everything below the controls describes the levers the data was computed FOR (lib/bridgeModel.ts, shownPlan).
@@ -337,46 +334,15 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
       )}
 
       <div className="bridge__levers">
-        <FieldRow label={copy.retireLabel}>
-          {(w) => (
-            <NumberField kind="int" min={RETIRE_RANGE.min} max={RETIRE_RANGE.max} value={levers.retirementAge} onChange={(n) => change({ retirementAge: n })} id={w.id} />
-          )}
-        </FieldRow>
-        <div className="field-row">
-          <p className="field-row__label" id="bridge-rrq-label">
-            {copy.rrqLabel}
-          </p>
-          <Rail role="group" aria-labelledby="bridge-rrq-label">
-            {RRQ_AGES.map((age) => (
-              <Chip key={age} selected={levers.rrqStartAge === age} onClick={() => change({ rrqStartAge: age })}>
-                {age}
-              </Chip>
-            ))}
-          </Rail>
-        </div>
-        <div className="field-row">
-          <p className="field-row__label" id="bridge-oas-label">
-            {copy.oasLabel}
-          </p>
-          <Rail role="group" aria-labelledby="bridge-oas-label">
-            {OAS_AGES.map((age) => (
-              <Chip key={age} selected={levers.oasStartAge === age} onClick={() => change({ oasStartAge: age })}>
-                {age}
-              </Chip>
-            ))}
-          </Rail>
-        </div>
+        <p className="field-row__hint">{copy.agesLine(copy.age(levers.retirementAge), copy.age(levers.rrqStartAge), copy.age(levers.oasStartAge))}</p>
         {household.persons.length > 1 && (
-          <div className="field-row">
-            <Cluster>
-              <Chip selected={levers.both === true} onClick={() => change({ both: levers.both !== true })}>
-                {copy.bothLabel}
-              </Chip>
-            </Cluster>
-            <p className="field-row__hint">{copy.bothHint}</p>
-          </div>
+          <Cluster>
+            <Chip selected={levers.both === true} onClick={() => change({ both: levers.both !== true })}>
+              {copy.bothLabel}
+            </Chip>
+          </Cluster>
         )}
-        <p className="field-row__hint">{copy.leverHint}</p>
+        {household.persons.length > 1 && <p className="field-row__hint">{copy.bothHint}</p>}
       </div>
 
       {view === null || verdict === null ? (
