@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Rail } from '../components/Layout'
@@ -99,12 +99,26 @@ export function Resultats() {
   )
 
   // Old deep links chose one question (`?q=save|stop`); the three answers share the page now, so
-  // the link becomes a scroll to that section, and the key is dropped from the address.
-  const legacyQ = params.get('q')
+  // the link becomes a scroll to that section, and the key is dropped from the address. Read once,
+  // at mount: stripping the key must not re-run (and so cancel) the settling scroll below.
+  const [legacyQ] = useState(() => params.get('q'))
   useEffect(() => {
-    if (legacyQ === null) return
-    if (legacyQ === 'save' || legacyQ === 'stop') document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
+    if (legacyQ !== 'save' && legacyQ !== 'stop') return
     setParam('q', null)
+    const go = () => document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
+    go()
+    // The sections above stream in (workers, lazy charts) and would push the target off screen:
+    // hold the anchor while the layout settles, and give the scroll back at the reader's first move.
+    const observer = new ResizeObserver(go)
+    observer.observe(document.body)
+    const release = () => observer.disconnect()
+    const timer = setTimeout(release, 3000)
+    for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(ev, release, { once: true, passive: true })
+    return () => {
+      clearTimeout(timer)
+      release()
+      for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.removeEventListener(ev, release)
+    }
   }, [legacyQ, setParam])
 
   // On a phone the rail shows only its first chips: bring the ones already switched on into view, once, so the page

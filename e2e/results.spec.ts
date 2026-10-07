@@ -19,7 +19,7 @@ test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 test('the chart draws one line per comparison, a marker for each retirement, and names itself for a screen reader', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
-  const chart = page.locator('figure.chart')
+  const chart = page.locator('.chart-panel figure.chart')
   await expect(chart).toBeVisible()
   await expect(chart).toHaveAttribute('role', 'img')
   await expect(chart).toHaveAttribute('aria-label', 'Valeur nette de 2026 à 2076 pour : Mon plan, 65 ans.')
@@ -35,7 +35,7 @@ test('the chart draws one line per comparison, a marker for each retirement, and
 
 test('hovering the chart shows the year, the ages and each scenario’s exact figure', async ({ page }) => {
   await page.goto('/resultats')
-  const plot = page.locator('.chart__plot')
+  const plot = page.locator('.chart-panel .chart__plot')
   await plot.locator('.recharts-surface').waitFor()
   // The mouse can only hover what is on screen.
   await plot.scrollIntoViewIfNeeded()
@@ -51,7 +51,7 @@ test('hovering the chart shows the year, the ages and each scenario’s exact fi
 
 test('the measure and the dollars are chosen in the address, and the chart follows', async ({ page }) => {
   await page.goto('/resultats')
-  const chart = page.locator('figure.chart')
+  const chart = page.locator('.chart-panel figure.chart')
   await page.getByRole('tab', { name: 'Revenu garanti' }).click()
   await expect(page).toHaveURL(/metric=income/)
   await expect(chart).toHaveAttribute('aria-label', /^Revenu garanti de 2026 à 2076/)
@@ -60,7 +60,7 @@ test('the measure and the dollars are chosen in the address, and the chart follo
   await expect(page.getByText('Les dollars de chaque année, sans correction pour l’inflation.')).toBeVisible()
   // The address alone restores the view.
   await page.goto('/resultats?metric=income&dollars=nominal&ages=62')
-  await expect(page.locator('figure.chart')).toHaveAttribute('aria-label', 'Revenu garanti de 2026 à 2076 pour : 62 ans.')
+  await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Revenu garanti de 2026 à 2076 pour : 62 ans.')
   await expect(page.getByRole('tab', { name: 'Revenu garanti', selected: true })).toBeVisible()
   // Choosing the default again takes the parameter back out of the address.
   await page.getByRole('tab', { name: 'Valeur nette' }).click()
@@ -70,15 +70,15 @@ test('the measure and the dollars are chosen in the address, and the chart follo
 test('another comparison adds a line and keeps the other choices', async ({ page }) => {
   await page.goto('/resultats?dollars=nominal')
   await page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans' }).click()
-  await expect(page.locator('.chart__legend-item')).toHaveText(['Mon plan', '65 ans', '62 ans'])
-  await expect(page.locator('path.recharts-line-curve')).toHaveCount(3)
+  await expect(page.locator('.chart-panel .chart__legend-item')).toHaveText(['Mon plan', '65 ans', '62 ans'])
+  await expect(page.locator('.chart-panel path.recharts-line-curve')).toHaveCount(3)
   await expect(page).toHaveURL(/dollars=nominal/)
 })
 
 test('the chart speaks English too', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: 'EN' }).click()
-  await expect(page.locator('figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan, 65.')
+  await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan, 65.')
   await expect(page.getByRole('tab', { name: 'Guaranteed income' })).toBeVisible()
 })
 
@@ -136,8 +136,8 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
 test('no chart or table runs past the right edge on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
   await page.goto('/resultats')
-  await page.locator('figure.chart').waitFor()
-  const box = (await page.locator('figure.chart').boundingBox())!
+  await page.locator('.chart-panel figure.chart').waitFor()
+  const box = (await page.locator('.chart-panel figure.chart').boundingBox())!
   expect(box.x).toBeGreaterThanOrEqual(0)
   expect(box.x + box.width).toBeLessThanOrEqual(361)
 })

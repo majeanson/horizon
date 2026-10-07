@@ -8,6 +8,7 @@ import { formatMoney } from '../../lib/money'
 import { mapPerson, setAssumptions, setReturn, setSpending } from '../../lib/profileEdit'
 import { MAX_AGE, MIN_AGE } from '../../lib/resultsModel'
 import { updateProfile } from '../../lib/store'
+import { Chip } from '../Chip'
 import { Slider } from '../Slider'
 
 // « Mes données et leur calcul »: every number that sets the answer, as a slider, with the calculation it triggers and the
@@ -112,6 +113,8 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   return (
     <div className="ledger">
       <p className="field-row__hint">{c.hint}</p>
+      {/* Two views, one store: these sliders and the Profil / Hypothèses fields write the same profile. */}
+      <p className="field-row__hint">{c.sameStore}</p>
       {ledger.map((l, i) => {
         const was = opened.ledger.find((x) => x.id === l.id)!
         const name = names[i] ?? ''
@@ -119,6 +122,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
         return (
           <section key={l.id} className="ledger__person" aria-label={c.person(name)}>
             {household.persons.length > 1 && <h3 className="year-table__title">{c.person(name)}</h3>}
+            <Chip to={`/?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
             <div className="ledger__row">
               {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge, l.retirement.done)}
               <p className="ledger__calc">{c.retireCalc(monthYear(l.retirement.leaving))}</p>
@@ -145,6 +149,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
 
       <section className="ledger__person" aria-label={c.moneyTitle}>
         <h3 className="year-table__title">{c.moneyTitle}</h3>
+        <Chip to="/hypotheses">{c.editAssumptions}</Chip>
         {spend('spend:workingToday', c.spendWorkLabel)}
         {spend('spend:retiredToday', c.spendRetLabel)}
         <div className="ledger__row">

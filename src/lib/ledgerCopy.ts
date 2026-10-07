@@ -5,6 +5,10 @@
 export interface LedgerCopy {
   title: string
   hint: string
+  /** The two-views framing: these sliders and the Profil / Hypothèses fields edit the SAME stored profile. */
+  sameStore: string
+  editProfile: string
+  editAssumptions: string
   person: (name: string) => string
   retireLabel: string
   rrqLabel: string
@@ -44,6 +48,9 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
   fr: {
     title: 'Mes données et leur calcul',
     hint: 'Glissez un curseur : le calcul, le montant et l’effet sur le plan suivent, et le verdict plus haut se met à jour quand vous relâchez. C’est enregistré dans votre profil.',
+    sameStore: 'Ce sont vos données du profil, vues du côté du calcul : modifier ici ou sur Profil et Hypothèses, c’est modifier la même chose.',
+    editProfile: 'Modifier dans le profil',
+    editAssumptions: 'Modifier dans les hypothèses',
     person: (name) => `Âges de ${name}`,
     retireLabel: 'Âge de la retraite',
     rrqLabel: 'Début du RRQ',
@@ -75,6 +82,9 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
   en: {
     title: 'My data and its calculation',
     hint: 'Drag a slider: the calculation, the amount and the effect on the plan follow, and the verdict above updates when you let go. It is saved in your profile.',
+    sameStore: 'This is your profile data, seen from the calculation’s side: editing here or on Profile and Assumptions edits the same thing.',
+    editProfile: 'Edit in the profile',
+    editAssumptions: 'Edit in the assumptions',
     person: (name) => `${name}’s ages`,
     retireLabel: 'Retirement age',
     rrqLabel: 'QPP start',
