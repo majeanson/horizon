@@ -87,11 +87,11 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
   const order: string[] = []
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 9; i++) {
     await page.keyboard.press('Tab')
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
-  // The top bar first (name, language, theme), then the four destinations.
-  expect(order.slice(0, 3)).toEqual(['Horizon', 'EN', ''])
-  expect(order.slice(3, 7)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
+  // The skip link first — the whole point of one — then the top bar (name, language, theme), then the four destinations.
+  expect(order.slice(0, 4)).toEqual(['Aller au contenu', 'Horizon', 'EN', ''])
+  expect(order.slice(4, 8)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
 })

@@ -164,7 +164,8 @@ test.describe('a blank profile', () => {
     await box(page, 'Revenus admissibles de 2020').fill('55000')
     await box(page, 'Revenus admissibles de 2020').blur()
     await page.getByRole('button', { name: 'Estimer les années vides à partir du salaire actuel' }).click()
-    await expect(page.getByText(/années estimées/)).toBeVisible()
+    // The note (« 30 années estimées »), not the undo chip (« Retirer les années estimées ») beside it.
+    await expect(page.getByText(/\d+ années estimées/)).toBeVisible()
     const history = async () => (await savedProfile(page)).household.persons[0].earningsHistory
     await expect.poll(async () => Object.keys(await history()).length).toBeGreaterThan(10)
     expect((await history())['2020']).toBe(55000)
