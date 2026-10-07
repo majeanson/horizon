@@ -12,6 +12,7 @@ import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
 import { exampleProfile } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
+import type { Profile } from '../lib/schema'
 import { clearProfile, exportFileName, exportProfileJson, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { useNotice } from '../lib/toast'
 
@@ -40,6 +41,16 @@ export function Donnees() {
   const copies = unreadableCopies()
   const fileInput = useRef<HTMLInputElement>(null)
   const [failure, setFailure] = useState<Extract<ReadResult, { ok: false }> | null>(null)
+  // The profile as it was before the last replace or clear, held in memory for this visit: the confirm
+  // promises « rétablir tout de suite après », and this is what keeps the promise. Gone on navigation —
+  // beyond the visit, the export file remains the only way back, as the confirm also says.
+  const [previous, setPrevious] = useState<Profile | null>(null)
+  const restorePrevious = () => {
+    if (previous === null) return
+    replaceProfile(previous)
+    setPrevious(null)
+    notice(d.undo.done)
+  }
 
   const download = () => {
     saveAsFile(exportProfileJson(getProfile()), exportFileName())
@@ -60,6 +71,7 @@ export function Donnees() {
       const result = readProfileJson(text)
       if (!result.ok) return setFailure(result)
       if (await confirm({ message: d.import.confirm, confirmLabel: d.import.confirmLabel, tone: 'default' })) {
+        setPrevious(getProfile())
         replaceProfile(result.profile)
         notice(d.import.done)
       }
@@ -73,6 +85,15 @@ export function Donnees() {
   return (
     <section className="page-body">
       <PageHead title={d.title} subtitle={d.privacy} />
+
+      {previous !== null && (
+        <Cluster className="data-undo surface">
+          <StatusMessage tone="info">{d.undo.offer}</StatusMessage>
+          <button type="button" className="btn btn--sm" onClick={restorePrevious}>
+            {d.undo.button}
+          </button>
+        </Cluster>
+      )}
 
       <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
         <Cluster>
@@ -135,6 +156,7 @@ export function Donnees() {
                 className="btn btn--ghost btn--sm"
                 onClick={async () => {
                   if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
+                    setPrevious(getProfile())
                     replaceProfile(exampleProfile(id))
                     notice(d.example.done)
                   }
@@ -157,6 +179,7 @@ export function Donnees() {
             className="btn btn--danger"
             onClick={async () => {
               if (await confirm({ message: d.clear.confirm, confirmLabel: d.clear.confirmLabel, tone: 'danger' })) {
+                setPrevious(getProfile())
                 clearProfile()
                 notice(d.clear.done)
               }

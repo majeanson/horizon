@@ -423,7 +423,7 @@ export const FR = {
       title: 'Importer',
       hint: 'Choisissez un fichier exporté depuis Horizon. Il remplace le profil de cet appareil.',
       button: 'Choisir un fichier',
-      confirm: 'Importer ce fichier ? Le profil de cet appareil sera remplacé par celui du fichier ; sans export, l’ancien ne se récupère pas.',
+      confirm: 'Importer ce fichier ? Le profil de cet appareil sera remplacé par celui du fichier. Vous pourrez rétablir l’ancien tout de suite après ; sans export, il ne se récupère plus ensuite.',
       confirmLabel: 'Importer',
       done: 'Fichier importé',
       notJson: 'Ce fichier n’est pas un document JSON lisible.',
@@ -440,7 +440,7 @@ export const FR = {
     example: {
       title: 'Exemple',
       hint: 'Charge un foyer fictif pour voir à quoi ressemble un résultat. Sept cas, pour comparer.',
-      confirm: (name: string) => `Charger « ${name} » ? Le profil de cet appareil sera remplacé par un foyer fictif ; sans export, l’ancien ne se récupère pas.`,
+      confirm: (name: string) => `Charger « ${name} » ? Le profil de cet appareil sera remplacé par un foyer fictif. Vous pourrez rétablir l’ancien tout de suite après ; sans export, il ne se récupère plus ensuite.`,
       confirmLabel: 'Charger',
       done: 'Exemple chargé',
     },
@@ -448,7 +448,7 @@ export const FR = {
       title: 'Effacer',
       hint: 'Retire le profil et les hypothèses de cet appareil.',
       button: 'Tout effacer',
-      confirm: 'Tout effacer ? Le profil et les hypothèses seront retirés de cet appareil ; sans export, rien ne les ramène.',
+      confirm: 'Tout effacer ? Le profil et les hypothèses seront retirés de cet appareil. Vous pourrez les rétablir tout de suite après ; sans export, rien ne les ramène ensuite.',
       confirmLabel: 'Tout effacer',
       done: 'Données effacées',
     },
@@ -464,6 +464,11 @@ export const FR = {
       hint: 'Le profil que cet appareil n’a pas pu lire est resté sur place. Téléchargez-le avant d’effacer quoi que ce soit : un fichier de cette sorte se répare souvent à la main.',
       button: 'Télécharger la copie illisible',
       older: 'Télécharger la copie illisible précédente',
+    },
+    undo: {
+      offer: 'L’ancien profil est encore récupérable, le temps de cette visite.',
+      button: 'Rétablir l’ancien profil',
+      done: 'Ancien profil rétabli',
     },
     display: {
       title: 'Affichage',

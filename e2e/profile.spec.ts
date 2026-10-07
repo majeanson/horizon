@@ -326,6 +326,10 @@ test.describe('data stays on this device', () => {
     await page.getByRole('button', { name: 'Tout effacer' }).click()
     await page.getByRole('alertdialog').getByRole('button', { name: 'Tout effacer' }).click()
     await expect.poll(async () => page.evaluate(() => localStorage.getItem('horizon-profile'))).toBeNull()
+    // The confirm promised « rétablir tout de suite après » — the offer is on the page, and taking it
+    // brings the whole profile back for this visit.
+    await page.getByRole('button', { name: 'Rétablir l’ancien profil' }).click()
+    await expect.poll(async () => (await savedProfile(page))?.household.persons.length).toBe(2)
   })
 
   test('the example loads over a blank profile, after a confirmation', async ({ page }) => {

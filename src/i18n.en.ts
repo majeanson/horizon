@@ -406,7 +406,7 @@ export const EN: typeof FR = {
       title: 'Import',
       hint: 'Choose a file exported from Horizon. It replaces this device’s profile.',
       button: 'Choose a file',
-      confirm: 'Import this file? This device’s profile will be replaced by the file’s; without an export, the old one cannot be recovered.',
+      confirm: 'Import this file? This device’s profile will be replaced by the file’s. You can restore the old one right after; without an export, it cannot be recovered later.',
       confirmLabel: 'Import',
       done: 'File imported',
       notJson: 'This file is not a readable JSON document.',
@@ -423,7 +423,7 @@ export const EN: typeof FR = {
     example: {
       title: 'Example',
       hint: 'Loads a fictional household to show what a result looks like. Seven cases, to compare.',
-      confirm: (name: string) => `Load “${name}”? This device’s profile will be replaced by a fictional household; without an export, the old one cannot be recovered.`,
+      confirm: (name: string) => `Load “${name}”? This device’s profile will be replaced by a fictional household. You can restore the old one right after; without an export, it cannot be recovered later.`,
       confirmLabel: 'Load',
       done: 'Example loaded',
     },
@@ -431,7 +431,7 @@ export const EN: typeof FR = {
       title: 'Erase',
       hint: 'Removes the profile and assumptions from this device.',
       button: 'Erase everything',
-      confirm: 'Erase everything? The profile and assumptions will be removed from this device; without an export, nothing brings them back.',
+      confirm: 'Erase everything? The profile and assumptions will be removed from this device. You can restore them right after; without an export, nothing brings them back later.',
       confirmLabel: 'Erase everything',
       done: 'Data erased',
     },
@@ -447,6 +447,11 @@ export const EN: typeof FR = {
       hint: 'The profile this device could not read was left in place. Download it before erasing anything: a file like this can often be mended by hand.',
       button: 'Download the unreadable copy',
       older: 'Download the previous unreadable copy',
+    },
+    undo: {
+      offer: 'The previous profile can still be brought back, for this visit.',
+      button: 'Restore the previous profile',
+      done: 'Previous profile restored',
     },
     display: {
       title: 'Display',
