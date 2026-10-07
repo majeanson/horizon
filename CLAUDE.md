@@ -165,7 +165,9 @@ canary (the detector is pinned against a fixture), an `ALLOWED` map whose entrie
 `numberFieldBounds` (every `NumberField` declares the `max` the saved profile's schema will accept —
 a box without one can commit a figure that blanks the plan at the next launch) ·
 `twins` (every cited page has its other-language edition in `engine/params/twins.ts`, or a stated
-reason it has none; a new source must decide) · `verifiedHeader` (every worked example names its source).
+reason it has none; a new source must decide) · `verifiedHeader` (every worked example names its source) ·
+`fixtureSanity` (the golden couple, the example and every fixture hold to what life allows — earnings vs the cited ceilings, room vs the law, retired spending ≤ 1,05 × working — canary + ALLOWED reasons) ·
+`documentLang` (the head and manifest follow the reader's language) · the copy tests of the lazily-loaded results copy (`bridgeCopy`, `deferralCopy`, `resultsCopy`: non-empty, translated, no rate retyped).
 
 > **A new guard must be run against the bug it was written for before it is trusted.** A green
 > grep test proves nothing on its own — plant the violation (or stash the fix), watch the guard

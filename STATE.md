@@ -18,7 +18,7 @@
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
 | **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **9 — every phase is built.** What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (96 cited figures for 2026, 17 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
+| **Phase** | **10 — every phase is built** (the app, the three questions, the bridge years). What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (96 cited figures for 2026, 17 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://retraite.marcportal.com · https://github.com/majeanson/horizon |
 | **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
 
@@ -114,8 +114,8 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] `components/charts/*` (Recharts behind an adapter), `chartBoundary.test.ts` (planted: an import from a page → red; in a comment → green; the door's own import removed → red), a DevKit specimen
 - [x] Résultats: verdict, comparison chips, scenario cards, the chart (net worth or guaranteed income, in today's or the year's dollars, all in the address), per-year table, « Paramètres utilisés », and the sensitivity grid in a web worker; `e2e/results.spec.ts` (10)
-- [x] Bundle caps set from the real build (the chart library is 347 KB raw / 103 KB gzip, lazy, off the door; a lowered cap and a static `Résultats` import each turn `check:bundle` red)
-- [ ] The chart library is the biggest thing in the app. If 103 KB gzip on the first Résultats visit matters, the adapter lets a ~5 KB hand-drawn SVG replace it by editing one folder
+- [x] Bundle caps set from the real build (the chart library is 369 KB raw / 108 KB gzip since the stacked bar chart, lazy, off the door; a lowered cap and a static `Résultats` import each turn `check:bundle` red)
+- [ ] The chart library is the biggest thing in the app. If 108 KB gzip on the first Résultats visit matters, the adapter lets a ~5 KB hand-drawn SVG replace it by editing one folder
 
 - [x] « Quand commencer ma rente ? » on Résultats (behind a disclosure, in Simple too): the QPP at 60 · 65 · 70 · 72 and the OAS at 65 · 70 per person, with the break-even and the effect on the plan (`engine/deferral.ts`, `components/results/DeferralPanel.tsx`, its words in `lib/deferralCopy.ts` to keep the eager dictionary in budget); the case for and against deferring, and what it leaves out (survivor pension, GIS interplay, health)
 
@@ -138,8 +138,10 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] One Simple ↔ Full switch in the top bar (`lib/mode.ts`, `Advanced`, `ModeSwitch`): a new device starts Simple, a device that already holds a profile starts Full; Simple folds the optional / expert groups behind « Voir les détails » and loses nothing (`e2e/mode.spec.ts`, axe in both modes)
 - [x] A plain headline on Résultats (« Vous pouvez prendre votre retraite à 60 ans, tous les deux. » + why: the year money runs short one age earlier — `lib/headline.ts`); one `NextStep` at the foot of each page (Profil → Hypothèses → Résultats → Données, with what is missing); the longest hints shortened
+- [x] The e2e suite as it runs (`npx playwright test --list`): profile 31 · smoke 15 · results 11 · bridge 10 · mode 8 · keyboard 8 · questions 6 · a11y (every route × 7 display states) · `e2e:sw` 6 separate
 - [x] « Ma question » on Résultats (`?q=when|save|stop`): « Quand prendre ma retraite ? » (the verdict and the comparison), « Combien épargner ? » (`engine/savingsNeeded.ts`, in a worker) and « Quand arrêter de travailler ? » (`lib/stopWorking.ts`)
-- [ ] The eager i18n chunk is at its 36 KB cap: split the Résultats copy into its own lazy chunk before the next feature. ❓ « Combien épargner ? » moves money out of working-years spending into a non-registered account (ENGINE.md says why); it does not pick the best account, and it ignores a raise or a second income. « Quand arrêter » has no chart of its own
+- [x] The eager i18n chunk is back under its 33 KB cap (31,2 KB): the results-only copy (the three questions, the headline, « each of us ») lives in `lib/resultsCopy.ts`, fetched with the results page. ❓ Four near-identical off-thread hooks remain (`useEarliestEach`, `useSavingsNeeded`, `useDeferral`, `useSensitivity`); `useBridge` and `usePresetEarliest` share `lib/useOffThread.ts` — porting the rest is mechanical
+- [ ] ❓ « Combien épargner ? » moves money out of working-years spending into a non-registered account (ENGINE.md says why); it does not pick the best account, and it ignores a raise or a second income. « Quand arrêter » has no chart of its own
 
 ## 5. Lessons carried over from Babillard
 

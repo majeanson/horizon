@@ -1,6 +1,10 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { STRATEGY_KEYS } from '../engine/bridge.ts'
 import { paramsFor } from '../engine/params/index.ts'
+import { formatPct } from './format.ts'
 import { BRIDGE_COPY, type BridgeCopy } from './bridgeCopy.ts'
 import type { Verdict } from './bridgeModel.ts'
 
@@ -9,6 +13,12 @@ import type { Verdict } from './bridgeModel.ts'
 // none empty, none left in the other language, and the claims the copy makes are the ones the engine pins.
 
 const { fr, en } = BRIDGE_COPY
+
+const FACTS = (() => {
+  const P = paramsFor(2026, { inflation: 0.021, wageGrowth: 0.031 })
+  return { rrqPerMonth: P.rrq.latePerMonth, rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths, oasPerMonth: P.oas.deferralPerMonth, oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths }
+})()
+const whyArgs = (lang: 'fr' | 'en') => ({ rrqPerMonth: formatPct(FACTS.rrqPerMonth, lang, 1), rrqMax: formatPct(FACTS.rrqLateMax, lang, 1), oasPerMonth: formatPct(FACTS.oasPerMonth, lang, 1), oasMax: formatPct(FACTS.oasLateMax, lang, 0) })
 
 const VERDICTS: Verdict[] = [
   { kind: 'holds', defers: false, horizonAge: 95 },
@@ -26,7 +36,8 @@ function texts(c: BridgeCopy): [string, string][] {
     if (typeof v === 'string') out.push([k, v])
     else if (Array.isArray(v)) v.forEach((line, i) => out.push([`${k}.${i}`, line]))
     else if (typeof v === 'function') {
-      if (k === 'verdict') VERDICTS.forEach((verdict, i) => out.push([`verdict.${i}`, c.verdict(verdict)]))
+      if (k === 'why') c.why(whyArgs(c === en ? 'en' : 'fr')).forEach((line, i) => out.push([`why.${i}`, line]))
+      else if (k === 'verdict') VERDICTS.forEach((verdict, i) => out.push([`verdict.${i}`, c.verdict(verdict)]))
       else if (k === 'nestHint') out.push([k, c.nestHint(65, 70)])
       else if (k === 'tooltip') out.push([k, c.tooltip(62, 2054)])
       else if (k === 'barsFigure' || k === 'nestFigure') out.push([k, (v as (a: number, b: number) => string)(60, 70)])
@@ -45,7 +56,7 @@ describe('the bridge copy, in both languages', () => {
       expect(Object.keys(c.strategyLine).sort()).toEqual([...STRATEGY_KEYS].sort())
       expect(Object.keys(c.status).sort()).toEqual(['covered', 'drawing', 'short'])
     }
-    expect(en.why.length).toBe(fr.why.length)
+    expect(en.why(whyArgs('en')).length).toBe(fr.why(whyArgs('fr')).length)
     expect(en.caveats.length).toBe(fr.caveats.length)
   })
 
@@ -74,21 +85,31 @@ describe('the bridge copy, in both languages', () => {
     expect(P.rrq.latePerMonth * P.rrq.lateMaxMonths).toBeCloseTo(0.588, 10)
     expect(P.oas.deferralPerMonth).toBeCloseTo(0.006, 10)
     expect(P.oas.deferralPerMonth * P.oas.deferralMaxMonths).toBeCloseTo(0.36, 10)
-    expect(fr.why[0]).toContain('0,7 %')
-    expect(fr.why[0]).toContain('58,8 %')
-    expect(fr.why[0]).toContain('0,6 %')
-    expect(fr.why[0]).toContain('36 %')
-    expect(en.why[0]).toContain('0.7%')
-    expect(en.why[0]).toContain('58.8%')
-    expect(en.why[0]).toContain('0.6%')
-    expect(en.why[0]).toContain('36%')
+    // The copy is handed the rates (view.facts, from the cited params): it prints them in the reader's language …
+    const norm = (t: string) => t.replace(/[  ]/g, ' ')
+    const f = norm(fr.why(whyArgs('fr'))[0])
+    for (const t of ['0,7 %', '58,8 %', '0,6 %', '36 %']) expect(f).toContain(t)
+    const e = norm(en.why(whyArgs('en'))[0])
+    for (const t of ['0.7%', '58.8%', '0.6%', '36%']) expect(e).toContain(t)
+    // … and never types them: a rate retyped in the copy would drift from the params without a test noticing.
+    const source = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'bridgeCopy.ts'), 'utf8')
+    expect(source).not.toMatch(/0,7 %|58,8 %|0,6 %|36 %|0.7%|58.8%|0.6%|36%/)
   })
 
-  it('names the three sets of assumptions and the levers’ ranges as the page offers them', () => {
-    for (const c of [fr, en]) expect(Object.keys(c.presetName).sort()).toEqual(['bold', 'neutral', 'prudent'])
+  it('says the levers’ ranges as the page offers them (the scenario names come from the Assumptions page itself)', () => {
     expect(fr.leverHint).toContain('60 à 72')
     expect(fr.leverHint).toContain('65 à 70')
     expect(en.leverHint).toContain('60 to 72')
     expect(en.leverHint).toContain('65 to 70')
+  })
+})
+
+describe('canary: the « not French pasted in » check can fail', () => {
+  it('French used as the English copy is caught by the very comparison the real test makes', () => {
+    const frTexts = new Map(texts(fr))
+    const pastedIn = texts(fr).filter(([k, v]) => v.length > 30 && v === frTexts.get(k))
+    expect(pastedIn.length).toBeGreaterThan(5)
+    const real = texts(en).filter(([k, v]) => v.length > 30 && v === frTexts.get(k))
+    expect(real).toEqual([])
   })
 })

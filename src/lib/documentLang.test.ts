@@ -112,3 +112,13 @@ describe('the service worker keeps both manifests for an offline start', () => {
     for (const m of Object.values(DOCUMENT_META)) expect(shell, m.manifest).toContain(`'${m.manifest}'`)
   })
 })
+
+describe('canary: the two-language check can fail', () => {
+  const bothLanguages = (text: string) => /retraite/.test(text) && /retire/.test(text)
+  it('a description in one language only is caught, and the two languages carry different manifests', () => {
+    expect(bothLanguages('Quand pouvez-vous prendre votre retraite ?')).toBe(false)
+    expect(bothLanguages('When can you retire?')).toBe(false)
+    expect(bothLanguages('Quand prendre sa retraite ? When can you retire?')).toBe(true)
+    expect(DOCUMENT_META.fr.manifest).not.toBe(DOCUMENT_META.en.manifest)
+  })
+})

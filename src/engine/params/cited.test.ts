@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { citedLeaves, isCited, type Cited } from './cited.ts'
+import { citedLeaves, isCited, type Cited, type Source } from './cited.ts'
 import { KNOWN, SERIES } from './index.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
 
@@ -104,8 +104,19 @@ describe('law 2: every figure is cited', () => {
     expect(bad, 'a `verify` must SAY why the figure is unconfirmed — a bare flag is worse than none').toEqual([])
   })
 
+  // The detector, pinned: with MAX_UNVERIFIED at 0 the ratchet below would pass for ever if the detector stopped seeing a flag
+  // (a renamed field, a changed test). One flagged figure MUST be counted, and the field is the one the type declares.
+  const unverifiedOf = (xs: readonly { where: string; path: string; cited: { source: { verify?: string } } }[]) => xs.filter(({ cited: c }) => c.source.verify !== undefined)
+  it('canary: the unconfirmed-figure detector counts a flagged figure, and reads the field the type declares', () => {
+    const flagged = { where: 'canary', path: 'x', cited: { source: { verify: 'une raison écrite en toutes lettres : la page est derrière un robot' } } }
+    expect(unverifiedOf([flagged, { where: 'canary', path: 'y', cited: { source: {} } }])).toHaveLength(1)
+    const field: keyof Source = 'verify'
+    expect(field).toBe('verify')
+    expect(unverifiedOf([flagged]).length, 'with one flagged figure the ratchet must FAIL').toBeGreaterThan(MAX_UNVERIFIED)
+  })
+
   it(`holds the unconfirmed figures to a ratchet (≤ ${MAX_UNVERIFIED}, may only fall)`, () => {
-    const unverified = all.filter(({ cited: c }) => c.source.verify !== undefined).map((l) => `${l.where} ${l.path}`)
+    const unverified = unverifiedOf(all).map((l) => `${l.where} ${l.path}`)
     expect(unverified.length, `unconfirmed figures: ${unverified.join(', ')}`).toBeLessThanOrEqual(MAX_UNVERIFIED)
   })
 
