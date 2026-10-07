@@ -58,7 +58,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **NumberField** | `src/components/NumberField.tsx` | The number box: owns the TEXT while it is typed and hands the page a NUMBER only when the text means one (FR-CA comma rules, `lib/money.ts`). Kinds `money` / `percent` / `decimal` / `year` / `int`; committed on Enter or blur; an out-of-range text stays on screen with its reason. `allowEmpty` makes an optional figure a number or `null`. |
 | **FieldRow** | `src/components/FieldRow.tsx` | One labelled field: label tied to the box, the box with its ⓘ, a quiet hint read with it. The control is a render function that receives the ids to wire — the caller never invents them. |
 | **FieldInfo** | `src/components/FieldInfo.tsx` | The ⓘ « where to find this number »: an inline note (not a popover) with WHERE the figure is, the document's own wording for it, and the official page. Wording lives in `FR.info.<id>`; `fieldInfoCopy.test.ts` holds every id to an entry and every link to an official host. |
-| **Chip** · ChipGroup | `src/components/Chip.tsx` | The ONE pill — toggle (`selected`), action (`onClick`), link (`to`), static label, expander. A test (`chip-rule.test.ts`) fails the build on a hand-rolled `className="chip"`. |
+| **Chip** · ChipGroup | `src/components/Chip.tsx` | The ONE pill — toggle (`selected`), action (`onClick`), link (`to`), static label, expander (`expanded`), the « you are here » of a nav (`current`). A test (`chip-rule.test.ts`) fails the build on a hand-rolled `className="chip"`. |
 | **SubTabs** | `src/components/SubTabs.tsx` | The segmented « one job at a time » control; keyboard-complete tablist, wheel-mapped, paging chevrons on a fine pointer. |
 
 ### Display / content

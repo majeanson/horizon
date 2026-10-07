@@ -33,6 +33,10 @@ import { InlineIcon, type IconName } from './Icon'
 // in place (the meal-idea rows, which unfold a MealPlanPicker under themselves).
 // It says `aria-expanded`, never `aria-pressed` — a disclosure is not a toggle.
 //
+// `current` is the sixth: the « you are here » chip of a nav (SectionNav's marked
+// section). It wears the `.is-on` look and says `aria-current`, never pressed —
+// a location is not a toggle, and « pressed » promised an un-press that meant nothing.
+//
 // `onRemove` is the removable tag-pill: the chip is itself the remove button and
 // grows a trailing ✕ (it is an action, so no `aria-pressed` there either).
 export function Chip({
@@ -44,6 +48,7 @@ export function Chip({
   removeLabel,
   to,
   expanded,
+  current,
   icon,
   ariaLabel,
   title,
@@ -64,6 +69,8 @@ export function Chip({
   to?: string
   /** A chip that UNFOLDS a panel under itself — `aria-expanded`, not pressed. */
   expanded?: boolean
+  /** The « you are here » of a nav — `aria-current` + the is-on look, not pressed. */
+  current?: boolean
   icon?: IconName
   ariaLabel?: string
   title?: string
@@ -79,7 +86,7 @@ export function Chip({
   // pattern the recipe tag-pills use. Otherwise it's a toggle, an action, a link
   // or a static label.
   const handler = onRemove ?? onClick
-  const cls = 'chip' + (selected ? ' is-on' : '') + (className ? ` ${className}` : '')
+  const cls = 'chip' + (selected || current ? ' is-on' : '') + (className ? ` ${className}` : '')
   // The space rides WITH the icon: `{icon && <I/>} {children}` puts a leading space
   // in every icon-less chip too, which is a stray character in its accessible name.
   const body = (
@@ -122,8 +129,9 @@ export function Chip({
       // along for the `.is-on` look of an opened rule.
       role={radio && selected !== undefined && !onRemove ? 'radio' : undefined}
       aria-checked={radio && selected !== undefined && !onRemove ? selected : undefined}
-      aria-pressed={selected === undefined || onRemove || radio || expanded !== undefined ? undefined : selected}
+      aria-pressed={selected === undefined || onRemove || radio || expanded !== undefined || current !== undefined ? undefined : selected}
       aria-expanded={expanded}
+      aria-current={current || undefined}
       aria-label={ariaLabel ?? (onRemove ? removeLabel : undefined)}
       title={title}
       disabled={disabled}

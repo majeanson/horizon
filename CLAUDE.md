@@ -61,7 +61,7 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | Where to find a number | **`FieldInfo`** — wording in `FR.info.<id>`, held to official hosts by `fieldInfoCopy.test.ts` | `components/FieldInfo.tsx` |
 | The top of a page | **`PageHead`** — the ONE `<h1>` | `components/PageHead.tsx` |
 | A card of fields on a page | **`Section`** | `components/profile/shared.tsx` |
-| A small pill (toggle · action · link · label · expander) | **`Chip`** — shape chosen by props; a test fails a hand-rolled `className="chip"` | `components/Chip.tsx` |
+| A small pill (toggle · action · link · label · expander · you-are-here) | **`Chip`** — shape chosen by props; a test fails a hand-rolled `className="chip"` | `components/Chip.tsx` |
 | Segmented « one job at a time » control | **`SubTabs`** | `components/SubTabs.tsx` |
 | A horizontal row of buttons / chips | **`Cluster`** (wraps) / **`Rail`** (scrolls one line) — never a bespoke flex row | `components/Layout.tsx` |
 | A row that scrolls sideways with a hidden scrollbar | **`useHScroll()`** — maps the wheel, reports `overflowing` | `lib/hscroll.ts` |
