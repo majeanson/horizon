@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
-import { Rail } from '../components/Layout'
+import { Cluster, Rail } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { BridgePanel } from '../components/results/BridgePanel'
@@ -28,6 +28,7 @@ import { parseBridgeParams } from '../lib/bridgeModel'
 import { presetOf } from '../engine/assumptionPresets'
 import { RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
+import { scrollBehavior } from '../lib/motion'
 import { usePresetRange } from '../lib/usePresetEarliest'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
@@ -128,7 +129,9 @@ export function Resultats() {
 
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
   const youngest = Math.min(...profile.household.persons.map((p) => year - p.birth.year))
-  const firstAge = Math.max(MIN_AGE, oldest)
+  // Clamped on BOTH sides: someone past 70 and still working used to leave firstAge above MAX_AGE —
+  // an empty compare rail and an age box whose min sat over its max.
+  const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, oldest))
   const headline = useMemo(
     () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest)),
     [profile, gaps.length, earliest, firstAge, youngest, year, month],
@@ -249,7 +252,14 @@ export function Resultats() {
             )}
           </>
         ) : headline.kind === 'none' ? (
-          <p className="verdict__note">{rc.headline.tryThis}</p>
+          <>
+            {/* The WORST verdict must be the most actionable one: the nudge carries its two doors. */}
+            <p className="verdict__note">{rc.headline.tryThis}</p>
+            <Cluster>
+              <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
+              <Chip onClick={() => document.getElementById('donnees-calcul')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })}>{rc.headline.tryLedger}</Chip>
+            </Cluster>
+          </>
         ) : (
           <>
             <p className="verdict__note">
@@ -285,7 +295,7 @@ export function Resultats() {
       {/* The refinement loop: the verdict stands on three numbers; these would sharpen it, each a link to its field. */}
       {refine.length > 0 && (
         <div className="surface results-section refine" aria-label={rc.refine.title}>
-          <SectionHeader title={rc.refine.title} subtitle={rc.refine.hint} />
+          <SectionHeader title={rc.refine.title} subtitle={headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
           <ul className="refine__list">
             {refine.map((k) => (
               <li key={k}>

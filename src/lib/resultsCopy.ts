@@ -19,6 +19,8 @@ const FR_RESULTS = {
   refine: {
     title: 'Préciser le calcul',
     hint: 'Le verdict tient déjà debout ; ces chiffres le rendraient plus fidèle.',
+    /** When the verdict is « ça ne tient pas », nothing « tient déjà debout ». */
+    hintNone: 'Ces chiffres rendraient le calcul plus fidèle.',
     statement: 'La rente projetée de votre relevé RRQ, ou vos revenus admissibles année par année.',
     accounts: 'Les soldes de vos comptes — REER, CELI, non enregistré.',
     spendingWork: 'Vos dépenses pendant les années de travail.',
@@ -80,6 +82,7 @@ const FR_RESULTS = {
     /** The accessible suffix on the compare rail's marked chip — the verdict's own age among twenty look-alikes. */
     earliestChip: 'le plus tôt qui tient',
     tryThis: 'Essayez de baisser les dépenses à la retraite, ou d’épargner davantage.',
+    tryLedger: 'Ajuster mes chiffres, plus bas',
   },
   each: {
     title: 'Chacun de son côté',
@@ -108,6 +111,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   refine: {
     title: 'Refine the calculation',
     hint: 'The verdict already stands; these numbers would make it more faithful.',
+    hintNone: 'These numbers would make the calculation more faithful.',
     statement: 'The projected pension from your QPP statement, or your pensionable earnings year by year.',
     accounts: 'Your account balances — RRSP, TFSA, non-registered.',
     spendingWork: 'Your spending during the working years.',
@@ -167,6 +171,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
     earlier: (age: number, year: number) => `At ${age}, the money would run short from ${year}.`,
     earliestChip: 'the earliest that lasts',
     tryThis: 'Try lowering spending in retirement, or saving more.',
+    tryLedger: 'Adjust my numbers, below',
   },
   each: {
     title: 'Each on their own',

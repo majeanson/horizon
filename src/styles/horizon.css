@@ -844,6 +844,14 @@
   font-weight: 700;
   background: var(--accent-soft);
 }
+/* The fragility told by tone: later than the base cell = a caution wash; no age lasts = the
+   same tone the failing bridge rows wear. The note under the grids says what the tints mean. */
+.sensitivity .table-wrap td.sensitivity__cell--later {
+  background: var(--marigold-wash);
+}
+.sensitivity .table-wrap td.sensitivity__cell--none {
+  background: var(--clay-soft);
+}
 
 /* ── First visit ─────────────────────────────────────────────────────────── */
 .welcome {

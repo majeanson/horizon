@@ -12,6 +12,15 @@ export function SplitPicker({ names, defaults, onAdd, disabled }: { names: reado
   const c = useT().results.compare
   const [first, setFirst] = useState(defaults[0])
   const [second, setSecond] = useState(defaults[1])
+  // The defaults ARE the profile's ages: when they change (an edit on this very page, through the
+  // ledger), the boxes follow instead of keeping the prefill from mount. The adjust-during-render
+  // pattern, so the reader never sees the stale pair.
+  const [seeded, setSeeded] = useState(defaults)
+  if (seeded[0] !== defaults[0] || seeded[1] !== defaults[1]) {
+    setSeeded(defaults)
+    setFirst(defaults[0])
+    setSecond(defaults[1])
+  }
   const valid = (n: number) => n >= MIN_AGE && n <= MAX_AGE
   const usable = valid(first) && valid(second) && first !== second
   return (

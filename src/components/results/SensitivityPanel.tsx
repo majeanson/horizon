@@ -39,15 +39,24 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
       ) : (
         <>
           <div className="sensitivity__grids">
-            {axes.horizonAges.map((horizonAge) => (
+            {axes.horizonAges.map((horizonAge) => {
+              // The grid's story is « how fast does the answer degrade » — told by tone, not only by
+              // reading 27 numbers: later-than-base cells are tinted, no-age-lasts cells are dark.
+              const base = find(horizonAge, 0, 0)
+              const cellClass = (rd: number, id: number, cell: ReturnType<typeof find>) => {
+                if (rd === 0 && id === 0) return 'is-base'
+                if (cell === undefined) return undefined
+                if (cell.earliestOk === null) return 'sensitivity__cell--none'
+                if (base !== undefined && base.earliestOk !== null && cell.earliestOk > base.earliestOk) return 'sensitivity__cell--later'
+                return undefined
+              }
+              return (
               <div key={horizonAge} className="table-wrap" role="region" aria-label={s.horizon(horizonAge)} tabIndex={0}>
                 <table>
                   <caption className="sensitivity__caption">{s.horizon(horizonAge)}</caption>
                   <thead>
                     <tr>
-                      <th scope="col">
-                        {s.returns} ↓ · {s.inflation} →
-                      </th>
+                      <th scope="col">{s.axes}</th>
                       {axes.inflationDeltas.map((d) => (
                         <th key={d} scope="col">
                           {s.delta(points(d))}
@@ -62,7 +71,7 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
                         {axes.inflationDeltas.map((id) => {
                           const cell = find(horizonAge, rd, id)
                           return (
-                            <td key={id} className={rd === 0 && id === 0 ? 'is-base' : undefined}>
+                            <td key={id} className={cellClass(rd, id, cell)}>
                               {cell === undefined ? '…' : cell.earliestOk === null ? s.none : cell.earliestOk}
                             </td>
                           )
@@ -72,7 +81,8 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
                   </tbody>
                 </table>
               </div>
-            ))}
+              )
+            })}
           </div>
           <StatusMessage tone="info">{s.note}</StatusMessage>
         </>

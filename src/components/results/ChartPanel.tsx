@@ -77,6 +77,8 @@ export function ChartPanel({
       </div>
       <p className="field-row__hint">
         {metric === 'netWorth' ? c.netWorthHint : c.incomeHint} {dollars === 'today' ? c.todayHint : c.nominalHint}
+        {/* The vertical dashed markers carried no key at all — a reader saw coloured lines and had to guess. */}
+        {markers.length > 0 && <> {c.markersHint}</>}
       </p>
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
