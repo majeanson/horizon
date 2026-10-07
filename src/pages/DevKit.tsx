@@ -13,6 +13,7 @@ import { Icon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Modal } from '../components/Modal'
 import { NumberField } from '../components/NumberField'
+import { Slider } from '../components/Slider'
 import { PageHead } from '../components/PageHead'
 import { Cluster, Rail } from '../components/Layout'
 import { SectionHeader } from '../components/SectionHeader'
@@ -70,6 +71,17 @@ function EditFieldSpecimen() {
       <Demo label="bouton étiqueté (passe sous le champ en espace étroit)">
         <EditField value={w} onChange={setW} onSubmit={setW} submitLabel="Ajouter" ariaLabel="Montant" />
       </Demo>
+    </>
+  )
+}
+
+function SliderSpecimen() {
+  const [age, setAge] = useState(65)
+  const [seen, setSeen] = useState(65)
+  return (
+    <>
+      <Slider label="Début de la rente" value={age} min={60} max={72} valueText={(v) => `${v} ans`} onPreview={setSeen} onCommit={setAge} />
+      <p className="field-row__hint">En mouvement : {seen} · enregistré : {age}</p>
     </>
   )
 }
@@ -282,6 +294,7 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Saisie', name: 'EditField', file: 'src/components/EditField.tsx', kw: 'champ texte saisie input', render: () => <EditFieldSpecimen /> },
+    { cat: 'Saisie', name: 'Slider', file: 'src/components/Slider.tsx', kw: 'curseur glissière âge plage', render: () => <SliderSpecimen /> },
     { cat: 'Saisie', name: 'NumberField', file: 'src/components/NumberField.tsx', kw: 'nombre montant pourcentage année âge saisie', render: () => <NumberFieldSpecimen /> },
     { cat: 'Saisie', name: 'FieldRow', file: 'src/components/FieldRow.tsx', kw: 'champ étiquette indice libellé', render: () => <FieldRowSpecimen /> },
     {

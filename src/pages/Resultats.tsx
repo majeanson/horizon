@@ -9,6 +9,7 @@ import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
 import { DeferralPanel } from '../components/results/DeferralPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
+import { LedgerPanel } from '../components/results/LedgerPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SaveView } from '../components/results/SaveView'
 import { StopView } from '../components/results/StopView'
@@ -22,6 +23,7 @@ import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
 import { BRIDGE_COPY } from '../lib/bridgeCopy'
 import { DEFERRAL_COPY } from '../lib/deferralCopy'
+import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { presetOf } from '../engine/assumptionPresets'
 import { RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
@@ -265,6 +267,11 @@ export function Resultats() {
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
+
+      {/* The ages that set the answer, with their calculation and a slider each: one line in both modes. */}
+      <Disclosure label={LEDGER_COPY[lang].title}>
+        <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
+      </Disclosure>
 
       {full && earliestBlock}
 

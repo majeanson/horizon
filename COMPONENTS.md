@@ -53,6 +53,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 
 | Component | File | Purpose |
 | --- | --- | --- |
+| **Slider** | `src/components/Slider.tsx` | A range control for a whole-number choice (an age) whose effect is worth SEEING while it moves: `onPreview` on every step (cheap — show what it would do), `onCommit` once on release / key up / blur (save it, recompute the heavy answers). The value is always printed beside it; pair with a `NumberField` where a typed value matters. |
 | **EditField** | `src/components/EditField.tsx` | The ONE text box: input or textarea, clear ✕ inside the box, optional submit / cancel / leading glyph / trailing unit. `NumberField` (profile amounts) wraps it. |
 | **NumberField** | `src/components/NumberField.tsx` | The number box: owns the TEXT while it is typed and hands the page a NUMBER only when the text means one (FR-CA comma rules, `lib/money.ts`). Kinds `money` / `percent` / `decimal` / `year` / `int`; committed on Enter or blur; an out-of-range text stays on screen with its reason. `allowEmpty` makes an optional figure a number or `null`. |
 | **FieldRow** | `src/components/FieldRow.tsx` | One labelled field: label tied to the box, the box with its ⓘ, a quiet hint read with it. The control is a render function that receives the ids to wire — the caller never invents them. |

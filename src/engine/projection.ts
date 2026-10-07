@@ -35,7 +35,7 @@ interface PersonState {
   nonReg: NonRegState
 }
 
-interface ResolvedPerson {
+export interface ResolvedPerson {
   p: Person
   retirementAge: number
   rrqStartAge: number
@@ -61,7 +61,7 @@ function workFraction(r: ResolvedPerson, year: number): number {
   return 0
 }
 
-function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRules): ResolvedPerson {
+export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRules): ResolvedPerson {
   const retirementAge = s.retirementAge?.[p.id] ?? p.retirementAge
   const rrqStartAge = s.rrqStartAge?.[p.id] ?? p.rrq.startAge
   const oasStartAge = s.oasStartAge?.[p.id] ?? p.oas.startAge

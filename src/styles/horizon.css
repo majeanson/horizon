@@ -998,3 +998,66 @@
   border-radius: 0;
   border-top: 2px dashed var(--ink);
 }
+
+/* Slider — a range input whose value is always printed beside it */
+.slider {
+  display: grid;
+  gap: 0.25rem;
+}
+.slider__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.slider__value {
+  font-weight: 600;
+}
+.slider__input {
+  width: 100%;
+  min-height: 2.75rem;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+.slider__input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.slider__ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+
+/* « Mes données » — the ages, the calculation behind each, and what it turns into */
+.ledger {
+  display: grid;
+  gap: 1rem;
+}
+.ledger__person {
+  display: grid;
+  gap: 0.75rem;
+}
+.ledger__row {
+  display: grid;
+  gap: 0.25rem;
+  padding-block: 0.5rem;
+  border-top: 1px solid var(--line, color-mix(in srgb, var(--ink) 15%, transparent));
+}
+.ledger__calc {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.ledger__result {
+  margin: 0;
+  font-weight: 600;
+}
+.ledger__delta {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+.ledger__glance {
+  margin: 0;
+}
