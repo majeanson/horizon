@@ -9,7 +9,7 @@
 //     — « When can you receive your pension under RREGOP and how much will you receive? »: the Johanne example.
 //   · https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf — the Act (R-10), ss. 33, 34.2, 38, 39, 77.
 import { describe, expect, it } from 'vitest'
-import { dbStart, dbYear, indexationRate, pensionAdjustment, unreducedAge, type DbInput } from '../dbPension.ts'
+import { daysPaidFromMonth, dbStart, dbYear, firstIndexationShare, indexationIncrease, indexationRate, pensionAdjustment, unreducedAge, type DbInput } from '../dbPension.ts'
 import { knownYear } from '../params/index.ts'
 import { rregopPension } from '../presets.ts'
 
@@ -110,8 +110,9 @@ describe('RREGOP — when the pension is paid in full (statute s. 33)', () => {
     expect(s.earlyReduction).toBeCloseTo(0.36, 10)
   })
 
-  it('the earliest start is 55, whatever the person asks for', () => {
-    const s = dbStart(rregopPension({ serviceYearsToDate: 20, startAge: 50 }), input(60_000, MGA_BIG, 50))
+  it('the earliest start is 55, whatever the person asks for (a plan WITHOUT a deferred rule: reduced to the unreduced age, 61)', () => {
+    const { deferred: _deferred, ...noDeferredRule } = rregopPension({ serviceYearsToDate: 20, startAge: 50 })
+    const s = dbStart(noDeferredRule, input(60_000, MGA_BIG, 50))
     expect(s.earlyReduction).toBeCloseTo(0.36, 10)
   })
 })
@@ -131,8 +132,10 @@ describe('RREGOP — indexation of the pension in pay (statute s. 77; « L\'inde
 
   it('the pension grows from the year after it starts, the coordination amount from the year after it applies', () => {
     const s = dbStart(rregopPension({ serviceYearsToDate: 32, startAge: 61 }), input(50_000, MGA_BIG))
-    expect(dbYear(s, 2022, 0.02)).toBeCloseTo(32_000 * 1.01, 2)
-    expect(dbYear(s, 2026, 0.02)).toBeCloseTo(32_000 * 1.01 ** 5 - 11_200 * 1.01, 2)
+    // Born June 1960, so the pension starts July 2021: 184 of the 365 days of 2021, hence 184/365 of the first (January 2022) indexation.
+    const first = 1 + 0.01 * (184 / 365)
+    expect(dbYear(s, 2022, 0.02)).toBeCloseTo(32_000 * first, 2)
+    expect(dbYear(s, 2026, 0.02)).toBeCloseTo(32_000 * first * 1.01 ** 4 - 11_200 * 1.01, 2)
   })
 })
 
@@ -148,5 +151,84 @@ describe('pension adjustment — CRA, Pension Adjustment Guide (T4084)', () => {
     expect(pensionAdjustment([p], 10_000, true, R)).toBe(1_200) // 9 × 200 − 600
     expect(pensionAdjustment([p], 2_000, true, R)).toBe(0) // 9 × 40 − 600 < 0
     expect(pensionAdjustment([p], 80_000, false, R)).toBe(0)
+  })
+})
+
+// The page's own worked example, « L'indexation (réajustement) de la rente »: Réjean, 25 200 $ a year, TAIR 2,0 %.
+describe('RREGOP — the FIRST indexation is pro-rated by the days the pension was paid (Réjean)', () => {
+  // The three service tiers of the page, each as the plan's own formula: full TAIR · TAIR − 3 % · the better of 50 % of TAIR and TAIR − 3 %.
+  const TIERS = [
+    { annual: 360, ix: { share: 1, minus: 0 }, expected: [7.2, 4.73] },
+    { annual: 12_600, ix: { share: 0, minus: 0.03 }, expected: [0, 0] },
+    { annual: 12_240, ix: { share: 0.5, minus: 0.03 }, expected: [122.4, 80.48] },
+  ]
+  const TAIR = 0.02
+
+  it('retiring on 1 January 2025 the whole year is paid: +129,60 $ → 25 329,60 $', () => {
+    const increases = TIERS.map((t) => indexationIncrease(t.annual, indexationRate(TAIR, t.ix), firstIndexationShare(365, 365)))
+    expect(increases).toEqual(TIERS.map((t) => t.expected[0]))
+    expect(Math.round(increases.reduce((a, b) => a + b, 0) * 100) / 100).toBe(129.6)
+  })
+
+  it('retiring on 5 May 2025 the pension is paid 240 days: +4,73 $ + 0 + 80,48 $ = +85,21 $ → 25 285,21 $', () => {
+    const increases = TIERS.map((t) => indexationIncrease(t.annual, indexationRate(TAIR, t.ix), firstIndexationShare(240, 365)))
+    expect(increases).toEqual(TIERS.map((t) => t.expected[1]))
+    expect(Math.round(increases.reduce((a, b) => a + b, 0) * 100) / 100).toBe(85.21)
+  })
+
+  it('the engine counts the days from the 1st of the month the pension starts (months are its smallest step), 366 in a leap year', () => {
+    expect(daysPaidFromMonth(2025, 0)).toEqual({ paid: 365, inYear: 365 }) // January: the whole year
+    expect(daysPaidFromMonth(2025, 4)).toEqual({ paid: 245, inYear: 365 }) // 1 May: 245 days (the page's 240 starts on 6 May)
+    expect(daysPaidFromMonth(2024, 2)).toEqual({ paid: 306, inYear: 366 }) // 1 March of a leap year
+    expect(daysPaidFromMonth(2025, 11)).toEqual({ paid: 31, inYear: 365 })
+  })
+
+  it('a pension that starts in January is indexed in full the next January; one that starts in July only for the half-year it was paid', () => {
+    const jan = dbStart(rregopPension({ serviceYearsToDate: 32, startAge: 60 }), { ...input(50_000, MGA_BIG, 60), birth: { year: 1960, month: 12 }, leaving: { year: 2020, month: 12 }, today: { year: 2020, month: 12 } })
+    expect(jan.firstYearShare).toBe(1) // starts January 2021
+    const jul = dbStart(rregopPension({ serviceYearsToDate: 32, startAge: 61 }), input(50_000, MGA_BIG)) // starts July 2021
+    expect(jul.firstYearShare).toBeCloseTo(184 / 365, 12)
+  })
+})
+
+describe('RREGOP — a DEFERRED pension (« La fin d’emploi avant l’admissibilité à une rente »)', () => {
+  // A member born June 1992 who leaves at 40 with 15 years of service and takes the pension at the age asked.
+  const born = { year: 1992, month: 6 }
+  const leaveAt40: DbInput = { birth: born, leaving: { year: 2032, month: 6 }, today: { year: 2032, month: 6 }, salaryAt: () => 75_000, mgaAt: () => MGA_BIG }
+
+  it('payable at 65 it is paid in full: no reduction, and the coordination starts at 65', () => {
+    const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 65 }), leaveAt40)
+    expect(s.earlyReduction).toBe(0)
+    expect(s.formulaAnnual).toBe(22_500) // 15 × 2 % × 75 000
+    expect(s.annualBeforeCoordination).toBe(22_500)
+    expect(s.coordinationIndex).toBe(s.startIndex)
+  })
+
+  it('taken at 60 it is cut 0,5 % a month back to the 65th birthday: 60 months → 30 %', () => {
+    const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 60 }), leaveAt40)
+    expect(s.earlyReduction).toBeCloseTo(0.3, 10)
+    expect(s.annualBeforeCoordination).toBeCloseTo(15_750, 2)
+  })
+
+  it('the coordination applies from the first payment, cut by the same 30 %: 15 × 0,7 % × 75 000 = 7 875 → 5 512,50', () => {
+    const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 60 }), leaveAt40)
+    expect(s.coordinationAnnual).toBeCloseTo(5_512.5, 2)
+    expect(s.coordinationIndex).toBe(s.startIndex)
+  })
+
+  it('until it starts it is indexed in FULL from the January after leaving to the January of its start year', () => {
+    const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 60 }), leaveAt40)
+    // Leaves 2032, starts July 2052: twenty full indexations (2033 … 2052) of 2 %. The year it starts pays the amount indexed to that January.
+    const startYear = Math.floor(s.startIndex / 12)
+    expect(startYear).toBe(2052)
+    const paid = dbYear(s, 2052, 0.02)
+    const monthly = (s.annualBeforeCoordination * 1.02 ** 20 - s.coordinationAnnual * 1.02 ** 20) / 12
+    expect(paid).toBeCloseTo(monthly * 6, 0) // July to December
+  })
+
+  it('a member who leaves at 55 or later, or with 35 years, is NOT deferred: the active reduction to the unreduced age applies', () => {
+    const leaveAt58: DbInput = { ...leaveAt40, leaving: { year: 2050, month: 6 }, today: { year: 2050, month: 6 } }
+    expect(dbStart(rregopPension({ serviceYearsToDate: 20, startAge: 58 }), leaveAt58).earlyReduction).toBeCloseTo(0.18, 10) // (61 − 58) × 6 %
+    expect(dbStart(rregopPension({ serviceYearsToDate: 36, startAge: 55 }), leaveAt40).deferredFromYear).toBeNull()
   })
 })

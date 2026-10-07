@@ -68,6 +68,44 @@ export interface DbStart {
   /** A pension in pay whose amount changes at 65: the month it changes, and the new annual amount in today's dollars. */
   afterIndex?: number | null
   afterAnnual?: number
+  /**
+   * The share of the YEAR the pension is paid in its first year, from the first of its first month: the first January
+   * indexation is only that share of the full rate (see `firstIndexationShare`). 1 when the pension starts in January.
+   */
+  firstYearShare?: number
+  /** A deferred pension (the member left before being eligible): the calendar year of leaving, and the indexation it gets until payment. */
+  deferredFromYear?: number | null
+  deferredIndexation?: { share: number; minus: number }
+}
+
+/** True for a leap year. */
+const isLeap = (year: number): boolean => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+
+const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+/**
+ * The days of `year` from the first day of the 0-based `month` to 31 December, both ends counted, and the days in that
+ * year. The engine is month-granular, so a pension is read as taking effect on the 1st of its first month.
+ */
+export function daysPaidFromMonth(year: number, month: number): { paid: number; inYear: number } {
+  const inYear = isLeap(year) ? 366 : 365
+  let before = 0
+  for (let m = 0; m < month; m++) before += m === 1 && isLeap(year) ? 29 : MONTH_DAYS[m]
+  return { paid: inYear - before, inYear }
+}
+
+/**
+ * The share of the full January indexation a pension gets the FIRST time, because it was paid for only part of the year
+ * before: « the number of days the pension was paid in its first year ÷ 365 (366 in a leap year) » (Retraite Québec, RREGOP,
+ * « L'indexation (réajustement) de la rente »). A pension paid the whole year gets the whole rate.
+ */
+export function firstIndexationShare(daysPaid: number, daysInYear: number): number {
+  return Math.min(1, Math.max(0, daysPaid / daysInYear))
+}
+
+/** The January increase of an amount of `annual`: `annual × rate × share`, to the cent — the unit of Retraite Québec's worked example. */
+export function indexationIncrease(annual: number, rate: number, share = 1): number {
+  return roundTo(annual * rate * share, 0.01)
 }
 
 /** The last calendar year of work: the year before leaving, or the leaving year itself when leaving is after January. */
@@ -112,7 +150,14 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
   // The reduction counts the YEARS (to the month) between the start and the earliest date the member could have been paid in full.
   const startAge = Math.max(p.startAge, p.earliestAge)
   const unreduced = unreducedAge(p, service)
-  const earlyReduction = Math.min(1, Math.max(0, unreduced - startAge) * p.earlyReductionPerYear)
+  // A member who LEAVES before being eligible for any pension has a deferred pension: the reduction counts the years from the
+  // start to the plan's `deferred.toAge` (65 for RREGOP), not to the unreduced age. Eligible = old enough for the earliest
+  // (reduced) pension, or holding the service that pays one at any age.
+  const leavingAge = yearsBetween(input.birth, input.leaving)
+  const eligibleAtLeaving = leavingAge >= p.earliestAge || (p.unreduced.serviceYears !== null && service >= p.unreduced.serviceYears)
+  const isDeferred = p.deferred !== undefined && !eligibleAtLeaving
+  const reduceToAge = isDeferred ? p.deferred!.toAge : unreduced
+  const earlyReduction = Math.min(1, Math.max(0, reduceToAge - startAge) * p.earlyReductionPerYear)
   const annualBeforeCoordination = formulaAnnual * (1 - earlyReduction)
 
   // Coordination reads the LAST years' salary and the same years' MGA, and its service is capped (35 for RREGOP).
@@ -121,6 +166,10 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
     : 0
 
   const atAge = (age: number): number => monthIndex({ year: input.birth.year + age, month: input.birth.month }) + 1
+  // The deferred pension is coordinated from the day it starts, by the same share as the pension is reduced.
+  const coordinationShown = isDeferred ? coordinationAnnual * (1 - earlyReduction) : coordinationAnnual
+  const startIndex = atAge(startAge)
+  const first = daysPaidFromMonth(Math.floor(startIndex / 12), startIndex % 12)
   return {
     service: roundTo(service, 0.01),
     averageSalary: roundTo(avg, 0.01),
@@ -128,12 +177,15 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
     unreducedAge: unreduced,
     earlyReduction,
     annualBeforeCoordination: roundTo(annualBeforeCoordination, 0.01),
-    coordinationAnnual: roundTo(coordinationAnnual, 0.01),
-    startIndex: atAge(startAge),
-    coordinationIndex: p.coordination ? atAge(p.coordination.fromAge) : null,
+    coordinationAnnual: roundTo(coordinationShown, 0.01),
+    startIndex,
+    coordinationIndex: p.coordination ? (isDeferred ? Math.min(startIndex, atAge(p.coordination.fromAge)) : atAge(p.coordination.fromAge)) : null,
     bridgeAnnual: p.bridge ? roundTo(p.bridge.share * annualBeforeCoordination, 0.01) : 0,
     bridgeEndIndex: p.bridge ? atAge(p.bridge.untilAge) - 1 : null,
     indexation: p.indexation,
+    firstYearShare: firstIndexationShare(first.paid, first.inYear),
+    deferredFromYear: isDeferred ? input.leaving.year : null,
+    deferredIndexation: isDeferred ? p.deferred!.indexation : undefined,
   }
 }
 
@@ -180,22 +232,28 @@ export function indexationRate(inflation: number, ix: { share: number; minus: nu
  * The pension received in `year`, in that year's dollars, month by month: nothing before the first payment;
  * the pension from then, less the coordination from ITS month (the month after the 65th birthday — even when
  * the RRQ was taken earlier), plus the bridge up to its last month. The pension is indexed each January from the
- * year after it starts (the first indexation is not pro-rated: ENGINE.md §2); the coordination amount, a fixed
- * sum when it first applies, is indexed from the year after THAT.
+ * year after it starts — the FIRST of those is only the share of the rate matching the days it was paid that year
+ * (`firstYearShare`); the coordination amount, a fixed sum when it first applies, is indexed from the year after THAT.
+ * A deferred pension is first indexed, in full, from the January after leaving to the January of its start year.
  */
 export function dbYear(s: DbStart, year: number, inflation: number): number {
   const rate = indexationRate(inflation, s.indexation)
   const startYear = Math.floor(s.startIndex / 12)
-  const pension = s.annualBeforeCoordination * (1 + rate) ** Math.max(0, year - startYear)
+  const grown = (years: number): number => (years <= 0 ? 1 : (1 + rate * (s.firstYearShare ?? 1)) * (1 + rate) ** (years - 1))
+  const waiting =
+    s.deferredFromYear != null && s.deferredIndexation
+      ? (1 + indexationRate(inflation, s.deferredIndexation)) ** Math.max(0, startYear - s.deferredFromYear)
+      : 1
+  const pension = s.annualBeforeCoordination * waiting * grown(year - startYear)
   let total = 0
   for (let m = 0; m < 12; m++) {
     const idx = year * 12 + m
     if (idx < s.startIndex) continue
     let annual = pension
     if (s.coordinationIndex !== null && idx >= s.coordinationIndex) {
-      annual -= s.coordinationAnnual * (1 + rate) ** Math.max(0, year - Math.floor(s.coordinationIndex / 12))
+      annual -= s.coordinationAnnual * waiting * (1 + rate) ** Math.max(0, year - Math.floor(s.coordinationIndex / 12))
     }
-    if (s.afterIndex != null && s.afterAnnual !== undefined && idx >= s.afterIndex) annual = s.afterAnnual * (1 + rate) ** Math.max(0, year - startYear)
+    if (s.afterIndex != null && s.afterAnnual !== undefined && idx >= s.afterIndex) annual = s.afterAnnual * grown(year - startYear)
     if (s.bridgeEndIndex !== null && idx <= s.bridgeEndIndex) annual += s.bridgeAnnual
     total += Math.max(0, annual) / 12
   }

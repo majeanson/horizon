@@ -19,6 +19,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v2 → v3: an employer pension may carry `inPay` (a pension already being paid). It is optional and absent from every
   // older file, which means « still to be calculated » — exactly what those files always were. Nothing to rewrite.
   (profile) => profile,
+  // v3 → v4: an employer pension may carry `deferred` (the plan's rule for a member who leaves before being eligible). It is
+  // optional; absent means « the plan has no such rule », which is what every older file's pension was calculated as.
+  (profile) => profile,
 ]
 
 export type ReadResult =

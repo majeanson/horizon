@@ -192,7 +192,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 <FieldRow label={p.serviceRate}>
                   {(w) => <NumberField kind="decimal" min={0} max={1} value={pension.serviceRatePerYear} onChange={(serviceRatePerYear) => set((x) => ({ ...x, serviceRatePerYear }))} id={w.id} />}
                 </FieldRow>
-                <FieldRow label={p.startAge}>
+                <FieldRow label={p.startAge} hint={pension.deferred ? p.startHint : undefined}>
                   {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.startAge} onChange={(startAge) => set((x) => ({ ...x, startAge }))} id={w.id} />}
                 </FieldRow>
               </>

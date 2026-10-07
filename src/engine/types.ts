@@ -42,6 +42,13 @@ export interface DbPension {
   /** The age the person starts the pension (≥ earliestAge). */
   startAge: number
   /**
+   * The plan's rule for a member who LEAVES before being eligible for any pension (a « deferred » pension): the permanent
+   * reduction counts the years from the start to `toAge` instead of to the unreduced age; the RRQ coordination then applies
+   * from the start, cut by the same share; and until the pension starts it is indexed by `indexation` (RREGOP: in full).
+   * Absent: the plan has no such rule, and a member who leaves early gets the active member's reduction.
+   */
+  deferred?: { toAge: number; indexation: { share: number; minus: number } }
+  /**
    * A pension ALREADY being paid (the retiree's « rente en cours »): the annual amount paid now, in today's dollars, as the
    * statement prints it — already reduced, coordinated and bridged. When set, the formula fields above are not read: only
    * `indexation` is, from next January on. Absent means a pension still to be calculated.

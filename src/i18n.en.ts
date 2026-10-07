@@ -151,6 +151,7 @@ export const EN: typeof FR = {
     service: 'Years of service for the pension calculation',
     serviceRate: 'Service credited per year worked (1 = full time)',
     startAge: 'Age the pension starts',
+    startHint: 'If you leave the job before 55 it is a deferred pension: reduced 0.5% a month back to your 65th birthday, fully indexed until it starts, and coordinated with the QPP from the day it starts.',
     rules: 'Plan rules',
     rulesHint: 'Prefilled for RREGOP from Retraite Québec. For another plan, copy them from your booklet.',
     accrual: 'Accrual rate per year of service',
@@ -456,7 +457,7 @@ export const EN: typeof FR = {
       note: 'Before 65 the pension is reduced by 0.5% to 0.6% a month; after 65 it grows by 0.7% a month, up to age 72.',
     },
     oasResidence: {
-      where: 'The number of years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40. Service Canada’s Old Age Security Benefits Estimator asks for it in its residence section.',
+      where: 'The number of years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40. Service Canada’s Old Age Security Benefits Estimator only asks, in step 4 (Residence), « Since the age of 18, have you only lived in Canada? » (Yes / No) for you and for your partner: it never asks for a number of years, so count them yourself.',
       label: '',
       url: 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/benefit-amount.html',
       note: 'At least 10 years of residence (20 if you live abroad) are needed to receive a pension.',

@@ -28,7 +28,8 @@ describe('the parameters panel shows exactly what the engine reads', () => {
 
   it('an unconfirmed figure carries its reason, a confirmed one carries none', () => {
     const rows = fr(knownYears()[0])
-    expect(rows.some((r) => r.verify)).toBe(true)
+    // Every figure is confirmed today; a reason, when one is written, must be a real sentence (the ratchet in cited.test.ts holds the count).
+    for (const r of rows) if (r.verify !== undefined) expect(r.verify.length, r.path).toBeGreaterThan(20)
     expect(rows.some((r) => !r.verify)).toBe(true)
   })
 

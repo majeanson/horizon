@@ -8,7 +8,7 @@ import { MAX_IN_PAY_ANNUAL } from './schema.ts'
 
 // A pension already in pay survives a save → load, an out-of-range amount is refused, and a file without one still opens.
 
-const base = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'profile.v3.json'), 'utf8'))
+const base = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'profile.v4.json'), 'utf8'))
 const withInPay = (annual: unknown) => {
   const j = structuredClone(base)
   j.household.persons[0].pensions = [{ ...inPayPension(), inPay: { annual } }]

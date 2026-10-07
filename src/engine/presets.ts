@@ -23,5 +23,6 @@ export function rregopPension(own: { serviceYearsToDate: number; startAge: numbe
     bridge: null,
     indexation: { share: R.indexationShare, minus: R.indexationMinus },
     startAge: own.startAge,
+    deferred: { toAge: R.deferredToAge, indexation: { share: R.deferredIndexationShare, minus: R.deferredIndexationMinus } },
   }
 }

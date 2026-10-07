@@ -21,7 +21,7 @@ const isOfficialHost = (host: string) => OFFICIAL.some((h) => host === h || host
 
 // The ratchet: figures whose source carries a `verify` reason. Lower it in the commit that
 // confirms one on an openable page; never raise it without writing the reason on the source.
-const MAX_UNVERIFIED = 1 // 5 → 1: the four GIS divisors, confirmed against the OAS Benefits Estimator (≤ 1 $/month, whole-dollar rounding). 8 → 5: Quebec brackets (revenuquebec.ca page read in a browser) and the line-361 age rule + worker-deduction rate (TP-1.G 2025-12). 11 → 8: quebec.creditRate and quebec.reductionRate re-read on the fetchable fiche; the two GIS knees confirmed on OAS Act s. 12.1(3) (only « A » is indexed); quebec.workerDeductionRate (the statute's wording, the host's page blocked) joined
+const MAX_UNVERIFIED = 0 // 1 → 0: the TFSA cumulative total, each year re-derived from a real CRA room history. 5 → 1: the four GIS divisors, confirmed against the OAS Benefits Estimator (≤ 1 $/month, whole-dollar rounding). 8 → 5: Quebec brackets (revenuquebec.ca page read in a browser) and the line-361 age rule + worker-deduction rate (TP-1.G 2025-12). 11 → 8: quebec.creditRate and quebec.reductionRate re-read on the fetchable fiche; the two GIS knees confirmed on OAS Act s. 12.1(3) (only « A » is indexed); quebec.workerDeductionRate (the statute's wording, the host's page blocked) joined
 
 const INDEX_RULES = ['cpi', 'wage', 'fixed', 'none']
 

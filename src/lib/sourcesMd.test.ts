@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { citedLeaves } from '../engine/params/cited.ts'
 import { KNOWN, SERIES } from '../engine/params/index.ts'
 import { renderSourcesMd } from '../engine/params/sourcesMd.ts'
 
@@ -24,7 +25,10 @@ describe('SOURCES.md is the params, printed', () => {
 
   it('lists every year of figures and says how many of them are unconfirmed', () => {
     for (const year of Object.keys(KNOWN)) expect(committed).toContain(`## ${year}`)
-    expect(committed).toMatch(/dont \*\*\d+ à vérifier\*\*/)
+    // « dont N à vérifier » is printed only while a figure is unconfirmed; none is today, and then the phrase must be absent.
+    const unconfirmed = Object.values(KNOWN).some((tree) => citedLeaves(tree).some((l) => l.cited.source.verify))
+    if (unconfirmed) expect(committed).toMatch(/dont \*\*\d+ à vérifier\*\*/)
+    else expect(committed).not.toMatch(/dont \*\*\d+ à vérifier\*\*/)
   })
 
   it('names every page it leans on, with the number of figures that depend on it', () => {
