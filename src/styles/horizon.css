@@ -622,6 +622,12 @@
 .table-wrap {
   max-width: 100%;
   overflow-x: auto;
+  /* Capped so a 45-row table scrolls INSIDE the wrap. That makes the wrap the vertical scroll
+     container — the only way the sticky header below can actually stick: against #root it never
+     engaged, and the column names left with the page two screens into the year-by-year tables.
+     A short table never reaches the cap and is unchanged. */
+  max-height: min(70vh, 34rem);
+  overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   /* A table wider than its box scrolls sideways, and on a phone the scrollbar is a thin overlay that is gone until

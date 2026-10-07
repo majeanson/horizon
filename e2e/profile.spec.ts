@@ -242,6 +242,10 @@ test.describe('the example household', () => {
     const yearTable = page.locator('#tableau').getByRole('table').first()
     await expect(yearTable).toBeVisible()
     expect(await yearTable.getByRole('row').count()).toBeGreaterThan(40)
+    // 40+ rows scroll INSIDE the capped wrap, so the sticky column names actually stick: against the
+    // page scroller they never engaged, and « 73 412 $ » two screens down had no column name in sight.
+    const wrap = page.locator('#tableau .table-wrap').first()
+    expect(await wrap.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
     expect(problems).toEqual([])
   })
 
