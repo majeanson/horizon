@@ -132,7 +132,8 @@ test.describe('a blank profile', () => {
     await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
     await year.fill('1800')
     await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
-    await expect(page.getByRole('alert')).toContainText('Valeur invalide')
+    // The refusal names the permitted range, like every NumberField — not a mute « Valeur invalide ».
+    await expect(page.getByRole('alert')).toContainText('Entre 1950 et 2100')
     await expect.poll(async () => (await savedProfile(page)).children).toEqual([2015])
     await page.getByRole('button', { name: 'Retirer l’enfant né en 2015' }).click()
     await expect.poll(async () => (await savedProfile(page)).children).toEqual([])
