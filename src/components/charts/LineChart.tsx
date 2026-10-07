@@ -13,6 +13,7 @@ const COLOUR: Record<SeriesColour, string> = {
   sky: 'var(--sky-deep)',
   sage: 'var(--sage-deep)',
   berry: 'var(--berry-deep)',
+  ink: 'var(--ink-faint)',
 }
 
 // One row per x, one key per series: the shape the library wants, built from series that may start and stop apart.
@@ -65,7 +66,16 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, markers 
               }
             />
             {markers.map((m) => (
-              <ReferenceLine key={`${m.colour}-${m.x}`} x={m.x} stroke={COLOUR[m.colour]} strokeDasharray="4 4" strokeOpacity={0.7} />
+              <ReferenceLine
+                key={`${m.colour}-${m.x}-${m.label}`}
+                x={m.x}
+                stroke={COLOUR[m.colour]}
+                strokeDasharray="4 4"
+                strokeOpacity={0.7}
+                // A marker that asks for it (`named`: « RRQ », « PSV ») names itself on the plot; the results chart's
+                // markers are carried by its legend and table instead.
+                label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: 11 } : undefined}
+              />
             ))}
             {series.map((s) => (
               <Line key={s.id} type="monotone" dataKey={s.id} stroke={COLOUR[s.colour]} strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />

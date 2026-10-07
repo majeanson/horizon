@@ -3,7 +3,7 @@
 // library behind it (chartBoundary.test.ts) — so the library can be replaced by editing one folder.
 
 /** The four series colours, as the design tokens they resolve to (never a hex literal: night mode would not follow). */
-export type SeriesColour = 'accent' | 'sky' | 'sage' | 'berry'
+export type SeriesColour = 'accent' | 'sky' | 'sage' | 'berry' | 'ink'
 
 export interface ChartPoint {
   x: number
@@ -22,6 +22,8 @@ export interface ChartMarker {
   x: number
   label: string
   colour: SeriesColour
+  /** Write the label on the plot beside the line (a short one: « RRQ »). Default: the legend and the table carry it. */
+  named?: boolean
 }
 
 export interface LineChartProps {
@@ -34,6 +36,23 @@ export interface LineChartProps {
   xTitle: (x: number) => string
   markers?: readonly ChartMarker[]
   /** The accessible name: the chart is a picture, and the per-year table beside it is its text. */
+  ariaLabel: string
+  height?: number
+}
+
+/** One year of a stacked bar chart: the x (a year) and one value per segment id. */
+export type StackedBarDatum = { x: number } & Record<string, number>
+
+export interface StackedBarChartProps {
+  data: readonly StackedBarDatum[]
+  /** The segments, bottom to top, each in a colour token. */
+  series: readonly Pick<ChartSeries, 'id' | 'label' | 'colour'>[]
+  /** One more value per year drawn as a dashed line across the bars (the year's spending plus tax). */
+  line?: { id: string; label: string }
+  yFormat: (y: number) => string
+  yDetail?: (y: number) => string
+  xTitle: (x: number) => string
+  markers?: readonly ChartMarker[]
   ariaLabel: string
   height?: number
 }

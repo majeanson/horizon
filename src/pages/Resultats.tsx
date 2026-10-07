@@ -5,6 +5,7 @@ import { Disclosure } from '../components/Disclosure'
 import { Rail } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
+import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
 import { DeferralPanel } from '../components/results/DeferralPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
@@ -19,6 +20,7 @@ import { StatusMessage } from '../components/StatusMessage'
 import { retireAt } from '../engine/retireAt'
 import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
+import { BRIDGE_COPY } from '../lib/bridgeCopy'
 import { DEFERRAL_COPY } from '../lib/deferralCopy'
 import { headlineOf } from '../lib/headline'
 import { formatMoney } from '../lib/money'
@@ -305,6 +307,12 @@ export function Resultats() {
           label={label}
         />
       )}
+
+      {/* The strategy view is the main tool for deciding when to start the pensions: it stays one visible line in BOTH modes
+          (it computes only when opened — a worker — and opens by itself when the address already carries its choices). */}
+      <Disclosure label={BRIDGE_COPY[lang].open} defaultOpen={['bp', 'br', 'bq', 'bo', 'bw'].some((k) => params.has(k))}>
+        <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
+      </Disclosure>
 
       {/* Simple keeps the verdict, the comparison and the chart; the rest folds into one « Voir les détails ». */}
       {full ? details : <Disclosure label={t.mode.details}>{earliestBlock}{details}</Disclosure>}

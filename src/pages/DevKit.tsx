@@ -108,6 +108,38 @@ function FieldRowSpecimen() {
 
 // The chart library is lazy here too: the gallery is online-only, and the library is the heaviest thing in the app.
 const LineChart = lazy(() => import('../components/charts').then((m) => ({ default: m.LineChart })))
+const StackedBarChart = lazy(() => import('../components/charts').then((m) => ({ default: m.StackedBarChart })))
+
+function StackedBarChartSpecimen() {
+  const { lang } = useLang()
+  const ages = Array.from({ length: 11 }, (_, i) => 60 + i)
+  const data = ages.map((x) => {
+    const late = x >= 65
+    const guaranteed = late ? 38_000 : 24_000
+    return { x, work: x < 62 ? 30_000 : 0, db: 24_000, rrq: late ? 14_000 : 0, oas: late ? 8_000 : 0, nest: Math.max(0, 60_000 - guaranteed - (x < 62 ? 30_000 : 0)), need: 66_000 }
+  })
+  return (
+    <Suspense fallback={<Loading />}>
+      <StackedBarChart
+        data={data}
+        series={[
+          { id: 'work', label: 'Travail', colour: 'ink' },
+          { id: 'db', label: 'Rente de l’employeur', colour: 'sky' },
+          { id: 'rrq', label: 'RRQ', colour: 'sage' },
+          { id: 'oas', label: 'PSV', colour: 'berry' },
+          { id: 'nest', label: 'Tiré du pécule', colour: 'accent' },
+        ]}
+        line={{ id: 'need', label: 'Dépenses + impôt' }}
+        markers={[{ x: 65, label: 'RRQ', colour: 'accent', named: true }]}
+        yFormat={(y) => formatCompactMoney(y, lang)}
+        yDetail={(y) => formatMoney(y, lang)}
+        xTitle={(x) => x + ' ans'}
+        ariaLabel="Exemple : d’où vient l’argent de 60 à 70 ans."
+        height={240}
+      />
+    </Suspense>
+  )
+}
 
 function LineChartSpecimen() {
   const { lang } = useLang()
@@ -274,6 +306,7 @@ function ENTRIES(): Entry[] {
       render: () => <SectionHeader title="Régime de rentes du Québec" subtitle="Retraite Québec" icon="info-bold" />,
     },
     { cat: 'Graphiques', name: 'LineChart', file: 'src/components/charts/LineChart.tsx', exports: ['LineChart'], kw: 'graphique courbe ligne série recharts', render: () => <LineChartSpecimen /> },
+    { cat: 'Graphiques', name: 'StackedBarChart', file: 'src/components/charts/StackedBarChart.tsx', exports: ['StackedBarChart'], kw: 'graphique barres empilées sources revenus recharts', render: () => <StackedBarChartSpecimen /> },
     { cat: 'Affichage', name: 'PageHead', file: 'src/components/PageHead.tsx', kw: 'titre page h1 en-tête', render: () => <PageHead title="Résultats" subtitle="Le titre unique d’une page, et une ligne discrète dessous." /> },
     {
       cat: 'Affichage',

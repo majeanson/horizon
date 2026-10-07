@@ -37,7 +37,9 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // state store. It is lazy, precached once, and never on the first screen (NOT_IN_DOOR below). The cap sits just above
 // today's size, so a dependency bump that grows it fails here; it comes DOWN after any win, never back up. (If the
 // library is ever swapped, that is a one-folder change: components/charts/, chartBoundary.test.ts.)
-const LAZY_CAPS = [{ re: /^charts-[^.]*\.js$/, cap: 360 * KB }]
+// 347 → 369 KB raw (108 KB gzip) on 2026-10-07: the stacked bar chart of « Mes années 60 à 70 » brings the library's
+// bar and composed-chart parts into the same lazy chunk.
+const LAZY_CAPS = [{ re: /^charts-[^.]*\.js$/, cap: 375 * KB }]
 
 // The door.
 const CLOSURE_CHUNK_CAP = 6

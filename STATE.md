@@ -119,6 +119,9 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] « Quand commencer ma rente ? » on Résultats (behind a disclosure, in Simple too): the QPP at 60 · 65 · 70 · 72 and the OAS at 65 · 70 per person, with the break-even and the effect on the plan (`engine/deferral.ts`, `components/results/DeferralPanel.tsx`, its words in `lib/deferralCopy.ts` to keep the eager dictionary in budget); the case for and against deferring, and what it leaves out (survivor pension, GIS interplay, health)
 
+- [x] « Mes années 60 à 70 » on Résultats (one visible line in BOTH modes, computed in a worker only when opened): each year of the bridge (spending, work, DB / QPP / OAS / GIS, what the nest paid and from which account, tax, the nest, a status), two pictures (a stacked bar of the sources of money and the nest under four ways of starting), the three levers in the address (`bp br bq bo bw`), five strategy cards with a one-sentence verdict, and a « tient ? » matrix under the prudent / neutral / bold sets (`engine/bridge.ts`, `components/results/BridgePanel.tsx`, words in `lib/bridgeCopy.ts`). The golden couple shows the trade: retiring at 58, starting at 65 runs out at 97 while deferring to 70 lasts to 95; a smaller nest retiring at 56 runs out SOONER when it defers
+- [ ] « Mes années 60 à 70 »: one person's levers at a time (a combined « both defer to 70 » row is a separate view); the retirement age is the same in the five strategies; no survivor's pension
+
 ### Phase 9 — offline proof and deploy
 
 - [x] The offline harness (`e2e:sw`, 6 tests): the shell, a deep link, the grey-screen trap, AND a saved profile + the results page with the chart and the worker, reopened with the network off

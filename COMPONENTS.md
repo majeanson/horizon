@@ -77,6 +77,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 
 | Component | File | Purpose |
 | --- | --- | --- |
+| **StackedBarChart** | `src/components/charts/StackedBarChart.tsx` | The second chart: one segment per source of money per year, plus an optional dashed line across the bars (what has to be covered). Same rules as the line chart — plain data in, the app's colour tokens out (`SeriesColour`, with a neutral `ink`), its own lazy chunk, `role="img"` with a name and the year table beside it as its text. Used by « Mes années 60 à 70 ». |
 | **LineChart** | `src/components/charts/LineChart.tsx` | The ONE chart: plain `ChartSeries` in, a line chart out, in the app's own colour tokens. A thin adapter — only `components/charts/*` may import the chart library (`chartBoundary.test.ts`), and it rides in its own lazy chunk. A picture: `role="img"` with a name, the per-year table beside it is its text. |
 
 ### Feedback / chrome

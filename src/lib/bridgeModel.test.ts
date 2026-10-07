@@ -1,0 +1,107 @@
+import { describe, expect, it } from 'vitest'
+import { bridgeRun, leversFor, profileLevers, type BridgeLevers } from '../engine/bridge.ts'
+import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
+import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, strategiesOf, verdictOf, windowRows } from './bridgeModel.ts'
+
+const H = GOLDEN_HOUSEHOLD
+const q = (s: string) => new URLSearchParams(s)
+
+describe('what the view keeps in the address bar', () => {
+  it('an empty address is the profile’s own plan for the first person', () => {
+    const p = parseBridgeParams(q(''), H)
+    expect(p.levers).toEqual(profileLevers(H, 'self'))
+    expect(p.window).toBe('bridge')
+  })
+
+  it('reads each choice, and falls back to the profile’s own for anything missing, malformed or out of range', () => {
+    const own = profileLevers(H, 'spouse')
+    expect(parseBridgeParams(q('bp=spouse&br=57&bq=70&bo=68&bw=plan'), H)).toEqual({ levers: { id: 'spouse', retirementAge: 57, rrqStartAge: 70, oasStartAge: 68 }, window: 'plan' })
+    for (const bad of ['bq=59', 'bq=73', 'bq=abc', 'bq=65.5', 'bq=', 'bq=-1', 'bq=<script>', 'bq=0070']) {
+      expect(parseBridgeParams(q(`bp=spouse&${bad}`), H).levers.rrqStartAge, bad).toBe(own.rrqStartAge)
+    }
+    expect(parseBridgeParams(q('bp=spouse&bo=64'), H).levers.oasStartAge).toBe(own.oasStartAge)
+    expect(parseBridgeParams(q('bp=spouse&bo=71'), H).levers.oasStartAge).toBe(own.oasStartAge)
+    expect(parseBridgeParams(q('br=49'), H).levers.retirementAge).toBe(profileLevers(H, 'self').retirementAge)
+    expect(parseBridgeParams(q('bp=nobody'), H).levers.id).toBe('self')
+    expect(parseBridgeParams(q('bw=whatever'), H).window).toBe('bridge')
+  })
+
+  it('writes only what differs from the profile, and reads back what it wrote', () => {
+    const own = parseBridgeParams(q(''), H)
+    expect(bridgeQuery(own, H)).toEqual({ bp: null, br: null, bq: null, bo: null, bw: null })
+    const custom = { levers: { id: 'spouse', retirementAge: 58, rrqStartAge: 70, oasStartAge: 70 } as BridgeLevers, window: 'plan' as const }
+    const written = bridgeQuery(custom, H)
+    expect(written.bp).toBe('spouse')
+    const url = new URLSearchParams(Object.entries(written).filter(([, v]) => v !== null) as [string, string][])
+    expect(parseBridgeParams(url, H)).toEqual(custom)
+  })
+
+  it('a household of one has no « spouse » to look at', () => {
+    const solo = structuredClone(H)
+    solo.persons = [solo.persons[0]]
+    expect(parseBridgeParams(q('bp=spouse'), solo).levers.id).toBe('self')
+  })
+})
+
+describe('which strategy a set of levers is', () => {
+  it('names every strategy whose start ages equal the levers (the retirement age is the same in all)', () => {
+    const base = profileLevers(H, 'self')
+    expect(strategiesOf({ ...base, rrqStartAge: 70, oasStartAge: 70 }, H)).toEqual(['bridge'])
+    expect(strategiesOf({ ...base, rrqStartAge: 72, oasStartAge: 70 }, H)).toEqual(['max'])
+    expect(strategiesOf({ ...base, rrqStartAge: 60, oasStartAge: 65 }, H)).toEqual(['asap'])
+    // the profile’s own 65 / 65 is « my plan » AND « standard »: the same plan, so both are pressed
+    expect(strategiesOf({ ...base, rrqStartAge: 65, oasStartAge: 65 }, H)).toEqual(expect.arrayContaining(['mine', 'standard']))
+    // anything else is none of the five
+    expect(strategiesOf({ ...base, rrqStartAge: 63, oasStartAge: 67 }, H)).toEqual([])
+  })
+
+  it('a strategy defers when either pension starts after 65', () => {
+    expect(defers(leversFor('standard', H, 'self', 60))).toBe(false)
+    expect(defers(leversFor('asap', H, 'self', 60))).toBe(false)
+    expect(defers(leversFor('max', H, 'self', 60))).toBe(true)
+    expect(defers(leversFor('bridge', H, 'self', 60))).toBe(true)
+  })
+})
+
+describe('the verdict says what the numbers say', () => {
+  const run = (retirementAge: number, key: Parameters<typeof leversFor>[0]) => bridgeRun(H, GOLDEN_ASSUMPTIONS, leversFor(key, H, 'self', retirementAge))
+  it('a plan that lasts says so, and says whether it defers', () => {
+    const std = run(60, 'standard')
+    const max = run(60, 'max')
+    expect(verdictOf(std.levers, std.summary, std.summary, 95)).toEqual({ kind: 'holds', defers: false, horizonAge: 95 })
+    expect(verdictOf(max.levers, max.summary, std.summary, 95)).toEqual({ kind: 'holds', defers: true, horizonAge: 95 })
+  })
+
+  it('a plan that runs out names the age, and whether starting at 65 would have avoided it', () => {
+    // Retiring at 58 on this nest: starting at 65 runs out near 97 (deferring, as it happens, would last).
+    const std = run(58, 'standard')
+    expect(std.summary.ok).toBe(false)
+    const v = verdictOf(std.levers, std.summary, std.summary, 95)
+    expect(v).toMatchObject({ kind: 'fails', defers: false, age: std.summary.firstShortfallAge })
+    const small = structuredClone(H)
+    for (const p of small.persons) for (const k of ['rrsp', 'tfsa', 'nonReg'] as const) p.accounts[k].balance *= 0.7
+    const a = bridgeRun(small, GOLDEN_ASSUMPTIONS, leversFor('standard', small, 'self', 56))
+    const b = bridgeRun(small, GOLDEN_ASSUMPTIONS, leversFor('max', small, 'self', 56))
+    expect(verdictOf(b.levers, b.summary, a.summary, 95)).toMatchObject({ kind: 'fails', defers: true, standardHolds: false, standardAge: a.summary.firstShortfallAge })
+  })
+})
+
+describe('the rows a window shows', () => {
+  const rows = bridgeRun(H, GOLDEN_ASSUMPTIONS, profileLevers(H, 'self')).rows
+  it('the bridge years are the person’s 60th to 70th year; the plan is every year to the horizon', () => {
+    const bridge = windowRows(rows, 'bridge')
+    expect(bridge.map((r) => r.age)).toEqual([60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70])
+    expect(windowRows(rows, 'plan')).toEqual(rows)
+    expect(rows.length).toBeGreaterThan(bridge.length)
+  })
+
+  it('the bar chart’s segments add up to what the household received that year, and the line is spending plus tax', () => {
+    for (const [i, r] of windowRows(rows, 'bridge').entries()) {
+      const bar = barRows(windowRows(rows, 'bridge'))[i]
+      const total = SEGMENTS.reduce((s, id) => s + bar[id], 0)
+      expect(total).toBeCloseTo(r.employment + r.guaranteed + r.drawn, 6)
+      expect(bar.need).toBeCloseTo(r.spending + r.tax, 6)
+      expect(bar.x).toBe(r.age)
+    }
+  })
+})

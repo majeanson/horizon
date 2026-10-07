@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { deferralView, OAS_START_AGES, RRQ_START_AGES } from './deferral.ts'
 import { GOLDEN_ASSUMPTIONS as A, GOLDEN_HOUSEHOLD as H } from './golden/household.fixture.ts'
 import { project } from './projection.ts'
@@ -7,6 +7,9 @@ import type { Household, Person, YearRow } from './types.ts'
 
 // « WHEN SHOULD I START MY PENSION? » — the deferral comparison, checked against the rules it must reproduce (+0.7 %
 // a month on the QPP after 65, +0.6 % on the OAS) and against the projection it is built from.
+
+// A full comparison is a few seconds of projections (5.5 s on a loaded machine) — over vitest's 5 s default, so it flaked.
+vi.setConfig({ testTimeout: 60_000 })
 
 const camille = H.persons[0]
 const alone: Household = { livesAlone: true, persons: [camille], spending: H.spending }

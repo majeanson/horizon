@@ -849,3 +849,126 @@
   flex-direction: column;
   gap: 0.25rem;
 }
+
+/* « Mes années 60 à 70 »: the levers, five strategy cards, the year table and the charts. */
+.bridge {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  min-width: 0;
+}
+.bridge--busy {
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.bridge__levers {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.bridge__verdict {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-left: 4px solid var(--sage-deep);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  line-height: 1.25;
+}
+.bridge__verdict--short {
+  border-left-color: var(--warn);
+}
+.bridge-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bridge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.8rem 1rem;
+  border-top: 4px solid var(--line-strong);
+}
+.bridge-card--on {
+  border-top-color: var(--marigold-deep);
+}
+.bridge-card--short {
+  border-top-color: var(--warn);
+}
+.bridge-card__line,
+.bridge-card__verdict {
+  margin: 0;
+}
+.bridge-card__line {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.bridge-card__verdict {
+  font-weight: 600;
+}
+.bridge-card__verdict--short {
+  color: var(--warn);
+}
+.bridge-card__facts {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+.bridge-card__facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.1rem 0.6rem;
+}
+.bridge-card__facts dt {
+  color: var(--ink-soft);
+}
+.bridge-card__facts dd {
+  margin: 0;
+}
+.bridge__window {
+  display: flex;
+}
+.bridge__charts {
+  display: grid;
+  gap: var(--space-2, 0.5rem);
+  min-width: 0;
+}
+.bridge__table td,
+.bridge__table th[scope='row'] {
+  white-space: nowrap;
+}
+.bridge__tag {
+  padding: 0 0.3rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--surface-2);
+  font-size: var(--text-xs);
+}
+.bridge__year {
+  color: var(--ink-soft);
+  font-weight: 400;
+  font-size: var(--text-xs);
+}
+.bridge__row--covered td,
+.bridge__row--covered th {
+  background: color-mix(in srgb, var(--sage-deep) 9%, transparent);
+}
+.bridge__cell--short {
+  color: var(--warn);
+  font-weight: 600;
+}
+.chart__swatch--line {
+  width: 1.1rem;
+  height: 0;
+  border-radius: 0;
+  border-top: 2px dashed var(--ink);
+}
