@@ -4,10 +4,11 @@ import type { Assumptions, Household } from '../engine/types.ts'
 import type { SavingsNeededMessage, SavingsNeededRequest } from './savingsNeeded.worker.ts'
 
 // « How much should I put aside to retire at `age`? », computed in a web worker where there is one (and, where a worker
-// cannot be made, on the page's own thread after a turn of the event loop so the screen paints first). `null` while it
-// runs, so the page can show a placeholder of the right shape; a new age or new inputs start it again.
+// cannot be made, on the page's own thread after a turn of the event loop so the screen paints first). The LAST answer
+// stays up while a new age recomputes (`busy`), so an edit never swaps the figure for a skeleton under the reader —
+// `value` is null only before the very first answer.
 
-export function useSavingsNeeded(household: Household, assumptions: Assumptions, age: number, enabled: boolean): SavingsNeeded | null {
+export function useSavingsNeeded(household: Household, assumptions: Assumptions, age: number, enabled: boolean): { value: SavingsNeeded | null; busy: boolean } {
   const [answer, setAnswer] = useState<{
     key: string
     value: SavingsNeeded
@@ -61,5 +62,5 @@ export function useSavingsNeeded(household: Household, assumptions: Assumptions,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, enabled])
 
-  return enabled && answer?.key === key ? answer.value : null
+  return { value: enabled ? (answer?.value ?? null) : null, busy: enabled && answer?.key !== key }
 }

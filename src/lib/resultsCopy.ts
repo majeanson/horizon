@@ -49,6 +49,7 @@ const FR_RESULTS = {
       unreachable: (age: number) => `À ${age} ans, le plan ne tient pas.`,
       unreachableWhy: 'Même en mettant de côté toutes vos dépenses du temps où vous travaillez, il manquerait de l’argent. Essayez un âge plus tardif.',
       already: (amount: string) => `Vous épargnez déjà ${amount} par année.`,
+      updating: 'Mise à jour du calcul…',
       caveat: 'Un compte enregistré ferait un peu mieux : ce montant est donc prudent.',
     },
     stop: {
@@ -137,6 +138,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
       unreachable: (age: number) => `At ${age}, the plan does not last.`,
       unreachableWhy: 'Even setting aside all of your spending while you work, money would run short. Try a later age.',
       already: (amount: string) => `You already save ${amount} a year.`,
+      updating: 'Updating the calculation…',
       caveat: 'A registered account would do a little better, so this amount is cautious.',
     },
     stop: {

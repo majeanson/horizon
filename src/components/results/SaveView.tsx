@@ -28,13 +28,21 @@ export function SaveView({
   const t = useT()
   const { lang } = useLang()
   const q = RESULTS_COPY[lang].questions.save
-  const answer = useSavingsNeeded(household, assumptions, age, true)
+  // The old answer stays on screen at full strength while a new age computes: each keystroke used
+  // to swap the figure for a skeleton inside the live region — a height jump and a screen-reader
+  // announcement per keystroke. The live region also goes quiet while busy, like the bridge verdict.
+  const { value: answer, busy } = useSavingsNeeded(household, assumptions, age, true)
   const saving = household.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
   return (
-    <div className="surface answer" aria-live="polite" aria-busy={answer === null}>
+    <div className="surface answer" aria-live={busy ? 'off' : 'polite'} aria-busy={busy}>
       <FieldRow label={q.age}>
         {(w) => <NumberField kind="int" min={minAge} max={maxAge} unit={t.fields.years} value={age} onChange={onAge} id={w.id} />}
       </FieldRow>
+      {busy && answer !== null && (
+        <p className="bridge__updating" role="status">
+          {q.updating}
+        </p>
+      )}
       {answer === null ? (
         <Skeleton count={2} />
       ) : answer.extraPerYear === null ? (
