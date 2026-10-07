@@ -10,7 +10,7 @@ export interface Answer<T> {
   busy: boolean
 }
 
-export function useOffThread<Req, Msg, T>(request: Req, makeWorker: () => Worker, compute: () => T, pick: (m: Msg) => T | null, enabled = true): Answer<T> {
+export function useOffThread<Req, Msg, T>(request: Req, makeWorker: () => Worker, compute: () => T, pick: (m: Msg) => T | null, enabled = true, priority: 'now' | 'idle' = 'now'): Answer<T> {
   const [answer, setAnswer] = useState<{ key: string; value: T } | null>(null)
   const key = JSON.stringify(request)
 
@@ -50,16 +50,21 @@ export function useOffThread<Req, Msg, T>(request: Req, makeWorker: () => Worker
         stopFallback = onThisThread()
       }
     }
-    const starter = setTimeout(begin, 0)
+    // `idle` yields to the page's first paint and the `now` requests: several heavy panels start
+    // together at load, and the ones furthest down the page must not race the verdict and the chart.
+    const stopStarter =
+      priority === 'idle' && typeof requestIdleCallback === 'function'
+        ? ((id) => () => cancelIdleCallback(id))(requestIdleCallback(begin, { timeout: 1500 }))
+        : ((id) => () => clearTimeout(id))(setTimeout(begin, priority === 'idle' ? 300 : 0))
     return () => {
       cancelled = true
-      clearTimeout(starter)
+      stopStarter()
       worker?.terminate()
       stopFallback?.()
     }
     // `key` stands for the request: its objects are rebuilt every render, their content is what matters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, enabled])
+  }, [key, enabled, priority])
 
   return { value: answer?.value ?? null, busy: enabled && answer?.key !== key }
 }

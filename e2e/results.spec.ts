@@ -69,7 +69,6 @@ test('the measure and the dollars are chosen in the address, and the chart follo
 
 test('another comparison adds a line and keeps the other choices', async ({ page }) => {
   await page.goto('/resultats?dollars=nominal')
-  await page.getByRole('button', { name: 'Comparer des âges de départ' }).click()
   await page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans' }).click()
   await expect(page.locator('.chart__legend-item')).toHaveText(['Mon plan', '65 ans', '62 ans'])
   await expect(page.locator('path.recharts-line-curve')).toHaveCount(3)
@@ -86,15 +85,11 @@ test('the chart speaks English too', async ({ page }) => {
 test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the page’s thread, and the middle is the verdict', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
-  await page.getByRole('button', { name: /Et si l’avenir est un peu moins bon/ }).click()
-  await page.getByRole('button', { name: 'Calculer' }).click()
-  await expect(page.getByRole('button', { name: 'Calcul en cours…' })).toBeDisabled()
-  // The page stays alive while it computes: a control still answers.
+  // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
   await page.getByRole('tab', { name: 'Revenu garanti' }).click()
   const grids = page.locator('.sensitivity__grids .table-wrap')
-  await expect(grids).toHaveCount(3)
-  await expect(page.getByRole('button', { name: 'Calculer' })).toBeEnabled({ timeout: 60_000 })
-  await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0)
+  await expect(grids).toHaveCount(3, { timeout: 60_000 })
+  await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
   // 27 cells, each an age or a dash; the base cell of the 95-year grid is the plain verdict.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
   // …and the three ready-made scenarios read prudent ≥ neutral ≥ bold (a more prudent future never retires earlier).
@@ -119,7 +114,6 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
 // agency publishes a page in one language only.
 test('« Paramètres utilisés » follows the reader\'s language: the page, the number, and an honest label when there is no edition', async ({ page }) => {
   await page.goto('/resultats')
-  await page.getByRole('button', { name: 'Paramètres utilisés' }).click()
   const row = (name: RegExp) => page.getByRole('row', { name })
 
   // French reader: the French edition, « 1 507,65 », and a French-only page needs no label.
@@ -129,7 +123,6 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
   await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTFR_/)
 
   await page.getByRole('button', { name: 'EN', exact: true }).click()
-  if (!(await page.getByRole('row', { name: /rrq\.maxPension65/ }).isVisible())) await page.getByRole('button', { name: 'Parameters used' }).click()
 
   // English reader: the English edition, « 1,507.65 », the English parameters PDF, and an honest label on the fiche that
   // exists in French only.
@@ -151,7 +144,6 @@ test('no chart or table runs past the right edge on a phone', async ({ page }) =
 
 test('a couple can compare two different retirement ages and the card says who retires when', async ({ page }) => {
   await page.goto('/resultats?ages=plan')
-  await page.getByRole('button', { name: 'Chacun son âge' }).click()
   const [first, second] = [page.getByRole('textbox', { name: /Âge de départ de/ }).nth(0), page.getByRole('textbox', { name: /Âge de départ de/ }).nth(1)]
   await first.fill('58')
   await second.fill('64')
@@ -179,14 +171,12 @@ test('a couple gets each person\'s own earliest age, worked out off the page\'s 
   expect(problems).toEqual([])
 })
 
-// « Quand commencer ma rente ? » sits behind a disclosure and works out, off the page's thread, what starting the QPP
+// « Quand commencer ma rente ? » sits on the page and works out, off the page's thread, what starting the QPP
 // pension and the OAS at each age does. The numbers are pinned by unit tests (src/engine/deferral.test.ts); this pins that a
-// person can open it, see the rule's own percentages beside the plan, tell which row is theirs, and switch person.
+// person can see the rule's own percentages beside the plan, tell which row is theirs, and switch person.
 test('« when should I start my pension » compares the start ages, flags the plan\'s own row and switches person', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
-  await page.getByRole('button', { name: /Mes années 60 à 70/ }).click()
-  await page.getByRole('button', { name: 'Quand commencer ma rente ?' }).click()
   const rrq = page.getByRole('region', { name: /Régime de rentes du Québec \(RRQ\)/ })
   const oas = page.getByRole('region', { name: /Sécurité de la vieillesse \(PSV\)/ })
   await expect(rrq).toBeVisible({ timeout: 60_000 })

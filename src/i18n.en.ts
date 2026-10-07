@@ -359,7 +359,6 @@ export const EN: typeof FR = {
     sensitivity: {
       title: 'What if the future is a little worse?',
       hint: 'The earliest age when returns, inflation or longevity move by a point or by five years.',
-      run: 'Calculate',
       running: 'Calculating…',
       returns: 'Return',
       inflation: 'Inflation',

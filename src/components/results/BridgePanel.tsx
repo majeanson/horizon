@@ -23,7 +23,6 @@ import { mapPerson } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
 import { Chip } from '../Chip'
-import { Disclosure } from '../Disclosure'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
@@ -383,9 +382,8 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             ))}
           </ul>
 
-          <Disclosure label={copy.matrixTitle}>
-            <MatrixSection household={household} assumptions={assumptions} levers={levers} copy={copy} ownerName={ownerName} />
-          </Disclosure>
+          <h3 className="deferral__title">{copy.matrixTitle}</h3>
+          <MatrixSection household={household} assumptions={assumptions} levers={levers} copy={copy} ownerName={ownerName} />
 
           <h3 className="deferral__title">{copy.caveatTitle}</h3>
           <ul className="deferral__list">

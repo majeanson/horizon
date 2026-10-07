@@ -37,6 +37,26 @@
   border-top: 1px solid var(--line);
 }
 
+/* ── Résultats: one scroll, a sticky map of its sections ─────────────────── */
+/* The nav rides under the sticky top bar (3.6rem, same offset as the desktop nav rail) and
+   stays above the content it scrolls past; a tapped section stops below both. */
+.section-nav {
+  position: sticky;
+  top: 3.6rem;
+  z-index: 15;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0.35rem var(--gutter);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  scroll-margin-top: 7.5rem;
+  min-width: 0;
+}
+
 /* ── A pension plan's rules, always on the card ──────────────────────────── */
 .plan-card__rules {
   display: flex;

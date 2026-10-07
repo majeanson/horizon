@@ -49,7 +49,8 @@ export function useSavingsNeeded(household: Household, assumptions: Assumptions,
         stopFallback = onThisThread()
       }
     }
-    const starter = setTimeout(begin, 0)
+    // A beat behind the page's `now` work: this answer sits far down the page and must not race the verdict and the chart.
+    const starter = setTimeout(begin, 300)
     return () => {
       cancelled = true
       clearTimeout(starter)

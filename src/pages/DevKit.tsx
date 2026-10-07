@@ -15,6 +15,7 @@ import { Slider } from '../components/Slider'
 import { PageHead } from '../components/PageHead'
 import { Cluster, Rail } from '../components/Layout'
 import { SectionHeader } from '../components/SectionHeader'
+import { SectionNav } from '../components/SectionNav'
 import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
@@ -334,6 +335,7 @@ function ENTRIES(): Entry[] {
     },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },
+    { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'Verdict' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres' }]} /> },
     { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/hypotheses" label="Suivant : mes hypothèses"><p>Votre profil est assez complet.</p></NextStep> },
     {
       cat: 'Feedback',

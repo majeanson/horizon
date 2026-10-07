@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
-import { Disclosure } from '../components/Disclosure'
 import { Rail } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
@@ -14,6 +13,7 @@ import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SaveView } from '../components/results/SaveView'
 import { StopView } from '../components/results/StopView'
 import { SectionHeader } from '../components/SectionHeader'
+import { SectionNav } from '../components/SectionNav'
 import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
@@ -165,27 +165,6 @@ export function Resultats() {
   }
 
   const deferralWho = parseBridgeParams(params, profile.household).levers.id
-  const earliestBlock =
-    isCouple && gaps.length === 0 && !retiredNow ? (
-      <div className="surface">
-        <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
-      </div>
-    ) : null
-  const details = (
-    <>
-      <Disclosure label={r.table.title} count={runs.length}>
-        <YearTables runs={runs} label={label} />
-      </Disclosure>
-
-      <Disclosure label={r.sensitivity.title}>
-        <SensitivityPanel household={profile.household} assumptions={assumptions} />
-      </Disclosure>
-
-      <Disclosure label={r.params.title}>
-        <ParamsPanel />
-      </Disclosure>
-    </>
-  )
 
   if (gaps.length > 0) {
     return (
@@ -213,11 +192,25 @@ export function Resultats() {
   const wantedSaveAge = Number(params.get('age'))
   const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
 
+  // The page's map, in reading order; a section that is not on the page has no chip.
+  const navLinks = [
+    { id: 'verdict', label: rc.nav.verdict },
+    { id: 'comparer', label: rc.nav.comparer },
+    ...(state.pensionsOpen ? [{ id: 'pont', label: rc.nav.pont }, { id: 'rente', label: rc.nav.rente }] : []),
+    { id: 'epargner', label: rc.nav.epargner },
+    ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
+    { id: 'donnees-calcul', label: rc.nav.donneesCalcul },
+    { id: 'tableau', label: rc.nav.tableau },
+    { id: 'sensibilite', label: rc.nav.sensibilite },
+    { id: 'parametres', label: rc.nav.parametres },
+  ]
+
   return (
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
+      <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
 
-      <div className="verdict surface" aria-live="polite">
+      <div id="verdict" className="verdict surface results-section" aria-live="polite">
         <p className="verdict__line">
           {retiredGlance ? rc.headline.retired(isCouple) : headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(headline.age!, isCouple)}
         </p>
@@ -250,18 +243,13 @@ export function Resultats() {
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
 
-      {/* The ages that set the answer, with their calculation and a slider each: one line in both modes. */}
-      <Disclosure label={LEDGER_COPY[lang].title}>
-        <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
-      </Disclosure>
-
+      {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
+          is ONE section: the same runs, seen as cards, as a picture, and per person. */}
+      <section id="comparer" className="results-section" aria-label={r.compare.label}>
+      <SectionHeader title={r.compare.label} />
       {!retiredNow && (
-      <Disclosure label={r.compare.label} defaultOpen={params.has('ages')}>
         <div className="compare" ref={compareRef}>
-          <p className="field-row__label" id="compare-label">
-            {r.compare.label}
-          </p>
-          <Rail role="group" aria-labelledby="compare-label">
+          <Rail role="group" aria-label={r.compare.label}>
             <Chip selected={selections.includes('plan')} onClick={() => toggle('plan')}>
               {r.compare.plan}
             </Chip>
@@ -282,7 +270,6 @@ export function Resultats() {
             <SplitPicker names={[names[0], names[1]]} defaults={[profile.household.persons[0].retirementAge, profile.household.persons[1].retirementAge === profile.household.persons[0].retirementAge ? Math.min(MAX_AGE, profile.household.persons[0].retirementAge + 5) : profile.household.persons[1].retirementAge]} onAdd={addSplit} disabled={selections.length >= MAX_SELECTIONS} />
           )}
         </div>
-      </Disclosure>
       )}
 
       <ul className="scenarios">
@@ -312,34 +299,60 @@ export function Resultats() {
         />
       )}
 
-      {earliestBlock}
+      {isCouple && !retiredNow && (
+        <div className="surface">
+          <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
+        </div>
+      )}
+      </section>
 
-      {/* The strategy view is the main tool for deciding when to start the pensions: it stays one visible line in BOTH modes
-          (it computes only when opened — a worker — and opens by itself when the address already carries its choices). */}
-      {/* Once every QPP and OAS start is behind the household there is nothing left to choose: the view is not offered. */}
+      {/* Once every QPP and OAS start is behind the household there is nothing left to choose: the two pension sections are not offered. */}
       {state.pensionsOpen && (
-      <Disclosure label={BRIDGE_COPY[lang].open} defaultOpen={['bp', 'bb', 'bw'].some((k) => params.has(k))}>
-        <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
-        {/* The same question seen one pension at a time: it belongs with the strategies, not as a second top-level line. */}
-        <Disclosure label={DEFERRAL_COPY[lang].title}>
-          <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
-        </Disclosure>
-      </Disclosure>
+        <>
+          <section id="pont" className="results-section" aria-label={BRIDGE_COPY[lang].open}>
+            <SectionHeader title={BRIDGE_COPY[lang].open} />
+            <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
+          </section>
+          {/* The same question seen one pension at a time — it follows the person the bridge looks at. */}
+          <section id="rente" className="results-section" aria-label={DEFERRAL_COPY[lang].title}>
+            <SectionHeader title={DEFERRAL_COPY[lang].title} />
+            <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
+          </section>
+        </>
       )}
 
       {/* The two other questions, answered on the same page: views over the same profile and assumptions. */}
-      <section id="epargner" className="answer-section" aria-label={rc.questions.tabs.save}>
+      <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
         <SectionHeader title={rc.questions.tabs.save} />
         <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
       </section>
       {stop !== null && (
-        <section id="arreter" className="answer-section" aria-label={rc.questions.tabs.stop}>
+        <section id="arreter" className="results-section" aria-label={rc.questions.tabs.stop}>
           <SectionHeader title={rc.questions.tabs.stop} subtitle={rc.questions.stop.hint} />
           <StopView names={names} stop={stop} />
         </section>
       )}
 
-      {details}
+      {/* The ages and figures that set the answer, with their calculation and a slider each. */}
+      <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
+        <SectionHeader title={LEDGER_COPY[lang].title} />
+        <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
+      </section>
+
+      <section id="tableau" className="results-section" aria-label={r.table.title}>
+        <SectionHeader title={r.table.title} />
+        <YearTables runs={runs} label={label} />
+      </section>
+
+      <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
+        <SectionHeader title={r.sensitivity.title} />
+        <SensitivityPanel household={profile.household} assumptions={assumptions} />
+      </section>
+
+      <section id="parametres" className="results-section" aria-label={r.params.title}>
+        <SectionHeader title={r.params.title} />
+        <ParamsPanel />
+      </section>
 
       <NextStep to="/donnees" label={t.next.toData}>
         <p>{t.next.resultsHint}</p>

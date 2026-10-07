@@ -18,12 +18,14 @@ export function useBridge(household: Household, assumptions: Assumptions, levers
   )
 }
 
-/** Whether each strategy lasts under the three sets of assumptions — fifteen projections, only mounted when asked for. */
+/** Whether each strategy lasts under the three sets of assumptions — fifteen projections, started once the page is idle. */
 export function useBridgeMatrix(household: Household, assumptions: Assumptions, levers: BridgeLevers): Answer<BridgeMatrix> {
   return useOffThread<BridgeRequest, BridgeMessage, BridgeMatrix>(
     { household, assumptions, levers, what: 'matrix' },
     makeWorker,
     () => bridgeMatrix(household, assumptions, levers),
     (m) => (m.what === 'matrix' ? m.matrix : null),
+    true,
+    'idle',
   )
 }

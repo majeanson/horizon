@@ -1,31 +1,43 @@
+import { useEffect } from 'react'
 import { useT } from '../../i18n'
 import { PRESET_KEYS } from '../../engine/assumptionPresets'
 import { sensitivityAxes } from '../../engine/simulate'
 import type { Assumptions, Household } from '../../engine/types'
 import { useSensitivity } from '../../lib/useSensitivity'
+import { Skeleton } from '../Skeleton'
 import { StatusMessage } from '../StatusMessage'
 
 // « Et si l'avenir est un peu moins bon ? » — the earliest age that lasts when returns, inflation or longevity move.
-// Twenty-seven projections, so it runs only when asked, in a worker, and fills in cell by cell.
+// Twenty-seven projections: they run by themselves, in a worker, cell by cell — but LAST, well behind the page's
+// first paint and the verdict (the longest wait on the page belongs to the least urgent answer).
 
 export function SensitivityPanel({ household, assumptions }: { household: Household; assumptions: Assumptions }) {
   const t = useT()
   const s = t.results.sensitivity
   const { state, run } = useSensitivity()
+  // Restarted whenever the question changes; `run` cancels the worker already on its way.
+  const key = JSON.stringify({ household, assumptions })
+  useEffect(() => {
+    const starter = setTimeout(() => run(household, assumptions), 600)
+    return () => clearTimeout(starter)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, run])
   const axes = sensitivityAxes(assumptions)
   const points = (delta: number) => Math.round(delta * 100)
   const find = (horizonAge: number, returnsDelta: number, inflationDelta: number) =>
     state.cells.find((c) => c.horizonAge === horizonAge && c.returnsDelta === returnsDelta && c.inflationDelta === inflationDelta)
 
   return (
-    <div className="sensitivity">
+    <div className="sensitivity" aria-busy={state.status !== 'done'}>
       <p className="field-row__hint">{s.hint}</p>
-      <div>
-        <button type="button" className="btn btn--sm" disabled={state.status === 'running'} onClick={() => run(household, assumptions)}>
-          {state.status === 'running' ? s.running : s.run}
-        </button>
-      </div>
-      {state.status !== 'idle' && (
+      {state.status === 'running' && (
+        <p className="bridge__updating" role="status">
+          {s.running}
+        </p>
+      )}
+      {state.status === 'idle' || (state.presets.length === 0 && state.cells.length === 0) ? (
+        <Skeleton count={4} />
+      ) : (
         <>
           <div className="table-wrap" role="region" aria-label={s.presetsTitle} tabIndex={0}>
             <table>

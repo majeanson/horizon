@@ -375,7 +375,6 @@ export const FR = {
     sensitivity: {
       title: 'Et si l’avenir est un peu moins bon ?',
       hint: 'L’âge au plus tôt quand le rendement, l’inflation ou la longévité changent d’un point ou de cinq ans.',
-      run: 'Calculer',
       running: 'Calcul en cours…',
       returns: 'Rendement',
       inflation: 'Inflation',

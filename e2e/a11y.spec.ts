@@ -52,9 +52,9 @@ async function violations(page: Page): Promise<string[]> {
   )
 }
 
-// Every route, in every display state, with the example household loaded — and with EVERY ⓘ note and EVERY
-// disclosure open, because the colours that matter most (a note on its tinted ground, a table row marked short)
-// only exist once something is opened.
+// Every route, in every display state, with the example household loaded — and with EVERY ⓘ note open,
+// because the colours that matter most (a note on its tinted ground, a table row marked short) only
+// exist once something is opened. Nothing else hides: the pages show everything by themselves.
 const PAGES = [
   ['the profile', '/', '.page-head__title'],
   ['the assumptions', '/hypotheses', '.page-head__title'],
@@ -71,7 +71,6 @@ for (const s of STATES) {
       await page.goto(path)
       await page.locator(ready).waitFor()
       for (const b of await page.locator('.info-btn').all()) await b.click()
-      for (const d of await page.locator('.disclosure__summary').all()) await d.click()
       expect(await violations(page)).toEqual([])
     })
   }

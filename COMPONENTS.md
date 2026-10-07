@@ -70,6 +70,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **ImpactMeter** | `src/components/ImpactMeter.tsx` | « Where does this assumption sit, and what does it do to the plan? » A five-step track with a marker, the level and its lean in words (cautious / central / optimistic), and one « why it matters » sentence. The level comes from `engine/assumptionImpact.ts` (anchored on the three scenarios); the copy is `FR.assumptions.impact`. |
 | **EmptyState** | `src/components/EmptyState.tsx` | The calm « nothing here » line (`role="status"`). |
 | **Disclosure** | `src/components/Disclosure.tsx` | A collapsed-by-default expander (caret + label + optional count) for secondary, space-hungry groups: the per-year table, the parameters behind a figure. |
+| **SectionNav** | `src/components/SectionNav.tsx` | The map of a long page: a sticky `Rail` of chips, one per section in reading order — a tap scrolls there, the section in view is marked (IntersectionObserver). Everything stays ON the page; the nav only moves the reader. |
 | **NextStep** | `src/components/NextStep.tsx` | The foot of a page: one line on what is missing (or that nothing is) and ONE primary action to the next page — Profil → Hypothèses → Résultats → Données. |
 
 ### Charts

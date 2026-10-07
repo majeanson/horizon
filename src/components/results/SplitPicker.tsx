@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useT } from '../../i18n'
 import { MAX_AGE, MIN_AGE } from '../../lib/resultsModel'
 import { Chip } from '../Chip'
-import { Disclosure } from '../Disclosure'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 
@@ -16,7 +15,8 @@ export function SplitPicker({ names, defaults, onAdd, disabled }: { names: reado
   const valid = (n: number) => n >= MIN_AGE && n <= MAX_AGE
   const usable = valid(first) && valid(second) && first !== second
   return (
-    <Disclosure label={c.splitTitle}>
+    <div className="split-picker">
+      <p className="field-row__label">{c.splitTitle}</p>
       <p className="field-row__hint">{c.splitHint}</p>
       <FieldRow label={c.splitFor(names[0])}>
         {(w) => <NumberField kind="int" min={MIN_AGE} max={MAX_AGE} value={first} onChange={setFirst} id={w.id} />}
@@ -28,6 +28,6 @@ export function SplitPicker({ names, defaults, onAdd, disabled }: { names: reado
       <Chip onClick={() => usable && !disabled && onAdd(first, second)} disabled={!usable || disabled}>
         {c.splitAdd}
       </Chip>
-    </Disclosure>
+    </div>
   )
 }

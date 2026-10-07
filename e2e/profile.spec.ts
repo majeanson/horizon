@@ -394,7 +394,7 @@ for (const width of [360, 390]) {
     for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
-      const small = await page.locator('.chip, .btn--sm, .disclosure__summary, .info-btn').evaluateAll((els) =>
+      const small = await page.locator('.chip, .btn--sm, .info-btn').evaluateAll((els) =>
         els.flatMap((el) => {
           const r = el.getBoundingClientRect()
           return r.width > 0 && r.height > 0 && r.height < 43.5 ? [`${el.className} ${Math.round(r.height)}px “${(el.textContent ?? '').trim().slice(0, 24)}”`] : []
@@ -413,7 +413,6 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
       for (const t of await page.locator('.info-btn').all()) await t.click()
-      for (const d of await page.locator('.disclosure__summary').all()) await d.click()
       await expectNoHorizontalOverflow(page)
     }
   })

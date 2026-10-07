@@ -5,6 +5,19 @@
 // typed as the French one, so the two cannot drift apart; lib/resultsCopy.test.ts holds them to non-empty and translated.
 
 const FR_RESULTS = {
+  nav: {
+    label: 'Sections des résultats',
+    verdict: 'Verdict',
+    comparer: 'Comparer',
+    pont: 'Années 60 à 70',
+    rente: 'Rente : quand ?',
+    epargner: 'Épargner',
+    arreter: 'Arrêter',
+    donneesCalcul: 'Mes données',
+    tableau: 'Année par année',
+    sensibilite: 'Sensibilité',
+    parametres: 'Paramètres',
+  },
   questions: {
     tabs: { when: 'Quand prendre ma retraite ?', save: 'Combien épargner ?', stop: 'Quand arrêter de travailler ?' },
     save: {
@@ -55,6 +68,19 @@ const FR_RESULTS = {
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
+  nav: {
+    label: 'Results sections',
+    verdict: 'Verdict',
+    comparer: 'Compare',
+    pont: 'Ages 60 to 70',
+    rente: 'Pension: when?',
+    epargner: 'Save',
+    arreter: 'Stop',
+    donneesCalcul: 'My data',
+    tableau: 'Year by year',
+    sensibilite: 'Sensitivity',
+    parametres: 'Parameters',
+  },
   questions: {
     tabs: { when: 'When can I retire?', save: 'How much to save?', stop: 'When can I stop working?' },
     save: {
