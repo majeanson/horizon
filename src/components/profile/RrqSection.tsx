@@ -28,6 +28,18 @@ export function RrqSection({ person, edit }: PersonEditor) {
   const now = today()
   const rules = useMemo(() => makeRrqRules({ inflation: assumptions.inflation, wageGrowth: assumptions.wageGrowth }), [assumptions.inflation, assumptions.wageGrowth])
   const years = useMemo(() => historyYears(person, now.year - 1), [person, now.year])
+  // The grid in decades, mirroring the relevé's own table, so a 40-year history reads as four
+  // labelled bands instead of one unbroken wall of boxes.
+  const decades = useMemo(() => {
+    const groups: { from: number; years: number[] }[] = []
+    for (const y of years) {
+      const from = Math.floor(y / 10) * 10
+      const last = groups[groups.length - 1]
+      if (last && last.from === from) last.years.push(y)
+      else groups.push({ from, years: [y] })
+    }
+    return groups
+  }, [years])
   const typed = Object.keys(person.earningsHistory).length
   const [filledNote, setFilledNote] = useState<string | null>(null)
 
@@ -57,7 +69,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
       </FieldRow>
 
         <div className="earnings">
-          <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed)} />
+          <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed, years.length)} />
           <p className="field-row__hint">{r.earningsHint}</p>
           <div className="earnings__tools">
             <FieldInfo id="earnings" label={r.earnings} />
@@ -65,21 +77,26 @@ export function RrqSection({ person, edit }: PersonEditor) {
           </div>
           <p className="field-row__hint">{r.fillHint}</p>
           {filledNote && <StatusMessage tone="info">{filledNote}</StatusMessage>}
-          <div className="earnings__grid">
-            {years.map((year) => (
-              <div key={year} className="earnings__cell">
-                <span className="earnings__year mono" aria-hidden="true">{year}</span>
-                <NumberField
-                  kind="money"
-                  allowEmpty
-                  max={1e9}
-                  value={person.earningsHistory[year] ?? null}
-                  onChange={(v) => edit((x) => setEarning(x, year, v))}
-                  ariaLabel={r.earningsYear(year)}
-                />
+          {decades.map((d) => (
+            <div key={d.from} className="earnings__decade">
+              <p className="earnings__decade-label mono">{r.decade(d.from)}</p>
+              <div className="earnings__grid">
+                {d.years.map((year) => (
+                  <div key={year} className="earnings__cell">
+                    <span className="earnings__year mono" aria-hidden="true">{year}</span>
+                    <NumberField
+                      kind="money"
+                      allowEmpty
+                      max={1e9}
+                      value={person.earningsHistory[year] ?? null}
+                      onChange={(v) => edit((x) => setEarning(x, year, v))}
+                      ariaLabel={r.earningsYear(year)}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
       <FieldRow label={r.statement65} infoId="rrqEstimate65" hint={r.statementHint}>

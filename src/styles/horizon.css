@@ -329,8 +329,20 @@
 }
 .earnings__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  /* 8.5rem: two columns fit a 360 px phone (the cells hold a 6-digit amount, nothing longer).
+     At 11rem the grid collapsed to ONE column there — a 30-to-60-field scroll that buried the
+     statement-check fields below it. */
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
   gap: 0.6rem;
+}
+/* The grid in decades, like the relevé's own table: the eye lands on « Années 1990 » on both. */
+.earnings__decade {
+  margin-top: 0.6rem;
+}
+.earnings__decade-label {
+  margin: 0 0 0.35rem;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
 }
 .earnings__cell {
   display: flex;
