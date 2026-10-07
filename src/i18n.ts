@@ -234,6 +234,8 @@ export const FR = {
       neutral: 'Neutre',
       bold: 'Audacieux',
       custom: 'Personnalisé',
+      confirmReplace: (name: string) => `Remplacer vos hypothèses personnalisées par le scénario ${name} ? Vos valeurs actuelles — inflation, salaires, rendements, horizon — seront écrasées.`,
+      confirmLabel: 'Remplacer',
       blurb: {
         prudent: 'Rendements plus bas, inflation plus haute, vie plus longue : un plan qui tient ici a de la marge.',
         neutral: 'Le milieu de la route : les hypothèses de projection 2026 de FP Canada et de l’Institut de planification financière.',

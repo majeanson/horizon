@@ -218,6 +218,8 @@ export const EN: typeof FR = {
       neutral: 'Neutral',
       bold: 'Aggressive',
       custom: 'Custom',
+      confirmReplace: (name: string) => `Replace your custom assumptions with the ${name} scenario? Your current values — inflation, wages, returns, horizon — will be overwritten.`,
+      confirmLabel: 'Replace',
       blurb: {
         prudent: 'Lower returns, higher inflation, a longer life: a plan that holds here has room to spare.',
         neutral: 'The middle of the road: the 2026 projection assumptions of FP Canada and the Institute of Financial Planning.',

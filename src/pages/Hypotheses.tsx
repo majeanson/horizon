@@ -14,6 +14,7 @@ import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
+import { useConfirm } from '../lib/confirm'
 import { formatPct } from '../lib/format'
 import { applyPreset, moveInOrder, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
@@ -28,6 +29,7 @@ export function Hypotheses() {
   const { assumptions, household } = profile
   const gaps = profileGaps(profile)
   const { lang } = useLang()
+  const confirm = useConfirm()
   const active = presetOf(assumptions)
   const presetSummary = (key: PresetKey) => {
     const v = ASSUMPTION_PRESETS[key]
@@ -42,6 +44,16 @@ export function Hypotheses() {
     return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
   }
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
+  // Moving a row to an edge disables the very button that was pressed, and a disabled element drops
+  // focus to <body> — a keyboard user pressing Enter on « Monter » lost their place. The rows keep
+  // their DOM nodes (keyed by kind), so only that one case needs catching: when focus actually fell,
+  // give it to the row's still-enabled arrow.
+  const keepFocusInRow = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const row = e.currentTarget.closest('.order-list__item')
+    requestAnimationFrame(() => {
+      if (document.activeElement === document.body) row?.querySelector<HTMLButtonElement>('button:enabled')?.focus()
+    })
+  }
 
   return (
     <section className="page-body">
@@ -55,7 +67,14 @@ export function Hypotheses() {
             ...(['prudent', 'neutral', 'bold'] as const).map((key) => ({ key, label: a.presets[key] })),
             ...(active === null ? [{ key: 'custom' as const, label: a.presets.custom }] : []),
           ]}
-          onSelect={(key) => key !== 'custom' && updateProfile((p) => applyPreset(p, key))}
+          onSelect={async (key) => {
+            if (key === 'custom') return
+            // Hand-tuned values are the one state a preset tap destroys with no way back: every other
+            // replace in the app confirms and names what is lost, so this one does too. From a preset,
+            // the tap is reversible (tap the old preset back) and asks nothing.
+            if (active === null && !(await confirm({ message: a.presets.confirmReplace(a.presets[key]), confirmLabel: a.presets.confirmLabel, tone: 'default' }))) return
+            updateProfile((p) => applyPreset(p, key))
+          }}
         />
         <p className="field-row__hint">{active === null ? a.presets.blurb.custom : a.presets.blurb[active]}</p>
         {active !== null && <p className="field-row__hint mono">{presetSummary(active)}</p>}
@@ -123,7 +142,10 @@ export function Hypotheses() {
                   className="btn btn--icon btn--ghost"
                   disabled={i === 0}
                   aria-label={`${t.common.moveUp} : ${accountName[kind]}`}
-                  onClick={() => updateProfile((p) => setAssumptions(p, { withdrawalOrder: moveInOrder(p.assumptions.withdrawalOrder, i, -1) }))}
+                  onClick={(e) => {
+                    updateProfile((p) => setAssumptions(p, { withdrawalOrder: moveInOrder(p.assumptions.withdrawalOrder, i, -1) }))
+                    keepFocusInRow(e)
+                  }}
                 >
                   <Icon name="caret-up-bold" size={18} />
                 </button>
@@ -132,7 +154,10 @@ export function Hypotheses() {
                   className="btn btn--icon btn--ghost"
                   disabled={i === assumptions.withdrawalOrder.length - 1}
                   aria-label={`${t.common.moveDown} : ${accountName[kind]}`}
-                  onClick={() => updateProfile((p) => setAssumptions(p, { withdrawalOrder: moveInOrder(p.assumptions.withdrawalOrder, i, 1) }))}
+                  onClick={(e) => {
+                    updateProfile((p) => setAssumptions(p, { withdrawalOrder: moveInOrder(p.assumptions.withdrawalOrder, i, 1) }))
+                    keepFocusInRow(e)
+                  }}
                 >
                   <Icon name="caret-down-bold" size={18} />
                 </button>

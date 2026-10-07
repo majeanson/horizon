@@ -451,6 +451,8 @@ test('the scenario picker sets the economy, follows a hand edit, and the desktop
   await rrsp.press('Enter')
   await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveAttribute('aria-selected', 'true')
   await picker.getByRole('tab', { name: 'Neutre' }).click()
+  // Hand-tuned values are the one state a preset tap would destroy silently: it asks first, naming what is lost.
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Remplacer' }).click()
   await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveCount(0)
   await expect.poll(async () => (await savedProfile(page)).assumptions.returns.rrsp).toBe(0.045)
 
