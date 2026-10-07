@@ -307,3 +307,14 @@ describe('the OAS Benefits Estimator, Oct–Dec 2026, single person', () => {
     expect(Math.round(762.5 * deferralMultiplier(65 + 11 / 12, RULES) * 100) / 100).toBe(812.83)
   })
 })
+
+// ── The same estimator, for the « newcomer » example (single, 67, 35 years of residence after 18, income 30 784 $, no deferral) ──
+// It printed « You could receive $667.19 per month: $667.19 from the Old Age Security pension, $0 from the Guaranteed Income Supplement ».
+describe('the OAS Benefits Estimator, Oct–Dec 2026, a partial pension', () => {
+  it('35 years of residence after 18 earns 35/40 of $762.50 = $667.19, and an income of 30 784 $ leaves no GIS', () => {
+    const person = { birth: { year: 1959, month: 2 }, startAge: 65, residentSince: 1989 } // 35 completed years by the 2024 start
+    expect(residenceFraction(person, oasStart(person.birth, 65).year, RULES)).toBe(35 / 40)
+    expect(Math.round(RULES.monthly65to74 * (35 / 40) * 100) / 100).toBe(667.19)
+    expect(gisMonthly(30_784, 'single', RULES)).toBe(0)
+  })
+})
