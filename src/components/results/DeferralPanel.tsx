@@ -9,8 +9,9 @@ import { Skeleton } from '../Skeleton'
 
 // « Quand commencer ma rente ? » — for each person, what starting the QPP pension (60 · 65 · 70 · 72) and the OAS (65 · 70)
 // at each age does: the monthly amount, how it compares with 65, when the choice has paid for itself, and what it does
-// to the plan (engine/deferral.ts). It sits behind a disclosure and starts computing — in a worker — only when opened.
-// Below the numbers, the case for and against deferring in plain words, and what the numbers leave out.
+// to the plan (engine/deferral.ts), computed in a worker. It is the RULE view of the pension section: always on the
+// page, after the strategy view, following its person tabs. Below the numbers, the case for and against deferring in
+// plain words, and what the numbers leave out.
 
 function OptionsTable({
   title,
