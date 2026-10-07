@@ -43,7 +43,11 @@ export const PARAM_LABELS: {
     "federal.splitMaxShare":
       "Fédéral : part maximale du revenu de pension fractionnable",
     "oas.deferralMaxMonths": "PSV : nombre maximal de mois de report",
+    "oas.allowanceCurve": "Allocation : courbe selon le revenu du couple (table 4)",
+    "oas.allowanceCutoff": "Allocation : seuil de revenu du couple",
+    "oas.allowanceMax": "Allocation : prestation mensuelle maximale",
     "oas.deferralPerMonth": "PSV : bonification par mois de report",
+    "oas.gisAllowanceCurve": "SRG du conjoint d’une personne qui reçoit l’allocation : courbe (table 4)",
     "oas.gis.baseDivisorCouple":
       "SRG : diviseur de la prestation de base (couple)",
     "oas.gis.baseDivisorSingle":
@@ -176,7 +180,11 @@ export const PARAM_LABELS: {
     "federal.splitMaxShare":
       "Federal maximum share of pension income that can be split",
     "oas.deferralMaxMonths": "OAS maximum months of deferral",
+    "oas.allowanceCurve": "Allowance: curve by the couple's income (table 4)",
+    "oas.allowanceCutoff": "Allowance: the couple's income cut-off",
+    "oas.allowanceMax": "Allowance: maximum monthly amount",
     "oas.deferralPerMonth": "OAS increase per month of deferral",
+    "oas.gisAllowanceCurve": "GIS of the spouse of an Allowance recipient: curve (table 4)",
     "oas.gis.baseDivisorCouple": "GIS base-amount divisor (couple)",
     "oas.gis.baseDivisorSingle": "GIS base-amount divisor (single)",
     "oas.gis.employmentExemptionBand":

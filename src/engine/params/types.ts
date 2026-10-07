@@ -83,6 +83,15 @@ export interface YearParams {
     /** Net income above which OAS is recovered (the recovery tax, « clawback »). */
     recoveryThreshold: Cited
     recoveryRate: Cited
+    /** The Allowance (the 60–64 spouse of a GIS recipient): its maximum monthly amount and its combined-income cut-off, at the quarter read. */
+    allowanceMax: Cited
+    allowanceCutoff: Cited
+    /**
+     * The shape of the Allowance and of the pensioner's GIS while the spouse receives it: breakpoints of Table 4 (combined annual
+     * income → monthly dollars) at the quarter read. In another year both axes scale with `allowanceMax` (prices).
+     */
+    allowanceCurve: Cited<Record<number, number>>
+    gisAllowanceCurve: Cited<Record<number, number>>
     gis: {
       /** Single, widowed or divorced. */
       single: GisCategory

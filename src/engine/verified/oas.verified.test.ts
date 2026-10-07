@@ -12,7 +12,7 @@
 //   · https://laws-lois.justice.gc.ca/eng/acts/o-9/FullText.html — Old Age Security Act, ss. 3, 7.1, 12, 12.1.
 import { describe, expect, it } from 'vitest'
 import { knownYear } from '../params/index.ts'
-import { deferralMultiplier, gisCategory, gisCountedIncome, gisMonthly, oasFullRecoveryIncome, oasRecovery, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson, type OasRules } from '../oas.ts'
+import { allowanceMonthly, deferralMultiplier, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasFullRecoveryIncome, oasRecovery, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson, type OasRules } from '../oas.ts'
 
 const RULES: OasRules = knownYear(2026).oas
 
@@ -339,5 +339,50 @@ describe('the OAS Benefits Estimator, Oct–Dec 2026, one spouse on the OAS and 
     const category = gisCategory({ present: true, receivesOas: false })
     expect(category).toBe('spouseNone')
     expect(Math.abs(gisMonthly(32_980 + 18_754, category, RULES) - 76.49)).toBeLessThan(1)
+  })
+})
+
+// ── The Allowance (the 60–64 spouse of a GIS recipient) — Table 4 of the Open Government Portal's « Table of Benefit Amounts », Oct–Dec 2026 ──
+// https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0 — « Table 4 - GIS and Allowance for couple »: 941 rows,
+// one per 48 $ of the couple's combined income, the Allowance and the GIS of the pensioner spouse. The copy beside this test keeps
+// the four columns the model reads. The curve is a few breakpoints fitted to it: every row must be within $1 a month at its lower edge.
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+describe('the Allowance and the pensioner\'s GIS beside it, row by row against the official table', () => {
+  const lines = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'data', 'oas-table4-2026q4.csv'), 'utf8').trim().split('\n').slice(1)
+  const table = lines.map((l) => l.split(',').map(Number)) // from, to, gis, allowance
+
+  it('the copy is the whole table: 941 bands from 0 to the cut-off', () => {
+    expect(table.length).toBe(941)
+    expect(table[0][0]).toBe(0)
+    expect(Math.ceil(table[table.length - 1][1])).toBe(RULES.allowanceCutoff)
+    expect(table[0][3]).toBe(RULES.allowanceMax)
+  })
+
+  it('the Allowance is within $1 a month of the table at the lower edge of every band', () => {
+    let worst = 0
+    for (const [from, , , allowance] of table) worst = Math.max(worst, Math.abs(allowanceMonthly(from, RULES) - allowance))
+    expect(worst).toBeLessThan(1.0001)
+  })
+
+  it('the pensioner\'s GIS beside it is within $1 a month of the table at the lower edge of every band', () => {
+    let worst = 0
+    for (const [from, , gis] of table) worst = Math.max(worst, Math.abs(gisWithAllowanceSpouseMonthly(from, RULES) - gis))
+    expect(worst).toBeLessThan(1.0001)
+  })
+
+  it('the Allowance is the maximum with no income, falls as income rises, and is nil at the cut-off', () => {
+    expect(allowanceMonthly(0, RULES)).toBe(1_448.06)
+    expect(allowanceMonthly(20_000, RULES)).toBeLessThan(allowanceMonthly(10_000, RULES))
+    expect(allowanceMonthly(RULES.allowanceCutoff, RULES)).toBe(0)
+    expect(allowanceMonthly(60_000, RULES)).toBe(0)
+  })
+
+  it('in a later year both axes scale with the maximum (prices): 5 % more money, 5 % more income for the same amount', () => {
+    const later = { ...RULES, allowanceMax: RULES.allowanceMax * 1.05, allowanceCutoff: RULES.allowanceCutoff * 1.05 }
+    expect(allowanceMonthly(0, later)).toBeCloseTo(1_448.06 * 1.05, 1)
+    expect(allowanceMonthly(20_000 * 1.05, later)).toBeCloseTo(allowanceMonthly(20_000, RULES) * 1.05, 1)
   })
 })

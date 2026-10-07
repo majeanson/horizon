@@ -191,3 +191,37 @@ export function gisCategory(spouse: { present: boolean; receivesOas: boolean }):
   if (!spouse.present) return 'single'
   return spouse.receivesOas ? 'spouseOas' : 'spouseNone'
 }
+
+// ── The Allowance ─────────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The Allowance is paid to the 60–64-year-old spouse of someone who receives the OAS and the GIS, from the month after their 60th
+ * birthday to the month of their 65th, while the COUPLE's combined income (the same income the GIS counts: without the OAS and the
+ * Allowance themselves) is under the cut-off, and they have lived in Canada at least ten years since 18. While it is paid, the
+ * pensioner's GIS follows another curve (« spouse receives the Allowance »).
+ *
+ * Both amounts are read from the official table (Table 4, one row per 48 $ of combined income), as breakpoints; in another year the
+ * table's two axes scale together with the maximum, which is indexed to prices.
+ */
+function onCurve(points: Readonly<Record<number, number>>, income: number, scale: number): number {
+  const xs = Object.keys(points).map(Number).sort((a, b) => a - b)
+  const x = Math.max(0, income) / scale
+  if (x >= xs[xs.length - 1]) return points[xs[xs.length - 1]] * scale
+  for (let i = 0; i < xs.length - 1; i++) {
+    if (x <= xs[i + 1]) return (points[xs[i]] + ((points[xs[i + 1]] - points[xs[i]]) * (x - xs[i])) / (xs[i + 1] - xs[i])) * scale
+  }
+  return 0
+}
+
+const allowanceScale = (rules: OasRules): number => rules.allowanceMax / rules.allowanceCurve[0]
+
+/** The Allowance for one month, at the couple's combined income (counted as the GIS counts it). Zero at and above the cut-off. */
+export function allowanceMonthly(income: number, rules: OasRules): number {
+  if (income >= rules.allowanceCutoff) return 0
+  return roundTo(Math.max(0, onCurve(rules.allowanceCurve, income, allowanceScale(rules))), 0.01)
+}
+
+/** The monthly GIS of the pensioner whose spouse receives the Allowance, at the couple's combined income. */
+export function gisWithAllowanceSpouseMonthly(income: number, rules: OasRules): number {
+  return roundTo(Math.max(0, onCurve(rules.gisAllowanceCurve, income, allowanceScale(rules))), 0.01)
+}

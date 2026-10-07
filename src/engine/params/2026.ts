@@ -35,6 +35,11 @@ const ESDC_Q4 = src(
   'Maximum Benefit Amounts and Related Figures - Canada Pension Plan (2026) and Old Age Security (October to December 2026)',
   { note: 'The latest published quarter. The year’s four quarterly maxima were 742.31, 743.05, 751.97 and 762.50 $ (ages 65–74); projection indexes from this level.' },
 )
+const OGP_TABLE4 = src(
+  'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0',
+  'Old Age Security (OAS) - Table of Benefit Amounts by marital status and income level (Table 4 — GIS and Allowance for a couple, October to December 2026)',
+  { note: 'Open Government Portal, the table behind the Service Canada « How much you could receive » pages: one row per 48 $ of combined income, the Allowance and the GIS of the pensioner spouse.' },
+)
 const OAS_DEFER = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/when-start.html', 'Old Age Security - When to start your retirement pension - Canada.ca')
 const OAS_REPAY = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/repayment.html', 'Repayment of Old Age Security pension - Canada.ca')
 const OAS_ACT = src('https://laws-lois.justice.gc.ca/eng/acts/o-9/FullText.html', 'Old Age Security Act (R.S.C., 1985, c. O-9)')
@@ -184,6 +189,18 @@ export const P2026 = {
     residenceYearsMinimum: c(10, 'fixed', { ...OAS_ACT, note: 's. 3(2)(b): a partial pension needs at least ten years of residence (twenty if living abroad).' }),
     recoveryThreshold: c(95_323, 'cpi', { ...ESDC_Q4, note: 'Footnote 7: « The OAS pension repayment range in 2026 is for net world income from $95,323 to $155,320 » (for the 2026 income year; the 2025 income year was $93,454).' }, 1),
     recoveryRate: c(0.15, 'fixed', { ...OAS_REPAY, note: '« You must repay 15% of that amount » (net income above the threshold, line 23400).' }),
+    allowanceMax: c(1_448.06, 'cpi', { ...ESDC_Q4, note: 'Table 5, « Allowance »: maximum monthly amount (the OAS pension, the GIS and the top-up together).' }, 0.01),
+    allowanceCutoff: c(42_768, 'cpi', { ...ESDC_Q4, note: 'Table 5, « Allowance »: the couple’s COMBINED annual income cut-off. It excludes the OAS pension and the employment-income exemption (footnote 6).' }, 1),
+    allowanceCurve: c<Record<number, number>>(
+      { 0: 1_448.06, 4_192: 1_185.06, 8_928: 840.07, 12_192: 636.07, 42_720: 0.57, 42_768: 0 },
+      'fixed',
+      { ...OGP_TABLE4, note: 'Breakpoints fitted to the table’s « Allowance » column (941 rows) to within $1 a month at every row’s lower income edge: $1 off per $16 of income while the OAS part and the top-up fall, then per $48. Checked row by row in verified/oas.verified.test.ts.' },
+    ),
+    gisAllowanceCurve: c<Record<number, number>>(
+      { 0: 685.56, 4_176: 684.56, 8_880: 635.57, 12_288: 634.57, 30_144: 262.92, 42_720: 262.92, 42_768: 262.92 },
+      'fixed',
+      { ...OGP_TABLE4, note: 'The same table’s « GIS » column: the supplement of a pensioner whose spouse receives the Allowance, to within $1 a month at every row’s lower edge. Above the cut-off the Allowance is gone and the pensioner’s own category applies.' },
+    ),
     gis: {
       single: {
         max: c(1_138.9, 'cpi', { ...ESDC_Q4, note: 'Table 5, « single, widowed or divorced »: maximum monthly amount (the top-up is included).' }, 0.01),
