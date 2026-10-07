@@ -47,6 +47,8 @@ export interface PersonIncome {
   payrollPremiums: number
   /** RRSP contributions deducted this year (line 20800). The caller keeps them within the person's deduction room. */
   rrspDeduction: number
+  /** The member's own contributions to an employer pension plan (line 20700; Québec line 207). Absent: none. */
+  rppDeduction?: number
 }
 
 export interface TaxRules {
@@ -120,7 +122,7 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
     const splitOut = split.from === i ? split.amount : 0
     const splitIn = split.from !== null && split.from !== i ? split.amount : 0
     const income = p.employment + p.rrq + p.oas + p.db + p.registered + p.capitalGains * rules.federal.capitalGainsInclusion + splitIn - splitOut
-    const before = income - p.rrqEnhanced - p.rrspDeduction
+    const before = income - p.rrqEnhanced - p.rrspDeduction - (p.rppDeduction ?? 0)
     const recovery = oasRecovery(before, p.oas, rules.oas)
     return { p, income, before, recovery, netIncome: before - recovery, splitIn, splitOut }
   })

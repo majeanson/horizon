@@ -134,7 +134,7 @@ describe('the sets diverge steadily — a gap that compounds, not a jump', () =>
       for (const age of AGES) {
         for (const r of at(age, withPreset(GOLDEN_ASSUMPTIONS, k))) {
           const people = Object.values(r.persons)
-          const putAway = people.reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+          const putAway = people.reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.pensionContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
           expect(r.household.grossIncome - r.household.tax - putAway, `${k} ${age} ${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
           expect(Number.isFinite(r.household.netWorthEnd), `${k} ${age} ${r.year}`).toBe(true)
           for (const p of people) for (const v of Object.values(p.balancesEnd)) expect(v, `${k} ${age} ${r.year}`).toBeGreaterThanOrEqual(-0.005)
@@ -206,9 +206,9 @@ describe('the verdict under each set', () => {
     }
   })
 
-  it('golden household snapshot: prudent 63 · neutral 59 · bold 57 — a 6-year spread is the expected size of the difference', () => {
+  it('golden household snapshot: prudent 64 · neutral 59 · bold 57 — a 6-year spread is the expected size of the difference', () => {
     const v = Object.fromEntries([...presetVerdicts(H, GOLDEN_ASSUMPTIONS)].map((x) => [x.preset, x.earliestOk]))
-    expect(v).toEqual({ prudent: 63, neutral: 59, bold: 57 })
+    expect(v).toEqual({ prudent: 64, neutral: 59, bold: 57 })
   })
 
   it('a verdict is the first age with no shortfall, and the years after a failing age fail at or before the horizon', () => {

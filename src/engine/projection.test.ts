@@ -34,7 +34,7 @@ describe('projection — the books always balance', () => {
   it('every year: everything received − tax − what is put away = what is spent − what could not be met', () => {
     for (const r of rows) {
       const received = r.household.grossIncome
-      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.pensionContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
       expect(received - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
     }
   })
@@ -119,7 +119,7 @@ describe('projection — a falling market never takes an account below zero', ()
         }
       }
       expect(r.household.netWorthEnd, `${r.year}`).toBeGreaterThanOrEqual(-0.005)
-      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+      const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.pensionContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
       expect(r.household.grossIncome - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
     }
   })
@@ -227,7 +227,7 @@ describe('projection — committed savings yield to spending', () => {
     for (const r of rows) {
       const p = r.persons.self!
       expect(p.contributions.rrsp).toBeLessThanOrEqual(2_000 * (1 + A.inflation) ** (r.year - A.today.year) + 0.01)
-      const putAway = p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa
+      const putAway = p.rrqContribution + p.payrollContribution + p.pensionContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa
       expect(r.household.grossIncome - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
     }
   })
@@ -413,7 +413,7 @@ describe('projection — more is never worse, over many households', () => {
   it('every row of every sampled household balances', () => {
     for (const { h, label } of sample.slice(0, 8)) {
       for (const r of project(h, A, { retirementAge: { self: 60, spouse: 62 } })) {
-        const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
+        const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.pensionContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
         expect(r.household.grossIncome - r.household.tax - putAway, `${label} ${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
       }
     }

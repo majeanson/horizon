@@ -18,18 +18,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 6000,
-     "tfsa": 7000
+     "tfsa": 5488.98
     },
     "rrqContribution": 4895.3,
     "payrollContribution": 1261.2,
-    "netIncome": 77873,
+    "pensionContribution": 5726.01,
+    "netIncome": 72146.99,
     "oasRecovery": 0,
-    "federalTax": 7466.92,
-    "quebecTax": 9149.84,
+    "federalTax": 6486.77,
+    "quebecTax": 8061.9,
     "balancesEnd": {
      "nonReg": 15600,
      "rrsp": 105408.51,
-     "tfsa": 57315.77
+     "tfsa": 55771.13
     }
    },
    "spouse": {
@@ -48,10 +49,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4000,
-     "tfsa": 6851.75
+     "tfsa": 4704.84
     },
     "rrqContribution": 3874.5,
     "payrollContribution": 1124.5,
+    "pensionContribution": 0,
     "netIncome": 60385,
     "oasRecovery": 0,
     "federalTax": 4548.87,
@@ -59,16 +61,16 @@
     "balancesEnd": {
      "nonReg": 10400,
      "rrsp": 66789.01,
-     "tfsa": 44624.22
+     "tfsa": 42429.54
     }
    }
   },
   "household": {
    "grossIncome": 150000,
-   "tax": 26992.75,
+   "tax": 24924.66,
    "spending": 88000,
    "shortfall": 0,
-   "netWorthEnd": 300137.51
+   "netWorthEnd": 296398.19
   },
   "projected": false
  },
@@ -91,18 +93,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 6126,
-     "tfsa": 7147
+     "tfsa": 6044.21
     },
     "rrqContribution": 5052.2,
     "payrollContribution": 1299.83,
-    "netIncome": 80347,
+    "pensionContribution": 5903.78,
+    "netIncome": 74443.22,
     "oasRecovery": 0,
-    "federalTax": 7760.87,
-    "quebecTax": 9501.48,
+    "federalTax": 6750.29,
+    "quebecTax": 8379.76,
     "balancesEnd": {
      "nonReg": 16224,
      "rrsp": 116414.21,
-     "tfsa": 67201.02
+     "tfsa": 64459.54
     }
    },
    "spouse": {
@@ -121,10 +124,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4084,
-     "tfsa": 7849.43
+     "tfsa": 5180.75
     },
     "rrqContribution": 4001.45,
     "payrollContribution": 1159.35,
+    "pensionContribution": 0,
     "netIncome": 62295.85,
     "oasRecovery": 0,
     "federalTax": 4748.63,
@@ -132,16 +136,16 @@
     "balancesEnd": {
      "nonReg": 10816,
      "rrsp": 73969.39,
-     "tfsa": 54656.41
+     "tfsa": 49634.9
     }
    }
   },
   "household": {
    "grossIncome": 154650,
-   "tax": 28082.74,
+   "tax": 25950.44,
    "spending": 89848,
    "shortfall": 0,
-   "netWorthEnd": 339281.03
+   "netWorthEnd": 331518.04
   },
   "projected": true
  },
@@ -164,18 +168,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 6254.65,
-     "tfsa": 7297.09
+     "tfsa": 6623.32
     },
     "rrqContribution": 5217.47,
     "payrollContribution": 1340.11,
-    "netIncome": 82896.97,
+    "pensionContribution": 6086.45,
+    "netIncome": 76810.52,
     "oasRecovery": 0,
-    "federalTax": 8064.66,
-    "quebecTax": 9865.18,
+    "federalTax": 7022.81,
+    "quebecTax": 8708.76,
     "balancesEnd": {
      "nonReg": 16872.96,
      "rrsp": 128046.68,
-     "tfsa": 77684.53
+     "tfsa": 74130.92
     }
    },
    "spouse": {
@@ -194,10 +199,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4169.76,
-     "tfsa": 8891.54
+     "tfsa": 5677.13
     },
     "rrqContribution": 4132.32,
     "payrollContribution": 1195.3,
+    "pensionContribution": 0,
     "netIncome": 64266.78,
     "oasRecovery": 0,
     "federalTax": 4955.81,
@@ -205,16 +211,16 @@
     "balancesEnd": {
      "nonReg": 11248.64,
      "rrsp": 81560.56,
-     "tfsa": 66205.35
+     "tfsa": 57671.93
     }
    }
   },
   "household": {
    "grossIncome": 159444.15,
-   "tax": 29211.1,
+   "tax": 27012.83,
    "spending": 91734.81,
    "shortfall": 0,
-   "netWorthEnd": 381618.72
+   "netWorthEnd": 369531.69
   },
   "projected": true
  },
@@ -241,14 +247,15 @@
     },
     "rrqContribution": 5387,
     "payrollContribution": 1382.06,
-    "netIncome": 90496.13,
+    "pensionContribution": 6274.23,
+    "netIncome": 84221.9,
     "oasRecovery": 0,
-    "federalTax": 9229.58,
-    "quebecTax": 11185.73,
+    "federalTax": 8155.59,
+    "quebecTax": 9993.62,
     "balancesEnd": {
      "nonReg": 17547.88,
      "rrsp": 135259.72,
-     "tfsa": 88796.45
+     "tfsa": 85082.92
     }
    },
    "spouse": {
@@ -267,10 +274,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4257.33,
-     "tfsa": 13155.57
+     "tfsa": 9147.44
     },
     "rrqContribution": 4267.26,
     "payrollContribution": 1232.36,
+    "pensionContribution": 0,
     "netIncome": 66299.66,
     "oasRecovery": 0,
     "federalTax": 5170.71,
@@ -278,16 +286,16 @@
     "balancesEnd": {
      "nonReg": 11698.59,
      "rrsp": 89582.85,
-     "tfsa": 82632.9
+     "tfsa": 69618.16
     }
    }
   },
   "household": {
    "grossIncome": 164386.92,
-   "tax": 32174.42,
+   "tax": 29908.32,
    "spending": 93661.24,
    "shortfall": 0,
-   "netWorthEnd": 425518.39
+   "netWorthEnd": 408790.12
   },
   "projected": true
  },
@@ -310,18 +318,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 16001.42
+     "tfsa": 7606.78
     },
     "rrqContribution": 5558.4,
     "payrollContribution": 1424.37,
-    "netIncome": 94164.32,
+    "pensionContribution": 6469.51,
+    "netIncome": 87694.81,
     "oasRecovery": 0,
-    "federalTax": 9719.18,
-    "quebecTax": 11754.97,
+    "federalTax": 8611.76,
+    "quebecTax": 10525.76,
     "balancesEnd": {
      "nonReg": 18249.8,
      "rrsp": 141959.76,
-     "tfsa": 109149.78
+     "tfsa": 96687.7
     }
    },
    "spouse": {
@@ -340,10 +349,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4346.73,
-     "tfsa": 6520.1
+     "tfsa": 10781.86
     },
     "rrqContribution": 4406.39,
     "payrollContribution": 1270.55,
+    "pensionContribution": 0,
     "netIncome": 68396.43,
     "oasRecovery": 0,
     "federalTax": 5393.61,
@@ -351,16 +361,16 @@
     "balancesEnd": {
      "nonReg": 12166.53,
      "rrsp": 98057.54,
-     "tfsa": 93016.57
+     "tfsa": 83772.76
     }
    }
   },
   "household": {
    "grossIncome": 169482.91,
-   "tax": 33726.83,
+   "tax": 31390.2,
    "spending": 95628.12,
    "shortfall": 0,
-   "netWorthEnd": 472599.98
+   "netWorthEnd": 450894.09
   },
   "projected": true
  },
@@ -387,14 +397,15 @@
     },
     "rrqContribution": 5738.2,
     "payrollContribution": 1469.68,
-    "netIncome": 97099.57,
+    "pensionContribution": 6670.35,
+    "netIncome": 90429.22,
     "oasRecovery": 0,
-    "federalTax": 10079.83,
-    "quebecTax": 12184.49,
+    "federalTax": 8938.03,
+    "quebecTax": 10917.12,
     "balancesEnd": {
      "nonReg": 18979.79,
      "rrsp": 148961.3,
-     "tfsa": 122000.87
+     "tfsa": 108978
     }
    },
    "spouse": {
@@ -413,10 +424,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4438.01,
-     "tfsa": 16197.56
+     "tfsa": 11936.38
     },
     "rrqContribution": 4549.81,
     "payrollContribution": 1309.94,
+    "pensionContribution": 0,
     "netIncome": 70559.11,
     "oasRecovery": 0,
     "federalTax": 5624.71,
@@ -424,16 +436,16 @@
     "balancesEnd": {
      "nonReg": 12653.19,
      "rrsp": 107006.9,
-     "tfsa": 113760.31
+     "tfsa": 99744.53
     }
    }
   },
   "household": {
    "grossIncome": 174736.88,
-   "tax": 35030.83,
+   "tax": 32621.66,
    "spending": 97636.32,
    "shortfall": 0,
-   "netWorthEnd": 523362.36
+   "netWorthEnd": 496323.71
   },
   "projected": true
  },
@@ -456,18 +468,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 9433.42
+     "tfsa": 7929.62
     },
     "rrqContribution": 5923.78,
     "payrollContribution": 1515.37,
-    "netIncome": 100126.63,
+    "pensionContribution": 6877,
+    "netIncome": 93249.63,
     "oasRecovery": 0,
-    "federalTax": 10453.02,
-    "quebecTax": 12628.8,
+    "federalTax": 9275.85,
+    "quebecTax": 11322.17,
     "balancesEnd": {
      "nonReg": 19738.98,
      "rrsp": 156277.91,
-     "tfsa": 137134.25
+     "tfsa": 121988.09
     }
    },
    "spouse": {
@@ -486,10 +499,11 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 4531.21,
-     "tfsa": 16034.04
+     "tfsa": 13144.64
     },
     "rrqContribution": 4697.7,
     "payrollContribution": 1350.56,
+    "pensionContribution": 0,
     "netIncome": 72789.73,
     "oasRecovery": 0,
     "federalTax": 5864.35,
@@ -497,16 +511,16 @@
     "balancesEnd": {
      "nonReg": 13159.32,
      "rrsp": 116454.25,
-     "tfsa": 135270.36
+     "tfsa": 117670.18
     }
    }
   },
   "household": {
    "grossIncome": 180153.73,
-   "tax": 36380.96,
+   "tax": 33897.16,
    "spending": 99686.68,
    "shortfall": 0,
-   "netWorthEnd": 578035.07
+   "netWorthEnd": 545288.73
   },
   "projected": true
  },
@@ -529,18 +543,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 15404.22
+     "tfsa": 15569.55
     },
     "rrqContribution": 6114.77,
     "payrollContribution": 1561.48,
-    "netIncome": 103248.74,
+    "pensionContribution": 7089.7,
+    "netIncome": 96159.04,
     "oasRecovery": 0,
-    "federalTax": 10839.25,
-    "quebecTax": 13086.51,
+    "federalTax": 9625.67,
+    "quebecTax": 11739.47,
     "balancesEnd": {
      "nonReg": 20528.54,
      "rrsp": 163923.77,
-     "tfsa": 159052.29
+     "tfsa": 143393.57
     }
    },
    "spouse": {
@@ -557,29 +572,30 @@
      "tfsa": 0
     },
     "contributions": {
-     "nonReg": 3633.96,
+     "nonReg": 0,
      "rrsp": 4626.37,
-     "tfsa": 8000
+     "tfsa": 6939.55
     },
     "rrqContribution": 4850.16,
     "payrollContribution": 1392.42,
+    "pensionContribution": 0,
     "netIncome": 75090.44,
     "oasRecovery": 0,
     "federalTax": 6112.82,
     "quebecTax": 7736.43,
     "balancesEnd": {
-     "nonReg": 17391.62,
+     "nonReg": 13685.69,
      "rrsp": 126424.01,
-     "tfsa": 149535.55
+     "tfsa": 130059.31
     }
    }
   },
   "household": {
    "grossIncome": 185738.49,
-   "tax": 37775.01,
+   "tax": 35214.39,
    "spending": 101780.1,
    "shortfall": 0,
-   "netWorthEnd": 636855.78
+   "netWorthEnd": 598014.89
   },
   "projected": true
  },
@@ -602,18 +618,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 8500
+     "tfsa": 8266.16
     },
     "rrqContribution": 6309.1,
     "payrollContribution": 1610.61,
-    "netIncome": 106465.62,
+    "pensionContribution": 7310.87,
+    "netIncome": 99154.75,
     "oasRecovery": 0,
-    "federalTax": 11238.54,
-    "quebecTax": 13561.62,
+    "federalTax": 9987.1,
+    "quebecTax": 12172.55,
     "balancesEnd": {
      "nonReg": 21349.68,
      "rrsp": 171913.69,
-     "tfsa": 174898.79
+     "tfsa": 158296.39
     }
    },
    "spouse": {
@@ -630,29 +647,30 @@
      "tfsa": 0
     },
     "contributions": {
-     "nonReg": 11671.13,
+     "nonReg": 0,
      "rrsp": 4723.52,
-     "tfsa": 8500
+     "tfsa": 15734.61
     },
     "rrqContribution": 5007.35,
     "payrollContribution": 1435.58,
+    "pensionContribution": 0,
     "netIncome": 77463.43,
     "oasRecovery": 0,
     "federalTax": 6370.25,
     "quebecTax": 8051.2,
     "balancesEnd": {
-     "nonReg": 29989.55,
+     "nonReg": 14233.12,
      "rrsp": 136941.72,
-     "tfsa": 164953.8
+     "tfsa": 151996.72
     }
    }
   },
   "household": {
    "grossIncome": 191496.39,
-   "tax": 39221.61,
+   "tax": 36581.1,
    "spending": 103917.48,
    "shortfall": 0,
-   "netWorthEnd": 700047.23
+   "netWorthEnd": 654731.32
   },
   "projected": true
  },
@@ -675,18 +693,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 8500
+     "tfsa": 18323.45
     },
     "rrqContribution": 6513.24,
     "payrollContribution": 1660.18,
-    "netIncome": 109784.43,
+    "pensionContribution": 7536.46,
+    "netIncome": 102247.97,
     "oasRecovery": 0,
-    "federalTax": 11651.48,
-    "quebecTax": 14051.29,
+    "federalTax": 10361.43,
+    "quebecTax": 12619.36,
     "balancesEnd": {
      "nonReg": 22203.67,
      "rrsp": 180263.16,
-     "tfsa": 191458.38
+     "tfsa": 184150.92
     }
    },
    "spouse": {
@@ -703,29 +722,30 @@
      "tfsa": 0
     },
     "contributions": {
-     "nonReg": 13372.01,
+     "nonReg": 0,
      "rrsp": 4822.72,
-     "tfsa": 8500
+     "tfsa": 7234.07
     },
     "rrqContribution": 5169.41,
     "payrollContribution": 1480.08,
+    "pensionContribution": 0,
     "netIncome": 79910.95,
     "oasRecovery": 0,
     "federalTax": 6637.29,
     "quebecTax": 8375.33,
     "balancesEnd": {
-     "nonReg": 44825.96,
+     "nonReg": 14802.44,
      "rrsp": 148034.13,
-     "tfsa": 181065.87
+     "tfsa": 166231.62
     }
    }
   },
   "household": {
    "grossIncome": 197432.77,
-   "tax": 40715.39,
+   "tax": 37993.41,
    "spending": 106099.75,
    "shortfall": 0,
-   "netWorthEnd": 767851.17
+   "netWorthEnd": 715685.94
   },
   "projected": true
  },
@@ -748,18 +768,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 8500
+     "tfsa": 8659.09
     },
     "rrqContribution": 6719.1,
     "payrollContribution": 1711.49,
-    "netIncome": 113205.81,
+    "pensionContribution": 7771.04,
+    "netIncome": 105434.77,
     "oasRecovery": 0,
-    "federalTax": 12079.04,
-    "quebecTax": 14559.7,
+    "federalTax": 10748.83,
+    "quebecTax": 13083.21,
     "balancesEnd": {
      "nonReg": 23091.82,
      "rrsp": 188988.35,
-     "tfsa": 208763.15
+     "tfsa": 201289.49
     }
    },
    "spouse": {
@@ -776,29 +797,30 @@
      "tfsa": 0
     },
     "contributions": {
-     "nonReg": 15142.15,
+     "nonReg": 0,
      "rrsp": 4923.99,
-     "tfsa": 8500
+     "tfsa": 18518.72
     },
     "rrqContribution": 5336.5,
     "payrollContribution": 1525.97,
+    "pensionContribution": 0,
     "netIncome": 82435.33,
     "oasRecovery": 0,
     "federalTax": 6914.1,
     "quebecTax": 8713.31,
     "balancesEnd": {
-     "nonReg": 62061.02,
+     "nonReg": 15394.54,
      "rrsp": 159729.23,
-     "tfsa": 197902.98
+     "tfsa": 192642.85
     }
    }
   },
   "household": {
    "grossIncome": 203553.19,
-   "tax": 42266.15,
+   "tax": 39459.45,
    "spending": 108327.84,
    "shortfall": 0,
-   "netWorthEnd": 840536.55
+   "netWorthEnd": 781136.28
   },
   "projected": true
  },
@@ -821,18 +843,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 600,
-     "tfsa": 9000
+     "tfsa": 12271.98
     },
     "rrqContribution": 6936.7,
     "payrollContribution": 1764.57,
-    "netIncome": 116733.56,
+    "pensionContribution": 8010.59,
+    "netIncome": 108722.97,
     "oasRecovery": 0,
-    "federalTax": 12520.4,
-    "quebecTax": 15083.53,
+    "federalTax": 11149.18,
+    "quebecTax": 13561.51,
     "balancesEnd": {
      "nonReg": 24015.49,
      "rrsp": 198106.18,
-     "tfsa": 227357.76
+     "tfsa": 222892.57
     }
    },
    "spouse": {
@@ -849,29 +872,30 @@
      "tfsa": 0
     },
     "contributions": {
-     "nonReg": 15983.58,
+     "nonReg": 7594.26,
      "rrsp": 5027.4,
      "tfsa": 9000
     },
     "rrqContribution": 5508.77,
     "payrollContribution": 1573.28,
+    "pensionContribution": 0,
     "netIncome": 85038.97,
     "oasRecovery": 0,
     "federalTax": 7200.83,
     "quebecTax": 9061.55,
     "balancesEnd": {
-     "nonReg": 80843.58,
+     "nonReg": 23754.97,
      "rrsp": 172056.31,
-     "tfsa": 216008.89
+     "tfsa": 210512.05
     }
    }
   },
   "household": {
    "grossIncome": 209863.34,
-   "tax": 43866.31,
+   "tax": 40973.07,
    "spending": 110602.73,
    "shortfall": 0,
-   "netWorthEnd": 918388.21
+   "netWorthEnd": 851337.57
   },
   "projected": true
  },
@@ -893,19 +917,20 @@
     },
     "contributions": {
      "nonReg": 0,
-     "rrsp": 569.65,
+     "rrsp": 404.87,
      "tfsa": 0
     },
     "rrqContribution": 1066.9,
     "payrollContribution": 353.52,
-    "netIncome": 57816,
+    "pensionContribution": 1376.62,
+    "netIncome": 56604.16,
     "oasRecovery": 0,
-    "federalTax": 3685.5,
-    "quebecTax": 4517.79,
+    "federalTax": 3543.83,
+    "quebecTax": 4348.13,
     "balancesEnd": {
      "nonReg": 24976.11,
-     "rrsp": 207603.29,
-     "tfsa": 237588.86
+     "rrsp": 207434.84,
+     "tfsa": 232922.74
     }
    },
    "spouse": {
@@ -923,28 +948,29 @@
     },
     "contributions": {
      "nonReg": 0,
-     "rrsp": 4873.34,
+     "rrsp": 3463.68,
      "tfsa": 0
     },
     "rrqContribution": 5686.38,
     "payrollContribution": 1622.05,
-    "netIncome": 87984.01,
+    "pensionContribution": 0,
+    "netIncome": 89393.66,
     "oasRecovery": 0,
-    "federalTax": 7542.68,
-    "quebecTax": 9471.76,
+    "federalTax": 7783.98,
+    "quebecTax": 9739.6,
     "balancesEnd": {
-     "nonReg": 84077.32,
-     "rrsp": 184780.62,
-     "tfsa": 225729.29
+     "nonReg": 24705.17,
+     "rrsp": 183339.6,
+     "tfsa": 219985.09
     }
    }
   },
   "household": {
    "grossIncome": 152314.94,
-   "tax": 25217.73,
+   "tax": 25415.54,
    "spending": 112925.38,
    "shortfall": 0,
-   "netWorthEnd": 964755.49
+   "netWorthEnd": 893363.55
   },
   "projected": true
  },
@@ -967,18 +993,19 @@
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 51610.18,
     "oasRecovery": 0,
     "federalTax": 3279.65,
     "quebecTax": 3749.08,
     "balancesEnd": {
      "nonReg": 24478.51,
-     "rrsp": 216945.44,
-     "tfsa": 248280.37
+     "rrsp": 216769.41,
+     "tfsa": 243404.26
     }
    },
    "spouse": {
@@ -1001,23 +1028,24 @@
     },
     "rrqContribution": 5869.49,
     "payrollContribution": 1672.33,
+    "pensionContribution": 0,
     "netIncome": 95734.83,
     "oasRecovery": 0,
     "federalTax": 8703.37,
     "quebecTax": 10792.28,
     "balancesEnd": {
-     "nonReg": 87440.41,
-     "rrsp": 193095.75,
-     "tfsa": 235887.11
+     "nonReg": 25693.38,
+     "rrsp": 191589.88,
+     "tfsa": 229884.42
     }
    }
   },
   "household": {
-   "grossIncome": 149363.03,
+   "grossIncome": 149363.02,
    "tax": 26524.38,
    "spending": 115296.82,
    "shortfall": 0,
-   "netWorthEnd": 1006127.59
+   "netWorthEnd": 931819.86
   },
   "projected": true
  },
@@ -1044,14 +1072,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 52130.02,
     "oasRecovery": 0,
     "federalTax": 3287.46,
     "quebecTax": 3748.92,
     "balancesEnd": {
      "nonReg": 24082.27,
-     "rrsp": 226707.98,
-     "tfsa": 259452.99
+     "rrsp": 226524.03,
+     "tfsa": 254357.45
     }
    },
    "spouse": {
@@ -1074,14 +1103,15 @@
     },
     "rrqContribution": 6058.28,
     "payrollContribution": 1724.17,
+    "pensionContribution": 0,
     "netIncome": 98701.53,
     "oasRecovery": 0,
     "federalTax": 9041.38,
     "quebecTax": 11200.41,
     "balancesEnd": {
-     "nonReg": 90938.03,
-     "rrsp": 201785.06,
-     "tfsa": 246502.03
+     "nonReg": 26721.12,
+     "rrsp": 200211.42,
+     "tfsa": 240229.22
     }
    }
   },
@@ -1090,7 +1120,7 @@
    "tax": 27278.17,
    "spending": 117718.05,
    "shortfall": 0,
-   "netWorthEnd": 1049468.36
+   "netWorthEnd": 972125.51
   },
   "projected": true
  },
@@ -1117,14 +1147,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 52648.09,
     "oasRecovery": 0,
     "federalTax": 3294.02,
     "quebecTax": 3746.83,
     "balancesEnd": {
      "nonReg": 23808.62,
-     "rrsp": 236909.84,
-     "tfsa": 271128.37
+     "rrsp": 236717.61,
+     "tfsa": 265803.54
     }
    },
    "spouse": {
@@ -1147,14 +1178,15 @@
     },
     "rrqContribution": 6252.92,
     "payrollContribution": 1777.63,
+    "pensionContribution": 0,
     "netIncome": 101760.19,
     "oasRecovery": 0,
     "federalTax": 9391.41,
     "quebecTax": 11623.09,
     "balancesEnd": {
-     "nonReg": 94575.55,
-     "rrsp": 210865.39,
-     "tfsa": 257594.62
+     "nonReg": 27789.96,
+     "rrsp": 209220.93,
+     "tfsa": 251039.53
     }
    }
   },
@@ -1163,7 +1195,7 @@
    "tax": 28055.35,
    "spending": 120190.13,
    "shortfall": 0,
-   "netWorthEnd": 1094882.39
+   "netWorthEnd": 1014380.19
   },
   "projected": true
  },
@@ -1190,14 +1222,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 53163.83,
     "oasRecovery": 0,
     "federalTax": 3299.13,
     "quebecTax": 3743.02,
     "balancesEnd": {
      "nonReg": 23680.71,
-     "rrsp": 247570.78,
-     "tfsa": 283329.15
+     "rrsp": 247369.9,
+     "tfsa": 277764.7
     }
    },
    "spouse": {
@@ -1220,14 +1253,15 @@
     },
     "rrqContribution": 6453.6,
     "payrollContribution": 1832.72,
+    "pensionContribution": 0,
     "netIncome": 104913.68,
     "oasRecovery": 0,
     "federalTax": 9753.76,
     "quebecTax": 12060.63,
     "balancesEnd": {
-     "nonReg": 98358.57,
-     "rrsp": 220354.33,
-     "tfsa": 269186.38
+     "nonReg": 28901.56,
+     "rrsp": 218635.87,
+     "tfsa": 262336.31
     }
    }
   },
@@ -1236,7 +1270,7 @@
    "tax": 28856.54,
    "spending": 122714.12,
    "shortfall": 0,
-   "netWorthEnd": 1142479.92
+   "netWorthEnd": 1058689.05
   },
   "projected": true
  },
@@ -1252,7 +1286,7 @@
     "db": 40958.65,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 0,
+     "nonReg": 307.35,
      "rrsp": 0,
      "tfsa": 0
     },
@@ -1263,14 +1297,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 70142.19,
+    "pensionContribution": 0,
+    "netIncome": 70233.02,
     "oasRecovery": 0,
-    "federalTax": 3765.74,
-    "quebecTax": 6042.29,
+    "federalTax": 3777.95,
+    "quebecTax": 6055,
     "balancesEnd": {
-     "nonReg": 24627.94,
-     "rrsp": 258711.47,
-     "tfsa": 296078.96
+     "nonReg": 24314.5,
+     "rrsp": 258501.55,
+     "tfsa": 290264.11
     }
    },
    "spouse": {
@@ -1282,7 +1317,7 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 7226.96,
+     "nonReg": 7069.02,
      "rrsp": 0,
      "tfsa": 0
     },
@@ -1293,23 +1328,24 @@
     },
     "rrqContribution": 4366.83,
     "payrollContribution": 1259.69,
-    "netIncome": 79351.22,
+    "pensionContribution": 0,
+    "netIncome": 79770.53,
     "oasRecovery": 0,
-    "federalTax": 5711.37,
-    "quebecTax": 7043.15,
+    "federalTax": 5760.38,
+    "quebecTax": 7118.63,
     "balancesEnd": {
-     "nonReg": 94922.83,
-     "rrsp": 230270.27,
-     "tfsa": 281299.77
+     "nonReg": 22848.61,
+     "rrsp": 228474.48,
+     "tfsa": 274141.44
     }
    }
   },
   "household": {
-   "grossIncome": 156327.71,
-   "tax": 22562.55,
+   "grossIncome": 156477.12,
+   "tax": 22711.96,
    "spending": 128138.64,
    "shortfall": 0,
-   "netWorthEnd": 1185911.24
+   "netWorthEnd": 1098544.69
   },
   "projected": true
  },
@@ -1325,25 +1361,26 @@
     "db": 37193.11,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 0,
+     "nonReg": 24314.5,
      "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 0.01
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 66688.87,
+    "pensionContribution": 0,
+    "netIncome": 74066.9,
     "oasRecovery": 0,
-    "federalTax": 3201.64,
-    "quebecTax": 4024.89,
+    "federalTax": 4179.35,
+    "quebecTax": 5452.37,
     "balancesEnd": {
-     "nonReg": 25613.06,
-     "rrsp": 270353.49,
-     "tfsa": 309402.51
+     "nonReg": 491.06,
+     "rrsp": 270134.12,
+     "tfsa": 303326
     }
    },
    "spouse": {
@@ -1355,8 +1392,8 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 53169.5,
-     "rrsp": 0,
+     "nonReg": 22848.61,
+     "rrsp": 10041.93,
      "tfsa": 0
     },
     "contributions": {
@@ -1366,23 +1403,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 27327.73,
+    "pensionContribution": 0,
+    "netIncome": 33795.05,
     "oasRecovery": 0,
-    "federalTax": 398.83,
-    "quebecTax": 0,
+    "federalTax": 1154.86,
+    "quebecTax": 874.31,
     "balancesEnd": {
-     "nonReg": 44497.28,
-     "rrsp": 240632.43,
-     "tfsa": 293958.26
+     "nonReg": 461.45,
+     "rrsp": 228490.45,
+     "tfsa": 286477.8
     }
    }
   },
   "household": {
-   "grossIncome": 138454.92,
-   "tax": 7625.36,
+   "grossIncome": 142490.46,
+   "tax": 11660.89,
    "spending": 130829.56,
    "shortfall": 0,
-   "netWorthEnd": 1184457.03
+   "netWorthEnd": 1089380.88
   },
   "projected": true
  },
@@ -1398,7 +1436,7 @@
     "db": 37583.64,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 10878.5,
+     "nonReg": 491.06,
      "rrsp": 0,
      "tfsa": 0
     },
@@ -1409,14 +1447,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 71276.7,
+    "pensionContribution": 0,
+    "netIncome": 79414.61,
     "oasRecovery": 0,
-    "federalTax": 3687.86,
-    "quebecTax": 4492.54,
+    "federalTax": 4781.88,
+    "quebecTax": 7180.13,
     "balancesEnd": {
-     "nonReg": 15543.65,
-     "rrsp": 282519.4,
-     "tfsa": 323325.62
+     "nonReg": 9.92,
+     "rrsp": 282290.16,
+     "tfsa": 316975.67
     }
    },
    "spouse": {
@@ -1428,34 +1467,35 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 44497.28,
-     "rrsp": 0,
+     "nonReg": 461.45,
+     "rrsp": 72243.22,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 585.33
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 27020.28,
+    "pensionContribution": 0,
+    "netIncome": 79990.67,
     "oasRecovery": 0,
-    "federalTax": 304.21,
-    "quebecTax": 0,
+    "federalTax": 6496.45,
+    "quebecTax": 7260.77,
     "balancesEnd": {
-     "nonReg": 898.67,
-     "rrsp": 251460.89,
-     "tfsa": 307186.38
+     "nonReg": 9.32,
+     "rrsp": 164921.72,
+     "tfsa": 299967.65
     }
    }
   },
   "household": {
-   "grossIncome": 142061.59,
-   "tax": 8484.61,
+   "grossIncome": 159881.54,
+   "tax": 25719.23,
    "spending": 133576.98,
    "shortfall": 0,
-   "netWorthEnd": 1180934.61
+   "netWorthEnd": 1064174.44
   },
   "projected": true
  },
@@ -1471,25 +1511,26 @@
     "db": 37978.27,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 15543.65,
+     "nonReg": 9.92,
      "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 580.43
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 74108.81,
+    "pensionContribution": 0,
+    "netIncome": 78622.03,
     "oasRecovery": 0,
-    "federalTax": 3949.7,
-    "quebecTax": 5221.75,
+    "federalTax": 4556.43,
+    "quebecTax": 6986.42,
     "balancesEnd": {
-     "nonReg": 313.92,
-     "rrsp": 295232.77,
-     "tfsa": 337875.27
+     "nonReg": 0.2,
+     "rrsp": 294993.22,
+     "tfsa": 331832.92
     }
    },
    "spouse": {
@@ -1501,34 +1542,35 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 898.67,
-     "rrsp": 38695.3,
+     "nonReg": 9.32,
+     "rrsp": 60654.91,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 69490.05,
+    "pensionContribution": 0,
+    "netIncome": 81510.43,
     "oasRecovery": 0,
-    "federalTax": 3344.05,
-    "quebecTax": 5707.95,
+    "federalTax": 4944.73,
+    "quebecTax": 6691.98,
     "balancesEnd": {
-     "nonReg": 18.15,
-     "rrsp": 223220.27,
-     "tfsa": 321009.77
+     "nonReg": 0.19,
+     "rrsp": 110338.57,
+     "tfsa": 313466.19
     }
    }
   },
   "household": {
-   "grossIncome": 154605.55,
-   "tax": 18223.45,
+   "grossIncome": 160142.08,
+   "tax": 23179.56,
    "spending": 136382.09,
    "shortfall": 0,
-   "netWorthEnd": 1177670.15
+   "netWorthEnd": 1050631.29
   },
   "projected": true
  },
@@ -1544,25 +1586,26 @@
     "db": 38377.04,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 313.92,
+     "nonReg": 0.2,
      "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 573.67
+     "tfsa": 625.19
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 83963.55,
+    "pensionContribution": 0,
+    "netIncome": 81887.84,
     "oasRecovery": 0,
-    "federalTax": 5153.21,
-    "quebecTax": 6929.9,
+    "federalTax": 4874.16,
+    "quebecTax": 6647.46,
     "balancesEnd": {
-     "nonReg": 6.34,
-     "rrsp": 308518.24,
-     "tfsa": 353666.09
+     "nonReg": 0,
+     "rrsp": 308267.91,
+     "tfsa": 347404.51
     }
    },
    "spouse": {
@@ -1574,8 +1617,8 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 18.15,
-     "rrsp": 27150.51,
+     "nonReg": 0.19,
+     "rrsp": 27627.17,
      "tfsa": 0
     },
     "contributions": {
@@ -1585,23 +1628,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 79295.18,
+    "pensionContribution": 0,
+    "netIncome": 81681.71,
     "oasRecovery": 0,
-    "federalTax": 4525.62,
-    "quebecTax": 6996.24,
+    "federalTax": 4846.45,
+    "quebecTax": 7330.36,
     "balancesEnd": {
-     "nonReg": 0.37,
-     "rrsp": 205510.51,
-     "tfsa": 335455.21
+     "nonReg": 0,
+     "rrsp": 87061.86,
+     "tfsa": 327572.17
     }
    }
   },
   "household": {
-   "grossIncome": 163424.76,
-   "tax": 23604.97,
+   "grossIncome": 163569.74,
+   "tax": 23698.43,
    "spending": 139246.12,
    "shortfall": 0,
-   "netWorthEnd": 1203156.76
+   "netWorthEnd": 1070306.45
   },
   "projected": true
  },
@@ -1617,7 +1661,7 @@
     "db": 38780,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 6.34,
+     "nonReg": 0,
      "rrsp": 0,
      "tfsa": 0
     },
@@ -1628,14 +1672,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 85227.26,
+    "pensionContribution": 0,
+    "netIncome": 85224.09,
     "oasRecovery": 0,
-    "federalTax": 5199.05,
-    "quebecTax": 7015.03,
+    "federalTax": 5198.62,
+    "quebecTax": 7014.75,
     "balancesEnd": {
-     "nonReg": 0.13,
-     "rrsp": 322401.56,
-     "tfsa": 369581.06
+     "nonReg": 0,
+     "rrsp": 322139.97,
+     "tfsa": 363037.71
     }
    },
    "spouse": {
@@ -1647,34 +1692,35 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 0.37,
-     "rrsp": 28658.14,
+     "nonReg": 0,
+     "rrsp": 28667.77,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 667.86
+     "tfsa": 668.89
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 81828.38,
+    "pensionContribution": 0,
+    "netIncome": 81837.83,
     "oasRecovery": 0,
-    "federalTax": 4742.12,
-    "quebecTax": 7264.65,
+    "federalTax": 4743.39,
+    "quebecTax": 7265.98,
     "balancesEnd": {
-     "nonReg": 0.01,
-     "rrsp": 185462.63,
-     "tfsa": 351233.41
+     "nonReg": 0,
+     "rrsp": 61673.94,
+     "tfsa": 342996.69
     }
    }
   },
   "household": {
-   "grossIncome": 167059,
-   "tax": 24220.85,
+   "grossIncome": 167061.92,
+   "tax": 24222.74,
    "spending": 142170.29,
    "shortfall": 0,
-   "netWorthEnd": 1228678.8
+   "netWorthEnd": 1089848.31
   },
   "projected": true
  },
@@ -1690,25 +1736,26 @@
     "db": 39187.19,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 0.13,
+     "nonReg": 0,
      "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 713.78
+     "tfsa": 713.79
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 86667.7,
+    "pensionContribution": 0,
+    "netIncome": 84708.27,
     "oasRecovery": 0,
-    "federalTax": 5266.3,
-    "quebecTax": 7115.3,
+    "federalTax": 5002.89,
+    "quebecTax": 7579.78,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 336909.63,
-     "tfsa": 386941.87
+     "rrsp": 336636.27,
+     "tfsa": 380104.08
     }
    },
    "spouse": {
@@ -1720,8 +1767,8 @@
     "db": 0,
     "rrifMinimum": 0,
     "withdrawals": {
-     "nonReg": 0.01,
-     "rrsp": 29735.58,
+     "nonReg": 0,
+     "rrsp": 29735.78,
      "tfsa": 0
     },
     "contributions": {
@@ -1731,23 +1778,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 83961.08,
+    "pensionContribution": 0,
+    "netIncome": 85920.64,
     "oasRecovery": 0,
-    "federalTax": 4902.44,
-    "quebecTax": 7475.17,
+    "federalTax": 5165.87,
+    "quebecTax": 7010.72,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 163411.18,
-     "tfsa": 367038.91
+     "rrsp": 34051.79,
+     "tfsa": 358431.54
     }
    }
   },
   "household": {
-   "grossIncome": 170628.85,
-   "tax": 24759.21,
+   "grossIncome": 170628.91,
+   "tax": 24759.26,
    "spending": 145155.86,
    "shortfall": 0,
-   "netWorthEnd": 1254301.59
+   "netWorthEnd": 1109223.68
   },
   "projected": true
  },
@@ -1761,10 +1809,10 @@
     "oas": 15067.44,
     "gis": 0,
     "db": 39598.65,
-    "rrifMinimum": 17788.83,
+    "rrifMinimum": 17774.4,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 17788.83,
+     "rrsp": 17774.4,
      "tfsa": 0
     },
     "contributions": {
@@ -1774,14 +1822,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 88911.59,
+    "pensionContribution": 0,
+    "netIncome": 88902.93,
     "oasRecovery": 0,
-    "federalTax": 5438.69,
-    "quebecTax": 7298.25,
+    "federalTax": 5437.53,
+    "quebecTax": 7297.05,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 333885.89,
-     "tfsa": 404354.25
+     "rrsp": 333614.98,
+     "tfsa": 397208.76
     }
    },
    "spouse": {
@@ -1794,33 +1843,34 @@
     "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 11994.89,
+     "rrsp": 12009.87,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 28.08
+     "tfsa": 28.47
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 84312.65,
+    "pensionContribution": 0,
+    "netIncome": 84321.86,
     "oasRecovery": 0,
-    "federalTax": 4820.44,
-    "quebecTax": 7434.65,
+    "federalTax": 4821.67,
+    "quebecTax": 7435.94,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 158502.88,
-     "tfsa": 383584.36
+     "rrsp": 23307,
+     "tfsa": 374590.07
     }
    }
   },
   "household": {
-   "grossIncome": 173224.24,
-   "tax": 24992.03,
+   "grossIncome": 173224.79,
+   "tax": 24992.19,
    "spending": 148204.13,
    "shortfall": 0,
-   "netWorthEnd": 1280327.38
+   "netWorthEnd": 1128720.81
   },
   "projected": true
  },
@@ -1834,10 +1884,10 @@
     "oas": 15383.88,
     "gis": 0,
     "db": 40014.44,
-    "rrifMinimum": 18029.84,
+    "rrifMinimum": 18015.21,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 18029.84,
+     "rrsp": 18015.21,
      "tfsa": 0
     },
     "contributions": {
@@ -1847,14 +1897,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 87547.53,
+    "pensionContribution": 0,
+    "netIncome": 90440.97,
     "oasRecovery": 0,
-    "federalTax": 5123.47,
-    "quebecTax": 7795.69,
+    "federalTax": 5512.44,
+    "quebecTax": 7405.19,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 330479.71,
-     "tfsa": 422550.19
+     "rrsp": 330211.56,
+     "tfsa": 415083.15
     }
    },
    "spouse": {
@@ -1867,33 +1918,34 @@
     "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 12831.23,
+     "rrsp": 12846.41,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 44.14
+     "tfsa": 44.53
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 89350.57,
+    "pensionContribution": 0,
+    "netIncome": 86457.68,
     "oasRecovery": 0,
-    "federalTax": 5365.86,
-    "quebecTax": 7252.52,
+    "federalTax": 4976.95,
+    "quebecTax": 7643.12,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 152518.76,
-     "tfsa": 400890.78
+     "rrsp": 11223.54,
+     "tfsa": 391492.14
     }
    }
   },
   "household": {
-   "grossIncome": 176898.1,
-   "tax": 25537.54,
+   "grossIncome": 176898.65,
+   "tax": 25537.7,
    "spending": 151316.42,
    "shortfall": 0,
-   "netWorthEnd": 1306439.44
+   "netWorthEnd": 1148010.39
   },
   "projected": true
  },
@@ -1907,10 +1959,10 @@
     "oas": 15706.92,
     "gis": 0,
     "db": 40434.59,
-    "rrifMinimum": 18275.53,
+    "rrifMinimum": 18260.7,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 18275.53,
+     "rrsp": 20655.83,
      "tfsa": 0
     },
     "contributions": {
@@ -1920,14 +1972,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 92017.32,
+    "pensionContribution": 0,
+    "netIncome": 88534.03,
     "oasRecovery": 0,
-    "federalTax": 5589.71,
-    "quebecTax": 7516.72,
+    "federalTax": 5121.43,
+    "quebecTax": 7840.14,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 326669.09,
-     "tfsa": 441564.95
+     "rrsp": 323955.61,
+     "tfsa": 433761.89
     }
    },
    "spouse": {
@@ -1940,33 +1993,34 @@
     "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 13690.59,
+     "rrsp": 11223.54,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 60.66
+     "tfsa": 0.01
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 88632.42,
+    "pensionContribution": 0,
+    "netIncome": 92028.96,
     "oasRecovery": 0,
-    "federalTax": 5134.66,
-    "quebecTax": 7853.92,
+    "federalTax": 5591.27,
+    "quebecTax": 7516.07,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 145386.86,
-     "tfsa": 418992.88
+     "rrsp": 255.31,
+     "tfsa": 409109.29
     }
    }
   },
   "household": {
-   "grossIncome": 180649.74,
-   "tax": 26095.01,
+   "grossIncome": 180562.99,
+   "tax": 26068.91,
    "spending": 154494.07,
    "shortfall": 0,
-   "netWorthEnd": 1332613.78
+   "netWorthEnd": 1167082.1
   },
   "projected": true
  },
@@ -1980,10 +2034,10 @@
     "oas": 17239.56,
     "gis": 0,
     "db": 40859.15,
-    "rrifMinimum": 18522.14,
+    "rrifMinimum": 18368.28,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 18522.14,
+     "rrsp": 32045.84,
      "tfsa": 0
     },
     "contributions": {
@@ -1993,14 +2047,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 94815.43,
+    "pensionContribution": 0,
+    "netIncome": 95639.16,
     "oasRecovery": 0,
-    "federalTax": 5828.39,
-    "quebecTax": 7793.6,
+    "federalTax": 5939.13,
+    "quebecTax": 7941.95,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 322434.9,
-     "tfsa": 461435.37
+     "rrsp": 305774.68,
+     "tfsa": 453281.18
     }
    },
    "spouse": {
@@ -2010,36 +2065,37 @@
     "oas": 16036.8,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 7676.43,
+    "rrifMinimum": 13.48,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 13262.21,
+     "rrsp": 255.31,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 341.95
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 89553.16,
+    "pensionContribution": 0,
+    "netIncome": 89246.23,
     "oasRecovery": 0,
-    "federalTax": 5120.95,
-    "quebecTax": 7887.2,
+    "federalTax": 5079.69,
+    "quebecTax": 7844.23,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 138371.95,
-     "tfsa": 437847.57
+     "rrsp": 5.81,
+     "tfsa": 427868.76
     }
    }
   },
   "household": {
-   "grossIncome": 184368.59,
-   "tax": 26630.14,
+   "grossIncome": 184885.39,
+   "tax": 26805,
    "spending": 157738.44,
    "shortfall": 0,
-   "netWorthEnd": 1360089.79
+   "netWorthEnd": 1186930.43
   },
   "projected": true
  },
@@ -2053,10 +2109,10 @@
     "oas": 18010.87,
     "gis": 0,
     "db": 41288.17,
-    "rrifMinimum": 18765.71,
+    "rrifMinimum": 17796.09,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 18765.71,
+     "rrsp": 33167.6,
      "tfsa": 0
     },
     "contributions": {
@@ -2066,14 +2122,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 96871.19,
+    "pensionContribution": 0,
+    "netIncome": 98066.74,
     "oasRecovery": 0,
-    "federalTax": 5964.43,
-    "quebecTax": 7966.66,
+    "federalTax": 6125.16,
+    "quebecTax": 8192.93,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 317761.18,
-     "tfsa": 482199.96
+     "rrsp": 285628.88,
+     "tfsa": 473678.83
     }
    },
    "spouse": {
@@ -2083,36 +2140,37 @@
     "oas": 16373.52,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 7472.09,
+    "rrifMinimum": 0.31,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 13719.97,
+     "rrsp": 5.81,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 440.1
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 91383.2,
+    "pensionContribution": 0,
+    "netIncome": 90875.38,
     "oasRecovery": 0,
-    "federalTax": 5226.65,
-    "quebecTax": 8045.69,
+    "federalTax": 5158.39,
+    "quebecTax": 7974.59,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 130573.42,
-     "tfsa": 457550.72
+     "rrsp": 0.13,
+     "tfsa": 447572.75
     }
    }
   },
   "household": {
-   "grossIncome": 188254.39,
-   "tax": 27203.43,
+   "grossIncome": 188942.12,
+   "tax": 27451.07,
    "spending": 161050.95,
    "shortfall": 0,
-   "netWorthEnd": 1388085.28
+   "netWorthEnd": 1206880.59
   },
   "projected": true
  },
@@ -2126,27 +2184,28 @@
     "oas": 18389.05,
     "gis": 0,
     "db": 41721.7,
-    "rrifMinimum": 19002.12,
+    "rrifMinimum": 17080.61,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 19002.12,
+     "rrsp": 34473.84,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 554.35
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 98550.72,
+    "pensionContribution": 0,
+    "netIncome": 100214.2,
     "oasRecovery": 0,
-    "federalTax": 6046.93,
-    "quebecTax": 8084.33,
+    "federalTax": 6270.56,
+    "quebecTax": 8385.97,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 312635.47,
-     "tfsa": 503898.96
+     "rrsp": 263241.21,
+     "tfsa": 495561.07
     }
    },
    "spouse": {
@@ -2156,10 +2215,10 @@
     "oas": 16717.32,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 7220.71,
+    "rrifMinimum": 0.01,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 14613.07,
+     "rrsp": 0.13,
      "tfsa": 0
     },
     "contributions": {
@@ -2169,23 +2228,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 93670.71,
+    "pensionContribution": 0,
+    "netIncome": 92866.01,
     "oasRecovery": 0,
-    "federalTax": 5390.89,
-    "quebecTax": 8266.26,
+    "federalTax": 5282.71,
+    "quebecTax": 8153.6,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 121510.97,
-     "tfsa": 478140.5
+     "rrsp": 0,
+     "tfsa": 467713.52
     }
    }
   },
   "household": {
-   "grossIncome": 192221.43,
-   "tax": 27788.41,
+   "grossIncome": 193080.21,
+   "tax": 28092.84,
    "spending": 164433.02,
    "shortfall": 0,
-   "netWorthEnd": 1416185.9
+   "netWorthEnd": 1226515.8
   },
   "projected": true
  },
@@ -2199,10 +2259,10 @@
     "oas": 18775.28,
     "gis": 0,
     "db": 42159.78,
-    "rrifMinimum": 19289.61,
+    "rrifMinimum": 16241.98,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 19289.61,
+     "rrsp": 35305.95,
      "tfsa": 0
     },
     "contributions": {
@@ -2212,14 +2272,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 100290.56,
+    "pensionContribution": 0,
+    "netIncome": 102153.79,
     "oasRecovery": 0,
-    "federalTax": 6134.33,
-    "quebecTax": 8208.8,
+    "federalTax": 6384.82,
+    "quebecTax": 8533.77,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 306985.22,
-     "tfsa": 526574.41
+     "rrsp": 238995.47,
+     "tfsa": 517861.32
     }
    },
    "spouse": {
@@ -2229,36 +2290,37 @@
     "oas": 17495.15,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 6889.67,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 15057.02,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 631.92
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 95981.79,
+    "pensionContribution": 0,
+    "netIncome": 95077.88,
     "oasRecovery": 0,
-    "federalTax": 5555.08,
-    "quebecTax": 8488.03,
+    "federalTax": 5433.57,
+    "quebecTax": 8361.48,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 111586.88,
-     "tfsa": 499656.82
+     "rrsp": 0,
+     "tfsa": 489406.61
     }
    }
   },
   "household": {
-   "grossIncome": 196272.35,
-   "tax": 28386.24,
+   "grossIncome": 197231.67,
+   "tax": 28713.64,
    "spending": 167886.11,
    "shortfall": 0,
-   "netWorthEnd": 1444803.33
+   "netWorthEnd": 1246263.4
   },
   "projected": true
  },
@@ -2272,27 +2334,28 @@
     "oas": 19169.57,
     "gis": 0,
     "db": 42602.46,
-    "rrifMinimum": 19524.26,
+    "rrifMinimum": 15200.11,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 19524.26,
+     "rrsp": 35119.02,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 624.82
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 102028.81,
+    "pensionContribution": 0,
+    "netIncome": 103613.52,
     "oasRecovery": 0,
-    "federalTax": 6218.75,
-    "quebecTax": 8329.86,
+    "federalTax": 6431.79,
+    "quebecTax": 8580.8,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 300840.83,
-     "tfsa": 550270.26
+     "rrsp": 213849.76,
+     "tfsa": 541803.8
     }
    },
    "spouse": {
@@ -2302,36 +2365,37 @@
     "oas": 19169.57,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 6494.36,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 14693.56,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.02
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 98379.53,
+    "pensionContribution": 0,
+    "netIncome": 97696.02,
     "oasRecovery": 0,
-    "federalTax": 5728.16,
-    "quebecTax": 8719.83,
+    "federalTax": 5636.27,
+    "quebecTax": 8624.14,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 101587.77,
-     "tfsa": 522141.39
+     "rrsp": 0,
+     "tfsa": 511429.91
     }
    }
   },
   "household": {
-   "grossIncome": 200408.34,
-   "tax": 28996.6,
+   "grossIncome": 201309.54,
+   "tax": 29273,
    "spending": 171411.72,
    "shortfall": 0,
-   "netWorthEnd": 1474840.25
+   "netWorthEnd": 1267083.47
   },
   "projected": true
  },
@@ -2345,10 +2409,10 @@
     "oas": 19572.17,
     "gis": 0,
     "db": 43049.78,
-    "rrifMinimum": 19795.33,
+    "rrifMinimum": 14071.31,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 19795.33,
+     "rrsp": 36513.31,
      "tfsa": 0
     },
     "contributions": {
@@ -2358,14 +2422,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 103819.7,
+    "pensionContribution": 0,
+    "netIncome": 105894.17,
     "oasRecovery": 0,
-    "federalTax": 6306.89,
-    "quebecTax": 8455.72,
+    "federalTax": 6585.77,
+    "quebecTax": 8786.16,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 294142.84,
-     "tfsa": 575032.42
+     "rrsp": 186147.18,
+     "tfsa": 566184.97
     }
    },
    "spouse": {
@@ -2375,36 +2440,37 @@
     "oas": 19572.17,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 6074.95,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 15601.66,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 769.95
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 100810.56,
+    "pensionContribution": 0,
+    "netIncome": 99852.41,
     "oasRecovery": 0,
-    "federalTax": 5902.36,
-    "quebecTax": 8953.92,
+    "federalTax": 5773.55,
+    "quebecTax": 8819.78,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 90210.38,
-     "tfsa": 545637.75
+     "rrsp": 0,
+     "tfsa": 535231.34
     }
    }
   },
   "household": {
-   "grossIncome": 204630.26,
-   "tax": 29618.89,
+   "grossIncome": 205746.58,
+   "tax": 29965.26,
    "spending": 175011.37,
    "shortfall": 0,
-   "netWorthEnd": 1505023.39
+   "netWorthEnd": 1287563.49
   },
   "projected": true
  },
@@ -2418,27 +2484,28 @@
     "oas": 19983.08,
     "gis": 0,
     "db": 43501.8,
-    "rrifMinimum": 20060.54,
+    "rrifMinimum": 12695.24,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 20060.54,
+     "rrsp": 37967.08,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 934.06
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 105638.29,
+    "pensionContribution": 0,
+    "netIncome": 108235.33,
     "oasRecovery": 0,
-    "federalTax": 6395.61,
-    "quebecTax": 8586.82,
+    "federalTax": 6744.75,
+    "quebecTax": 8999.56,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 286872.33,
-     "tfsa": 600908.88
+     "rrsp": 155711.86,
+     "tfsa": 592618.14
     }
    },
    "spouse": {
@@ -2448,36 +2515,37 @@
     "oas": 19983.08,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 5565.98,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 16682.41,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 95.05
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 103439.59,
+    "pensionContribution": 0,
+    "netIncome": 102066.68,
     "oasRecovery": 0,
-    "federalTax": 6100.03,
-    "quebecTax": 9213.76,
+    "federalTax": 5915.47,
+    "quebecTax": 9021.56,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 77216.21,
-     "tfsa": 570288.62
+     "rrsp": 0,
+     "tfsa": 559316.75
     }
    }
   },
   "household": {
-   "grossIncome": 209077.88,
-   "tax": 30296.22,
+   "grossIncome": 210302.01,
+   "tax": 30681.34,
    "spending": 178686.61,
    "shortfall": 0,
-   "netWorthEnd": 1535286.04
+   "netWorthEnd": 1307646.75
   },
   "projected": true
  },
@@ -2491,10 +2559,10 @@
     "oas": 20402.71,
     "gis": 0,
     "db": 43958.57,
-    "rrifMinimum": 20310.56,
+    "rrifMinimum": 11024.4,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 20310.56,
+     "rrsp": 39481.93,
      "tfsa": 0
     },
     "contributions": {
@@ -2504,14 +2572,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 107479.87,
+    "pensionContribution": 0,
+    "netIncome": 110638.64,
     "oasRecovery": 0,
-    "federalTax": 6484.16,
-    "quebecTax": 8715.26,
+    "federalTax": 6908.81,
+    "quebecTax": 9219.81,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 279019.07,
-     "tfsa": 627949.78
+     "rrsp": 122358.4,
+     "tfsa": 619285.96
     }
    },
    "spouse": {
@@ -2521,36 +2590,37 @@
     "oas": 20402.71,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 4910.95,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 17699.3,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 114.44
+     "tfsa": 1120.2
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 106027.15,
+    "pensionContribution": 0,
+    "netIncome": 104340.45,
     "oasRecovery": 0,
-    "federalTax": 6288.86,
-    "quebecTax": 9465.28,
+    "federalTax": 6062.11,
+    "quebecTax": 9229.14,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 62597.78,
-     "tfsa": 596068.6
+     "rrsp": 0,
+     "tfsa": 585631.13
     }
    }
   },
   "household": {
-   "grossIncome": 213507.02,
-   "tax": 30953.56,
+   "grossIncome": 214979.09,
+   "tax": 31419.87,
    "spending": 182439.02,
    "shortfall": 0,
-   "netWorthEnd": 1565635.23
+   "netWorthEnd": 1327275.49
   },
   "projected": true
  },
@@ -2564,27 +2634,28 @@
     "oas": 20831.18,
     "gis": 0,
     "db": 44420.14,
-    "rrifMinimum": 20591.61,
+    "rrifMinimum": 9030.05,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 20591.61,
+     "rrsp": 41064.6,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 1330.56
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 109372.74,
+    "pensionContribution": 0,
+    "netIncome": 113108.06,
     "oasRecovery": 0,
-    "federalTax": 6576.3,
-    "quebecTax": 8843.19,
+    "federalTax": 7078.46,
+    "quebecTax": 9448.92,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 270525.11,
-     "tfsa": 656207.52
+     "rrsp": 85886.14,
+     "tfsa": 648514
     }
    },
    "spouse": {
@@ -2594,10 +2665,10 @@
     "oas": 20831.18,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 4118.93,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 18525.06,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
@@ -2607,23 +2678,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 108465,
+    "pensionContribution": 0,
+    "netIncome": 106677.61,
     "oasRecovery": 0,
-    "federalTax": 6454.27,
-    "quebecTax": 9693.74,
+    "federalTax": 6213.98,
+    "quebecTax": 9443.51,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 46477.39,
-     "tfsa": 622891.69
+     "rrsp": 0,
+     "tfsa": 611984.53
     }
    }
   },
   "household": {
-   "grossIncome": 217837.74,
-   "tax": 31567.5,
+   "grossIncome": 219785.67,
+   "tax": 32184.87,
    "spending": 186270.24,
    "shortfall": 0,
-   "netWorthEnd": 1596101.71
+   "netWorthEnd": 1346384.67
   },
   "projected": true
  },
@@ -2637,10 +2709,10 @@
     "oas": 21268.63,
     "gis": 0,
     "db": 44886.55,
-    "rrifMinimum": 20857.49,
+    "rrifMinimum": 6621.82,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 20857.49,
+     "rrsp": 42723.37,
      "tfsa": 0
     },
     "contributions": {
@@ -2650,14 +2722,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 111289.79,
+    "pensionContribution": 0,
+    "netIncome": 115648.33,
     "oasRecovery": 0,
-    "federalTax": 6668.29,
-    "quebecTax": 9973.85,
+    "federalTax": 7254.23,
+    "quebecTax": 9687.26,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 261377.12,
-     "tfsa": 685736.86
+     "rrsp": 46076.94,
+     "tfsa": 677697.13
     }
    },
    "spouse": {
@@ -2667,36 +2740,37 @@
     "oas": 21268.63,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 3169.76,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 19782.29,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 154.6
+     "tfsa": 1571.27
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 111357.78,
+    "pensionContribution": 0,
+    "netIncome": 109082.83,
     "oasRecovery": 0,
-    "federalTax": 6677.43,
-    "quebecTax": 8991.48,
+    "federalTax": 6371.6,
+    "quebecTax": 9664.88,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 28346.38,
-     "tfsa": 651079.86
+     "rrsp": 0,
+     "tfsa": 641130.07
     }
    }
   },
   "household": {
-   "grossIncome": 222647.57,
-   "tax": 32311.05,
+   "grossIncome": 224731.16,
+   "tax": 32977.97,
    "spending": 190181.92,
    "shortfall": 0,
-   "netWorthEnd": 1626540.22
+   "netWorthEnd": 1364904.14
   },
   "projected": true
  },
@@ -2710,27 +2784,28 @@
     "oas": 21715.32,
     "gis": 0,
     "db": 45357.86,
-    "rrifMinimum": 21119.27,
+    "rrifMinimum": 3723.02,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 21119.27,
+     "rrsp": 44467.92,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 1847.79
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 116562.26,
+    "pensionContribution": 0,
+    "netIncome": 118265.02,
     "oasRecovery": 0,
-    "federalTax": 7207.94,
-    "quebecTax": 9582.63,
+    "federalTax": 7436.85,
+    "quebecTax": 9936.43,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 251549.87,
-     "tfsa": 716595.02
+     "rrsp": 2692.96,
+     "tfsa": 710082.41
     }
    },
    "spouse": {
@@ -2740,36 +2815,37 @@
     "oas": 21715.32,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 2006.92,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 20885.68,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 176.16
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 110801.44,
+    "pensionContribution": 0,
+    "netIncome": 111561.65,
     "oasRecovery": 0,
-    "federalTax": 6433.49,
-    "quebecTax": 9787.74,
+    "federalTax": 6535.69,
+    "quebecTax": 9894.17,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 8271.53,
-     "tfsa": 680558.54
+     "rrsp": 0,
+     "tfsa": 669980.92
     }
    }
   },
   "household": {
-   "grossIncome": 227363.7,
-   "tax": 33011.8,
+   "grossIncome": 229826.67,
+   "tax": 33803.14,
    "spending": 194175.74,
    "shortfall": 0,
-   "netWorthEnd": 1656974.96
+   "netWorthEnd": 1382756.29
   },
   "projected": true
  },
@@ -2783,27 +2859,28 @@
     "oas": 22171.38,
     "gis": 0,
     "db": 45834.12,
-    "rrifMinimum": 21406.89,
+    "rrifMinimum": 229.17,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 35021.24,
+     "rrsp": 2692.96,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 120.87
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 115320.24,
+    "pensionContribution": 0,
+    "netIncome": 101582.45,
     "oasRecovery": 0,
-    "federalTax": 6868.01,
-    "quebecTax": 10300.11,
+    "federalTax": 5033.42,
+    "quebecTax": 6276.68,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 227069.06,
-     "tfsa": 748965.36
+     "rrsp": 61.26,
+     "tfsa": 742036.12
     }
    },
    "spouse": {
@@ -2813,36 +2890,37 @@
     "oas": 22171.38,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 610.44,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 8271.53,
-     "tfsa": 0
+     "rrsp": 0,
+     "tfsa": 28507.99
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 7.19
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 116747.63,
+    "pensionContribution": 0,
+    "netIncome": 89885.61,
     "oasRecovery": 0,
-    "federalTax": 7059.9,
-    "quebecTax": 9465.55,
+    "federalTax": 3666.06,
+    "quebecTax": 6739.27,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 188.16,
-     "tfsa": 711183.67
+     "rrsp": 0,
+     "tfsa": 670995.05
     }
    }
   },
   "household": {
-   "grossIncome": 232067.87,
-   "tax": 33693.57,
+   "grossIncome": 219976.05,
+   "tax": 21715.43,
    "spending": 198253.43,
    "shortfall": 0,
-   "netWorthEnd": 1687406.25
+   "netWorthEnd": 1413092.43
   },
   "projected": true
  },
@@ -2856,10 +2934,10 @@
     "oas": 22636.94,
     "gis": 0,
     "db": 46315.37,
-    "rrifMinimum": 20413.51,
+    "rrifMinimum": 5.51,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 45536.35,
+     "rrsp": 61.26,
      "tfsa": 0
     },
     "contributions": {
@@ -2869,14 +2947,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 122391.12,
+    "pensionContribution": 0,
+    "netIncome": 104291.24,
     "oasRecovery": 0,
-    "federalTax": 7642.27,
-    "quebecTax": 10146.61,
+    "federalTax": 5211.43,
+    "quebecTax": 6405.66,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 190737.52,
-     "tfsa": 782668.8
+     "rrsp": 1.39,
+     "tfsa": 775427.75
     }
    },
    "spouse": {
@@ -2886,36 +2965,37 @@
     "oas": 22636.94,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 14.51,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 188.16,
-     "tfsa": 0
+     "rrsp": 0,
+     "tfsa": 31381.38
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 833.32
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 115591.42,
+    "pensionContribution": 0,
+    "netIncome": 88028.05,
     "oasRecovery": 0,
-    "federalTax": 6728.15,
-    "quebecTax": 10215.44,
+    "federalTax": 3310.26,
+    "quebecTax": 6356.57,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 4.28,
-     "tfsa": 744038.8
+     "rrsp": 0,
+     "tfsa": 669110.13
     }
    }
   },
   "household": {
-   "grossIncome": 237982.54,
-   "tax": 34732.47,
+   "grossIncome": 223700.67,
+   "tax": 21283.92,
    "spending": 202416.75,
    "shortfall": 0,
-   "netWorthEnd": 1717449.4
+   "netWorthEnd": 1444539.27
   },
   "projected": true
  },
@@ -2929,27 +3009,28 @@
     "oas": 23112.28,
     "gis": 0,
     "db": 46801.68,
-    "rrifMinimum": 18215.43,
+    "rrifMinimum": 0.13,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 47539.9,
+     "rrsp": 1.39,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1088.2
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 125241.79,
+    "pensionContribution": 0,
+    "netIncome": 103812.69,
     "oasRecovery": 0,
-    "federalTax": 7845.36,
-    "quebecTax": 10422.59,
+    "federalTax": 5013.8,
+    "quebecTax": 6152.18,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 150722.93,
-     "tfsa": 819001.31
+     "rrsp": 0.03,
+     "tfsa": 810322
     }
    },
    "spouse": {
@@ -2959,11 +3040,11 @@
     "oas": 23112.28,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 0.35,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 4.28,
-     "tfsa": 0
+     "rrsp": 0,
+     "tfsa": 32442.55
     },
     "contributions": {
      "nonReg": 0,
@@ -2972,23 +3053,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 118111.46,
+    "pensionContribution": 0,
+    "netIncome": 91997.77,
     "oasRecovery": 0,
-    "federalTax": 6886.8,
-    "quebecTax": 10442.8,
+    "federalTax": 3632.64,
+    "quebecTax": 6786.89,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 0.1,
-     "tfsa": 777520.55
+     "rrsp": 0,
+     "tfsa": 666055.61
     }
    }
   },
   "household": {
-   "grossIncome": 243353.25,
-   "tax": 35597.55,
+   "grossIncome": 228253.01,
+   "tax": 21585.51,
    "spending": 206667.5,
    "shortfall": 0,
-   "netWorthEnd": 1747244.89
+   "netWorthEnd": 1476377.64
   },
   "projected": true
  },
@@ -3002,10 +3084,10 @@
     "oas": 23597.64,
     "gis": 0,
     "db": 47293.1,
-    "rrifMinimum": 15388.81,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 49430.78,
+     "rrsp": 0.03,
      "tfsa": 0
     },
     "contributions": {
@@ -3015,14 +3097,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 128072.43,
+    "pensionContribution": 0,
+    "netIncome": 108086.37,
     "oasRecovery": 0,
-    "federalTax": 8042.04,
-    "quebecTax": 10690.18,
+    "federalTax": 5368.79,
+    "quebecTax": 6561.7,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 106974.73,
-     "tfsa": 855856.37
+     "rrsp": 0,
+     "tfsa": 846786.49
     }
    },
    "spouse": {
@@ -3032,36 +3115,37 @@
     "oas": 23597.64,
     "gis": 0,
     "db": 0,
-    "rrifMinimum": 0.01,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 0.1,
-     "tfsa": 0
+     "rrsp": 0,
+     "tfsa": 33487.31
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1368.3
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 120788.09,
+    "pensionContribution": 0,
+    "netIncome": 91343.3,
     "oasRecovery": 0,
-    "federalTax": 7062.77,
-    "quebecTax": 10689.71,
+    "federalTax": 3411.53,
+    "quebecTax": 6567.44,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 813907.72
+     "tfsa": 661795.63
     }
    }
   },
   "household": {
-   "grossIncome": 248860.52,
-   "tax": 36484.7,
+   "grossIncome": 232916.98,
+   "tax": 21909.46,
    "spending": 211007.52,
    "shortfall": 0,
-   "netWorthEnd": 1776738.82
+   "netWorthEnd": 1508582.12
   },
   "projected": true
  },
@@ -3075,27 +3159,28 @@
     "oas": 24093.17,
     "gis": 0,
     "db": 47789.68,
-    "rrifMinimum": 11756.52,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 51436.96,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1705.58
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 130997.71,
+    "pensionContribution": 0,
+    "netIncome": 105279.23,
     "oasRecovery": 0,
-    "federalTax": 8247.45,
-    "quebecTax": 10971.64,
+    "federalTax": 4892.88,
+    "quebecTax": 5975.44,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 59207.03,
-     "tfsa": 896113.44
+     "rrsp": 0,
+     "tfsa": 884891.88
     }
    },
    "spouse": {
@@ -3109,32 +3194,33 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 34555.87
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 0.01
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 123560.3,
+    "pensionContribution": 0,
+    "netIncome": 97841.82,
     "oasRecovery": 0,
-    "federalTax": 7247.6,
-    "quebecTax": 10947.06,
+    "federalTax": 4023.44,
+    "quebecTax": 7346.47,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 850533.57
+     "tfsa": 656251.62
     }
    }
   },
   "household": {
-   "grossIncome": 254558.01,
-   "tax": 37413.75,
+   "grossIncome": 237676.92,
+   "tax": 22238.23,
    "spending": 215438.68,
    "shortfall": 0,
-   "netWorthEnd": 1805854.04
+   "netWorthEnd": 1541143.5
   },
   "projected": true
  },
@@ -3148,10 +3234,10 @@
     "oas": 24599.12,
     "gis": 0,
     "db": 48291.47,
-    "rrifMinimum": 7057.48,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 53593.64,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
@@ -3161,14 +3247,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 134036.01,
+    "pensionContribution": 0,
+    "netIncome": 112068.34,
     "oasRecovery": 0,
-    "federalTax": 8464.18,
-    "quebecTax": 11272.01,
+    "federalTax": 5535.72,
+    "quebecTax": 6728.9,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 7085.11,
-     "tfsa": 936438.54
+     "rrsp": 0,
+     "tfsa": 924712.01
     }
    },
    "spouse": {
@@ -3182,32 +3269,33 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 35651.34
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 2118.74
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 126442.42,
+    "pensionContribution": 0,
+    "netIncome": 94816.45,
     "oasRecovery": 0,
-    "federalTax": 7443.33,
-    "quebecTax": 11217.28,
+    "federalTax": 3518.98,
+    "quebecTax": 6789.64,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 890973.47
+     "tfsa": 649338.27
     }
    }
   },
   "household": {
-   "grossIncome": 260478.43,
-   "tax": 38396.8,
+   "grossIncome": 242536.13,
+   "tax": 22573.24,
    "spending": 219962.89,
    "shortfall": 0,
-   "netWorthEnd": 1834497.12
+   "netWorthEnd": 1574050.28
   },
   "projected": true
  },
@@ -3221,27 +3309,28 @@
     "oas": 25115.77,
     "gis": 0,
     "db": 48798.53,
-    "rrifMinimum": 925.32,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 7085.11,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 43.55
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 112780.31,
+    "pensionContribution": 0,
+    "netIncome": 114117.61,
     "oasRecovery": 0,
-    "federalTax": 5464.99,
-    "quebecTax": 6813.11,
+    "federalTax": 5621.32,
+    "quebecTax": 6814.35,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 161.17,
-     "tfsa": 978622.79
+     "rrsp": 0,
+     "tfsa": 966324.05
     }
    },
    "spouse": {
@@ -3255,7 +3344,7 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 31737.79
+     "tfsa": 36773.21
     },
     "contributions": {
      "nonReg": 0,
@@ -3264,23 +3353,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 105027.25,
+    "pensionContribution": 0,
+    "netIncome": 96604.84,
     "oasRecovery": 0,
-    "federalTax": 4558.66,
-    "quebecTax": 8082.93,
+    "federalTax": 3574.08,
+    "quebecTax": 6903.8,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 898623.24
+     "tfsa": 640966.99
     }
    }
   },
   "household": {
-   "grossIncome": 249545.35,
-   "tax": 24919.69,
+   "grossIncome": 247495.66,
+   "tax": 22913.55,
    "spending": 224582.11,
    "shortfall": 0,
-   "netWorthEnd": 1877407.2
+   "netWorthEnd": 1607291.04
   },
   "projected": true
  },
@@ -3294,10 +3384,10 @@
     "oas": 25643.24,
     "gis": 0,
     "db": 49310.92,
-    "rrifMinimum": 23.35,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 161.17,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
@@ -3307,14 +3397,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 116303.39,
+    "pensionContribution": 0,
+    "netIncome": 116206.69,
     "oasRecovery": 0,
-    "federalTax": 5719.61,
-    "quebecTax": 6918.62,
+    "federalTax": 5708.31,
+    "quebecTax": 6900.85,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 3.67,
-     "tfsa": 1022660.82
+     "rrsp": 0,
+     "tfsa": 1009808.63
     }
    },
    "spouse": {
@@ -3328,7 +3419,7 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 37806.8
+     "tfsa": 37922.34
     },
     "contributions": {
      "nonReg": 0,
@@ -3337,23 +3428,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 98493.1,
+    "pensionContribution": 0,
+    "netIncome": 98428.63,
     "oasRecovery": 0,
-    "federalTax": 3637.59,
-    "quebecTax": 7029.13,
+    "federalTax": 3630.05,
+    "quebecTax": 7020.11,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 900413.19
+     "tfsa": 631044.3
     }
    }
   },
   "household": {
-   "grossIncome": 252603.29,
-   "tax": 23304.95,
+   "grossIncome": 252557.66,
+   "tax": 23259.32,
    "spending": 229298.34,
    "shortfall": 0,
-   "netWorthEnd": 1923077.68
+   "netWorthEnd": 1640852.93
   },
   "projected": true
  },
@@ -3367,10 +3459,10 @@
     "oas": 26181.67,
     "gis": 0,
     "db": 49828.68,
-    "rrifMinimum": 0.6,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 3.67,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
@@ -3380,14 +3472,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 115846.87,
+    "pensionContribution": 0,
+    "netIncome": 113353.42,
     "oasRecovery": 0,
-    "federalTax": 5505.86,
-    "quebecTax": 6640.25,
+    "federalTax": 5214.37,
+    "quebecTax": 6291.07,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 0.08,
-     "tfsa": 1068680.56
+     "rrsp": 0,
+     "tfsa": 1055250.02
     }
    },
    "spouse": {
@@ -3401,32 +3494,33 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 39097.39
+     "tfsa": 39100
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 102781.53,
+    "pensionContribution": 0,
+    "netIncome": 105271.31,
     "oasRecovery": 0,
-    "federalTax": 3978.52,
-    "quebecTax": 7487.55,
+    "federalTax": 4269.57,
+    "quebecTax": 7836.12,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 900964.39
+     "tfsa": 619471.22
     }
    }
   },
   "household": {
-   "grossIncome": 257725.79,
-   "tax": 23612.18,
+   "grossIncome": 257724.73,
+   "tax": 23611.13,
    "spending": 234113.6,
    "shortfall": 0,
-   "netWorthEnd": 1969645.03
+   "netWorthEnd": 1674721.24
   },
   "projected": true
  },
@@ -3440,10 +3534,10 @@
     "oas": 26731.58,
     "gis": 0,
     "db": 50351.88,
-    "rrifMinimum": 0.02,
+    "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 0.07,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
@@ -3453,14 +3547,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 123025.17,
+    "pensionContribution": 0,
+    "netIncome": 123025.12,
     "oasRecovery": 0,
-    "federalTax": 6181.11,
-    "quebecTax": 7430.24,
+    "federalTax": 6181.1,
+    "quebecTax": 7430.23,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 0.01,
-     "tfsa": 1116771.19
+     "rrsp": 0,
+     "tfsa": 1102736.27
     }
    },
    "spouse": {
@@ -3474,7 +3569,7 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 40305.77
+     "tfsa": 40305.82
     },
     "contributions": {
      "nonReg": 0,
@@ -3483,23 +3578,24 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 99667.74,
+    "pensionContribution": 0,
+    "netIncome": 99667.72,
     "oasRecovery": 0,
     "federalTax": 3450.62,
     "quebecTax": 6906.72,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 900305.12
+     "tfsa": 606144.7
     }
    }
   },
   "household": {
-   "grossIncome": 262998.68,
-   "tax": 23968.69,
+   "grossIncome": 262998.66,
+   "tax": 23968.67,
    "spending": 239029.99,
    "shortfall": 0,
-   "netWorthEnd": 2017076.32
+   "netWorthEnd": 1708880.97
   },
   "projected": true
  },
@@ -3526,14 +3622,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 120176.85,
     "oasRecovery": 0,
     "federalTax": 5680.85,
     "quebecTax": 6811.9,
     "balancesEnd": {
      "nonReg": 0,
-     "rrsp": 0.01,
-     "tfsa": 1167025.89
+     "rrsp": 0,
+     "tfsa": 1152359.4
     }
    },
    "spouse": {
@@ -3556,6 +3653,7 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 106663.67,
     "oasRecovery": 0,
     "federalTax": 4101.16,
@@ -3563,7 +3661,7 @@
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 898353.28
+     "tfsa": 590955.64
     }
    }
   },
@@ -3572,7 +3670,7 @@
    "tax": 24332.08,
    "spending": 244049.62,
    "shortfall": 0,
-   "netWorthEnd": 2065379.18
+   "netWorthEnd": 1743315.04
   },
   "projected": true
  },
@@ -3589,7 +3687,7 @@
     "rrifMinimum": 0,
     "withdrawals": {
      "nonReg": 0,
-     "rrsp": 0.01,
+     "rrsp": 0,
      "tfsa": 0
     },
     "contributions": {
@@ -3599,14 +3697,15 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
-    "netIncome": 127548.2,
+    "pensionContribution": 0,
+    "netIncome": 127548.19,
     "oasRecovery": 0,
     "federalTax": 6371.77,
     "quebecTax": 7619.41,
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1219542.06
+     "tfsa": 1204215.57
     }
    },
    "spouse": {
@@ -3620,15 +3719,16 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 42806.12
+     "tfsa": 42806.14
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0
+     "tfsa": 0.01
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 103521.7,
     "oasRecovery": 0,
     "federalTax": 3563.08,
@@ -3636,16 +3736,16 @@
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 895020.51
+     "tfsa": 573789.97
     }
    }
   },
   "household": {
-   "grossIncome": 273876.02,
+   "grossIncome": 273876.03,
    "tax": 24701.36,
    "spending": 249174.66,
    "shortfall": 0,
-   "netWorthEnd": 2114562.57
+   "netWorthEnd": 1778005.54
   },
   "projected": true
  },
@@ -3672,6 +3772,7 @@
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 129875.9,
     "oasRecovery": 0,
     "federalTax": 6469.35,
@@ -3679,7 +3780,7 @@
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1274421.45
+     "tfsa": 1258405.27
     }
    },
    "spouse": {
@@ -3693,15 +3794,16 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 44101.55
+     "tfsa": 44101.54
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
+    "pensionContribution": 0,
     "netIncome": 105506.81,
     "oasRecovery": 0,
     "federalTax": 3620.6,
@@ -3709,16 +3811,16 @@
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 890213.53
+     "tfsa": 554527.61
     }
    }
   },
   "household": {
-   "grossIncome": 279484.26,
+   "grossIncome": 279484.25,
    "tax": 25076.92,
    "spending": 254407.33,
    "shortfall": 0,
-   "netWorthEnd": 2164634.98
+   "netWorthEnd": 1812932.88
   },
   "projected": true
  }

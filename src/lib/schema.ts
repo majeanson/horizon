@@ -10,7 +10,7 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId }
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 5
+export const SCHEMA_VERSION = 6
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -126,6 +126,7 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
   const indexation = r.obj(o.indexation, `${path}.indexation`) ?? {}
   const inPay = o.inPay === undefined ? null : r.obj(o.inPay, `${path}.inPay`)
   const deferred = o.deferred === undefined ? null : r.obj(o.deferred, `${path}.deferred`)
+  const member = o.memberContribution === undefined ? null : r.obj(o.memberContribution, `${path}.memberContribution`)
   const deferredIndexation = deferred ? r.obj(deferred.indexation, `${path}.deferred.indexation`) ?? {} : null
   const after65 = inPay ? r.optNum(inPay.after65, `${path}.inPay.after65`, 0, MAX_IN_PAY_ANNUAL) : undefined
   const sinceRaw = inPay && inPay.since !== undefined ? r.obj(inPay.since, `${path}.inPay.since`) : null
@@ -168,6 +169,15 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
               share: r.num(deferredIndexation.share, `${path}.deferred.indexation.share`, 0, 1),
               minus: r.num(deferredIndexation.minus, `${path}.deferred.indexation.minus`, 0, 0.1),
             },
+          },
+        }
+      : {}),
+    ...(member
+      ? {
+          memberContribution: {
+            rate: r.num(member.rate, `${path}.memberContribution.rate`, 0, 0.3),
+            exemptionShare: r.num(member.exemptionShare, `${path}.memberContribution.exemptionShare`, 0, 1),
+            reductionFactor: r.num(member.reductionFactor, `${path}.memberContribution.reductionFactor`, 0, 1),
           },
         }
       : {}),

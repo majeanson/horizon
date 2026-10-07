@@ -14,6 +14,15 @@ export type PersonId = 'self' | 'spouse'
  * Québec public-sector plan (RREGOP) is one preset of these (engine/presets.ts); any other plan is entered by
  * hand from its own booklet — every field below is a rule a plan states, never a guess the engine makes.
  */
+/** What a member pays out of pay while working: see memberContribution.ts. Fractions: 0.0863 = 8,63 %. */
+export interface MemberContribution {
+  rate: number
+  /** The share of the maximum pensionable earnings (× service) that is exempt: 0.25. */
+  exemptionShare: number
+  /** The reduction per dollar the pay falls under the MGA (× service): 0.0153. */
+  reductionFactor: number
+}
+
 export interface DbPension {
   /** Free text, e.g. « RREGOP ». Display only. */
   label: string
@@ -48,6 +57,8 @@ export interface DbPension {
    * Absent: the plan has no such rule, and a member who leaves early gets the active member's reduction.
    */
   deferred?: { toAge: number; indexation: { share: number; minus: number } }
+  /** The member's own contributions out of pay while working (deducted from taxable income too). Absent: none are modelled. Ignored for a pension in pay. */
+  memberContribution?: MemberContribution
   /**
    * A pension ALREADY being paid (the retiree's « rente en cours »): the annual amount paid now, in today's dollars, as the
    * statement prints it — already reduced, coordinated and bridged. When set, the formula fields above are not read: only
@@ -153,6 +164,8 @@ export interface PersonYear {
   rrqContribution: number
   /** EI and QPIP premiums paid on this year's employment income. */
   payrollContribution: number
+  /** The member's own employer-pension-plan contributions out of this year's pay. */
+  pensionContribution: number
   /** Net income (line 23600): what the tax and the credits read. */
   netIncome: number
   oasRecovery: number

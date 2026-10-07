@@ -25,6 +25,20 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v4 → v5: a pension in pay may carry `since` (the month it began, which pro-rates its first January indexation). It is
   // optional; absent means « it already had its first indexation », which is how every older file's pension in pay was calculated.
   (profile) => profile,
+  // v5 → v6: an employer pension may carry `memberContribution` (the member's own contributions out of pay while working). A
+  // RREGOP pension that is not in pay is given the 2026 plan rule — every such file was missing it, and its working-years
+  // cash was overstated by it. The match is on the frozen RREGOP accrual, coordination and earliest age, not on the label.
+  (profile) => {
+    const household = profile.household
+    if (typeof household !== 'object' || household === null || Array.isArray(household)) return profile
+    const persons = (household as Raw).persons
+    if (!Array.isArray(persons)) return profile
+    const rule = { rate: 0.0863, exemptionShare: 0.25, reductionFactor: 0.0153 }
+    const isRregop = (d: Raw) => d.accrualRate === 0.02 && d.earliestAge === 55 && typeof d.coordination === 'object' && d.coordination !== null && (d.coordination as Raw).rate === 0.007
+    const fix = (d: unknown) => (typeof d === 'object' && d !== null && !Array.isArray(d) && !(d as Raw).inPay && !(d as Raw).memberContribution && isRregop(d as Raw) ? { ...(d as Raw), memberContribution: rule } : d)
+    const fixPerson = (p: unknown) => (typeof p === 'object' && p !== null && Array.isArray((p as Raw).pensions) ? { ...(p as Raw), pensions: ((p as Raw).pensions as unknown[]).map(fix) } : p)
+    return { ...profile, household: { ...(household as Raw), persons: persons.map(fixPerson) } }
+  },
 ]
 
 export type ReadResult =

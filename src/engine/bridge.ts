@@ -66,7 +66,7 @@ export interface BridgeYear {
   drawn: number
   /** Income tax and the OAS recovery tax. */
   tax: number
-  /** EI, QPIP and QPP contributions on pay. */
+  /** EI, QPIP, QPP and employer-pension-plan contributions on pay. */
   payroll: number
   /** Money put into accounts: the savings the person chose, and the surplus of a year that more than covers spending. */
   saved: number
@@ -194,7 +194,7 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): Br
     draws,
     drawn,
     tax: r.household.tax / d,
-    payroll: pick((p) => p.payrollContribution + p.rrqContribution),
+    payroll: pick((p) => p.payrollContribution + p.rrqContribution + p.pensionContribution),
     saved: pick((p) => p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa),
     shortfall,
     nest: { ...nestParts, total: sum(KINDS.map((k) => nestParts[k])) },

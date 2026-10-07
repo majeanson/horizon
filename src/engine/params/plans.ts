@@ -21,7 +21,15 @@ const RREGOP_WHEN = src(
 )
 const R10 = src('https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf', 'Act respecting the Government and Public Employees Retirement Plan (chapter R-10)', 'Updated to August 12, 2026.')
 
+const RREGOP_CONTRIB = src(
+  'https://www.retraitequebec.gouv.qc.ca/fr/guide-employeur/education/77766',
+  'Méthode de calcul des cotisations pour le RREGOP, le RRCE, le RRPE, le RRAS et le RRAPSC',
+)
+
 export const PLAN_RREGOP = {
+  contributionRate: c(0.0863, { ...RREGOP_CONTRIB, note: '2026 : « [(salaire cotisable − 25 % × MGA × service) × 8,63 %] − réduction ».' }),
+  contributionExemptionShare: c(0.25, { ...RREGOP_CONTRIB, note: 'L’exemption est 25 % du MGA (74 600 $ × 25 % = 18 650 $ en 2026), multipliée par le service.' }),
+  contributionReductionFactor: c(0.0153, { ...RREGOP_CONTRIB, note: 'Réduction sous le MGA : « 0,0153 × [(MGA × service) − salaire cotisable] » ; nulle si le résultat est négatif. Exemple de la page : 43 300 $ → 1 648,41 $ par année.' }),
   accrualRate: c(0.02, { ...RREGOP_PAGE, note: '« Years of service credited for calculation purposes (maximum 40) × Pension accrual rate (2%) × Average pensionable salary of the 5 best-paid years of service = Pension ».' }),
   maxServiceYears: c(40, { ...R10, note: 's. 34.2: « the employee’s years of credited service taken into account must not exceed 40 ».' }),
   averagingYears: c(5, { ...RREGOP_WHEN, note: '« the average salary of the five years during which you earned the most money. Those five years do not need to be consecutive. »' }),

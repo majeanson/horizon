@@ -98,7 +98,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [ ] Survivor scenarios (one spouse dies) — v2
 
 - [x] Retirement means no work income (`engine/retirement.props.test.ts`, planted bug red): after the leaving month no pay, EI/QPIP, QPP contribution or RRSP deduction; the income is only the OAS/GIS, QPP, DB pension and account draws; the years before the OAS/QPP start are paid from the accounts; a couple with one retired; a pension in pay with no work. `lib/fixtureSanity.test.ts` holds the golden couple, the example profile and every fixture to plausibility rules against the cited figures (the old golden history ended 18–28 % under today's salary: fixed, so the golden numbers moved — earliest age still 60, bold scenario 58)
-- [ ] RREGOP members' own contributions (8.63 % of pay above 25 % of the MGA in 2026, minus a reduction under the MGA) are NOT deducted from pay or from taxable income: the golden household's cash while working is overstated by about 5 700 $ a year. Needs the contribution formula's reduction from the plan's booklet before it can be cited
+- [x] RREGOP members' own contributions (schema v6, `memberContribution` on a plan pension; `engine/memberContribution.ts`): [(pay − 25 % × MGA × service) × 8,63 %] − 0,0153 × (MGA × service − pay), from Retraite Québec's employer guide (the page's 43 300 $ example, `verified/memberContribution.verified.test.ts`); paid out of pay while working and deducted from taxable income; an old RREGOP pension gets the rule in the v5 → v6 migration. NOT modelled: the stop at 40 years of service, non-pensionable pay
 
 ### Phase 7 — store, profile, assumptions, `FieldInfo`
 
