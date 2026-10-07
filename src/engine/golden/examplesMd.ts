@@ -102,7 +102,7 @@ export function renderExamplesMd(): string {
     '',
     '- **RRQ** : le simulateur de Retraite Québec (« Estimation des prestations ») avec les mêmes revenus de travail ; comparez la rente à 65 ans (en dollars d’aujourd’hui, la rente de la colonne « d’aujourd’hui »). Un écart de quelques pourcents vient du fait que l’application suppose que les salaires futurs croissent plus vite que les prix.',
     '- **PSV / SRG** : l’estimateur des prestations de la Sécurité de la vieillesse (canada.ca). La PSV de base est le montant cité × la part de résidence × le report ; le SRG dépend du revenu net du ménage de l’année témoin.',
-    '- **Impôt** : un calculateur d’impôt 2026 (fédéral et Québec) avec les revenus de la ligne « Année témoin » ; l’application ne modélise ni les dons, ni les frais médicaux, ni la contribution santé. **À ce jour, l’impôt n’a été comparé à aucun calculateur** (voir STATE.md).',
+    '- **Impôt** : un calculateur d’impôt 2026 (fédéral et Québec) avec les revenus de la ligne « Année témoin » ; l’application ne modélise ni les dons, ni les frais médicaux, ni la contribution santé. **À ce jour, l’impôt n’a été comparé à StudioTax que pour le cas « modeste » (voir STATE.md)**.',
     '- **Année par année** : chaque ligne doit satisfaire dépenses + impôt = travail + rentes + SRG + tiré du nid (+ surplus épargné).',
     '',
   ]
