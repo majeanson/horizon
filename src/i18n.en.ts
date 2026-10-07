@@ -120,6 +120,7 @@ export const EN: typeof FR = {
       fill: 'Estimate the blank years from the current salary',
       fillHint: 'An estimate to correct: it deflates your current salary and never touches a year you already entered.',
       filled: (n: number) => (n === 1 ? '1 year estimated' : `${n} years estimated`),
+      fillUndo: 'Remove the estimated years',
       nothingToFill: 'No year to estimate: enter a salary first, or every year is already filled.',
       statement65: 'Statement’s projected amount, pension at 65 (per month)',
       statement60: 'Statement’s projected amount, pension at 60 (per month)',

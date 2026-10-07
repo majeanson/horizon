@@ -168,6 +168,11 @@ test.describe('a blank profile', () => {
     const history = async () => (await savedProfile(page)).household.persons[0].earningsHistory
     await expect.poll(async () => Object.keys(await history()).length).toBeGreaterThan(10)
     expect((await history())['2020']).toBe(55000)
+    // One tap wrote ~30 estimated years indistinguishable from typed ones — the note now carries the
+    // way back, and taking it restores exactly the history from before the fill (the typed 2020 stays).
+    await page.getByRole('button', { name: 'Retirer les années estimées' }).click()
+    await expect.poll(async () => Object.keys(await history()).length).toBe(1)
+    expect((await history())['2020']).toBe(55000)
   })
 })
 

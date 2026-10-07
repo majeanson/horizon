@@ -136,6 +136,7 @@ export const FR = {
       fill: 'Estimer les années vides à partir du salaire actuel',
       fillHint: 'Une estimation à corriger : elle déflate votre salaire actuel et ne touche jamais une année déjà saisie.',
       filled: (n: number) => (n === 1 ? '1 année estimée' : `${n} années estimées`),
+      fillUndo: 'Retirer les années estimées',
       nothingToFill: 'Aucune année à estimer : saisissez un salaire d’abord, ou toutes les années sont remplies.',
       statement65: 'Montant projeté du relevé, rente à 65 ans (par mois)',
       statement60: 'Montant projeté du relevé, rente à 60 ans (par mois)',

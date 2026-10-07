@@ -41,13 +41,22 @@ export function RrqSection({ person, edit }: PersonEditor) {
     return groups
   }, [years])
   const typed = Object.keys(person.earningsHistory).length
-  const [filledNote, setFilledNote] = useState<string | null>(null)
+  // The note under the fill action and, while nothing else has been touched since, the way back:
+  // one tap writes ~30 estimated years that are indistinguishable from typed ones afterward, so the
+  // state keeps the history as it was. A manual cell edit clears the offer (undoing would eat it).
+  const [filledNote, setFilledNote] = useState<{ note: string; before: Record<number, number> | null } | null>(null)
 
   const fill = () => {
     const filled = fillFromSalary(person, now, assumptions.wageGrowth, rules.mga)
     const added = Object.keys(filled).length - typed
-    setFilledNote(added > 0 ? r.filled(added) : r.nothingToFill)
+    setFilledNote(added > 0 ? { note: r.filled(added), before: person.earningsHistory } : { note: r.nothingToFill, before: null })
     if (added > 0) edit((x) => ({ ...x, earningsHistory: filled }))
+  }
+  const unfill = () => {
+    const before = filledNote?.before
+    if (before == null) return
+    edit((x) => ({ ...x, earningsHistory: before }))
+    setFilledNote(null)
   }
 
   const canCheck = typed > 0 || person.salaryToday > 0
@@ -76,7 +85,12 @@ export function RrqSection({ person, edit }: PersonEditor) {
             <Chip onClick={fill}>{r.fill}</Chip>
           </div>
           <p className="field-row__hint">{r.fillHint}</p>
-          {filledNote && <StatusMessage tone="info">{filledNote}</StatusMessage>}
+          {filledNote && (
+            <div className="earnings__filled">
+              <StatusMessage tone="info">{filledNote.note}</StatusMessage>
+              {filledNote.before !== null && <Chip onClick={unfill}>{r.fillUndo}</Chip>}
+            </div>
+          )}
           {decades.map((d) => (
             <div key={d.from} className="earnings__decade">
               <p className="earnings__decade-label mono">{r.decade(d.from)}</p>
@@ -89,7 +103,10 @@ export function RrqSection({ person, edit }: PersonEditor) {
                       allowEmpty
                       max={1e9}
                       value={person.earningsHistory[year] ?? null}
-                      onChange={(v) => edit((x) => setEarning(x, year, v))}
+                      onChange={(v) => {
+                        setFilledNote(null)
+                        edit((x) => setEarning(x, year, v))
+                      }}
                       ariaLabel={r.earningsYear(year)}
                     />
                   </div>

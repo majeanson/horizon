@@ -344,6 +344,13 @@
   font-size: var(--text-xs);
   color: var(--ink-soft);
 }
+/* The fill's note and, beside it, the way back. */
+.earnings__filled {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
+}
 .earnings__cell {
   display: flex;
   flex-direction: column;
