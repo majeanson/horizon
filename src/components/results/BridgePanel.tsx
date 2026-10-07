@@ -328,7 +328,6 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
           {copy.updating}
         </p>
       )}
-      {household.persons.length > 1 && <p className="field-row__hint">{copy.ownerLine(ownerName)}</p>}
       {household.persons.length > 1 && (
         <SubTabs ariaLabel={copy.person} value={levers.id} onSelect={pickPerson} options={household.persons.map((p, i) => ({ key: p.id, label: names[i] ?? '' }))} />
       )}

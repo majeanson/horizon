@@ -40,7 +40,6 @@ for (const mode of ['simple', 'full'] as const) {
     // the verdict sentence and the five ways of starting
     // (the age is the one of the person looked at — Camille, the older one — not the plan's horizon for the younger)
     await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à \d\d ans/)
-    await expect(page.getByText('Les âges de cette page sont ceux de Camille')).toBeVisible()
     // the golden couple's own plan IS the standard: one card says so instead of two identical ones
     for (const name of ['Tout dès que possible', 'Standard (c’est aussi votre plan)', 'Reporter au maximum', 'Pont jusqu’à 70 ans', 'Les deux à 70 ans']) {
       await expect(page.locator('.bridge-card').getByRole('radio', { name, exact: true })).toBeVisible()

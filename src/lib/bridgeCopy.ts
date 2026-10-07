@@ -16,7 +16,6 @@ export interface BridgeCopy {
   updating: string
   person: string
   /** Whose ages the page uses, for a couple: « Âges : ceux de Camille. » */
-  ownerLine: (name: string) => string
   /** The three levers. */
   /** The ages in force, read from the profile: edited in « Mes données » and Profil, not here. */
   agesLine: (retire: string, rrq: string, oas: string) => string
@@ -103,8 +102,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le pécule doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
     updating: 'Mise à jour du calcul…',
     person: 'Pour',
-    ownerLine: (name) => `Les âges de cette page sont ceux de ${name}.`,
-    agesLine: (retire, rrq, oas) => `Vos âges : retraite à ${retire}, RRQ à ${rrq}, PSV à ${oas}. Choisissez une façon ci-dessous, ou réglez-les dans « Mes données et leur calcul ».`,
+    agesLine: (retire, rrq, oas) => `Vos âges : retraite à ${retire}, RRQ à ${rrq}, PSV à ${oas}. Pour les changer : « Mes données et leur calcul ».`,
     bothLabel: 'Pour les deux',
     bothHint: 'L’autre personne commence son RRQ et sa PSV aux mêmes âges ; son âge de retraite reste celui de son profil.',
     age: (age) => `${age} ans`,
@@ -202,8 +200,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg has to cover, and what is left. Pick a way of starting your pensions to see whether the plan holds. Everything is in today’s dollars.',
     updating: 'Updating the calculation…',
     person: 'For',
-    ownerLine: (name) => `The ages on this page are ${name}’s.`,
-    agesLine: (retire, rrq, oas) => `Your ages: retire at ${retire}, QPP at ${rrq}, OAS at ${oas}. Pick a way below, or set them in “My data and its calculation”.`,
+    agesLine: (retire, rrq, oas) => `Your ages: retire at ${retire}, QPP at ${rrq}, OAS at ${oas}. To change them: “My data and its calculation”.`,
     bothLabel: 'For both',
     bothHint: 'The other person starts their QPP and OAS at the same ages; their retirement age stays the one in their profile.',
     age: (age) => `age ${age}`,
