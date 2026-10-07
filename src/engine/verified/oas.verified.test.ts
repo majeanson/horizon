@@ -329,3 +329,15 @@ describe('the OAS Benefits Estimator, Oct–Dec 2026, a couple both on the OAS w
     expect(RULES.monthly65to74).toBe(762.5)
   })
 })
+
+// ── The same estimator, for the « rich » couple at 66 and 64: she is on the OAS, he is not yet (combined income 51 734 $ without the OAS) ──
+// It printed « $838.99 per month: $762.50 from the Old Age Security pension, $76.49 from the Guaranteed Income Supplement », and an
+// Allowance of $0 for the 64-year-old partner. A rich household is paid a small GIS because the test counts TAXABLE income, and a
+// household that draws on non-registered money has little of it.
+describe('the OAS Benefits Estimator, Oct–Dec 2026, one spouse on the OAS and the other not', () => {
+  it('the GIS is within the estimator\'s $1 a month, in the category « spouse without the OAS »', () => {
+    const category = gisCategory({ present: true, receivesOas: false })
+    expect(category).toBe('spouseNone')
+    expect(Math.abs(gisMonthly(32_980 + 18_754, category, RULES) - 76.49)).toBeLessThan(1)
+  })
+})
