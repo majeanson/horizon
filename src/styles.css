@@ -10,5 +10,7 @@
    cascade position is immaterial. */
 @import './styles/kit.css';
 @import './styles/horizon.css';
+/* The « nothing hidden » restructure's layout (.persons columns, unfolded blocks). */
+@import './styles/revamp.css';
 /* The dev-only component gallery (/dev/kit) is NOT imported here: pages/DevKit.tsx imports
    its own stylesheet as a side effect, so the shell never pays for it. */

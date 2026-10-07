@@ -8,10 +8,10 @@ import { setEarning } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
-import { Disclosure } from '../Disclosure'
 import { FieldInfo } from '../FieldInfo'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { SectionHeader } from '../SectionHeader'
 import { StatusMessage } from '../StatusMessage'
 import { Section, type PersonEditor } from './shared'
 
@@ -56,9 +56,9 @@ export function RrqSection({ person, edit }: PersonEditor) {
         )}
       </FieldRow>
 
-      <Disclosure label={r.earnings} count={typed}>
         <div className="earnings">
-          <p className="field-row__hint">{r.earningsCount(typed)}. {r.earningsHint}</p>
+          <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed)} />
+          <p className="field-row__hint">{r.earningsHint}</p>
           <div className="earnings__tools">
             <FieldInfo id="earnings" label={r.earnings} />
             <Chip onClick={fill}>{r.fill}</Chip>
@@ -81,7 +81,6 @@ export function RrqSection({ person, edit }: PersonEditor) {
             ))}
           </div>
         </div>
-      </Disclosure>
 
       <FieldRow label={r.statement65} infoId="rrqEstimate65" hint={r.statementHint}>
         {(w) => (

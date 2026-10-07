@@ -72,7 +72,6 @@ export const EN: typeof FR = {
       start: 'Start',
       example: 'See an example',
     },
-    persons: 'Person',
     self: 'Me',
     spouse: 'Spouse',
     family: {

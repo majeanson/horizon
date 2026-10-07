@@ -10,12 +10,12 @@ import { useNotice } from '../../lib/toast'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
-import { Disclosure } from '../Disclosure'
 import { EditField } from '../EditField'
 import { FieldInfo } from '../FieldInfo'
 import { FieldRow } from '../FieldRow'
 import { Icon } from '../Icon'
 import { NumberField } from '../NumberField'
+import { SectionHeader } from '../SectionHeader'
 import { Section, type PersonEditor } from './shared'
 
 // The employer's defined-benefit plans: a formula, not a balance. A plan is entered once from its own booklet —
@@ -236,9 +236,10 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 </FieldRow>
               </>
             )}
-            <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
+            <div className="plan-card__rules">
+              <SectionHeader title={pension.inPay ? p.inPayRules : p.rules} />
               <Rules pension={pension} set={set} />
-            </Disclosure>
+            </div>
           </article>
         )
       })}

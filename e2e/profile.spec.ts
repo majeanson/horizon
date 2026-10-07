@@ -85,16 +85,14 @@ test.describe('a blank profile', () => {
     await expect(note).toBeHidden()
   })
 
-  test('adding a spouse gives a second tab with its own numbers; removing asks first, in words that say what is lost', async ({ page }) => {
+  test('adding a spouse gives a second column with its own numbers; removing asks first, in words that say what is lost', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
-    const tabs = page.getByRole('tablist', { name: 'Personne' })
-    await expect(tabs.getByRole('tab', { name: 'Conjoint·e' })).toBeVisible()
-    await tabs.getByRole('tab', { name: 'Conjoint·e' }).click()
-    await expect(page).toHaveURL(/person=spouse/)
-    // The URL changes a tick before the form does: wait for the tab that is derived from the same render.
-    await expect(tabs.getByRole('tab', { name: 'Conjoint·e', selected: true })).toBeVisible()
-    const salary = box(page, 'Revenu de travail annuel actuel')
+    // Both people are on the page at once, each column named: no tab hides the other person.
+    await expect(page.locator('#person-self').getByRole('heading', { name: 'Moi' })).toBeVisible()
+    const spouseCol = page.locator('#person-spouse')
+    await expect(spouseCol.getByRole('heading', { name: 'Conjoint·e' })).toBeVisible()
+    const salary = spouseCol.getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })
     await salary.fill('65000')
     await salary.press('Enter')
     await expect.poll(async () => (await savedProfile(page)).household.persons[1]?.salaryToday).toBe(65000)
@@ -162,7 +160,7 @@ test.describe('a blank profile', () => {
     const salary = box(page, 'Revenu de travail annuel actuel')
     await salary.fill('80000')
     await salary.press('Enter')
-    await page.getByRole('button', { name: /Revenus de travail admissibles par année/ }).click()
+    // The earnings grid sits on the page itself: no disclosure to open first.
     await box(page, 'Revenus admissibles de 2020').fill('55000')
     await box(page, 'Revenus admissibles de 2020').blur()
     await page.getByRole('button', { name: 'Estimer les années vides à partir du salaire actuel' }).click()
@@ -239,11 +237,10 @@ test.describe('the example household', () => {
     await expect(page.getByText(/Manque dès \d{4}/)).toBeVisible()
   })
 
-  test('the profile page loads the golden couple’s numbers into the fields', async ({ page }) => {
+  test('the profile page loads the golden couple’s numbers into the fields, one column each', async ({ page }) => {
     await page.goto('/')
-    await expect(box(page, 'Revenu de travail annuel actuel')).toHaveValue(/85\D000/)
-    await page.getByRole('tab', { name: 'Conjoint·e' }).click()
-    await expect(box(page, 'Revenu de travail annuel actuel')).toHaveValue(/65\D000/)
+    await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
+    await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/65\D000/)
     await page.goto('/hypotheses')
     await expect(box(page, 'Inflation annuelle')).toHaveValue('2,1')
   })
@@ -412,7 +409,7 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
   test(`no page runs past the right edge at ${name} width (${width}px), with the example loaded and every ⓘ open`, async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width, height: 800 })
-    for (const path of ['/', '/?person=spouse', '/hypotheses', '/resultats', '/donnees']) {
+    for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
       for (const t of await page.locator('.info-btn').all()) await t.click()

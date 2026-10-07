@@ -62,27 +62,24 @@ test.describe('with the keyboard alone', () => {
     await expect(info).toHaveAttribute('aria-expanded', 'false')
   })
 
-  test('a disclosure opens with Enter, and what is inside it is reachable next', async ({ page }) => {
+  test('the earnings grid sits on the page: its ⓘ, the fill action and the first year are the next stops', async ({ page }) => {
     await page.goto('/')
     await page.locator('.page-head__title').waitFor()
-    await tabTo(page, /Revenus de travail admissibles par année/)
-    await expect(page.getByRole('button', { name: 'Revenus de travail admissibles par année', exact: true })).toHaveAttribute('aria-expanded', 'false')
-    await page.keyboard.press('Enter')
-    await expect(page.getByRole('button', { name: 'Revenus de travail admissibles par année', exact: true })).toHaveAttribute('aria-expanded', 'true')
+    await tabTo(page, /Où trouver ce chiffre : Revenus de travail admissibles par année/)
     await page.keyboard.press('Tab')
-    expect((await focused(page)).name).toMatch(/Où trouver ce chiffre : Revenus de travail admissibles par année/)
+    expect((await focused(page)).name).toBe('Estimer les années vides à partir du salaire actuel')
+    await page.keyboard.press('Tab')
+    expect((await focused(page)).name).toMatch(/Revenus admissibles de \d{4}/)
   })
 
-  test('the people tabs are a real tablist: arrow keys move and select, Home and End jump', async ({ page }) => {
-    await page.goto('/')
-    await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
-    const tabs = page.getByRole('tablist', { name: 'Personne' })
-    await tabs.getByRole('tab', { name: 'Moi' }).focus()
+  test('a segmented control is a real tablist: arrow keys move and select, Home jumps back', async ({ page }) => {
+    await page.goto('/hypotheses')
+    const tabs = page.getByRole('tablist', { name: 'Choisir un scénario' })
+    await tabs.getByRole('tab', { name: 'Neutre' }).focus()
     await page.keyboard.press('ArrowRight')
-    await expect(tabs.getByRole('tab', { name: 'Conjoint·e', selected: true })).toBeFocused()
-    await expect(page).toHaveURL(/person=spouse/)
+    await expect(tabs.getByRole('tab', { name: 'Audacieux', selected: true })).toBeFocused()
     await page.keyboard.press('Home')
-    await expect(tabs.getByRole('tab', { name: 'Moi', selected: true })).toBeFocused()
+    await expect(tabs.getByRole('tab', { name: 'Prudent', selected: true })).toBeFocused()
   })
 
   test('a confirmation traps focus, closes on Escape, and gives focus back to the button that opened it', async ({ page }) => {

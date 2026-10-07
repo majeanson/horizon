@@ -88,7 +88,6 @@ export const FR = {
       start: 'Commencer',
       example: 'Voir un exemple',
     },
-    persons: 'Personne',
     self: 'Moi',
     spouse: 'Conjoint·e',
     family: {

@@ -1,0 +1,38 @@
+/* « Nothing hidden » restructure: layout for pages that now show everything at once.
+   App-specific, uniquely named (.persons, .person*, .plan-card__rules), appended last in
+   styles.css — never reorder that list. */
+
+/* ── Profil: every person on the page ────────────────────────────────────── */
+/* One column per person: stacked on a phone, side by side from 860px when there are two.
+   minmax(0, …) lets the earnings grid shrink inside a half-width column instead of
+   forcing the page wide. */
+.persons {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+.person {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+.person__title {
+  margin: 0 0 -0.25rem;
+  font-size: var(--text-md);
+}
+@media (min-width: 860px) {
+  .persons--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+/* ── A pension plan's rules, always on the card ──────────────────────────── */
+.plan-card__rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}

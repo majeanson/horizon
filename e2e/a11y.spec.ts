@@ -56,8 +56,7 @@ async function violations(page: Page): Promise<string[]> {
 // disclosure open, because the colours that matter most (a note on its tinted ground, a table row marked short)
 // only exist once something is opened.
 const PAGES = [
-  ['the profile (me)', '/', '.page-head__title'],
-  ['the profile (spouse)', '/?person=spouse', '.page-head__title'],
+  ['the profile', '/', '.page-head__title'],
   ['the assumptions', '/hypotheses', '.page-head__title'],
   ['the results', '/resultats', '.page-head__title'],
   ['the data page', '/donnees', '.page-head__title'],
