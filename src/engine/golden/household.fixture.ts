@@ -8,8 +8,10 @@ import type { Assumptions, Household, Person } from '../types.ts'
 //   · Spouse, born September 1981 (45): a private-sector employee, 65 000 $, no employer pension.
 //   · Two children (born 2012 and 2015) are in the profile but change nothing in v1 (no child benefits).
 //
-// The earnings history is a plain ramp so the fixture does not carry 55 literals: it starts at 24 000 $ the
-// year after a person turns 21 and grows 4 % a year, never above the year's own MGA.
+// The earnings history is a plain ramp so the fixture does not carry 55 literals: it starts the year a person turns
+// 21 and grows 4 % a year, never above that year's ceiling — the MGA, and from 2024 the additional ceiling (YAMPE),
+// which is what a relevé prints for someone earning above the MGA. The two starting pays are chosen so the LAST year
+// lands within a few percent of today's salary (a history that ended 25 % under the salary would be a raise nobody got).
 
 export const GOLDEN_TODAY = { year: 2026, month: 10 } as const
 
@@ -20,11 +22,14 @@ const MGA_BY_YEAR: Readonly<Record<number, number>> = {
   2023: 66_600, 2024: 68_500, 2025: 71_300,
 }
 
+/** The additional ceiling the relevé counts earnings up to, from 2024 (the cited params: rrqHistory.ts). */
+const YAMPE_BY_YEAR: Readonly<Record<number, number>> = { 2024: 73_200, 2025: 81_200 }
+
 function history(birthYear: number, startPay: number): Record<number, number> {
   const out: Record<number, number> = {}
   let pay = startPay
   for (let y = birthYear + 21; y <= 2025; y++) {
-    out[y] = Math.round(Math.min(pay, MGA_BY_YEAR[y] ?? 37_000))
+    out[y] = Math.round(Math.min(pay, YAMPE_BY_YEAR[y] ?? MGA_BY_YEAR[y] ?? 37_000))
     pay *= 1.04
   }
   return out
@@ -36,7 +41,7 @@ const self: Person = {
   birth: { year: 1978, month: 3 },
   retirementAge: 60,
   salaryToday: 85_000,
-  earningsHistory: history(1978, 24_000),
+  earningsHistory: history(1978, 30_000),
   rrq: { startAge: 65 },
   oas: { startAge: 65, residentSince: 1996 },
   accounts: {
@@ -53,7 +58,7 @@ const spouse: Person = {
   birth: { year: 1981, month: 9 },
   retirementAge: 62,
   salaryToday: 65_000,
-  earningsHistory: history(1981, 22_000),
+  earningsHistory: history(1981, 25_000),
   rrq: { startAge: 65 },
   oas: { startAge: 65, residentSince: 1999 },
   accounts: {

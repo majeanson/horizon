@@ -6,6 +6,7 @@ import { Rail } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { ChartPanel } from '../components/results/ChartPanel'
+import { DeferralPanel } from '../components/results/DeferralPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SplitPicker } from '../components/results/SplitPicker'
@@ -15,6 +16,7 @@ import { StatusMessage } from '../components/StatusMessage'
 import { retireAt } from '../engine/retireAt'
 import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
+import { DEFERRAL_COPY } from '../lib/deferralCopy'
 import { headlineOf } from '../lib/headline'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
@@ -130,6 +132,10 @@ export function Resultats() {
     ) : null
   const details = (
     <>
+      <Disclosure label={DEFERRAL_COPY[lang].title}>
+        <DeferralPanel household={profile.household} assumptions={assumptions} names={names} />
+      </Disclosure>
+
       <Disclosure label={r.table.title} count={runs.length}>
         <YearTables runs={runs} label={label} />
       </Disclosure>

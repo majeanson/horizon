@@ -206,9 +206,9 @@ describe('the verdict under each set', () => {
     }
   })
 
-  it('golden household snapshot: prudent 66 · neutral 61 · bold 59 — a 7-year spread is the expected size of the difference', () => {
+  it('golden household snapshot: prudent 66 · neutral 61 · bold 58 — an 8-year spread is the expected size of the difference', () => {
     const v = Object.fromEntries([...presetVerdicts(H, GOLDEN_ASSUMPTIONS)].map((x) => [x.preset, x.earliestOk]))
-    expect(v).toEqual({ prudent: 66, neutral: 61, bold: 59 })
+    expect(v).toEqual({ prudent: 66, neutral: 61, bold: 58 })
   })
 
   it('a verdict is the first age with no shortfall, and the years after a failing age fail at or before the horizon', () => {

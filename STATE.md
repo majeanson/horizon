@@ -97,6 +97,9 @@ official page, and any guard it added has been **planted against its own bug** a
 - [ ] The sensitivity grid takes ≈ 4 s for 27 cells: run it on demand (a disclosure), off the main thread if it becomes a first-paint cost
 - [ ] Survivor scenarios (one spouse dies) — v2
 
+- [x] Retirement means no work income (`engine/retirement.props.test.ts`, planted bug red): after the leaving month no pay, EI/QPIP, QPP contribution or RRSP deduction; the income is only the OAS/GIS, QPP, DB pension and account draws; the years before the OAS/QPP start are paid from the accounts; a couple with one retired; a pension in pay with no work. `lib/fixtureSanity.test.ts` holds the golden couple, the example profile and every fixture to plausibility rules against the cited figures (the old golden history ended 18–28 % under today's salary: fixed, so the golden numbers moved — earliest age still 60, bold scenario 58)
+- [ ] RREGOP members' own contributions (8.63 % of pay above 25 % of the MGA in 2026, minus a reduction under the MGA) are NOT deducted from pay or from taxable income: the golden household's cash while working is overstated by about 5 700 $ a year. Needs the contribution formula's reduction from the plan's booklet before it can be cited
+
 ### Phase 7 — store, profile, assumptions, `FieldInfo`
 
 - [x] `lib/schema.ts` (the validator every outside file passes through), `migrations.ts`, `store.ts`, JSON export / import, `schemaVersion.test.ts` — planted: a range edit, a bump without a migration, a missing fixture each turn it red; a comment-only edit stays green
@@ -113,6 +116,8 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] Résultats: verdict, comparison chips, scenario cards, the chart (net worth or guaranteed income, in today's or the year's dollars, all in the address), per-year table, « Paramètres utilisés », and the sensitivity grid in a web worker; `e2e/results.spec.ts` (10)
 - [x] Bundle caps set from the real build (the chart library is 347 KB raw / 103 KB gzip, lazy, off the door; a lowered cap and a static `Résultats` import each turn `check:bundle` red)
 - [ ] The chart library is the biggest thing in the app. If 103 KB gzip on the first Résultats visit matters, the adapter lets a ~5 KB hand-drawn SVG replace it by editing one folder
+
+- [x] « Quand commencer ma rente ? » on Résultats (behind a disclosure, in Simple too): the QPP at 60 · 65 · 70 · 72 and the OAS at 65 · 70 per person, with the break-even and the effect on the plan (`engine/deferral.ts`, `components/results/DeferralPanel.tsx`, its words in `lib/deferralCopy.ts` to keep the eager dictionary in budget); the case for and against deferring, and what it leaves out (survivor pension, GIS interplay, health)
 
 ### Phase 9 — offline proof and deploy
 

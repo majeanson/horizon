@@ -795,3 +795,27 @@
 .next__hint p {
   margin: 0;
 }
+
+/* « Quand commencer ma rente ? »: two option tables and the case for and against deferring. */
+.deferral {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+}
+.deferral__title {
+  margin: var(--space-2, 0.5rem) 0 0;
+  font-size: var(--text-md, 1rem);
+}
+.deferral__list {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.deferral__yours {
+  font-weight: 400;
+  opacity: 0.8;
+}
+.deferral__row--yours th,
+.deferral__row--yours td {
+  background: var(--surface-2);
+}
