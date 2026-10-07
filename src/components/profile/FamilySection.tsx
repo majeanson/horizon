@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
+import { scrollBehavior } from '../../lib/motion'
 import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -23,7 +24,9 @@ export function FamilySection() {
   const [bad, setBad] = useState(false)
 
   const submitChild = () => {
-    const n = Number(year.trim())
+    // A four-digit year typed as text: digits only, then the same range sentence every NumberField
+    // gives — « Valeur invalide. » said nothing about WHAT was permitted.
+    const n = /^\d{4}$/.test(year.trim()) ? Number(year.trim()) : NaN
     if (!Number.isInteger(n) || n < 1950 || n > 2100) return setBad(true)
     setBad(false)
     updateProfile((p) => addChild(p, n))
@@ -44,7 +47,16 @@ export function FamilySection() {
             {f.removeSpouse}
           </button>
         ) : (
-          <button type="button" className="btn btn--sm" onClick={() => updateProfile((p) => addSpouse(p, today()))}>
+          <button
+            type="button"
+            className="btn btn--sm"
+            onClick={() => {
+              updateProfile((p) => addSpouse(p, today()))
+              // The new column appears far below on a phone with no cue at all: bring it on screen
+              // (one frame later — the column mounts with the re-render this update triggers).
+              requestAnimationFrame(() => document.getElementById('person-spouse')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }))
+            }}
+          >
             {f.addSpouse}
           </button>
         )}
@@ -86,7 +98,7 @@ export function FamilySection() {
           ariaLabel={f.childYear}
           placeholder={f.childYear}
         />
-        {bad && <StatusMessage tone="error">{t.fields.invalid}</StatusMessage>}
+        {bad && <StatusMessage tone="error">{t.fields.range('1950', '2100')}</StatusMessage>}
       </div>
     </Section>
   )

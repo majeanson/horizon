@@ -101,13 +101,12 @@ export const FR = {
     spouse: 'Conjoint·e',
     family: {
       title: 'Famille',
-      spouseOn: 'Planifier avec un·e conjoint·e',
       addSpouse: 'Ajouter un·e conjoint·e',
       removeSpouse: 'Retirer le·la conjoint·e',
       removeSpouseConfirm: 'Retirer le·la conjoint·e ? Ses revenus, ses comptes et ses régimes seront effacés de ce profil.',
       livesAlone: 'Je vis seul·e',
       livesAloneHint:
-        'Seul·e dans un logement distinct, toute l’année : c’est la condition du montant pour personne vivant seule (Revenu Québec). Décochez si vous partagez votre logement avec un·e colocataire ou un·e adulte.',
+        'Seul·e dans un logement distinct, toute l’année : c’est la condition du montant pour personne vivant seule (Revenu Québec). Désactivez la pastille si vous partagez votre logement avec un·e colocataire ou un·e adulte.',
       children: 'Enfants',
       childrenHint: 'Année de naissance seulement. Cette version ne calcule pas de prestations pour enfants.',
       childYear: 'Année de naissance de l’enfant',

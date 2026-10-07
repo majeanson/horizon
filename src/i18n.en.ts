@@ -85,13 +85,12 @@ export const EN: typeof FR = {
     spouse: 'Spouse',
     family: {
       title: 'Family',
-      spouseOn: 'Plan with a spouse',
       addSpouse: 'Add a spouse',
       removeSpouse: 'Remove the spouse',
       removeSpouseConfirm: 'Remove the spouse? Their income, accounts and pension plans will be erased from this profile.',
       livesAlone: 'I live alone',
       livesAloneHint:
-        'Alone in a separate dwelling, all year: that is the condition for Québec’s living-alone amount (Revenu Québec). Untick it if you share your home with a roommate or another adult.',
+        'Alone in a separate dwelling, all year: that is the condition for Québec’s living-alone amount (Revenu Québec). Turn the pill off if you share your home with a roommate or another adult.',
       children: 'Children',
       childrenHint: 'Birth year only. This version does not calculate child benefits.',
       childYear: 'Child’s birth year',
