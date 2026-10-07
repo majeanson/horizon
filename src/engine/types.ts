@@ -56,8 +56,12 @@ export interface DbPension {
    * `after65`: what the same pension pays from the month after the 65th birthday, in today's dollars, when it steps
    * down (a plan coordinated with the RRQ) or up. Leave it out for a pension that stays the same; it is ignored once
    * the person is already past that month (the figure paid now already is the one after).
+   *
+   * `since`: the month the pension began. It matters only when that is THIS year: the first January indexation then
+   * pays only the share of the year the pension was paid (like any new pension). Absent, or any earlier year, means the
+   * full first indexation — the pension already got its share, and the figure entered is the one paid now.
    */
-  inPay?: { annual: number; after65?: number }
+  inPay?: { annual: number; after65?: number; since?: YearMonth }
 }
 
 export interface Person {

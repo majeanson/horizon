@@ -4,8 +4,10 @@ import { useLang, useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
 import { formatDecimal, formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
-import { addPension, blankPension, inPayPension, removePension, updatePension } from '../../lib/profileEdit'
+import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
+import { useNotice } from '../../lib/toast'
+import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Disclosure } from '../Disclosure'
@@ -128,7 +130,9 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
 export function PensionPlans({ person, edit }: PersonEditor) {
   const t = useT()
   const { lang } = useLang()
+  const thisYear = today().year
   const confirm = useConfirm()
+  const notice = useNotice()
   const p = t.plans
   const add = (pension: DbPension) => edit((x) => addPension(x, pension))
 
@@ -159,6 +163,21 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 <Icon name="trash-bold" size={18} />
               </button>
             </header>
+            {needsDeferredRule(person.retirementAge, pension) && (
+              <div className="plan-card__notice">
+                <p className="field-row__hint">{p.deferredNotice(person.retirementAge)}</p>
+                <Chip
+                  onClick={async () => {
+                    if (await confirm({ message: p.deferredConfirm, confirmLabel: p.deferredConfirmLabel })) {
+                      set(applyDeferredRule)
+                      notice(p.deferredDone)
+                    }
+                  }}
+                >
+                  {p.deferredApply}
+                </Chip>
+              </div>
+            )}
             <FieldRow label={p.label}>
               {(w) => <EditField as="div" value={pension.label} onChange={(label) => set((x) => ({ ...x, label }))} submitIcon={null} maxLength={60} id={w.id} ariaLabel={p.label} />}
             </FieldRow>
@@ -177,7 +196,26 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                     min={0}
                     max={MAX_IN_PAY_ANNUAL}
                     value={pension.inPay!.after65 ?? null}
-                    onChange={(after65) => set((x) => ({ ...x, inPay: { annual: x.inPay!.annual, ...(after65 === null ? {} : { after65 }) } }))}
+                    onChange={(after65) => set((x) => ({ ...x, inPay: { annual: x.inPay!.annual, ...(x.inPay!.since ? { since: x.inPay!.since } : {}), ...(after65 === null ? {} : { after65 }) } }))}
+                    id={w.id}
+                    ariaDescribedBy={w.describedBy}
+                  />
+                )}
+              </FieldRow>
+              <FieldRow label={p.inPaySince} hint={p.inPaySinceHint}>
+                {(w) => (
+                  <NumberField
+                    kind="int"
+                    allowEmpty
+                    min={1}
+                    max={12}
+                    value={pension.inPay!.since?.year === thisYear ? pension.inPay!.since.month : null}
+                    onChange={(month) =>
+                      set((x) => {
+                        const { since: _old, ...rest } = x.inPay!
+                        return { ...x, inPay: month === null ? rest : { ...rest, since: { year: thisYear, month } } }
+                      })
+                    }
                     id={w.id}
                     ariaDescribedBy={w.describedBy}
                   />

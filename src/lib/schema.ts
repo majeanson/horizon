@@ -10,7 +10,7 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId }
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 4
+export const SCHEMA_VERSION = 5
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -128,6 +128,7 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
   const deferred = o.deferred === undefined ? null : r.obj(o.deferred, `${path}.deferred`)
   const deferredIndexation = deferred ? r.obj(deferred.indexation, `${path}.deferred.indexation`) ?? {} : null
   const after65 = inPay ? r.optNum(inPay.after65, `${path}.inPay.after65`, 0, MAX_IN_PAY_ANNUAL) : undefined
+  const sinceRaw = inPay && inPay.since !== undefined ? r.obj(inPay.since, `${path}.inPay.since`) : null
   return {
     label: r.str(o.label, `${path}.label`, 60),
     accrualRate: r.num(o.accrualRate, `${path}.accrualRate`, 0, 0.1),
@@ -175,6 +176,7 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
           inPay: {
             annual: r.num(inPay.annual, `${path}.inPay.annual`, 0, MAX_IN_PAY_ANNUAL),
             ...(after65 === undefined ? {} : { after65 }),
+            ...(sinceRaw ? { since: { year: r.num(sinceRaw.year, `${path}.inPay.since.year`, 1900, 2100, true), month: r.num(sinceRaw.month, `${path}.inPay.since.month`, 1, 12, true) } } : {}),
           },
         }
       : {}),

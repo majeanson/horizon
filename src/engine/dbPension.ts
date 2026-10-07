@@ -198,6 +198,10 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
  */
 function inPayStart(p: DbPension, input: DbInput): DbStart {
   const annual = roundTo(p.inPay!.annual, 0.01)
+  // A pension that began THIS year has not had its first indexation yet: it gets only the share of the year it was paid.
+  // One that began in an earlier year (or has no stated start) already had it, and the figure is the one paid now.
+  const since = p.inPay!.since
+  const first = since && since.year === input.today.year ? daysPaidFromMonth(since.year, since.month - 1) : null
   return {
     service: 0,
     averageSalary: 0,
@@ -211,6 +215,7 @@ function inPayStart(p: DbPension, input: DbInput): DbStart {
     bridgeAnnual: 0,
     bridgeEndIndex: null,
     indexation: p.indexation,
+    ...(first ? { firstYearShare: firstIndexationShare(first.paid, first.inYear) } : {}),
     ...afterAge65(p, input),
   }
 }

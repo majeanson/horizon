@@ -162,3 +162,18 @@ test('a couple can compare two different retirement ages and the card says who r
   await page.getByRole('button', { name: /58 ans · .* 64 ans/ }).click()
   await expect(page).not.toHaveURL(/58-64/)
 })
+
+test('a couple gets each person\'s own earliest age, worked out off the page\'s thread, and can send the pair to the comparison', async ({ page }) => {
+  const problems = watchConsole(page)
+  await page.goto('/resultats')
+  const panel = page.getByRole('heading', { name: 'Chacun de son côté' })
+  await expect(panel).toBeVisible()
+  // One line per person, each naming who the other is held at; then the placeholder is gone.
+  const lines = page.locator('.verdict__each-row, .verdict__each-list li')
+  await expect(lines).toHaveCount(2)
+  await expect(lines.first()).toContainText(/dès \d+ ans, si .* part à \d+ ans|aucun âge/)
+  const compare = lines.first().getByRole('button', { name: /^Comparer .* à \d+ ans et .* à \d+ ans$/ })
+  await compare.click()
+  await expect(page).toHaveURL(/ages=plan(%2C|,)65(%2C|,)\d+-\d+/)
+  expect(problems).toEqual([])
+})

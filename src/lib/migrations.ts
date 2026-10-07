@@ -22,6 +22,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v3 → v4: an employer pension may carry `deferred` (the plan's rule for a member who leaves before being eligible). It is
   // optional; absent means « the plan has no such rule », which is what every older file's pension was calculated as.
   (profile) => profile,
+  // v4 → v5: a pension in pay may carry `since` (the month it began, which pro-rates its first January indexation). It is
+  // optional; absent means « it already had its first indexation », which is how every older file's pension in pay was calculated.
+  (profile) => profile,
 ]
 
 export type ReadResult =

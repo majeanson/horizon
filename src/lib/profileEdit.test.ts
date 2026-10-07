@@ -8,7 +8,7 @@ import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears, rrqEstimate } from './earnings.ts'
 import {
   addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, moveInOrder, removeChild, removePension, removeSpouse,
-  setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
+  applyDeferredRule, needsDeferredRule, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { profileGaps } from './profileGaps.ts'
 import { defaultProfile, SCHEMA_VERSION, validateProfile, type Profile } from './schema.ts'
@@ -179,5 +179,31 @@ describe('applying a ready-made scenario', () => {
     valid(bold)
     expect(applyPreset(bold, 'bold')).toBe(bold)
     expect(presetOf(setReturn(bold, 'rrsp', 0.07).assumptions)).toBeNull()
+  })
+})
+
+describe('the deferred rule on a RREGOP pension saved without it', () => {
+  const saved = (() => {
+    const { deferred: _drop, ...old } = rregopPension({ serviceYearsToDate: 10, startAge: 60 })
+    return old
+  })()
+
+  it('is offered only to a RREGOP pension, not in pay, without the rule, whose person leaves before the plan\'s earliest age', () => {
+    expect(needsDeferredRule(40, saved)).toBe(true)
+    expect(needsDeferredRule(55, saved)).toBe(false)
+    expect(needsDeferredRule(40, rregopPension({ serviceYearsToDate: 10, startAge: 60 }))).toBe(false)
+    expect(needsDeferredRule(40, { ...saved, label: 'Mon régime' })).toBe(false)
+    expect(needsDeferredRule(40, { ...saved, inPay: { annual: 12_000 } })).toBe(false)
+  })
+
+  it('adds the plan\'s cited rule and nothing else; every other case returns the SAME object', () => {
+    const next = applyDeferredRule(saved)
+    expect(next.deferred).toEqual(rregopPension({ serviceYearsToDate: 10, startAge: 60 }).deferred)
+    expect({ ...next, deferred: undefined }).toEqual({ ...saved, deferred: undefined })
+    expect(applyDeferredRule(next)).toBe(next)
+    const mine = { ...saved, label: 'Mon régime' }
+    expect(applyDeferredRule(mine)).toBe(mine)
+    const paying = { ...saved, inPay: { annual: 12_000 } }
+    expect(applyDeferredRule(paying)).toBe(paying)
   })
 })

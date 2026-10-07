@@ -1,4 +1,5 @@
 import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
+import { rregopPension } from '../engine/presets.ts'
 import type { AccountKind, DbPension, Person, PersonId } from '../engine/types.ts'
 import { blankPerson, type Profile, type StoredAssumptions } from './schema.ts'
 
@@ -113,6 +114,18 @@ export const blankPension = (): DbPension => ({
 
 /** A pension the person is ALREADY receiving: one stated annual amount (today's dollars) and how it is indexed — no formula. */
 export const inPayPension = (): DbPension => ({ ...blankPension(), inPay: { annual: 0 } })
+
+/**
+ * A RREGOP pension saved before the plan's DEFERRED rule existed (schema v4) is still calculated the old way: reduced from
+ * the earliest unreduced date, with no full indexation while waiting. It matters only to a member who leaves BEFORE the
+ * plan's earliest age. This says when the rule is missing for that person; `applyDeferredRule` adds it. Never done silently:
+ * the page asks first, because the figure changes.
+ */
+export const needsDeferredRule = (leavingAge: number, p: DbPension): boolean => p.label === 'RREGOP' && !p.inPay && !p.deferred && leavingAge < p.earliestAge
+
+/** The same pension with the RREGOP deferred rule added — the SAME object when it is not a RREGOP pension, is in pay, or already has the rule. */
+export const applyDeferredRule = (p: DbPension): DbPension =>
+  p.label !== 'RREGOP' || p.inPay || p.deferred ? p : { ...p, deferred: rregopPension({ serviceYearsToDate: p.serviceYearsToDate, startAge: p.startAge }).deferred }
 
 export function addPension(person: Person, pension: DbPension): Person {
   return person.pensions.length >= 8 ? person : { ...person, pensions: [...person.pensions, pension] }

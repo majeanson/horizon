@@ -8,7 +8,7 @@ import { MAX_IN_PAY_ANNUAL } from './schema.ts'
 
 // A pension already in pay survives a save → load, an out-of-range amount is refused, and a file without one still opens.
 
-const base = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'profile.v4.json'), 'utf8'))
+const base = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'profile.v5.json'), 'utf8'))
 const withInPay = (annual: unknown) => {
   const j = structuredClone(base)
   j.household.persons[0].pensions = [{ ...inPayPension(), inPay: { annual } }]
@@ -55,5 +55,23 @@ describe('the figure after 65', () => {
     const r = migrateProfile(withAfter(MAX_IN_PAY_ANNUAL + 1))
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.problems.some((p) => p.path.endsWith('inPay.after65') && p.problem === 'range')).toBe(true)
+  })
+})
+
+describe('the month a pension in pay began', () => {
+  const withSince = (since: unknown) => {
+    const j = structuredClone(base)
+    j.household.persons[0].pensions = [{ ...inPayPension(), inPay: { annual: 30_000, since } }]
+    return j
+  }
+
+  it('round-trips, is optional, and a month outside 1–12 is refused', () => {
+    const r = migrateProfile(withSince({ year: 2026, month: 5 }))
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.profile.household.persons[0].pensions[0].inPay).toEqual({ annual: 30_000, since: { year: 2026, month: 5 } })
+    expect(migrateProfile(withSince(undefined)).ok).toBe(true)
+    const bad = migrateProfile(withSince({ year: 2026, month: 13 }))
+    expect(bad.ok).toBe(false)
+    if (!bad.ok) expect(bad.problems.some((p) => p.path.endsWith('inPay.since.month') && p.problem === 'range')).toBe(true)
   })
 })

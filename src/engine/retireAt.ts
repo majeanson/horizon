@@ -64,3 +64,48 @@ export function compare(
 ): { label: string; result: AgeResult }[] {
   return scenarios.map((s) => ({ label: s.label, result: runScenario(h, a, s.scenario, s.age) }))
 }
+
+/** One person's own answer in a couple: the earliest age THEY can retire, the other holding at `heldAt`. */
+export interface EarliestEach {
+  id: PersonId
+  /** The earliest whole age at which this person can retire so no year has a shortfall, or null when none up to `to` works. */
+  earliestOk: number | null
+  /** The person who keeps working (or not) at a fixed age while this one's age is tried, and that age. */
+  other: { id: PersonId; heldAt: number } | null
+}
+
+export interface EarliestEachOptions {
+  /** The age each person is held at while the OTHER one's age is tried (default: the age in the profile). */
+  heldAt?: Partial<Record<PersonId, number>>
+  from?: number
+  to?: number
+}
+
+/**
+ * « When can EACH of us retire? » — for every person, the earliest age they can retire with the other held at a
+ * stated age (by default the one in the profile), instead of everyone retiring together at the tried age.
+ *
+ * It is the one-question-at-a-time reading of a two-person plan: the answer for A says « if B does what the plan
+ * says, A can stop at X », and the answer for B says the converse. The two answers are NOT a joint plan (A at X and
+ * B at Y together may fail: both stopping early removes two incomes) — the joint check is the « Chacun son âge »
+ * comparison. A person's own range starts at their own current age (nobody retires in the past), not the oldest's.
+ * A household of one gets the plain `earliestOk`, with no `other`.
+ */
+export function earliestEach(h: Household, a: Assumptions, options: EarliestEachOptions = {}): EarliestEach[] {
+  return h.persons.map((p) => {
+    const other = h.persons.length === 2 ? h.persons.find((q) => q.id !== p.id)! : null
+    const heldAt = other ? (options.heldAt?.[other.id] ?? other.retirementAge) : 0
+    const from = Math.max(options.from ?? 50, ageThisYear(h, a, p.id))
+    const to = Math.max(from, options.to ?? 70)
+    const scenario = (age: number): Scenario => ({ retirementAge: { ...(other ? { [other.id]: heldAt } : {}), [p.id]: age } })
+    // Not `retireAt`: it never tries an age below the OLDEST person's, and here each person's range starts at their own.
+    let earliestOk: number | null = null
+    for (let age = from; age <= to; age++) {
+      if (runScenario(h, a, scenario(age), age).ok) {
+        earliestOk = age
+        break
+      }
+    }
+    return { id: p.id, earliestOk, other: other ? { id: other.id, heldAt } : null }
+  })
+}

@@ -100,3 +100,25 @@ describe('a pension in pay that changes at 65', () => {
     })
   })
 })
+
+describe('a pension in pay that began THIS year has not had its first indexation yet', () => {
+  const p = (since?: { year: number; month: number }) => inPay(24_000, { indexation: { share: 1, minus: 0 }, inPay: { annual: 24_000, ...(since ? { since } : {}) } })
+  const leap = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0
+  const daysFrom = (month: number) => (leap(YEAR) ? 366 : 365) - [31, leap(YEAR) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30].slice(0, month - 1).reduce((a, b) => a + b, 0)
+
+  it('pays only the days-paid share of the first January increase, read from the 1st of the start month', () => {
+    const s = dbStart(p({ year: YEAR, month: 5 }), input)
+    const share = daysFrom(5) / (leap(YEAR) ? 366 : 365)
+    expect(dbYear(s, YEAR, 0.02)).toBeCloseTo(24_000, 2)
+    expect(dbYear(s, YEAR + 1, 0.02)).toBeCloseTo(24_000 * (1 + 0.02 * share), 2)
+    // …and from the second January on it is the full rate.
+    expect(dbYear(s, YEAR + 2, 0.02)).toBeCloseTo(24_000 * (1 + 0.02 * share) * 1.02, 2)
+  })
+
+  it('a January start gets the whole increase; no start, or an earlier year, is the old behaviour', () => {
+    const full = dbYear(dbStart(p(), input), YEAR + 1, 0.02)
+    expect(full).toBeCloseTo(24_000 * 1.02, 2)
+    expect(dbYear(dbStart(p({ year: YEAR, month: 1 }), input), YEAR + 1, 0.02)).toBeCloseTo(full, 2)
+    expect(dbYear(dbStart(p({ year: YEAR - 1, month: 9 }), input), YEAR + 1, 0.02)).toBeCloseTo(full, 2)
+  })
+})

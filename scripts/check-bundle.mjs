@@ -28,7 +28,7 @@ const EAGER_CHUNKS = [
   // name pattern → its own budget (all load before first paint)
   { re: /^index-/, cap: 40 * KB, label: 'eager entry' },
   { re: /^react-vendor-/, cap: 280 * KB, label: 'eager react-vendor' },
-  { re: /^i18n-/, cap: 30 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' },
+  { re: /^i18n-/, cap: 33 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
 ]
 // Chunks that are lazy AND deliberately un-precached (see ONLINE_ONLY_CHUNKS in vite.config.ts).
 const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]

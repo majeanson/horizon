@@ -5,6 +5,7 @@ import { Disclosure } from '../components/Disclosure'
 import { Rail } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { ChartPanel } from '../components/results/ChartPanel'
+import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
@@ -16,6 +17,7 @@ import type { Dollars, Metric } from '../lib/chartData'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, type Selection } from '../lib/resultsModel'
+import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
 
@@ -40,6 +42,8 @@ export function Resultats() {
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
   const assumptions = assumptionsOf(profile, { year, month })
+  const isCouple = profile.household.persons.length === 2
+  const earliestEachAnswer = useEarliestEach(profile.household, assumptions, isCouple && gaps.length === 0)
 
   const setParam = useCallback(
     (key: string, value: string | null) =>
@@ -142,6 +146,12 @@ export function Resultats() {
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
+
+      {isCouple && gaps.length === 0 && (
+        <div className="surface">
+          <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
+        </div>
+      )}
 
       <div className="compare" ref={compareRef}>
         <p className="field-row__label" id="compare-label">
