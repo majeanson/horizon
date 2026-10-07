@@ -330,6 +330,29 @@ export const FR = {
       toProfile: 'Aller au profil',
       toAssumptions: 'Aller aux hypothèses',
     },
+    questions: {
+      label: 'Ma question',
+      tabs: { when: 'Quand prendre ma retraite ?', save: 'Combien épargner ?', stop: 'Quand arrêter de travailler ?' },
+      save: {
+        age: 'Partir à (âge)',
+        amount: (amount: string) => `${amount} de plus par année`,
+        perMonth: (amount: string) => `Soit environ ${amount} par mois, pendant que vous travaillez.`,
+        why: (age: number) => `C’est le plus petit montant qui fait tenir le plan à ${age} ans. Il est pris sur vos dépenses d’aujourd’hui et placé dans un compte non enregistré.`,
+        nothing: (age: number) => `Rien de plus : à ${age} ans, le plan tient déjà.`,
+        nothingWhy: 'Vous épargnez déjà assez, selon ces hypothèses.',
+        unreachable: (age: number) => `À ${age} ans, le plan ne tient pas.`,
+        unreachableWhy: 'Même en mettant de côté toutes vos dépenses du temps où vous travaillez, il manquerait de l’argent. Essayez un âge plus tardif.',
+        already: (amount: string) => `Vous épargnez déjà ${amount} par année.`,
+        caveat: 'Un compte enregistré ferait un peu mieux : ce montant est donc prudent.',
+      },
+      stop: {
+        age: (age: number, together: boolean) => `Dès ${age} ans${together ? ', tous les deux' : ''}.`,
+        when: (name: string, year: number) => `${name} : en ${year}`,
+        share: (pct: string, year: number) => `En ${year}, vos rentes couvrent ${pct} de vos dépenses ; le reste vient de votre épargne.`,
+        coversFrom: (year: number) => `Dès ${year}, vos rentes seules couvrent vos dépenses.`,
+        neverCovers: 'Vos rentes ne couvrent jamais seules vos dépenses : vous puisez dans l’épargne jusqu’à la fin.',
+      },
+    },
     verdict: {
       headline: {
         now: 'Vous pouvez déjà prendre votre retraite.',

@@ -9,6 +9,9 @@ import { ChartPanel } from '../components/results/ChartPanel'
 import { DeferralPanel } from '../components/results/DeferralPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
+import { SaveView } from '../components/results/SaveView'
+import { StopView } from '../components/results/StopView'
+import { SubTabs } from '../components/SubTabs'
 import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
@@ -22,6 +25,7 @@ import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, type Selection } from '../lib/resultsModel'
 import { useMode } from '../lib/mode'
+import { stopWorking } from '../lib/stopWorking'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
@@ -44,6 +48,7 @@ export function Resultats() {
   const { year, month } = today()
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
   const selections = parseSelections(params.get('ages'), defaultSelections(profile.household)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
+  const question = (['save', 'stop'] as const).find((k) => k === params.get('q')) ?? 'when'
   const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
@@ -89,6 +94,10 @@ export function Resultats() {
   const headline = useMemo(
     () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, oldest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, oldest)),
     [profile, gaps.length, earliest, firstAge, oldest, year, month],
+  )
+  const stop = useMemo(
+    () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
+    [profile, gaps.length, headline.age, year, month],
   )
   const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
@@ -172,9 +181,45 @@ export function Resultats() {
     )
   }
 
+  const pickQuestion = (
+    <SubTabs<'when' | 'save' | 'stop'>
+      ariaLabel={r.questions.label}
+      value={question}
+      onSelect={(k) => setParam('q', k === 'when' ? null : k)}
+      options={(['when', 'save', 'stop'] as const).map((k) => ({ key: k, label: r.questions.tabs[k] }))}
+    />
+  )
+  if (question === 'save') {
+    const wanted = Number(params.get('age'))
+    const age = Number.isFinite(wanted) && wanted >= firstAge && wanted <= MAX_AGE ? Math.round(wanted) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
+    return (
+      <section className="page-body">
+        <PageHead title={r.title} />
+        {pickQuestion}
+        <SaveView household={profile.household} assumptions={assumptions} age={age} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
+        <NextStep to="/donnees" label={t.next.toData}>
+          <p>{t.next.resultsHint}</p>
+        </NextStep>
+      </section>
+    )
+  }
+  if (question === 'stop') {
+    return (
+      <section className="page-body">
+        <PageHead title={r.title} />
+        {pickQuestion}
+        <StopView household={profile.household} names={names} headline={headline} stop={stop} each={earliestEachAnswer} maxAge={MAX_AGE} />
+        <NextStep to="/donnees" label={t.next.toData}>
+          <p>{t.next.resultsHint}</p>
+        </NextStep>
+      </section>
+    )
+  }
+
   return (
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
+      {pickQuestion}
 
       <div className="verdict surface" aria-live="polite">
         <p className="verdict__line">

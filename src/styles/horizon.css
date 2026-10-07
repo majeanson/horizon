@@ -818,4 +818,32 @@
 .deferral__row--yours th,
 .deferral__row--yours td {
   background: var(--surface-2);
+/* ── One question, one answer (Résultats ▸ « Ma question ») ───────────────────────────────────────────────────── */
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.1rem;
+}
+.answer__big {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 4.5vw, var(--text-xl));
+  font-weight: 700;
+  line-height: 1.2;
+}
+.answer__big--short {
+  color: var(--warn);
+}
+.answer__note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+.answer__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }

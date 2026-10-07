@@ -314,6 +314,29 @@ export const EN: typeof FR = {
       toProfile: 'Go to the profile',
       toAssumptions: 'Go to the assumptions',
     },
+    questions: {
+      label: 'My question',
+      tabs: { when: 'When can I retire?', save: 'How much to save?', stop: 'When can I stop working?' },
+      save: {
+        age: 'Retire at (age)',
+        amount: (amount: string) => `${amount} more per year`,
+        perMonth: (amount: string) => `About ${amount} a month, while you work.`,
+        why: (age: number) => `The smallest amount that makes the plan last at ${age}. It is taken out of today’s spending and put in a non-registered account.`,
+        nothing: (age: number) => `Nothing more: at ${age}, the plan already lasts.`,
+        nothingWhy: 'You already save enough, under these assumptions.',
+        unreachable: (age: number) => `At ${age}, the plan does not last.`,
+        unreachableWhy: 'Even setting aside all of your spending while you work, money would run short. Try a later age.',
+        already: (amount: string) => `You already save ${amount} a year.`,
+        caveat: 'A registered account would do a little better, so this amount is cautious.',
+      },
+      stop: {
+        age: (age: number, together: boolean) => `From ${age}${together ? ', both of you' : ''}.`,
+        when: (name: string, year: number) => `${name}: in ${year}`,
+        share: (pct: string, year: number) => `In ${year}, your pensions cover ${pct} of your spending; the rest comes from your savings.`,
+        coversFrom: (year: number) => `From ${year}, your pensions alone cover your spending.`,
+        neverCovers: 'Your pensions never cover your spending on their own: you draw on savings to the end.',
+      },
+    },
     verdict: {
       headline: {
         now: 'You can already retire.',
