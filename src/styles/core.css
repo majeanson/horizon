@@ -595,7 +595,10 @@ textarea,
   background: var(--paper);
   color: var(--ink);
   font: inherit;
-  font-size: 16px;
+  /* 16px is the iOS no-zoom-on-focus floor; max() lets the field GROW with the in-app
+     text-size ramp (1rem follows the root font-size) instead of opting the one thing the
+     reader came to type out of it. */
+  font-size: max(16px, 1rem);
   line-height: 1.4;
 }
 /* A multi-line field grows from its rows; keep the min as a floor, not a fixed

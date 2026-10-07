@@ -688,6 +688,16 @@
   width: 100%;
   border-collapse: collapse;
   font-size: var(--text-sm);
+  /* Hanken Grotesk ships proportional figures: without this, digits never line up column to
+     column in the money tables, however right-aligned the cells are. */
+  font-variant-numeric: tabular-nums;
+}
+/* The other places a figure must hold its width: card facts, the slider's live value (it
+   jittered while dragging), the chart tooltip's rows. */
+.bridge-card__facts,
+.slider__value,
+.chart-tip {
+  font-variant-numeric: tabular-nums;
 }
 .table-wrap th,
 .table-wrap td {

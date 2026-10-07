@@ -47,8 +47,8 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, markers 
               text is the per-year table), so a focusable node inside it is an axe « aria-hidden-focus » violation. */}
           <RLineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 0 }} accessibilityLayer={false}>
             <CartesianGrid stroke="var(--hairline)" vertical={false} />
-            <XAxis dataKey="x" type="number" domain={['dataMin', 'dataMax']} tickLine={false} axisLine={{ stroke: 'var(--line-strong)' }} tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={(x: number) => String(x)} minTickGap={24} />
-            <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={(y: number) => yFormat(y)} />
+            <XAxis dataKey="x" type="number" domain={['dataMin', 'dataMax']} tickLine={false} axisLine={{ stroke: 'var(--line-strong)' }} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(x: number) => String(x)} minTickGap={24} />
+            <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(y: number) => yFormat(y)} />
             <Tooltip
               cursor={{ stroke: 'var(--ink-faint)', strokeDasharray: '3 3' }}
               content={({ active, label, payload }) =>
@@ -74,7 +74,7 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, markers 
                 strokeOpacity={0.7}
                 // A marker that asks for it (`named`: « RRQ », « PSV ») names itself on the plot; the results chart's
                 // markers are carried by its legend and table instead.
-                label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: 11 } : undefined}
+                label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: '0.78rem' } : undefined}
               />
             ))}
             {series.map((s) => (

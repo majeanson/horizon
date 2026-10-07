@@ -43,11 +43,11 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
               type="category"
               tickLine={false}
               axisLine={{ stroke: 'var(--line-strong)' }}
-              tick={{ fill: 'var(--ink-soft)', fontSize: 12 }}
+              tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }}
               interval="preserveStartEnd"
               minTickGap={16}
             />
-            <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={(y: number) => yFormat(y)} />
+            <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(y: number) => yFormat(y)} />
             <Tooltip
               cursor={{ fill: 'var(--hairline)', opacity: 0.5 }}
               content={({ active, label, payload }) =>
@@ -73,7 +73,7 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
                 stroke={COLOUR[m.colour]}
                 strokeDasharray="4 4"
                 strokeOpacity={0.8}
-                label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: 11 } : undefined}
+                label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: '0.78rem' } : undefined}
               />
             ))}
             {series.map((s) => (
