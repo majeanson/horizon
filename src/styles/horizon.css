@@ -590,6 +590,15 @@
   gap: 0.4rem;
   min-width: 0;
 }
+/* The verdict's own age in the compare rail: a quiet accent dot (the chip's gap spaces it). */
+.chip--earliest::before {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
 .scenarios {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));

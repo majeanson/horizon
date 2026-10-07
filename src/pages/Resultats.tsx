@@ -307,7 +307,16 @@ export function Resultats() {
               {r.compare.plan}
             </Chip>
             {ages.map((age) => (
-              <Chip key={age} selected={selections.includes(age)} onClick={() => toggle(age)}>
+              // The verdict's own age wears a quiet accent dot: among ~20 look-alike chips, the one
+              // number the reader most wants to compare against must not be indistinguishable at #12.
+              <Chip
+                key={age}
+                selected={selections.includes(age)}
+                onClick={() => toggle(age)}
+                className={age === earliest ? 'chip--earliest' : undefined}
+                ariaLabel={age === earliest ? `${r.compare.age(age)} — ${rc.headline.earliestChip}` : undefined}
+                title={age === earliest ? rc.headline.earliestChip : undefined}
+              >
                 {r.compare.age(age)}
               </Chip>
             ))}

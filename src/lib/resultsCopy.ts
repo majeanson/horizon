@@ -76,6 +76,8 @@ const FR_RESULTS = {
     rangeGap: 'L’écart avec le scénario prudent est marqué : « Sensibilité », plus bas, montre comment l’âge bouge quand chaque hypothèse bouge.',
     sensitivityDetail: 'Comment l’âge du verdict bouge quand le rendement, l’inflation et l’horizon bougent — ce qui sépare les trois scénarios du verdict.',
     earlier: (age: number, year: number) => `À ${age} ans, l’argent viendrait à manquer dès ${year}.`,
+    /** The accessible suffix on the compare rail's marked chip — the verdict's own age among twenty look-alikes. */
+    earliestChip: 'le plus tôt qui tient',
     tryThis: 'Essayez de baisser les dépenses à la retraite, ou d’épargner davantage.',
   },
   each: {
@@ -161,6 +163,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
     sensitivityDetail: 'How the verdict’s age moves when returns, inflation and the horizon move — what sets the three scenarios apart.',
     holds: (horizon: number) => `And the money lasts to age ${horizon}.`,
     earlier: (age: number, year: number) => `At ${age}, the money would run short from ${year}.`,
+    earliestChip: 'the earliest that lasts',
     tryThis: 'Try lowering spending in retirement, or saving more.',
   },
   each: {
