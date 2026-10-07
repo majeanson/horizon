@@ -6,6 +6,7 @@ import { GOLDEN_HOUSEHOLD, GOLDEN_TODAY } from '../engine/golden/household.fixtu
 import { paramsFor } from '../engine/params/index.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from '../engine/params/rrqHistory.ts'
 import type { Household } from '../engine/types.ts'
+import { EXAMPLE_IDS } from '../engine/golden/examples.ts'
 import { exampleProfile } from './example.ts'
 
 // A HOUSEHOLD THE ENGINE CAN RUN IS NOT THEREFORE A HOUSEHOLD THAT COULD EXIST.
@@ -127,7 +128,7 @@ const ALLOWED: Record<string, Record<string, string>> = {
 
 const SOURCES = [
   { name: 'the golden household', household: GOLDEN_HOUSEHOLD, children: [2012, 2015] },
-  { name: 'the example profile', household: exampleProfile().household, children: exampleProfile().children },
+  ...EXAMPLE_IDS.map((id) => ({ name: `the « ${id} » example`, household: exampleProfile(id).household, children: exampleProfile(id).children })),
   ...FIXTURES,
 ]
 

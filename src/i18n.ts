@@ -443,9 +443,8 @@ export const FR = {
     },
     example: {
       title: 'Exemple',
-      hint: 'Charge un couple fictif pour voir à quoi ressemble un résultat.',
-      button: 'Charger l’exemple',
-      confirm: 'Charger l’exemple ? Le profil de cet appareil sera remplacé par un couple fictif ; sans export, l’ancien ne se récupère pas.',
+      hint: 'Charge un foyer fictif pour voir à quoi ressemble un résultat. Sept cas, pour comparer.',
+      confirm: (name: string) => `Charger « ${name} » ? Le profil de cet appareil sera remplacé par un foyer fictif ; sans export, l’ancien ne se récupère pas.`,
       confirmLabel: 'Charger',
       done: 'Exemple chargé',
     },

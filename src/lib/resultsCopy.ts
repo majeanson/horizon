@@ -30,6 +30,9 @@ const FR_RESULTS = {
   },
   headline: {
     now: 'Vous pouvez déjà prendre votre retraite.',
+    retired: (together: boolean): string => (together ? 'Vous êtes déjà tous les deux à la retraite.' : 'Vous êtes déjà à la retraite.'),
+    runsOut: (year: number) => `Mais l’argent viendrait à manquer dès ${year}.`,
+    retiredPrudent: (name: string, ok: boolean, year: number | null) => (ok ? `Sous le scénario ${name.toLowerCase()} : l’argent dure aussi.` : `Sous le scénario ${name.toLowerCase()} : l’argent manque dès ${year}.`),
     at: (age: number, together: boolean) => `Vous pouvez prendre votre retraite à ${age} ans${together ? ', tous les deux' : ''}.`,
     none: (to: number) => `Avec ces hypothèses, la retraite ne tient pas, même à ${to} ans.`,
     holds: (horizon: number) => `Et l’argent dure jusqu’à ${horizon} ans.`,
@@ -79,6 +82,9 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   headline: {
     now: 'You can already retire.',
+    retired: (together: boolean): string => (together ? 'You are both already retired.' : 'You are already retired.'),
+    runsOut: (year: number) => `But the money would run out in ${year}.`,
+    retiredPrudent: (name: string, ok: boolean, year: number | null) => (ok ? `Under the ${name} scenario: the money lasts too.` : `Under the ${name} scenario: the money runs out in ${year}.`),
     at: (age: number, together: boolean) => `You can retire at ${age}${together ? ', both of you' : ''}.`,
     none: (to: number) => `Under these assumptions, retiring does not work, even at ${to}.`,
     scenario: (name: string) => `Under the ${name} scenario.`,

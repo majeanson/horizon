@@ -1,4 +1,5 @@
 import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
+import { RRQ_MGA_HISTORY } from '../params/rrqHistory.ts'
 import { rregopPension } from '../presets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 
@@ -26,11 +27,11 @@ const MGA_BY_YEAR: Readonly<Record<number, number>> = {
 /** The additional ceiling the relevé counts earnings up to, from 2024 (the cited params: rrqHistory.ts). */
 const YAMPE_BY_YEAR: Readonly<Record<number, number>> = { 2024: 73_200, 2025: 81_200 }
 
-function history(birthYear: number, startPay: number): Record<number, number> {
+export function history(birthYear: number, startPay: number, lastYear = 2025, firstYear = birthYear + 21): Record<number, number> {
   const out: Record<number, number> = {}
   let pay = startPay
-  for (let y = birthYear + 21; y <= 2025; y++) {
-    out[y] = Math.round(Math.min(pay, YAMPE_BY_YEAR[y] ?? MGA_BY_YEAR[y] ?? 37_000))
+  for (let y = firstYear; y <= lastYear; y++) {
+    out[y] = Math.round(Math.min(pay, YAMPE_BY_YEAR[y] ?? MGA_BY_YEAR[y] ?? RRQ_MGA_HISTORY.value[y] ?? 37_000))
     pay *= 1.04
   }
   return out

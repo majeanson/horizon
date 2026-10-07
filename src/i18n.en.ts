@@ -426,9 +426,8 @@ export const EN: typeof FR = {
     },
     example: {
       title: 'Example',
-      hint: 'Loads a fictional couple to show what a result looks like.',
-      button: 'Load the example',
-      confirm: 'Load the example? This device’s profile will be replaced by a fictional couple; without an export, the old one cannot be recovered.',
+      hint: 'Loads a fictional household to show what a result looks like. Seven cases, to compare.',
+      confirm: (name: string) => `Load “${name}”? This device’s profile will be replaced by a fictional household; without an export, the old one cannot be recovered.`,
       confirmLabel: 'Load',
       done: 'Example loaded',
     },

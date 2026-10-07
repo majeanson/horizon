@@ -196,7 +196,7 @@ test.describe('first visit', () => {
       await page.goto(path)
       await expect(page).toHaveTitle(title)
     }
-    await page.getByRole('button', { name: 'EN' }).click()
+    await page.getByRole('button', { name: 'EN', exact: true }).click()
     await expect(page).toHaveTitle('Data · Horizon')
   })
 })
@@ -312,7 +312,7 @@ test.describe('data stays on this device', () => {
   test('the example loads over a blank profile, after a confirmation', async ({ page }) => {
     await seedProfile(page, blankSeed())
     await page.goto('/donnees')
-    await page.getByRole('button', { name: 'Charger l’exemple' }).click()
+    await page.getByRole('button', { name: 'Couple, un en fonction publique' }).click()
     await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.persons.length).toBe(2)
   })

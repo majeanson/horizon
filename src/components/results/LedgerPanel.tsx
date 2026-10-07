@@ -90,7 +90,14 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
       onCommit={(v) => commit(key, v)}
     />
   )
-  const ageSlider = (id: PersonId, field: AgeField, label: string, value: number) => slider(`${id}:${field}`, label, value, RANGES[field].min, RANGES[field].max, 1, (v) => c.age(String(v)))
+  const ageSlider = (id: PersonId, field: AgeField, label: string, value: number, done: boolean) =>
+    done ? (
+      <p className="ledger__fixed">
+        <span className="field-row__label">{label}</span> <span className="mono">{c.age(String(value))} · {c.done}</span>
+      </p>
+    ) : (
+      slider(`${id}:${field}`, label, value, RANGES[field].min, RANGES[field].max, 1, (v) => c.age(String(v)))
+    )
   const pct = (perMille: number) => formatPct(perMille / 1000, lang, 1)
   const spend = (key: SpendKey, label: string) => {
     const now = shown.spending[spendField(key)]
@@ -113,18 +120,18 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
           <section key={l.id} className="ledger__person" aria-label={c.person(name)}>
             {household.persons.length > 1 && <h3 className="year-table__title">{c.person(name)}</h3>}
             <div className="ledger__row">
-              {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge)}
+              {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge, l.retirement.done)}
               <p className="ledger__calc">{c.retireCalc(monthYear(l.retirement.leaving))}</p>
             </div>
             <div className="ledger__row">
-              {ageSlider(l.id, 'rrq', c.rrqLabel, p.rrq.startAge)}
+              {ageSlider(l.id, 'rrq', c.rrqLabel, p.rrq.startAge, l.rrq.done)}
               <p className="ledger__result">
                 {c.rrqResult(money(l.rrq.monthlyToday))} <span className="ledger__delta">{delta(l.rrq.monthlyToday, was.rrq.monthlyToday, c.moreMonth, c.lessMonth)}</span>
               </p>
               <p className="ledger__calc">{c.rrqCalc(monthYear(l.rrq.start), money(l.rrq.base, true), money(l.rrq.additionalFirst, true), money(l.rrq.additionalSecond, true), formatPct(l.rrq.adjustment, lang, 1), money(l.rrq.monthly, true))}</p>
             </div>
             <div className="ledger__row">
-              {ageSlider(l.id, 'oas', c.oasLabel, p.oas.startAge)}
+              {ageSlider(l.id, 'oas', c.oasLabel, p.oas.startAge, l.oas.done)}
               <p className="ledger__result">
                 {c.oasResult(money(l.oas.monthlyToday))} <span className="ledger__delta">{delta(l.oas.monthlyToday, was.oas.monthlyToday, c.moreMonth, c.lessMonth)}</span>
               </p>

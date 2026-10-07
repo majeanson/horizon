@@ -21,7 +21,7 @@ export const MAX_SELECTIONS = 4
  * alternative — 65, or 60 when the plan already is 65 (two identical cards compare nothing). It used to open on
  * « 60 and 65 » whatever the profile said, so a household planning to retire at 55 saw neither its plan nor its date.
  */
-export const defaultSelections = (household: Household): Selection[] => ['plan', household.persons[0].retirementAge === 65 ? 60 : 65]
+export const defaultSelections = (household: Household, retired = false): Selection[] => (retired ? ['plan'] : ['plan', household.persons[0].retirementAge === 65 ? 60 : 65])
 
 export const assumptionsOf = (profile: Profile, today: { year: number; month: number }): Assumptions => ({ ...profile.assumptions, today })
 

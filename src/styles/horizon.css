@@ -1061,3 +1061,17 @@
 .ledger__glance {
   margin: 0;
 }
+
+/* The example households on the data page */
+.example-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.example-list li {
+  display: grid;
+  gap: 0.15rem;
+  justify-items: start;
+}

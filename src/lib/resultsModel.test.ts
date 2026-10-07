@@ -109,3 +109,9 @@ describe('the net worth on a comparison card is in the dollars the page shows', 
     expect(worthAtHorizon(result, 'today', a)).toBeGreaterThan(0)
   })
 })
+
+describe('a household that has already retired', () => {
+  it('compares only its own plan: there is no departure age to try', () => {
+    expect(defaultSelections(GOLDEN_HOUSEHOLD, true)).toEqual(['plan'])
+  })
+})

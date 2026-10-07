@@ -4,9 +4,11 @@ import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
-import { useT } from '../i18n'
+import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
+import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
 import { exampleProfile } from '../lib/example'
+import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import { clearProfile, exportFileName, exportProfileJson, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { useNotice } from '../lib/toast'
@@ -26,6 +28,7 @@ function saveAsFile(text: string, name: string): void {
 // or erase this device's copy. Every action that replaces the profile asks first, in words that say what is lost.
 export function Donnees() {
   const t = useT()
+  const { lang } = useLang()
   const d = t.data
   const confirm = useConfirm()
   const notice = useNotice()
@@ -122,20 +125,25 @@ export function Donnees() {
       </Section>
 
       <Section title={d.example.title} subtitle={d.example.hint} icon="user-bold">
-        <Cluster>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            onClick={async () => {
-              if (await confirm({ message: d.example.confirm, confirmLabel: d.example.confirmLabel, tone: 'default' })) {
-                replaceProfile(exampleProfile())
-                notice(d.example.done)
-              }
-            }}
-          >
-            {d.example.button}
-          </button>
-        </Cluster>
+        <ul className="example-list">
+          {EXAMPLE_IDS.map((id: ExampleId) => (
+            <li key={id}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={async () => {
+                  if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
+                    replaceProfile(exampleProfile(id))
+                    notice(d.example.done)
+                  }
+                }}
+              >
+                {EXAMPLE_COPY[lang][id].name}
+              </button>
+              <span className="field-row__hint">{EXAMPLE_COPY[lang][id].story}</span>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold">

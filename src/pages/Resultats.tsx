@@ -19,6 +19,8 @@ import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
 import { retireAt } from '../engine/retireAt'
+import { planGlance, retirementState } from '../engine/ledger'
+import { withPreset } from '../engine/assumptionPresets'
 import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
 import { BRIDGE_COPY } from '../lib/bridgeCopy'
@@ -55,15 +57,23 @@ export function Resultats() {
   const full = useMode() === 'full'
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
+  // Everybody already stopped working: « when can I retire? » is answered, and what is left to say is whether the money lasts.
+  const state = useMemo(() => retirementState(profile.household, assumptionsOf(profile, { year, month })), [profile, year, month])
+  const retiredNow = state.everyoneRetired && profileGaps(profile).length === 0
+  const retiredGlance = useMemo(() => {
+    if (!retiredNow) return null
+    const a = assumptionsOf(profile, { year, month })
+    return { now: planGlance(profile.household, a), prudent: planGlance(profile.household, withPreset(a, 'prudent')) }
+  }, [retiredNow, profile, year, month])
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
-  const selections = parseSelections(params.get('ages'), defaultSelections(profile.household)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
+  const selections = parseSelections(params.get('ages'), defaultSelections(profile.household, state.everyoneRetired)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
   const question = (['save', 'stop'] as const).find((k) => k === params.get('q')) ?? 'when'
   const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
   const assumptions = assumptionsOf(profile, { year, month })
   const isCouple = profile.household.persons.length === 2
-  const earliestEachAnswer = useEarliestEach(profile.household, assumptions, isCouple && gaps.length === 0)
+  const earliestEachAnswer = useEarliestEach(profile.household, assumptions, isCouple && gaps.length === 0 && !retiredNow)
 
   const setParam = useCallback(
     (key: string, value: string | null) =>
@@ -151,7 +161,7 @@ export function Resultats() {
 
   const deferralWho = parseBridgeParams(params, profile.household).levers.id
   const earliestBlock =
-    isCouple && gaps.length === 0 ? (
+    isCouple && gaps.length === 0 && !retiredNow ? (
       <div className="surface">
         <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
       </div>
@@ -236,9 +246,19 @@ export function Resultats() {
 
       <div className="verdict surface" aria-live="polite">
         <p className="verdict__line">
-          {headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(headline.age!, isCouple)}
+          {retiredGlance ? rc.headline.retired(isCouple) : headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(headline.age!, isCouple)}
         </p>
-        {headline.kind === 'none' ? (
+        {retiredGlance ? (
+          <>
+            <p className="verdict__note">
+              {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(retiredGlance.now.firstShortfallYear!)}{' '}
+              {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
+            </p>
+            {activePreset !== 'prudent' && (retiredGlance.prudent.ok !== retiredGlance.now.ok || retiredGlance.prudent.firstShortfallYear !== retiredGlance.now.firstShortfallYear) && (
+              <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear)}</p>
+            )}
+          </>
+        ) : headline.kind === 'none' ? (
           <p className="verdict__note">{rc.headline.tryThis}</p>
         ) : (
           <>
@@ -254,7 +274,7 @@ export function Resultats() {
           </>
         )}
         {/* Simple hides the « Chacun de son côté » panel: one line keeps each person's own answer in view. */}
-        {!full && isCouple && earliestEachAnswer && (
+        {!full && isCouple && !retiredNow && earliestEachAnswer && (
           <p className="verdict__note">
             {rc.headline.separately}{' '}
             {earliestEachAnswer
@@ -276,6 +296,7 @@ export function Resultats() {
         <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
       </Disclosure>
 
+      {!retiredNow && (
       <Disclosure label={r.compare.label} defaultOpen={params.has('ages')}>
         <div className="compare" ref={compareRef}>
           <p className="field-row__label" id="compare-label">
@@ -303,6 +324,7 @@ export function Resultats() {
           )}
         </div>
       </Disclosure>
+      )}
 
       <ul className="scenarios">
         {runs.map(({ selection, result }, i) => (
@@ -335,6 +357,8 @@ export function Resultats() {
 
       {/* The strategy view is the main tool for deciding when to start the pensions: it stays one visible line in BOTH modes
           (it computes only when opened — a worker — and opens by itself when the address already carries its choices). */}
+      {/* Once every QPP and OAS start is behind the household there is nothing left to choose: the view is not offered. */}
+      {state.pensionsOpen && (
       <Disclosure label={BRIDGE_COPY[lang].open} defaultOpen={['bp', 'bb', 'bw'].some((k) => params.has(k))}>
         <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
         {/* The same question seen one pension at a time: it belongs with the strategies, not as a second top-level line. */}
@@ -342,6 +366,7 @@ export function Resultats() {
           <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
         </Disclosure>
       </Disclosure>
+      )}
 
       {/* Simple keeps the verdict, the comparison and the chart; the rest folds into one « Voir les détails ». */}
       {full ? details : <Disclosure label={t.mode.details}>{earliestBlock}{details}</Disclosure>}

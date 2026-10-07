@@ -139,7 +139,7 @@ function StackedBarChartSpecimen() {
           { id: 'db', label: 'Rente de l’employeur', colour: 'sky' },
           { id: 'rrq', label: 'RRQ', colour: 'sage' },
           { id: 'oas', label: 'PSV', colour: 'berry' },
-          { id: 'nest', label: 'Tiré du pécule', colour: 'accent' },
+          { id: 'nest', label: 'Tiré du nid', colour: 'accent' },
         ]}
         line={{ id: 'need', label: 'Dépenses + impôt' }}
         markers={[{ x: 65, label: 'RRQ', colour: 'accent', named: true }]}

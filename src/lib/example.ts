@@ -1,16 +1,18 @@
-import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
+import { EXAMPLES, type ExampleId } from '../engine/golden/examples.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
 
-// « Charger l'exemple »: the golden household — an invented couple, every number round — as a saved profile.
-// It is the same couple the golden snapshots, the e2e seed and the gallery use, so what a first-time visitor
-// sees is what the tests pin.
-export function exampleProfile(): Profile {
-  const { today: _today, ...assumptions } = GOLDEN_ASSUMPTIONS
+// « Charger un exemple »: an invented household as a saved profile. The default is the golden couple — the same couple the
+// golden snapshots, the e2e seed and the gallery use, so what a first-time visitor sees is what the tests pin; the others
+// (an average couple, a modest single, a rich couple, someone behind, a retired couple, a newcomer) are there to look at,
+// and to check by hand, a different kind of life (engine/golden/examples.ts says who they are).
+export function exampleProfile(id: ExampleId = 'golden'): Profile {
+  const e = EXAMPLES[id]
+  const { today: _today, ...assumptions } = e.assumptions
   return {
     app: 'horizon',
     version: SCHEMA_VERSION,
-    household: structuredClone(GOLDEN_HOUSEHOLD),
-    children: [2012, 2015],
+    household: structuredClone(e.household),
+    children: [...e.children],
     assumptions: structuredClone(assumptions),
   }
 }

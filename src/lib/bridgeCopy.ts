@@ -99,7 +99,7 @@ export interface BridgeCopy {
 export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
   fr: {
     open: 'Mes années 60 à 70 : reporter ou prendre tôt ?',
-    hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le pécule doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
+    hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le nid doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
     updating: 'Mise à jour du calcul…',
     person: 'Pour',
     agesLine: (retire, rrq, oas) => `Vos âges : retraite à ${retire}, RRQ à ${rrq}, PSV à ${oas}. Pour les changer : « Mes données et leur calcul ».`,
@@ -113,21 +113,21 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       asap: 'RRQ à 60 ans, PSV à 65 ans : le plus tôt permis.',
       standard: 'RRQ et PSV à 65 ans.',
       max: 'RRQ à 72 ans, PSV à 70 ans : les rentes les plus élevées.',
-      bridge: 'Vivre du pécule jusqu’à 70 ans, puis RRQ et PSV à 70 ans.',
+      bridge: 'Vivre du nid jusqu’à 70 ans, puis RRQ et PSV à 70 ans.',
       both: 'Comme le pont, mais l’autre personne reporte aussi son RRQ et sa PSV à 70 ans.',
     },
     custom: 'Vos choix ne correspondent à aucune de ces façons : ils sont montrés sous « Mon plan ».',
-    lowestNestLabel: 'Pécule le plus bas, de 60 à 70 ans',
+    lowestNestLabel: 'Nid le plus bas, de 60 à 70 ans',
     selectedName: 'Votre choix actuel',
     worth85: 'Valeur nette à 85 ans',
     worth95: 'Valeur nette à 95 ans',
     noWorth: '—',
-    lifetime: 'Revenus encaissés sur tout le plan, après impôt (retraits du pécule compris)',
+    lifetime: 'Revenus encaissés sur tout le plan, après impôt (retraits du nid compris)',
     todayNote: 'Montants en dollars d’aujourd’hui.',
     standardIsMine: 'Standard (c’est aussi votre plan)',
-    extraDrawn: (amount) => `${amount} de plus tirés du pécule entre 60 et 69 ans que le standard`,
-    lessDrawn: (amount) => `${amount} de moins tirés du pécule entre 60 et 69 ans que le standard`,
-    sameDrawn: 'Autant tiré du pécule entre 60 et 69 ans que le standard',
+    extraDrawn: (amount) => `${amount} de plus tirés du nid entre 60 et 69 ans que le standard`,
+    lessDrawn: (amount) => `${amount} de moins tirés du nid entre 60 et 69 ans que le standard`,
+    sameDrawn: 'Autant tiré du nid entre 60 et 69 ans que le standard',
     breakEvenLater: (age) => `Les rentes cumulées rattrapent le standard à ${age} ans`,
     breakEvenEarlier: (age) => `Attendre 65 ans rattrape cette façon à ${age} ans`,
     breakEvenNone: 'Pas de point d’équilibre avant l’horizon du plan',
@@ -135,12 +135,12 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     verdict: (v) =>
       v.kind === 'holds'
         ? v.defers
-          ? `Vous pouvez reporter : votre pécule tient jusqu’à ${v.horizonAge} ans.`
+          ? `Vous pouvez reporter : votre nid tient jusqu’à ${v.horizonAge} ans.`
           : `Ce plan tient jusqu’à ${v.horizonAge} ans.`
         : v.defers && v.standardHolds
-          ? `Reporter épuise votre pécule à ${v.age} ans ; prendre le RRQ et la PSV à 65 ans évite la pénurie.`
+          ? `Reporter épuise votre nid à ${v.age} ans ; prendre le RRQ et la PSV à 65 ans évite la pénurie.`
           : v.defers && v.standardAge !== null
-            ? `Reporter épuise votre pécule à ${v.age} ans, et prendre les rentes à 65 ans ne règle rien : le manque vient à ${v.standardAge} ans.`
+            ? `Reporter épuise votre nid à ${v.age} ans, et prendre les rentes à 65 ans ne règle rien : le manque vient à ${v.standardAge} ans.`
             : `Ce plan manque d’argent à ${v.age} ans.`,
     windowLabel: 'Années montrées',
     windowBridge: '60 à 70 ans',
@@ -153,33 +153,33 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     colRrq: 'RRQ',
     colOas: 'PSV',
     colGis: 'SRG',
-    colDraw: 'Tiré du pécule',
+    colDraw: 'Tiré du nid',
     colNonReg: 'dont non enregistré',
     colRrsp: 'dont REER / FERR',
     colTfsa: 'dont CELI',
     colTax: 'Impôt',
-    colNest: 'Pécule en fin d’année',
+    colNest: 'Nid en fin d’année',
     colStatus: 'État',
-    status: { covered: 'Couvert par les revenus', drawing: 'Le pécule est mis à contribution', short: 'Pécule épuisé : pénurie' },
-    householdNote: 'Les revenus, les dépenses, l’impôt et le pécule sont ceux du ménage ; l’âge est celui de la personne choisie.',
+    status: { covered: 'Couvert par les revenus', drawing: 'Le nid est mis à contribution', short: 'Nid épuisé : pénurie' },
+    householdNote: 'Les revenus, les dépenses, l’impôt et le nid sont ceux du ménage ; l’âge est celui de la personne choisie.',
     barsTitle: 'D’où vient l’argent, année par année',
-    barsHint: 'Chaque barre est une année : le travail, les rentes garanties et ce que le pécule doit fournir. La ligne pointillée est ce qu’il faut couvrir (dépenses et impôt).',
+    barsHint: 'Chaque barre est une année : le travail, les rentes garanties et ce que le nid doit fournir. La ligne pointillée est ce qu’il faut couvrir (dépenses et impôt).',
     barsFigure: (from, to) => `Sources de revenus année par année, de ${from} à ${to} ans`,
-    segment: { work: 'Travail', db: 'Rente de l’employeur', rrq: 'RRQ', oas: 'PSV et SRG', nest: 'Tiré du pécule' },
+    segment: { work: 'Travail', db: 'Rente de l’employeur', rrq: 'RRQ', oas: 'PSV et SRG', nest: 'Tiré du nid' },
     needLine: 'Dépenses + impôt',
-    nestTitle: 'Le pécule, selon la façon de commencer',
-    nestHint: (rrq, oas) => `Traits pointillés : début du RRQ (${rrq} ans) et de la PSV (${oas} ans) de votre choix. Reporter creuse le pécule d’abord, puis le fait remonter.`,
-    nestFigure: (from, to) => `Pécule en fin d’année selon la façon de commencer les rentes, de ${from} à ${to} ans`,
+    nestTitle: 'Le nid, selon la façon de commencer',
+    nestHint: (rrq, oas) => `Traits pointillés : début du RRQ (${rrq} ans) et de la PSV (${oas} ans) de votre choix. Reporter creuse le nid d’abord, puis le fait remonter.`,
+    nestFigure: (from, to) => `Nid en fin d’année selon la façon de commencer les rentes, de ${from} à ${to} ans`,
     markerRrq: 'RRQ',
     markerOas: 'PSV',
     tooltip: (age, year) => `${age} ans · ${year}`,
     whyTitle: 'Pourquoi ?',
-    whyCost: (amount) => `Le pont coûte ${amount} de pécule de plus entre 60 et 69 ans, par rapport à prendre les rentes à 65 ans (dollars d’aujourd’hui).`,
-    whyCostNone: 'Entre 60 et 69 ans, ce plan ne tire pas plus du pécule que le standard.',
+    whyCost: (amount) => `Le pont puise ${amount} de plus dans le nid entre 60 et 69 ans, par rapport à prendre les rentes à 65 ans (dollars d’aujourd’hui).`,
+    whyCostNone: 'Entre 60 et 69 ans, ce plan ne tire pas plus du nid que le standard.',
     whyGis: (gis, recovery) => `Sur tout le plan : ${gis} de Supplément de revenu garanti reçu et ${recovery} de PSV repris par l’impôt de récupération.`,
     why: (f) => [
       `Une rente reportée est plus élevée toute la vie et suit les prix : le RRQ gagne ${f.rrqPerMonth} par mois après 65 ans (jusqu’à ${f.rrqMax} de plus à 72 ans), la PSV ${f.oasPerMonth} par mois (jusqu’à ${f.oasMax} de plus à 70 ans).`,
-      'Les années du pont sont payées par le pécule : plus il est gros au départ, plus le report est possible. Un pécule qui s’épuise avant 70 ans ne peut pas le porter.',
+      'Les années du pont sont payées par le nid : plus il est gros au départ, plus le report est possible. Un nid qui s’épuise avant 70 ans ne peut pas le porter.',
       'Le Supplément de revenu garanti se perd avec un revenu plus élevé : reporter la PSV reporte aussi le SRG qui l’accompagne. Au-delà d’un certain revenu, la PSV est reprise en partie par l’impôt de récupération.',
       'Retirer du REER/FERR pendant le pont peut baisser l’impôt plus tard : les retraits sont faits à un taux plus bas qu’avec toutes les rentes en plus.',
     ],

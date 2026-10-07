@@ -10,6 +10,8 @@ export interface LedgerCopy {
   rrqLabel: string
   oasLabel: string
   age: (age: string) => string
+  /** Beside an age that has already happened: it is shown as a fact, with no slider. */
+  done: string
   /** The calculation line under each age. */
   retireCalc: (lastPay: string) => string
   rrqCalc: (start: string, base: string, first: string, second: string, adjustment: string, monthly: string) => string
@@ -47,6 +49,7 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
     rrqLabel: 'Début du RRQ',
     oasLabel: 'Début de la PSV',
     age: (age) => `${age} ans`,
+    done: 'déjà passé',
     retireCalc: (lastPay) => `Dernier salaire : ${lastPay}.`,
     rrqCalc: (start, base, first, second, adjustment, monthly) => `Première rente : ${start}. (Base ${base} + 1ʳᵉ supplémentaire ${first} + 2ᵉ supplémentaire ${second}) × ajustement ${adjustment} = ${monthly} par mois.`,
     oasCalc: (start, full, residence, multiplier, monthly) => `Première pension : ${start}. ${full} par mois × résidence ${residence} × report ${multiplier} = ${monthly} par mois.`,
@@ -77,6 +80,7 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
     rrqLabel: 'QPP start',
     oasLabel: 'OAS start',
     age: (age) => `age ${age}`,
+    done: 'already behind you',
     retireCalc: (lastPay) => `Last pay: ${lastPay}.`,
     rrqCalc: (start, base, first, second, adjustment, monthly) => `First payment: ${start}. (Base ${base} + 1st additional ${first} + 2nd additional ${second}) × adjustment ${adjustment} = ${monthly} a month.`,
     oasCalc: (start, full, residence, multiplier, monthly) => `First payment: ${start}. ${full} a month × residence ${residence} × deferral ${multiplier} = ${monthly} a month.`,

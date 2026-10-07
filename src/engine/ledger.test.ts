@@ -45,3 +45,24 @@ describe('planGlance', () => {
     expect(poor.netWorthEnd).toBeLessThan(g.netWorthEnd)
   })
 })
+
+describe('what is already behind the household', () => {
+  it('a retired couple: every age is done, no pension start is left to choose', async () => {
+    const { EXAMPLES } = await import('./golden/examples.ts')
+    const { retirementState } = await import('./ledger.ts')
+    const { household, assumptions } = EXAMPLES.retired
+    expect(retirementState(household, assumptions)).toEqual({ everyoneRetired: true, pensionsOpen: false })
+    for (const l of agesLedger(household, assumptions)) expect([l.retirement.done, l.rrq.done, l.oas.done]).toEqual([true, true, true])
+  })
+  it('a working couple: nothing is done and the pensions are still to start', async () => {
+    const { retirementState } = await import('./ledger.ts')
+    expect(retirementState(H, A)).toEqual({ everyoneRetired: false, pensionsOpen: true })
+    for (const l of agesLedger(H, A)) expect([l.retirement.done, l.rrq.done, l.oas.done]).toEqual([false, false, false])
+  })
+  it('one retired and one working: not everyone is retired', async () => {
+    const { EXAMPLES } = await import('./golden/examples.ts')
+    const { retirementState } = await import('./ledger.ts')
+    const mixed = { ...EXAMPLES.retired.household, persons: [EXAMPLES.retired.household.persons[0], EXAMPLES.average.household.persons[0]] }
+    expect(retirementState(mixed, EXAMPLES.retired.assumptions).everyoneRetired).toBe(false)
+  })
+})
