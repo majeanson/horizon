@@ -1,7 +1,6 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip, ChipGroup } from '../components/Chip'
-import { Disclosure } from '../components/Disclosure'
 import { NextStep } from '../components/NextStep'
 import { EditField } from '../components/EditField'
 import { EmptyState } from '../components/EmptyState'
@@ -203,14 +202,6 @@ function ChipSpecimen() {
   )
 }
 
-function DisclosureSpecimen() {
-  return (
-    <Disclosure label="Détail par année" count={3}>
-      <p>Le contenu n’apparaît que sur demande.</p>
-    </Disclosure>
-  )
-}
-
 function ModalSpecimen() {
   const [open, setOpen] = useState(false)
   return (
@@ -334,7 +325,6 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
-    { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },
     { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'Verdict', arc: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
     { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/hypotheses" label="Suivant : mes hypothèses"><p>Votre profil est assez complet.</p></NextStep> },
     {

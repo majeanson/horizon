@@ -6,7 +6,7 @@
 @import './styles/fonts.css';
 @import './styles/core.css';
 @import './styles/fields.css';
-/* Shared "kit" primitives (EmptyState, Chip, Modal, Disclosure, …) — uniquely named, so
+/* Shared "kit" primitives (EmptyState, Chip, Modal, …) — uniquely named, so
    cascade position is immaterial. */
 @import './styles/kit.css';
 @import './styles/horizon.css';

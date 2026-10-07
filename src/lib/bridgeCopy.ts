@@ -9,8 +9,6 @@ import type { StrategyKey, YearStatus } from '../engine/bridge.ts'
 import type { Verdict } from './bridgeModel.ts'
 
 export interface BridgeCopy {
-  /** The line on the disclosure that opens the view in Simple mode. */
-  open: string
   hint: string
   /** Shown while a new answer is being worked out and the old one is still on screen. */
   updating: string
@@ -98,7 +96,6 @@ export interface BridgeCopy {
 
 export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
   fr: {
-    open: 'Mes années 60 à 70 : reporter ou prendre tôt ?',
     hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le nid doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
     updating: 'Mise à jour du calcul…',
     person: 'Pour',
@@ -196,7 +193,6 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     strategyCol: 'Façon de commencer',
   },
   en: {
-    open: 'My years from 60 to 70: defer or take early?',
     hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg has to cover, and what is left. Pick a way of starting your pensions to see whether the plan holds. Everything is in today’s dollars.',
     updating: 'Updating the calculation…',
     person: 'For',

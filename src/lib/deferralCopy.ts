@@ -6,7 +6,6 @@
 // non-empty and genuinely translated.
 
 export interface DeferralCopy {
-  title: string
   hint: string
   busy: string
   person: string
@@ -49,7 +48,6 @@ export interface DeferralCopy {
 
 export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
   fr: {
-      title: 'Quand commencer ma rente ?',
       hint: 'La rente du RRQ et la pension de la Sécurité de la vieillesse (PSV) durent toute la vie et suivent les prix : commencer plus tard donne un montant plus élevé, mais pendant moins d’années. Voici ce que donne chaque âge de début pour votre ménage, tout le reste du plan inchangé.',
       busy: 'Calcul en cours…',
       person: 'Pour',
@@ -96,7 +94,6 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       caveat: 'Montants avant impôt, en dollars d’aujourd’hui, une seule rente modifiée à la fois. On suppose une vie aussi longue que l’horizon du plan. La rente de conjoint survivant n’est pas modélisée : elle peut jouer pour ou contre le report et n’est pas comptée ici.',
   },
   en: {
-      title: 'When should I start my pension?',
       hint: 'The QPP pension and Old Age Security (OAS) are paid for life and follow prices: starting later gives a bigger amount, but for fewer years. Here is what each starting age gives your household, everything else in the plan unchanged.',
       busy: 'Calculating…',
       person: 'For',

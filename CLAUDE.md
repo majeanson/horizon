@@ -49,7 +49,7 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
    (`src/pages/DevKit.tsx`) renders every shared component live across theme, contrast, text
    size and locale. If one *almost* fits, **extend it** — do not fork a copy.
 3. **Reuse the CSS class family** (`.btn`, `.input`, `.chip`, `.edit-field__*`, `.subtabs`,
-   `.cluster` / `.rail`, `.disclosure`, …). `@import` order in `styles.css` **is** the cascade:
+   `.cluster` / `.rail`, …). `@import` order in `styles.css` **is** the cascade:
    append only, never reorder.
 
 ### Reach for these before hand-rolling
@@ -65,7 +65,7 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | Segmented « one job at a time » control | **`SubTabs`** | `components/SubTabs.tsx` |
 | A horizontal row of buttons / chips | **`Cluster`** (wraps) / **`Rail`** (scrolls one line) — never a bespoke flex row | `components/Layout.tsx` |
 | A row that scrolls sideways with a hidden scrollbar | **`useHScroll()`** — maps the wheel, reports `overflowing` | `lib/hscroll.ts` |
-| Collapse a secondary group | **`Disclosure`** | `components/Disclosure.tsx` |
+| The map of a long page (anchored sections) | **`SectionNav`** | `components/SectionNav.tsx` |
 | Empty / status / section header | **`EmptyState`** / **`StatusMessage`** / **`SectionHeader`** | same-named files |
 | A surface that is loading | **`Skeleton`** if the shape is known (rows, a grid); **`Loading`** for a whole route | `components/Skeleton.tsx`, `Loading.tsx` |
 | A dialog | **`Modal`** + `useModal` | `components/Modal.tsx`, `lib/useModal.ts` |
