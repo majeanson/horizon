@@ -77,7 +77,7 @@ test('another comparison adds a line and keeps the other choices', async ({ page
 
 test('the chart speaks English too', async ({ page }) => {
   await page.goto('/resultats')
-  await page.getByRole('button', { name: 'EN' }).click()
+  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
   await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan, 65.')
   await expect(page.getByRole('tab', { name: 'Guaranteed income' })).toBeVisible()
 })
@@ -124,7 +124,7 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
   await expect(row(/quebec\.creditRate/)).not.toContainText('page en anglais seulement')
   await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTFR_/)
 
-  await page.getByRole('button', { name: 'EN', exact: true }).click()
+  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
 
   // English reader: the English edition, « 1,507.65 », the English parameters PDF, and an honest label on the fiche that
   // exists in French only.

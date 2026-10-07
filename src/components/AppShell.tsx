@@ -1,5 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { Suspense, useState } from 'react'
+import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
 import { useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -21,6 +21,37 @@ const TABS = [
   { to: '/donnees', key: 'data', icon: 'download-simple-bold' },
 ] as const satisfies ReadonlyArray<{ to: string; key: string; icon: IconName }>
 
+// Scroll and focus across navigations. #root is the single scroller, so the browser restores
+// nothing by itself: switching page used to keep the previous page's offset, with the new <h1>
+// off screen. A tap on a tab lands at the top; back/forward return to where the reader was
+// (one remembered offset per path). Only a PATHNAME change moves anything — Résultats keeps
+// every view choice in the search string, and a chip tap must not throw the reader to the top.
+// Focus moves to <main>, so a screen reader hears the new page and Tab starts in the content;
+// rendered BEFORE the Outlet, so a page's own deep-link scroll (an old ?person= link) runs
+// after this and wins.
+const scrollPositions = new Map<string, number>()
+function RouteChange() {
+  const { pathname } = useLocation()
+  const navType = useNavigationType()
+  const prev = useRef<string | null>(null)
+  useEffect(() => {
+    const el = document.getElementById('root')
+    if (!el) return
+    const save = () => scrollPositions.set(pathname, el.scrollTop)
+    el.addEventListener('scroll', save, { passive: true })
+    return () => el.removeEventListener('scroll', save)
+  }, [pathname])
+  useEffect(() => {
+    const arriving = prev.current === null
+    const samePage = prev.current === pathname
+    prev.current = pathname
+    if (arriving || samePage) return
+    document.getElementById('root')?.scrollTo({ top: navType === 'POP' ? (scrollPositions.get(pathname) ?? 0) : 0 })
+    document.getElementById('main')?.focus({ preventScroll: true })
+  }, [pathname, navType])
+  return null
+}
+
 export function AppShell() {
   const t = useT()
   const { lang, setLang } = useLang()
@@ -28,24 +59,36 @@ export function AppShell() {
   // Whatever stops the profile from being kept — or read — must be said on EVERY page: a person who lost their plan to a
   // refused profile and finds a blank one on Profil would otherwise think the app simply forgot them.
   const storageIssue = useStorageIssue()
+  const themeLabel = theme === 'night' ? t.common.themeToDay : t.common.themeToNight
 
   return (
     <div className="shell">
+      <a
+        className="skip-link"
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault()
+          document.getElementById('main')?.focus()
+        }}
+      >
+        {t.nav.skip}
+      </a>
+      <RouteChange />
       <header className="shell__bar">
         <NavLink to="/" className="shell__brand">
           {t.appName}
         </NavLink>
         <div className="shell__actions">
-          <button type="button" className="btn btn--ghost btn--sm mono" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>
-            {t.common.lang}
-          </button>
           <button
             type="button"
-            className="btn btn--icon"
-            aria-label={t.common.theme}
-            title={t.common.theme}
-            onClick={() => setThemeState(toggleTheme())}
+            className="btn btn--ghost btn--sm mono"
+            aria-label={t.common.langLabel}
+            title={t.common.langLabel}
+            onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
           >
+            {t.common.lang}
+          </button>
+          <button type="button" className="btn btn--icon" aria-label={themeLabel} title={themeLabel} onClick={() => setThemeState(toggleTheme())}>
             <Icon name={theme === 'night' ? 'sun-bold' : 'moon-stars-bold'} size={20} />
           </button>
         </div>
@@ -58,7 +101,8 @@ export function AppShell() {
           </NavLink>
         ))}
       </nav>
-      <main className="shell__main">
+      {/* tabIndex -1: the skip link's target and where focus lands after a navigation — never a tab stop itself. */}
+      <main className="shell__main" id="main" tabIndex={-1}>
         {storageIssue && <StatusMessage tone={storageIssue === 'unsaved' ? 'error' : 'info'}>{t.data.issue[storageIssue]}</StatusMessage>}
         {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched. */}
         <Suspense fallback={<Loading />}>

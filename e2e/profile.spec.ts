@@ -208,7 +208,7 @@ test.describe('first visit', () => {
       await page.goto(path)
       await expect(page).toHaveTitle(title)
     }
-    await page.getByRole('button', { name: 'EN', exact: true }).click()
+    await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
     await expect(page).toHaveTitle('Data · Horizon')
   })
 })

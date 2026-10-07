@@ -28,12 +28,12 @@ test('boots, renders the shell, and prints nothing to the console', async ({ pag
 
 test('the language toggle flips the whole shell to English and back, and remembers', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'EN' }).click()
+  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.reload()
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible()
-  await page.getByRole('button', { name: 'FR' }).click()
+  await page.getByRole('button', { name: 'Switch to French' }).click()
   await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
 })
 
@@ -43,7 +43,7 @@ test('the page head follows the language: description, link preview and install 
   await page.goto('/')
   await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
   await expect(description).toHaveAttribute('content', /retraite/)
-  await page.getByRole('button', { name: 'EN' }).click()
+  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
   await expect(manifest).toHaveAttribute('href', '/manifest.en.webmanifest')
   await expect(description).toHaveAttribute('content', /retire/)
   await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'en_CA')
@@ -54,7 +54,7 @@ test('the page head follows the language: description, link preview and install 
   // …and a reload keeps it.
   await page.reload()
   await expect(manifest).toHaveAttribute('href', '/manifest.en.webmanifest')
-  await page.getByRole('button', { name: 'FR' }).click()
+  await page.getByRole('button', { name: 'Switch to French' }).click()
   await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
 })
 
@@ -62,7 +62,7 @@ test('the theme toggle flips data-theme and survives a reload with no flash of t
   await page.goto('/')
   const html = page.locator('html')
   const before = await html.getAttribute('data-theme')
-  await page.getByRole('button', { name: 'Jour / Nuit' }).click()
+  await page.getByRole('button', { name: /Passer au mode (jour|nuit)/ }).click()
   const after = await html.getAttribute('data-theme')
   expect(after).not.toBe(before)
   await page.reload()

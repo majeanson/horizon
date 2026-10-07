@@ -28,8 +28,10 @@ export const EN: typeof FR = {
     whereToFind: 'Where to find this number',
     openPage: 'Open the official page',
     projected: 'projected',
-    theme: 'Day / Night',
+    themeToNight: 'Switch to night mode',
+    themeToDay: 'Switch to day mode',
     lang: 'FR',
+    langLabel: 'Switch to French',
     add: 'Add',
     remove: 'Remove',
     edit: 'Edit',
@@ -46,6 +48,7 @@ export const EN: typeof FR = {
 
   nav: {
     label: 'Main navigation',
+    skip: 'Skip to content',
     profile: 'Profile',
     assumptions: 'Assumptions',
     results: 'Results',

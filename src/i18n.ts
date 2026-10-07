@@ -44,8 +44,10 @@ export const FR = {
     whereToFind: 'Où trouver ce chiffre',
     openPage: 'Ouvrir la page officielle',
     projected: 'projeté',
-    theme: 'Jour / Nuit',
+    themeToNight: 'Passer au mode nuit',
+    themeToDay: 'Passer au mode jour',
     lang: 'EN',
+    langLabel: 'Passer à l’anglais',
     add: 'Ajouter',
     remove: 'Retirer',
     edit: 'Modifier',
@@ -62,6 +64,7 @@ export const FR = {
 
   nav: {
     label: 'Navigation principale',
+    skip: 'Aller au contenu',
     profile: 'Profil',
     assumptions: 'Hypothèses',
     results: 'Résultats',
