@@ -41,7 +41,7 @@ describe('projection — the books always balance', () => {
 
   it('gross income is exactly the sum of what each person received, withdrawals included', () => {
     for (const r of rows) {
-      const sum = people(r).reduce((s, p) => s + p.employment + p.rrq + p.oas + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
+      const sum = people(r).reduce((s, p) => s + p.employment + p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
       expect(sum, `${r.year}`).toBeCloseTo(r.household.grossIncome, 1)
     }
   })

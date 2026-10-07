@@ -187,7 +187,7 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): Br
   const pick = (f: (p: NonNullable<(typeof people)[number]>) => number) => sum(people.map((p) => f(p!))) / d
   const draws = Object.fromEntries(KINDS.map((k) => [k, pick((p) => p.withdrawals[k])])) as Record<AccountKind, number>
   const nestParts = Object.fromEntries(KINDS.map((k) => [k, pick((p) => p.balancesEnd[k])])) as Record<AccountKind, number>
-  const guaranteed = pick((p) => p.db + p.rrq + p.oas + p.gis)
+  const guaranteed = pick((p) => p.db + p.rrq + p.oas + p.gis + p.allowance)
   const drawn = sum(KINDS.map((k) => draws[k]))
   const shortfall = r.household.shortfall / d
   return {
@@ -198,7 +198,8 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): Br
     db: pick((p) => p.db),
     rrq: pick((p) => p.rrq),
     oas: pick((p) => p.oas),
-    gis: pick((p) => p.gis),
+    // The income-tested supplements together: the GIS, and the Allowance a 60–64 spouse gets beside it.
+    gis: pick((p) => p.gis + p.allowance),
     ownPension: ((r.persons[id]?.rrq ?? 0) + (r.persons[id]?.oas ?? 0)) / d,
     ownRrq: (r.persons[id]?.rrq ?? 0) / d,
     ownOas: (r.persons[id]?.oas ?? 0) / d,

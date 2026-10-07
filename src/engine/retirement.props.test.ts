@@ -236,7 +236,7 @@ describe('a household with a pension in pay and no work at all', () => {
       expect(p.payrollContribution, `${r.year}`).toBe(0)
       expect(p.rrqContribution, `${r.year}`).toBe(0)
       expect(p.contributions.rrsp, `${r.year}: no RRSP deduction without pay (what is saved is only the surplus, in a TFSA or non-registered account)`).toBe(0)
-      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(p.rrq + p.oas + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 2)
+      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 2)
     }
   })
 
@@ -318,7 +318,7 @@ describe('over many households: whoever has retired earns nothing and every acco
     for (const { h, label } of sample) {
       for (const row of project(h, A, {})) {
         const ps = Object.values(row.persons)
-        const gross = ps.reduce((s, p) => s + p.employment + p.rrq + p.oas + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
+        const gross = ps.reduce((s, p) => s + p.employment + p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
         expect(row.household.grossIncome, `${label} ${row.year}`).toBeCloseTo(gross, 1)
         for (const p of ps) {
           for (const k of ['nonReg', 'rrsp', 'tfsa'] as const) {

@@ -154,6 +154,8 @@ export interface PersonYear {
   employment: number
   rrq: number
   oas: number
+  /** The Allowance: paid to the 60–64 spouse of a pensioner on the GIS, taxable, income-tested (nothing once the couple's income is over the cut-off). */
+  allowance: number
   /** Tax-free, income-tested; paid only to a pensioner. */
   gis: number
   db: number

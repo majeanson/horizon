@@ -1,13 +1,13 @@
 import { ageAtJan1, firstRrifYear, grow, maxWithdraw, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, tfsaNextRoom, type NonRegState } from './accounts.ts'
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
-import { gisCategory, gisCountedIncome, gisMonthly, oasYear, type GisCategoryName, type OasPerson } from './oas.ts'
+import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson } from './oas.ts'
 import { memberContribution } from './memberContribution.ts'
 import { payrollContribution } from './payroll.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
 import { roundTo, type Indexation } from './params/project.ts'
 import { rrqContribution, rrqPension, type RrqPension, type RrqRules } from './rrq.ts'
 import { makeRrqRules, rrqContributionRulesFor } from './rrqRules.ts'
-import { householdTax, householdTaxWithSplit, type PersonIncome, type Split, type TaxRules } from './tax.ts'
+import { householdTax, householdTaxWithSplit, type HouseholdTax, type PersonIncome, type Split, type TaxRules } from './tax.ts'
 import type { AccountKind, Assumptions, Household, Person, PersonId, PersonYear, Scenario, YearRow } from './types.ts'
 
 // The year-by-year projection: from today to the year the youngest person reaches the horizon age, what each
@@ -208,23 +208,65 @@ function simulateYear(
     }
   }
 
+  // ── the Allowance: the 60–64 spouse of a pensioner, from the month after the 60th birthday to the month of the 65th ──
+  // Paid in the months the person is in that window, their spouse is already on the OAS, and they have the ten years of residence;
+  // while it is paid, the pensioner's GIS follows the « spouse receives the Allowance » curve. The same months, seen from both sides.
+  const alwMonths = people.map((r, i) => {
+    if (!couple || residenceFraction(r.oas, year, P.oas) <= 0) return 0
+    const j = i === 0 ? 1 : 0
+    const from = (r.p.birth.year + 60) * 12 + (r.p.birth.month - 1) + 1
+    const to = (r.p.birth.year + 65) * 12 + (r.p.birth.month - 1)
+    const spouseStart = oasStart(people[j].p.birth, people[j].oasStartAge)
+    const spouseIdx = spouseStart.year * 12 + spouseStart.month - 1
+    let n = 0
+    for (let m = 0; m < 12; m++) {
+      const idx = year * 12 + m
+      if (idx >= from && idx <= to && idx >= spouseIdx && fixed[j].oasMonths > 0) n++
+    }
+    return n
+  })
+  const anyAllowance = alwMonths.some((m) => m > 0)
+  /** The couple's income as the GIS counts it: net income without the OAS and the Allowance, less the employment exemption. */
+  const countedOf = (persons: PersonIncome[], netBefore: number[]) => (j: number) => gisCountedIncome(Math.max(0, netBefore[j] - persons[j].oas), persons[j].employment, P.oas)
+  /** The Allowance each person receives this year, for the incomes given (before the Allowance itself is counted anywhere). */
+  const allowanceFor = (persons: PersonIncome[], netBefore: number[]): number[] => {
+    if (!anyAllowance) return people.map(() => 0)
+    const counted = countedOf(persons, netBefore)
+    const monthly = allowanceMonthly(counted(0) + counted(1), P.oas)
+    return people.map((_, i) => roundTo(monthly * alwMonths[i], 0.01))
+  }
+  /**
+   * The tax with the Allowance in it. The Allowance depends on the income WITHOUT itself and is taxable, so: tax once, read the
+   * Allowance off that, add it to the OAS-side income (it is taxable, and the GIS does not count it), tax again. One pass when
+   * nobody is eligible, which is nearly always.
+   */
+  const taxWithAllowance = (persons: PersonIncome[], compute: (p: PersonIncome[]) => HouseholdTax) => {
+    const first = compute(persons)
+    const allowance = allowanceFor(persons, first.persons.map((t) => t.netIncomeBeforeAdjustments))
+    if (allowance.every((x) => x === 0)) return { tax: first, persons, allowance }
+    const withAllowance = persons.map((p, i) => ({ ...p, oas: p.oas + allowance[i] }))
+    return { tax: compute(withAllowance), persons: withAllowance, allowance }
+  }
+
   /** The GIS each person receives for the incomes given (a pensioner's, never above the published maximum). */
   const gisFor = (persons: PersonIncome[], netBefore: number[]): number[] =>
     people.map((_, i) => {
       if (fixed[i].oasMonths === 0) return 0
       const other = i === 0 ? 1 : 0
       const category: GisCategoryName = gisCategory({ present: couple, receivesOas: couple && fixed[other].oasMonths > 0 })
-      const counted = (j: number) => gisCountedIncome(Math.max(0, netBefore[j] - persons[j].oas), persons[j].employment, P.oas)
+      const counted = countedOf(persons, netBefore)
       const income = couple ? counted(0) + counted(1) : counted(i)
-      return roundTo(gisMonthly(income, category, P.oas) * fixed[i].oasMonths, 0.01)
+      // In the months the spouse receives the Allowance, this person's GIS is the one beside it (and the ordinary one once it is nil).
+      const withAllowance = couple && allowanceMonthly(income, P.oas) > 0 ? Math.min(alwMonths[other], fixed[i].oasMonths) : 0
+      return roundTo(gisMonthly(income, category, P.oas) * (fixed[i].oasMonths - withAllowance) + gisWithAllowanceSpouseMonthly(income, P.oas) * withAllowance, 0.01)
     })
 
   /** Net cash the household has after tax and committed savings, for the current withdrawals, with a fixed split. */
   const evaluate = (split: Split) => {
-    const { persons, realized } = incomes()
-    const tax = householdTaxWithSplit(persons, rules, split)
+    const { persons: base, realized } = incomes()
+    const { tax, persons, allowance } = taxWithAllowance(base, (p) => householdTaxWithSplit(p, rules, split))
     const gis = gisFor(persons, tax.persons.map((t) => t.netIncomeBeforeAdjustments))
-    const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + gis[i]))
+    const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + allowance[i] + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + gis[i]))
     const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].payrollC + fixed[i].rppC + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
     return { tax, gis, realized, cash: cashIn - tax.total - out }
   }
@@ -346,12 +388,16 @@ function simulateYear(
   // The tax is final: let splitting pick its best allocation for the incomes actually received.
   const { persons: finalIncomes } = incomes()
   // …but never worse than the split the withdrawals were solved against (it may sit between two 5 % steps of the search).
-  const searchedTax = householdTax(finalIncomes, rules, { splitting: a.pensionSplitting })
-  const heldTax = householdTaxWithSplit(finalIncomes, rules, fixedSplit())
-  const finalTax = heldTax.total < searchedTax.total ? heldTax : searchedTax
-  const finalGis = gisFor(finalIncomes, finalTax.persons.map((t) => t.netIncomeBeforeAdjustments))
+  const settled = taxWithAllowance(finalIncomes, (p) => {
+    const searched = householdTax(p, rules, { splitting: a.pensionSplitting })
+    const held = householdTaxWithSplit(p, rules, fixedSplit())
+    return held.total < searched.total ? held : searched
+  })
+  const finalTax = settled.tax
+  const finalAllowance = settled.allowance
+  const finalGis = gisFor(settled.persons, finalTax.persons.map((t) => t.netIncomeBeforeAdjustments))
   const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].payrollC + fixed[i].rppC + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
-  const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
+  const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + finalAllowance[i] + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
   const cash = cashIn - finalTax.total - out
   const shortfall = roundTo(Math.max(0, spending - cash), 0.01)
   let surplus = Math.max(0, cash - spending)
@@ -406,6 +452,7 @@ function simulateYear(
       employment: roundTo(fixed[i].employment, 0.01),
       rrq: fixed[i].rrq,
       oas: fixed[i].oas,
+      allowance: finalAllowance[i],
       gis: finalGis[i],
       db: fixed[i].db,
       rrifMinimum: fixed[i].rrifMin,
@@ -422,7 +469,7 @@ function simulateYear(
     }
   })
 
-  const grossIncome = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
+  const grossIncome = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + finalAllowance[i] + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
   const row: YearRow = {
     year,
     persons,

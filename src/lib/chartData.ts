@@ -16,7 +16,7 @@ export const SERIES_COLOURS: readonly SeriesColour[] = ['accent', 'sky', 'sage',
 export function metricValue(row: YearRow, metric: Metric): number {
   if (metric === 'netWorth') return row.household.netWorthEnd
   let sum = 0
-  for (const p of Object.values(row.persons)) sum += p.employment + p.db + p.rrq + p.oas + p.gis
+  for (const p of Object.values(row.persons)) sum += p.employment + p.db + p.rrq + p.oas + p.allowance + p.gis
   return sum
 }
 
