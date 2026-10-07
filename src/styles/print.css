@@ -1,0 +1,72 @@
+/* What the page becomes on paper. The product is a cited plan a household shows a spouse or an
+   advisor — printing (or « imprimer en PDF ») is how it leaves the device WITHOUT any network.
+   On paper: the content, on white, in full — no app chrome, no night ink, no clipped columns.
+
+   The !important on the tokens is deliberate and contained: the night and contrast palettes are
+   declared under many selector shapes (`:root[data-theme='night']`, the contrast combos, the
+   `prefers-color-scheme` auto blocks), and out-speccing each of them here would mean mirroring
+   every one. A print page is day, whatever the screen was — importance says exactly that once. */
+@media print {
+  :root {
+    --paper: #ffffff !important;
+    --paper-deep: #f2f2f2 !important;
+    --card: #ffffff !important;
+    --ink: #000000 !important;
+    --ink-soft: #333333 !important;
+    --ink-faint: #555555 !important;
+    --line: #bbbbbb !important;
+    --hairline: #dddddd !important;
+    color-scheme: light;
+  }
+
+  /* The page prints as one flow: the app's own scroller must not clip it to one screen. */
+  html,
+  body,
+  #root {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  /* The riso paper grain prints as grey dirt. */
+  body::before {
+    display: none;
+  }
+
+  /* Chrome off: the bars, the section map, the skip link, the toast line and the « next page »
+     hand-over are navigation — none of them is the plan. */
+  .shell__bar,
+  .shell__nav,
+  .skip-link,
+  .section-nav,
+  .toast-region,
+  .next {
+    display: none !important;
+  }
+  .shell {
+    display: block;
+  }
+  .shell__main {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* Cards hold together across page breaks; tables un-cap and un-clip — every column, every row. */
+  .surface {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+    background: none;
+  }
+  .table-wrap thead th {
+    position: static;
+  }
+  .table-wrap th,
+  .table-wrap td {
+    white-space: normal;
+  }
+  .table-wrap tr {
+    break-inside: avoid;
+  }
+}
