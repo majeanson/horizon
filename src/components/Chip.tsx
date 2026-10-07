@@ -117,10 +117,12 @@ export function Chip({
       onClick={handler}
       // Only a TOGGLE says pressed. An action chip that announced
       // `aria-pressed="false"` for ever ("Balayer, toggle button, not pressed")
-      // was the bug this shape split fixes.
+      // was the bug this shape split fixes. A chip that says `expanded` is a
+      // disclosure, never ALSO a pressed toggle — `selected` may still ride
+      // along for the `.is-on` look of an opened rule.
       role={radio && selected !== undefined && !onRemove ? 'radio' : undefined}
       aria-checked={radio && selected !== undefined && !onRemove ? selected : undefined}
-      aria-pressed={selected === undefined || onRemove || radio ? undefined : selected}
+      aria-pressed={selected === undefined || onRemove || radio || expanded !== undefined ? undefined : selected}
       aria-expanded={expanded}
       aria-label={ariaLabel ?? (onRemove ? removeLabel : undefined)}
       title={title}

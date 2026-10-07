@@ -41,29 +41,30 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
 
       {!pension.inPay && (
         <>
-      <FieldRow label={p.accrual}>
-        {(w) => <NumberField kind="percent" min={0} max={0.1} value={pension.accrualRate} onChange={(accrualRate) => set((x) => ({ ...x, accrualRate }))} id={w.id} />}
+      <FieldRow label={p.accrual} hint={p.accrualHint}>
+        {(w) => <NumberField kind="percent" min={0} max={0.1} value={pension.accrualRate} onChange={(accrualRate) => set((x) => ({ ...x, accrualRate }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       <FieldRow label={p.maxService}>
         {(w) => (
           <NumberField kind="decimal" allowEmpty min={1} max={60} unit={t.fields.years} placeholder={p.maxServiceNone} value={pension.maxServiceYears} onChange={(maxServiceYears) => set((x) => ({ ...x, maxServiceYears }))} id={w.id} />
         )}
       </FieldRow>
-      <FieldRow label={p.averaging}>
-        {(w) => <NumberField kind="int" min={1} max={10} unit={t.fields.years} value={pension.averagingYears} onChange={(averagingYears) => set((x) => ({ ...x, averagingYears }))} id={w.id} />}
+      <FieldRow label={p.averaging} hint={p.averagingHint}>
+        {(w) => <NumberField kind="int" min={1} max={10} unit={t.fields.years} value={pension.averagingYears} onChange={(averagingYears) => set((x) => ({ ...x, averagingYears }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
-      <FieldRow label={p.earliestAge}>
-        {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.earliestAge} onChange={(earliestAge) => set((x) => ({ ...x, earliestAge }))} id={w.id} />}
+      <FieldRow label={p.earliestAge} hint={p.earliestAgeHint}>
+        {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.earliestAge} onChange={(earliestAge) => set((x) => ({ ...x, earliestAge }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
-      <FieldRow label={p.unreducedAge}>
-        {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.unreduced.age} onChange={(age) => set((x) => ({ ...x, unreduced: { ...x.unreduced, age } }))} id={w.id} />}
+      <FieldRow label={p.unreducedAge} hint={p.unreducedAgeHint}>
+        {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.unreduced.age} onChange={(age) => set((x) => ({ ...x, unreduced: { ...x.unreduced, age } }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
-      <FieldRow label={p.unreducedService}>
+      <FieldRow label={p.unreducedService} hint={p.unreducedServiceHint}>
         {(w) => (
-          <NumberField kind="decimal" allowEmpty min={1} max={60} unit={t.fields.years} value={pension.unreduced.serviceYears} onChange={(serviceYears) => set((x) => ({ ...x, unreduced: { ...x.unreduced, serviceYears } }))} id={w.id} />
+          <NumberField kind="decimal" allowEmpty min={1} max={60} unit={t.fields.years} value={pension.unreduced.serviceYears} onChange={(serviceYears) => set((x) => ({ ...x, unreduced: { ...x.unreduced, serviceYears } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
-      <Chip selected={pension.unreduced.factor !== null} onClick={() => set((x) => ({ ...x, unreduced: { ...x.unreduced, factor: x.unreduced.factor ? null : NEUTRAL.factor } }))}>
+      {/* The three optional rules unfold their fields in place: expanders to a screen reader, not toggles. */}
+      <Chip selected={pension.unreduced.factor !== null} expanded={pension.unreduced.factor !== null} onClick={() => set((x) => ({ ...x, unreduced: { ...x.unreduced, factor: x.unreduced.factor ? null : NEUTRAL.factor } }))}>
         {p.factor}
       </Chip>
       {pension.unreduced.factor && (
@@ -76,11 +77,11 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
           </FieldRow>
         </>
       )}
-      <FieldRow label={p.earlyReduction}>
-        {(w) => <NumberField kind="percent" min={0} max={0.2} value={pension.earlyReductionPerYear} onChange={(earlyReductionPerYear) => set((x) => ({ ...x, earlyReductionPerYear }))} id={w.id} />}
+      <FieldRow label={p.earlyReduction} hint={p.earlyReductionHint}>
+        {(w) => <NumberField kind="percent" min={0} max={0.2} value={pension.earlyReductionPerYear} onChange={(earlyReductionPerYear) => set((x) => ({ ...x, earlyReductionPerYear }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
 
-      <Chip selected={pension.coordination !== null} onClick={() => set((x) => ({ ...x, coordination: x.coordination ? null : NEUTRAL.coordination }))}>
+      <Chip selected={pension.coordination !== null} expanded={pension.coordination !== null} onClick={() => set((x) => ({ ...x, coordination: x.coordination ? null : NEUTRAL.coordination }))}>
         {p.coordination}
       </Chip>
       {pension.coordination && (
@@ -100,7 +101,7 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
         </>
       )}
 
-      <Chip selected={pension.bridge !== null} onClick={() => set((x) => ({ ...x, bridge: x.bridge ? null : NEUTRAL.bridge }))}>
+      <Chip selected={pension.bridge !== null} expanded={pension.bridge !== null} onClick={() => set((x) => ({ ...x, bridge: x.bridge ? null : NEUTRAL.bridge }))}>
         {p.bridge}
       </Chip>
       {pension.bridge && (
