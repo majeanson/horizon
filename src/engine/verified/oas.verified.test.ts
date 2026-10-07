@@ -318,3 +318,14 @@ describe('the OAS Benefits Estimator, Oct–Dec 2026, a partial pension', () => 
     expect(gisMonthly(30_784, 'single', RULES)).toBe(0)
   })
 })
+
+// ── The same estimator, for the « retired » couple (both on the OAS since 65, 47 years of residence, net incomes 36 546 $ and 19 842 $ without the OAS) ──
+// It printed, for each of them, « $762.50 from the Old Age Security pension, $0 from the Guaranteed Income Supplement ».
+describe('the OAS Benefits Estimator, Oct–Dec 2026, a couple both on the OAS with a combined income of 56 388 $', () => {
+  it('each gets the full $762.50, and the combined income is far above the couple\'s GIS cut-off: no GIS', () => {
+    const category = gisCategory({ present: true, receivesOas: true })
+    expect(category).toBe('spouseOas')
+    expect(gisMonthly(36_546 + 19_842, category, RULES)).toBe(0)
+    expect(RULES.monthly65to74).toBe(762.5)
+  })
+})
