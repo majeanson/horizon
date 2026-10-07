@@ -48,7 +48,6 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 0 — scaffold and CI
 
-- [x] Repo, tooling, primitives, i18n contract, guards (`noNetwork`, `intl-rule`, `chip-rule`, `autofocus`, `devkitParity`, `i18nParity`, `docs`), Worker, service worker, `check-bundle`
 - [x] CI green on GitHub (`ci.yml`), first deploy to Cloudflare (local `wrangler deploy`), `e2e/smoke.spec.ts`, `a11y.spec.ts` and the service-worker harness green in CI
 
 ### Phase 1 — parameters for 2026, with their sources

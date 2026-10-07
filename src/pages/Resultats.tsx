@@ -13,7 +13,7 @@ import { LedgerPanel } from '../components/results/LedgerPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SaveView } from '../components/results/SaveView'
 import { StopView } from '../components/results/StopView'
-import { SubTabs } from '../components/SubTabs'
+import { SectionHeader } from '../components/SectionHeader'
 import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
@@ -65,7 +65,6 @@ export function Resultats() {
   }, [retiredNow, profile, year, month])
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
   const selections = parseSelections(params.get('ages'), defaultSelections(profile.household, state.everyoneRetired)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
-  const question = (['save', 'stop'] as const).find((k) => k === params.get('q')) ?? 'when'
   const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
@@ -99,6 +98,15 @@ export function Resultats() {
     [profile, gaps.length, year, month, picked],
   )
 
+  // Old deep links chose one question (`?q=save|stop`); the three answers share the page now, so
+  // the link becomes a scroll to that section, and the key is dropped from the address.
+  const legacyQ = params.get('q')
+  useEffect(() => {
+    if (legacyQ === null) return
+    if (legacyQ === 'save' || legacyQ === 'stop') document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
+    setParam('q', null)
+  }, [legacyQ, setParam])
+
   // On a phone the rail shows only its first chips: bring the ones already switched on into view, once, so the page
   // never opens looking as if nothing were selected.
   const compareRef = useRef<HTMLDivElement>(null)
@@ -110,18 +118,17 @@ export function Resultats() {
   const youngest = Math.min(...profile.household.persons.map((p) => year - p.birth.year))
   const firstAge = Math.max(MIN_AGE, oldest)
   const headline = useMemo(
-    // The headline reads two more projections: not worked out for a question that never shows it (« Combien épargner ? »).
-    () => (gaps.length > 0 || question === 'save' ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest)),
-    [profile, gaps.length, question, earliest, firstAge, youngest, year, month],
+    () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest)),
+    [profile, gaps.length, earliest, firstAge, youngest, year, month],
   )
   // Which scenario the answer is under, and — when the prudent one gives a clearly later age — what that age is (off the page's thread).
   const activePreset = presetOf(assumptions)
-  const prudent = usePresetEarliest(profile.household, assumptions, gaps.length === 0 && question === 'when' && activePreset !== 'prudent')
+  const prudent = usePresetEarliest(profile.household, assumptions, gaps.length === 0 && activePreset !== 'prudent')
   const prudentGap = prudentDiffers(prudent, headline.age)
+  // The verdict's age, put in dates: one cheap main-thread projection.
   const stop = useMemo(
-    // One more projection, and only for the question that shows it.
-    () => (gaps.length > 0 || question !== 'stop' || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
-    [profile, gaps.length, question, headline.age, year, month],
+    () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
+    [profile, gaps.length, headline.age, year, month],
   )
   const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
@@ -202,45 +209,13 @@ export function Resultats() {
     )
   }
 
-  const pickQuestion = (
-    <SubTabs<'when' | 'save' | 'stop'>
-      ariaLabel={rc.questions.label}
-      value={question}
-      onSelect={(k) => setParam('q', k === 'when' ? null : k)}
-      options={(['when', 'save', 'stop'] as const).map((k) => ({ key: k, label: rc.questions.tabs[k] }))}
-    />
-  )
-  if (question === 'save') {
-    const wanted = Number(params.get('age'))
-    const age = Number.isFinite(wanted) && wanted >= firstAge && wanted <= MAX_AGE ? Math.round(wanted) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
-    return (
-      <section className="page-body">
-        <PageHead title={r.title} />
-        {pickQuestion}
-        <SaveView household={profile.household} assumptions={assumptions} age={age} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
-        <NextStep to="/donnees" label={t.next.toData}>
-          <p>{t.next.resultsHint}</p>
-        </NextStep>
-      </section>
-    )
-  }
-  if (question === 'stop') {
-    return (
-      <section className="page-body">
-        <PageHead title={r.title} />
-        {pickQuestion}
-        <StopView household={profile.household} names={names} headline={headline} stop={stop} each={earliestEachAnswer} maxAge={MAX_AGE} />
-        <NextStep to="/donnees" label={t.next.toData}>
-          <p>{t.next.resultsHint}</p>
-        </NextStep>
-      </section>
-    )
-  }
+  // « Combien épargner ? » keeps its own age in the address (`?age=`), independent of the comparisons.
+  const wantedSaveAge = Number(params.get('age'))
+  const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
 
   return (
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
-      {pickQuestion}
 
       <div className="verdict surface" aria-live="polite">
         <p className="verdict__line">
@@ -350,6 +325,18 @@ export function Resultats() {
           <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
         </Disclosure>
       </Disclosure>
+      )}
+
+      {/* The two other questions, answered on the same page: views over the same profile and assumptions. */}
+      <section id="epargner" className="answer-section" aria-label={rc.questions.tabs.save}>
+        <SectionHeader title={rc.questions.tabs.save} />
+        <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
+      </section>
+      {stop !== null && (
+        <section id="arreter" className="answer-section" aria-label={rc.questions.tabs.stop}>
+          <SectionHeader title={rc.questions.tabs.stop} subtitle={rc.questions.stop.hint} />
+          <StopView names={names} stop={stop} />
+        </section>
       )}
 
       {details}

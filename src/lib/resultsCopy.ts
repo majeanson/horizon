@@ -6,7 +6,6 @@
 
 const FR_RESULTS = {
   questions: {
-    label: 'Ma question',
     tabs: { when: 'Quand prendre ma retraite ?', save: 'Combien épargner ?', stop: 'Quand arrêter de travailler ?' },
     save: {
       age: 'Partir à (âge)',
@@ -21,7 +20,7 @@ const FR_RESULTS = {
       caveat: 'Un compte enregistré ferait un peu mieux : ce montant est donc prudent.',
     },
     stop: {
-      age: (age: number, together: boolean) => `Dès ${age} ans${together ? ', tous les deux' : ''}.`,
+      hint: 'L’âge du verdict, mis en dates.',
       when: (name: string, year: number) => `${name} : en ${year}`,
       share: (pct: string, year: number) => `En ${year}, vos rentes, après impôt, couvrent ${pct} de vos dépenses ; le reste vient de votre épargne.`,
       coversFrom: (year: number) => `Dès ${year}, vos rentes seules, après impôt, couvrent vos dépenses.`,
@@ -42,7 +41,6 @@ const FR_RESULTS = {
       age === null ? `Sous le scénario ${name.toLowerCase()}, aucun âge ne tient, même à ${max} ans.` : `Sous le scénario ${name.toLowerCase()} : ${age} ans.`,
     earlier: (age: number, year: number) => `À ${age} ans, l’argent viendrait à manquer dès ${year}.`,
     tryThis: 'Essayez de baisser les dépenses à la retraite, ou d’épargner davantage.',
-    separately: 'Chacun de son côté :',
   },
   each: {
     title: 'Chacun de son côté',
@@ -58,7 +56,6 @@ const FR_RESULTS = {
 
 const EN_RESULTS: typeof FR_RESULTS = {
   questions: {
-    label: 'My question',
     tabs: { when: 'When can I retire?', save: 'How much to save?', stop: 'When can I stop working?' },
     save: {
       age: 'Retire at (age)',
@@ -73,7 +70,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
       caveat: 'A registered account would do a little better, so this amount is cautious.',
     },
     stop: {
-      age: (age: number, together: boolean) => `From ${age}${together ? ', both of you' : ''}.`,
+      hint: 'The verdict’s age, put in dates.',
       when: (name: string, year: number) => `${name}: in ${year}`,
       share: (pct: string, year: number) => `In ${year}, your pensions, after tax, cover ${pct} of your spending; the rest comes from your savings.`,
       coversFrom: (year: number) => `From ${year}, your pensions alone, after tax, cover your spending.`,
@@ -94,7 +91,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
     holds: (horizon: number) => `And the money lasts to age ${horizon}.`,
     earlier: (age: number, year: number) => `At ${age}, the money would run short from ${year}.`,
     tryThis: 'Try lowering spending in retirement, or saving more.',
-    separately: 'Each on their own:',
   },
   each: {
     title: 'Each on their own',
