@@ -52,16 +52,13 @@
   --sky-deep: #548aa4; /* 3.06:1 on --sky-wash (was #5891ac, 2.80:1) */
   --berry: #b06a93;
   --berry-deep: #95527a;
-  --teal: #34b3a6; /* turquoise — Le cercle's accent */
-  --teal-deep: #2a8f85;
-  --butter: #fbd66b;
+  /* (Babillard's teal and butter left with Le cercle — nothing here used them.) */
 
   --marigold-wash: #fbe6c8;
   --terracotta-wash: #f6dace;
   --sage-wash: #e2ead6;
   --sky-wash: #d8eaf1;
   --berry-wash: #efdce8;
-  --teal-wash: #d4ece9;
 
   /* ---- Section INK tier (bmad/08 A-10 — the text-safe section colours) ----
      One per hub section, tuned per THEME to ≥4.5:1 (WCAG AA small text) on that
@@ -74,7 +71,6 @@
   --sage-ink: #566f42; /* 4.53:1 */
   --sky-ink: #426d82; /* 4.53:1 */
   --berry-ink: #8f4f75; /* 4.54:1 */
-  --teal-ink: #22736a; /* 4.55:1 */
 
   /* ---- Babillard-compat semantic aliases (map onto Pip) ---- */
   --paper-2: var(--paper-deep);
@@ -107,7 +103,8 @@
   --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
   --sans: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --display: 'Baloo 2', ui-rounded, system-ui, sans-serif;
-  --font-hand: 'Caveat', 'Hanken Grotesk', cursive;
+  /* (--font-hand 'Caveat' is gone: fonts.css never shipped the face, so it would
+     have silently rendered a cursive fallback the day someone used it.) */
   /* legacy aliases used by older rules */
   --font-display: var(--display);
   --font-body: var(--sans);
@@ -191,6 +188,10 @@
    sink it onto warm-dark stock, keep the inks (they read fine bright on dark),
    and darken the washes so colour-coded tiles still hold. */
 :root[data-theme='night'] {
+  /* The NATIVE chrome follows the palette too: without this, the desktop scrollbar on
+     #root and the overscroll glow stayed light-scheme over the dark paper. (.input
+     repeats the scheme below for the pickers — that stays, it is more specific.) */
+  color-scheme: dark;
   --paper: #1b1712;
   --paper-deep: #221d16;
   --card: #25201a;
@@ -222,7 +223,6 @@
   --sage-wash: #28301f;
   --sky-wash: #1f2c33;
   --berry-wash: #321f2c;
-  --teal-wash: #1d2e2c;
 
   /* Berry was the one night-side glyph-on-wash fail (2.75:1) — lifted past 3:1. */
   --berry-deep: #9a5a81; /* 3.04:1 on night --berry-wash */
@@ -234,7 +234,6 @@
   --sage-ink: #88a36f; /* 4.90:1 */
   --sky-ink: #7bb0c9; /* 6.07:1 */
   --berry-ink: #b8789d; /* 4.54:1 */
-  --teal-ink: #34b3a6; /* 5.51:1 */
 
   --accent-ink: #1b1712;
   --on-primary: #1b1712;
@@ -344,10 +343,10 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /* Lock browser zoom (pairs with viewport user-scalable=no): pan-x/pan-y keeps
-     scrolling but disallows the pinch-zoom gesture that made fixed overlays
-     shimmer; it also drops double-tap-to-zoom. In-app zoom stays tap-to-
-     fullscreen (ZoomableImg). */
+  /* BROWSER ZOOM STAYS ENABLED in Horizon (index.html sets no user-scalable=no):
+     pinch-zoom is the reader's reach beyond the in-app text-size setting, and
+     nothing here may take it away. (A Babillard-era comment used to claim the
+     opposite and nearly got the lock "restored".) */
   /* App-shell scroll lock. The document itself NEVER scrolls — #root is the one
      scroller (and within it a page may have its own, e.g. .hub__body). Without
      this the 100vh hub sits taller than the iOS visual viewport, so the page
@@ -624,45 +623,8 @@ textarea.input {
 :root[data-theme='night'] .input {
   color-scheme: dark;
 }
-.tag {
-  font-family: var(--mono);
-  /* Type floor (bmad/08 A-10): nothing readable below --text-xs (~12.5px). */
-  font-size: var(--text-xs);
-  padding: 0.15rem 0.55rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-.tag--on {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-.tag--off {
-  color: var(--warn);
-  border-color: var(--warn);
-}
-/* A tag that's also the on/off control (the IA switch in the Réglages header):
-   inherits the pill look but behaves as a tappable button. */
-.tag--btn {
-  background: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.tag--btn:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-.eyebrow {
-  color: var(--ink-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: var(--text-xs); /* type floor (A-10) — was 0.74rem */
-  margin: 0 0 0.5rem;
-}
-.error {
-  color: var(--warn);
-}
+/* (The Babillard .tag / .eyebrow / .error families lived here — nothing in Horizon
+   rendered them; Chip and StatusMessage are the pills and the status lines.) */
 .lead {
   color: var(--ink-soft);
   max-width: 50ch;
@@ -711,43 +673,8 @@ textarea.input {
      viewport scrolls #root; the hub overrides this with its own fixed height. */
   min-height: 100%;
 }
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--line);
-}
-.topbar__brand {
-  font-weight: 700;
-  text-decoration: none;
-  letter-spacing: -0.01em;
-}
-.topbar__actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-.narrow {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 2rem 1.25rem;
-}
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 22rem;
-}
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-.field__label {
-  font-size: var(--text-sm);
-  color: var(--ink-soft);
-}
+/* (Babillard's .topbar / .narrow / .form / .field chrome lived here — Horizon's
+   shell is .shell__* in horizon.css and its forms are FieldRow in fields.css.) */
 
 /* The sub-tab nav + its contextual "?" help toggle on one row; the segmented
    control flexes to fill, the round toggle sits beside it (matches the board). */
@@ -949,30 +876,6 @@ textarea.input {
   --hs-r: var(--hs-fade); /* …and/or to the RIGHT */
 }
 
-.kitchen__day-empty {
-  font-size: var(--text-md);
-  opacity: 0.7;
-}
-/* "💡 Léa" — a kid suggested this supper into an empty slot. Quiet, so it reads as
-   a note beside the meal, not a second meal. */
-.kitchen__day-sugg {
-  /* Its OWN line below the meal (the .kitchen__day wrap was always meant to drop
-     it here). Beside the title it competed for width and — because flex shrinks
-     the larger-content item hardest — collapsed the title into a one-letter-per-
-     line column. Full-basis takes it out of that fight; a long name ellipsizes. */
-  flex: 0 0 100%;
-  min-width: 0;
-  max-width: max-content;
-  font-size: var(--text-xs);
-  color: var(--terracotta-deep);
-  background: var(--terracotta-wash);
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* --- Focus-visible rings (a11y) ------------------------------------------- */
 /* Keyboard / switch / desktop-operator + guest users need a visible focus cue on
    every core tappable, not just .input. One consistent ring across the system:
@@ -981,11 +884,9 @@ textarea.input {
    feedback (translate + shadow) is untouched; this only paints for keyboard
    focus. Kit / hub primitives carry the same rule in their own files. */
 .btn:focus-visible,
-.tag--btn:focus-visible,
 .subtabs__opt:focus-visible,
-.board__list-item:focus-visible,
-/* .chip is defined across kitchen/almanac/cercle — the shared ring lives HERE
-   (affordance audit 2026-07-14: chips are primary nav yet had no focus cue). */
+/* .chip's shared ring lives HERE (affordance audit 2026-07-14: chips are primary
+   nav yet had no focus cue). */
 .chip:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
