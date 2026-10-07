@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { LangContext, type Lang } from './i18n'
 import { ToastProvider } from './lib/toast'
 import { ConfirmProvider } from './lib/confirm'
+import { applyDocumentLang } from './lib/documentLang'
 import { registerSw } from './lib/registerSw'
 import './styles.css'
 
@@ -31,10 +32,11 @@ function Root() {
     } catch {
       /* storage blocked — the choice just does not persist */
     }
-    document.documentElement.lang = l
+    applyDocumentLang(l)
   }
-  // index.html is lang="fr"; keep <html lang> honest on a saved English choice.
-  if (document.documentElement.lang !== lang) document.documentElement.lang = lang
+  // index.html is lang="fr" and carries both languages' description: narrow <html lang>, the description, the link
+  // preview and the install manifest to the reader's language (a saved English choice included).
+  applyDocumentLang(lang)
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>

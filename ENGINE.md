@@ -77,6 +77,6 @@ simplification · `⬜` = not yet built (see `STATE.md` for the phase).
    with the official URL and today's `retrieved` date.
 2. Add it to `KNOWN` in `engine/params/index.ts`.
 3. Add `engine/params/<year>.test.ts` — one literal assertion per leaf, URL in the name.
-4. `npm run sources` (regenerates `SOURCES.md`), then update the golden household and review the
+4. `npm run sources` (regenerates `SOURCES.md` and `SOURCES.en.md`), then update the golden household and review the
    diff — a year's indexation should move numbers in the direction you expect, and by about
    the percentage you expect.

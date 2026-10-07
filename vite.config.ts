@@ -26,6 +26,7 @@ function buildSha(): string {
 const PUBLIC_SHELL = [
   '/',
   '/manifest.webmanifest',
+  '/manifest.en.webmanifest',
   '/theme-bootstrap.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

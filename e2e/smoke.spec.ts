@@ -37,6 +37,27 @@ test('the language toggle flips the whole shell to English and back, and remembe
   await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
 })
 
+test('the page head follows the language: description, link preview and install manifest, from the first paint of a saved choice', async ({ page }) => {
+  const manifest = page.locator('link[rel="manifest"]')
+  const description = page.locator('meta[name="description"]')
+  await page.goto('/')
+  await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
+  await expect(description).toHaveAttribute('content', /retraite/)
+  await page.getByRole('button', { name: 'EN' }).click()
+  await expect(manifest).toHaveAttribute('href', '/manifest.en.webmanifest')
+  await expect(description).toHaveAttribute('content', /retire/)
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'en_CA')
+  // The English manifest is a real, parseable file the server answers.
+  const res = await page.request.get('/manifest.en.webmanifest')
+  expect(res.ok()).toBe(true)
+  expect((await res.json()).lang).toBe('en')
+  // …and a reload keeps it.
+  await page.reload()
+  await expect(manifest).toHaveAttribute('href', '/manifest.en.webmanifest')
+  await page.getByRole('button', { name: 'FR' }).click()
+  await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
+})
+
 test('the theme toggle flips data-theme and survives a reload with no flash of the other one', async ({ page }) => {
   await page.goto('/')
   const html = page.locator('html')

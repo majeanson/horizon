@@ -12,17 +12,21 @@
     <meta name="theme-color" content="#FBF3E4" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1b1712" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#FBF3E4" />
-    <meta name="description" content="Horizon — à quel âge pouvez-vous prendre votre retraite ? Un planificateur pour le Québec, calculé sur les paramètres officiels, dont les données restent sur votre appareil." />
+    <!-- The description and the link-preview text ship BOTH languages (FR, then EN): a crawler or a search snippet never
+         runs a script. The app narrows them to the reader's language once it knows it (lib/documentLang.ts). -->
+    <meta name="description" content="Horizon — à quel âge pouvez-vous prendre votre retraite ? Un planificateur pour le Québec, calculé sur les paramètres officiels, dont les données restent sur votre appareil. / At what age can you retire? A planner for Québec, calculated on the official parameters; your data stays on your device." />
     <title>Horizon</title>
     <meta property="og:title" content="Horizon" />
-    <meta property="og:description" content="Quand pouvez-vous prendre votre retraite ? Calculé sur les paramètres officiels du Québec et du Canada ; vos données ne quittent jamais votre appareil." />
+    <meta property="og:description" content="Quand pouvez-vous prendre votre retraite ? Calculé sur les paramètres officiels du Québec et du Canada ; vos données ne quittent jamais votre appareil. / When can you retire? Calculated on the official Québec and Canadian parameters; your data never leaves your device." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Horizon" />
     <meta property="og:locale" content="fr_CA" />
+    <meta property="og:locale:alternate" content="en_CA" />
     <meta name="twitter:card" content="summary" />
     <!-- PWA: installable, offline app shell via /sw.js (registered in src/lib/registerSw.ts,
          prod builds only). Fonts are self-hosted (@fontsource, bundled): not one request
          leaves the origin. -->
+    <!-- French manifest by default; lib/documentLang.ts points an English reader at /manifest.en.webmanifest. -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/png" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />

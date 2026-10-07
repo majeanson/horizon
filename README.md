@@ -16,7 +16,7 @@ year-by-year table behind it, and how fragile the answer is to worse returns, hi
 longer life.
 
 - **Every government figure is cited.** Each parameter carries the official page it came from and
-  the date it was read (`SOURCES.md`, generated; the results page lists them too). Worked examples
+  the date it was read (`SOURCES.md` / `SOURCES.en.md`, generated; the results page lists them too). Worked examples
   from those pages are tests, and a weekly job checks that every cited page still opens.
 - **Every number you type has an ⓘ** that says where to find it — the portal, the document, the
   statement's own wording — and links to the official page.
@@ -41,7 +41,7 @@ Deploys as a single Cloudflare Worker that serves static files (`npm run deploy`
 
 Start with [`STATE.md`](./STATE.md) — what is built, what is next, and the questions still open.
 [`CLAUDE.md`](./CLAUDE.md) is how code is written here, [`ENGINE.md`](./ENGINE.md) the calculation
-contract (what is official and what is simplified), [`SOURCES.md`](./SOURCES.md) every cited figure,
+contract (what is official and what is simplified), [`SOURCES.md`](./SOURCES.md) / [`SOURCES.en.md`](./SOURCES.en.md) every cited figure,
 and [`COMPONENTS.md`](./COMPONENTS.md) the shared UI (live at `/dev/kit`).
 
 Scaffolded from Babillard, a household command-centre, whose tooling and generic primitives came

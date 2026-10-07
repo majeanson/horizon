@@ -112,7 +112,7 @@ npm run build          # tsc -b (typecheck) then vite build → dist/
 npm run typecheck      # tsc -b --noEmit
 npm test               # vitest run — the engine, the guards, the helpers
 npm run test:engine    # vitest run src/engine only
-npm run sources        # regenerate SOURCES.md from the params files
+npm run sources        # regenerate SOURCES.md (FR) and SOURCES.en.md (EN) from the params files
 npm run check:bundle   # size budgets + the offline precache check (needs dist/)
 npm run knip           # dead-code gate (CI only: its parser needs a >4 GiB buffer that a memory-tight Windows box refuses)
 npm run e2e            # Playwright against Vite, profile seeded into localStorage

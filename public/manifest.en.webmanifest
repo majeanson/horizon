@@ -1,9 +1,9 @@
 {
   "id": "/",
-  "name": "Horizon — quand la retraite ?",
+  "name": "Horizon — when can you retire?",
   "short_name": "Horizon",
-  "description": "À quel âge pouvez-vous prendre votre retraite ? Un planificateur pour le Québec, calculé sur les paramètres officiels. Vos données restent sur votre appareil.",
-  "lang": "fr",
+  "description": "At what age can you retire? A planner for Québec, calculated on the official parameters. Your data stays on your device.",
+  "lang": "en",
   "categories": ["finance", "productivity"],
   "start_url": "/",
   "scope": "/",

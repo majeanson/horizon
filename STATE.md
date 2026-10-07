@@ -32,6 +32,7 @@
 | `ENGINE.md` | the calculation contract: conventions, what is official vs simplified, how trust is earned |
 | `COMPONENTS.md` | the shared-UI inventory, paired with the `/dev/kit` gallery |
 | `SOURCES.md` | *generated* (`npm run sources`) — every government parameter, its official page and retrieval date |
+| `SOURCES.en.md` | *generated* (`npm run sources`) — the same table in English, each page linked in its English edition |
 
 **The checkbox convention** (repo-wide): `- [ ]` is **open work**, and lives only in this file ·
 `- [x]` done, with what settles it · `- [~]` parked, with the why · `❓` an open question.
@@ -121,7 +122,8 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] Every page names the browser tab (`Résultats · Horizon`); a blank profile says where to start
 - [x] `.github/workflows/sources.yml`: every cited page — the figures' AND the ⓘ links, in both languages — is opened weekly; a gone or erroring page fails the job; a page that refuses bots (Revenu Québec, legisquebec) is reported as blocked, never fatal
 - [x] Deployed to https://horizon.marc-jeanson.workers.dev with `npm run deploy` (local `wrangler login`)
-- [ ] Language, what is still one-language: `SOURCES.md` is French (it lists both editions of each page); `index.html`'s description / Open Graph tags and the install manifest are French (a static file cannot follow the reader); 7 cited pages exist in one language only (`twins.ts` says which and why)
+- [x] Language: `SOURCES.md` and `SOURCES.en.md` are both generated (`npm run sources`), the English one linking each page's English edition; `index.html` ships a FR + EN description / link preview and `lib/documentLang.ts` narrows them, `<html lang>` and the install manifest (`manifest.webmanifest` / `manifest.en.webmanifest`, both precached) to the reader's language
+- [ ] Language, what is still one-language: a link-preview crawler reads the FR + EN sentence, never one language (it runs no script); the `<link rel=manifest>` swap is read by the browser at install time, so an app installed in one language keeps that language's name until reinstalled; a note in `SOURCES.en.md` is the official page's own wording, so a few are French; 7 cited pages exist in one language only (`twins.ts` says which and why)
 - [ ] **Deploy on push**: add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets (Settings ▸ Secrets and variables ▸ Actions). Until then CI skips the deploy job cleanly and a deploy is `npm run deploy` from a logged-in machine
 
 ### Phase 10 — Simple / Full, clarity, questions

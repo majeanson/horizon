@@ -89,3 +89,63 @@ describe('renderSourcesMd()', () => {
     expect(renderSourcesMd({ years: { 2026: tree }, series: [] })).not.toContain('Séries historiques')
   })
 })
+
+describe('renderSourcesMd() — the English edition', () => {
+  // Real entries of twins.ts: a French-first page with an English twin, an English-first page with a French twin, a French-only page.
+  const FR_FIRST = 'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf'
+  const EN_FIRST = 'https://laws-lois.justice.gc.ca/eng/acts/I-3.3/section-118.html'
+  const FR_ONLY = 'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110906.asp'
+  const at = (url: string, title: string): Cited<number> => ({ value: 1, source: { url, title, retrieved: '2026-10-01' }, index: 'fixed' })
+  const real = { frFirst: at(FR_FIRST, 'Paramètres français'), enFirst: at(EN_FIRST, 'Income Tax Act, section 118'), frOnly: at(FR_ONLY, 'Fiche française') }
+  const rowOf = (md: string, path: string) => md.split('\n').find((l) => l.startsWith(`| \`${path}\``))!
+
+  const mdEn = renderSourcesMd({ years: { 2026: tree }, series: [{ name: 'rrq.mgaHistory', cited: history }] }, 'en')
+
+  it('prints the same rows with English headings, English numbers and English index words', () => {
+    expect(mdEn).toContain('# SOURCES.en.md')
+    expect(mdEn).toContain('| Parameter | Value | Official page | Read on | Moves with | Note |')
+    expect(mdEn).toContain('| `rrq.mga` | 74,600 |')
+    expect(mdEn).toContain('| `federal.brackets` | 58,523 @ 14% · ∞ @ 33% |')
+    expect(mdEn).toContain('wages · rounded to 100')
+    expect(mdEn).toContain('3 parameters.')
+    expect(mdEn).toContain('## Historical series')
+    expect(mdEn).toContain('## Pages consulted')
+    expect(mdEn).toContain('3 official pages.')
+    expect(mdEn).not.toContain('paramètres')
+  })
+
+  it('links the English edition of a page first and the French one beside it — whichever language the page was cited in', () => {
+    const out = renderSourcesMd({ years: { 2026: real }, series: [] }, 'en')
+    // cited in French → its English twin is shown, the French page is the « version française » link
+    expect(rowOf(out, 'frFirst')).toMatch(/^\| `frFirst` \| 1 \| \[[^\]]+\]\((?!https:\/\/cdn-contenu[^)]*AUTFR)[^)]+\) · \[version française\]\(https:\/\/cdn-contenu[^)]*AUTFR_RegimeImpot2026\.pdf\)/)
+    // cited in English → shown as is, the French twin beside it
+    expect(rowOf(out, 'enFirst')).toContain(`[Income Tax Act, section 118](${EN_FIRST}) · [version française](https://laws-lois.justice.gc.ca/fra/`)
+    // the French edition of the document keeps the page as cited, with its twin beside it (unchanged behaviour)
+    expect(rowOf(renderSourcesMd({ years: { 2026: real }, series: [] }), 'enFirst')).toContain(`[Income Tax Act, section 118](${EN_FIRST}) · [version française](`)
+  })
+
+  it('links a page that exists in French only as it is, and says so', () => {
+    const out = renderSourcesMd({ years: { 2026: real }, series: [] }, 'en')
+    expect(rowOf(out, 'frOnly')).toContain(`[Fiche française](${FR_ONLY}) (French-language page only)`)
+    expect(rowOf(out, 'frOnly')).not.toContain('version française')
+  })
+
+  it('flags an unconfirmed figure in English too', () => {
+    const flagged = { ...tree, federal: { brackets: { ...tree.federal.brackets, source: { ...SRC(2), verify: 'read from an archived copy' } } } }
+    const out = renderSourcesMd({ years: { 2026: flagged }, series: [] }, 'en')
+    expect(out).toContain('**⚠ TO VERIFY:** read from an archived copy')
+    expect(out).toContain('3 parameters, of which **1 to verify**.')
+  })
+
+  it('never lets a pipe break the table, and has exactly the French edition’s rows', () => {
+    for (const line of mdEn.split('\n').filter((l) => l.startsWith('| `'))) expect(line.replace(/\\\|/g, '').split('|').length, line).toBe(8)
+    const fr = renderSourcesMd({ years: { 2026: tree }, series: [{ name: 'rrq.mgaHistory', cited: history }] })
+    const pathsOf = (md: string) => md.split('\n').filter((l) => l.startsWith('| `')).map((l) => l.split('|')[1])
+    expect(pathsOf(mdEn)).toEqual(pathsOf(fr))
+  })
+
+  it('is deterministic, and the default edition stays French', () => {
+    expect(renderSourcesMd({ years: { 2026: tree }, series: [{ name: 'rrq.mgaHistory', cited: history }] }, 'en')).toBe(mdEn)
+    expect(renderSourcesMd({ years: { 2026: tree }, series: [] })).toContain('# SOURCES.md — chaque chiffre')
+  })
+})

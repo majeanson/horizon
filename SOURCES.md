@@ -2,6 +2,7 @@
 
 > **Généré** par `npm run sources` à partir de `src/engine/params/` — ne pas éditer à la main.
 > Un test (`sourcesMd.test.ts`) échoue si ce fichier diffère de ce que le code imprimerait.
+> L’édition anglaise est [`SOURCES.en.md`](./SOURCES.en.md) : mêmes lignes, mêmes chiffres.
 >
 > Chaque ligne est une valeur que le moteur lit, la page officielle où elle a été lue (titre et lien tels
 > qu’imprimés), le jour de la lecture, et la façon dont elle évolue d’une année à l’autre quand aucune page
