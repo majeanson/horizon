@@ -56,6 +56,14 @@ export function AppShell() {
   const t = useT()
   const { lang, setLang } = useLang()
   const [theme, setThemeState] = useState<Theme>(getTheme)
+  // A deploy while the page is OPEN and VISIBLE: registerSw never reloads under a reader; it raises
+  // this event instead, and the shell offers the reload as a one-line notice with a button.
+  const [swUpdate, setSwUpdate] = useState(false)
+  useEffect(() => {
+    const ready = () => setSwUpdate(true)
+    window.addEventListener('horizon:sw-update', ready)
+    return () => window.removeEventListener('horizon:sw-update', ready)
+  }, [])
   // Whatever stops the profile from being kept — or read — must be said on EVERY page: a person who lost their plan to a
   // refused profile and finds a blank one on Profil would otherwise think the app simply forgot them.
   const storageIssue = useStorageIssue()
@@ -104,6 +112,14 @@ export function AppShell() {
       {/* tabIndex -1: the skip link's target and where focus lands after a navigation — never a tab stop itself. */}
       <main className="shell__main" id="main" tabIndex={-1}>
         {storageIssue && <StatusMessage tone={storageIssue === 'unsaved' ? 'error' : 'info'}>{t.data.issue[storageIssue]}</StatusMessage>}
+        {swUpdate && (
+          <div className="sw-update">
+            <StatusMessage tone="info">{t.common.updateReady}</StatusMessage>
+            <button type="button" className="btn btn--sm" onClick={() => window.location.reload()}>
+              {t.common.updateReload}
+            </button>
+          </div>
+        )}
         {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched. */}
         <Suspense fallback={<Loading />}>
           <Outlet />

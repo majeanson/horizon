@@ -30,6 +30,8 @@ export const EN: typeof FR = {
     projected: 'projected',
     themeToNight: 'Switch to night mode',
     themeToDay: 'Switch to day mode',
+    updateReady: 'A new version of Horizon is ready.',
+    updateReload: 'Reload',
     lang: 'FR',
     langLabel: 'Switch to French',
     add: 'Add',

@@ -46,6 +46,8 @@ export const FR = {
     projected: 'projeté',
     themeToNight: 'Passer au mode nuit',
     themeToDay: 'Passer au mode jour',
+    updateReady: 'Une nouvelle version d’Horizon est prête.',
+    updateReload: 'Recharger',
     lang: 'EN',
     langLabel: 'Passer à l’anglais',
     add: 'Ajouter',
