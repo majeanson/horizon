@@ -84,8 +84,10 @@ export const FR = {
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
     welcome: {
       title: 'Pour commencer',
-      body: 'Entrez votre année de naissance et votre revenu de travail ; le reste peut attendre. Chaque chiffre à saisir a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
-      start: 'Commencer',
+      body: 'Trois chiffres suffisent pour un premier verdict ; le reste précise le calcul. Chaque chiffre a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
+      birth: 'Votre année de naissance',
+      salary: 'Votre revenu de travail par année',
+      spending: 'Vos dépenses par année, une fois à la retraite',
       example: 'Voir un exemple',
     },
     self: 'Moi',

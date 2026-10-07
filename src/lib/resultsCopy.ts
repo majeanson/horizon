@@ -16,6 +16,15 @@ const FR_RESULTS = {
     planView: 'L’effet sur tout le plan',
     ruleView: 'La règle, rente par rente',
   },
+  refine: {
+    title: 'Préciser le calcul',
+    hint: 'Le verdict tient déjà debout ; ces chiffres le rendraient plus fidèle.',
+    statement: 'La rente projetée de votre relevé RRQ, ou vos revenus admissibles année par année.',
+    accounts: 'Les soldes de vos comptes — REER, CELI, non enregistré.',
+    spendingWork: 'Vos dépenses pendant les années de travail.',
+    toProfile: 'Ouvrir le profil',
+    toAssumptions: 'Ouvrir les hypothèses',
+  },
   nav: {
     label: 'Sections des résultats',
     verdict: 'Verdict',
@@ -92,6 +101,15 @@ const EN_RESULTS: typeof FR_RESULTS = {
     hint: 'One decision, two views: what each way of starting does to the whole plan, then the rule, pension by pension.',
     planView: 'The effect on the whole plan',
     ruleView: 'The rule, pension by pension',
+  },
+  refine: {
+    title: 'Refine the calculation',
+    hint: 'The verdict already stands; these numbers would make it more faithful.',
+    statement: 'The projected pension from your QPP statement, or your pensionable earnings year by year.',
+    accounts: 'Your account balances — RRSP, TFSA, non-registered.',
+    spendingWork: 'Your spending during the working years.',
+    toProfile: 'Open the profile',
+    toAssumptions: 'Open the assumptions',
   },
   nav: {
     label: 'Results sections',

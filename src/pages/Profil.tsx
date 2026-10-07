@@ -6,11 +6,13 @@ import { AccountsSection, OasSection } from '../components/profile/OasAccountsSe
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
 import { Cluster } from '../components/Layout'
+import { FieldRow } from '../components/FieldRow'
 import { NextStep } from '../components/NextStep'
+import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
-import { hasSpouse, mapPerson } from '../lib/profileEdit'
+import { hasSpouse, mapPerson, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 
@@ -43,17 +45,14 @@ export function Profil() {
   return (
     <section className="page-body">
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
-      {profileGaps(profile).includes('income') && (
-        // First visit: a blank form is a wall. Say where to start, and offer a finished example to look at instead.
+      {gaps.length > 0 && (
+        // First visit: a blank form is a wall. The three numbers a first verdict needs are typed HERE — a short-form
+        // view of the same stored fields as the form below, gone as soon as the verdict has what it needs.
         <aside className="welcome surface">
           <h2 className="welcome__title">{t.profile.welcome.title}</h2>
           <p className="welcome__body">{t.profile.welcome.body}</p>
+          <QuickStart />
           <Cluster>
-            {/* The fields the card names sit a screen below it, under « Famille »: take the reader there. Scroll only —
-                a tap that asks « where do I start » does not ask for the keyboard. */}
-            <button type="button" className="btn btn--sm" onClick={() => document.getElementById('person-self')?.scrollIntoView({ block: 'start' })}>
-              {t.profile.welcome.start}
-            </button>
             <Link className="btn btn--sm btn--ghost" to="/donnees">
               {t.profile.welcome.example}
             </Link>
@@ -77,6 +76,28 @@ export function Profil() {
         {gaps.length === 0 ? <p>{t.next.profileReady}</p> : <p>{t.results.gaps.lead} {gaps.map((g) => t.results.gaps[g]).join(' ')}</p>}
       </NextStep>
     </section>
+  )
+}
+
+// The quick start: birth year, work income, retired spending — the three numbers `profileGaps` asks for before the
+// results page gives a verdict. They write the same store as the full form below (and as Hypothèses for the spending).
+function QuickStart() {
+  const t = useT()
+  const profile = useProfile()
+  const self = profile.household.persons[0]
+  const edit = (change: Parameters<typeof mapPerson>[2]) => updateProfile((p) => mapPerson(p, 'self', change))
+  return (
+    <div className="welcome__fields">
+      <FieldRow label={t.profile.welcome.birth}>
+        {(w) => <NumberField kind="year" min={1900} max={2100} value={self.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} />}
+      </FieldRow>
+      <FieldRow label={t.profile.welcome.salary}>
+        {(w) => <NumberField kind="money" max={1e8} value={self.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} />}
+      </FieldRow>
+      <FieldRow label={t.profile.welcome.spending}>
+        {(w) => <NumberField kind="money" max={1e8} value={profile.household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
+      </FieldRow>
+    </div>
   )
 }
 

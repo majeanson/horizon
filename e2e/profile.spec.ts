@@ -172,20 +172,29 @@ test.describe('a blank profile', () => {
 })
 
 test.describe('first visit', () => {
-  test('a blank profile says where to start, and the note goes away once something is entered', async ({ page }) => {
+  test('a blank profile asks for three numbers in the card itself; filled, the card goes and the verdict stands, with its refinements listed', async ({ page }) => {
     await seedProfile(page, blankSeed())
     await page.goto('/')
     const welcome = page.getByRole('complementary')
-    await expect(welcome).toContainText('Entrez votre année de naissance et votre revenu de travail')
+    await expect(welcome).toContainText('Trois chiffres suffisent pour un premier verdict')
     await expect(welcome.getByRole('link', { name: 'Voir un exemple' })).toHaveAttribute('href', '/donnees')
-    // The card names two fields that sit a screen below it: « Commencer » takes the reader to them, without opening a keyboard.
-    const salary = box(page, 'Revenu de travail annuel actuel')
-    await welcome.getByRole('button', { name: 'Commencer' }).click()
-    await expect(salary).toBeInViewport()
-    await expect(salary).not.toBeFocused()
+    // The quick start is a short-form view of the SAME stored fields as the form below: typing here fills there.
+    const salary = welcome.getByRole('textbox', { name: 'Votre revenu de travail par année' })
     await salary.fill('70000')
     await salary.press('Enter')
+    await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/70\D000/)
+    const spending = welcome.getByRole('textbox', { name: 'Vos dépenses par année, une fois à la retraite' })
+    await spending.fill('40000')
+    await spending.press('Enter')
     await expect(welcome).toBeHidden()
+    // Three numbers are enough: the results page answers, and says what would refine it.
+    await page.getByRole('link', { name: 'Résultats', exact: true }).click()
+    await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)/)).toBeVisible()
+    const refine = page.locator('.refine')
+    await expect(refine).toContainText('Préciser le calcul')
+    await expect(refine).toContainText('relevé RRQ')
+    await expect(refine).toContainText('soldes de vos comptes')
+    await expect(refine).toContainText('dépenses pendant les années de travail')
   })
 
   test('every page names the tab, so history and bookmarks are not all « Horizon »', async ({ page }) => {

@@ -205,6 +205,13 @@ export function Resultats() {
   const wantedSaveAge = Number(params.get('age'))
   const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
 
+  // What would make the verdict more faithful — detectable absences only, never a guess about what the household owns.
+  const refine = [
+    ...(profile.household.persons.some((p) => p.salaryToday > 0 && p.rrq.statementAt65 === undefined && Object.keys(p.earningsHistory).length === 0) ? (['statement'] as const) : []),
+    ...(profile.household.persons.every((p) => p.accounts.rrsp.balance + p.accounts.tfsa.balance + p.accounts.nonReg.balance === 0) ? (['accounts'] as const) : []),
+    ...(profile.household.spending.workingToday <= 0 && !retiredNow ? (['spendingWork'] as const) : []),
+  ]
+
   // The page's map, in reading order, grouped into its three arcs; a section that is not on the page has no chip.
   const navLinks = [
     { id: 'verdict', label: rc.nav.verdict, arc: rc.arcs.answer },
@@ -267,6 +274,20 @@ export function Resultats() {
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
+
+      {/* The refinement loop: the verdict stands on three numbers; these would sharpen it, each a link to its field. */}
+      {refine.length > 0 && (
+        <div className="surface results-section refine" aria-label={rc.refine.title}>
+          <SectionHeader title={rc.refine.title} subtitle={rc.refine.hint} />
+          <ul className="refine__list">
+            {refine.map((k) => (
+              <li key={k}>
+                {rc.refine[k]} <Chip to={k === 'spendingWork' ? '/hypotheses' : '/'}>{k === 'spendingWork' ? rc.refine.toAssumptions : rc.refine.toProfile}</Chip>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
           is ONE section: the same runs, seen as cards, as a picture, and per person. */}

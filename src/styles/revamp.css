@@ -81,6 +81,24 @@
   letter-spacing: 0.06em;
 }
 
+/* ── Profil: the quick start's three fields inside the welcome card ──────── */
+.welcome__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-self: stretch;
+  max-width: 26rem;
+}
+
+/* ── Résultats: « préciser le calcul » — what would refine the verdict ───── */
+.refine__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
 /* ── A pension plan's rules, always on the card ──────────────────────────── */
 .plan-card__rules {
   display: flex;
