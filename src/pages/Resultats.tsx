@@ -260,19 +260,26 @@ export function Resultats() {
             )}
           </>
         )}
-        {/* The answer's own range — the ONE place the three scenarios' ages are written; « Sensibilité » details it. */}
-        {range !== undefined && !retiredGlance && (
-          <p className="verdict__note">
-            {rc.headline.range(
-              (['prudent', 'neutral', 'bold'] as const)
-                .map((k) => `${t.assumptions.presets[k]} : ${range[k] === null ? rc.headline.rangeNone(MAX_AGE) : rc.headline.rangeAge(range[k]!)}`)
-                .join(' · '),
-            )}
-            {prudentGap && <> {rc.headline.rangeGap}</>}
-          </p>
+        {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,
+            not a joined sentence. The row is on the card from the first paint (… while the worker runs), so the
+            late answer fills boxes that already exist instead of growing the card under the reader. */}
+        {!retiredGlance && (
+          <div className="verdict__range">
+            <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
+            <dl className="verdict__range-list">
+              {(['prudent', 'neutral', 'bold'] as const).map((k) => (
+                <div key={k} className={'verdict__range-item' + (activePreset === k ? ' is-on' : '')}>
+                  <dt>{t.assumptions.presets[k]}</dt>
+                  <dd className="mono">{range === undefined ? '…' : range[k] === null ? rc.headline.rangeNone(MAX_AGE) : rc.headline.rangeAge(range[k]!)}</dd>
+                </div>
+              ))}
+            </dl>
+            {range !== undefined && prudentGap && <p className="verdict__note">{rc.headline.rangeGap}</p>}
+          </div>
         )}
-        {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
-        <p className="verdict__note">{r.verdict.caveat}</p>
+        {/* The verdict is an estimate under stated assumptions, and it says so where it is read — quietly: it must
+            be present, not compete with the answer. */}
+        <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
       </div>
 
       {/* The refinement loop: the verdict stands on three numbers; these would sharpen it, each a link to its field. */}

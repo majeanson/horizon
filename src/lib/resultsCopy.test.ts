@@ -45,9 +45,13 @@ describe('the results-page copy, in both languages', () => {
     expect(fr.headline.none(70)).toContain('même à 70 ans')
     expect(en.headline.none(70)).toContain('even at 70')
     expect(fr.headline.none(70)).not.toContain('avant 70')
-    // The preset names are written ONCE, in the dictionary: the range line only frames what the page composes.
-    expect(fr.headline.range('Prudent : 62 ans')).toContain('Prudent : 62 ans')
-    expect(en.headline.range('Conservative: age 62')).not.toContain('Prudent')
+    // The preset names are written ONCE, in the dictionary (`assumptions.presets`): the range row's own copy
+    // holds only the heading and the two figure shapes, never a preset name.
+    for (const c of [fr, en]) {
+      for (const text of [c.headline.rangeTitle, c.headline.rangeAge(62), c.headline.rangeNone(70)]) {
+        expect(text).not.toMatch(/Prudent|Neutre|Audacieux|Conservative|Neutral|Bold/i)
+      }
+    }
   })
 
   it('names the tax in the stop-working answer: the pensions are counted AFTER tax', () => {

@@ -495,6 +495,46 @@
   color: var(--ink-soft);
   font-size: var(--text-sm);
 }
+/* The estimate-not-advice line: present where the verdict is read, but quieter than the answer. */
+.verdict__note--caveat {
+  color: var(--ink-faint);
+  font-size: var(--text-xs);
+}
+/* « Selon le scénario » : three labelled figures, boxes reserved before the worker answers. */
+.verdict__range {
+  margin-top: 0.7rem;
+}
+.verdict__range-title {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.verdict__range-list {
+  margin: 0.4rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.verdict__range-item {
+  flex: 1 1 8rem;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.65rem;
+}
+.verdict__range-item.is-on {
+  border-color: var(--accent);
+}
+.verdict__range-item dt {
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+.verdict__range-item dd {
+  margin: 0.1rem 0 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+}
 .verdict__each-title {
   margin: 0;
   font-size: var(--text-lg);

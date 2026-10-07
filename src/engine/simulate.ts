@@ -1,4 +1,3 @@
-import { PRESET_KEYS, withPreset, type PresetKey } from './assumptionPresets.ts'
 import { retireAt, type RetireAtOptions } from './retireAt.ts'
 import type { Assumptions, Household } from './types.ts'
 
@@ -60,15 +59,6 @@ export function* sensitivityCells(h: Household, a: Assumptions, options: Sensiti
 
 export const sensitivity = (h: Household, a: Assumptions, options: SensitivityOptions = {}): SensitivityCell[] => [...sensitivityCells(h, a, options)]
 
-export interface PresetVerdict {
-  preset: PresetKey
-  /** The earliest age that works when the preset's economy, returns and horizon replace the person's, or null. */
-  earliestOk: number | null
-}
-
-/** The verdict under each ready-made set of assumptions — three projections, a generator for the same reason as above. */
-export function* presetVerdicts(h: Household, a: Assumptions, options: RetireAtOptions = {}): Generator<PresetVerdict> {
-  for (const preset of PRESET_KEYS) {
-    yield { preset, earliestOk: retireAt(h, withPreset(a, preset), { ...options, stopAtFirstOk: true }).earliestOk }
-  }
-}
+// The verdict under each READY-MADE set is not here any more: the three figures belong to the results page's own
+// range line, computed by lib/presetEarliest.worker.ts straight from retireAt + withPreset (one home per figure).
+// The sensitivity worker used to compute them a second time and the page dropped them unseen.

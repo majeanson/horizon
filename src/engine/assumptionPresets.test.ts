@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ASSUMPTION_PRESETS, PRESET_KEYS, presetOf, withPreset } from './assumptionPresets.ts'
 import { RRQ_MGA_HISTORY } from './params/rrqHistory.ts'
-import { presetVerdicts } from './simulate.ts'
+import { retireAt } from './retireAt.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from './golden/household.fixture.ts'
 
 describe('the three ready-made assumption sets', () => {
@@ -65,7 +65,8 @@ describe('the three ready-made assumption sets', () => {
   })
 
   it('the verdict never gets better as the preset gets more prudent', () => {
-    const v = Object.fromEntries([...presetVerdicts(GOLDEN_HOUSEHOLD, GOLDEN_ASSUMPTIONS)].map((x) => [x.preset, x.earliestOk ?? Infinity]))
+    // The same computation as lib/presetEarliest.worker.ts (the verdict's « Selon le scénario » row).
+    const v = Object.fromEntries(PRESET_KEYS.map((p) => [p, retireAt(GOLDEN_HOUSEHOLD, withPreset(GOLDEN_ASSUMPTIONS, p), { stopAtFirstOk: true }).earliestOk ?? Infinity]))
     expect(v.bold).toBeLessThanOrEqual(v.neutral)
     expect(v.neutral).toBeLessThanOrEqual(v.prudent)
   })

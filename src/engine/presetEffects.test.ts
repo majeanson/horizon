@@ -4,7 +4,7 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from './golden/household.fixture
 import { paramsFor } from './params/index.ts'
 import { project } from './projection.ts'
 import { everyoneAt, retireAt } from './retireAt.ts'
-import { presetVerdicts, sensitivityCells, shifted } from './simulate.ts'
+import { sensitivityCells, shifted } from './simulate.ts'
 import type { Assumptions, YearRow } from './types.ts'
 
 // The grid test runs ~27 projections (5.6 s alone, 8 s on a busy machine) — over vitest's 5 s default, so it flaked.
@@ -200,15 +200,12 @@ describe('applying a set', () => {
 })
 
 describe('the verdict under each set', () => {
-  it('presetVerdicts is exactly retireAt run on the set laid over the person\'s assumptions', () => {
-    for (const v of presetVerdicts(H, GOLDEN_ASSUMPTIONS)) {
-      expect(v.earliestOk, v.preset).toBe(retireAt(H, withPreset(GOLDEN_ASSUMPTIONS, v.preset), { stopAtFirstOk: true }).earliestOk)
-    }
-  })
+  // The computation of the verdict's « Selon le scénario » row (lib/presetEarliest.worker.ts), pinned here
+  // against the golden household so the three preset ages cannot drift unnoticed.
+  const presetEarliest = () => Object.fromEntries(PRESET_KEYS.map((p) => [p, retireAt(H, withPreset(GOLDEN_ASSUMPTIONS, p), { stopAtFirstOk: true }).earliestOk]))
 
   it('golden household snapshot: prudent 64 · neutral 59 · bold 57 — a 6-year spread is the expected size of the difference', () => {
-    const v = Object.fromEntries([...presetVerdicts(H, GOLDEN_ASSUMPTIONS)].map((x) => [x.preset, x.earliestOk]))
-    expect(v).toEqual({ prudent: 64, neutral: 59, bold: 57 })
+    expect(presetEarliest()).toEqual({ prudent: 64, neutral: 59, bold: 57 })
   })
 
   it('a verdict is the first age with no shortfall, and the years after a failing age fail at or before the horizon', () => {

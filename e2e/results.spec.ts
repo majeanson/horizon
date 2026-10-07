@@ -94,9 +94,12 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
   // …and the verdict's own range line reads prudent ≥ neutre ≥ audacieux (a more prudent future never retires earlier)
   // — the ONE place the three scenarios' ages are written; the grids detail it.
-  const rangeLine = page.locator('.verdict', { hasText: 'Selon le scénario —' })
-  await expect(rangeLine).toContainText(/Prudent : \d\d ans · Neutre : \d\d ans · Audacieux : \d\d ans/)
-  const scenarios = (await rangeLine.innerText()).match(/: (\d\d) ans/g)!.map((x) => Number(x.slice(2, 4)))
+  const range = page.locator('.verdict__range')
+  await expect(range).toContainText('Selon le scénario')
+  for (const name of ['Prudent', 'Neutre', 'Audacieux']) await expect(range.locator('dt', { hasText: name })).toBeVisible()
+  // The three boxes are on the card from the first paint and FILL (no late paragraph growing the card).
+  await expect(range.locator('dd', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
+  const scenarios = (await range.locator('dd').allTextContents()).map((x) => Number(x.match(/\d+/)![0]))
   expect(scenarios[0]).toBeGreaterThanOrEqual(scenarios[1])
   expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
   const base = grids.nth(1).locator('td.is-base')

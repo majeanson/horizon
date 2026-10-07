@@ -1,19 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { presetVerdicts, sensitivityCells, type PresetVerdict, type SensitivityCell } from '../engine/simulate.ts'
+import { sensitivityCells, type SensitivityCell } from '../engine/simulate.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
 import type { SensitivityMessage, SensitivityRequest } from './sensitivity.worker.ts'
 
 // Runs the sensitivity grid without freezing the page: in a web worker where there is one, and — where a worker
 // cannot be made — on the page's own thread, one cell per turn of the event loop so the screen still breathes.
-// The cells arrive one at a time; `done` flips when the last has. The three ready-made scenarios arrive first.
+// The cells arrive one at a time; `done` flips when the last has.
 
 export type SensitivityState = {
   status: 'idle' | 'running' | 'done'
   cells: SensitivityCell[]
-  presets: PresetVerdict[]
 }
 
-const IDLE: SensitivityState = { status: 'idle', cells: [], presets: [] }
+const IDLE: SensitivityState = { status: 'idle', cells: [] }
 
 export function useSensitivity(): { state: SensitivityState; run: (household: Household, assumptions: Assumptions) => void; reset: () => void } {
   const [state, setState] = useState<SensitivityState>(IDLE)
@@ -27,9 +26,8 @@ export function useSensitivity(): { state: SensitivityState; run: (household: Ho
 
   const run = useCallback((household: Household, assumptions: Assumptions) => {
     stop.current?.()
-    setState({ status: 'running', cells: [], presets: [] })
+    setState({ status: 'running', cells: [] })
     const add = (cell: SensitivityCell) => setState((s) => ({ ...s, status: 'running', cells: [...s.cells, cell] }))
-    const addPreset = (preset: PresetVerdict) => setState((s) => ({ ...s, status: 'running', presets: [...s.presets, preset] }))
     const finish = () => setState((s) => ({ ...s, status: 'done' }))
 
     let worker: Worker | null = null
@@ -43,7 +41,6 @@ export function useSensitivity(): { state: SensitivityState; run: (household: Ho
       const w = worker
       w.onmessage = (e: MessageEvent<SensitivityMessage>) => {
         if ('cell' in e.data) add(e.data.cell)
-        else if ('preset' in e.data) addPreset(e.data.preset)
         else {
           finish()
           w.terminate()
@@ -61,21 +58,15 @@ export function useSensitivity(): { state: SensitivityState; run: (household: Ho
 
     function runOnThisThread() {
       let cancelled = false
-      const presets = presetVerdicts(household, assumptions)
       const cells = sensitivityCells(household, assumptions)
       const step = () => {
         if (cancelled) return
-        const p = presets.next()
-        if (!p.done) {
-          addPreset(p.value)
-          return void setTimeout(step, 0)
-        }
         const next = cells.next()
         if (next.done) return finish()
         add(next.value)
         setTimeout(step, 0)
       }
-      setState({ status: 'running', cells: [], presets: [] })
+      setState({ status: 'running', cells: [] })
       setTimeout(step, 0)
       stop.current = () => {
         cancelled = true
