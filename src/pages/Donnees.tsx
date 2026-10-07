@@ -4,7 +4,9 @@ import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
+import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
+import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type Contrast, type TextScale } from '../lib/accessibility'
 import { useConfirm } from '../lib/confirm'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
 import { exampleProfile } from '../lib/example'
@@ -146,6 +148,8 @@ export function Donnees() {
         </ul>
       </Section>
 
+      <DisplaySection />
+
       <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold">
         <Cluster>
           <button
@@ -167,5 +171,48 @@ export function Donnees() {
         {d.build(__BUILD_SHA__)} · <Link to="/dev/kit">{d.kit}</Link>
       </p>
     </section>
+  )
+}
+
+// The reading settings the low-vision reader came for — the same contrast and text-size machinery the dev
+// gallery flips, but ON a page of the app. The setters write the DOM attribute (the cascade does the rest)
+// and persist to this device; local state only mirrors them so the control shows what is in force.
+function DisplaySection() {
+  const t = useT()
+  const d = t.data.display
+  const [contrast, setContrastShown] = useState<Contrast>(getContrast)
+  const [scale, setScaleShown] = useState<TextScale>(getTextScale)
+  return (
+    <Section title={d.title} subtitle={d.hint} icon="sliders-horizontal-bold">
+      <div className="field-row">
+        <p className="field-row__label">{d.contrast}</p>
+        <SubTabs
+          size="mini"
+          ariaLabel={d.contrast}
+          value={contrast}
+          onSelect={(c: Contrast) => {
+            setContrast(c)
+            setContrastShown(c)
+          }}
+          options={[
+            { key: 'normal', label: d.contrastNormal },
+            { key: 'high', label: d.contrastHigh },
+          ]}
+        />
+      </div>
+      <div className="field-row">
+        <p className="field-row__label">{d.textSize}</p>
+        <SubTabs
+          size="mini"
+          ariaLabel={d.textSize}
+          value={scale}
+          onSelect={(s: TextScale) => {
+            setTextScale(s)
+            setScaleShown(s)
+          }}
+          options={TEXT_SCALES.map((s) => ({ key: s, label: d.textSizes[s] }))}
+        />
+      </div>
+    </Section>
   )
 }
