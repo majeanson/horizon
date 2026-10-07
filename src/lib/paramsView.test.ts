@@ -3,6 +3,7 @@ import { citedLeaves } from '../engine/params/cited.ts'
 import { KNOWN } from '../engine/params/index.ts'
 import { EN } from '../i18n.en.ts'
 import { FR } from '../i18n.ts'
+import { PARAM_LABELS } from './paramLabels.ts'
 import { displayValue, knownYears, paramRows } from './paramsView.ts'
 
 const fr = (year: number) => paramRows(year, 'fr', FR.results.params.entries)
@@ -87,5 +88,22 @@ describe('the panel speaks the reader\'s language: the page, and the number', ()
     expect(row(fr(year), 'accounts.rrifFactors').value).toMatch(/^25 valeurs: 71 → /)
     expect(row(en(year), 'accounts.rrifFactors').value).toMatch(/^25 entries: 71 → /)
     expect(displayValue(true, 'fr', FR.results.params.entries)).toBe('true')
+  })
+})
+
+describe('every figure has a human name in both languages', () => {
+  it('a label for each cited path, written in its own language — the id is only a footnote', () => {
+    for (const year of knownYears()) {
+      for (const { path } of citedLeaves(KNOWN[year])) {
+        expect(PARAM_LABELS.fr[path], `fr ${path}`).toBeTruthy()
+        expect(PARAM_LABELS.en[path], `en ${path}`).toBeTruthy()
+        expect(PARAM_LABELS.en[path], path).not.toBe(PARAM_LABELS.fr[path])
+      }
+    }
+  })
+
+  it('no label is left over for a figure the engine no longer reads', () => {
+    const paths = new Set(knownYears().flatMap((y) => citedLeaves(KNOWN[y]).map((l) => l.path)))
+    for (const labels of [PARAM_LABELS.fr, PARAM_LABELS.en]) for (const key of Object.keys(labels)) expect(paths.has(key), key).toBe(true)
   })
 })

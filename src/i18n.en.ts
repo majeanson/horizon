@@ -140,6 +140,13 @@ export const EN: typeof FR = {
     empty: 'No plan entered.',
     addRregop: 'Add RREGOP',
     addOther: 'Add another plan',
+    addInPay: 'Add a pension in pay',
+    inPayAnnual: 'Pension being paid now, per year',
+    inPayHint: 'The yearly amount on your statement or latest pay stub, in today’s dollars, after any reduction: the tool does not recompute it. It then rises each January by the indexation below.',
+    inPayAfter65: 'Pension paid from age 65, per year (optional)',
+    inPayAfter65Hint: 'If your plan is coordinated with the QPP, the pension drops at 65: enter the yearly amount after the drop, in today’s dollars. Leave blank if it does not change, or if you are already past 65.',
+    inPayRules: 'Pension indexation',
+    inPaySummary: (annual: string) => `pension in pay · ${annual} per year`,
     label: 'Plan name',
     service: 'Years of service for the pension calculation',
     serviceRate: 'Service credited per year worked (1 = full time)',
@@ -203,6 +210,38 @@ export const EN: typeof FR = {
       source:
         'Neutral: inflation 2.1%, Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2%, YMPE growth 3.1% (FP Canada and the Institute of Financial Planning, 2026 guidelines) — about 5.1% for a 60 / 40 mix, less an estimated 0.6 point of fees. Conservative and Aggressive move those figures by a fixed margin. These are assumptions, neither official figures nor forecasts.',
     },
+    impact: {
+      whyTitle: 'Why it matters:',
+      outside: 'Beyond what the three scenarios cover.',
+      level: { below: 'Very low', low: 'Low', typical: 'Typical', high: 'High', above: 'Very high' },
+      tilt: {
+        cautious: 'A cautious assumption: the plan has room',
+        middle: 'A central assumption',
+        optimistic: 'An optimistic assumption: the plan depends on it',
+      },
+      why: {
+        inflation: {
+          low: 'Prices rise slowly: your spending grows little and your savings keep their buying power. That is favourable, but if real inflation is higher the plan runs out sooner.',
+          typical: 'Prices follow the Bank of Canada target (1 to 3 %). Higher inflation grows your spending while your returns stay the same.',
+          high: 'Prices rise fast: today\'s spending will cost much more later while your returns stay the same. Savings lose buying power every year.',
+        },
+        wageGrowth: {
+          low: 'Your pay grows little: the QPP pension and any employer pension, both worked out from your earnings, come out smaller.',
+          typical: 'Pay follows average earnings growth: the QPP earnings ceiling grew about 3.1 % a year from 2016 to 2026.',
+          high: 'Your pay climbs fast: the QPP and employer pensions, worked out from your earnings, come out bigger. The plan counts on raises that are not guaranteed.',
+        },
+        returns: {
+          low: 'Savings grow slowly: withdrawals eat into the capital sooner. This is the plan\'s most powerful lever: a small gap, compounded over decades, becomes huge.',
+          typical: 'About what a 60 / 40 mix of stocks and bonds earns after fees. It is the lever that weighs most on the plan: a small gap, compounded over decades, becomes huge.',
+          high: 'Savings must grow fast: that means more stocks, so more risk, and low fees. The plan leans heavily on this assumption, and a bad market breaks it first.',
+        },
+        horizonAge: {
+          low: 'The plan has to last less long: easier to satisfy, but if you live longer the money runs short at the end. This only changes the length: the years before stay identical.',
+          typical: 'A common planning age, far enough that a long life does not catch you out. This only changes the length: the years before stay identical.',
+          high: 'The plan has to last longer: every extra year is a year to fund. That is cautious: better a plan that lasts too long than one that is too short. The years before stay identical.',
+        },
+      },
+    },
     spending: {
       title: 'Household spending',
       working: 'Yearly spending while anyone is working',
@@ -262,6 +301,12 @@ export const EN: typeof FR = {
       planHint: 'Each person retires at the age set in the profile.',
       age: (age: number) => `${age}`,
       max: 'Four comparisons at most: remove one to add another.',
+      splitTitle: 'Each at their own age',
+      splitHint: 'For a couple: one person retires at one age, the other at another. A card is added to the comparisons above.',
+      splitFor: (name: string) => `${name}’s retirement age`,
+      splitSame: 'Two identical ages: use that age’s chip instead.',
+      splitAdd: 'Add this comparison',
+      split: (a: string, ageA: number, b: string, ageB: number) => `${a} age ${ageA} · ${b} age ${ageB}`,
     },
     chart: {
       title: 'Your horizon',

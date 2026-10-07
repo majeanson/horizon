@@ -55,8 +55,8 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `params/2026.ts` — every leaf from its official page; the 6,30 % splits 5,3 base + 1,0 first additional (settled)
 - [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
-- [ ] Eight figures carry a `verify` reason — the four GIS divisors derived from the Act's wording; Revenu Québec's bracket rates and its line-361 age rule (read through an archive: the host blocks bots); the Québec worker-deduction rate (read in the statute's wording, the fiche refused a robot); one derived TFSA total. Confirm each on an openable page and lower the ratchet in `cited.test.ts`
-- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the Québec bracket rates page and the TP-1.G wording behind the retirement-income age rule; the QPP Act's rounding of the 15 % drop-out (nearest vs up); the QPP contribution boundary at 72; RREGOP's deferred-member (left-before-pension) reduction rule; the CRA's T5008 « case 20 » caveat page; the OAS estimator's residence wording
+- [ ] One figure carries a `verify` reason — the derived TFSA total (the four GIS divisors were confirmed on 2026-10-06 against the OAS Benefits Estimator, ≤ 1 $/month apart; ratchet 5 → 1). (The Québec brackets, the line-361 age rule and the worker-deduction rate were confirmed on 2026-10-06 from a browser screenshot and `docs/TP-1.G(2025-12).pdf`; ratchet 8 → 5.) Confirm each on an openable page and lower the ratchet in `cited.test.ts`
+- [ ] **Needs a human with a browser** (revenuquebec.ca and legisquebec.gouv.qc.ca refuse every automated client): the QPP Act's rounding of the 15 % drop-out (nearest vs up); the QPP contribution boundary at 72; RREGOP's deferred-member (left-before-pension) reduction rule; the CRA's T5008 « case 20 » caveat page; the OAS estimator's residence wording
 
 ### Phase 2 — RRQ
 
@@ -69,14 +69,15 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] Residence proration, deferral (+36 % at 70), the 75-and-over increase — against the « when to start » table
 - [x] Recovery tax against the canada.ca example (100 000 $ → 981.90 $); GIS through every published figure of the four 2026 quarters, the statutory slopes cross-checked across them
-- [ ] Confirm the four derived GIS divisors against the OAS Benefits Estimator (Service Canada's own calculator) and lower the `verify` ratchet
+- [x] The four derived GIS divisors and the employment exemption confirmed against the OAS Benefits Estimator (couple 48 / 96, single 24 / 48; the estimator rounds the reduction to whole dollars, the engine works in cents — ≤ 1 $/month)
+- [ ] ❓ GIS whole-dollar rounding NOT modelled (the engine works in cents; the estimator is ≤ 1 $/month away). Flooring each reduction (income ÷ divisor, base starting at 0) reproduces the estimator's couple 0 / 8 000 and single 10 000 exactly, but its figures at single 20 000 (129.49), single 20 000 with 10 000 of work income (442.49) and couple 16 000 / 24 000 (302.57 / 135.57) imply a TOP-UP maximum of 176.41 $ (single) and 49.99 $ (couple) that the published cut-offs (→ 177 / 50) cannot give: a new cited figure per category is needed. Observed 2026-10-06, Oct–Dec 2026 quarter
 
 ### Phase 4 — taxes
 
 - [x] Federal brackets, BPA phase-down, abatement; age, pension-income and QPP credits — Finance Canada's test case reproduced
 - [x] Québec brackets, BPA, the shared age / living-alone / retirement amount — DERIVED examples (Revenu Québec publishes none readable)
 - [x] `householdTax` and pension splitting; the top marginal rate 53.31 % and the lowest 25.69 % reproduced; FSS, RAMQ, prior-year OAS basis flagged in ENGINE.md
-- [ ] Re-check against Revenu Québec's TP-1.G guide when readable: the base-QPP-contribution treatment, the 14 % conversion rate, the retirement-income age gate
+- [ ] Re-check against Revenu Québec's TP-1.G guide (now in `docs/`): the base-QPP-contribution treatment and the 14 % conversion rate (the line-361 age gate is confirmed)
 
 ### Phase 5 — accounts and defined-benefit pensions
 
@@ -98,8 +99,8 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] `FieldInfo`, `NumberField`, `FieldRow`, `fieldInfoCopy.test.ts` — the labels were READ on the official pages (research below); planted: a dead id, a non-official host, a dropped link, a stale excuse each turn it red
 - [x] Profil, Hypothèses, Résultats (verdict, comparison chips, per-year table, parameters used), Données; `e2e/profile.spec.ts` (22), axe on every route in every display state with every ⓘ and disclosure open
 - [ ] ❓ Statement wording still UNCONFIRMED (the ⓘ quotes none rather than guess): the RRQ relevé's per-age columns for the 60/65 estimate and its contributory-years label; the OAS estimator's residence question (behind a script-driven page); whether Revenu Québec shows any registered-savings room (revenuquebec.ca blocks automated clients — open its « Avis de cotisation » in a browser)
-- [ ] A couple retires at ONE age in the comparison (everyone at the tried age). Two separate ages per person is a v2 control
-- [ ] A person already retired cannot yet enter a pension in pay (their salary is back-projected): add « rente en cours » figures
+- [x] A couple can compare two separate retirement ages (« Chacun son âge » on Résultats: `?ages=…,58-64` = the first person at 58, the second at 64; `lib/resultsModel.ts`, `components/results/SplitPicker.tsx`). The verdict line (« Au plus tôt ») still tries ONE age for everyone — a per-person earliest-age search is a v2 question
+- [x] A person already retired can enter a pension in pay (`inPay`, schema v3; `engine/dbInPay.test.ts`, `lib/inPaySchema.test.ts`). A pension in pay may carry an optional « after 65 » figure (`inPay.after65`, today's dollars, applied from the month after the 65th birthday, indexed like the first figure; ignored when that month has already passed)
 
 ### Phase 8 — chart and results
 
@@ -116,7 +117,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] Every page names the browser tab (`Résultats · Horizon`); a blank profile says where to start
 - [x] `.github/workflows/sources.yml`: every cited page — the figures' AND the ⓘ links, in both languages — is opened weekly; a gone or erroring page fails the job; a page that refuses bots (Revenu Québec, legisquebec) is reported as blocked, never fatal
 - [x] Deployed to https://horizon.marc-jeanson.workers.dev with `npm run deploy` (local `wrangler login`)
-- [ ] Language, what is still one-language: the « Paramètres utilisés » figure column shows the engine's ids (`rrq.mga`) in both languages — a human label per figure (96 × 2) is open; `SOURCES.md` is French (it lists both editions of each page); `index.html`'s description / Open Graph tags and the install manifest are French (a static file cannot follow the reader); 7 cited pages exist in one language only (`twins.ts` says which and why)
+- [ ] Language, what is still one-language: `SOURCES.md` is French (it lists both editions of each page); `index.html`'s description / Open Graph tags and the install manifest are French (a static file cannot follow the reader); 7 cited pages exist in one language only (`twins.ts` says which and why)
 - [ ] **Deploy on push**: add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets (Settings ▸ Secrets and variables ▸ Actions). Until then CI skips the deploy job cleanly and a deploy is `npm run deploy` from a logged-in machine
 
 ## 5. Lessons carried over from Babillard

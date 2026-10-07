@@ -3,6 +3,8 @@ import { Cluster } from '../components/Layout'
 import { Disclosure } from '../components/Disclosure'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
+import { impactOf, type ImpactField } from '../engine/assumptionImpact'
+import { ImpactMeter } from '../components/ImpactMeter'
 import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
@@ -27,6 +29,13 @@ export function Hypotheses() {
     const v = ASSUMPTION_PRESETS[key]
     const pct = (x: number) => formatPct(x, lang, 1)
     return a.presets.summary(pct(v.inflation), pct(v.wageGrowth), [v.returns.rrsp, v.returns.tfsa, v.returns.nonReg].map(pct).join(' / '), v.horizonAge)
+  }
+  const impact = t.assumptions.impact
+  /** The meter for one assumption: where the value sits against the three scenarios, and why it matters. */
+  const meter = (field: ImpactField, value: number) => {
+    const { level, tilt } = impactOf(field, value)
+    const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level
+    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
   }
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
 
@@ -74,9 +83,11 @@ export function Hypotheses() {
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
+        {meter('inflation', assumptions.inflation)}
         <FieldRow label={a.economy.wageGrowth} infoId="wageGrowth" hint={a.economy.wageHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.wageGrowth} onChange={(wageGrowth) => updateProfile((p) => setAssumptions(p, { wageGrowth }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
+        {meter('wageGrowth', assumptions.wageGrowth)}
       </Section>
 
       <Section title={a.returns.title} subtitle={a.returns.hint} icon="sliders-horizontal-bold">
@@ -85,12 +96,14 @@ export function Hypotheses() {
             {(w) => <NumberField kind="percent" min={-0.2} max={0.3} value={assumptions.returns[kind]} onChange={(v) => updateProfile((p) => setReturn(p, kind, v))} id={w.id} />}
           </FieldRow>
         ))}
+        {meter('returns', (assumptions.returns.rrsp + assumptions.returns.tfsa + assumptions.returns.nonReg) / 3)}
       </Section>
 
       <Section title={a.horizon.title} icon="calendar-blank-bold">
         <FieldRow label={a.horizon.age} infoId="horizonAge" hint={a.horizon.hint}>
           {(w) => <NumberField kind="int" min={80} max={110} unit={t.fields.years} value={assumptions.horizonAge} onChange={(horizonAge) => updateProfile((p) => setAssumptions(p, { horizonAge }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
+        {meter('horizonAge', assumptions.horizonAge)}
       </Section>
 
       <Section title={a.order.title} subtitle={a.order.hint} icon="download-simple-bold">

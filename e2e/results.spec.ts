@@ -147,3 +147,18 @@ test('no chart or table runs past the right edge on a phone', async ({ page }) =
   expect(box.x).toBeGreaterThanOrEqual(0)
   expect(box.x + box.width).toBeLessThanOrEqual(361)
 })
+
+test('a couple can compare two different retirement ages and the card says who retires when', async ({ page }) => {
+  await page.goto('/resultats?ages=plan')
+  await page.getByRole('button', { name: 'Chacun son âge' }).click()
+  const [first, second] = [page.getByRole('textbox', { name: /Âge de départ de/ }).nth(0), page.getByRole('textbox', { name: /Âge de départ de/ }).nth(1)]
+  await first.fill('58')
+  await second.fill('64')
+  await page.getByRole('button', { name: 'Ajouter cette comparaison' }).click()
+  await expect(page).toHaveURL(/ages=plan(%2C|,)58-64/)
+  await expect(page.getByRole('button', { name: /58 ans · .* 64 ans/, pressed: true })).toBeVisible()
+  await expect(page.getByText(/Départ : .*58 ans · .*64 ans/).first()).toBeVisible()
+  // The chip is a toggle like any other: pressing it takes the card away.
+  await page.getByRole('button', { name: /58 ans · .* 64 ans/ }).click()
+  await expect(page).not.toHaveURL(/58-64/)
+})

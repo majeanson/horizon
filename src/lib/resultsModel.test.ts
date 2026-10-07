@@ -67,3 +67,33 @@ describe('the chips in the address bar', () => {
     expect(full).toHaveLength(MAX_SELECTIONS)
   })
 })
+
+describe('a couple that retires at two different ages', () => {
+  it('a split is the first person at one age and the second at another — everything else as in the profile', () => {
+    expect(scenarioOf(GOLDEN_HOUSEHOLD, '58-64')).toEqual({ retirementAge: { self: 58, spouse: 64 } })
+    expect(selectionAge(GOLDEN_HOUSEHOLD, '58-64')).toBe(58)
+  })
+
+  it('running a split is running the engine with those two ages — not « everyone at one of them »', () => {
+    const [split] = runSelections(profile(), TODAY, ['58-64'])
+    expect(split.result.rows).toEqual(project(GOLDEN_HOUSEHOLD, GOLDEN_ASSUMPTIONS, { retirementAge: { self: 58, spouse: 64 } }))
+    expect(split.result.rows).not.toEqual(project(GOLDEN_HOUSEHOLD, GOLDEN_ASSUMPTIONS, { retirementAge: { self: 58, spouse: 58 } }))
+    expect(split.result.rows).not.toEqual(project(GOLDEN_HOUSEHOLD, GOLDEN_ASSUMPTIONS, { retirementAge: { self: 64, spouse: 64 } }))
+  })
+
+  it('reads splits from the address, drops the unreadable, the out-of-range and the pair that is just one age', () => {
+    expect(parseSelections('plan,58-64,60', NONE)).toEqual(['plan', '58-64', 60])
+    expect(parseSelections('58-58,49-60,60-71,5-6,58-64-65', NONE)).toEqual([])
+    expect(formatSelections(parseSelections('58-64,plan', NONE))).toBe('58-64,plan')
+  })
+
+  it('a split counts toward the cap of four, and toggles like any chip', () => {
+    expect(toggleSelection(['plan', '58-64'], '58-64')).toEqual(['plan'])
+    expect(toggleSelection(['plan', 60, 61, '58-64'], 62)).toEqual(['plan', 60, 61, '58-64'])
+  })
+
+  it('on a household of one, a split falls back to everyone at its first age', () => {
+    const solo = { ...GOLDEN_HOUSEHOLD, persons: [GOLDEN_HOUSEHOLD.persons[0]] }
+    expect(scenarioOf(solo, '58-64')).toEqual({ retirementAge: { self: 58 } })
+  })
+})

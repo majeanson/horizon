@@ -1,3 +1,4 @@
+import { PARAM_LABELS } from '../../lib/paramLabels'
 import { useLang, useT } from '../../i18n'
 import { knownYears, paramRows } from '../../lib/paramsView'
 
@@ -33,8 +34,9 @@ export function ParamsPanel() {
                 <tbody>
                   {rows.map((row) => (
                     <tr key={row.path}>
-                      <th scope="row" className="mono">
-                        {row.path}
+                      <th scope="row">
+                        {PARAM_LABELS[lang][row.path] ?? row.path}
+                        <span className="mono params__id"> {row.path}</span>
                       </th>
                       <td className="params__value">{row.value}</td>
                       <td>

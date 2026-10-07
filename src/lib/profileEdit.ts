@@ -111,6 +111,9 @@ export const blankPension = (): DbPension => ({
   startAge: 65,
 })
 
+/** A pension the person is ALREADY receiving: one stated annual amount (today's dollars) and how it is indexed — no formula. */
+export const inPayPension = (): DbPension => ({ ...blankPension(), inPay: { annual: 0 } })
+
 export function addPension(person: Person, pension: DbPension): Person {
   return person.pensions.length >= 8 ? person : { ...person, pensions: [...person.pensions, pension] }
 }

@@ -156,6 +156,13 @@ export const FR = {
     empty: 'Aucun régime saisi.',
     addRregop: 'Ajouter le RREGOP',
     addOther: 'Ajouter un autre régime',
+    addInPay: 'Ajouter une rente en cours',
+    inPayAnnual: 'Rente versée en ce moment, par année',
+    inPayHint: 'Le montant annuel de votre relevé ou de votre dernier talon, en dollars d’aujourd’hui, après toute réduction : l’outil ne le recalcule pas. Il augmente ensuite chaque janvier selon l’indexation ci-dessous.',
+    inPayAfter65: 'Rente versée à partir de 65 ans, par année (facultatif)',
+    inPayAfter65Hint: 'Si votre régime est coordonné avec le RRQ, la rente baisse à 65 ans : inscrivez ici le montant annuel après la baisse, en dollars d’aujourd’hui. Laissez vide si elle ne change pas, ou si vous avez déjà passé 65 ans.',
+    inPayRules: 'Indexation de la rente',
+    inPaySummary: (annual: string) => `rente en cours · ${annual} par année`,
     label: 'Nom du régime',
     service: 'Années de service pour le calcul de la rente',
     serviceRate: 'Service crédité par année travaillée (1 = temps plein)',
@@ -219,6 +226,38 @@ export const FR = {
       source:
         'Neutre : inflation 2,1 %, actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 %, croissance du MGA 3,1 % (FP Canada et Institut de planification financière, normes 2026), soit environ 5,1 % pour un mélange 60 / 40, moins 0,6 point de frais estimés. Prudent et Audacieux déplacent ces chiffres d’une marge fixe. Ce sont des hypothèses, ni des chiffres officiels ni des prévisions.',
     },
+    impact: {
+      whyTitle: 'Pourquoi ça compte :',
+      outside: 'Au-delà de ce que couvrent les trois scénarios.',
+      level: { below: 'Très bas', low: 'Bas', typical: 'Typique', high: 'Élevé', above: 'Très élevé' },
+      tilt: {
+        cautious: 'Hypothèse prudente : le plan a de la marge',
+        middle: 'Hypothèse centrale',
+        optimistic: 'Hypothèse optimiste : le plan en dépend',
+      },
+      why: {
+        inflation: {
+          low: 'Les prix montent lentement : vos dépenses grossissent peu et votre épargne garde son pouvoir d’achat. C’est favorable, mais si l’inflation réelle est plus haute, le plan s’épuise plus tôt.',
+          typical: 'Les prix suivent la cible de la Banque du Canada (1 à 3 %). Une inflation plus haute fait grossir vos dépenses sans que vos rendements changent.',
+          high: 'Les prix montent vite : vos dépenses d’aujourd’hui coûteront bien plus cher plus tard, alors que vos rendements restent les mêmes. L’épargne perd du pouvoir d’achat chaque année.',
+        },
+        wageGrowth: {
+          low: 'Votre salaire progresse peu : la rente du RRQ et celle d’un régime d’employeur, calculées sur vos gains, sont plus petites.',
+          typical: 'Le salaire suit la croissance moyenne des gains : le plafond du RRQ a crû d’environ 3,1 % par année de 2016 à 2026.',
+          high: 'Votre salaire grimpe vite : les rentes du RRQ et du régime d’employeur, calculées sur vos gains, sont plus grosses. Le plan compte sur des augmentations qui ne sont pas garanties.',
+        },
+        returns: {
+          low: 'L’épargne croît lentement : les retraits entament le capital plus tôt. C’est le levier le plus puissant du plan : un petit écart, composé pendant des décennies, devient énorme.',
+          typical: 'À peu près ce que donne un mélange 60 / 40 d’actions et d’obligations après frais. C’est le levier qui pèse le plus sur le plan : un petit écart, composé pendant des décennies, devient énorme.',
+          high: 'L’épargne doit croître vite : cela suppose plus d’actions, donc plus de risque, et des frais bas. Le plan repose beaucoup sur cette hypothèse, et un mauvais marché le fait basculer en premier.',
+        },
+        horizonAge: {
+          low: 'Le plan doit tenir moins longtemps : il est plus facile à satisfaire, mais si vous vivez plus vieux l’argent manquera à la fin. Ce choix ne change que la durée : les années d’avant restent identiques.',
+          typical: 'Un âge de planification courant, assez loin pour qu’une longue vie ne vous prenne pas au dépourvu. Ce choix ne change que la durée : les années d’avant restent identiques.',
+          high: 'Le plan doit durer plus longtemps : chaque année de plus est une année à financer. C’est prudent : mieux vaut un plan qui dure trop qu’un plan trop court. Les années d’avant restent identiques.',
+        },
+      },
+    },
     spending: {
       title: 'Dépenses du ménage',
       working: 'Dépenses annuelles tant que quelqu’un travaille',
@@ -278,6 +317,12 @@ export const FR = {
       planHint: 'Chacun part à l’âge indiqué dans le profil.',
       age: (age: number) => `${age} ans`,
       max: 'Quatre comparaisons au plus : retirez-en une pour en ajouter une autre.',
+      splitTitle: 'Chacun son âge',
+      splitHint: 'Pour un couple : une personne part à un âge, l’autre à un autre. Une carte s’ajoute aux comparaisons ci-dessus.',
+      splitFor: (name: string) => `Âge de départ de ${name}`,
+      splitSame: 'Deux âges identiques : utilisez plutôt la puce de cet âge.',
+      splitAdd: 'Ajouter cette comparaison',
+      split: (a: string, ageA: number, b: string, ageB: number) => `${a} ${ageA} ans · ${b} ${ageB} ans`,
     },
     chart: {
       title: 'Votre horizon',

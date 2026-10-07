@@ -6,6 +6,7 @@ import { Rail } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { ChartPanel } from '../components/results/ChartPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
+import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
@@ -14,7 +15,7 @@ import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
-import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, parseSelections, runSelections, toggleSelection, type Selection } from '../lib/resultsModel'
+import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, type Selection } from '../lib/resultsModel'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
 
@@ -74,7 +75,22 @@ export function Resultats() {
   const firstAge = Math.max(MIN_AGE, oldest)
   const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   const toggle = (s: Selection) => setParam('ages', formatSelections(toggleSelection(selections, s)))
-  const label = useCallback((s: Selection) => (s === 'plan' ? r.compare.plan : r.compare.age(s)), [r])
+  // A person with no name is « Moi » / « Conjoint·e », as on the profile page.
+  const names = profile.household.persons.map((p, i) => p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse))
+  const label = useCallback(
+    (s: Selection) => {
+      if (s === 'plan') return r.compare.plan
+      if (!isSplit(s)) return r.compare.age(s)
+      const [a, b] = splitAges(s)
+      return r.compare.split(names[0] ?? '', a, names[1] ?? '', b)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [r, names.join('|')],
+  )
+  const addSplit = (first: number, second: number) => {
+    const s = splitOf(first, second)
+    if (!selections.includes(s)) setParam('ages', formatSelections(toggleSelection(selections, s)))
+  }
 
   if (gaps.length > 0) {
     return (
@@ -122,9 +138,17 @@ export function Resultats() {
               {r.compare.age(age)}
             </Chip>
           ))}
+          {selections.filter(isSplit).map((s) => (
+            <Chip key={s} selected onClick={() => toggle(s)}>
+              {label(s)}
+            </Chip>
+          ))}
         </Rail>
         {selections.length >= MAX_SELECTIONS && <p className="field-row__hint">{r.compare.max}</p>}
         {selections.includes('plan') && <p className="field-row__hint">{r.compare.planHint}</p>}
+        {profile.household.persons.length === 2 && (
+          <SplitPicker names={[names[0], names[1]]} defaults={[profile.household.persons[0].retirementAge, profile.household.persons[1].retirementAge === profile.household.persons[0].retirementAge ? Math.min(MAX_AGE, profile.household.persons[0].retirementAge + 5) : profile.household.persons[1].retirementAge]} onAdd={addSplit} disabled={selections.length >= MAX_SELECTIONS} />
+        )}
       </div>
 
       <ul className="scenarios">

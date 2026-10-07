@@ -16,6 +16,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     const persons = (household as Raw).persons
     return { ...profile, household: { ...(household as Raw), livesAlone: Array.isArray(persons) && persons.length === 1 } }
   },
+  // v2 → v3: an employer pension may carry `inPay` (a pension already being paid). It is optional and absent from every
+  // older file, which means « still to be calculated » — exactly what those files always were. Nothing to rewrite.
+  (profile) => profile,
 ]
 
 export type ReadResult =

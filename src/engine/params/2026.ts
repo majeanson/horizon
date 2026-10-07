@@ -97,8 +97,7 @@ const QC_PARAMS = src(
   { note: 'Finances Québec, novembre 2025 — Tableau 3.' },
 )
 const QC_RATES = src('https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/income-tax-rates/', 'Income Tax Rates', {
-  verify:
-    'Les taux (14 / 19 / 24 / 25,75 %) ont été lus sur une copie de l’Internet Archive datée du 2026-09-03, car revenuquebec.ca refuse l’accès automatisé. Les seuils, eux, sont confirmés dans le PDF officiel de Finances Québec (Tableau 3) cité aux autres lignes.',
+  note: 'Page « Taux d’imposition », lue sur revenuquebec.ca le 2026-10-06 : 2026 — 54 345 $ ou moins 14 % ; au-delà de 54 345 $ jusqu’à 108 680 $ 19 % ; au-delà de 108 680 $ jusqu’à 132 245 $ 24 % ; au-delà de 132 245 $ 25,75 %.',
 })
 const QC_EXPENDITURES_2020 = src(
   'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/documents/Depenses_fiscales_2020_Description_mesures.pdf',
@@ -109,15 +108,13 @@ const QC_FICHE = src('https://www.budget.finances.gouv.qc.ca/budget/outils/depen
   note: 'Édition « Dépenses fiscales 2025 », relue le 2026-10-06 : « converti, au taux de 14 % (15 % avant 2023), en un crédit d’impôt qui est partageable entre les conjoints » ; seuil de réduction 42 955 $ et montant en raison de l’âge 3 986 $ pour 2026.',
 })
 const QC_WORKERS = src('https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110906.asp', 'Dépenses fiscales — Déduction pour les travailleurs', {
-  verify:
-    'Le taux de 6 % est celui de la Loi sur les impôts, art. 358.0.3 (« le moindre de 1 420 $ et de 6 % de son revenu de travail admissible », guide des mesures fiscales du CFFP, Université de Sherbrooke) ; la fiche officielle l’énonce aussi mais a refusé la lecture automatisée le jour du relevé. Le maximum de 2026 est, lui, lu dans le PDF officiel de Finances Québec.',
+  note: 'Guide TP-1.G (2025-12), ligne 201 : « égale à 6 % de votre revenu de travail admissible. Le maximum est de 1 420 $ » (2025) ; la fiche officielle l’énonce aussi.',
 })
 const QC_LINE_361 = src(
   'https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/350-a-398-1-credits-dimpot-non-remboursables/ligne-361/',
   "Ligne 361 - Montant accordé en raison de l'âge ou pour personne vivant seule ou pour revenus de retraite",
   {
-    verify:
-      'Lu sur une copie de l’Internet Archive datée du 2026-04-24 (texte de l’année d’imposition 2025) : revenuquebec.ca refuse l’accès automatisé. Le seuil d’âge est « né avant le 1er janvier 1961 » pour 2025, soit 65 ans.',
+    note: 'Guide TP-1.G (2025-12), ligne 361 : « Vous pouvez inscrire un montant en raison de votre âge si vous êtes né(e) avant le 1er janvier 1961 » (65 ans en 2025).',
   },
 )
 
@@ -213,23 +210,19 @@ export const P2026 = {
       }),
       baseDivisorSingle: c(24, 'fixed', {
         ...OAS_ACT,
-        note: 's. 12: the supplement is the maximum « minus one dollar for each full two dollars of the pensioner’s monthly base income »; s. 12(6)(a): a single pensioner’s monthly base income is « one-twelfth of the income » of the year → $1 per 2 × 12 = 24 annual dollars.',
-        verify: 'Dérivé du texte de la Loi par calcul (aucune page canada.ca ne l’énonce en « cents par dollar »). Contre-vérifié par un test contre les seuils publiés des quatre trimestres de 2026 (le revenu limite implicite concorde à quelques dizaines de dollars près).',
+        note: 's. 12: the supplement is the maximum « minus one dollar for each full two dollars of the pensioner’s monthly base income »; s. 12(6)(a): a single pensioner’s monthly base income is « one-twelfth of the income » of the year → $1 per 2 × 12 = 24 annual dollars. Confirmé le 2026-10-06 contre l’Estimateur des prestations de la SV (Service Canada) : écart ≤ 1 $/mois (arrondi au dollar entier).',
       }),
       baseDivisorCouple: c(48, 'fixed', {
         ...OAS_ACT,
-        note: 's. 12(6)(c)(ii): for a couple who both receive a pension, the monthly base income is « one twenty-fourth of the aggregate of the incomes » → $1 per 2 × 24 = 48 dollars of the couple’s COMBINED annual income, for each spouse.',
-        verify: 'Dérivé du texte de la Loi par calcul, comme le diviseur d’une personne seule ; mêmes contre-vérifications.',
+        note: 's. 12(6)(c)(ii): for a couple who both receive a pension, the monthly base income is « one twenty-fourth of the aggregate of the incomes » → $1 per 2 × 24 = 48 dollars of the couple’s COMBINED annual income, for each spouse. Confirmé le 2026-10-06 contre l’Estimateur des prestations de la SV (Service Canada) : écart ≤ 1 $/mois (arrondi au dollar entier).',
       }),
       topUpDivisorSingle: c(48, 'fixed', {
         ...OAS_ACT,
-        note: 's. 12.1(1)(a): the top-up is « A × B − C/4 » with C = « 1/12 of the pensioner’s income … in excess of $2,000 » → it falls $1 per 4 × 12 = 48 annual dollars above its start.',
-        verify: 'Dérivé du texte de la Loi par calcul. Contre-vérifié : (seuil du supplément − 2 000 $) ÷ 48 redonne ≈ 177 $, le même supplément maximal pour une personne seule et pour un conjoint sans pension.',
+        note: 's. 12.1(1)(a): the top-up is « A × B − C/4 » with C = « 1/12 of the pensioner’s income … in excess of $2,000 » → it falls $1 per 4 × 12 = 48 annual dollars above its start. Confirmé le 2026-10-06 contre l’Estimateur des prestations de la SV (Service Canada) : écart ≤ 1 $/mois (arrondi au dollar entier).',
       }),
       topUpDivisorCouple: c(96, 'fixed', {
         ...OAS_ACT,
-        note: 's. 12.1(1)(b), (2): C = « 1/24 of the aggregate of the incomes … in excess of $4,000 » → $1 per 4 × 24 = 96 dollars of combined annual income above its start.',
-        verify: 'Dérivé du texte de la Loi par calcul. Contre-vérifié : (8 800 − 4 000) ÷ 96 = 50 $, le « A = $50 » de la Loi pour un conjoint qui reçoit la pleine pension.',
+        note: 's. 12.1(1)(b), (2): C = « 1/24 of the aggregate of the incomes … in excess of $4,000 » → $1 per 4 × 24 = 96 dollars of combined annual income above its start. Confirmé le 2026-10-06 contre l’Estimateur des prestations de la SV (Service Canada) : écart ≤ 1 $/mois (arrondi au dollar entier).',
       }),
       employmentExemptionFull: c(5_000, 'fixed', { ...OAS_ACT, note: 's. 2, « income », (b.1): the first $5,000 of employment income is exempt; « you can earn up to $5,000 with no reduction ». No 2026 change found.' }),
       employmentExemptionBand: c(10_000, 'fixed', { ...OAS_ACT, note: '…then half of the next $10,000 (to $15,000 of earnings) is exempt — a maximum exemption of $10,000.' }),

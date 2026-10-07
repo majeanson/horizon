@@ -41,6 +41,16 @@ export interface DbPension {
   indexation: { share: number; minus: number }
   /** The age the person starts the pension (≥ earliestAge). */
   startAge: number
+  /**
+   * A pension ALREADY being paid (the retiree's « rente en cours »): the annual amount paid now, in today's dollars, as the
+   * statement prints it — already reduced, coordinated and bridged. When set, the formula fields above are not read: only
+   * `indexation` is, from next January on. Absent means a pension still to be calculated.
+   *
+   * `after65`: what the same pension pays from the month after the 65th birthday, in today's dollars, when it steps
+   * down (a plan coordinated with the RRQ) or up. Leave it out for a pension that stays the same; it is ignored once
+   * the person is already past that month (the figure paid now already is the one after).
+   */
+  inPay?: { annual: number; after65?: number }
 }
 
 export interface Person {

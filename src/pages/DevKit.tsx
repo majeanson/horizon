@@ -13,6 +13,7 @@ import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
 import { Cluster, Rail } from '../components/Layout'
 import { SectionHeader } from '../components/SectionHeader'
+import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
@@ -271,6 +272,19 @@ function ENTRIES(): Entry[] {
     },
     { cat: 'Graphiques', name: 'LineChart', file: 'src/components/charts/LineChart.tsx', exports: ['LineChart'], kw: 'graphique courbe ligne série recharts', render: () => <LineChartSpecimen /> },
     { cat: 'Affichage', name: 'PageHead', file: 'src/components/PageHead.tsx', kw: 'titre page h1 en-tête', render: () => <PageHead title="Résultats" subtitle="Le titre unique d’une page, et une ligne discrète dessous." /> },
+    {
+      cat: 'Affichage',
+      name: 'ImpactMeter',
+      file: 'src/components/ImpactMeter.tsx',
+      kw: 'impact niveau bas élevé hypothèse indicateur',
+      render: () => (
+        <>
+          <ImpactMeter level="low" tilt="cautious" levelLabel="Bas" tiltLabel="Hypothèse prudente : le plan a de la marge" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." />
+          <ImpactMeter level="typical" tilt="middle" levelLabel="Typique" tiltLabel="Hypothèse centrale" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." />
+          <ImpactMeter level="above" tilt="optimistic" levelLabel="Très élevé" tiltLabel="Hypothèse optimiste : le plan en dépend" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." outside="Au-delà de ce que couvrent les trois scénarios." />
+        </>
+      ),
+    },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Disclosure', file: 'src/components/Disclosure.tsx', kw: 'pli replier détail', render: () => <DisclosureSpecimen /> },
     {

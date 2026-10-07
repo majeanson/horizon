@@ -321,3 +321,59 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
+/* ── ImpactMeter ─────────────────────────────────────────────────────────── */
+.impact {
+  margin: 0.15rem 0 0.9rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  --impact-on: var(--ink-faint);
+}
+.impact--cautious {
+  --impact-on: var(--success);
+}
+.impact--optimistic {
+  --impact-on: var(--warn);
+}
+.impact__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.6rem;
+  font-size: var(--text-sm);
+}
+.impact__track {
+  display: inline-flex;
+  gap: 3px;
+}
+.impact__step {
+  width: 1.1rem;
+  height: 0.55rem;
+  border-radius: 2px;
+  background: var(--line);
+}
+.impact__step--on {
+  background: var(--impact-on);
+}
+.impact__level {
+  font-weight: 600;
+}
+.impact__tilt {
+  color: var(--ink-faint);
+}
+.impact__outside {
+  margin: 0.35rem 0 0;
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+.impact__why {
+  margin: 0.35rem 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+.impact__why strong {
+  color: var(--ink);
+}

@@ -581,6 +581,11 @@
   max-width: 24rem;
   overflow-wrap: anywhere;
 }
+.params__id {
+  display: block;
+  font-weight: 400;
+  opacity: 0.7;
+}
 .projected,
 .params__verify {
   color: var(--ink-soft);

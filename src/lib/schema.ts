@@ -10,7 +10,10 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId }
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
+
+/** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
+export const MAX_IN_PAY_ANNUAL = 1_000_000
 
 export type StoredAssumptions = Omit<Assumptions, 'today'>
 
@@ -121,6 +124,8 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
   const factor = unreduced.factor === null ? null : r.obj(unreduced.factor, `${path}.unreduced.factor`)
   const bridge = o.bridge === null ? null : r.obj(o.bridge, `${path}.bridge`)
   const indexation = r.obj(o.indexation, `${path}.indexation`) ?? {}
+  const inPay = o.inPay === undefined ? null : r.obj(o.inPay, `${path}.inPay`)
+  const after65 = inPay ? r.optNum(inPay.after65, `${path}.inPay.after65`, 0, MAX_IN_PAY_ANNUAL) : undefined
   return {
     label: r.str(o.label, `${path}.label`, 60),
     accrualRate: r.num(o.accrualRate, `${path}.accrualRate`, 0, 0.1),
@@ -152,6 +157,14 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
       minus: r.num(indexation.minus, `${path}.indexation.minus`, 0, 0.1),
     },
     startAge: r.num(o.startAge, `${path}.startAge`, 45, 75, true),
+    ...(inPay
+      ? {
+          inPay: {
+            annual: r.num(inPay.annual, `${path}.inPay.annual`, 0, MAX_IN_PAY_ANNUAL),
+            ...(after65 === undefined ? {} : { after65 }),
+          },
+        }
+      : {}),
   }
 }
 

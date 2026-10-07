@@ -5,8 +5,12 @@ import type { Profile } from './schema.ts'
 // What the results page asks of the engine, kept out of the page so it can be tested without a browser: how a
 // stored profile becomes the engine's inputs, what the chips on the page mean, and what each one costs to run.
 
-/** A comparison the person has switched on: « my plan » (each retires at their own age) or one age for everyone. */
-export type Selection = 'plan' | number
+/**
+ * A comparison the person has switched on: « my plan » (each retires at their own age), one age for everyone, or — for a
+ * couple — a SPLIT: the first person at one age, the second at another, written `60-65` (profile order).
+ */
+export type Split = `${number}-${number}`
+export type Selection = 'plan' | number | Split
 
 export const MIN_AGE = 50
 export const MAX_AGE = 70
@@ -21,13 +25,26 @@ export const defaultSelections = (household: Household): Selection[] => ['plan',
 
 export const assumptionsOf = (profile: Profile, today: { year: number; month: number }): Assumptions => ({ ...profile.assumptions, today })
 
+export const isSplit = (s: Selection): s is Split => typeof s === 'string' && s !== 'plan'
+const inRange = (n: number) => n >= MIN_AGE && n <= MAX_AGE
+export const splitOf = (first: number, second: number): Split => `${first}-${second}`
+export const splitAges = (s: Split): [number, number] => {
+  const [a, b] = s.split('-')
+  return [Number(a), Number(b)]
+}
+
 export function scenarioOf(household: Household, selection: Selection): Scenario {
-  return selection === 'plan' ? {} : everyoneAt(household, selection)
+  if (selection === 'plan') return {}
+  if (!isSplit(selection)) return everyoneAt(household, selection)
+  const [first, second] = splitAges(selection)
+  const [a, b] = household.persons
+  // A split only means something for two people; for anyone else it falls back to « everyone at the first age ».
+  return b ? { retirementAge: { [a.id]: first, [b.id]: second } } : everyoneAt(household, first)
 }
 
 /** The age a selection stands for on the chart's axis: the profile's own, for « my plan » (the first person's). */
 export const selectionAge = (household: Household, selection: Selection): number =>
-  selection === 'plan' ? household.persons[0].retirementAge : selection
+  selection === 'plan' ? household.persons[0].retirementAge : isSplit(selection) ? splitAges(selection)[0] : selection
 
 /** Run every selection in full (rows included): what the chart and the table draw. */
 export function runSelections(profile: Profile, today: { year: number; month: number }, selections: readonly Selection[]): { selection: Selection; result: AgeResult }[] {
@@ -38,12 +55,20 @@ export function runSelections(profile: Profile, today: { year: number; month: nu
   }))
 }
 
-/** `?ages=plan,60,65` → selections. Anything unreadable is dropped; no address at all → `fallback` (the household's defaults). */
+/** `?ages=plan,60,60-65` → selections (`60-65`: the first person at 60, the second at 65). Anything unreadable is dropped; no address at all → `fallback` (the household's defaults). */
 export function parseSelections(text: string | null, fallback: readonly Selection[]): Selection[] {
   if (text === null) return [...fallback]
   const out: Selection[] = []
   for (const token of text.split(',')) {
-    const sel: Selection | null = token === 'plan' ? 'plan' : /^\d{2}$/.test(token) && Number(token) >= MIN_AGE && Number(token) <= MAX_AGE ? Number(token) : null
+    const pair = /^(\d{2})-(\d{2})$/.exec(token)
+    const sel: Selection | null =
+      token === 'plan'
+        ? 'plan'
+        : /^\d{2}$/.test(token) && inRange(Number(token))
+          ? Number(token)
+          : pair && inRange(Number(pair[1])) && inRange(Number(pair[2])) && pair[1] !== pair[2]
+            ? splitOf(Number(pair[1]), Number(pair[2]))
+            : null
     if (sel !== null && !out.includes(sel)) out.push(sel)
   }
   return out.slice(0, MAX_SELECTIONS)

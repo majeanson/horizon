@@ -3,7 +3,9 @@ import type { DbPension } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
 import { formatDecimal, formatPct } from '../../lib/format'
-import { addPension, blankPension, removePension, updatePension } from '../../lib/profileEdit'
+import { formatMoney } from '../../lib/money'
+import { addPension, blankPension, inPayPension, removePension, updatePension } from '../../lib/profileEdit'
+import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Disclosure } from '../Disclosure'
@@ -35,6 +37,8 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
         <FieldInfo id="dbRules" label={p.rules} />
       </div>
 
+      {!pension.inPay && (
+        <>
       <FieldRow label={p.accrual}>
         {(w) => <NumberField kind="percent" min={0} max={0.1} value={pension.accrualRate} onChange={(accrualRate) => set((x) => ({ ...x, accrualRate }))} id={w.id} />}
       </FieldRow>
@@ -108,6 +112,9 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
         </>
       )}
 
+        </>
+      )}
+
       <FieldRow label={p.indexShare} hint={p.indexHint}>
         {(w) => <NumberField kind="percent" min={0} max={1} value={pension.indexation.share} onChange={(share) => set((x) => ({ ...x, indexation: { ...x.indexation, share } }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
@@ -136,7 +143,9 @@ export function PensionPlans({ person, edit }: PersonEditor) {
             <header className="plan-card__head">
               <div>
                 <h3 className="plan-card__name">{name}</h3>
-                <p className="plan-card__summary mono">{p.summary(formatPct(pension.accrualRate, lang, 2), formatDecimal(pension.serviceYearsToDate, lang, 2), pension.startAge)}</p>
+                <p className="plan-card__summary mono">
+                  {pension.inPay ? p.inPaySummary(formatMoney(pension.inPay.annual, lang)) : p.summary(formatPct(pension.accrualRate, lang, 2), formatDecimal(pension.serviceYearsToDate, lang, 2), pension.startAge)}
+                </p>
               </div>
               <button
                 type="button"
@@ -153,16 +162,42 @@ export function PensionPlans({ person, edit }: PersonEditor) {
             <FieldRow label={p.label}>
               {(w) => <EditField as="div" value={pension.label} onChange={(label) => set((x) => ({ ...x, label }))} submitIcon={null} maxLength={60} id={w.id} ariaLabel={p.label} />}
             </FieldRow>
-            <FieldRow label={p.service} infoId="dbService">
-              {(w) => <NumberField kind="decimal" min={0} max={60} unit={t.fields.years} value={pension.serviceYearsToDate} onChange={(serviceYearsToDate) => set((x) => ({ ...x, serviceYearsToDate }))} id={w.id} />}
-            </FieldRow>
-            <FieldRow label={p.serviceRate}>
-              {(w) => <NumberField kind="decimal" min={0} max={1} value={pension.serviceRatePerYear} onChange={(serviceRatePerYear) => set((x) => ({ ...x, serviceRatePerYear }))} id={w.id} />}
-            </FieldRow>
-            <FieldRow label={p.startAge}>
-              {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.startAge} onChange={(startAge) => set((x) => ({ ...x, startAge }))} id={w.id} />}
-            </FieldRow>
-            <Disclosure label={p.rules}>
+            {pension.inPay ? (
+              <>
+              <FieldRow label={p.inPayAnnual} hint={p.inPayHint}>
+                {(w) => (
+                  <NumberField kind="money" min={0} max={MAX_IN_PAY_ANNUAL} value={pension.inPay!.annual} onChange={(annual) => set((x) => ({ ...x, inPay: { ...x.inPay, annual } }))} id={w.id} ariaDescribedBy={w.describedBy} />
+                )}
+              </FieldRow>
+              <FieldRow label={p.inPayAfter65} hint={p.inPayAfter65Hint}>
+                {(w) => (
+                  <NumberField
+                    kind="money"
+                    allowEmpty
+                    min={0}
+                    max={MAX_IN_PAY_ANNUAL}
+                    value={pension.inPay!.after65 ?? null}
+                    onChange={(after65) => set((x) => ({ ...x, inPay: { annual: x.inPay!.annual, ...(after65 === null ? {} : { after65 }) } }))}
+                    id={w.id}
+                    ariaDescribedBy={w.describedBy}
+                  />
+                )}
+              </FieldRow>
+              </>
+            ) : (
+              <>
+                <FieldRow label={p.service} infoId="dbService">
+                  {(w) => <NumberField kind="decimal" min={0} max={60} unit={t.fields.years} value={pension.serviceYearsToDate} onChange={(serviceYearsToDate) => set((x) => ({ ...x, serviceYearsToDate }))} id={w.id} />}
+                </FieldRow>
+                <FieldRow label={p.serviceRate}>
+                  {(w) => <NumberField kind="decimal" min={0} max={1} value={pension.serviceRatePerYear} onChange={(serviceRatePerYear) => set((x) => ({ ...x, serviceRatePerYear }))} id={w.id} />}
+                </FieldRow>
+                <FieldRow label={p.startAge}>
+                  {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.startAge} onChange={(startAge) => set((x) => ({ ...x, startAge }))} id={w.id} />}
+                </FieldRow>
+              </>
+            )}
+            <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
               <Rules pension={pension} set={set} />
             </Disclosure>
           </article>
@@ -174,6 +209,9 @@ export function PensionPlans({ person, edit }: PersonEditor) {
         </button>
         <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(blankPension())}>
           {p.addOther}
+        </button>
+        <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(inPayPension())}>
+          {p.addInPay}
         </button>
       </Cluster>
     </Section>

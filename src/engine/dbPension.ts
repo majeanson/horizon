@@ -65,6 +65,9 @@ export interface DbStart {
   bridgeAnnual: number
   bridgeEndIndex: number | null
   indexation: { share: number; minus: number }
+  /** A pension in pay whose amount changes at 65: the month it changes, and the new annual amount in today's dollars. */
+  afterIndex?: number | null
+  afterAnnual?: number
 }
 
 /** The last calendar year of work: the year before leaving, or the leaving year itself when leaving is after January. */
@@ -100,6 +103,7 @@ export function unreducedAge(p: DbPension, service: number): number {
 
 /** What the pension is, once, at the age the person chooses to start it. */
 export function dbStart(p: DbPension, input: DbInput): DbStart {
+  if (p.inPay) return inPayStart(p, input)
   const raw = p.serviceYearsToDate + yearsBetween(input.today, input.leaving) * p.serviceRatePerYear
   const service = p.maxServiceYears === null ? raw : Math.min(raw, p.maxServiceYears)
   const avg = averageSalary(input, p.averagingYears)
@@ -133,6 +137,40 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
   }
 }
 
+/**
+ * A pension already in pay: the stated annual amount is what is received from January of today's year (every month of
+ * this year counts), with no formula, reduction, coordination or bridge — the statement's figure already includes them —
+ * and the plan's indexation applies each January from the next one. `today` is the inflation base, so the figure is
+ * in the dollars of the current year, exactly as every other « today's dollars » input.
+ */
+function inPayStart(p: DbPension, input: DbInput): DbStart {
+  const annual = roundTo(p.inPay!.annual, 0.01)
+  return {
+    service: 0,
+    averageSalary: 0,
+    formulaAnnual: annual,
+    unreducedAge: p.earliestAge,
+    earlyReduction: 0,
+    annualBeforeCoordination: annual,
+    coordinationAnnual: 0,
+    startIndex: input.today.year * 12,
+    coordinationIndex: null,
+    bridgeAnnual: 0,
+    bridgeEndIndex: null,
+    indexation: p.indexation,
+    ...afterAge65(p, input),
+  }
+}
+
+/** The step of a pension in pay at 65 — only when that month is still ahead of today. */
+function afterAge65(p: DbPension, input: DbInput): { afterIndex: number | null; afterAnnual?: number } {
+  const after = p.inPay?.after65
+  if (after === undefined) return { afterIndex: null }
+  const index = monthIndex({ year: input.birth.year + 65, month: input.birth.month }) + 1
+  if (index <= input.today.year * 12 + input.today.month - 1) return { afterIndex: null }
+  return { afterIndex: index, afterAnnual: roundTo(after, 0.01) }
+}
+
 /** The yearly increase of a pension in pay for a given inflation: the greater of `share` × inflation and inflation − `minus`, never negative. */
 export function indexationRate(inflation: number, ix: { share: number; minus: number }): number {
   return Math.max(0, ix.share * inflation, inflation - ix.minus)
@@ -157,6 +195,7 @@ export function dbYear(s: DbStart, year: number, inflation: number): number {
     if (s.coordinationIndex !== null && idx >= s.coordinationIndex) {
       annual -= s.coordinationAnnual * (1 + rate) ** Math.max(0, year - Math.floor(s.coordinationIndex / 12))
     }
+    if (s.afterIndex != null && s.afterAnnual !== undefined && idx >= s.afterIndex) annual = s.afterAnnual * (1 + rate) ** Math.max(0, year - startYear)
     if (s.bridgeEndIndex !== null && idx <= s.bridgeEndIndex) annual += s.bridgeAnnual
     total += Math.max(0, annual) / 12
   }
@@ -176,7 +215,7 @@ export function pensionAdjustment(
 ): number {
   if (!accruing) return 0
   return pensions.reduce(
-    (sum, p) => sum + Math.max(0, rules.pensionAdjustmentFactor * p.accrualRate * p.serviceRatePerYear * salary - rules.pensionAdjustmentOffset),
+    (sum, p) => p.inPay ? sum : sum + Math.max(0, rules.pensionAdjustmentFactor * p.accrualRate * p.serviceRatePerYear * salary - rules.pensionAdjustmentOffset),
     0,
   )
 }
