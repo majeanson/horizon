@@ -166,7 +166,7 @@ export const EN: typeof FR = {
     inPayRules: 'Pension indexation',
     inPaySummary: (annual: string) => `pension in pay · ${annual} per year`,
     label: 'Plan name',
-    service: 'Years of service for the pension calculation',
+    service: 'Years of service for the pension calculation (as on your statement, at 31 December)',
     serviceRate: 'Service credited per year worked (1 = full time)',
     startAge: 'Age the pension starts',
     startHint: 'If you leave the job before 55 and without 35 years of service it is a deferred pension: reduced 0.5% a month back to your 65th birthday, fully indexed until it starts, and coordinated with the QPP from the day it starts.',

@@ -25,7 +25,7 @@ Dépenses : 88 000 $ par année en travaillant, 90 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 641 349 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 678 364 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
 
 ### Le calcul des rentes
@@ -42,14 +42,14 @@ Dépenses : 88 000 $ par année en travaillant, 90 000 $ à la retraite (dol
 | 48 | 88 000 $ | 150 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 24 925 $ | 296 398 $ | couvert |
 | 50 | 88 000 $ | 152 953 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 25 913 $ | 354 487 $ | couvert |
 | 55 | 88 000 $ | 160 591 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 30 447 $ | 517 049 $ | couvert |
-| 60 | 88 000 $ | 88 989 $ | 29 706 $ | 0 $ | 0 $ | 0 $ | 0 $ | 19 806 $ | 696 176 $ | couvert |
-| 65 | 90 000 $ | 51 142 $ | 28 768 $ | 17 950 $ | 6 863 $ | 0 $ | 5 181 $ | 15 952 $ | 771 578 $ | tire du nid |
-| 70 | 90 000 $ | 0 $ | 24 549 $ | 44 760 $ | 18 300 $ | 0 $ | 18 148 $ | 15 334 $ | 689 922 $ | tire du nid |
-| 75 | 90 000 $ | 0 $ | 23 313 $ | 44 760 $ | 18 986 $ | 0 $ | 18 430 $ | 15 294 $ | 677 221 $ | tire du nid |
-| 80 | 90 000 $ | 0 $ | 22 138 $ | 44 760 $ | 20 130 $ | 0 $ | 18 777 $ | 15 410 $ | 662 133 $ | tire du nid |
-| 85 | 90 000 $ | 0 $ | 21 023 $ | 44 760 $ | 20 130 $ | 0 $ | 20 611 $ | 15 668 $ | 640 904 $ | tire du nid |
-| 90 | 90 000 $ | 0 $ | 19 964 $ | 44 760 $ | 20 130 $ | 0 $ | 14 436 $ | 9 290 $ | 643 816 $ | tire du nid |
-| 95 | 90 000 $ | 0 $ | 18 959 $ | 44 760 $ | 20 130 $ | 0 $ | 15 176 $ | 9 025 $ | 643 431 $ | tire du nid |
+| 60 | 88 000 $ | 88 989 $ | 30 658 $ | 0 $ | 0 $ | 0 $ | 0 $ | 19 669 $ | 697 289 $ | couvert |
+| 65 | 90 000 $ | 51 142 $ | 29 689 $ | 17 950 $ | 6 863 $ | 0 $ | 4 467 $ | 16 159 $ | 777 917 $ | tire du nid |
+| 70 | 90 000 $ | 0 $ | 25 336 $ | 44 760 $ | 18 300 $ | 0 $ | 17 281 $ | 15 310 $ | 702 838 $ | tire du nid |
+| 75 | 90 000 $ | 0 $ | 24 059 $ | 44 760 $ | 18 986 $ | 0 $ | 17 388 $ | 15 194 $ | 695 954 $ | tire du nid |
+| 80 | 90 000 $ | 0 $ | 22 848 $ | 44 760 $ | 20 130 $ | 0 $ | 17 837 $ | 15 335 $ | 687 580 $ | tire du nid |
+| 85 | 90 000 $ | 0 $ | 21 697 $ | 44 760 $ | 20 130 $ | 0 $ | 19 594 $ | 15 556 $ | 673 688 $ | tire du nid |
+| 90 | 90 000 $ | 0 $ | 20 604 $ | 44 760 $ | 20 130 $ | 0 $ | 13 977 $ | 9 471 $ | 671 320 $ | tire du nid |
+| 95 | 90 000 $ | 0 $ | 19 566 $ | 44 760 $ | 20 130 $ | 0 $ | 14 741 $ | 9 197 $ | 676 705 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2044, en dollars d’aujourd’hui
 
@@ -57,8 +57,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Camille | 66 | 0 $ | 25 586 $ | 23 934 $ | 9 150 $ | 0 $ | 50 952 $ | 2 875 $ | 3 751 $ | 0 $ |
-| Alex | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 6 908 $ | 23 248 $ | 794 $ | 601 $ | 0 $ |
+| Camille | 66 | 0 $ | 26 405 $ | 23 934 $ | 9 150 $ | 0 $ | 52 565 $ | 3 092 $ | 3 614 $ | 0 $ |
+| Alex | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 337 $ | 17 195 $ | 87 $ | 0 $ | 0 $ |
 
 ## average — Couple, revenus moyens
 

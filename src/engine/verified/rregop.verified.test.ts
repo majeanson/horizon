@@ -19,6 +19,7 @@ const input = (salary: number, mga: number, leavingAge = 61): DbInput => ({
   birth: BIRTH,
   leaving: { year: 1960 + leavingAge, month: 6 },
   today: { year: 1960 + leavingAge, month: 6 },
+  statement: { year: 1960 + leavingAge, month: 6 }, // the service typed is the service AT the leaving date (these are the plan's own worked examples)
   salaryAt: () => salary,
   mgaAt: () => mga,
 })
@@ -184,7 +185,7 @@ describe('RREGOP — the FIRST indexation is pro-rated by the days the pension w
   })
 
   it('a pension that starts in January is indexed in full the next January; one that starts in July only for the half-year it was paid', () => {
-    const jan = dbStart(rregopPension({ serviceYearsToDate: 32, startAge: 60 }), { ...input(50_000, MGA_BIG, 60), birth: { year: 1960, month: 12 }, leaving: { year: 2020, month: 12 }, today: { year: 2020, month: 12 } })
+    const jan = dbStart(rregopPension({ serviceYearsToDate: 32, startAge: 60 }), { ...input(50_000, MGA_BIG, 60), birth: { year: 1960, month: 12 }, leaving: { year: 2020, month: 12 }, today: { year: 2020, month: 12 }, statement: { year: 2020, month: 12 } })
     expect(jan.firstYearShare).toBe(1) // starts January 2021
     const jul = dbStart(rregopPension({ serviceYearsToDate: 32, startAge: 61 }), input(50_000, MGA_BIG)) // starts July 2021
     expect(jul.firstYearShare).toBeCloseTo(184 / 365, 12)
@@ -194,7 +195,7 @@ describe('RREGOP — the FIRST indexation is pro-rated by the days the pension w
 describe('RREGOP — a DEFERRED pension (« La fin d’emploi avant l’admissibilité à une rente »)', () => {
   // A member born June 1992 who leaves at 40 with 15 years of service and takes the pension at the age asked.
   const born = { year: 1992, month: 6 }
-  const leaveAt40: DbInput = { birth: born, leaving: { year: 2032, month: 6 }, today: { year: 2032, month: 6 }, salaryAt: () => 75_000, mgaAt: () => MGA_BIG }
+  const leaveAt40: DbInput = { birth: born, leaving: { year: 2032, month: 6 }, today: { year: 2032, month: 6 }, statement: { year: 2032, month: 6 }, salaryAt: () => 75_000, mgaAt: () => MGA_BIG }
 
   it('payable at 65 it is paid in full: no reduction, and the coordination starts at 65', () => {
     const s = dbStart(rregopPension({ serviceYearsToDate: 15, startAge: 65 }), leaveAt40)
@@ -245,8 +246,45 @@ describe('RREGOP — a DEFERRED pension (« La fin d’emploi avant l’admissib
   })
 
   it('a member who leaves at 55 or later, or with 35 years, is NOT deferred: the active reduction to the unreduced age applies', () => {
-    const leaveAt58: DbInput = { ...leaveAt40, leaving: { year: 2050, month: 6 }, today: { year: 2050, month: 6 } }
+    const leaveAt58: DbInput = { ...leaveAt40, leaving: { year: 2050, month: 6 }, today: { year: 2050, month: 6 }, statement: { year: 2050, month: 6 } }
     expect(dbStart(rregopPension({ serviceYearsToDate: 20, startAge: 58 }), leaveAt58).earlyReduction).toBeCloseTo(0.18, 10) // (61 − 58) × 6 %
     expect(dbStart(rregopPension({ serviceYearsToDate: 36, startAge: 55 }), leaveAt40).deferredFromYear).toBeNull()
+  })
+})
+
+// ── Retraite Québec's own RREGOP estimator, read on 2026-10-07 for the golden couple's first person ─────────────────────────────
+// https://estimationrente.retraitequebec.gouv.qc.ca — born 1978-03-15, 12,000 years of service on the statement, 85 000 $, 100 %.
+// Amounts in today's dollars, no indexation; service projected from the statement date (2025-12-31) to the leaving date:
+//   leaving 2038-03-13 (59,997): service 24,197 → rente de base avec réduction 38 666 $, coordination −12 636 $ from 2043-04-01
+//   leaving 2039-03-14 (61):     service 25,200 → rente de base 42 840 $,               coordination −13 159 $
+//   leaving 2043-03-14 (65):     service 29,200 → rente de base coordonnée au RRQ 34 392 $
+// The tool counts days, the engine months: a gap under 0.5 % is that, not a rule.
+describe('the RREGOP estimator (Camille, 85 000 $, 12 years on the 2025 statement)', () => {
+  const MGA_NOW = 74_600
+  const camille = (leaveAge: number, startAge: number) =>
+    dbStart(rregopPension({ serviceYearsToDate: 12, startAge }), {
+      birth: { year: 1978, month: 3 },
+      leaving: { year: 1978 + leaveAge, month: 3 },
+      today: { year: 2026, month: 10 },
+      salaryAt: () => 85_000,
+      mgaAt: () => MGA_NOW,
+    })
+  const near = (actual: number, expected: number) => expect(Math.abs(actual - expected) / expected).toBeLessThan(0.005)
+
+  it('leaving at 60, paid at 60: 6 % reduction, 38 666 $, then −12 636 $ at 65', () => {
+    const s = camille(60, 60)
+    expect(s.earlyReduction).toBeCloseTo(0.06, 10)
+    near(s.annualBeforeCoordination, 38_666)
+    near(s.coordinationAnnual, 12_636)
+  })
+  it('leaving at 61, paid at 61: no reduction, 42 840 $, then −13 159 $ at 65', () => {
+    const s = camille(61, 61)
+    expect(s.earlyReduction).toBe(0)
+    near(s.annualBeforeCoordination, 42_840)
+    near(s.coordinationAnnual, 13_159)
+  })
+  it('leaving at 65, paid at 65: 49 640 $ − 15 247 $ = 34 392 $ coordinated', () => {
+    const s = camille(65, 65)
+    near(s.annualBeforeCoordination - s.coordinationAnnual, 34_392)
   })
 })

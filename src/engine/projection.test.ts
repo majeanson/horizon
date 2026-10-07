@@ -276,7 +276,7 @@ describe('projection — the withdrawal solver is precise and shares a couple fa
   // couple-allocation weight were caught only by the golden snapshot — which is regenerated, not argued with.
   const SEED = 20261007
   const NO_SPLIT = { ...A, pensionSplitting: false }
-  const sample = cases(SEED, 60, (r, i) => {
+  const sample = cases(SEED, 120, (r, i) => {
     const scale = between(r, 0.15, 0.9)
     const h: Household = {
       persons: H.persons.map((p) => ({

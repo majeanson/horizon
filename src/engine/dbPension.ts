@@ -34,8 +34,10 @@ export interface DbInput {
   birth: YearMonth
   /** When employment ends. */
   leaving: YearMonth
-  /** Today, to the month: the service credited at the statement date runs from here. */
+  /** Today, to the month. The service credited on the statement runs from January of this year (statements are dated 31 December); the inflation base is today. */
   today: YearMonth
+  /** The month the service on the statement is counted to (default: the start of this year — a statement is dated 31 December of its year). A test that states the service AT the leaving date says so here. */
+  statement?: YearMonth
   /** Nominal salary in a calendar year (the engine's projection). */
   salaryAt: (year: number) => number
   /** The RRQ's maximum pensionable earnings of a calendar year. */
@@ -142,7 +144,9 @@ export function unreducedAge(p: DbPension, service: number): number {
 /** What the pension is, once, at the age the person chooses to start it. */
 export function dbStart(p: DbPension, input: DbInput): DbStart {
   if (p.inPay) return inPayStart(p, input)
-  const raw = p.serviceYearsToDate + yearsBetween(input.today, input.leaving) * p.serviceRatePerYear
+  // The service figure a person types is the one on their participation statement, dated 31 December of its year: service accrues from
+  // January of THIS year (not from today's month), exactly as Retraite Québec's own estimator projects it (« Service projeté à compter du 2025-12-31 »).
+  const raw = p.serviceYearsToDate + yearsBetween(input.statement ?? { year: input.today.year, month: 1 }, input.leaving) * p.serviceRatePerYear
   const service = p.maxServiceYears === null ? raw : Math.min(raw, p.maxServiceYears)
   const avg = averageSalary(input, p.averagingYears)
   const formulaAnnual = p.accrualRate * service * avg

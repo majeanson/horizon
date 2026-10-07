@@ -182,7 +182,7 @@ export const FR = {
     inPayRules: 'Indexation de la rente',
     inPaySummary: (annual: string) => `rente en cours · ${annual} par année`,
     label: 'Nom du régime',
-    service: 'Années de service pour le calcul de la rente',
+    service: 'Années de service pour le calcul de la rente (celles de votre relevé, au 31 décembre)',
     serviceRate: 'Service crédité par année travaillée (1 = temps plein)',
     startAge: 'Âge de début de la rente',
     startHint: 'Si vous quittez l’emploi avant 55 ans et sans 35 années de service, c’est une rente différée : elle est réduite de 0,5 % par mois jusqu’à vos 65 ans, indexée en entier jusqu’à son début, et coordonnée avec le RRQ dès qu’elle commence.',
