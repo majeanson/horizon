@@ -818,6 +818,8 @@
 .deferral__row--yours th,
 .deferral__row--yours td {
   background: var(--surface-2);
+}
+
 /* ── One question, one answer (Résultats ▸ « Ma question ») ───────────────────────────────────────────────────── */
 .answer {
   display: flex;
