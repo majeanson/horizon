@@ -292,3 +292,18 @@ describe('which category', () => {
     expect(gisCategory({ present: true, receivesOas: false })).toBe('spouseNone')
   })
 })
+
+// ── The OAS Benefits Estimator, read on 2026-10-07 for the « modest » example (a single person, born 1971-11) ─────────────────
+// Entered: single, lived in Canada since 18, income excluding OAS 14 588 $ (QPP 10 926 + RRSP 3 662), no work income.
+// It printed: « At 65, you could start receiving $1,117.99 per month: $762.50 from the Old Age Security pension, $355.49 from the
+// Guaranteed Income Supplement ». A second entry, for a start 11 months after 65, printed OAS $812.83 and the same GIS $355.49.
+describe('the OAS Benefits Estimator, Oct–Dec 2026, single person', () => {
+  it('the GIS at 14 588 $ of income is within the estimator\'s $1 a month (it rounds the reduction to whole dollars, the engine works in cents)', () => {
+    const gis = gisMonthly(14_588, 'single', RULES)
+    expect(Math.abs(gis - 355.49)).toBeLessThan(1)
+  })
+  it('the OAS at 65 is $762.50, and 11 months later it is $812.83: the 0.6 % a month, to the cent', () => {
+    expect(RULES.monthly65to74).toBe(762.5)
+    expect(Math.round(762.5 * deferralMultiplier(65 + 11 / 12, RULES) * 100) / 100).toBe(812.83)
+  })
+})
