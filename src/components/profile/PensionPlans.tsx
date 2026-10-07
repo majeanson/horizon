@@ -6,10 +6,8 @@ import { formatDecimal, formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
-import { setMode, useMode } from '../../lib/mode'
 import { useNotice } from '../../lib/toast'
 import { today } from '../../lib/today'
-import { Advanced } from '../Advanced'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Disclosure } from '../Disclosure'
@@ -136,7 +134,6 @@ export function PensionPlans({ person, edit }: PersonEditor) {
   const confirm = useConfirm()
   const notice = useNotice()
   const p = t.plans
-  const full = useMode() === 'full'
   const add = (pension: DbPension) => edit((x) => addPension(x, pension))
 
   return (
@@ -166,7 +163,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 <Icon name="trash-bold" size={18} />
               </button>
             </header>
-            {/* A correctness warning, so it is NOT folded in Simple mode: the figure changes if it is ignored. */}
+            {/* A correctness warning: the figure changes if it is ignored. */}
             {needsDeferredRule(person.retirementAge, pension) && (
               <div className="plan-card__notice">
                 <p className="field-row__hint">{p.deferredNotice(person.retirementAge)}</p>
@@ -239,11 +236,9 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 </FieldRow>
               </>
             )}
-            <Advanced what={t.mode.what.rules}>
-              <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
-                <Rules pension={pension} set={set} />
-              </Disclosure>
-            </Advanced>
+            <Disclosure label={pension.inPay ? p.inPayRules : p.rules}>
+              <Rules pension={pension} set={set} />
+            </Disclosure>
           </article>
         )
       })}
@@ -254,15 +249,9 @@ export function PensionPlans({ person, edit }: PersonEditor) {
         <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(blankPension())}>
           {p.addOther}
         </button>
-        {full ? (
-          <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(inPayPension())}>
-            {p.addInPay}
-          </button>
-        ) : (
-          <span className="field-row__hint">
-            {p.inPayPointer} <Chip onClick={() => setMode('full')}>{t.mode.details}</Chip>
-          </span>
-        )}
+        <button type="button" className="btn btn--sm btn--ghost" onClick={() => add(inPayPension())}>
+          {p.addInPay}
+        </button>
       </Cluster>
     </Section>
   )

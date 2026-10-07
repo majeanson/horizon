@@ -1,7 +1,6 @@
 import type { AccountKind } from '../engine/types'
 import { Cluster } from '../components/Layout'
 import { Disclosure } from '../components/Disclosure'
-import { Advanced } from '../components/Advanced'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
@@ -17,7 +16,6 @@ import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { formatPct } from '../lib/format'
 import { applyPreset, moveInOrder, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
-import { useMode } from '../lib/mode'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 
@@ -30,7 +28,6 @@ export function Hypotheses() {
   const { assumptions, household } = profile
   const gaps = profileGaps(profile)
   const { lang } = useLang()
-  const full = useMode() === 'full'
   const active = presetOf(assumptions)
   const presetSummary = (key: PresetKey) => {
     const v = ASSUMPTION_PRESETS[key]
@@ -86,20 +83,6 @@ export function Hypotheses() {
         </FieldRow>
       </Section>
 
-      {!full && (
-        <Section title={a.impactSummary} subtitle={a.impactSummaryHint} icon="chart-line-up-bold">
-          <p className="field-row__label">{a.economy.inflation}</p>
-          {meter('inflation', assumptions.inflation)}
-          <p className="field-row__label">{a.economy.wageGrowth}</p>
-          {meter('wageGrowth', assumptions.wageGrowth)}
-          <p className="field-row__label">{a.returns.title}</p>
-          {meter('returns', (assumptions.returns.rrsp + assumptions.returns.tfsa + assumptions.returns.nonReg) / 3)}
-          <p className="field-row__label">{a.horizon.title}</p>
-          {meter('horizonAge', assumptions.horizonAge)}
-        </Section>
-      )}
-
-      <Advanced what={t.mode.what.economy}>
       <Section title={a.economy.title} icon="chart-line-up-bold">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
@@ -164,7 +147,6 @@ export function Hypotheses() {
         </Chip>
         <p className="field-row__hint">{a.splitting.hint}</p>
       </Section>
-      </Advanced>
 
       {gaps.length === 0 ? (
         <NextStep to="/resultats" label={t.next.toResults}>

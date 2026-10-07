@@ -34,7 +34,6 @@ import { usePresetEarliest } from '../lib/usePresetEarliest'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
-import { useMode } from '../lib/mode'
 import { stopWorking } from '../lib/stopWorking'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
@@ -54,7 +53,6 @@ export function Resultats() {
   const r = t.results
   const rc = RESULTS_COPY[lang]
   const profile = useProfile()
-  const full = useMode() === 'full'
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
   // Everybody already stopped working: « when can I retire? » is answered, and what is left to say is whether the money lasts.
@@ -273,20 +271,6 @@ export function Resultats() {
             )}
           </>
         )}
-        {/* Simple hides the « Chacun de son côté » panel: one line keeps each person's own answer in view. */}
-        {!full && isCouple && !retiredNow && earliestEachAnswer && (
-          <p className="verdict__note">
-            {rc.headline.separately}{' '}
-            {earliestEachAnswer
-              .filter((a) => a.other)
-              .map((a) => {
-                const name = names[profile.household.persons.findIndex((p) => p.id === a.id)] ?? ''
-                const other = names[profile.household.persons.findIndex((p) => p.id === a.other!.id)] ?? ''
-                return a.earliestOk === null ? rc.each.none(name, MAX_AGE, other, a.other!.heldAt) : rc.each.line(name, a.earliestOk, other, a.other!.heldAt)
-              })
-              .join(' · ')}
-          </p>
-        )}
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — not only behind a disclosure. */}
         <p className="verdict__note">{r.verdict.caveat}</p>
       </div>
@@ -353,7 +337,7 @@ export function Resultats() {
         />
       )}
 
-      {full && earliestBlock}
+      {earliestBlock}
 
       {/* The strategy view is the main tool for deciding when to start the pensions: it stays one visible line in BOTH modes
           (it computes only when opened — a worker — and opens by itself when the address already carries its choices). */}
@@ -368,8 +352,7 @@ export function Resultats() {
       </Disclosure>
       )}
 
-      {/* Simple keeps the verdict, the comparison and the chart; the rest folds into one « Voir les détails ». */}
-      {full ? details : <Disclosure label={t.mode.details}>{earliestBlock}{details}</Disclosure>}
+      {details}
 
       <NextStep to="/donnees" label={t.next.toData}>
         <p>{t.next.resultsHint}</p>

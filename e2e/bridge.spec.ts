@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
 import { EXAMPLE, savedProfile, seedProfile } from './seed'
 
-// « Mes années 60 à 70 » in a real browser: the strategy view sits on the results page in BOTH modes, computes only when
+// « Mes années 60 à 70 » in a real browser: the strategy view sits on the results page, computes only when
 // opened (off the page's thread), keeps every choice in the address, and shows each year of the bridge as text beside the
 // pictures. The arithmetic is pinned by engine/bridge.test.ts; this pins that a person can SEE and drive it.
 
@@ -17,20 +17,10 @@ function watchConsole(page: Page): string[] {
   return problems
 }
 
-const useMode = (page: Page, mode: 'simple' | 'full') =>
-  page.addInitScript((m) => {
-    if (!sessionStorage.getItem('mode-seeded')) {
-      sessionStorage.setItem('mode-seeded', '1')
-      localStorage.setItem('horizon-mode', m)
-    }
-  }, mode)
-
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
-for (const mode of ['simple', 'full'] as const) {
-  test(`${mode}: one visible line opens the strategy view; it shows each year from 60 to 70, five strategies and two pictures`, async ({ page }) => {
+test('one visible line opens the strategy view; it shows each year from 60 to 70, five strategies and two pictures', async ({ page }) => {
     const problems = watchConsole(page)
-    await useMode(page, mode)
     await page.goto('/resultats')
     const open = page.getByRole('button', { name: OPEN })
     await expect(open).toBeVisible()
@@ -60,8 +50,7 @@ for (const mode of ['simple', 'full'] as const) {
     await expect(figures.first().locator('.recharts-bar-rectangle').first()).toBeVisible()
     expect(await figures.first().locator('.chart__plot').boundingBox().then((b) => b!.height)).toBeGreaterThan(200)
     expect(problems).toEqual([])
-  })
-}
+})
 
 test('choosing a way of starting saves the ages in the profile, presses the card, and changes the verdict', async ({ page }) => {
   await page.goto('/resultats')

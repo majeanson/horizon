@@ -33,14 +33,6 @@ export const FR = {
     resultsHint: 'Votre profil ne quitte jamais cet appareil : exportez-le pour le garder ou le partager.',
   },
 
-  mode: {
-    full: 'Complet',
-    hint: 'Affichage complet : tous les champs, tableaux et sources. Désactivé : l’essentiel seulement, le reste reste à un clic.',
-    details: 'Voir les détails',
-    name: 'Affichage complet',
-    what: { pension: 'régime de retraite', statement: 'relevé de participation', economy: 'hypothèses détaillées', rules: 'règles du régime' },
-  },
-
   common: {
     loading: 'Chargement…',
     cancel: 'Annuler',
@@ -175,7 +167,6 @@ export const FR = {
     addRregop: 'Ajouter le RREGOP',
     addOther: 'Ajouter un autre régime',
     addInPay: 'Ajouter une rente en cours',
-    inPayPointer: 'Vous touchez déjà une rente de votre employeur ?',
     inPayAnnual: 'Rente versée en ce moment, par année',
     inPayHint: 'Le montant annuel de votre relevé ou de votre dernier talon, en dollars d’aujourd’hui, après toute réduction : l’outil ne le recalcule pas. Il augmente ensuite chaque janvier selon l’indexation ci-dessous. Si votre rente a commencé cette année, indiquez le mois plus bas : la première hausse est alors réduite au prorata des jours payés. Sans mois, elle est comptée en entier.',
     deferredNotice: (age: number) => `Vous quittez l’emploi à ${age} ans, avant le premier âge où une rente est possible. Cette rente RREGOP a été enregistrée sans la règle de la rente différée.`,
@@ -291,8 +282,6 @@ export const FR = {
       retired: 'Dépenses annuelles une fois tout le monde à la retraite',
       hint: 'En dollars d’aujourd’hui, impôt non compris. Elles suivent ensuite l’inflation.',
     },
-    impactSummary: 'Ce que ce scénario suppose',
-    impactSummaryHint: 'Où se situe chaque hypothèse, et ce qu’elle change au plan. Pour les modifier une à une : « Complet ».',
     economy: {
       title: 'L’économie',
       inflation: 'Inflation annuelle',

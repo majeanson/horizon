@@ -19,7 +19,6 @@ interface State {
   theme: 'day' | 'night'
   contrast?: 'high'
   scale?: 'x-large'
-  mode?: 'simple'
 }
 
 const STATES: State[] = [
@@ -28,8 +27,7 @@ const STATES: State[] = [
   { name: 'day + high contrast', theme: 'day', contrast: 'high' },
   { name: 'night + high contrast', theme: 'night', contrast: 'high' },
   { name: 'day + largest text', theme: 'day', scale: 'x-large' },
-  { name: 'day + Simple mode', theme: 'day', mode: 'simple' },
-  { name: 'night + largest text + Simple mode', theme: 'night', scale: 'x-large', mode: 'simple' },
+  { name: 'night + largest text', theme: 'night', scale: 'x-large' },
 ]
 
 async function setState(page: Page, s: State): Promise<void> {
@@ -37,12 +35,11 @@ async function setState(page: Page, s: State): Promise<void> {
     localStorage.setItem('horizon-theme', st.theme)
     if (st.contrast) localStorage.setItem('horizon-contrast', st.contrast)
     if (st.scale) localStorage.setItem('horizon-text-scale', st.scale)
-    if (st.mode) localStorage.setItem('horizon-mode', st.mode)
   }, s)
 }
 
 async function violations(page: Page): Promise<string[]> {
-  // WHY this waits (the one-off contrast failure on the results page, night + Simple, that never reproduced in 50 reruns): the
+  // WHY this waits (a one-off contrast failure on the results page at night that never reproduced in 50 reruns): the
   // test opens every disclosure, which starts the bridge / deferral workers, and the bridge panel used to be DIMMED (opacity .6) while
   // a result was on its way — text at 60 % opacity fails 4.5:1 whenever axe happened to read it before the worker answered. That dimming
   // is gone (a status line replaces it, at full contrast); the two waits below keep the read deterministic: no panel still busy, and
@@ -96,7 +93,7 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
     await page.keyboard.press('Tab')
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
-  // The top bar first (name, display mode, language, theme), then the four destinations.
-  expect(order.slice(0, 4)).toEqual(['Horizon', 'Complet', 'EN', ''])
-  expect(order.slice(4, 8)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
+  // The top bar first (name, language, theme), then the four destinations.
+  expect(order.slice(0, 3)).toEqual(['Horizon', 'EN', ''])
+  expect(order.slice(3, 7)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
 })

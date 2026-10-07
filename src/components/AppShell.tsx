@@ -4,7 +4,6 @@ import { useLang, useT } from '../i18n'
 import { useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { Icon, type IconName } from './Icon'
-import { ModeSwitch } from './ModeSwitch'
 import { Loading } from './Loading'
 import { StatusMessage } from './StatusMessage'
 
@@ -37,7 +36,6 @@ export function AppShell() {
           {t.appName}
         </NavLink>
         <div className="shell__actions">
-          <ModeSwitch />
           <button type="button" className="btn btn--ghost btn--sm mono" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>
             {t.common.lang}
           </button>

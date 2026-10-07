@@ -17,14 +17,6 @@ export const EN: typeof FR = {
     resultsHint: 'Your profile never leaves this device: export it to keep it or share it.',
   },
 
-  mode: {
-    full: 'Full',
-    hint: 'Full view: every field, table and source. Off: the essentials only, the rest one tap away.',
-    details: 'Show details',
-    name: 'Full display',
-    what: { pension: 'pension plan', statement: 'participation statement', economy: 'detailed assumptions', rules: 'plan rules' },
-  },
-
   common: {
     loading: 'Loading…',
     cancel: 'Cancel',
@@ -159,7 +151,6 @@ export const EN: typeof FR = {
     addRregop: 'Add RREGOP',
     addOther: 'Add another plan',
     addInPay: 'Add a pension in pay',
-    inPayPointer: 'Already receiving a pension from your employer?',
     inPayAnnual: 'Pension being paid now, per year',
     inPayHint: 'The yearly amount on your statement or latest pay stub, in today’s dollars, after any reduction: the tool does not recompute it. It then rises each January by the indexation below. If your pension began this year, give the month below: the first increase is then cut to the days paid. Without a month it is counted in full.',
     deferredNotice: (age: number) => `You leave the job at ${age}, before the first age a pension is possible. This RREGOP pension was saved without the deferred-pension rule.`,
@@ -275,8 +266,6 @@ export const EN: typeof FR = {
       retired: 'Yearly spending once everyone has retired',
       hint: 'In today’s dollars, tax not included. It then follows inflation.',
     },
-    impactSummary: 'What this scenario assumes',
-    impactSummaryHint: 'Where each assumption sits, and what it does to the plan. To edit them one by one: “Full”.',
     economy: {
       title: 'The economy',
       inflation: 'Yearly inflation',
