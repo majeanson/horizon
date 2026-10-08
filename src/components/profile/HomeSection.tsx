@@ -1,6 +1,7 @@
 import { useLang, useT } from '../../i18n'
 import { monthsToPayoff, payoffYear } from '../../engine/home'
 import { useConfirm } from '../../lib/confirm'
+import { factId } from '../../lib/facts'
 import { formatMoney } from '../../lib/money'
 import { addHome, removeHome, updateHome } from '../../lib/profileEdit'
 import { updateProfile, useProfile } from '../../lib/store'
@@ -42,10 +43,10 @@ export function HomeSection() {
         </>
       ) : (
         <>
-          <FieldRow label={h.value} hint={h.valueHint}>
+          <FieldRow label={h.value} hint={h.valueHint} fact={factId('household', 'homeValue')}>
             {(w) => <NumberField kind="money" max={1e8} value={home.value} onChange={(value) => updateProfile((p) => updateHome(p, (x) => ({ ...x, value })))} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
-          <FieldRow label={h.balance}>
+          <FieldRow label={h.balance} fact={factId('household', 'mortgage')}>
             {(w) => <NumberField kind="money" max={1e8} value={home.mortgage.balance} onChange={(balance) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, balance } })))} id={w.id} />}
           </FieldRow>
           {home.mortgage.balance > 0 && (

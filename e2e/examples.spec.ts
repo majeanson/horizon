@@ -105,8 +105,8 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   // the profile says it: a home, a mortgage, a planned sale
   await page.goto('/')
   const home = page.locator('.profile-section', { hasText: 'Résidence principale' })
-  await expect(home.getByLabel('Valeur de la maison aujourd’hui')).toHaveValue(/880\s?000/)
-  await expect(home.getByLabel('Âge de la vente (première personne)')).toHaveValue('58')
+  await expect(home.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' })).toHaveValue(/880\s?000/)
+  await expect(home.getByRole('textbox', { name: 'Âge de la vente (première personne)' })).toHaveValue('58')
   // and the year table carries the home's columns
   await page.goto('/resultats?v=verify')
   await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible({ timeout: 30_000 })

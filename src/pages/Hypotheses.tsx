@@ -14,6 +14,7 @@ import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
+import { factId } from '../lib/facts'
 import { formatPct } from '../lib/format'
 import { applyPreset, restoreCustom, sameScenario, scenarioOf, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
@@ -103,10 +104,10 @@ export function Hypotheses() {
       </Section>
 
       <Section title={a.spending.title} icon="house-bold">
-        <FieldRow label={a.spending.working} infoId="spendingWorking" hint={a.spending.hint}>
+        <FieldRow label={a.spending.working} infoId="spendingWorking" hint={a.spending.hint} fact={factId('household', 'spendingWorking')}>
           {(w) => <NumberField kind="money" max={1e8} value={household.spending.workingToday} onChange={(workingToday) => updateProfile((p) => setSpending(p, { workingToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
-        <FieldRow label={a.spending.retired} infoId="spendingRetired">
+        <FieldRow label={a.spending.retired} infoId="spendingRetired" fact={factId('household', 'spendingRetired')}>
           {(w) => <NumberField kind="money" max={1e8} value={household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
         </FieldRow>
       </Section>

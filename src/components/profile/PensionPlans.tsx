@@ -2,12 +2,15 @@ import { rregopPension } from '../../engine/presets'
 import type { DbPension } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
+import { factId } from '../../lib/facts'
+import { useGuided } from '../../lib/guide'
 import { formatDecimal, formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
 import { useNotice } from '../../lib/toast'
 import { Chip } from '../Chip'
+import { FactMark } from '../FactMark'
 import { Cluster } from '../Layout'
 import { EditField } from '../EditField'
 import { FieldInfo } from '../FieldInfo'
@@ -133,11 +136,17 @@ export function PensionPlans({ person, edit }: PersonEditor) {
   const confirm = useConfirm()
   const notice = useNotice()
   const p = t.plans
+  const guided = useGuided()
   const add = (pension: DbPension) => edit((x) => addPension(x, pension))
 
   return (
     <Section title={p.title} subtitle={p.subtitle} icon="users-three-bold">
       {person.pensions.length === 0 && <p className="field-row__hint">{p.empty}</p>}
+      {person.pensions.length > 0 && (
+        <div className={'fact-line' + (guided === factId(person.id, 'pension') ? ' fact-line--guided' : '')} data-fact={factId(person.id, 'pension')}>
+          <FactMark id={factId(person.id, 'pension')} label={p.title} line />
+        </div>
+      )}
       {person.pensions.map((pension, i) => {
         const set = (change: (x: DbPension) => DbPension) => edit((x) => updatePension(x, i, change))
         const name = pension.label || p.unnamed

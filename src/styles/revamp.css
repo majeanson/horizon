@@ -314,3 +314,302 @@
     align-self: stretch;
   }
 }
+
+/* ── Which figures are real: the mark beside a field, and the field the guide is on ──────────────────────────────── */
+/* The mark is a hollow circle (estimated) that fills with a check (confirmed) — a full touch target like the ⓘ it sits beside,
+   and its state is also its accessible name, so colour is never the only cue. */
+.field-row__control--fact {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+.fact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.fact-btn--wait {
+  cursor: default;
+}
+.fact-btn__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 2px dashed var(--line-strong);
+  border-radius: 50%;
+  color: var(--paper);
+}
+.fact-btn.is-on .fact-btn__mark {
+  border: 2px solid var(--sage-deep);
+  background: var(--sage-deep);
+}
+.fact-btn:hover:not(.fact-btn--wait) {
+  background: var(--accent-soft);
+}
+.fact-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+/* The field the guide is standing on: a quiet frame, held while it is the current step. */
+.field-row--guided {
+  padding: 0.5rem 0.6rem;
+  margin: -0.5rem -0.6rem;
+  border-radius: var(--radius-md);
+  outline: 2px solid var(--marigold-deep);
+  background: color-mix(in srgb, var(--marigold-deep) 8%, transparent);
+}
+.fact-line__row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.fact-line__text {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+.fact-line--guided,
+.earnings--guided {
+  padding: 0.5rem 0.6rem;
+  margin: -0.5rem -0.6rem;
+  border-radius: var(--radius-md);
+  outline: 2px solid var(--marigold-deep);
+  background: color-mix(in srgb, var(--marigold-deep) 8%, transparent);
+}
+
+/* ── « Rendre mon profil exact »: the meter, the two ways, the documents, the guide ───────────────────────────────── */
+.meter {
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.meter__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sage-deep);
+  transition: width var(--dur-base, 200ms) var(--ease-out, ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .meter__fill {
+    transition: none;
+  }
+}
+.accuracy__meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.accuracy__count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+  margin: 0;
+}
+.accuracy__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.fact-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px dashed var(--line-strong);
+  border-radius: 50%;
+  color: var(--paper);
+  flex: none;
+}
+.fact-dot.is-on {
+  border: 2px solid var(--sage-deep);
+  background: var(--sage-deep);
+}
+.accuracy__legend .fact-dot + .fact-dot,
+.accuracy__legend .fact-dot ~ .fact-dot {
+  margin-left: 0.5rem;
+}
+.accuracy__modes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+@media (min-width: 700px) {
+  .accuracy__modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.accuracy__mode {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+}
+.accuracy__mode--exact {
+  border-style: solid;
+  border-color: var(--sage-deep);
+}
+.accuracy__mode-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: var(--text-md);
+}
+.accuracy__mode-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-xs);
+}
+.docs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.doc {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.doc--done {
+  border-color: var(--sage-deep);
+}
+.doc__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.doc__name {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.doc__count {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+.doc__what {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+.doc__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.doc__fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.doc__fact.is-on {
+  border-color: var(--sage-deep);
+}
+.doc__fact:hover {
+  background: var(--accent-soft);
+}
+.doc__owner {
+  color: var(--ink-soft);
+}
+.doc__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin-top: 0.2rem;
+}
+/* The guide: docked above the bottom navigation on a phone, at the foot of the window on a wide screen. */
+.guide-bar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: min(94vw, 38rem);
+  max-height: 55dvh;
+  overflow-y: auto;
+  padding: 0.9rem 1rem;
+  border: 2px solid var(--marigold-deep);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-float);
+}
+@media (min-width: 860px) {
+  .guide-bar {
+    bottom: 1.25rem;
+  }
+}
+.guide-bar__step {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.guide-bar__title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+.guide-bar__doc,
+.guide-bar__where {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+.guide-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+@media print {
+  .guide-bar {
+    display: none;
+  }
+}
+
+/* A figure the guide scrolls to stops below the top bar. */
+[data-fact] {
+  scroll-margin-top: 5.5rem;
+}

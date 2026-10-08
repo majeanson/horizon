@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react'
 import { makeRrqRules } from '../../engine/rrqRules'
 import { useLang, useT } from '../../i18n'
 import { earningsCeiling, fillFromSalary, historyYears } from '../../lib/earnings'
+import { factId } from '../../lib/facts'
+import { useGuided } from '../../lib/guide'
+import { FactMark } from '../FactMark'
 import { formatYearAge } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { setEarning } from '../../lib/profileEdit'
@@ -20,6 +23,7 @@ import { Section, type PersonEditor } from './shared'
 export function RrqSection({ person, edit }: PersonEditor) {
   const t = useT()
   const { lang } = useLang()
+  const guided = useGuided()
   const r = t.profile.rrq
   const { assumptions } = useProfile()
   const now = today()
@@ -53,9 +57,10 @@ export function RrqSection({ person, edit }: PersonEditor) {
         )}
       </FieldRow>
 
-        <div className="earnings">
+        <div className={'earnings' + (guided === factId(person.id, 'earnings') ? ' earnings--guided' : '')} data-fact={factId(person.id, 'earnings')}>
           <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed, years.length)} />
           <p className="field-row__hint">{r.earningsHint}</p>
+          <FactMark id={factId(person.id, 'earnings')} label={r.earnings} line />
           <div className="earnings__tools">
             <FieldInfo id="earnings" label={r.earnings} />
             <Chip onClick={fill}>{r.fill}</Chip>

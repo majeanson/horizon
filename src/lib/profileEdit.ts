@@ -26,6 +26,22 @@ export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): P
   return { ...p, assumptions: { ...p.assumptions, ...patch } }
 }
 
+// ── Which figures are real ─────────────────────────────────────────────────────────────────────────
+
+/** Say a figure is confirmed (read off a document) or estimated again; the same profile back when it already is. */
+export function setFact(p: Profile, id: string, confirmed: boolean): Profile {
+  const has = p.confirmed.includes(id)
+  if (has === confirmed) return p
+  return { ...p, confirmed: confirmed ? [...p.confirmed, id] : p.confirmed.filter((x) => x !== id) }
+}
+
+export const toggleFact = (p: Profile, id: string): Profile => setFact(p, id, !p.confirmed.includes(id))
+
+/** Confirm (or un-confirm) several figures at once — what finishing a step of the guide does. */
+export function setFacts(p: Profile, ids: readonly string[], confirmed: boolean): Profile {
+  return ids.reduce((acc, id) => setFact(acc, id, confirmed), p)
+}
+
 // ── The principal residence ─────────────────────────────────────────────────────────────────────────
 
 /** A home with nothing in it yet: a typical rate (the person types the rest), no sale planned. */
@@ -87,7 +103,8 @@ export function addSpouse(p: Profile, today: { year: number }): Profile {
 
 export function removeSpouse(p: Profile): Profile {
   if (!hasSpouse(p)) return p
-  return { ...p, household: { ...p.household, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse') } }
+  // What was confirmed about the spouse goes with them (a returning spouse starts again from estimates).
+  return { ...p, household: { ...p.household, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse') }, confirmed: p.confirmed.filter((id) => !id.startsWith('spouse:')) }
 }
 
 /** Whether a one-adult household lives alone (Québec's living-alone amount). A couple is unaffected. */

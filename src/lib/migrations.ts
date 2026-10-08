@@ -49,6 +49,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     if (typeof household !== 'object' || household === null || Array.isArray(household)) return profile
     return { ...profile, household: { ...(household as Raw), home: null } }
   },
+  // v8 → v9: the figures the person has CONFIRMED against a document are remembered (`confirmed`, ids like « self:rrspBalance »).
+  // Every older file confirmed none: every figure is an estimate until said otherwise.
+  (profile) => ({ ...profile, confirmed: [] }),
 ]
 
 export type ReadResult =

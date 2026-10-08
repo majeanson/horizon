@@ -1,4 +1,5 @@
 import type { AccountKind, Assumptions, DbPension, Home, Household, Person, PersonId } from '../engine/types.ts'
+import { FACT_ID_PATTERN } from './facts.ts'
 
 // THE SHAPE OF A SAVED PROFILE — what is written to this device's storage and to an exported file.
 //
@@ -10,7 +11,7 @@ import type { AccountKind, Assumptions, DbPension, Home, Household, Person, Pers
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 8
+export const SCHEMA_VERSION = 9
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -30,6 +31,8 @@ export interface Profile {
   assumptions: StoredAssumptions
   /** The hand-typed scenario kept aside when a ready-made one replaced it; null when none is kept. */
   customScenario: CustomScenario | null
+  /** The figures the person has confirmed against a document (lib/facts.ts): « self:rrspBalance », « household:homeValue »… Anything not listed is an estimate. */
+  confirmed: string[]
 }
 
 /** What is wrong with one field of a profile read from outside (a file, or storage). The UI words each one. */
@@ -73,6 +76,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     pensionSplitting: true,
   },
   customScenario: null,
+  confirmed: [],
 })
 
 // ── Validation: the gate every outside file passes through ──────────────────────────────────────────
@@ -329,6 +333,15 @@ export function validateProfile(raw: unknown): ProfileResult {
     }
   }
 
+  // The figures confirmed against a document: ids of the form « owner:kind », at most one per figure the household can have.
+  const rawConfirmed = r.arr(root.confirmed, 'confirmed') ?? []
+  if (rawConfirmed.length > 60) r.count('confirmed')
+  const confirmed: string[] = []
+  rawConfirmed.slice(0, 60).forEach((c, i) => {
+    if (typeof c !== 'string' || !FACT_ID_PATTERN.test(c)) r.count(`confirmed[${i}]`)
+    else if (!confirmed.includes(c)) confirmed.push(c)
+  })
+
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow, home }, children, assumptions, customScenario } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow, home }, children, assumptions, customScenario, confirmed } }
 }

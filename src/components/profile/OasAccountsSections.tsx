@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { Person } from '../../engine/types'
 import type { InfoId } from '../../i18n'
 import { useT } from '../../i18n'
+import { factId } from '../../lib/facts'
 import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
@@ -15,7 +16,7 @@ export function OasSection({ person, edit }: PersonEditor) {
   const o = t.profile.oas
   return (
     <Section title={o.title} icon="house-bold">
-      <FieldRow label={o.residentSince} infoId="oasResidence" hint={o.residentHint}>
+      <FieldRow label={o.residentSince} infoId="oasResidence" hint={o.residentHint} fact={factId(person.id, 'residence')}>
         {(w) => (
           <NumberField kind="year" min={1900} max={2100} value={person.oas.residentSince} onChange={(residentSince) => edit((x) => ({ ...x, oas: { ...x.oas, residentSince } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
@@ -52,10 +53,10 @@ function RegisteredGroup({ kind, person, edit, info }: PersonEditor & { kind: Re
   const set = (patch: Partial<Person['accounts'][Registered]>) => edit((x) => ({ ...x, accounts: { ...x.accounts, [kind]: { ...x.accounts[kind], ...patch } } }))
   return (
     <Group title={a[kind]}>
-      <FieldRow label={a.balance} infoId={info.balance}>
+      <FieldRow label={a.balance} infoId={info.balance} fact={factId(person.id, kind === 'rrsp' ? 'rrspBalance' : 'tfsaBalance')}>
         {(w) => <NumberField kind="money" max={1e9} value={account.balance} onChange={(balance) => set({ balance })} id={w.id} />}
       </FieldRow>
-      <FieldRow label={a.room} infoId={info.room}>
+      <FieldRow label={a.room} infoId={info.room} fact={factId(person.id, kind === 'rrsp' ? 'rrspRoom' : 'tfsaRoom')}>
         {(w) => <NumberField kind="money" max={1e9} value={account.room} onChange={(room) => set({ room })} id={w.id} />}
       </FieldRow>
       <FieldRow label={a.contribution} hint={a.contributionHint}>
@@ -75,10 +76,10 @@ export function AccountsSection({ person, edit }: PersonEditor) {
       <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} />
       <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} />
       <Group title={a.nonReg}>
-        <FieldRow label={a.balance} infoId="nonRegBalance">
+        <FieldRow label={a.balance} infoId="nonRegBalance" fact={factId(person.id, 'nonRegBalance')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
         </FieldRow>
-        <FieldRow label={a.acb} infoId="nonRegAcb" hint={a.acbHint}>
+        <FieldRow label={a.acb} infoId="nonRegAcb" hint={a.acbHint} fact={factId(person.id, 'nonRegAcb')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.acb} onChange={(acb) => setNonReg({ acb })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
         <FieldRow label={a.contribution} hint={a.contributionHint}>

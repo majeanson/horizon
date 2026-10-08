@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { HomeSection } from '../components/profile/HomeSection'
@@ -15,9 +15,12 @@ import { SectionLevel } from '../components/SectionHeader'
 import { StatusMessage } from '../components/StatusMessage'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
+import { factId } from '../lib/facts'
 import { hasSpouse, mapPerson, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
+
+const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
 
 // The profile: the household, then EVERY person's fields on the page — side by side on a wide
 // screen, one after the other on a phone. Nothing sits behind a tab. Every field writes straight
@@ -78,6 +81,10 @@ export function Profil() {
           )}
         </aside>
       )}
+      {/* « Rendre mon profil exact »: the meter, the documents and the guide — loaded on its own, the form never waits for it. */}
+      <Suspense fallback={null}>
+        <AccuracyGuide />
+      </Suspense>
       <FamilySection />
       <HomeSection />
       <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
@@ -115,10 +122,10 @@ function QuickStart() {
           <NumberField kind="year" min={1900} max={2100} value={self.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
-      <FieldRow label={t.profile.welcome.salary} infoId="salary">
+      <FieldRow label={t.profile.welcome.salary} infoId="salary" fact={factId('self', 'salary')}>
         {(w) => <NumberField kind="money" max={1e8} value={self.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} />}
       </FieldRow>
-      <FieldRow label={t.profile.welcome.spending} infoId="spendingRetired">
+      <FieldRow label={t.profile.welcome.spending} infoId="spendingRetired" fact={factId('household', 'spendingRetired')}>
         {(w) => <NumberField kind="money" max={1e8} value={profile.household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
       </FieldRow>
     </div>

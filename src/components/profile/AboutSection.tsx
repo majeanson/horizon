@@ -1,4 +1,5 @@
 import { useT } from '../../i18n'
+import { factId } from '../../lib/facts'
 import { EditField } from '../EditField'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
@@ -30,7 +31,7 @@ export function AboutSection({ person, edit }: PersonEditor) {
           <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
-      <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint}>
+      <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint} fact={factId(person.id, 'salary')}>
         {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
     </Section>
