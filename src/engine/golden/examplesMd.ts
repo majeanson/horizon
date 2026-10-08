@@ -1,5 +1,6 @@
 import { bridgeRun, profileLevers } from '../bridge.ts'
 import { agesLedger, planGlance, retirementState } from '../ledger.ts'
+import { monthsToPayoff, payoffYear } from '../home.ts'
 import { project } from '../projection.ts'
 import { retireAt } from '../retireAt.ts'
 import type { Person } from '../types.ts'
@@ -43,6 +44,14 @@ function section(e: ExampleHousehold): string[] {
   out.push('### Ce qui entre', '', '| Personne | Naissance | Retraite | Revenu | Rentes publiques |', '| --- | --- | --- | --- | --- |')
   for (const p of h.persons) out.push(...personTable(p))
   out.push('', `Dépenses : ${$(h.spending.workingToday)} par année en travaillant, ${$(h.spending.retiredToday)} à la retraite (dollars d’aujourd’hui). Inflation ${pct(a.inflation)}, croissance des salaires ${pct(a.wageGrowth)}, rendements REER ${pct(a.returns.rrsp)} · CELI ${pct(a.returns.tfsa)} · non enregistré ${pct(a.returns.nonReg)}, horizon ${a.horizonAge} ans, ordre de retrait ${a.withdrawalOrder.join(' → ')}.`, '')
+
+  if (h.home) {
+    const m = h.home.mortgage
+    const months = monthsToPayoff(m.balance, m.rate, m.monthlyPayment)
+    const payoff = m.balance <= 0 ? 'aucune hypothèque' : months === null ? 'jamais remboursée à ce paiement' : `payée en ${payoffYear(a.today.year, months)}`
+    const sale = h.home.sale ? `vendue à ${h.home.sale.age} ans (logement de remplacement : ${$(h.home.sale.replacementCost)})` : 'gardée à vie'
+    out.push(`Résidence principale : valeur ${$(h.home.value)}, hypothèque ${$(m.balance)} à ${pct(m.rate)} (${$(m.monthlyPayment)} par mois, ${payoff}), ${sale}. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.`, '')
+  }
 
   out.push('### Ce qui sort', '')
   out.push(`- Le plan tel que décrit : ${g.ok ? `tient jusqu’à l’horizon, valeur nette à la fin ${$(g.netWorthEnd)} (dollars d’aujourd’hui)` : `manque d’argent en ${g.firstShortfallYear}`}.`)

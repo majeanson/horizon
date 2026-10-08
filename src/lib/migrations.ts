@@ -42,6 +42,13 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v6 → v7: the hand-typed « Personnalisé » scenario may be kept aside (`customScenario`) while a ready-made one is chosen.
   // Every older file kept none: null.
   (profile) => ({ ...profile, customScenario: null }),
+  // v7 → v8: the household may own a principal residence (`household.home`: its value, its mortgage, an optional sale). Every
+  // older file owned none as far as the plan knew: null.
+  (profile) => {
+    const household = profile.household
+    if (typeof household !== 'object' || household === null || Array.isArray(household)) return profile
+    return { ...profile, household: { ...(household as Raw), home: null } }
+  },
 ]
 
 export type ReadResult =

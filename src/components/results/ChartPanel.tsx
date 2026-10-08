@@ -3,7 +3,7 @@ import type { AgeResult, Assumptions, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import {
   BALANCE_COLOUR,
-  BALANCE_SEGMENTS,
+  type BalanceBarSegment,
   SOURCE_COLOUR,
   SOURCE_SEGMENTS,
   balanceBars,
@@ -152,6 +152,9 @@ function DetailView({
 
   const sources = useMemo(() => sourceBars(rows, personId, scale), [rows, personId, scale])
   const balances = useMemo(() => balanceBars(rows, personId, scale), [rows, personId, scale])
+  // The house's equity is a segment of the household's bars when the plan has a home.
+  const balanceSegments: BalanceBarSegment[] = ['rrsp', 'tfsa', 'nonReg']
+  if (personId === null && rows.some((r) => r.household.homeValueEnd > 0)) balanceSegments.push('home')
   const hypotheses = useMemo(
     () => hypothesisSeries(household, assumptions, scenarioOf(household, run.selection), scale, c.hyp),
     [household, assumptions, run.selection, scale, c.hyp],
@@ -206,7 +209,7 @@ function DetailView({
         <Suspense fallback={<Loading />}>
           <StackedBarChart
             data={balances}
-            series={BALANCE_SEGMENTS.map((id) => ({ id, label: c.balance[id], colour: BALANCE_COLOUR[id] }))}
+            series={balanceSegments.map((id) => ({ id, label: c.balance[id], colour: BALANCE_COLOUR[id] }))}
             yFormat={yFormat}
             yDetail={yDetail}
             xTitle={xTitle}

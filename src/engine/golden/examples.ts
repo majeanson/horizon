@@ -6,7 +6,7 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 // every table and every result can be looked at, and checked by hand, for more than one kind of person:
 //
 //   golden    a couple, one in the public sector (RREGOP), the other private — the household the golden snapshots pin
-//   average   a couple on ordinary incomes, savings in RRSP and TFSA, no employer pension
+//   average   a couple on ordinary incomes, savings in RRSP and TFSA, no employer pension, a home with a mortgage that ends
 //   modest    one person on a low income, little saved: the GIS matters
 //   rich      a couple on high incomes with large savings in all three accounts, retiring early
 //   behind    one person, 52, who started saving late and plans to stop at 60: the plan does NOT hold
@@ -57,7 +57,9 @@ const average: Household = {
       pensions: [],
     }),
   ],
-  spending: { workingToday: 82_000, retiredToday: 74_000 },
+  // The mortgage is its own line (13 800 $ a year; it ENDS in 2041), so the living costs below do not carry it.
+  home: { value: 520_000, mortgage: { balance: 150_000, rate: 0.049, monthlyPayment: 1_150 }, sale: null },
+  spending: { workingToday: 72_000, retiredToday: 74_000 },
 }
 
 const modest: Household = {

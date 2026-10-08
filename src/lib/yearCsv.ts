@@ -18,6 +18,9 @@ export interface YearCsvHeads {
   spending: string
   shortfall: string
   netWorth: string
+  /** Headings of the two home columns; added only when a year of the plan has a home. */
+  mortgage?: string
+  homeEquity?: string
 }
 
 export interface YearCsvOptions {
@@ -32,7 +35,8 @@ const field = (text: string, sep: string): string => (text.includes(sep) || text
 export function yearCsv(result: AgeResult, heads: YearCsvHeads, lang: Lang, options: YearCsvOptions = {}): string {
   const sep = lang === 'fr' ? ';' : ','
   const money = (head: string) => (options.unit ? `${head} (${options.unit})` : head)
-  const lines = [[heads.year, heads.ages, money(heads.income), money(heads.tax), money(heads.spending), money(heads.shortfall), money(heads.netWorth)]]
+  const withHome = heads.mortgage !== undefined && heads.homeEquity !== undefined && result.rows.some((r) => r.household.homeValueEnd > 0)
+  const lines = [[heads.year, heads.ages, money(heads.income), money(heads.tax), money(heads.spending), money(heads.shortfall), money(heads.netWorth), ...(withHome ? [money(heads.mortgage!), money(heads.homeEquity!)] : [])]]
   for (const row of result.rows) {
     const h = row.household
     const whole = (n: number) => String(Math.round(n / (options.factor ? options.factor(row.year) : 1)))
@@ -46,6 +50,7 @@ export function yearCsv(result: AgeResult, heads: YearCsvHeads, lang: Lang, opti
       whole(h.spending),
       whole(h.shortfall),
       whole(h.netWorthEnd),
+      ...(withHome ? [whole(h.mortgagePayment), whole(h.homeValueEnd - h.mortgageBalanceEnd)] : []),
     ])
   }
   return '﻿' + lines.map((l) => l.map((c) => field(c, sep)).join(sep)).join('\r\n') + '\r\n'

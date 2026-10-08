@@ -11,7 +11,7 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
   return {
     app: 'horizon',
     version: SCHEMA_VERSION,
-    household: structuredClone(e.household),
+    household: { ...structuredClone(e.household), home: structuredClone(e.household.home ?? null) },
     children: [...e.children],
     assumptions: structuredClone(assumptions),
     customScenario: null,

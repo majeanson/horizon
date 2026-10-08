@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
+import { HomeSection } from '../components/profile/HomeSection'
 import { FamilySection } from '../components/profile/FamilySection'
 import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
 import { PensionPlans } from '../components/profile/PensionPlans'
@@ -78,6 +79,7 @@ export function Profil() {
         </aside>
       )}
       <FamilySection />
+      <HomeSection />
       <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
         {profile.household.persons.map((p, i) => {
           const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)

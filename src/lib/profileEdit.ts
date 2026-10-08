@@ -1,6 +1,6 @@
 import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
 import { rregopPension } from '../engine/presets.ts'
-import type { AccountKind, DbPension, Person, PersonId } from '../engine/types.ts'
+import type { AccountKind, DbPension, Home, Person, PersonId } from '../engine/types.ts'
 import { blankPerson, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
 
 // Every way the pages change a profile, as a pure function from profile to profile. A page never builds a new
@@ -24,6 +24,22 @@ export function setSpending(p: Profile, patch: Partial<Profile['household']['spe
 
 export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): Profile {
   return { ...p, assumptions: { ...p.assumptions, ...patch } }
+}
+
+// ── The principal residence ─────────────────────────────────────────────────────────────────────────
+
+/** A home with nothing in it yet: a typical rate (the person types the rest), no sale planned. */
+export const blankHome = (): Home => ({ value: 0, mortgage: { balance: 0, rate: 0.05, monthlyPayment: 0 }, sale: null })
+
+export const addHome = (p: Profile): Profile => (p.household.home ? p : { ...p, household: { ...p.household, home: blankHome() } })
+export const removeHome = (p: Profile): Profile => (p.household.home ? { ...p, household: { ...p.household, home: null } } : p)
+
+/** Change the home; the same profile back when nothing changes (or there is no home to change). */
+export function updateHome(p: Profile, change: (home: Home) => Home): Profile {
+  const home = p.household.home
+  if (!home) return p
+  const next = change(home)
+  return next === home ? p : { ...p, household: { ...p.household, home: next } }
 }
 
 /** The four figures that make a scenario (what the three ready-made sets also fix). */

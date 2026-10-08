@@ -71,12 +71,14 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Luc | né·e en 1982-02 | retraite à 63 ans | salaire 58 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2000) |
 | ↳ comptes | REER 55 000 $ (+3 000 $/an) | CELI 40 000 $ (+5 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 82 000 $ par année en travaillant, 74 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 72 000 $ par année en travaillant, 74 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+Résidence principale : valeur 520 000 $, hypothèque 150 000 $ à 4,9 % (1 150 $ par mois, payée en 2041), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 931 239 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 945 611 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 60 ans.
 
 ### Le calcul des rentes
 
@@ -89,18 +91,18 @@ Dépenses : 82 000 $ par année en travaillant, 74 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 42 | 82 000 $ | 130 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 21 044 $ | 273 351 $ | couvert |
-| 45 | 82 000 $ | 133 857 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 22 230 $ | 351 144 $ | couvert |
-| 50 | 82 000 $ | 140 542 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 24 430 $ | 510 047 $ | couvert |
-| 55 | 82 000 $ | 147 561 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 876 $ | 709 573 $ | couvert |
-| 60 | 82 000 $ | 154 930 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 29 445 $ | 955 563 $ | couvert |
-| 65 | 74 000 $ | 0 $ | 0 $ | 34 251 $ | 14 487 $ | 0 $ | 33 802 $ | 8 540 $ | 832 376 $ | tire du nid |
-| 70 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 18 300 $ | 0 $ | 19 594 $ | 8 580 $ | 830 029 $ | tire du nid |
-| 75 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 19 749 $ | 0 $ | 18 269 $ | 8 641 $ | 830 397 $ | tire du nid |
-| 80 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 18 593 $ | 8 864 $ | 836 489 $ | tire du nid |
-| 85 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 864 281 $ | tire du nid |
-| 90 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 895 817 $ | tire du nid |
-| 95 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 931 239 $ | tire du nid |
+| 42 | 85 800 $ | 130 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 21 044 $ | 269 467 $ | couvert |
+| 45 | 84 966 $ | 133 857 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 22 230 $ | 336 794 $ | couvert |
+| 50 | 83 686 $ | 140 542 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 24 430 $ | 482 148 $ | couvert |
+| 55 | 82 533 $ | 147 561 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 876 $ | 672 905 $ | couvert |
+| 60 | 72 000 $ | 154 930 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 29 445 $ | 951 076 $ | couvert |
+| 65 | 74 000 $ | 0 $ | 0 $ | 34 251 $ | 14 487 $ | 0 $ | 33 802 $ | 8 540 $ | 847 105 $ | tire du nid |
+| 70 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 18 300 $ | 0 $ | 19 594 $ | 8 580 $ | 846 573 $ | tire du nid |
+| 75 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 19 749 $ | 0 $ | 18 182 $ | 8 616 $ | 849 029 $ | tire du nid |
+| 80 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 18 203 $ | 8 754 $ | 857 935 $ | tire du nid |
+| 85 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 875 673 $ | tire du nid |
+| 90 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 908 613 $ | tire du nid |
+| 95 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 945 611 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2047, en dollars d’aujourd’hui
 
@@ -108,8 +110,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Marie | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 43 574 $ | 47 206 $ | 3 595 $ | 3 524 $ | 0 $ |
-| Luc | 65 | 0 $ | 0 $ | 16 369 $ | 7 625 $ | 17 942 $ | 38 348 $ | 1 332 $ | 2 716 $ | 0 $ |
+| Marie | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 43 197 $ | 49 566 $ | 3 871 $ | 3 847 $ | 0 $ |
+| Luc | 65 | 0 $ | 0 $ | 16 369 $ | 7 625 $ | 17 787 $ | 35 683 $ | 1 021 $ | 2 342 $ | 0 $ |
 
 ## modest — Une personne, petit revenu
 

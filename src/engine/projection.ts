@@ -1,6 +1,7 @@
 import { ageAtJan1, firstRrifYear, grow, maxWithdraw, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, tfsaNextRoom, type NonRegState } from './accounts.ts'
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson } from './oas.ts'
+import { homeYear, initialHome, type HomeState } from './home.ts'
 import { memberContribution } from './memberContribution.ts'
 import { payrollContribution } from './payroll.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
@@ -130,13 +131,32 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
   }))
 
   const rows: YearRow[] = []
+  let home: HomeState | null = h.home ? initialHome(h.home) : null
   for (let year = a.today.year; year <= endYear; year++) {
-    const out = simulateYear(year, h, a, people, states, paramsOf, indexation)
+    // The house first: the year's mortgage payments, and — in the year of a sale — the equity it frees (into the first person's
+    // non-registered account, before the year's tax and withdrawals are worked out) or the extra a dearer home costs.
+    let housing: Housing = NO_HOUSING
+    if (h.home && home) {
+      const step = homeYear(home, h.home, year - h.persons[0].birth.year, a.inflation, (1 + a.inflation) ** (year - a.today.year))
+      housing = { payment: step.payment, extraNeed: step.extraNeed, valueEnd: step.valueEnd, balanceEnd: step.balanceEnd }
+      home = step.next
+      if (step.released > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + step.released, acb: s.nonReg.acb + step.released } } : s))
+    }
+    const out = simulateYear(year, h, a, people, states, paramsOf, indexation, housing)
     rows.push(out.row)
     states = out.next
   }
   return rows
 }
+
+/** What the house adds to a year: the mortgage paid, anything a dearer replacement home costs, and where the house ends the year. */
+interface Housing {
+  payment: number
+  extraNeed: number
+  valueEnd: number
+  balanceEnd: number
+}
+const NO_HOUSING: Housing = { payment: 0, extraNeed: 0, valueEnd: 0, balanceEnd: 0 }
 
 function simulateYear(
   year: number,
@@ -146,6 +166,7 @@ function simulateYear(
   states: PersonState[],
   paramsOf: (y: number) => PlainYear,
   indexation: Indexation,
+  housing: Housing,
 ): { row: YearRow; next: PersonState[] } {
   const P = paramsOf(year)
   const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, livesAlone: h.livesAlone }
@@ -181,7 +202,8 @@ function simulateYear(
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
-  const spending = roundTo((retiredAll ? h.spending.retiredToday : h.spending.workingToday) * inflate, 0.01)
+  // What the household must pay: its living costs, plus the mortgage (which ENDS) and a replacement home's extra cost in a sale year.
+  const spending = roundTo((retiredAll ? h.spending.retiredToday : h.spending.workingToday) * inflate + housing.payment + housing.extraNeed, 0.01)
 
   // ── withdrawals are the unknown: one amount per person per account, solved below ──────────────
   const draw: Record<AccountKind, number[]> = { nonReg: people.map(() => 0), rrsp: people.map(() => 0), tfsa: people.map(() => 0) }
@@ -479,6 +501,9 @@ function simulateYear(
       spending,
       shortfall,
       netWorthEnd: roundTo(sum(next.map((s) => s.rrsp + s.tfsa + s.nonReg.balance)), 0.01),
+      mortgagePayment: roundTo(housing.payment, 0.01),
+      homeValueEnd: roundTo(housing.valueEnd, 0.01),
+      mortgageBalanceEnd: roundTo(housing.balanceEnd, 0.01),
     },
     projected: P.projected,
   }

@@ -83,3 +83,17 @@ test('heir: young and rich — « dès maintenant » rather than a first age tri
   // the comparison starts at the age already reached, and nobody is shown an age in the past
   await expect(page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: /^27 ans/ })).toBeVisible()
 })
+
+test('average couple: the home is in the year table (the mortgage paid, the equity) and in the chart’s balances', async ({ page }) => {
+  await loadExample(page, 'Couple, revenus moyens')
+  await page.goto('/resultats?v=verify')
+  const table = page.locator('.year-table table')
+  await expect(table.getByRole('columnheader', { name: 'Hypothèque payée' })).toBeVisible({ timeout: 30_000 })
+  await expect(table.getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible()
+  // the first year pays twelve payments; a year after 2041 pays none
+  await expect(table.locator('tbody tr').first()).toContainText('13 800 $')
+  await expect(table.locator('tbody tr', { hasText: /^2045/ })).toContainText('—')
+  // the chart's « Détail »: the house beside the accounts
+  await page.goto('/resultats?metric=detail')
+  await expect(page.locator('.chart-detail .chart__legend-item', { hasText: 'Maison (valeur nette)' })).toBeVisible({ timeout: 30_000 })
+})

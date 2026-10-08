@@ -72,7 +72,10 @@
    "tax": 24924.66,
    "spending": 88000,
    "shortfall": 0,
-   "netWorthEnd": 296398.19
+   "netWorthEnd": 296398.19,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": false
  },
@@ -149,7 +152,10 @@
    "tax": 25950.44,
    "spending": 89848,
    "shortfall": 0,
-   "netWorthEnd": 331518.04
+   "netWorthEnd": 331518.04,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -226,7 +232,10 @@
    "tax": 27012.83,
    "spending": 91734.81,
    "shortfall": 0,
-   "netWorthEnd": 369531.69
+   "netWorthEnd": 369531.69,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -303,7 +312,10 @@
    "tax": 29908.32,
    "spending": 93661.24,
    "shortfall": 0,
-   "netWorthEnd": 408790.12
+   "netWorthEnd": 408790.12,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -380,7 +392,10 @@
    "tax": 31390.2,
    "spending": 95628.12,
    "shortfall": 0,
-   "netWorthEnd": 450894.09
+   "netWorthEnd": 450894.09,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -457,7 +472,10 @@
    "tax": 32621.66,
    "spending": 97636.32,
    "shortfall": 0,
-   "netWorthEnd": 496323.71
+   "netWorthEnd": 496323.71,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -534,7 +552,10 @@
    "tax": 33897.16,
    "spending": 99686.68,
    "shortfall": 0,
-   "netWorthEnd": 545288.73
+   "netWorthEnd": 545288.73,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -611,7 +632,10 @@
    "tax": 35214.39,
    "spending": 101780.1,
    "shortfall": 0,
-   "netWorthEnd": 598014.89
+   "netWorthEnd": 598014.89,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -688,7 +712,10 @@
    "tax": 36581.1,
    "spending": 103917.48,
    "shortfall": 0,
-   "netWorthEnd": 654731.32
+   "netWorthEnd": 654731.32,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -765,7 +792,10 @@
    "tax": 37993.41,
    "spending": 106099.75,
    "shortfall": 0,
-   "netWorthEnd": 715685.94
+   "netWorthEnd": 715685.94,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -842,7 +872,10 @@
    "tax": 39459.45,
    "spending": 108327.84,
    "shortfall": 0,
-   "netWorthEnd": 781136.28
+   "netWorthEnd": 781136.28,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -919,7 +952,10 @@
    "tax": 40973.07,
    "spending": 110602.73,
    "shortfall": 0,
-   "netWorthEnd": 851337.57
+   "netWorthEnd": 851337.57,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -996,7 +1032,10 @@
    "tax": 25240.1,
    "spending": 112925.38,
    "shortfall": 0,
-   "netWorthEnd": 894790.99
+   "netWorthEnd": 894790.99,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1073,7 +1112,10 @@
    "tax": 26858.71,
    "spending": 115296.82,
    "shortfall": 0,
-   "netWorthEnd": 934643.86
+   "netWorthEnd": 934643.86,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1150,7 +1192,10 @@
    "tax": 27612.55,
    "spending": 117718.05,
    "shortfall": 0,
-   "netWorthEnd": 976419.8
+   "netWorthEnd": 976419.8,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1227,7 +1272,10 @@
    "tax": 28331.8,
    "spending": 120190.13,
    "shortfall": 0,
-   "netWorthEnd": 1020281.19
+   "netWorthEnd": 1020281.19,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1304,7 +1352,10 @@
    "tax": 29056.73,
    "spending": 122714.12,
    "shortfall": 0,
-   "netWorthEnd": 1066358.65
+   "netWorthEnd": 1066358.65,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1381,7 +1432,10 @@
    "tax": 23007.09,
    "spending": 128138.64,
    "shortfall": 0,
-   "netWorthEnd": 1107569.65
+   "netWorthEnd": 1107569.65,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1458,7 +1512,10 @@
    "tax": 9874.62,
    "spending": 130829.56,
    "shortfall": 0,
-   "netWorthEnd": 1101838.96
+   "netWorthEnd": 1101838.96,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1535,7 +1592,10 @@
    "tax": 25650.53,
    "spending": 133576.98,
    "shortfall": 0,
-   "netWorthEnd": 1078493.54
+   "netWorthEnd": 1078493.54,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1612,7 +1672,10 @@
    "tax": 23141.39,
    "spending": 136382.09,
    "shortfall": 0,
-   "netWorthEnd": 1066877.23
+   "netWorthEnd": 1066877.23,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1689,7 +1752,10 @@
    "tax": 23660.6,
    "spending": 139246.12,
    "shortfall": 0,
-   "netWorthEnd": 1088578.65
+   "netWorthEnd": 1088578.65,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1766,7 +1832,10 @@
    "tax": 24184.5,
    "spending": 142170.29,
    "shortfall": 0,
-   "netWorthEnd": 1110251.56
+   "netWorthEnd": 1110251.56,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1843,7 +1912,10 @@
    "tax": 24720.62,
    "spending": 145155.86,
    "shortfall": 0,
-   "netWorthEnd": 1131867.62
+   "netWorthEnd": 1131867.62,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1920,7 +1992,10 @@
    "tax": 24979.94,
    "spending": 148204.13,
    "shortfall": 0,
-   "netWorthEnd": 1153692.75
+   "netWorthEnd": 1153692.75,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -1997,7 +2072,10 @@
    "tax": 25522.71,
    "spending": 151316.42,
    "shortfall": 0,
-   "netWorthEnd": 1175431.52
+   "netWorthEnd": 1175431.52,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2074,7 +2152,10 @@
    "tax": 26080.04,
    "spending": 154494.07,
    "shortfall": 0,
-   "netWorthEnd": 1197049.68
+   "netWorthEnd": 1197049.68,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2151,7 +2232,10 @@
    "tax": 26630.16,
    "spending": 157738.44,
    "shortfall": 0,
-   "netWorthEnd": 1219763.06
+   "netWorthEnd": 1219763.06,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2228,7 +2312,10 @@
    "tax": 27203.42,
    "spending": 161050.95,
    "shortfall": 0,
-   "netWorthEnd": 1242795.69
+   "netWorthEnd": 1242795.69,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2305,7 +2392,10 @@
    "tax": 27831.52,
    "spending": 164433.02,
    "shortfall": 0,
-   "netWorthEnd": 1265680.24
+   "netWorthEnd": 1265680.24,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2382,7 +2472,10 @@
    "tax": 28582.75,
    "spending": 167886.11,
    "shortfall": 0,
-   "netWorthEnd": 1288704.41
+   "netWorthEnd": 1288704.41,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2459,7 +2552,10 @@
    "tax": 29160.01,
    "spending": 171411.72,
    "shortfall": 0,
-   "netWorthEnd": 1312944.68
+   "netWorthEnd": 1312944.68,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2536,7 +2632,10 @@
    "tax": 29819.32,
    "spending": 175011.37,
    "shortfall": 0,
-   "netWorthEnd": 1337047.13
+   "netWorthEnd": 1337047.13,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2613,7 +2712,10 @@
    "tax": 30515.25,
    "spending": 178686.61,
    "shortfall": 0,
-   "netWorthEnd": 1360951.25
+   "netWorthEnd": 1360951.25,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2690,7 +2792,10 @@
    "tax": 31238.56,
    "spending": 182439.02,
    "shortfall": 0,
-   "netWorthEnd": 1384603.29
+   "netWorthEnd": 1384603.29,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2767,7 +2872,10 @@
    "tax": 31986.14,
    "spending": 186270.24,
    "shortfall": 0,
-   "netWorthEnd": 1407949.74
+   "netWorthEnd": 1407949.74,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2844,7 +2952,10 @@
    "tax": 32759.54,
    "spending": 190181.92,
    "shortfall": 0,
-   "netWorthEnd": 1430932.58
+   "netWorthEnd": 1430932.58,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2921,7 +3032,10 @@
    "tax": 33562.16,
    "spending": 194175.74,
    "shortfall": 0,
-   "netWorthEnd": 1453487.43
+   "netWorthEnd": 1453487.43,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -2998,7 +3112,10 @@
    "tax": 34395.94,
    "spending": 198253.43,
    "shortfall": 0,
-   "netWorthEnd": 1475544.45
+   "netWorthEnd": 1475544.45,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3075,7 +3192,10 @@
    "tax": 32915.28,
    "spending": 202416.75,
    "shortfall": 0,
-   "netWorthEnd": 1499427.88
+   "netWorthEnd": 1499427.88,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3152,7 +3272,10 @@
    "tax": 22255.77,
    "spending": 206667.5,
    "shortfall": 0,
-   "netWorthEnd": 1534583.41
+   "netWorthEnd": 1534583.41,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3229,7 +3352,10 @@
    "tax": 22343.95,
    "spending": 211007.52,
    "shortfall": 0,
-   "netWorthEnd": 1570511.43
+   "netWorthEnd": 1570511.43,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3306,7 +3432,10 @@
    "tax": 22671.76,
    "spending": 215438.68,
    "shortfall": 0,
-   "netWorthEnd": 1606981.16
+   "netWorthEnd": 1606981.16,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3383,7 +3512,10 @@
    "tax": 23011.19,
    "spending": 219962.89,
    "shortfall": 0,
-   "netWorthEnd": 1643984.07
+   "netWorthEnd": 1643984.07,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3460,7 +3592,10 @@
    "tax": 23356.1,
    "spending": 224582.11,
    "shortfall": 0,
-   "netWorthEnd": 1681517.17
+   "netWorthEnd": 1681517.17,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3537,7 +3672,10 @@
    "tax": 23706.51,
    "spending": 229298.34,
    "shortfall": 0,
-   "netWorthEnd": 1719576.6
+   "netWorthEnd": 1719576.6,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3614,7 +3752,10 @@
    "tax": 24063.03,
    "spending": 234113.6,
    "shortfall": 0,
-   "netWorthEnd": 1758156.97
+   "netWorthEnd": 1758156.97,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3691,7 +3832,10 @@
    "tax": 24425.31,
    "spending": 239029.99,
    "shortfall": 0,
-   "netWorthEnd": 1797253.1
+   "netWorthEnd": 1797253.1,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3768,7 +3912,10 @@
    "tax": 24793.52,
    "spending": 244049.62,
    "shortfall": 0,
-   "netWorthEnd": 1836858.1
+   "netWorthEnd": 1836858.1,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3845,7 +3992,10 @@
    "tax": 25167.63,
    "spending": 249174.66,
    "shortfall": 0,
-   "netWorthEnd": 1876964.79
+   "netWorthEnd": 1876964.79,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  },
@@ -3922,7 +4072,10 @@
    "tax": 25548.09,
    "spending": 254407.33,
    "shortfall": 0,
-   "netWorthEnd": 1917564.7
+   "netWorthEnd": 1917564.7,
+   "mortgagePayment": 0,
+   "homeValueEnd": 0,
+   "mortgageBalanceEnd": 0
   },
   "projected": true
  }

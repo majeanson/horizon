@@ -107,6 +107,26 @@ export interface Person {
   pensions: DbPension[]
 }
 
+/** The household's principal residence: what it is worth, what is still owed on it, and — optionally — when it is sold. */
+export interface Home {
+  /** What it would sell for today, in today's dollars. It then keeps its real value (grows with inflation). */
+  value: number
+  /** The mortgage; a home owned outright has a balance of 0. */
+  mortgage: {
+    /** Still owed today. */
+    balance: number
+    /** The stated annual rate (0.05 = 5 %); compounded semi-annually, as Canadian fixed-rate mortgages are. */
+    rate: number
+    /** The payment, each month, in nominal dollars. */
+    monthlyPayment: number
+  }
+  /**
+   * Sold (or traded down) when the FIRST person reaches `age`; `replacementCost` is the new home's price in today's dollars
+   * (0 = rent). Null: the home is kept for life.
+   */
+  sale: { age: number; replacementCost: number } | null
+}
+
 export interface Household {
   /**
    * Whether the household is ONE adult who lives alone — the condition for Québec's living-alone amount. Ignored for a
@@ -115,6 +135,8 @@ export interface Household {
    */
   livesAlone?: boolean
   persons: Person[]
+  /** The principal residence. Absent or null: the household owns none (or does not want it counted). */
+  home?: Home | null
   spending: {
     /** Household spending while anyone still works, in today's dollars. */
     workingToday: number
@@ -190,6 +212,12 @@ export interface YearRow {
     shortfall: number
     /** Everything the household owns, at the end of the year. */
     netWorthEnd: number
+    /** Paid on the mortgage this year (0 with no home or once paid off); it is part of `spending`. */
+    mortgagePayment: number
+    /** What the home is worth at the end of the year (0 with no home): wealth the net worth does not count. */
+    homeValueEnd: number
+    /** Still owed on the mortgage at the end of the year. */
+    mortgageBalanceEnd: number
   }
   /** The figures this year used were projected, not published. */
   projected: boolean

@@ -1,4 +1,4 @@
-import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId } from '../engine/types.ts'
+import type { AccountKind, Assumptions, DbPension, Home, Household, Person, PersonId } from '../engine/types.ts'
 
 // THE SHAPE OF A SAVED PROFILE — what is written to this device's storage and to an exported file.
 //
@@ -10,7 +10,7 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId }
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 7
+export const SCHEMA_VERSION = 8
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -62,7 +62,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
 export const defaultProfile = (today: { year: number }): Profile => ({
   app: 'horizon',
   version: SCHEMA_VERSION,
-  household: { livesAlone: true, persons: [blankPerson('self', today)], spending: { workingToday: 0, retiredToday: 0 } },
+  household: { livesAlone: true, persons: [blankPerson('self', today)], spending: { workingToday: 0, retiredToday: 0 }, home: null },
   children: [],
   assumptions: {
     inflation: 0.02,
@@ -269,6 +269,27 @@ export function validateProfile(raw: unknown): ProfileResult {
   }
   const livesAlone = r.bool(household.livesAlone, 'household.livesAlone')
 
+  // The principal residence: null (none), or what it is worth, what is owed on it, and when it is sold (null: never).
+  let home: Home | null = null
+  if (household.home !== null) {
+    const hm = r.obj(household.home, 'household.home') ?? {}
+    const mg = r.obj(hm.mortgage, 'household.home.mortgage') ?? {}
+    let sale: Home['sale'] = null
+    if (hm.sale !== null) {
+      const s = r.obj(hm.sale, 'household.home.sale') ?? {}
+      sale = { age: r.num(s.age, 'household.home.sale.age', 40, 100, true), replacementCost: r.num(s.replacementCost, 'household.home.sale.replacementCost', 0, 1e8) }
+    }
+    home = {
+      value: r.num(hm.value, 'household.home.value', 0, 1e8),
+      mortgage: {
+        balance: r.num(mg.balance, 'household.home.mortgage.balance', 0, 1e8),
+        rate: r.num(mg.rate, 'household.home.mortgage.rate', 0, 0.25),
+        monthlyPayment: r.num(mg.monthlyPayment, 'household.home.mortgage.monthlyPayment', 0, 1e6),
+      },
+      sale,
+    }
+  }
+
   const rawChildren = r.arr(root.children, 'children') ?? []
   if (rawChildren.length > 12) r.count('children')
   const children = rawChildren.slice(0, 12).map((c, i) => r.num(c, `children[${i}]`, 1950, 2100, true))
@@ -309,5 +330,5 @@ export function validateProfile(raw: unknown): ProfileResult {
   }
 
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow }, children, assumptions, customScenario } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow, home }, children, assumptions, customScenario } }
 }

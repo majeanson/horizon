@@ -163,3 +163,33 @@ test('the estimate for a high salary stops at each year’s ceiling — the addi
   // 2023 (before the additional ceiling existed): the plain maximum, 66 600 $.
   await expect(section.locator('.earnings__row', { hasText: '2023' }).locator('input')).toHaveValue(/66\s?600/)
 })
+
+test('the home: owning one, its mortgage says when the payment stops, and it is saved with the profile', async ({ page }) => {
+  await page.goto('/')
+  const section = page.locator('.profile-section', { hasText: 'Résidence principale' })
+  await section.getByRole('button', { name: 'Je possède ma résidence principale' }).click()
+  await section.getByLabel('Valeur de la maison aujourd’hui').fill('520000')
+  await section.getByLabel('Solde de l’hypothèque').fill('150000')
+  await section.getByLabel('Solde de l’hypothèque').blur() // a box commits when left: the rate and payment fields appear once there is a balance
+  await section.getByLabel('Taux de l’hypothèque (annuel)').fill('4,9')
+  await section.getByLabel('Taux de l’hypothèque (annuel)').blur()
+  await section.getByLabel('Paiement mensuel').fill('1150')
+  await section.getByLabel('Paiement mensuel').blur()
+  // The payment stops on a stated date — the same year the plan's table stops charging it.
+  await expect(section).toContainText(/Hypothèque payée en \d{4}, dans \d+ ans : ce paiement cesse alors\./)
+  await expect.poll(async () => (await savedProfile(page)).household.home).toMatchObject({ value: 520_000, mortgage: { balance: 150_000, rate: 0.049, monthlyPayment: 1_150 }, sale: null })
+  // A payment that does not cover the interest says so, plainly.
+  await section.getByLabel('Paiement mensuel').fill('300')
+  await section.getByLabel('Paiement mensuel').blur()
+  await expect(section).toContainText('ne se rembourse jamais')
+  // A sale can be planned.
+  await section.getByRole('button', { name: 'Vendre ou réduire à un certain âge' }).click()
+  await section.getByLabel('Âge de la vente (première personne)').fill('78')
+  await section.getByLabel('Âge de la vente (première personne)').blur()
+  await expect.poll(async () => (await savedProfile(page)).household.home.sale).toEqual({ age: 78, replacementCost: 0 })
+  // Taking the home away asks what is lost, and erases it.
+  await section.getByRole('button', { name: 'Retirer la résidence' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Retirer' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.home).toBeNull()
+  await expect(section.getByRole('button', { name: 'Je possède ma résidence principale' })).toBeVisible()
+})

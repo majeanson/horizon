@@ -41,6 +41,19 @@ describe('each story', () => {
     expect(retireAt(household, assumptions, { stopAtFirstOk: true }).earliestOk!).toBeLessThanOrEqual(Math.max(...household.persons.map((p) => p.retirementAge)))
   })
 
+  it('average: the home has a mortgage that ENDS before either retires — the payment is in the spending until then and gone after, and the equity is wealth beside the nest', () => {
+    const { household, assumptions } = EXAMPLES.average
+    const rows = rowsOf('average')
+    const paid = rows.find((r) => r.household.mortgageBalanceEnd === 0)!
+    expect(paid.year).toBe(2041)
+    expect(Math.max(...household.persons.map((p) => p.birth.year + p.retirementAge))).toBeGreaterThan(paid.year)
+    expect(rows[0].household.mortgagePayment).toBeCloseTo(12 * 1_150, 0)
+    expect(rows.filter((r) => r.year > paid.year).every((r) => r.household.mortgagePayment === 0)).toBe(true)
+    expect(rows[0].household.homeValueEnd).toBeGreaterThan(household.home!.value)
+    expect(rows[rows.length - 1].household.homeValueEnd).toBeGreaterThan(0) // never sold: still there at the horizon
+    expect(planGlance(household, assumptions).ok).toBe(true)
+  })
+
   it('modest: the plan holds only just, and the GIS is a large part of why', () => {
     const { household, assumptions } = EXAMPLES.modest
     const g = planGlance(household, assumptions)
