@@ -26,7 +26,7 @@ const KB = 1024
 const CHUNK_BUDGET = 150 * KB // any lazy chunk
 const EAGER_CHUNKS = [
   // name pattern → its own budget (all load before first paint)
-  { re: /^index-/, cap: 40 * KB, label: 'eager entry' },
+  { re: /^index-/, cap: 42 * KB, label: 'eager entry' }, // 40 → 42 KB on 2026-10-08 (measured 40,6 KB): the saved profile now validates and migrates named plans (each a whole profile) and the market path, and profileEdit carries their edits — code every page's store reads, so it rides in the shell
   { re: /^react-vendor-/, cap: 280 * KB, label: 'eager react-vendor' },
   { re: /^i18n-/, cap: 34 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 33 → 34: the locked-in REER (the chip, two fields, one ⓘ: ~1 KB of French; the REER balance's note shortened to pay for part of it). 36 → 33: the results-only copy (the three questions, the headline, « each of us ») moved to lib/resultsCopy.ts, fetched with the results page; it was 31.2 KB measured after the move. 33 → 36: Simple/Full, the headline, the next steps and the three questions (~3 KB of French). 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
 ]

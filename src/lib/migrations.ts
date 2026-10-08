@@ -79,6 +79,8 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     if (typeof a !== 'object' || a === null || Array.isArray(a)) return profile
     return { ...profile, assumptions: { marketPath: { preset: 'smooth', custom: [] }, ...(a as Raw) } }
   },
+  // v12 → v13: named plans (`plans`) kept beside the profile. Every older file has none.
+  (profile) => ({ plans: [], ...profile }),
 ]
 
 export type ReadResult =
@@ -115,6 +117,18 @@ export function migrateProfile(raw: unknown, migrations: readonly ((profile: Raw
         return { ok: false, reason: 'invalid', problems: [{ path: 'profile', problem: 'type' }] }
       }
     }
+  }
+  // A named plan is a whole profile of its own, and was saved at ITS version: bring each to today's shape the same way, so a plan kept
+  // before a schema change still opens after it. A plan that cannot be read is dropped, not allowed to refuse the profile around it.
+  if (typeof current === 'object' && current !== null && !Array.isArray(current) && Array.isArray((current as Raw).plans)) {
+    const kept = ((current as Raw).plans as unknown[]).flatMap((entry) => {
+      if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) return []
+      const e = entry as Raw
+      if (typeof e.profile !== 'object' || e.profile === null || Array.isArray(e.profile)) return []
+      const inner = migrateProfile({ ...(e.profile as Raw), plans: [] }, migrations)
+      return inner.ok ? [{ ...e, profile: inner.profile }] : []
+    })
+    current = { ...(current as Raw), plans: kept }
   }
   const result = validateProfile(current)
   return result.ok ? result : { ok: false, reason: 'invalid', problems: result.problems }

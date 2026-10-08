@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
+import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
@@ -95,6 +96,8 @@ export function Donnees() {
           </button>
         </Cluster>
       )}
+
+      <PlansSection onReplace={setPrevious} />
 
       <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
         <Cluster>

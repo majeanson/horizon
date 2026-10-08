@@ -21,5 +21,6 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
     assumptions: { surplusToRrsp: false, marketPath: { preset: 'smooth', custom: [] }, ...structuredClone(assumptions) },
     customScenario: null,
     confirmed: [],
+    plans: [],
   }
 }

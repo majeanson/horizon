@@ -62,12 +62,14 @@ test.describe('with the keyboard alone', () => {
     await expect(info).toHaveAttribute('aria-expanded', 'false')
   })
 
-  test('the earnings grid sits on the page: its ⓘ, the fill action and the first year are the next stops', async ({ page }) => {
+  test('the earnings grid sits on the page: its ⓘ, the fill action, the paste action and the first year are the next stops', async ({ page }) => {
     await page.goto('/?form=1')
     await page.locator('.page-head__title').waitFor()
     await tabTo(page, /Où trouver ce chiffre : Revenus de travail admissibles par année/)
     await page.keyboard.press('Tab')
     expect((await focused(page)).name).toBe('Estimer les années vides à partir du salaire actuel')
+    await page.keyboard.press('Tab')
+    expect((await focused(page)).name).toBe('Coller mon relevé')
     await page.keyboard.press('Tab')
     expect((await focused(page)).name).toMatch(/Revenus admissibles de \d{4}/)
   })

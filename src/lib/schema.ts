@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 12
+export const SCHEMA_VERSION = 13
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -33,7 +33,18 @@ export interface Profile {
   customScenario: CustomScenario | null
   /** The figures the person has confirmed against a document (lib/facts.ts): « self:rrspBalance », « household:homeValue »… Anything not listed is an estimate. */
   confirmed: string[]
+  /** Named versions of the whole plan (« Je vends la maison », « Retraite à 55 ») kept beside the one being edited; at most MAX_PLANS. */
+  plans: SavedPlan[]
 }
+
+/** A named snapshot of a whole profile (itself without plans). It is a full profile on purpose: it migrates, validates and exports like one. */
+export interface SavedPlan {
+  name: string
+  profile: Profile
+}
+
+export const MAX_PLANS = 6
+export const MAX_PLAN_NAME = 40
 
 /** What is wrong with one field of a profile read from outside (a file, or storage). The UI words each one. */
 export interface ProfileProblem {
@@ -79,6 +90,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
   },
   customScenario: null,
   confirmed: [],
+  plans: [],
 })
 
 // ── Validation: the gate every outside file passes through ──────────────────────────────────────────
@@ -359,6 +371,22 @@ export function validateProfile(raw: unknown): ProfileResult {
     else if (!confirmed.includes(c)) confirmed.push(c)
   })
 
+  // The named plans: each a whole profile of its own (without plans of its own), under a name that is unique and short.
+  const rawPlans = r.arr(root.plans, 'plans') ?? []
+  if (rawPlans.length > MAX_PLANS) r.count('plans')
+  const plans: SavedPlan[] = []
+  rawPlans.slice(0, MAX_PLANS).forEach((entry, i) => {
+    const e = r.obj(entry, `plans[${i}]`) ?? {}
+    const name = typeof e.name === 'string' ? e.name.trim() : ''
+    if (name === '' || name.length > MAX_PLAN_NAME || plans.some((x) => x.name === name)) return void r.count(`plans[${i}].name`)
+    const inner = e.profile
+    const nested = typeof inner === 'object' && inner !== null && !Array.isArray(inner) ? (inner as Record<string, unknown>).plans : undefined
+    if (Array.isArray(nested) && nested.length > 0) return void r.count(`plans[${i}].profile.plans`)
+    const read = validateProfile(inner)
+    if (!read.ok) return void r.problems.push({ path: `plans[${i}].profile`, problem: 'type' })
+    plans.push({ name, profile: read.profile })
+  })
+
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow, home }, children, assumptions, customScenario, confirmed } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow, home }, children, assumptions, customScenario, confirmed, plans } }
 }

@@ -2,7 +2,7 @@ import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPreset
 import { CUSTOM_PATH_YEARS, MARKET_PATHS } from '../engine/marketPaths.ts'
 import { rregopPension } from '../engine/presets.ts'
 import type { AccountKind, DbPension, Home, Person, PersonId } from '../engine/types.ts'
-import { blankPerson, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
+import { blankPerson, MAX_PLAN_NAME, MAX_PLANS, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
 
 // Every way the pages change a profile, as a pure function from profile to profile. A page never builds a new
 // profile by hand: it calls one of these, which is why each can be tested without a browser and why the pages
@@ -95,6 +95,40 @@ export function restoreCustom(p: Profile): Profile {
   const kept = p.customScenario
   if (kept === null || sameScenario(kept, scenarioOf(p.assumptions))) return p
   return { ...p, assumptions: { ...p.assumptions, inflation: kept.inflation, wageGrowth: kept.wageGrowth, returns: { ...kept.returns }, horizonAge: kept.horizonAge } }
+}
+
+// ── Named plans ─────────────────────────────────────────────────────────────────────────────────────────────
+
+/** The profile as a plan keeps it: everything but the plans themselves. */
+const withoutPlans = (p: Profile): Profile => ({ ...p, plans: [] })
+
+/** What a name has to be to be kept: trimmed, not empty, not longer than a plan name may be. */
+export const cleanPlanName = (name: string): string => name.trim().slice(0, MAX_PLAN_NAME)
+
+/** Keep the profile as it stands under a name; a name already kept is replaced. Refused (same object) when the name is empty or six plans are kept. */
+export function savePlan(p: Profile, name: string): Profile {
+  const n = cleanPlanName(name)
+  if (n === '') return p
+  const entry = { name: n, profile: withoutPlans(p) }
+  if (p.plans.some((x) => x.name === n)) return { ...p, plans: p.plans.map((x) => (x.name === n ? entry : x)) }
+  if (p.plans.length >= MAX_PLANS) return p
+  return { ...p, plans: [...p.plans, entry] }
+}
+
+/** Make a kept plan the one being edited. The other plans stay where they are; the figures being edited are replaced (the page asks first). */
+export function openPlan(p: Profile, name: string): Profile {
+  const found = p.plans.find((x) => x.name === name)
+  return found ? { ...found.profile, plans: p.plans } : p
+}
+
+export function deletePlan(p: Profile, name: string): Profile {
+  return p.plans.some((x) => x.name === name) ? { ...p, plans: p.plans.filter((x) => x.name !== name) } : p
+}
+
+/** Is the profile as it stands exactly what a kept plan holds? (Then opening it loses nothing.) */
+export const planIsCurrent = (p: Profile, name: string): boolean => {
+  const found = p.plans.find((x) => x.name === name)
+  return found !== undefined && JSON.stringify(withoutPlans({ ...found.profile, version: p.version })) === JSON.stringify(withoutPlans(p))
 }
 
 // ── The path the markets take ───────────────────────────────────────────────────────────────────────
