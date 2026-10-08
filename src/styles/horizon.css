@@ -125,16 +125,22 @@
     grid-column: 1 / -1;
   }
   .shell__nav {
+    /* `inset` first: it is a shorthand for top too, and after `top` it reset it to auto, so the rail
+       never stuck and scrolled away with the page. */
+    inset: auto;
     position: sticky;
     top: var(--bar-h);
     align-self: start;
-    inset: auto;
     flex-direction: column;
     gap: 0.25rem;
     padding: 1rem 0.75rem;
     border-top: 0;
     border-right: 1px solid var(--line);
     min-height: calc(100dvh - var(--bar-h));
+    /* Exactly the window below the bar, no taller: if the tabs ever outgrow it (a short window, the
+       largest text size) the rail scrolls on its own instead of its last tab sitting out of reach. */
+    max-height: calc(100dvh - var(--bar-h));
+    overflow-y: auto;
   }
   .shell__tab {
     flex: 0 0 auto;
