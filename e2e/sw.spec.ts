@@ -180,7 +180,8 @@ test('offline, the saved profile is intact and the results — the chart and the
   await page.getByRole('tab', { name: 'Vérifier' }).click() // the grid lives on the « Vérifier » view
   // 27 cells = three 3 × 3 grids.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27, { timeout: 90_000 })
-  await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('59')
+  // The 27 cells exist at once as « … » placeholders and fill as the worker streams: wait for the value, not the cell.
+  await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('59', { timeout: 90_000 })
 
   expect(failed, 'nothing the offline app asked for failed').toEqual([])
   expect(consoleErrors).toEqual([])

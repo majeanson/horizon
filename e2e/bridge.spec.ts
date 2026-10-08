@@ -73,7 +73,8 @@ test('« Pour les deux » makes the other person follow: it is in the address, p
   await page.locator('.bridge-card').getByRole('radio', { name: 'Pont jusqu’à 70 ans', exact: true }).click()
   await both.click()
   await expect(page).toHaveURL(/bb=1/)
-  await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Les deux à 70 ans', exact: true })).toHaveAttribute('aria-checked', 'true')
+  // The pressed card describes what the worker computed FOR these levers, so it follows the address by one recomputation: wait for it like the matrix does.
+  await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Les deux à 70 ans', exact: true })).toHaveAttribute('aria-checked', 'true', { timeout: 60_000 })
   await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Pont jusqu’à 70 ans', exact: true })).toHaveAttribute('aria-checked', 'false')
   await page.reload()
   await expect(page.getByRole('button', { name: 'Pour les deux', exact: true })).toHaveAttribute('aria-pressed', 'true')
