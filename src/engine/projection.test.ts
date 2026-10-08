@@ -401,14 +401,14 @@ describe('projection — more is never worse, over many households', () => {
       }
     }
     expect(worked, 'the sample must include plans that work').toBeGreaterThan(8)
-  })
+  }, 30_000) // ≈ 5 s of projections on a quiet machine: the 5 s default flakes on a loaded CI runner
 
   it('lower spending: wherever the plan worked, it still works', () => {
     for (const { h, label } of sample) {
       const frugal = { ...h, spending: { workingToday: h.spending.workingToday * 0.8, retiredToday: h.spending.retiredToday * 0.8 } }
       for (const age of AGES) if (works(h, age)) expect(works(frugal, age), `${label} @ ${age}`).toBe(true)
     }
-  })
+  }, 30_000)
 
   it('every row of every sampled household balances', () => {
     for (const { h, label } of sample.slice(0, 8)) {
