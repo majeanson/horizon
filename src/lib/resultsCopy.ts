@@ -5,6 +5,7 @@
 // typed as the French one, so the two cannot drift apart; lib/resultsCopy.test.ts holds them to non-empty and translated.
 
 const FR_RESULTS = {
+  tabs: { label: 'Vues des résultats', answer: 'Réponse', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
     title: 'Dans quel ordre puiser ?',
     hint: (age: number) => `Votre plan, retraite à ${age} ans, refait avec chacun des six ordres de retrait des comptes. Les retraits sont recalculés année par année avec l’impôt, la RRQ, la PSV et le SRG.`,
@@ -128,6 +129,7 @@ const FR_RESULTS = {
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
+  tabs: { label: 'Results views', answer: 'Answer', strategies: 'Strategies', verify: 'Check' },
   orders: {
     title: 'In which order should I draw?',
     hint: (age: number) => `Your plan, retiring at ${age}, rerun with each of the six orders of drawing the accounts. Withdrawals are recomputed year by year with tax, QPP, OAS and GIS.`,

@@ -49,19 +49,18 @@ test('hovering the chart shows the year, the ages and each scenario’s exact fi
   await expect(tip.locator('.chart-tip__row').first()).toContainText(/Mon plan: .*\$/)
 })
 
-test('the measure and the dollars are chosen in the address, and the chart follows', async ({ page }) => {
+test('the measure is chosen in the address, and the chart follows; today’s dollars have no switch, an old link still opens the year’s dollars', async ({ page }) => {
   await page.goto('/resultats')
   const chart = page.locator('.chart-panel figure.chart')
   await page.getByRole('tab', { name: 'Revenu garanti' }).click()
   await expect(page).toHaveURL(/metric=income/)
   await expect(chart).toHaveAttribute('aria-label', /^Revenu garanti de 2026 à 2076/)
-  await page.getByRole('tab', { name: 'Dollars de l’année' }).click()
-  await expect(page).toHaveURL(/dollars=nominal/)
-  await expect(page.getByText('Les dollars de chaque année, sans correction pour l’inflation.')).toBeVisible()
-  // The address alone restores the view.
+  await expect(page.getByRole('tab', { name: 'Dollars de l’année' })).toHaveCount(0)
+  // The address alone restores the view — an old link with the year's dollars included.
   await page.goto('/resultats?metric=income&dollars=nominal&ages=62')
   await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Revenu garanti de 2026 à 2076 pour : 62 ans.')
   await expect(page.getByRole('tab', { name: 'Revenu garanti', selected: true })).toBeVisible()
+  await expect(page.getByText('Les dollars de chaque année, sans correction pour l’inflation.')).toBeVisible()
   // Choosing the default again takes the parameter back out of the address.
   await page.getByRole('tab', { name: 'Valeur nette' }).click()
   await expect(page).not.toHaveURL(/metric=/)
@@ -87,6 +86,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await page.goto('/resultats')
   // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
   await page.getByRole('tab', { name: 'Revenu garanti' }).click()
+  await page.getByRole('tab', { name: 'Vérifier' }).click()
   const grids = page.locator('.sensitivity__grids .table-wrap')
   await expect(grids).toHaveCount(3, { timeout: 60_000 })
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
@@ -94,6 +94,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
   // …and the verdict's own range line reads prudent ≥ neutre ≥ audacieux (a more prudent future never retires earlier)
   // — the ONE place the three scenarios' ages are written; the grids detail it.
+  await page.getByRole('tab', { name: 'Réponse' }).click()
   const range = page.locator('.verdict__range')
   await expect(range).toContainText('Selon le scénario')
   for (const name of ['Prudent', 'Neutre', 'Audacieux']) await expect(range.locator('dt', { hasText: name })).toBeVisible()
@@ -102,6 +103,10 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   const scenarios = (await range.locator('dd').allTextContents()).map((x) => Number(x.match(/\d+/)![0]))
   expect(scenarios[0]).toBeGreaterThanOrEqual(scenarios[1])
   expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
+  await page.getByRole('tab', { name: 'Vérifier' }).click()
+  // The panel mounts afresh with the view and computes again: wait for all of it.
+  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27, { timeout: 60_000 })
+  await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
   const base = grids.nth(1).locator('td.is-base')
   await expect(base).toHaveText('59')
   // A worse future never retires earlier than a better one: down the return axis, the ages do not fall.
@@ -118,7 +123,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
 // French page and an English reader to the English one, write numbers the way each language does, and say plainly when the
 // agency publishes a page in one language only.
 test('« Paramètres utilisés » follows the reader\'s language: the page, the number, and an honest label when there is no edition', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=verify')
   const row = (name: RegExp) => page.getByRole('row', { name })
 
   // French reader: the French edition, « 1 507,65 », and a French-only page needs no label.
@@ -181,7 +186,7 @@ test('a couple gets each person\'s own earliest age, worked out off the page\'s 
 // person can see the rule's own percentages beside the plan, tell which row is theirs, and switch person.
 test('« when should I start my pension » compares the start ages, flags the plan\'s own row and switches person', async ({ page }) => {
   const problems = watchConsole(page)
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   const rrq = page.getByRole('region', { name: /Régime de rentes du Québec \(RRQ\)/ })
   const oas = page.getByRole('region', { name: /Sécurité de la vieillesse \(PSV\)/ })
   await expect(rrq).toBeVisible({ timeout: 60_000 })

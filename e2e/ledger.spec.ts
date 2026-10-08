@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 
 test('a slider shows the calculation, previews while held, and saves the age in the profile when released', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=verify')
   const panel = page.locator('.ledger')
   await expect(panel).toBeVisible()
   // each age is a slider with a readable value, and the QPP line shows its formula and its result
@@ -31,13 +31,13 @@ test('a slider shows the calculation, previews while held, and saves the age in 
 
 test('the page has no horizontal overflow at phone width with the panel open', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=verify')
   await expect(page.locator('.ledger')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
 test('spending and the economy are sliders too: releasing one saves it, and the calculation says what it means', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=verify')
   const panel = page.locator('.ledger')
   const infl = panel.getByRole('slider', { name: 'Inflation' })
   const before = (await savedProfile(page)).assumptions.inflation

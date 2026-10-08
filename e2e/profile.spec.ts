@@ -246,6 +246,7 @@ test.describe('the example household', () => {
     await expect(chips.getByRole('button', { name: '57 ans', pressed: false })).toBeVisible()
     await expect(page).toHaveURL(/ages=plan%2C65%2C55%2C56|ages=plan,65,55,56/)
 
+    await page.getByRole('tab', { name: 'Vérifier' }).click()
     const yearTable = page.locator('#tableau').getByRole('table').first()
     await expect(yearTable).toBeVisible()
     expect(await yearTable.getByRole('row').count()).toBeGreaterThan(40)
@@ -409,7 +410,7 @@ for (const width of [360, 390]) {
     }
     // On the chart, the sub-tab pill must be able to SCROLL (its content wider than it) rather than push its row off the screen.
     await page.goto('/resultats')
-    const pill = page.locator('.chart-panel .subtabs').nth(1)
+    const pill = page.locator('.chart-panel .subtabs').first()
     await pill.waitFor()
     const room = await pill.evaluate((el) => ({ client: el.clientWidth, scroll: el.scrollWidth, right: el.getBoundingClientRect().right, viewport: document.documentElement.clientWidth }))
     expect(room.right, 'the pill stays on screen').toBeLessThanOrEqual(room.viewport)

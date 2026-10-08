@@ -22,7 +22,6 @@ export function ChartPanel({
   metric,
   dollars,
   onMetric,
-  onDollars,
   label,
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
@@ -32,7 +31,6 @@ export function ChartPanel({
   metric: Metric
   dollars: Dollars
   onMetric: (m: Metric) => void
-  onDollars: (d: Dollars) => void
   label: (s: Selection) => string
 }) {
   const t = useT()
@@ -62,16 +60,6 @@ export function ChartPanel({
           options={[
             { key: 'netWorth', label: c.netWorth },
             { key: 'income', label: c.income },
-          ]}
-        />
-        <SubTabs
-          size="mini"
-          ariaLabel={c.dollars}
-          value={dollars}
-          onSelect={onDollars}
-          options={[
-            { key: 'today', label: c.today },
-            { key: 'nominal', label: c.nominal },
           ]}
         />
       </div>

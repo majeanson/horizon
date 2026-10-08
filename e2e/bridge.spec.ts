@@ -19,7 +19,7 @@ test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('the strategy view sits on the page: each year from 60 to 70, five strategies and two pictures', async ({ page }) => {
     const problems = watchConsole(page)
-    await page.goto('/resultats')
+    await page.goto('/resultats?v=strategies')
 
     // the verdict sentence and the five ways of starting
     // (the age is the one of the person looked at — Camille, the older one — not the plan's horizon for the younger)
@@ -47,7 +47,7 @@ test('the strategy view sits on the page: each year from 60 to 70, five strategi
 })
 
 test('choosing a way of starting saves the ages in the profile, presses the card, and changes the verdict', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   const card = (name: string) => page.locator('.bridge-card').getByRole('radio', { name, exact: true })
   await card('Reporter au maximum').click()
   // the ages are the PROFILE's: the card writes them there, and nothing about them is in the address
@@ -66,7 +66,7 @@ test('choosing a way of starting saves the ages in the profile, presses the card
 })
 
 test('« Pour les deux » makes the other person follow: it is in the address, presses « Les deux à 70 ans », and survives a reload', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   const both = page.getByRole('button', { name: 'Pour les deux', exact: true })
   await expect(both).toHaveAttribute('aria-pressed', 'false')
@@ -83,7 +83,7 @@ test('« Pour les deux » makes the other person follow: it is in the address, p
 })
 
 test('a deferral digs into the nest first: the nest at 70 is lower than starting at 65, and the cost is said in dollars', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   const std = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Standard (c’est aussi votre plan)', exact: true }) })
   const max = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Reporter au maximum', exact: true }) })
@@ -93,7 +93,7 @@ test('a deferral digs into the nest first: the nest at 70 is lower than starting
 })
 
 test('a couple has one tab per person, each with their own ages from the profile', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   await expect(page.locator('.bridge')).toContainText('retraite à 60 ans')
   const tabs = page.getByRole('tablist', { name: 'Pour' })
@@ -104,7 +104,7 @@ test('a couple has one tab per person, each with their own ages from the profile
 })
 
 test('« jusqu’à l’horizon » shows every year of the plan, and the bridge shows only 60 to 70', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__table tbody tr')).toHaveCount(11)
   await page.getByRole('tab', { name: 'Jusqu’à l’horizon' }).click()
   await expect(page).toHaveURL(/bw=plan/)
@@ -114,7 +114,7 @@ test('« jusqu’à l’horizon » shows every year of the plan, and the bridge 
 })
 
 test('the three sets of assumptions: eighteen answers, filled in by themselves off the page’s thread', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   const matrix = page.getByRole('region', { name: 'Sous trois jeux d’hypothèses' })
   await expect(matrix.locator('tbody tr')).toHaveCount(6, { timeout: 60_000 })
@@ -127,7 +127,7 @@ test('the three sets of assumptions: eighteen answers, filled in by themselves o
 
 test('English: the view speaks English and keeps the same choices', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await page.locator('.bridge-card').getByRole('radio', { name: 'Bridge to 70', exact: true }).click()
   await expect(page.locator('.bridge__verdict')).toContainText(/You can defer|Deferring uses up/)
   await expect(page.locator('.bridge')).toContainText('Your ages: retire at age 60, QPP at age 70, OAS at age 70')
@@ -136,7 +136,7 @@ test('English: the view speaks English and keeps the same choices', async ({ pag
 
 test('on a phone the view fits the screen: the table scrolls inside its own region, nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
-  await page.goto('/resultats')
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__verdict')).toBeVisible()
   await expectNoHorizontalOverflow(page, page.locator('.bridge'))
   await expect(page.locator('.bridge__table')).toHaveAttribute('role', 'region')

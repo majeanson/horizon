@@ -11,8 +11,11 @@ async function loadExample(page: Page, name: string) {
   await page.goto('/resultats')
   await expect(page.locator('.verdict__line')).toBeVisible()
 }
-// Every panel is on the page now (nothing folds): the ledger only has to be there.
-const openLedger = (page: Page) => expect(page.locator('.ledger')).toBeVisible()
+// The ledger lives on the « Vérifier » view of the results page.
+const openLedger = async (page: Page) => {
+  await page.goto('/resultats?v=verify')
+  await expect(page.locator('.ledger')).toBeVisible()
+}
 
 test('the data page offers all seven examples, each with its story', async ({ page }) => {
   await page.goto('/donnees')
@@ -31,6 +34,7 @@ test('modest single: one person, no couple widgets, and the GIS is in the year t
   await expect(page.locator('.verdict__line')).toContainText('64 ans.')
   await expect(page.locator('.verdict__line')).not.toContainText('tous les deux')
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
+  await page.goto('/resultats?v=strategies')
   await expect(page.locator('#rentes')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Pour les deux' })).toHaveCount(0)
   await expect(page.locator('.bridge__table')).toContainText('SRG')
@@ -51,8 +55,10 @@ test('retired couple: no retirement question, no age to compare, no pension star
   await loadExample(page, 'Couple à la retraite')
   await expect(page.locator('.verdict__line')).toHaveText('Vous êtes déjà tous les deux à la retraite.')
   await expect(page.locator('.compare')).toHaveCount(0) // no departure ages to try (the plan's own card and chart stay)
-  await expect(page.locator('#rentes')).toHaveCount(0)
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
+  await page.goto('/resultats?v=strategies')
+  await expect(page.locator('#ordre')).toBeVisible()
+  await expect(page.locator('#rentes')).toHaveCount(0)
   await openLedger(page)
   const ledger = page.locator('.ledger')
   await expect(ledger.getByRole('slider', { name: 'Âge de la retraite' })).toHaveCount(0)

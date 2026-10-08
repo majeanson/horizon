@@ -15,6 +15,7 @@ import { SaveView } from '../components/results/SaveView'
 import { StopView } from '../components/results/StopView'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
+import { SubTabs } from '../components/SubTabs'
 import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
@@ -45,6 +46,8 @@ import { today } from '../lib/today'
 // check: the year-by-year table, the parameters, and how fragile the verdict is. Nothing is shown until the profile
 // holds enough to mean something (profileGaps). Every choice lives in the address (`?ages=&metric=&dollars=`), so a
 // view can be bookmarked and the back button means what it says.
+
+type View = 'answer' | 'strategies' | 'verify'
 
 const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
@@ -185,6 +188,9 @@ export function Resultats() {
     if (!cur.includes(s)) commit(toggleSelection(cur, s))
   }
 
+  // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
+  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
+
   const deferralWho = parseBridgeParams(params, profile.household).levers.id
 
   if (gaps.length > 0) {
@@ -221,22 +227,36 @@ export function Resultats() {
   ]
 
   // The page's map, in reading order, grouped into its three arcs; a section that is not on the page has no chip.
-  const navLinks = [
-    { id: 'verdict', label: rc.nav.verdict, arc: rc.arcs.answer },
-    { id: 'comparer', label: rc.nav.comparer },
-    { id: 'epargner', label: rc.nav.epargner },
-    ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
-    ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, arc: rc.arcs.pensions }] : []),
-    { id: 'donnees-calcul', label: rc.nav.donneesCalcul, arc: rc.arcs.verify },
-    { id: 'ordre', label: rc.nav.ordre },
-    { id: 'tableau', label: rc.nav.tableau },
-    { id: 'sensibilite', label: rc.nav.sensibilite },
-    { id: 'parametres', label: rc.nav.parametres },
-  ]
+  const navLinks =
+    view === 'answer'
+      ? [
+          { id: 'verdict', label: rc.nav.verdict },
+          { id: 'comparer', label: rc.nav.comparer },
+          { id: 'epargner', label: rc.nav.epargner },
+          ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
+        ]
+      : view === 'strategies'
+        ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
+        : [
+            { id: 'donnees-calcul', label: rc.nav.donneesCalcul },
+            { id: 'tableau', label: rc.nav.tableau },
+            { id: 'sensibilite', label: rc.nav.sensibilite },
+            { id: 'parametres', label: rc.nav.parametres },
+          ]
 
   return (
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
+      <SubTabs
+        ariaLabel={rc.tabs.label}
+        value={view}
+        onSelect={(v) => setParam('v', v === 'answer' ? null : v)}
+        options={[
+          { key: 'answer' as const, label: rc.tabs.answer },
+          { key: 'strategies' as const, label: rc.tabs.strategies },
+          { key: 'verify' as const, label: rc.tabs.verify },
+        ]}
+      />
       <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
       {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
       <Cluster className="no-print">
@@ -245,9 +265,9 @@ export function Resultats() {
         </Chip>
       </Cluster>
 
-      {/* Arc 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
-      <section className="arc" aria-label={rc.arcs.answer}>
-      <h2 className="arc__title">{rc.arcs.answer}</h2>
+      {/* 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
+      {view === 'answer' && (
+      <section className="arc" aria-label={rc.tabs.answer}>
 
       <div id="verdict" className="verdict surface results-section" aria-live="polite">
         <p className="verdict__line">
@@ -378,7 +398,6 @@ export function Resultats() {
           metric={metric}
           dollars={dollars}
           onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}
-          onDollars={(d) => setParam('dollars', d === 'today' ? null : d)}
           label={label}
         />
       )}
@@ -402,34 +421,33 @@ export function Resultats() {
         </section>
       )}
       </section>
+      )}
 
-      {/* Arc 2 — ONE decision (when to start the QPP and the OAS), two views of it: the strategies' effect on the
+      {/* 2 — ONE decision (when to start the QPP and the OAS), two views of it: the strategies' effect on the
           whole plan, then the rule, pension by pension. Once every start is behind the household, nothing to choose. */}
-      {state.pensionsOpen && (
-        <section className="arc" aria-label={rc.arcs.pensions}>
-          <h2 className="arc__title">{rc.arcs.pensions}</h2>
-          <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
+      {view === 'strategies' && (
+        <section className="arc" aria-label={rc.tabs.strategies}>
+          {state.pensionsOpen && <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
             <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} />
             <h3 className="deferral__title">{rc.pensions.planView}</h3>
             <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
             <h3 className="deferral__title">{rc.pensions.ruleView}</h3>
             <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
+          </section>}
+          <section id="ordre" className="results-section" aria-label={rc.orders.title}>
+            <SectionHeader title={rc.orders.title} />
+            <OrderPanel household={profile.household} assumptions={assumptions} age={earliest ?? saveAge} firstAge={firstAge} />
           </section>
         </section>
       )}
 
-      <section className="arc" aria-label={rc.arcs.verify}>
-      <h2 className="arc__title">{rc.arcs.verify}</h2>
+      {view === 'verify' && (
+      <section className="arc" aria-label={rc.tabs.verify}>
 
       {/* The ages and figures that set the answer, with their calculation and a slider each. */}
       <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
         <SectionHeader title={LEDGER_COPY[lang].title} />
         <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
-      </section>
-
-      <section id="ordre" className="results-section" aria-label={rc.orders.title}>
-        <SectionHeader title={rc.orders.title} />
-        <OrderPanel household={profile.household} assumptions={assumptions} age={earliest ?? saveAge} firstAge={firstAge} />
       </section>
 
       <section id="tableau" className="results-section" aria-label={r.table.title}>
@@ -447,6 +465,7 @@ export function Resultats() {
         <ParamsPanel />
       </section>
       </section>
+      )}
 
       <NextStep to="/donnees" label={t.next.toData}>
         <p>{t.next.resultsHint}</p>

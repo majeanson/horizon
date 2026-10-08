@@ -177,6 +177,7 @@ test('offline, the saved profile is intact and the results — the chart and the
 
   // …and the worker runs offline: the « what if » grid starts by itself and fills from the cache.
   await page.getByRole('link', { name: 'Résultats', exact: true }).click()
+  await page.getByRole('tab', { name: 'Vérifier' }).click() // the grid lives on the « Vérifier » view
   // 27 cells = three 3 × 3 grids.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27, { timeout: 90_000 })
   await expect(page.locator('.sensitivity__grids td.is-base').nth(1)).toHaveText('59')
