@@ -392,3 +392,53 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Jules | 31 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 584 $ | 0 $ | 0 $ | 0 $ |
 
+## downsizer — Couple, vendre la maison
+
+### Ce qui entre
+
+| Personne | Naissance | Retraite | Revenu | Rentes publiques |
+| --- | --- | --- | --- | --- |
+| Nadia | né·e en 1971-06 | retraite à 58 ans | salaire 96 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1989) |
+| ↳ comptes | REER 255 000 $ (+6 000 $/an) | CELI 88 000 $ (+6 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+| Paul | né·e en 1973-01 | retraite à 58 ans | salaire 74 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1991) |
+| ↳ comptes | REER 170 000 $ (+4 000 $/an) | CELI 62 000 $ (+5 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+
+Dépenses : 92 000 $ par année en travaillant, 80 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+Résidence principale : valeur 880 000 $, hypothèque 70 000 $ à 4,5 % (1 300 $ par mois, payée en 2031), vendue à 58 ans (logement de remplacement : 360 000 $). Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
+
+### Ce qui sort
+
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 328 604 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 58 ans.
+
+### Le calcul des rentes
+
+| Personne | RRQ | PSV |
+| --- | --- | --- |
+| Nadia | première rente 07/2036 : (base 1 867,39 $ + 1ʳᵉ supp. 136,24 $ + 2ᵉ supp. 41,43 $) × ajustement 100,0 % = 2 045,06 $/mois, soit 1 661 $ d’aujourd’hui | première pension 07/2036 : 938,64 $ × résidence 100 % × report 0,0 % = 938,64 $/mois, soit 763 $ d’aujourd’hui |
+| Paul | première rente 02/2038 : (base 1 940,11 $ + 1ʳᵉ supp. 169,84 $ + 2ᵉ supp. 14,60 $) × ajustement 100,0 % = 2 124,55 $/mois, soit 1 656 $ d’aujourd’hui | première pension 02/2038 : 978,47 $ × résidence 100 % × report 0,0 % = 978,47 $/mois, soit 762 $ d’aujourd’hui |
+
+### Année par année — Nadia (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
+
+| Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 55 | 107 600 $ | 170 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 112 $ | 617 669 $ | couvert |
+| 60 | 80 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 80 000 $ | 0 $ | 1 143 011 $ | tire du nid |
+| 65 | 80 000 $ | 0 $ | 0 $ | 9 968 $ | 4 575 $ | 6 187 $ | 59 270 $ | 0 $ | 870 694 $ | tire du nid |
+| 70 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 18 300 $ | 0 $ | 32 734 $ | 10 837 $ | 787 390 $ | tire du nid |
+| 75 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 18 758 $ | 0 $ | 32 325 $ | 10 885 $ | 709 243 $ | tire du nid |
+| 80 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 31 018 $ | 10 934 $ | 629 515 $ | tire du nid |
+| 85 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 31 032 $ | 10 965 $ | 540 855 $ | tire du nid |
+| 90 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 31 667 $ | 11 170 $ | 440 365 $ | tire du nid |
+| 95 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 23 488 $ | 3 420 $ | 360 062 $ | tire du nid |
+
+### Année témoin pour un calculateur d’impôt : 2031, en dollars d’aujourd’hui
+
+Montants de l’année divisés par l’inflation : les barèmes sont indexés sur les prix, donc un calculateur 2026 doit donner presque la même chose (à 1 % près, les arrondis des barèmes). Le revenu net compte aussi le fractionnement du revenu de pension et les gains en capital réalisés : ce n’est pas la somme des colonnes.
+
+| Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Nadia | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 3 078 $ | 0 $ | 0 $ | 0 $ |
+| Paul | 58 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ |
+

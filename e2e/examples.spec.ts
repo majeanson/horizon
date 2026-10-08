@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-// EVERY EXAMPLE, THROUGH THE REAL PAGES. The eight example households (src/engine/golden/examples.ts) are loaded the way a person
+// EVERY EXAMPLE, THROUGH THE REAL PAGES. The nine example households (src/engine/golden/examples.ts) are loaded the way a person
 // loads them — the data page — and each one must read as its own story on the results page: the headline, the cards, the ledger,
 // and which panels are offered at all. The arithmetic behind each is printed in EXAMPLES.md and pinned by engine/golden/examples.test.ts.
 
@@ -17,9 +17,9 @@ const openLedger = async (page: Page) => {
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
-test('the data page offers all eight examples, each with its story', async ({ page }) => {
+test('the data page offers all nine examples, each with its story', async ({ page }) => {
   await page.goto('/donnees')
-  await expect(page.locator('.example-list li')).toHaveCount(8)
+  await expect(page.locator('.example-list li')).toHaveCount(9)
   await expect(page.locator('.example-list')).toContainText('Julien, 52 ans')
 })
 
@@ -96,4 +96,18 @@ test('average couple: the home is in the year table (the mortgage paid, the equi
   // the chart's « Détail »: the house beside the accounts
   await page.goto('/resultats?metric=detail')
   await expect(page.locator('.chart-detail .chart__legend-item', { hasText: 'Maison (valeur nette)' })).toBeVisible({ timeout: 30_000 })
+})
+
+test('downsizer: selling the house is what lets them stop at 58, and the plan shows the house beside the accounts', async ({ page }) => {
+  await loadExample(page, 'Couple, vendre la maison')
+  await expect(page.locator('.verdict__line')).toContainText('58 ans')
+  await expect(page.locator('.scenario').first()).toContainText('Tient jusqu’à l’horizon')
+  // the profile says it: a home, a mortgage, a planned sale
+  await page.goto('/')
+  const home = page.locator('.profile-section', { hasText: 'Résidence principale' })
+  await expect(home.getByLabel('Valeur de la maison aujourd’hui')).toHaveValue(/880\s?000/)
+  await expect(home.getByLabel('Âge de la vente (première personne)')).toHaveValue('58')
+  // and the year table carries the home's columns
+  await page.goto('/resultats?v=verify')
+  await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible({ timeout: 30_000 })
 })

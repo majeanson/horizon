@@ -2,7 +2,7 @@ import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './household.fixture.ts'
 
-// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Eight different lives, so that
+// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Nine different lives, so that
 // every table and every result can be looked at, and checked by hand, for more than one kind of person:
 //
 //   golden    a couple, one in the public sector (RREGOP), the other private — the household the golden snapshots pin
@@ -12,14 +12,16 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //   behind    one person, 52, who started saving late and plans to stop at 60: the plan does NOT hold
 //   retired   a retired couple: a pension in pay, both pensions already started, the nest being drawn down
 //   newcomer  one person who arrived in Canada at 30: a partial OAS and a QPP history that starts late
+//   downsizer a couple whose big house is what makes an early retirement work: sold at 58 for a smaller one, they stop at 58;
+//             without the sale the money runs out and the earliest age that works is later
 //   heir      one person, 27, who inherited a large sum: the very-early-retirement case — the answer is « dès maintenant »,
 //             and the plan has to last seventy years
 //
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
 
-export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir'
-export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir']
+export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer'
+export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer']
 
 export interface ExampleHousehold {
   id: ExampleId
@@ -180,6 +182,34 @@ const heir: Household = {
   spending: { workingToday: 52_000, retiredToday: 54_000 },
 }
 
+const downsizer: Household = {
+  livesAlone: false,
+  persons: [
+    person({
+      id: 'self', name: 'Nadia', birth: { year: 1971, month: 6 }, retirementAge: 58, salaryToday: 96_000, earningsHistory: history(1971, 38_000),
+      accounts: {
+        rrsp: { balance: 255_000, room: 20_000, annualContribution: 6_000 },
+        tfsa: { balance: 88_000, room: 25_000, annualContribution: 6_000 },
+        nonReg: none,
+      },
+      pensions: [],
+    }),
+    person({
+      id: 'spouse', name: 'Paul', birth: { year: 1973, month: 1 }, retirementAge: 58, salaryToday: 74_000, earningsHistory: history(1973, 31_000),
+      accounts: {
+        rrsp: { balance: 170_000, room: 15_000, annualContribution: 4_000 },
+        tfsa: { balance: 62_000, room: 25_000, annualContribution: 5_000 },
+        nonReg: none,
+      },
+      pensions: [],
+    }),
+  ],
+  // The family house is most of what they own. Sold when Nadia is 58 (2029), a 360 000 $ home replaces it and the rest of the
+  // equity goes to their savings: that is what lets them stop at 58 — keep it for life and the accounts alone run out in 2042.
+  home: { value: 880_000, mortgage: { balance: 70_000, rate: 0.045, monthlyPayment: 1_300 }, sale: { age: 58, replacementCost: 360_000 } },
+  spending: { workingToday: 92_000, retiredToday: 80_000 },
+}
+
 const base = (): Assumptions => ({ ...GOLDEN_ASSUMPTIONS, today: GOLDEN_TODAY, ...ASSUMPTION_PRESETS.neutral })
 
 export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
@@ -191,4 +221,5 @@ export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
   retired: { id: 'retired', household: retired, children: [], assumptions: base() },
   newcomer: { id: 'newcomer', household: newcomer, children: [], assumptions: base() },
   heir: { id: 'heir', household: heir, children: [], assumptions: base() },
+  downsizer: { id: 'downsizer', household: downsizer, children: [2005], assumptions: base() },
 }

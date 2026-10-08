@@ -123,6 +123,26 @@ describe('each story', () => {
     expect(retireAt(household, assumptions, { from: 18, stopAtFirstOk: true }).earliestOk).toBe(27)
   })
 
+  it('downsizer: the sale of the house is what makes stopping at 58 work — keep the house and the accounts alone run out', () => {
+    const { household, assumptions } = EXAMPLES.downsizer
+    const home = household.home!
+    expect(home.sale).toEqual({ age: 58, replacementCost: 360_000 })
+    expect(Math.max(...household.persons.map((p) => p.retirementAge))).toBe(58)
+    // with the sale: the plan holds, and 58 is the earliest age that works
+    expect(planGlance(household, assumptions).ok).toBe(true)
+    expect(retireAt(household, assumptions, { stopAtFirstOk: true }).earliestOk).toBe(58)
+    // the sale frees real money: the equity less the replacement, paid into Nadia's non-registered account the year she turns 58
+    const rows = rowsOf('downsizer')
+    const saleYear = household.persons[0].birth.year + 58
+    const before = rows.find((r) => r.year === saleYear - 1)!
+    const during = rows.find((r) => r.year === saleYear)!
+    expect(during.household.netWorthEnd - before.household.netWorthEnd).toBeGreaterThan(300_000)
+    // the same household that keeps its house: no money for it, a shortfall, and a later earliest age
+    const kept = { ...household, home: { ...home, sale: null } }
+    expect(planGlance(kept, assumptions).ok).toBe(false)
+    expect(retireAt(kept, assumptions, { stopAtFirstOk: true }).earliestOk!).toBeGreaterThan(58)
+  })
+
   it('« dès maintenant » is only said when today is the floor AND works: a household whose first working age is later is not told « now »', () => {
     const { household, assumptions } = EXAMPLES.behind
     expect(worksNow(household, assumptions, null)).toBe(false)

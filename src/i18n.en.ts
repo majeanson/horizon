@@ -373,7 +373,7 @@ export const EN: typeof FR = {
       source: { work: 'Work', db: 'Employer pension', rrq: 'QPP', oas: 'OAS and supplements', nest: 'Savings drawn' },
       need: 'Spending + tax',
       balancesTitle: 'What the accounts hold',
-      balancesHint: 'Year-end balances, by kind of account.',
+      balancesHint: 'Year-end balances, by kind of account. What is left after spending, tax and your contributions is saved: first in the TFSA (as room allows), then in the non-registered account, which also grows with its return.',
       balance: { rrsp: 'RRSP', tfsa: 'TFSA', nonReg: 'Non-registered', home: 'Home (net value)' },
       hypTitle: 'Under the three sets of hypotheses',
       hypHint: 'The same scenario’s net worth with prudent, neutral or bold returns (see Assumptions). They are not forecasts.',
