@@ -344,6 +344,16 @@
 .earnings__tools .chip {
   justify-self: start;
 }
+.earnings__paste-wrap {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+.earnings__paste {
+  display: grid;
+  gap: 0.5rem;
+  justify-self: stretch;
+}
 /* One line per year, like the relevé: the year with its age on the left, the amount on the right.
    The two columns are shared by the header and every row so the amounts line up down the page. */
 .earnings__head,

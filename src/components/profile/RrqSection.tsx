@@ -16,6 +16,7 @@ import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { SectionHeader } from '../SectionHeader'
 import { StatusMessage } from '../StatusMessage'
+import { PasteEarnings } from './PasteEarnings'
 import { Section, type PersonEditor } from './shared'
 
 // The RRQ: when the pension starts, and the pensionable earnings the relevé lists year by year.
@@ -66,6 +67,9 @@ export function RrqSection({ person, edit }: PersonEditor) {
             <Chip onClick={fill}>{r.fill}</Chip>
           </div>
           <p className="field-row__hint">{r.fillHint}</p>
+          <div className="earnings__paste-wrap">
+            <PasteEarnings person={person} edit={edit} years={years} />
+          </div>
           {filledNote && (
             <div className="earnings__filled">
               <StatusMessage tone="info">{filledNote.note}</StatusMessage>

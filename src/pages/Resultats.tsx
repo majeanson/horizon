@@ -35,6 +35,7 @@ import { usePresetRange } from '../lib/usePresetEarliest'
 import { useMarketRange } from '../lib/useMarketRange'
 import { STRESS_PRESETS } from '../lib/marketRange'
 import { MARKET_COPY } from '../lib/marketCopy'
+import { maxRetiredSpending } from '../engine/maxSpending'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
@@ -160,6 +161,11 @@ export function Resultats() {
   const mc = MARKET_COPY[lang]
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
+  // What the verdict's age can fund each month: the retired spending turned round (engine/maxSpending.ts), after tax, today's dollars.
+  const comfort = useMemo(
+    () => (gaps.length > 0 || headline.age === null ? undefined : maxRetiredSpending(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
+    [profile, gaps.length, headline.age, year, month],
+  )
   // The verdict's age, put in dates: one cheap main-thread projection.
   const stop = useMemo(
     () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
@@ -341,6 +347,14 @@ export function Resultats() {
             </dl>
             {range !== undefined && prudentGap && <p className="verdict__note">{rc.headline.rangeGap}</p>}
           </div>
+        )}
+        {headline.age !== null && !retiredGlance && comfort !== undefined && (
+          <p className="verdict__note">
+            {comfort === null
+              ? mc.income.none(headline.age)
+              : mc.income.line(headline.age, formatMoney(Math.round(comfort / 12 / 10) * 10, lang), formatMoney(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10, lang))}{' '}
+            {mc.income.note}
+          </p>
         )}
         {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. Boxes from the first paint. */}
         {!retiredGlance && (

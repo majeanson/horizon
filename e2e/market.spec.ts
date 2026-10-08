@@ -58,3 +58,8 @@ test('the verdict shows the earliest age under a hard market, beside « Lisse »
   await expect(bad.locator('dd')).toHaveText(/\d+ ans|aucun/)
   await expect(page.getByRole('link', { name: 'Choisir ou modifier le parcours' })).toBeVisible()
 })
+
+test('the verdict says what the age can fund each month, beside what is planned', async ({ page }) => {
+  await page.goto('/resultats')
+  await expect(page.getByText(/peut financer jusqu’à .* par mois \(après impôt\) — vous prévoyez/)).toBeVisible()
+})

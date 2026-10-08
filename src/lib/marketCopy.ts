@@ -5,6 +5,7 @@ import type { Lang } from '../i18n.ts'
 
 export interface MarketCopy {
   surplus: { title: string; on: string; hint: string }
+  income: { line: (age: number, perMonth: string, planned: string) => string; none: (age: number) => string; note: string }
   stress: { title: string; active: (name: string) => string; none: (max: number) => string; age: (n: number) => string; hint: string; link: string }
   path: {
     title: string
@@ -23,6 +24,11 @@ const FR: MarketCopy = {
     title: 'L’argent qui reste',
     on: 'Placer d’abord le surplus dans le REER',
     hint: 'Quand une année de travail laisse de l’argent de côté et qu’il reste des droits de cotisation REER, cet argent va d’abord au REER (la déduction fait baisser l’impôt), puis au CELI, puis au compte non enregistré. Désactivé, il va d’abord au CELI.',
+  },
+  income: {
+    line: (age, perMonth, planned) => `À ${age} ans, le plan peut financer jusqu’à ${perMonth} par mois (après impôt) — vous prévoyez ${planned}.`,
+    none: (age) => `À ${age} ans, le plan ne finance aucune dépense à la retraite.`,
+    note: 'En dollars d’aujourd’hui, pour toutes les années de la retraite, avec vos hypothèses.',
   },
   stress: {
     title: 'Si les marchés tournent mal',
@@ -55,6 +61,11 @@ const EN: MarketCopy = {
     title: 'The money left over',
     on: 'Put the surplus in the RRSP first',
     hint: 'When a working year leaves money over and RRSP room is open, it goes to the RRSP first (the deduction lowers the tax), then the TFSA, then the non-registered account. Off, it goes to the TFSA first.',
+  },
+  income: {
+    line: (age, perMonth, planned) => `At ${age}, the plan can fund up to ${perMonth} a month (after tax) — you plan ${planned}.`,
+    none: (age) => `At ${age}, the plan funds no retirement spending at all.`,
+    note: 'In today’s dollars, for every year of retirement, under your assumptions.',
   },
   stress: {
     title: 'If the markets go badly',
