@@ -31,6 +31,7 @@ import { formatPct, formatYearAge } from '../lib/format'
 import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
 import { scrollToSection } from '../lib/motion'
+import { useSettled } from '../lib/useSettled'
 import { usePresetRange } from '../lib/usePresetEarliest'
 import { useMarketRange } from '../lib/useMarketRange'
 import { STRESS_PRESETS } from '../lib/marketRange'
@@ -73,12 +74,12 @@ export function Resultats() {
   const r = t.results
   const rc = RESULTS_COPY[lang]
   const profile = useProfile()
-  // The ANSWER is derived from a deferred copy of the profile: a slider held on the arrow key or a figure typed digit by
-  // digit writes the profile many times a second, and the thirty-odd projections behind the answer (the earliest age, the
-  // monthly comfort, the comparisons, the dates) used to run again on EVERY write, on the page's own thread — twenty seconds
-  // of a frozen page for twenty key presses. Deferred, React lets the controls paint first and skips the answers nobody
-  // would have seen; the verdict catches up a beat after the hand stops. The controls themselves read the live profile.
-  const slow = useDeferredValue(profile)
+  // The ANSWER is derived from a SETTLED copy of the profile: a slider held on the arrow key or a figure typed digit by
+  // digit writes the profile at every step, and the thirty-odd projections behind the answer (the earliest age, the
+  // monthly comfort, the comparisons, the dates) used to run again on EVERY write, on the page's own thread — a second
+  // per step on a slow machine, for the length of the gesture. They now run once the hand has rested 300 ms (useSettled),
+  // and deferred, so a tap that lands while they run is painted first. The controls themselves read the live profile.
+  const slow = useDeferredValue(useSettled(profile))
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
   const slowAssumptions = useMemo(() => assumptionsOf(slow, { year, month }), [slow, year, month])

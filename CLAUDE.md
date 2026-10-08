@@ -75,6 +75,7 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | Format a number / money / percent | the **cached** helpers in `lib/format.ts` / `lib/money.ts` | — |
 | A chart | **`LineChart`** from `components/charts` — the only folder that touches the chart library (`chartBoundary.test.ts`); build `ChartSeries` in `lib/chartData.ts` | `components/charts/` |
 | Heavy work (a long loop of projections) | a **web worker** (`lib/sensitivity.worker.ts` + `useSensitivity`) that streams results — never a multi-second loop on the page's thread | `lib/` |
+| A heavy derivation that FOLLOWS a control (the answer behind a slider, a typed figure) | **`useSettled`** — derive from the value once the hand has rested, never from every step: a block of projections cannot be interrupted once begun, so deferring it is not enough | `lib/useSettled.ts` |
 
 **When you add a shared component:** register it in `src/pages/DevKit.tsx` and add its row to
 `COMPONENTS.md` — `devkitParity.test.ts` fails the build on either half missing.

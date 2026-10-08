@@ -66,10 +66,12 @@ test('a slider says what its number means while it moves: the three scenarios on
   await infl.focus()
   for (let i = 0; i < 20; i++) await page.keyboard.press('ArrowRight')
   await expect(row.locator('.impact__level')).toHaveText(/Élevé|Très élevé/)
+  // The store writes a beat after the last change: wait for the twenty steps to land before reading the figure they made.
+  const held = Number(await infl.inputValue()) / 1000
+  await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(held, 5)
   // The « + » / « − » buttons move one exact step and save it at once.
-  const before = (await savedProfile(page)).assumptions.inflation
   await row.getByRole('button', { name: 'Moins : Inflation' }).click()
-  await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(before - 0.001, 5)
+  await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(held - 0.001, 5)
   // A tap on a scenario in the legend sets the slider to it and saves it at once; the chip then reads as chosen.
   await legend.getByRole('radio', { name: /^Audacieux/ }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(0.02, 5)

@@ -10,6 +10,7 @@ import { formatMoney } from '../../lib/money'
 import { mapPerson, setAssumptions, setReturn, setSpending } from '../../lib/profileEdit'
 import { MAX_AGE, MIN_AGE } from '../../lib/resultsModel'
 import { updateProfile } from '../../lib/store'
+import { useSettled } from '../../lib/useSettled'
 import { Chip } from '../Chip'
 import { ImpactMeter } from '../ImpactMeter'
 import { Slider, type SliderMark } from '../Slider'
@@ -18,7 +19,7 @@ import { Slider, type SliderMark } from '../Slider'
 // amount it becomes — and what the plan does as the slider moves. The ages (when the pay stops, when the QPP starts, when
 // the OAS starts), then the spending and the economy (inflation, returns). A value is saved in the profile when the slider
 // is released (the same place Profil edits), and the verdict above, which reads the profile, follows. While the thumb moves,
-// the panel previews from ONE projection on a copy of the household.
+// the panel previews from ONE projection on a copy of the household, run when the thumb pauses.
 
 type AgeField = 'retirement' | 'rrq' | 'oas'
 type SpendKey = 'spend:workingToday' | 'spend:retiredToday'
@@ -71,7 +72,14 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   }, [household, assumptions, preview])
 
   const ledger = useMemo(() => agesLedger(shown, shownA), [shown, shownA])
-  const glance = useMemo(() => planGlance(shown, shownA), [shown, shownA])
+  // The plan's glance is ONE full projection — the heaviest thing on the panel — so it runs once the thumb has rested a beat
+  // (useSettled), not at every step of a held arrow key; and the settled thing is the CONTENT (a JSON key), not the object,
+  // so the released value coming back from the store as the same figures does not project again.
+  const settledKey = useSettled(JSON.stringify([shown, shownA]), 150)
+  const glance = useMemo(() => {
+    const [h, a] = JSON.parse(settledKey) as [Household, Assumptions]
+    return planGlance(h, a)
+  }, [settledKey])
   // The figures when the panel opened: « what did this change » is read against them.
   const [opened] = useState(() => ({ ledger: agesLedger(household, assumptions), glance: planGlance(household, assumptions) }))
 
