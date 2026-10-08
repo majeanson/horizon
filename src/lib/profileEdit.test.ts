@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { presetOf } from '../engine/assumptionPresets.ts'
+import { rrqPension } from '../engine/rrq.ts'
 import { makeRrqRules } from '../engine/rrqRules.ts'
 import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, earningsCeiling, fillFromSalary, historyYears } from './earnings.ts'
@@ -134,30 +135,34 @@ describe('earnings helpers', () => {
     expect(historyYears({ ...person(), birth: { year: 1940, month: 1 } }, 2025)[0]).toBe(1966)
   })
 
-  it('fills only the years not typed, deflating today\'s pay, capped at each year ceiling, from the assumed first-job age', () => {
+  it('fills only the years not typed, deflating today\'s pay, uncapped, from the assumed first-job age', () => {
     const blank = { ...person(), earningsHistory: { 2020: 55_000 } }
-    const ceiling = earningsCeiling(rules)
-    const filled = fillFromSalary(blank, TODAY, 0.03, ceiling)
+    const filled = fillFromSalary(blank, TODAY, 0.03)
     expect(filled[2020]).toBe(55_000) // a typed year is never overwritten
     expect(filled[1999]).toBeUndefined() // before the assumed first job (age 22 → 2000)
     expect(1978 + ASSUMED_FIRST_JOB_AGE).toBe(2000)
-    expect(filled[2025]).toBe(Math.round(Math.min(85_000 / 1.03, ceiling(2025))))
-    for (const [year, pay] of Object.entries(filled)) expect(pay, year).toBeLessThanOrEqual(Math.max(55_000, ceiling(Number(year))))
+    expect(filled[2025]).toBe(Math.round(85_000 / 1.03)) // last year's pay, as it was — nothing cut off
+    for (const [year, pay] of Object.entries(filled)) expect(pay, year).toBeLessThanOrEqual(Math.max(55_000, Math.round(85_000 / 1.03 ** (2026 - Number(year)))))
   })
 
-  it('a high salary is capped at the ADDITIONAL ceiling from 2024 (what the relevé counts), not at the plain maximum', () => {
+  it('a high salary is estimated as it was (about 116 000 $ last year for 120 000 $ today); the QPP counts each year only up to its ceiling — the additional one from 2024', () => {
     const high = { ...person(), salaryToday: 120_000, earningsHistory: {} }
+    const filled = fillFromSalary(high, TODAY, 0.03)
+    expect(filled[2025]).toBe(Math.round(120_000 / 1.03))
+    expect(filled[2025]).toBeGreaterThan(110_000)
     const ceiling = earningsCeiling(rules)
-    const filled = fillFromSalary(high, TODAY, 0.03, ceiling)
     expect(rules.yampe(2025)).toBeGreaterThan(rules.mga(2025))
-    expect(filled[2025]).toBe(rules.yampe(2025)) // 81 200 $, not 71 300 $
-    expect(filled[2024]).toBe(rules.yampe(2024))
-    expect(filled[2023]).toBe(rules.mga(2023)) // before 2024 there is no additional ceiling
+    expect(ceiling(2025)).toBe(rules.yampe(2025)) // 81 200 $ counts for 2025, not 71 300 $
+    expect(ceiling(2023)).toBe(rules.mga(2023)) // before 2024 there is no additional ceiling
+    // and the engine really does read only that much: a pay far above the ceiling gives the same pension as a pay AT it
+    const capped = Object.fromEntries(Object.entries(filled).map(([y, pay]) => [y, Math.min(pay, ceiling(Number(y)))]))
+    const pension = (earnings: Record<number, number>) => rrqPension({ birth: high.birth, startAge: 65, earnings }, rules).monthly
+    expect(pension(filled)).toBeCloseTo(pension(capped), 6)
   })
 
   it('does nothing without a salary', () => {
     const none = { ...person(), salaryToday: 0, earningsHistory: {} }
-    expect(fillFromSalary(none, TODAY, 0.03, earningsCeiling(rules))).toEqual({})
+    expect(fillFromSalary(none, TODAY, 0.03)).toEqual({})
   })
 
 })

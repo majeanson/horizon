@@ -3,6 +3,7 @@ import { makeRrqRules } from '../../engine/rrqRules'
 import { useLang, useT } from '../../i18n'
 import { earningsCeiling, fillFromSalary, historyYears } from '../../lib/earnings'
 import { formatYearAge } from '../../lib/format'
+import { formatMoney } from '../../lib/money'
 import { setEarning } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -32,7 +33,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
   const [filledNote, setFilledNote] = useState<{ note: string; before: Record<number, number> | null } | null>(null)
 
   const fill = () => {
-    const filled = fillFromSalary(person, now, assumptions.wageGrowth, ceiling)
+    const filled = fillFromSalary(person, now, assumptions.wageGrowth)
     const added = Object.keys(filled).length - typed
     setFilledNote(added > 0 ? { note: r.filled(added), before: person.earningsHistory } : { note: r.nothingToFill, before: null })
     if (added > 0) edit((x) => ({ ...x, earningsHistory: filled }))
@@ -76,7 +77,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
               <li key={year} className="earnings__row">
                 <span className="earnings__year mono" aria-hidden="true">
                   {formatYearAge(year, [person.birth.year], lang)}
-                  {(person.earningsHistory[year] ?? 0) >= ceiling(year) && <span className="earnings__cap"> · {r.capped}</span>}
+                  {(person.earningsHistory[year] ?? 0) >= ceiling(year) && <span className="earnings__cap"> · {r.capped(formatMoney(ceiling(year), lang))}</span>}
                 </span>
                 <NumberField
                   kind="money"
