@@ -11,6 +11,7 @@ import { LedgerPanel } from '../components/results/LedgerPanel'
 import { OrderPanel } from '../components/results/OrderPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SaveView } from '../components/results/SaveView'
+import { SpendView } from '../components/results/SpendView'
 import { StopView } from '../components/results/StopView'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
@@ -33,6 +34,7 @@ import { usePresetRange } from '../lib/usePresetEarliest'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
+import { parseSpend } from '../lib/spendModel'
 import { stopWorking } from '../lib/stopWorking'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
@@ -213,6 +215,9 @@ export function Resultats() {
   // « Combien épargner ? » keeps its own age in the address (`?age=`), independent of the comparisons.
   const wantedSaveAge = Number(params.get('age'))
   const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
+  // « Et si je dépensais moins ? » keeps its what-if amount in the address (`?spend=`) too; absent, the slider sits on the profile's own.
+  const spend = parseSpend(params.get('spend')) ?? profile.household.spending.retiredToday
+  const toSpend = () => document.getElementById('depenser')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
 
   // What would make the verdict more faithful — detectable absences only, never a guess about what the household owns.
   const refine = [
@@ -228,6 +233,7 @@ export function Resultats() {
           { id: 'verdict', label: rc.nav.verdict },
           { id: 'comparer', label: rc.nav.comparer },
           { id: 'epargner', label: rc.nav.epargner },
+          ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }]),
           ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
         ]
       : view === 'strategies'
@@ -283,6 +289,7 @@ export function Resultats() {
             {/* The WORST verdict must be the most actionable one: the nudge carries its two doors. */}
             <p className="verdict__note">{rc.headline.tryThis}</p>
             <Cluster>
+              <Chip icon="caret-down-bold" onClick={toSpend}>{rc.headline.trySpend}</Chip>
               <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
               <Chip onClick={() => document.getElementById('donnees-calcul')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })}>{rc.headline.tryLedger}</Chip>
             </Cluster>
@@ -295,6 +302,10 @@ export function Resultats() {
             {headline.earlierAge !== null && headline.earlierShortfallYear !== null && (
               <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear))}</p>
             )}
+            {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
+            <Cluster>
+              <Chip icon="caret-down-bold" onClick={toSpend}>{rc.headline.trySpend}</Chip>
+            </Cluster>
           </>
         )}
         {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,
@@ -406,6 +417,12 @@ export function Resultats() {
         <SectionHeader title={rc.questions.tabs.save} />
         <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
       </section>
+      {!retiredNow && (
+        <section id="depenser" className="results-section" aria-label={rc.questions.tabs.spend}>
+          <SectionHeader title={rc.questions.tabs.spend} />
+          <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} maxAge={MAX_AGE} />
+        </section>
+      )}
       {stop !== null && (
         <section id="arreter" className="results-section" aria-label={rc.questions.tabs.stop}>
           <SectionHeader title={rc.questions.tabs.stop} subtitle={rc.questions.stop.hint} />
@@ -441,7 +458,7 @@ export function Resultats() {
 
       <section id="tableau" className="results-section" aria-label={r.table.title}>
         <SectionHeader title={r.table.title} />
-        <YearTables runs={runs} label={label} />
+        <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} />
       </section>
 
       <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>

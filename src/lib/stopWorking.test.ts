@@ -38,6 +38,31 @@ describe('what « I can stop at X » means in dates', () => {
     const big = { ...H, spending: { ...H.spending, retiredToday: 10_000_000 } }
     expect(stopWorking(big, A, 60).pensionsCoverFrom).toBeNull()
   })
+
+  it('says when NO pension has started in the first full year (a 0 % that is not « small pensions »), and gives the share again once every pension is in pay', () => {
+    // At 55 nothing is in pay the year after the last stop (the plan pension starts at 60, the QPP and the OAS at 65).
+    const early = stopWorking(H, A, 55)
+    expect(early.pensionsStarted).toBe(false)
+    expect(early.pensionShare).toBe(0)
+    // Every pension is in pay from the first FULL year after the last start: the younger person's 65th birthday year + 1.
+    const lastStart = Math.max(...H.persons.map((p) => p.birth.year + Math.max(p.rrq.startAge, p.oas.startAge, ...p.pensions.map((d) => d.startAge))))
+    expect(early.allStarted).not.toBeNull()
+    expect(early.allStarted!.year).toBe(lastStart + 1)
+    const row = runScenario(H, A, everyoneAt(H, 55), 55).rows.find((r) => r.year === lastStart + 1)!
+    expect(early.allStarted!.share).toBeCloseTo(Math.max(0, pensionsAfterTax(row)) / row.household.spending, 10)
+    expect(early.allStarted!.share).toBeGreaterThan(0)
+    // At 60 the first full year already has the plan pension in pay — and the share then is lower than once everything has started.
+    const sixty = stopWorking(H, A, 60)
+    expect(sixty.pensionsStarted).toBe(true)
+    expect(sixty.allStarted!.share).toBeGreaterThan(sixty.pensionShare)
+  })
+
+  it('adds no « once every pension has started » line when the first full year already is that year', () => {
+    // Retiring at 66: the QPP and OAS (65) and the plan pension (60) are all in pay by the first full year.
+    const s = stopWorking(H, A, 66)
+    expect(s.pensionsStarted).toBe(true)
+    expect(s.allStarted).toBeNull()
+  })
 })
 
 describe('the case that fooled a pre-tax comparison', () => {

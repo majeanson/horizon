@@ -59,12 +59,15 @@ function StrategyCards({
   copy,
   onPick,
   horizonAge,
+  who,
 }: {
   view: BridgeView
   pressed: readonly StrategyKey[]
   copy: BridgeCopy
   onPick: (key: StrategyKey) => void
   horizonAge: number
+  /** The person `horizonAge` is counted for, named in a couple; null for a person alone. */
+  who: string | null
 }) {
   const { lang } = useLang()
   const standard = view.strategies.find((s) => s.key === 'standard')!
@@ -81,7 +84,7 @@ function StrategyCards({
           {s.key === 'standard' && mineIsStandard ? copy.standardIsMine : copy.strategyName[s.key]}
         </Chip>
         <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>
-        <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v)}</p>
+        <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v, who)}</p>
         <dl className="bridge-card__facts">
           <div>
             <dt>{copy.worth85}</dt>
@@ -303,6 +306,8 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const { levers } = state
   const { value: view, busy } = useBridge(household, assumptions, levers)
   const ownerName = names[Math.max(0, household.persons.findIndex((p) => p.id === levers.id))] ?? ''
+  // The ages under « tient jusqu'à » are this person's; in a couple that is not the youngest, so the verdict names them.
+  const who = household.persons.length > 1 ? ownerName : null
 
   // Every change is built from the address bar as it is NOW (like the comparison chips): two quick taps must compose.
   const write = (next: BridgeParams) => {
@@ -377,12 +382,12 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
       ) : (
         <>
           <p className={'bridge__verdict' + (view.selected.summary.ok ? '' : ' bridge__verdict--short')} aria-live={busy ? 'off' : 'polite'}>
-            {copy.verdict(verdict)}
+            {copy.verdict(verdict, who)}
           </p>
 
           <h3 className="bridge__heading">{copy.strategyTitle}</h3>
           {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
-          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} />
+          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} />
           {applied !== null && (
             <Cluster className="bridge__applied">
               <StatusMessage tone="success">

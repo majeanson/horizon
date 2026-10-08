@@ -27,4 +27,14 @@ describe('the per-year spreadsheet', () => {
   it('uses a comma in English and quotes a field that holds the separator', () => {
     expect(yearCsv(result, { ...heads, year: 'Year, AD' }, 'en').split('\r\n')[0]).toContain('"Year, AD",')
   })
+
+  it('says which dollars it holds, in every money heading, and divides each year by the table’s own factor', () => {
+    const factor = (year: number) => (1 + GOLDEN_ASSUMPTIONS.inflation) ** (year - GOLDEN_ASSUMPTIONS.today.year)
+    const today = yearCsv(result, heads, 'fr', { factor, unit: 'dollars d’aujourd’hui' }).replace('﻿', '').trimEnd().split('\r\n')
+    expect(today[0]).toBe('Année;Âges;Revenu (dollars d’aujourd’hui);Impôt (dollars d’aujourd’hui);Dépenses (dollars d’aujourd’hui);Manque (dollars d’aujourd’hui);Valeur nette (dollars d’aujourd’hui)')
+    const last = result.rows[result.rows.length - 1]
+    expect(Number(today[today.length - 1].split(';')[6])).toBe(Math.round(last.household.netWorthEnd / factor(last.year)))
+    // The first year is today's: the same figure either way.
+    expect(today[1].split(';')[6]).toBe(lines[1].split(';')[6])
+  })
 })

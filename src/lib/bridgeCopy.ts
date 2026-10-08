@@ -47,7 +47,8 @@ export interface BridgeCopy {
   breakEvenEarlier: (age: number) => string
   breakEvenNone: string
   breakEvenSelf: string
-  verdict: (v: Verdict) => string
+  /** `who`: the person the ages are counted for (a couple's view names one of them); null for a person alone. */
+  verdict: (v: Verdict, who?: string | null) => string
   /** The year table and charts. */
   windowLabel: string
   windowBridge: string
@@ -135,11 +136,13 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     breakEvenEarlier: (age) => `Attendre 65 ans rattrape cette façon à ${age} ans`,
     breakEvenNone: 'Pas de point d’équilibre avant l’horizon du plan',
     breakEvenSelf: 'La référence des comparaisons',
-    verdict: (v) =>
+    // « L’horizon » is the verdict's own word for the plan's last year (the youngest person's 95): the age printed here is
+    // the person looked at, which is NOT the youngest in a couple — so the person is named beside it.
+    verdict: (v, who = null) =>
       v.kind === 'holds'
         ? v.defers
-          ? `Vous pouvez reporter : votre nid tient jusqu’à ${v.horizonAge} ans.`
-          : `Ce plan tient jusqu’à ${v.horizonAge} ans.`
+          ? `Vous pouvez reporter : votre nid tient jusqu’à l’horizon (${who === null ? '' : `${who} : `}${v.horizonAge} ans).`
+          : `Ce plan tient jusqu’à l’horizon (${who === null ? '' : `${who} : `}${v.horizonAge} ans).`
         : v.defers && v.standardHolds
           ? `Reporter épuise votre nid à ${v.age} ans ; prendre le RRQ et la PSV à 65 ans évite la pénurie.`
           : v.defers && v.standardAge !== null
@@ -235,11 +238,11 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     breakEvenEarlier: (age) => `Waiting until 65 catches up with this at ${age}`,
     breakEvenNone: 'No break-even before the plan’s horizon',
     breakEvenSelf: 'The reference for the comparisons',
-    verdict: (v) =>
+    verdict: (v, who = null) =>
       v.kind === 'holds'
         ? v.defers
-          ? `You can defer: your nest egg lasts to age ${v.horizonAge}.`
-          : `This plan holds to age ${v.horizonAge}.`
+          ? `You can defer: your nest egg lasts to the horizon (${who === null ? '' : `${who}: `}age ${v.horizonAge}).`
+          : `This plan holds to the horizon (${who === null ? '' : `${who}: `}age ${v.horizonAge}).`
         : v.defers && v.standardHolds
           ? `Deferring uses up your nest egg at ${v.age}; taking the QPP and OAS at 65 avoids the shortfall.`
           : v.defers && v.standardAge !== null

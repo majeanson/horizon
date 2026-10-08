@@ -22,8 +22,9 @@ test('the strategy view sits on the page: each year from 60 to 70, five strategi
     await page.goto('/resultats?v=strategies')
 
     // the verdict sentence and the five ways of starting
-    // (the age is the one of the person looked at — Camille, the older one — not the plan's horizon for the younger)
-    await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à \d\d ans/)
+    // (the age is the one of the person looked at — Camille, the older one — not the plan's horizon for the younger:
+    // the sentence says « l’horizon », the verdict's word, and names whose age it prints)
+    await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à l’horizon \(Camille : \d\d ans\)/)
     // the golden couple's own plan IS the standard: one card says so instead of two identical ones
     for (const name of ['Tout dès que possible', 'Standard (c’est aussi votre plan)', 'Reporter au maximum', 'Pont jusqu’à 70 ans', 'Les deux à 70 ans']) {
       await expect(page.locator('.bridge-card').getByRole('radio', { name, exact: true })).toBeVisible()

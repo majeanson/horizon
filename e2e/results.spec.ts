@@ -74,6 +74,20 @@ test('another comparison adds a line and keeps the other choices', async ({ page
   await expect(page).toHaveURL(/dollars=nominal/)
 })
 
+test('the year-by-year table says which dollars it holds, and its last net worth is the card’s figure', async ({ page }) => {
+  await page.goto('/resultats?v=verify')
+  const tables = page.locator('#tableau')
+  await expect(tables.locator('.year-table__unit')).toContainText('Dollars d’aujourd’hui.')
+  // The « Mon plan » table's last row ends on the same number the scenario card prints (today's dollars, both).
+  const last = tables.locator('.year-table').first().locator('tbody tr').last().locator('td').last()
+  const worth = (await last.textContent())!.trim()
+  await page.goto('/resultats')
+  await expect(page.locator('.scenario').first()).toContainText(`Valeur nette à l’horizon : ${worth} (Dollars d’aujourd’hui)`)
+  // An old link with the year's dollars still opens them, and says so.
+  await page.goto('/resultats?v=verify&dollars=nominal')
+  await expect(tables.locator('.year-table__unit')).toContainText('Dollars de l’année.')
+})
+
 test('the chart speaks English too', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: 'Passer à l’anglais' }).click()

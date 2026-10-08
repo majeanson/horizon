@@ -5,6 +5,10 @@ import type { Lang } from '../i18n'
 // screen. Whole dollars, no thousands separators and no currency sign — a spreadsheet reads a bare integer in any locale
 // — and the field separator follows the language's spreadsheet (« ; » in French, where « , » is the decimal mark).
 // A leading BOM makes Excel read the accents as UTF-8.
+//
+// The file says the same numbers as the table on screen: `factor` divides each year's dollars the way the table does
+// (today's dollars, or 1 for the year's own), and `unit` names those dollars in every money column's heading, so a
+// spreadsheet opened next month still says which dollars it holds.
 
 export interface YearCsvHeads {
   year: string
@@ -16,14 +20,22 @@ export interface YearCsvHeads {
   netWorth: string
 }
 
+export interface YearCsvOptions {
+  /** What a dollar of `year` is divided by (the chart's deflator for today's dollars); absent: the year's own dollars. */
+  factor?: (year: number) => number
+  /** The dollars' name, appended to every money heading: « (dollars d’aujourd’hui) ». */
+  unit?: string
+}
+
 const field = (text: string, sep: string): string => (text.includes(sep) || text.includes('"') ? `"${text.replace(/"/g, '""')}"` : text)
 
-export function yearCsv(result: AgeResult, heads: YearCsvHeads, lang: Lang): string {
+export function yearCsv(result: AgeResult, heads: YearCsvHeads, lang: Lang, options: YearCsvOptions = {}): string {
   const sep = lang === 'fr' ? ';' : ','
-  const whole = (n: number) => String(Math.round(n))
-  const lines = [[heads.year, heads.ages, heads.income, heads.tax, heads.spending, heads.shortfall, heads.netWorth]]
+  const money = (head: string) => (options.unit ? `${head} (${options.unit})` : head)
+  const lines = [[heads.year, heads.ages, money(heads.income), money(heads.tax), money(heads.spending), money(heads.shortfall), money(heads.netWorth)]]
   for (const row of result.rows) {
     const h = row.household
+    const whole = (n: number) => String(Math.round(n / (options.factor ? options.factor(row.year) : 1)))
     lines.push([
       String(row.year),
       Object.values(row.persons)

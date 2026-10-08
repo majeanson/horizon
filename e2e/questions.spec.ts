@@ -53,3 +53,32 @@ test('typing an age in « Combien épargner ? » recomputes the answer and keeps
   await expect(page).toHaveURL(/age=58/)
   await expect(page.getByText(/de plus par année/)).toBeVisible({ timeout: 30_000 })
 })
+
+test('« Quand arrêter » says when no pension has begun yet, and what they cover once every one is in pay', async ({ page }) => {
+  await page.goto('/resultats')
+  // The golden couple's verdict (59) has the plan pension in pay the year after the last stop; every pension is in pay later.
+  await expect(page.locator('#arreter')).toContainText(/vos rentes, après impôt, couvrent \d+\s*% de vos dépenses/)
+  await expect(page.locator('#arreter')).toContainText(/Une fois toutes vos rentes commencées, en 20\d\d \(\d\d \/ \d\d ans\), elles couvrent \d+\s*% de vos dépenses, après impôt\./)
+})
+
+test('« Et si je dépensais moins ? » recomputes the age for an amount from the address, compares it with the profile’s, and can keep it', async ({ page }) => {
+  await page.goto('/resultats')
+  // The door on the verdict card leads to the section; at the profile's own amount the answer is the verdict's age.
+  await page.getByRole('button', { name: 'Et si je dépensais moins ?' }).first().click()
+  await expect(page.locator('#depenser')).toBeInViewport()
+  await expect(page.locator('#depenser')).toContainText('À 90 000 $ par année : dès 59 ans.')
+  await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses.')
+  // A lower amount from the address: an earlier age, said against the profile's own.
+  await page.goto('/resultats?spend=70000')
+  await expect(page.locator('#depenser')).toContainText('À 70 000 $ par année : dès 56 ans.', { timeout: 30_000 })
+  await expect(page.locator('#depenser')).toContainText('3 ans plus tôt qu’avec les 90 000 $ de vos hypothèses.')
+  // The slider's step button is one exact step, kept in the address.
+  await page.getByRole('button', { name: 'Moins : Dépenses à la retraite' }).click()
+  await expect(page).toHaveURL(/spend=69500/)
+  // Keeping the amount writes it to the profile: the verdict follows, the address forgets the what-if.
+  await page.getByRole('button', { name: 'Garder ce montant dans mes hypothèses' }).click()
+  await expect(page).not.toHaveURL(/spend=/)
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 56 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('#depenser')).toContainText('À 69 500 $ par année : dès 56 ans.')
+  await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses.')
+})
