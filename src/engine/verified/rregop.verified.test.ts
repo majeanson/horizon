@@ -271,6 +271,17 @@ describe('the RREGOP estimator (Camille, 85 000 $, 12 years on the 2025 statemen
     })
   const near = (actual: number, expected: number) => expect(Math.abs(actual - expected) / expected).toBeLessThan(0.005)
 
+  // Read 2026-10-07, same inputs: leaving 2033-03-15 (55,003), service 19,203 → rente de base avec réduction 20 893 $, coordination −10 028 $ from 2043-04-01.
+  it('leaving at 55, paid at 55: 36 % reduction, 20 893 $, then −10 028 $ at 65', () => {
+    const s = camille(55, 55)
+    expect(s.earlyReduction).toBeCloseTo(0.36, 10)
+    near(s.annualBeforeCoordination, 20_893)
+    near(s.coordinationAnnual, 10_028)
+  })
+  // The estimator REFUSES an end of employment before 51 (« ne peut pas être inférieur à 51 ans ») and, for anyone under 55 with under
+  // 35 years, answers « Vous n’aurez pas droit à une rente à la date de fin d’emploi que vous avez indiquée » (it models only a pension
+  // payable at the leaving date), so the deferred pension (leaving before 55) has NO estimator reading: its rule is pinned above from
+  // the plan page's « La fin d’emploi avant l’admissibilité à une rente », which is its only official source.
   it('leaving at 60, paid at 60: 6 % reduction, 38 666 $, then −12 636 $ at 65', () => {
     const s = camille(60, 60)
     expect(s.earlyReduction).toBeCloseTo(0.06, 10)

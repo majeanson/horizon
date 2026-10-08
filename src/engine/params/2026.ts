@@ -152,7 +152,7 @@ export const P2026 = {
     maxBasePension65: c(1_441.25, 'cpi', { ...RRQ_FIGURES, note: 'CHECK FIGURE (tests only): « The maximum retirement pension at age 65 for the base plan is $1441.25 ».' }, 0.01),
     indexation: c(0.02, 'none', { ...RRQ_FIGURES, note: '« Indexation rate for benefits as at 1 January 2026 | 2.00% » (Consumer Price Index for Canada). An observation: not projected.' }),
     baseReplacement: c(0.25, 'fixed', { ...RRQ_LEAFLET_65, note: '« the 25% replacement rate offered up to the MPE is used ».' }),
-    excludedShare: c(0.15, 'fixed', { ...RRQ_CALC, note: '« up to 15% of your lowest employment earnings will not decrease your pension » — rounded to the nearest whole month (15 % of 564 = 84.6 → 85, in the leaflet).' }),
+    excludedShare: c(0.15, 'fixed', { ...RRQ_CALC, note: '« up to 15% of your lowest employment earnings will not decrease your pension » — rounded UP to a whole month (15 % of 564 = 84.6 → 85, in the leaflet; s. 116.4 of the QPP Act, R-9: « counting any fraction of a month as a whole month »).' }),
     firstReplacement: c(0.0833, 'fixed', { ...RRQ_LEAFLET_65, note: '« the 8.33% replacement rate offered up to the MPE is used ».' }),
     secondReplacement: c(0.3333, 'fixed', { ...RRQ_LEAFLET_65, note: '« the 33.33% replacement rate applicable to the earnings between the MPE and the [YAMPE] is used ».' }),
     firstFrom: c(2019, 'fixed', { ...RRQ_LEAFLET_65, note: 'The first additional component counts earnings from 1 January 2019.' }),

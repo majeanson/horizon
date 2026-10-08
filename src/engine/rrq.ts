@@ -188,9 +188,9 @@ function basePension(input: RrqPensionInput, rules: RrqRules, startIdx: number, 
     return { perMonth: adjusted / months, months, adjusted }
   })
 
-  // The 15 % of months with the lowest earnings do not count — rounded to the nearest whole month
-  // (84.6 → 85, 66.6 → 67 in the leaflets' examples).
-  const excluded = Math.round(rules.excludedShare * totalMonths)
+  // s. 116.4 of the QPP Act: 15 % of the months « counting any fraction of a month as a whole month » — rounded UP
+  // (84.6 → 85, 66.6 → 67 in the leaflets). (Its other limit, the months over 120, cannot bind: the period is 504 months at 60.)
+  const excluded = Math.ceil(rules.excludedShare * totalMonths - 1e-9)
   const kept = totalMonths - excluded
   if (kept <= 0) return { pension: 0, months: totalMonths, excluded, adjustedTotal: 0, excludedTotal: 0 }
 
