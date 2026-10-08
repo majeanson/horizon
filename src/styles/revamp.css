@@ -82,15 +82,6 @@
   letter-spacing: 0.06em;
 }
 
-/* ── Profil: the quick start's three fields inside the welcome card ──────── */
-.welcome__fields {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-self: stretch;
-  max-width: 26rem;
-}
-
 /* ── Résultats: « préciser le calcul » — what would refine the verdict ───── */
 .refine__list {
   margin: 0;
@@ -612,4 +603,61 @@
 /* A figure the guide scrolls to stops below the top bar. */
 [data-fact] {
   scroll-margin-top: 5.5rem;
+}
+
+/* ── The first visit: one question per screen ───────────────────────────────────────────────────────────────────── */
+.onboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 34rem;
+  padding: 1.25rem 1.25rem 1rem;
+}
+.onboard__lead {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.onboard__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.onboard__step {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.onboard__question {
+  margin: 0;
+  font-size: var(--text-xl, 1.5rem);
+  line-height: 1.25;
+}
+.onboard__why {
+  margin: 0;
+  color: var(--ink-soft);
+}
+.onboard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+.onboard__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+.onboard__aside {
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+}
+.onboard__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+  padding-left: 1.1rem;
 }

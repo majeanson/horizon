@@ -43,7 +43,7 @@ test.describe('with the keyboard alone', () => {
   test.beforeEach(async ({ page }) => seedProfile(page, blankSeed()))
 
   test('a field is reached, typed into, committed with Enter, and explained with Space — and the note opens in place', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     await page.locator('.page-head__title').waitFor()
     await tabTo(page, 'Revenu de travail annuel actuel')
     await page.keyboard.press('Control+A')
@@ -63,7 +63,7 @@ test.describe('with the keyboard alone', () => {
   })
 
   test('the earnings grid sits on the page: its ⓘ, the fill action and the first year are the next stops', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     await page.locator('.page-head__title').waitFor()
     await tabTo(page, /Où trouver ce chiffre : Revenus de travail admissibles par année/)
     await page.keyboard.press('Tab')
@@ -83,7 +83,7 @@ test.describe('with the keyboard alone', () => {
   })
 
   test('a confirmation traps focus, closes on Escape, and gives focus back to the button that opened it', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
     const remove = page.getByRole('button', { name: 'Retirer le·la conjoint·e' })
     await remove.focus()

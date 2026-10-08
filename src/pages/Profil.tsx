@@ -1,25 +1,23 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { HomeSection } from '../components/profile/HomeSection'
 import { FamilySection } from '../components/profile/FamilySection'
 import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
-import { Cluster } from '../components/Layout'
-import { FieldRow } from '../components/FieldRow'
+import { Loading } from '../components/Loading'
 import { NextStep } from '../components/NextStep'
-import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
 import { SectionLevel } from '../components/SectionHeader'
-import { StatusMessage } from '../components/StatusMessage'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
-import { hasSpouse, mapPerson, setSpending } from '../lib/profileEdit'
+import { hasSpouse, mapPerson } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
+const Onboarding = lazy(() => import('../components/Onboarding'))
 
 // The profile: the household, then EVERY person's fields on the page — side by side on a wide
 // screen, one after the other on a phone. Nothing sits behind a tab. Every field writes straight
@@ -51,35 +49,34 @@ export function Profil() {
     )
   }, [linked, spouse, setParams])
 
+  // First visit: a blank form is a wall. The page IS one question at a time (components/Onboarding.tsx) until the person finishes it or
+  // asks for the full form (`?form=1`, which the path writes and a link can carry). Decided at arrival, like the card it replaces: a
+  // person who types the last number is not yanked out from under their finger — the path itself says when it is enough.
+  if (welcome && params.get('form') !== '1') {
+    return (
+      <section className="page-body">
+        <PageHead title={t.profile.welcome.title} />
+        <Suspense fallback={<Loading />}>
+          <Onboarding
+            onSkip={() =>
+              setParams(
+                () => {
+                  const next = new URLSearchParams(window.location.search)
+                  next.set('form', '1')
+                  return next
+                },
+                { replace: true },
+              )
+            }
+          />
+        </Suspense>
+      </section>
+    )
+  }
+
   return (
     <section className="page-body">
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
-      {welcome && (
-        // First visit: a blank form is a wall. The three numbers a first verdict needs are typed HERE — a short-form
-        // view of the same stored fields as the form below. Once they are in, the card says so and points at the
-        // verdict it promised; it leaves the page on the next visit, not under the reader's fingers.
-        <aside className="welcome surface">
-          <h2 className="welcome__title">{t.profile.welcome.title}</h2>
-          <p className="welcome__body">{t.profile.welcome.body}</p>
-          <QuickStart />
-          {gaps.length === 0 ? (
-            <>
-              <StatusMessage tone="success">{t.profile.welcome.done}</StatusMessage>
-              <Cluster>
-                <Link className="btn btn--sm" to="/resultats">
-                  {t.next.toResults}
-                </Link>
-              </Cluster>
-            </>
-          ) : (
-            <Cluster>
-              <Link className="btn btn--sm btn--ghost" to="/donnees">
-                {t.profile.welcome.example}
-              </Link>
-            </Cluster>
-          )}
-        </aside>
-      )}
       {/* « Rendre mon profil exact »: the meter, the documents and the guide — loaded on its own, the form never waits for it. */}
       <Suspense fallback={null}>
         <AccuracyGuide />
@@ -104,36 +101,6 @@ export function Profil() {
         {gaps.length === 0 ? <p>{t.next.profileReady}</p> : <p>{t.results.gaps.lead} {gaps.map((g) => t.results.gaps[g]).join(' ')}</p>}
       </NextStep>
     </section>
-  )
-}
-
-// The quick start: birth year, work income, retired spending — the three numbers `profileGaps` asks for before the
-// results page gives a verdict. They write the same store as the full form below (and as Hypothèses for the spending).
-function QuickStart() {
-  const t = useT()
-  const profile = useProfile()
-  const self = profile.household.persons[0]
-  const edit = (change: Parameters<typeof mapPerson>[2]) => updateProfile((p) => mapPerson(p, 'self', change))
-  return (
-    <div className="welcome__fields">
-      <FieldRow label={t.profile.welcome.birth} hint={t.profile.welcome.birthHint}>
-        {(w) => (
-          <NumberField kind="year" min={1900} max={2100} value={self.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} ariaDescribedBy={w.describedBy} />
-        )}
-      </FieldRow>
-      <FieldRow label={t.profile.welcome.salary} infoId="salary">
-        {(w) => <NumberField kind="money" max={1e8} value={self.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} />}
-      </FieldRow>
-      {/* The three account totals: the other numbers a first verdict leans on. One box each (the form below splits room, cost base and contributions). */}
-      {(['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
-        <FieldRow key={kind} label={`${t.profile.accounts[kind]} · ${t.profile.accounts.balance}`} infoId={kind === 'rrsp' ? 'rrspBalance' : kind === 'tfsa' ? 'tfsaBalance' : 'nonRegBalance'}>
-          {(w) => <NumberField kind="money" max={1e9} value={self.accounts[kind].balance} onChange={(balance) => edit((x) => ({ ...x, accounts: { ...x.accounts, [kind]: { ...x.accounts[kind], balance } } }))} id={w.id} />}
-        </FieldRow>
-      ))}
-      <FieldRow label={t.profile.welcome.spending} infoId="spendingRetired">
-        {(w) => <NumberField kind="money" max={1e8} value={profile.household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
-      </FieldRow>
-    </div>
   )
 }
 

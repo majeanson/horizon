@@ -71,16 +71,7 @@ export const EN: typeof FR = {
   profile: {
     title: 'Profile',
     subtitle: 'Your numbers, typed by hand. They stay on this device.',
-    welcome: {
-      title: 'To begin',
-      body: 'Three numbers are enough for a first verdict; the rest refines it. Every amount has an ⓘ that says where to find it, and nothing you write leaves this device.',
-      birth: 'Your birth year',
-      birthHint: 'A default is already filled in: replace it with your own year.',
-      salary: 'Your yearly work income',
-      spending: 'Your yearly spending, once retired',
-      done: 'That is all a first verdict needs. The rest of the page refines it.',
-      example: 'See an example',
-    },
+    welcome: { title: 'To begin' },
     self: 'Me',
     spouse: 'Spouse',
     home: {
@@ -540,7 +531,7 @@ export const EN: typeof FR = {
       where: 'Your financial institution’s statement, as of the last day of the month.',
       label: '',
       url: '',
-      note: 'Add up all your RRSPs, including employer ones you can withdraw from.',
+      note: 'Add up all your RRSPs. A VRSP or PRPP goes in too: same tax, same contribution room. Take the statement’s total balance, employer share included.',
     },
     rrspRoom: {
       where: 'Your latest CRA notice of assessment (the RRSP deduction limit and available contribution room statement), or your CRA account.',

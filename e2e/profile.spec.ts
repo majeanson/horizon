@@ -28,7 +28,7 @@ test.describe('a blank profile', () => {
 
   test('opens on the profile, prints nothing to the console, and asks for the missing numbers on the results page', async ({ page }) => {
     const problems = watchConsole(page)
-    await page.goto('/')
+    await page.goto('/?form=1')
     await expect(page.getByRole('heading', { name: 'Profil', level: 1 })).toBeVisible()
     await page.getByRole('link', { name: 'Résultats', exact: true }).click()
     await expect(page.getByText('Il manque des chiffres pour un résultat fiable')).toBeVisible()
@@ -38,7 +38,7 @@ test.describe('a blank profile', () => {
   })
 
   test('a typed salary is saved, survives a reload, and drops the « no income » gap', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const salary = box(page, 'Revenu de travail annuel actuel')
     await salary.fill('85 000')
     await salary.press('Enter')
@@ -48,7 +48,7 @@ test.describe('a blank profile', () => {
   })
 
   test('a comma decimal is read the Québécois way: « 85 000,50 » is eighty-five thousand dollars and fifty cents', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const field = box(page, 'Revenu de travail annuel actuel')
     await field.fill('85 000,50')
     await field.blur()
@@ -56,7 +56,7 @@ test.describe('a blank profile', () => {
   })
 
   test('an out-of-range text is refused with its reason, kept on screen, and not saved', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const age = box(page, 'Âge où le revenu de travail s’arrête')
     await age.fill('12')
     await age.blur()
@@ -70,7 +70,7 @@ test.describe('a blank profile', () => {
   })
 
   test('« où trouver ce chiffre » opens in place, names the document’s own wording, and links to an official page', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const toggle = page.getByRole('button', { name: /Où trouver ce chiffre : Droits de cotisation inutilisés/ }).first()
     await expect(toggle).toHaveAttribute('aria-expanded', 'false')
     await toggle.click()
@@ -86,7 +86,7 @@ test.describe('a blank profile', () => {
   })
 
   test('adding a spouse gives a second column with its own numbers; removing asks first, in words that say what is lost', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
     // Both people are on the page at once, each column named: no tab hides the other person.
     await expect(page.locator('#person-self').getByRole('heading', { name: 'Moi' })).toBeVisible()
@@ -109,7 +109,7 @@ test.describe('a blank profile', () => {
   })
 
   test('« Je vis seul·e » is on for one adult, can be unticked (and says why), and is gone — and false — for a couple', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const alone = page.getByRole('button', { name: 'Je vis seul·e' })
     await expect(alone).toHaveAttribute('aria-pressed', 'true')
     await expect(page.getByText('Seul·e dans un logement distinct, toute l’année')).toBeVisible()
@@ -126,7 +126,7 @@ test.describe('a blank profile', () => {
   })
 
   test('children are birth years: added, shown as removable chips, validated', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const year = page.getByRole('textbox', { name: 'Année de naissance de l’enfant' })
     await year.fill('2015')
     await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
@@ -140,7 +140,7 @@ test.describe('a blank profile', () => {
   })
 
   test('an employer plan starts from the RREGOP preset, carries its cited rules, and is removable', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     await page.getByRole('button', { name: 'Ajouter le RREGOP' }).click()
     const saved = async () => (await savedProfile(page)).household.persons[0].pensions
     await expect.poll(async () => (await saved()).length).toBe(1)
@@ -157,7 +157,7 @@ test.describe('a blank profile', () => {
   })
 
   test('the earnings years can be estimated from the salary — and a typed year is never overwritten', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/?form=1')
     const salary = box(page, 'Revenu de travail annuel actuel')
     await salary.fill('80000')
     await salary.press('Enter')
@@ -179,35 +179,6 @@ test.describe('a blank profile', () => {
 })
 
 test.describe('first visit', () => {
-  test('a blank profile asks for three numbers in the card itself; filled, the card goes and the verdict stands, with its refinements listed', async ({ page }) => {
-    await seedProfile(page, blankSeed())
-    await page.goto('/')
-    const welcome = page.getByRole('complementary')
-    await expect(welcome).toContainText('Trois chiffres suffisent pour un premier verdict')
-    await expect(welcome.getByRole('link', { name: 'Voir un exemple' })).toHaveAttribute('href', '/donnees')
-    // The quick start is a short-form view of the SAME stored fields as the form below: typing here fills there.
-    const salary = welcome.getByRole('textbox', { name: 'Votre revenu de travail par année' })
-    await salary.fill('70000')
-    await salary.press('Enter')
-    await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/70\D000/)
-    const spending = welcome.getByRole('textbox', { name: 'Vos dépenses par année, une fois à la retraite' })
-    await spending.fill('40000')
-    await spending.press('Enter')
-    // The card does NOT unmount under the typing finger: it stays for this visit, says the three numbers
-    // are in, and finally points at the verdict it promised. It leaves the page on the next visit.
-    await expect(welcome).toContainText('C’est tout ce qu’il faut pour un premier verdict')
-    // Three numbers are enough: the results page answers, and says what would refine it.
-    await welcome.getByRole('link', { name: 'Voir mes résultats' }).click()
-    await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)/)).toBeVisible()
-    const refine = page.locator('.refine')
-    await expect(refine).toContainText('Préciser le calcul')
-    await expect(refine).toContainText('relevé RRQ')
-    await expect(refine).toContainText('soldes de vos comptes')
-    await expect(refine).toContainText('dépenses pendant les années de travail')
-    // A later visit no longer needs the card: it is gone, not re-shown in its success state forever.
-    await page.goto('/')
-    await expect(page.getByRole('complementary')).toBeHidden()
-  })
 
   test('every page names the tab, so history and bookmarks are not all « Horizon »', async ({ page }) => {
     await seedProfile(page, EXAMPLE)

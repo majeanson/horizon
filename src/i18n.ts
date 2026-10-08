@@ -87,16 +87,7 @@ export const FR = {
   profile: {
     title: 'Profil',
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
-    welcome: {
-      title: 'Pour commencer',
-      body: 'Trois chiffres suffisent pour un premier verdict ; le reste précise le calcul. Chaque montant a un ⓘ qui dit où le trouver, et rien de ce que vous écrivez ne quitte cet appareil.',
-      birth: 'Votre année de naissance',
-      birthHint: 'Une valeur par défaut est déjà inscrite : remplacez-la par votre année.',
-      salary: 'Votre revenu de travail par année',
-      spending: 'Vos dépenses par année, une fois à la retraite',
-      done: 'C’est tout ce qu’il faut pour un premier verdict. Le reste de la page le précisera.',
-      example: 'Voir un exemple',
-    },
+    welcome: { title: 'Pour commencer' },
     self: 'Moi',
     spouse: 'Conjoint·e',
     home: {
@@ -560,7 +551,7 @@ export const FR = {
       where: 'Le relevé de votre institution financière, au dernier jour du mois.',
       label: '',
       url: '',
-      note: 'Additionnez tous vos REER, y compris ceux de l’employeur que vous pouvez retirer.',
+      note: 'Additionnez tous vos REER. Un RVER ou un RPAC s’y ajoute : mêmes impôts, mêmes droits de cotisation. Prenez le solde total du relevé, part de l’employeur comprise.',
     },
     rrspRoom: {
       where: 'Votre dernier avis de cotisation de l’ARC (relevé du maximum déductible au titre des REER), ou votre compte de l’ARC.',

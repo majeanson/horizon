@@ -127,20 +127,6 @@ test('the quick way: « Estimer ce qui manque » fills blank earnings years and 
   await expect(quick.getByRole('status')).toContainText('Rien à estimer')
 })
 
-test('a first visit asks for the account totals too: the figures a first verdict leans on', async ({ page }) => {
-  await page.goto('/')
-  await page.evaluate((key) => localStorage.removeItem(key), PROFILE_KEY)
-  await page.evaluate(() => sessionStorage.setItem('e2e-seeded', '1'))
-  await page.reload()
-  const card = page.locator('.welcome__fields')
-  await expect(card).toBeVisible()
-  for (const name of ['REER · Solde', 'CELI · Solde', 'Non enregistré · Solde']) await expect(card.getByRole('textbox', { name })).toBeVisible()
-  const rrsp = card.getByRole('textbox', { name: 'REER · Solde' })
-  await rrsp.fill('85000')
-  await rrsp.blur()
-  await expect.poll(async () => (await savedProfile(page))?.household.persons[0].accounts.rrsp.balance).toBe(85_000)
-})
-
 test('the results say how much of the answer stands on confirmed figures, and point back to the profile', async ({ page }) => {
   await page.goto('/resultats')
   const note = page.locator('.verdict').getByText(/chiffres confirmés/)

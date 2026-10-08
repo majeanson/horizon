@@ -849,23 +849,6 @@
 }
 
 /* ── First visit ─────────────────────────────────────────────────────────── */
-.welcome {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
-  padding: 1rem;
-  border-left: 4px solid var(--accent);
-}
-.welcome__title {
-  margin: 0;
-  font-size: var(--text-md);
-}
-.welcome__body {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--ink-soft);
-}
 
 /* ── Desktop: nothing stretches to fill the width it is given ─────────────────────────────────────────────────────
    Measured at 1440 px: a two-character percent sat in a 52 rem box, the Moi / Conjoint·e pill ran the whole card, a
