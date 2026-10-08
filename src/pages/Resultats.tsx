@@ -19,8 +19,8 @@ import { usePinOffset } from '../lib/pinOffset'
 import { SubTabs } from '../components/SubTabs'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
+import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
-import { retireAt, worksNow } from '../engine/retireAt'
 import { planGlance, retirementState } from '../engine/ledger'
 import { withPreset } from '../engine/assumptionPresets'
 import { useLang, useT } from '../i18n'
@@ -29,7 +29,9 @@ import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { presetOf } from '../engine/assumptionPresets'
 import { formatPct, formatYearAge } from '../lib/format'
 import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
-import { headlineOf, prudentDiffers } from '../lib/headline'
+import { prudentDiffers } from '../lib/headline'
+import { NO_HEADLINE } from '../lib/answer'
+import { useAnswer } from '../lib/useAnswer'
 import { scrollToSection } from '../lib/motion'
 import { useSettled } from '../lib/useSettled'
 import { usePresetRange } from '../lib/usePresetEarliest'
@@ -38,13 +40,11 @@ import { STRESS_PRESETS } from '../lib/marketRange'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { LEVERS_COPY } from '../lib/leversCopy'
 import { useLevers } from '../lib/useLevers'
-import { maxRetiredSpending } from '../engine/maxSpending'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
 import { accuracyOf } from '../lib/facts'
 import { parseSpend } from '../lib/spendModel'
-import { stopWorking } from '../lib/stopWorking'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
@@ -119,12 +119,19 @@ export function Resultats() {
     [setParams],
   )
 
-  const earliest = useMemo(
-    () => (gaps.length > 0 ? null : retireAt(slow.household, slowAssumptions, { stopAtFirstOk: true }).earliestOk),
-    [slow, slowAssumptions, gaps.length],
-  )
-  // « Dès maintenant »: the earliest age found is only the first one tried (the oldest person's age today) and stopping today works.
-  const nowOk = useMemo(() => gaps.length === 0 && worksNow(slow.household, slowAssumptions, earliest), [slow, slowAssumptions, gaps.length, earliest])
+  const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
+  const youngest = Math.min(...profile.household.persons.map((p) => year - p.birth.year))
+  // Clamped on BOTH sides: someone past 70 and still working used to leave firstAge above MAX_AGE —
+  // an empty compare rail and an age box whose min sat over its max.
+  const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, oldest))
+  // THE answer — the earliest age, « dès maintenant », the headline, the monthly comfort, the dates — is one job worked out
+  // off the page's thread (lib/answer.ts): null until the first one is in (the card shows a skeleton), then the LAST one
+  // while a re-asked question runs (the card says it is busy). Forty projections never again run between two taps.
+  const answer = useAnswer(slow.household, slowAssumptions, firstAge, youngest, gaps.length === 0)
+  const got = gaps.length === 0 ? answer.value : null
+  const answerPending = gaps.length === 0 && got === null
+  const earliest = got?.earliest ?? null
+  const nowOk = got?.nowOk ?? false
   const picked = formatSelections(selections)
   const runs = useMemo(
     () => (gaps.length > 0 ? [] : runSelections(slow, { year, month }, parseSelections(picked, []))),
@@ -186,15 +193,7 @@ export function Resultats() {
     if (c.left < box.left || c.right > box.right) rail.scrollTo({ left: Math.max(0, rail.scrollLeft + (c.left - box.left) - (box.width - c.width) / 2) })
   }, [gaps.length])
 
-  const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
-  const youngest = Math.min(...profile.household.persons.map((p) => year - p.birth.year))
-  // Clamped on BOTH sides: someone past 70 and still working used to leave firstAge above MAX_AGE —
-  // an empty compare rail and an age box whose min sat over its max.
-  const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, oldest))
-  const headline = useMemo(
-    () => (gaps.length > 0 ? headlineOf(slow.household, slowAssumptions, null, firstAge, youngest) : headlineOf(slow.household, slowAssumptions, earliest, firstAge, youngest, nowOk)),
-    [slow, slowAssumptions, gaps.length, earliest, nowOk, firstAge, youngest],
-  )
+  const headline = got?.headline ?? NO_HEADLINE
   // The answer under each ready-made scenario (off the page's thread): the answer's own range line, and the
   // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
   const activePreset = presetOf(assumptions)
@@ -205,16 +204,9 @@ export function Resultats() {
   const levers = useLevers(slow.household, slowAssumptions, gaps.length === 0)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
-  // What the answer's age can fund each month: the retired spending turned round (engine/maxSpending.ts), after tax, today's dollars.
-  const comfort = useMemo(
-    () => (gaps.length > 0 || headline.age === null ? undefined : maxRetiredSpending(slow.household, slowAssumptions, headline.age)),
-    [slow, slowAssumptions, gaps.length, headline.age],
-  )
-  // The answer's age, put in dates: one cheap main-thread projection.
-  const stop = useMemo(
-    () => (gaps.length > 0 || headline.age === null ? null : stopWorking(slow.household, slowAssumptions, headline.age)),
-    [slow, slowAssumptions, gaps.length, headline.age],
-  )
+  // What the answer's age can fund each month (engine/maxSpending.ts, after tax, today's dollars), and the age put in dates.
+  const comfort = got?.comfort
+  const stop = got?.stop ?? null
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
   // re-rendered, and a quick second tap must build on the first, not on the stale list.
   const pending = useRef<{ text: string; at: number } | null>(null)
@@ -339,63 +331,69 @@ export function Resultats() {
       {/* 1 — what you asked: the answer, then the same answer compared, costed and dated. */}
       {view === 'answer' && (
         <section className="arc" aria-label={rc.tabs.answer}>
-          <div id="verdict" className="verdict surface results-section" aria-live="polite">
-            <p className="verdict__line">
-              {sentenceAfter === undefined ? (
-                sentenceBefore
-              ) : (
-                <>
-                  <span className="verdict__lead">{sentenceBefore}</span>
-                  <span className="verdict__big">
-                    <strong className="verdict__age">{rc.headline.ageText(headline.age!)}</strong>
-                    {sentenceAfter}
-                  </span>
-                </>
-              )}
-            </p>
-            {retiredGlance ? (
-              <>
-                <p className="verdict__note">
-                  {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(at(retiredGlance.now.firstShortfallYear! - 1))}{' '}
-                  {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
-                </p>
-                {activePreset !== 'prudent' && (retiredGlance.prudent.ok !== retiredGlance.now.ok || retiredGlance.prudent.firstShortfallYear !== retiredGlance.now.firstShortfallYear) && (
-                  <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear === null ? null : at(retiredGlance.prudent.firstShortfallYear - 1))}</p>
-                )}
-              </>
-            ) : headline.kind === 'none' ? (
-              <>
-                {/* The WORST answer must be the most actionable one: the nudge carries its doors, and each door opens. */}
-                <p className="verdict__note">{rc.headline.tryThis}</p>
-                <Cluster>
-                  <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
-                  <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
-                  <Chip onClick={() => goTo('verify', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
-                </Cluster>
-              </>
+          <div id="verdict" className={'verdict surface results-section' + (answer.busy ? ' is-busy' : '')} aria-live="polite" aria-busy={answer.busy || undefined}>
+            {answerPending && !retiredGlance ? (
+              <Skeleton count={3} className="skeleton--verdict" />
             ) : (
               <>
-                <p className="verdict__note">
-                  {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
-                </p>
-                {/* The answer in dates: the year each person reaches the age, and when the pensions carry the spending by themselves. */}
-                {stop !== null && (
-                  <div id="arreter" className="verdict__dates">
-                    <p className="verdict__range-title">{rc.questions.stop.title}</p>
-                    <ul className="verdict__dates-list">
-                      {stop.years.map((y, i) => (
-                        <li key={y.id}>{rc.questions.stop.when(names[i] ?? '', formatYearAge(y.year, births[i] === undefined ? [] : [births[i]], lang))}</li>
-                      ))}
-                      <li>{stop.pensionsStarted ? rc.questions.stop.share(pct(stop.pensionShare), at(stop.firstYear)) : rc.questions.stop.shareNone(at(stop.firstYear))}</li>
-                      {stop.allStarted !== null && <li>{rc.questions.stop.shareAll(pct(stop.allStarted.share), at(stop.allStarted.year))}</li>}
-                      <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
-                    </ul>
-                  </div>
+              <p className="verdict__line">
+                {sentenceAfter === undefined ? (
+                  sentenceBefore
+                ) : (
+                  <>
+                    <span className="verdict__lead">{sentenceBefore}</span>
+                    <span className="verdict__big">
+                      <strong className="verdict__age">{rc.headline.ageText(headline.age!)}</strong>
+                      {sentenceAfter}
+                    </span>
+                  </>
                 )}
-                {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
-                <Cluster>
-                  <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
-                </Cluster>
+              </p>
+              {retiredGlance ? (
+                <>
+                  <p className="verdict__note">
+                    {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(at(retiredGlance.now.firstShortfallYear! - 1))}{' '}
+                    {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
+                  </p>
+                  {activePreset !== 'prudent' && (retiredGlance.prudent.ok !== retiredGlance.now.ok || retiredGlance.prudent.firstShortfallYear !== retiredGlance.now.firstShortfallYear) && (
+                    <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear === null ? null : at(retiredGlance.prudent.firstShortfallYear - 1))}</p>
+                  )}
+                </>
+              ) : headline.kind === 'none' ? (
+                <>
+                  {/* The WORST answer must be the most actionable one: the nudge carries its doors, and each door opens. */}
+                  <p className="verdict__note">{rc.headline.tryThis}</p>
+                  <Cluster>
+                    <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
+                    <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
+                    <Chip onClick={() => goTo('verify', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
+                  </Cluster>
+                </>
+              ) : (
+                <>
+                  <p className="verdict__note">
+                    {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
+                  </p>
+                  {/* The answer in dates: the year each person reaches the age, and when the pensions carry the spending by themselves. */}
+                  {stop !== null && (
+                    <div id="arreter" className="verdict__dates">
+                      <p className="verdict__range-title">{rc.questions.stop.title}</p>
+                      <ul className="verdict__dates-list">
+                        {stop.years.map((y, i) => (
+                          <li key={y.id}>{rc.questions.stop.when(names[i] ?? '', formatYearAge(y.year, births[i] === undefined ? [] : [births[i]], lang))}</li>
+                        ))}
+                        <li>{stop.pensionsStarted ? rc.questions.stop.share(pct(stop.pensionShare), at(stop.firstYear)) : rc.questions.stop.shareNone(at(stop.firstYear))}</li>
+                        {stop.allStarted !== null && <li>{rc.questions.stop.shareAll(pct(stop.allStarted.share), at(stop.allStarted.year))}</li>}
+                        <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
+                      </ul>
+                    </div>
+                  )}
+                  {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
+                  <Cluster>
+                    <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
+                  </Cluster>
+                </>
+              )}
               </>
             )}
             {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,

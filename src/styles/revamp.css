@@ -906,3 +906,23 @@
   margin: 0.1em 0 0.05em;
   line-height: 1.05;
 }
+
+/* The answer card while its answer is being worked out (lib/useAnswer.ts): a skeleton shaped like the headline and two
+   notes before the first answer; a quiet dimming of the words while a re-asked question runs and the last answer stays. */
+.skeleton--verdict .skeleton__block {
+  height: 2.6rem;
+  width: 70%;
+}
+.skeleton--verdict .skeleton__block + .skeleton__block {
+  height: 1rem;
+  width: 90%;
+}
+.skeleton--verdict .skeleton__block + .skeleton__block + .skeleton__block {
+  width: 60%;
+}
+.verdict.is-busy .verdict__line,
+.verdict.is-busy .verdict__note,
+.verdict.is-busy .verdict__dates {
+  opacity: 0.6;
+  transition: opacity 0.2s ease-out;
+}
