@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-// EVERY EXAMPLE, THROUGH THE REAL PAGES. The seven example households (src/engine/golden/examples.ts) are loaded the way a person
+// EVERY EXAMPLE, THROUGH THE REAL PAGES. The eight example households (src/engine/golden/examples.ts) are loaded the way a person
 // loads them — the data page — and each one must read as its own story on the results page: the headline, the cards, the ledger,
 // and which panels are offered at all. The arithmetic behind each is printed in EXAMPLES.md and pinned by engine/golden/examples.test.ts.
 
@@ -17,9 +17,9 @@ const openLedger = async (page: Page) => {
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
-test('the data page offers all seven examples, each with its story', async ({ page }) => {
+test('the data page offers all eight examples, each with its story', async ({ page }) => {
   await page.goto('/donnees')
-  await expect(page.locator('.example-list li')).toHaveCount(7)
+  await expect(page.locator('.example-list li')).toHaveCount(8)
   await expect(page.locator('.example-list')).toContainText('Julien, 52 ans')
 })
 
@@ -72,4 +72,14 @@ test('newcomer: the OAS is the share her residence earns, and the ledger shows t
   await loadExample(page, 'Arrivée au Canada à 30 ans')
   await openLedger(page)
   await expect(page.locator('.ledger')).toContainText('résidence 88 %')
+})
+
+test('heir: young and rich — « dès maintenant » rather than a first age tried, in the verdict and in the spending answer', async ({ page }) => {
+  await loadExample(page, 'Une personne, grand héritage')
+  await expect(page.locator('.verdict__line')).toHaveText('Vous pouvez déjà prendre votre retraite.')
+  // the spending lever says it too, whatever the amount that still works
+  await page.goto('/resultats?spend=60000')
+  await expect(page.locator('#depenser')).toContainText('À 60 000 $ par année : dès maintenant.', { timeout: 30_000 })
+  // the comparison starts at the age already reached, and nobody is shown an age in the past
+  await expect(page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: /^27 ans/ })).toBeVisible()
 })

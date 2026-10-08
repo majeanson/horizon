@@ -20,7 +20,7 @@ import { SubTabs } from '../components/SubTabs'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
-import { retireAt } from '../engine/retireAt'
+import { retireAt, worksNow } from '../engine/retireAt'
 import { planGlance, retirementState } from '../engine/ledger'
 import { withPreset } from '../engine/assumptionPresets'
 import { useLang, useT } from '../i18n'
@@ -100,6 +100,8 @@ export function Resultats() {
     () => (gaps.length > 0 ? null : retireAt(profile.household, assumptionsOf(profile, { year, month }), { stopAtFirstOk: true }).earliestOk),
     [profile, gaps.length, year, month],
   )
+  // « Dès maintenant »: the earliest age found is only the first one tried (the oldest person's age today) and stopping today works.
+  const nowOk = useMemo(() => gaps.length === 0 && worksNow(profile.household, assumptionsOf(profile, { year, month }), earliest), [profile, gaps.length, earliest, year, month])
   const picked = formatSelections(selections)
   const runs = useMemo(
     () => (gaps.length > 0 ? [] : runSelections(profile, { year, month }, parseSelections(picked, []))),
@@ -142,8 +144,8 @@ export function Resultats() {
   // an empty compare rail and an age box whose min sat over its max.
   const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, oldest))
   const headline = useMemo(
-    () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest)),
-    [profile, gaps.length, earliest, firstAge, youngest, year, month],
+    () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest, nowOk)),
+    [profile, gaps.length, earliest, nowOk, firstAge, youngest, year, month],
   )
   // The answer under each ready-made scenario (off the page's thread): the verdict's own range line, and the
   // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
@@ -429,7 +431,7 @@ export function Resultats() {
       {!retiredNow && (
         <section id="depenser" className="results-section" aria-label={rc.questions.tabs.spend}>
           <SectionHeader title={rc.questions.tabs.spend} />
-          <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} maxAge={MAX_AGE} />
+          <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
         </section>
       )}
       {stop !== null && (

@@ -23,6 +23,7 @@ export function SpendView({
   spend,
   onSpend,
   earliest,
+  now,
   maxAge,
 }: {
   household: Household
@@ -33,6 +34,8 @@ export function SpendView({
   onSpend: (spend: number | null) => void
   /** The verdict's age at the profile's own spending (null: no age works). */
   earliest: number | null
+  /** The verdict's answer is « dès maintenant » (stopping today works). */
+  now: boolean
   maxAge: number
 }) {
   const { lang } = useLang()
@@ -44,6 +47,8 @@ export function SpendView({
   // undefined: not worked out yet (a skeleton); null: no age up to 70 works.
   const age: number | null | undefined = isCurrent ? earliest : answer.value ? answer.value.earliest : undefined
   const busy = !isCurrent && answer.busy
+  // « Dès maintenant » rather than the first age tried: today already works, so there is nothing to wait for.
+  const rightNow = isCurrent ? now : (answer.value?.now ?? false)
   const money = (n: number) => formatMoney(n, lang)
   const keep = () => {
     updateProfile((p) => setSpending(p, { retiredToday: spend }))
@@ -81,7 +86,7 @@ export function SpendView({
       ) : age === null ? (
         <p className="answer__big answer__big--short">{q.none(money(spend), maxAge)}</p>
       ) : (
-        <p className="answer__big">{q.at(money(spend), age)}</p>
+        <p className="answer__big">{rightNow ? q.now(money(spend)) : q.at(money(spend), age)}</p>
       )}
       <p className="answer__note">{q.perMonth(money(spend / 12))}</p>
       {isCurrent ? (

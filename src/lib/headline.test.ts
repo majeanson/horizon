@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
-import { everyoneAt, retireAt, runScenario } from '../engine/retireAt.ts'
+import { EXAMPLES } from '../engine/golden/examples.ts'
+import { everyoneAt, retireAt, runScenario, worksNow } from '../engine/retireAt.ts'
 import { presetOf, withPreset } from '../engine/assumptionPresets.ts'
 import { headlineOf, prudentDiffers } from './headline.ts'
 
@@ -59,5 +60,24 @@ describe('when the headline also names the prudent scenario', () => {
     const prudent = retireAt(H, withPreset(A, 'prudent'), { stopAtFirstOk: true }).earliestOk
     expect(own).toBe(59)
     expect(prudentDiffers(prudent, own)).toBe(true)
+  })
+})
+
+describe('« dès maintenant »', () => {
+  // The rich couple: Sophie is 50 today, Marc 48. At very low spending the first age tried (50, Sophie's) already works — but
+  // that is the FLOOR of the search, not a minimum: stopping today (each at their own age) works too, and the headline says so.
+  const rich = EXAMPLES.rich
+  const frugal = { ...rich.household, spending: { workingToday: 20_000, retiredToday: 20_000 } }
+  const earliestFrugal = retireAt(frugal, rich.assumptions, { stopAtFirstOk: true }).earliestOk
+  it('is said when the earliest age is the floor and stopping today works, even though the younger person is below that age', () => {
+    expect(earliestFrugal).toBe(50)
+    expect(worksNow(frugal, rich.assumptions, earliestFrugal)).toBe(true)
+    expect(headlineOf(frugal, rich.assumptions, earliestFrugal, 50, 48).kind).toBe('at') // the shared-age reading: Marc waits two years
+    expect(headlineOf(frugal, rich.assumptions, earliestFrugal, 50, 48, true).kind).toBe('now')
+  })
+  it('is not said when the household cannot stop today', () => {
+    const e = retireAt(rich.household, rich.assumptions, { stopAtFirstOk: true }).earliestOk
+    expect(e).toBeGreaterThan(50)
+    expect(worksNow(rich.household, rich.assumptions, e)).toBe(false)
   })
 })

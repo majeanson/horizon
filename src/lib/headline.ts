@@ -1,4 +1,4 @@
-import { everyoneAt, runScenario } from '../engine/retireAt.ts'
+import { everyoneAt, nowScenario, runScenario } from '../engine/retireAt.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
 
 // The one sentence the results page leads with, and the facts behind it. It is built from two more projections around the
@@ -19,14 +19,15 @@ export interface Headline {
   netWorthAtHorizon: number | null
 }
 
-/** `firstAge` is the lowest age tried; `youngest` is the age the YOUNGEST person has reached this year (the household can retire today only if everyone has reached the answer). */
-export function headlineOf(household: Household, assumptions: Assumptions, earliest: number | null, firstAge: number, youngest: number): Headline {
+/** `firstAge` is the lowest age tried; `youngest` is the age the YOUNGEST person has reached this year (the household can retire today only if everyone has reached the answer, or when `nowOk`: stopping today — each at their own age — works, see `worksNow`). */
+export function headlineOf(household: Household, assumptions: Assumptions, earliest: number | null, firstAge: number, youngest: number, nowOk = false): Headline {
   if (earliest === null) return { kind: 'none', age: null, earlierShortfallYear: null, earlierAge: null, netWorthAtHorizon: null }
-  const at = runScenario(household, assumptions, everyoneAt(household, earliest), earliest)
+  // « Dès maintenant »: stopping today works, so the plan to read is THAT one (each at the age reached), not the shared first age tried.
+  const at = nowOk ? runScenario(household, assumptions, nowScenario(household, assumptions), earliest) : runScenario(household, assumptions, everyoneAt(household, earliest), earliest)
   const earlierAge = earliest - 1 >= firstAge ? earliest - 1 : null
   const earlier = earlierAge === null ? null : runScenario(household, assumptions, everyoneAt(household, earlierAge), earlierAge)
   return {
-    kind: earliest <= youngest ? 'now' : 'at',
+    kind: earliest <= youngest || nowOk ? 'now' : 'at',
     age: earliest,
     earlierShortfallYear: earlier && !earlier.ok ? earlier.firstShortfallYear : null,
     earlierAge: earlier ? earlierAge : null,

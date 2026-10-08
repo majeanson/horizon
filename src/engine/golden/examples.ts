@@ -2,7 +2,7 @@ import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './household.fixture.ts'
 
-// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Seven different lives, so that
+// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Eight different lives, so that
 // every table and every result can be looked at, and checked by hand, for more than one kind of person:
 //
 //   golden    a couple, one in the public sector (RREGOP), the other private — the household the golden snapshots pin
@@ -12,12 +12,14 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //   behind    one person, 52, who started saving late and plans to stop at 60: the plan does NOT hold
 //   retired   a retired couple: a pension in pay, both pensions already started, the nest being drawn down
 //   newcomer  one person who arrived in Canada at 30: a partial OAS and a QPP history that starts late
+//   heir      one person, 27, who inherited a large sum: the very-early-retirement case — the answer is « dès maintenant »,
+//             and the plan has to last seventy years
 //
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
 
-export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer'
-export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer']
+export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir'
+export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir']
 
 export interface ExampleHousehold {
   id: ExampleId
@@ -158,6 +160,24 @@ const newcomer: Household = {
   spending: { workingToday: 38_000, retiredToday: 36_000 },
 }
 
+const heir: Household = {
+  livesAlone: true,
+  persons: [
+    person({
+      // 27, five years in a first job, then an inheritance: it sits in a non-registered account (its cost base is the value at
+      // the parent's death, so little of it is a gain yet). Works on for now, plans to stop at 30 — and could stop today.
+      id: 'self', name: 'Jules', birth: { year: 1999, month: 9 }, retirementAge: 30, salaryToday: 62_000, earningsHistory: history(1999, 45_000),
+      accounts: {
+        rrsp: { balance: 18_000, room: 25_000, annualContribution: 0 },
+        tfsa: { balance: 70_000, room: 25_000, annualContribution: 5_000 },
+        nonReg: { balance: 3_500_000, acb: 3_400_000, annualContribution: 0 },
+      },
+      pensions: [],
+    }),
+  ],
+  spending: { workingToday: 52_000, retiredToday: 54_000 },
+}
+
 const base = (): Assumptions => ({ ...GOLDEN_ASSUMPTIONS, today: GOLDEN_TODAY, ...ASSUMPTION_PRESETS.neutral })
 
 export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
@@ -168,4 +188,5 @@ export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
   behind: { id: 'behind', household: behind, children: [], assumptions: base() },
   retired: { id: 'retired', household: retired, children: [], assumptions: base() },
   newcomer: { id: 'newcomer', household: newcomer, children: [], assumptions: base() },
+  heir: { id: 'heir', household: heir, children: [], assumptions: base() },
 }

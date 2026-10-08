@@ -59,6 +59,23 @@ export function retireAt(h: Household, a: Assumptions, options: RetireAtOptions 
   return { byAge, earliestOk: byAge.find((r) => r.ok)?.age ?? null }
 }
 
+/** Stopping TODAY: every person at the age they have reached this year (nobody can retire in the past). */
+export const nowScenario = (h: Household, a: Assumptions): Scenario => ({
+  retirementAge: Object.fromEntries(h.persons.map((p) => [p.id, ageThisYear(h, a, p.id)])),
+})
+
+/**
+ * Is the earliest age `earliest` the FLOOR of the search — the age the oldest person has already reached — and does stopping
+ * today (each at their own age) work? Then the honest answer is « dès maintenant », not « dès 50 ans »: 50 was only the first
+ * age tried (the older person is 50 today), not a minimum anyone has to wait for.
+ */
+export function worksNow(h: Household, a: Assumptions, earliest: number | null): boolean {
+  if (earliest === null) return false
+  const oldest = Math.max(0, ...h.persons.map((p) => ageThisYear(h, a, p.id)))
+  if (earliest !== Math.max(MIN_TRY_AGE, oldest)) return false
+  return runScenario(h, a, nowScenario(h, a), oldest).ok
+}
+
 /** Side by side: the named scenarios, each run in full — the data of the « 60 vs 65 » chart. */
 export function compare(
   h: Household,

@@ -17,6 +17,7 @@ export const EXAMPLE_COPY: { fr: Record<ExampleId, ExampleText>; en: Record<Exam
     behind: { name: 'Une personne, en retard', story: 'Julien, 52 ans, 62 000 $, presque rien d’épargné : à 60 ans l’argent manque vers 62 ans.' },
     retired: { name: 'Couple à la retraite', story: 'Gilles (rente d’employeur en cours) et Francine : RRQ et PSV déjà versés, le nid est mis à contribution.' },
     newcomer: { name: 'Arrivée au Canada à 30 ans', story: 'Amira, 58 000 $ : PSV partielle (35 ans sur 40) et un historique du RRQ qui commence tard.' },
+    heir: { name: 'Une personne, grand héritage', story: 'Jules, 27 ans, hérite de 3,5 M$ : il pourrait arrêter de travailler dès maintenant, et l’argent doit durer soixante-dix ans.' },
   },
   en: {
     golden: { name: 'Couple, one in the public service', story: 'Camille (RREGOP, $85,000) and Alex ($65,000): the couple used in the documentation.' },
@@ -26,5 +27,6 @@ export const EXAMPLE_COPY: { fr: Record<ExampleId, ExampleText>; en: Record<Exam
     behind: { name: 'One person, behind', story: 'Julien, 52, $62,000, almost nothing saved: retiring at 60, the money runs out around 62.' },
     retired: { name: 'Retired couple', story: 'Gilles (employer pension in pay) and Francine: QPP and OAS already paid, the nest egg is being drawn.' },
     newcomer: { name: 'Arrived in Canada at 30', story: 'Amira, $58,000: a partial OAS (35 of 40 years) and a QPP history that starts late.' },
+    heir: { name: 'One person, large inheritance', story: 'Jules, 27, inherits $3.5M: he could stop working right now, and the money has to last seventy years.' },
   },
 }

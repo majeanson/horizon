@@ -3,7 +3,7 @@ import { bridgeView, profileLevers } from '../bridge.ts'
 import { deferralView } from '../deferral.ts'
 import { agesLedger, planGlance } from '../ledger.ts'
 import { project } from '../projection.ts'
-import { retireAt } from '../retireAt.ts'
+import { retireAt, worksNow } from '../retireAt.ts'
 import type { YearRow } from '../types.ts'
 import { EXAMPLE_IDS, EXAMPLES } from './examples.ts'
 
@@ -90,6 +90,32 @@ describe('each story', () => {
     expect(l.oas.residence).toBeCloseTo(35 / 40, 6)
     expect(Math.min(...Object.keys(household.persons[0].earningsHistory).map(Number))).toBe(household.persons[0].oas.residentSince)
     expect(planGlance(household, assumptions).ok).toBe(true)
+  })
+
+  it('heir: 27 years old, the inheritance is non-registered, and stopping TODAY works — the earliest age is the first one tried, not a minimum', () => {
+    const { household, assumptions } = EXAMPLES.heir
+    const p = household.persons[0]
+    expect(assumptions.today.year - p.birth.year).toBe(27)
+    expect(p.accounts.nonReg.balance).toBeGreaterThan(3_000_000)
+    expect(p.retirementAge).toBeLessThanOrEqual(30)
+    const r = retireAt(household, assumptions, { stopAtFirstOk: true })
+    expect(r.earliestOk).toBe(27) // the floor: nobody can retire in the past
+    expect(worksNow(household, assumptions, r.earliestOk)).toBe(true)
+    // …and a life that long is a plan that long: the money lasts to the horizon, seventy years on, with a large nest left.
+    const g = planGlance(household, assumptions)
+    expect(g.ok).toBe(true)
+    expect(g.netWorthEnd).toBeGreaterThan(1_000_000)
+    expect(rowsOf('heir').length).toBeGreaterThan(65)
+    // nobody is asked to wait: asking from 18 gives the same answer as from the age already reached
+    expect(retireAt(household, assumptions, { from: 18, stopAtFirstOk: true }).earliestOk).toBe(27)
+  })
+
+  it('« dès maintenant » is only said when today is the floor AND works: a household whose first working age is later is not told « now »', () => {
+    const { household, assumptions } = EXAMPLES.behind
+    expect(worksNow(household, assumptions, null)).toBe(false)
+    expect(worksNow(household, assumptions, 60)).toBe(false) // 52 today: 60 is not the floor
+    const heir = EXAMPLES.heir
+    expect(worksNow(heir.household, heir.assumptions, 28)).toBe(false) // 28 is not the floor either (27 is)
   })
 
   it('behind (a single person, edge case): the bridge and deferral views run', () => {

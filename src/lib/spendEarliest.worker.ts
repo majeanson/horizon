@@ -1,5 +1,5 @@
 import type { Assumptions, Household } from '../engine/types.ts'
-import { spendEarliest } from './spendModel.ts'
+import { spendAnswer } from './spendModel.ts'
 
 // « And if we spent less in retirement? » — the earliest age that works once the retired spending is `retiredToday`
 // (today's dollars): one search of a dozen full projections, off the page's thread. Nothing here touches the network
@@ -11,9 +11,9 @@ export interface SpendEarliestRequest {
   retiredToday: number
 }
 
-export type SpendEarliestMessage = { earliest: number | null }
+export type SpendEarliestMessage = { earliest: number | null; now: boolean }
 
 self.onmessage = (event: MessageEvent<SpendEarliestRequest>) => {
   const { household, assumptions, retiredToday } = event.data
-  self.postMessage({ earliest: spendEarliest(household, assumptions, retiredToday) } satisfies SpendEarliestMessage)
+  self.postMessage(spendAnswer(household, assumptions, retiredToday) satisfies SpendEarliestMessage)
 }

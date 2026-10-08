@@ -340,3 +340,53 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Amira | 66 | 0 $ | 0 $ | 16 131 $ | 8 006 $ | 14 648 $ | 38 786 $ | 1 367 $ | 1 419 $ | 0 $ |
 
+## heir — Une personne, grand héritage
+
+### Ce qui entre
+
+| Personne | Naissance | Retraite | Revenu | Rentes publiques |
+| --- | --- | --- | --- | --- |
+| Jules | né·e en 1999-09 | retraite à 30 ans | salaire 62 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2017) |
+| ↳ comptes | REER 18 000 $ (+0 $/an) | CELI 70 000 $ (+5 000 $/an) | non enregistré 3 500 000 $ (+0 $/an) | rente d’employeur : aucune |
+
+Dépenses : 52 000 $ par année en travaillant, 54 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+### Ce qui sort
+
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 6 790 234 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 27 ans.
+
+### Le calcul des rentes
+
+| Personne | RRQ | PSV |
+| --- | --- | --- |
+| Jules | première rente 10/2064 : (base 891,24 $ + 1ʳᵉ supp. 253,41 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 144,65 $/mois, soit 520 $ d’aujourd’hui | première pension 10/2064 : 1 679,65 $ × résidence 100 % × report 0,0 % = 1 679,65 $/mois, soit 763 $ d’aujourd’hui |
+
+### Année par année — Jules (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
+
+| Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 27 | 52 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 559 $ | 10 801 $ | 3 726 290 $ | tire du nid |
+| 30 | 54 000 $ | 42 560 $ | 0 $ | 0 $ | 0 $ | 0 $ | 20 250 $ | 5 600 $ | 3 908 292 $ | tire du nid |
+| 35 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 002 569 $ | tire du nid |
+| 40 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 106 273 $ | tire du nid |
+| 45 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 220 356 $ | tire du nid |
+| 50 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 345 863 $ | tire du nid |
+| 55 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 226 $ | 226 $ | 4 483 231 $ | tire du nid |
+| 60 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 417 $ | 417 $ | 4 633 286 $ | tire du nid |
+| 65 | 54 000 $ | 0 $ | 0 $ | 1 559 $ | 2 288 $ | 252 $ | 49 902 $ | 0 $ | 4 802 273 $ | tire du nid |
+| 70 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 9 150 $ | 202 $ | 40 081 $ | 1 669 $ | 5 061 587 $ | tire du nid |
+| 75 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 9 379 $ | 0 $ | 40 122 $ | 1 737 $ | 5 344 099 $ | tire du nid |
+| 80 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 39 702 $ | 2 003 $ | 5 657 395 $ | tire du nid |
+| 85 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 39 830 $ | 2 131 $ | 6 000 738 $ | tire du nid |
+| 90 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 39 938 $ | 2 239 $ | 6 377 223 $ | tire du nid |
+| 95 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 40 030 $ | 2 330 $ | 6 790 234 $ | tire du nid |
+
+### Année témoin pour un calculateur d’impôt : 2030, en dollars d’aujourd’hui
+
+Montants de l’année divisés par l’inflation : les barèmes sont indexés sur les prix, donc un calculateur 2026 doit donner presque la même chose (à 1 % près, les arrondis des barèmes). Le revenu net compte aussi le fractionnement du revenu de pension et les gains en capital réalisés : ce n’est pas la somme des colonnes.
+
+| Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Jules | 31 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 584 $ | 0 $ | 0 $ | 0 $ |
+

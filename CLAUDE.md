@@ -113,7 +113,7 @@ npm run typecheck      # tsc -b --noEmit
 npm test               # vitest run — the engine, the guards, the helpers
 npm run test:engine    # vitest run src/engine only
 npm run sources        # regenerate SOURCES.md (FR) and SOURCES.en.md (EN) from the params files
-npm run examples       # regenerate EXAMPLES.md (the seven example households, printed) from the engine
+npm run examples       # regenerate EXAMPLES.md (the eight example households, printed) from the engine
 npm run check:bundle   # size budgets + the offline precache check (needs dist/)
 npm run knip           # dead-code gate (CI only: its parser needs a >4 GiB buffer that a memory-tight Windows box refuses)
 npm run e2e            # Playwright against Vite, profile seeded into localStorage
@@ -168,7 +168,7 @@ a box without one can commit a figure that blanks the plan at the next launch) �
 `twins` (every cited page has its other-language edition in `engine/params/twins.ts`, or a stated
 reason it has none; a new source must decide) · `verifiedHeader` (every worked example names its source) ·
 `fixtureSanity` (the golden couple, the example and every fixture hold to what life allows — earnings vs the cited ceilings, room vs the law, retired spending ≤ 1,05 × working — canary + ALLOWED reasons) ·
-`documentLang` (the head and manifest follow the reader's language) · `vocabulary` (words ruled out of the copy, in any case: « pécule » → « nid ») · `examplesMd` (EXAMPLES.md is the engine's own print of the seven example households: `npm run examples`) · the copy tests of the lazily-loaded results copy (`bridgeCopy`, `deferralCopy`, `resultsCopy`: non-empty, translated, no rate retyped).
+`documentLang` (the head and manifest follow the reader's language) · `vocabulary` (words ruled out of the copy, in any case: « pécule » → « nid ») · `examplesMd` (EXAMPLES.md is the engine's own print of the eight example households: `npm run examples`) · the copy tests of the lazily-loaded results copy (`bridgeCopy`, `deferralCopy`, `resultsCopy`: non-empty, translated, no rate retyped).
 
 > **A new guard must be run against the bug it was written for before it is trusted.** A green
 > grep test proves nothing on its own — plant the violation (or stash the fix), watch the guard

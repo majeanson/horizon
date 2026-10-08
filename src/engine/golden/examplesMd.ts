@@ -22,6 +22,7 @@ const NAMES: Record<string, string> = {
   behind: 'Une personne, en retard',
   retired: 'Couple à la retraite',
   newcomer: 'Arrivée au Canada à 30 ans',
+  heir: 'Une personne, grand héritage',
 }
 
 function personTable(p: Person): string[] {
