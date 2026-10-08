@@ -15,6 +15,7 @@ import { SpendView } from '../components/results/SpendView'
 import { StopView } from '../components/results/StopView'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
+import { usePinOffset } from '../lib/pinOffset'
 import { SubTabs } from '../components/SubTabs'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
@@ -51,6 +52,7 @@ type View = 'answer' | 'strategies' | 'verify'
 const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
 export function Resultats() {
+  const pinned = usePinOffset()
   const t = useT()
   const { lang } = useLang()
   const r = t.results
@@ -246,7 +248,7 @@ export function Resultats() {
           ]
 
   return (
-    <section className="page-body">
+    <section className="page-body results-page" ref={pinned}>
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
       {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
       <Cluster className="no-print">
@@ -254,7 +256,7 @@ export function Resultats() {
           {rc.out.print}
         </Chip>
       </Cluster>
-      {/* The three views and the map of the open one stay pinned under the top bar while the page scrolls. */}
+      {/* The three views stay pinned under the top bar while the page scrolls; the map of the open view pins under them from 860 px (usePinOffset measures both). */}
       <div className="results-pin">
       <SubTabs
         ariaLabel={rc.tabs.label}
@@ -266,8 +268,8 @@ export function Resultats() {
           { key: 'verify' as const, label: rc.tabs.verify },
         ]}
       />
-      <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
       </div>
+      <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
 
       {/* 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
       {view === 'answer' && (

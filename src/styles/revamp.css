@@ -53,8 +53,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  /* clear of the top bar AND the pinned views + map (.results-pin) */
-  scroll-margin-top: 13rem;
+  /* clear of the top bar AND whatever is pinned under it: usePinOffset measures --pin-h (the fallback is the wide layout) */
+  scroll-margin-top: calc(var(--bar-h) + var(--pin-h, 7rem) + 0.75rem);
   min-width: 0;
 }
 /* A group label inside the sticky map: reading order only, never a control. */
@@ -165,26 +165,27 @@
   padding-top: 0.6rem;
 }
 
-/* ── Résultats: the views and the section map pinned together ────────────── */
-/* One sticky block (not two stacked sticky rows, whose offsets drift with text size): the three views, then the map of
-   the open one. It rides under the top bar on every width, so a reader deep in the table can still switch view. */
+/* ── Résultats: the views (and, from 860 px, the section map) pinned under the top bar ─────────────────────────────── */
+/* The three views ride under the top bar at every width, so a reader deep in the table can still switch view. The map of
+   the open view pins under them only where there is room: on a phone it would take a quarter of the screen, so it scrolls
+   away with the page. Both offsets are MEASURED (lib/pinOffset.ts sets --tabs-h and --pin-h) and never typed in rem. */
 .results-pin {
   position: sticky;
   top: var(--bar-h);
   z-index: 15;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
   margin: 0 calc(-1 * var(--gutter));
-  padding: 0.35rem var(--gutter) 0;
+  padding: 0.35rem var(--gutter);
   background: var(--paper);
   border-bottom: 1px solid var(--line);
 }
-.results-pin .section-nav {
+.results-page .section-nav {
   position: static;
-  margin: 0;
-  padding: 0 0 0.35rem;
-  border-bottom: 0;
+}
+@media (min-width: 860px) {
+  .results-page .section-nav {
+    position: sticky;
+    top: calc(var(--bar-h) + var(--tabs-h, 3.5rem));
+  }
 }
 
 /* ── Résultats: the chart's « Détail » view — the same shape for one person or two ─────────────────────── */
@@ -201,4 +202,15 @@
 .chart-detail__heading {
   margin: 0.6rem 0 0;
   font-size: var(--text-sm);
+}
+
+/* A tab that stands for a person wears their colour as a dot (the name stays the label). */
+.subtabs__opt .who-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-inline-end: 0.4rem;
+  border-radius: 50%;
+  background: var(--who);
+  flex: none;
 }

@@ -16,6 +16,9 @@ interface SubTabOption<K extends string> {
   // Accessible name + tooltip for a segment whose `label` carries no text (an icon-only
   // tab). Without it such a tab reaches AT as an unnamed button.
   ariaLabel?: string
+  // The household position (0 first person, 1 second) of a tab that stands for a PERSON: a dot in that person's colour
+  // before the name — never the only cue, the name is the label.
+  who?: 0 | 1
 }
 
 export function SubTabs<K extends string>({
@@ -115,11 +118,12 @@ export function SubTabs<K extends string>({
             role="tab"
             aria-selected={value === o.key}
             tabIndex={value === o.key ? 0 : -1}
-            className={'subtabs__opt' + (value === o.key ? ' is-on' : '')}
+            className={'subtabs__opt' + (value === o.key ? ' is-on' : '') + (o.who === undefined ? '' : ` who--${o.who}`)}
             aria-label={o.ariaLabel}
             title={o.ariaLabel}
             onClick={() => onSelect(o.key)}
           >
+            {o.who !== undefined && <span className="who-dot" aria-hidden="true" />}
             {o.icon && <InlineIcon name={o.icon} size={15} />}
             {o.label}
           </button>

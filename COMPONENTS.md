@@ -59,7 +59,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **FieldRow** | `src/components/FieldRow.tsx` | One labelled field: label tied to the box, the box with its ⓘ, a quiet hint read with it. The control is a render function that receives the ids to wire — the caller never invents them. |
 | **FieldInfo** | `src/components/FieldInfo.tsx` | The ⓘ « where to find this number »: an inline note (not a popover) with WHERE the figure is, the document's own wording for it, and the official page. Wording lives in `FR.info.<id>`; `fieldInfoCopy.test.ts` holds every id to an entry and every link to an official host. |
 | **Chip** · ChipGroup | `src/components/Chip.tsx` | The ONE pill — toggle (`selected`), action (`onClick`), link (`to`), static label, expander (`expanded`), the « you are here » of a nav (`current`). A test (`chip-rule.test.ts`) fails the build on a hand-rolled `className="chip"`. |
-| **SubTabs** | `src/components/SubTabs.tsx` | The segmented « one job at a time » control; keyboard-complete tablist, wheel-mapped, paging chevrons on a fine pointer. |
+| **SubTabs** | `src/components/SubTabs.tsx` | The segmented « one job at a time » control; keyboard-complete tablist, wheel-mapped, paging chevrons on a fine pointer. An option may carry `who` (0 / 1) to wear a person's colour dot. |
 
 ### Display / content
 

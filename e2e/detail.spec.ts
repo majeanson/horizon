@@ -26,3 +26,48 @@ test('« Détail » shows where the money comes from, what the accounts hold, an
   await expect(chart.getByRole('heading', { name: 'Ce que contiennent les comptes' })).toBeVisible()
   await expect(chart.getByRole('heading', { name: 'Sous les trois jeux d’hypothèses' })).toBeVisible()
 })
+
+// How much is pinned depends on the room: the views everywhere, the section map only from 860 px up. A tapped section
+// must stop BELOW whatever is pinned — measured, not guessed (lib/pinOffset.ts).
+for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['desktop', 1280, 720, true]] as const) {
+  test(`${name}: the views are pinned${mapPinned ? ' with the section map' : ', the map scrolls away'}, and a tapped section stops below them`, async ({ page }) => {
+    await page.setViewportSize({ width, height })
+    await page.goto('/resultats')
+    await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
+    const pin = page.locator('.results-pin')
+    const nav = page.locator('.section-nav')
+    await expect(pin).toBeVisible()
+    await page.locator('#root').evaluate((el) => el.scrollTo({ top: 1500 }))
+    const pinBox = (await pin.boundingBox())!
+    await expect.poll(async () => ((await nav.boundingBox())!.y >= pinBox.y + pinBox.height - 1)).toBe(mapPinned)
+    // Back at the top, tap « Dépenser » in the map: the section stops under the pinned chrome, fully clear of it.
+    await page.locator('#root').evaluate((el) => el.scrollTo({ top: 0 }))
+    await expect.poll(() => page.locator('#root').evaluate((el) => el.scrollTop)).toBe(0) // the page may scroll smoothly: tap only once it is back
+    // …and only once the page has stopped growing: a smooth scroll aims at where the section WAS when it began.
+    let last = -1
+    await expect
+      .poll(async () => {
+        const h = await page.locator('#root').evaluate((el) => el.scrollHeight)
+        const same = h === last
+        last = h
+        return same
+      }, { intervals: [600] })
+      .toBe(true)
+    await nav.getByRole('button', { name: 'Dépenser' }).click()
+    const target = page.locator('#depenser')
+    // The page settles (a smooth scroll, the worker's answers replacing skeletons) before it is measured: poll the landing
+    // spot until it holds, instead of guessing how long that takes.
+    await expect
+      .poll(
+        async () => {
+          const navBox = (await nav.boundingBox())!
+          const pinNow = (await pin.boundingBox())!
+          const clear = mapPinned ? navBox.y + navBox.height : pinNow.y + pinNow.height
+          const top = (await target.boundingBox())!.y
+          return top >= clear - 2 && top < clear + 120 // clear of the chrome, and close to it: scrolled TO, not left below the fold
+        },
+        { timeout: 10_000, message: 'landing' },
+      )
+      .toBe(true)
+  })
+}

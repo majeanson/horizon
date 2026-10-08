@@ -177,7 +177,7 @@ function DetailView({
           ariaLabel={c.who}
           value={who}
           onSelect={setPickedWho}
-          options={[{ key: 'all', label: c.everyone }, ...household.persons.map((p, i) => ({ key: p.id as string, label: names[i] ?? '' }))]}
+          options={[{ key: 'all', label: c.everyone }, ...household.persons.map((p, i) => ({ key: p.id as string, label: names[i] ?? '', who: Math.min(i, 1) as 0 | 1 }))]}
         />
       )}
       {/* The same heading shape for one person or two: the person (or « both »), in their colour. */}

@@ -362,10 +362,10 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
         </p>
       )}
       {household.persons.length > 1 && (
-        <SubTabs ariaLabel={copy.person} value={levers.id} onSelect={pickPerson} options={household.persons.map((p, i) => ({ key: p.id, label: names[i] ?? '' }))} />
+        <SubTabs ariaLabel={copy.person} value={levers.id} onSelect={pickPerson} options={household.persons.map((p, i) => ({ key: p.id, label: names[i] ?? '', who: Math.min(i, 1) as 0 | 1 }))} />
       )}
 
-      <div className="bridge__levers">
+      <div className={'bridge__levers' + (household.persons.length > 1 ? ` who who--${Math.min(Math.max(0, household.persons.findIndex((p) => p.id === levers.id)), 1)}` : '')}>
         <p className="field-row__hint">{copy.agesLine(copy.age(levers.retirementAge), copy.age(levers.rrqStartAge), copy.age(levers.oasStartAge))}</p>
         {household.persons.length > 1 && (
           <Cluster>
