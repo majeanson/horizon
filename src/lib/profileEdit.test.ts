@@ -5,11 +5,12 @@ import { describe, expect, it } from 'vitest'
 import { presetOf } from '../engine/assumptionPresets.ts'
 import { makeRrqRules } from '../engine/rrqRules.ts'
 import { rregopPension } from '../engine/presets.ts'
-import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears } from './earnings.ts'
+import { ASSUMED_FIRST_JOB_AGE, earningsCeiling, fillFromSalary, historyYears } from './earnings.ts'
 import {
   addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, removeChild, removePension, removeSpouse,
-  applyDeferredRule, isRregopRules, needsDeferredRule, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
+  applyDeferredRule, isRregopRules, needsDeferredRule, restoreCustom, scenarioOf, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
+import { migrateProfile } from './migrations.ts'
 import { profileGaps } from './profileGaps.ts'
 import { defaultProfile, SCHEMA_VERSION, validateProfile, type Profile } from './schema.ts'
 
@@ -133,19 +134,30 @@ describe('earnings helpers', () => {
     expect(historyYears({ ...person(), birth: { year: 1940, month: 1 } }, 2025)[0]).toBe(1966)
   })
 
-  it('fills only the years not typed, deflating today\'s pay, capped at the MGA, from the assumed first-job age', () => {
+  it('fills only the years not typed, deflating today\'s pay, capped at each year ceiling, from the assumed first-job age', () => {
     const blank = { ...person(), earningsHistory: { 2020: 55_000 } }
-    const filled = fillFromSalary(blank, TODAY, 0.03, rules.mga)
+    const ceiling = earningsCeiling(rules)
+    const filled = fillFromSalary(blank, TODAY, 0.03, ceiling)
     expect(filled[2020]).toBe(55_000) // a typed year is never overwritten
     expect(filled[1999]).toBeUndefined() // before the assumed first job (age 22 → 2000)
     expect(1978 + ASSUMED_FIRST_JOB_AGE).toBe(2000)
-    expect(filled[2025]).toBe(Math.round(Math.min(85_000 / 1.03, rules.mga(2025))))
-    for (const [year, pay] of Object.entries(filled)) expect(pay, year).toBeLessThanOrEqual(Math.max(55_000, rules.mga(Number(year))))
+    expect(filled[2025]).toBe(Math.round(Math.min(85_000 / 1.03, ceiling(2025))))
+    for (const [year, pay] of Object.entries(filled)) expect(pay, year).toBeLessThanOrEqual(Math.max(55_000, ceiling(Number(year))))
+  })
+
+  it('a high salary is capped at the ADDITIONAL ceiling from 2024 (what the relevé counts), not at the plain maximum', () => {
+    const high = { ...person(), salaryToday: 120_000, earningsHistory: {} }
+    const ceiling = earningsCeiling(rules)
+    const filled = fillFromSalary(high, TODAY, 0.03, ceiling)
+    expect(rules.yampe(2025)).toBeGreaterThan(rules.mga(2025))
+    expect(filled[2025]).toBe(rules.yampe(2025)) // 81 200 $, not 71 300 $
+    expect(filled[2024]).toBe(rules.yampe(2024))
+    expect(filled[2023]).toBe(rules.mga(2023)) // before 2024 there is no additional ceiling
   })
 
   it('does nothing without a salary', () => {
     const none = { ...person(), salaryToday: 0, earningsHistory: {} }
-    expect(fillFromSalary(none, TODAY, 0.03, rules.mga)).toEqual({})
+    expect(fillFromSalary(none, TODAY, 0.03, earningsCeiling(rules))).toEqual({})
   })
 
 })
@@ -192,5 +204,51 @@ describe('the deferred rule on a RREGOP pension saved without it', () => {
     expect(applyDeferredRule(renamed).deferred).toEqual(rregopPension({ serviceYearsToDate: 10, startAge: 60 }).deferred)
     const paying = { ...saved, inPay: { annual: 12_000 } }
     expect(applyDeferredRule(paying)).toBe(paying)
+  })
+})
+
+describe('« Personnalisé » is kept while a ready-made scenario is on', () => {
+  const mine = () => setReturn(setAssumptions(applyPreset(golden(), 'neutral'), { inflation: 0.031 }), 'rrsp', 0.07) // hand-typed: matches no preset
+
+  it('a hand-typed scenario is kept aside when a ready-made one replaces it, and nothing is kept when a preset replaces a preset', () => {
+    const p = mine()
+    expect(presetOf(p.assumptions)).toBeNull()
+    const prudent = applyPreset(p, 'prudent')
+    expect(presetOf(prudent.assumptions)).toBe('prudent')
+    expect(prudent.customScenario).toEqual(scenarioOf(p.assumptions))
+    valid(prudent)
+    // preset → preset keeps what was kept (and keeps nothing new)
+    expect(applyPreset(prudent, 'bold').customScenario).toEqual(prudent.customScenario)
+    expect(applyPreset(applyPreset(golden(), 'prudent'), 'bold').customScenario).toBeNull()
+  })
+
+  it('restoreCustom takes the kept figures back, copies them, keeps the rest of the assumptions, and is a no-op when none is kept or they are in use', () => {
+    const p = mine()
+    const away = applyPreset(p, 'bold')
+    const back = restoreCustom(away)
+    expect(scenarioOf(back.assumptions)).toEqual(scenarioOf(p.assumptions))
+    expect(back.assumptions.withdrawalOrder).toEqual(p.assumptions.withdrawalOrder)
+    expect(back.assumptions.returns).not.toBe(back.customScenario!.returns) // a copy: editing one never edits the other
+    valid(back)
+    expect(restoreCustom(back)).toBe(back) // already in use
+    expect(restoreCustom(golden())).toEqual(golden()) // none kept
+    // the round trip survives going away again: still kept, and a preset in between changes nothing about it
+    expect(applyPreset(back, 'prudent').customScenario).toEqual(scenarioOf(p.assumptions))
+  })
+
+  it('what is kept is saved with the profile: it survives a validate round trip, and a bad figure is refused', () => {
+    const away = applyPreset(mine(), 'prudent')
+    const read = validateProfile(JSON.parse(JSON.stringify(away)))
+    expect(read.ok && read.profile.customScenario).toEqual(away.customScenario)
+    const bad = JSON.parse(JSON.stringify(away))
+    bad.customScenario.inflation = 9
+    const refused = validateProfile(bad)
+    expect(!refused.ok && refused.problems.map((x) => x.path)).toContain('customScenario.inflation')
+  })
+
+  it('a version-6 file opens with nothing kept', () => {
+    const old = JSON.parse(readFileSync(join(dir, 'fixtures', 'profile.v6.json'), 'utf8'))
+    const read = migrateProfile(old)
+    expect(read.ok && read.profile.customScenario).toBeNull()
   })
 })

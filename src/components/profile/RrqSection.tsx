@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { makeRrqRules } from '../../engine/rrqRules'
 import { useLang, useT } from '../../i18n'
-import { fillFromSalary, historyYears } from '../../lib/earnings'
+import { earningsCeiling, fillFromSalary, historyYears } from '../../lib/earnings'
 import { formatYearAge } from '../../lib/format'
 import { setEarning } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
@@ -23,6 +23,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
   const { assumptions } = useProfile()
   const now = today()
   const rules = useMemo(() => makeRrqRules({ inflation: assumptions.inflation, wageGrowth: assumptions.wageGrowth }), [assumptions.inflation, assumptions.wageGrowth])
+  const ceiling = useMemo(() => earningsCeiling(rules), [rules])
   const years = useMemo(() => historyYears(person, now.year - 1), [person, now.year])
   const typed = Object.keys(person.earningsHistory).length
   // The note under the fill action and, while nothing else has been touched since, the way back:
@@ -31,7 +32,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
   const [filledNote, setFilledNote] = useState<{ note: string; before: Record<number, number> | null } | null>(null)
 
   const fill = () => {
-    const filled = fillFromSalary(person, now, assumptions.wageGrowth, rules.mga)
+    const filled = fillFromSalary(person, now, assumptions.wageGrowth, ceiling)
     const added = Object.keys(filled).length - typed
     setFilledNote(added > 0 ? { note: r.filled(added), before: person.earningsHistory } : { note: r.nothingToFill, before: null })
     if (added > 0) edit((x) => ({ ...x, earningsHistory: filled }))
@@ -73,7 +74,10 @@ export function RrqSection({ person, edit }: PersonEditor) {
           <ul className="earnings__list">
             {years.map((year) => (
               <li key={year} className="earnings__row">
-                <span className="earnings__year mono" aria-hidden="true">{formatYearAge(year, [person.birth.year], lang)}</span>
+                <span className="earnings__year mono" aria-hidden="true">
+                  {formatYearAge(year, [person.birth.year], lang)}
+                  {(person.earningsHistory[year] ?? 0) >= ceiling(year) && <span className="earnings__cap"> · {r.capped}</span>}
+                </span>
                 <NumberField
                   kind="money"
                   allowEmpty

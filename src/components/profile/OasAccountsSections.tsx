@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { Person } from '../../engine/types'
 import type { InfoId } from '../../i18n'
 import { useT } from '../../i18n'
+import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { Section, type PersonEditor } from './shared'
@@ -19,6 +20,10 @@ export function OasSection({ person, edit }: PersonEditor) {
           <NumberField kind="year" min={1900} max={2100} value={person.oas.residentSince} onChange={(residentSince) => edit((x) => ({ ...x, oas: { ...x.oas, residentSince } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
+      {/* The quick answer for someone born here: the year of birth (the OAS counts only the years after 18, whatever is written). */}
+      <Chip selected={person.oas.residentSince <= person.birth.year} onClick={() => edit((x) => ({ ...x, oas: { ...x.oas, residentSince: x.birth.year } }))}>
+        {o.sinceBirth}
+      </Chip>
       <FieldRow label={o.startAge} infoId="oasStartAge" hint={o.startHint}>
         {(w) => (
           <NumberField kind="int" min={65} max={70} unit={t.fields.years} value={person.oas.startAge} onChange={(startAge) => edit((x) => ({ ...x, oas: { ...x.oas, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />

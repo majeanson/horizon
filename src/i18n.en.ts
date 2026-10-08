@@ -120,7 +120,8 @@ export const EN: typeof FR = {
       earningsHint: 'Copy the list from your statement. A year left blank counts as zero.',
       earningsYear: (year: number) => `Pensionable earnings for ${year}`,
       fill: 'Estimate the blank years from the current salary',
-      fillHint: 'An estimate to correct: it deflates your current salary and never touches a year you already entered.',
+      fillHint: 'An estimate to correct: it deflates your current salary, capped at each year’s maximum (the statement counts nothing above it), and never touches a year you already entered.',
+      capped: 'ceiling',
       filled: (n: number) => (n === 1 ? '1 year estimated' : `${n} years estimated`),
       fillUndo: 'Remove the estimated years',
       nothingToFill: 'No year to estimate: enter a salary first, or every year is already filled.',
@@ -128,6 +129,7 @@ export const EN: typeof FR = {
     oas: {
       title: 'Old Age Security (OAS)',
       residentSince: 'Resident of Canada since (year)',
+      sinceBirth: 'Since birth',
       residentHint: 'The year you began living in Canada, after turning 18. Forty years of residence earn the full pension.',
       startAge: 'Age OAS starts',
       startHint: '65 to 70. Each month deferred raises the pension by 0.6%.',
@@ -215,7 +217,9 @@ export const EN: typeof FR = {
       neutral: 'Neutral',
       bold: 'Aggressive',
       custom: 'Custom',
-      confirmReplace: (name: string) => `Replace your custom assumptions with the ${name} scenario? Your current values — inflation, wages, returns, horizon — will be overwritten.`,
+      confirmReplace: (name: string) => `A Custom scenario is already kept aside. Keep your current values — inflation, wages, returns, horizon — instead, before switching to the ${name} scenario? The old Custom will be replaced.`,
+      kept: 'Your custom values are kept: tap “Custom” to go back to them.',
+      keptSummary: (summary: string) => `Custom, kept: ${summary}`,
       confirmLabel: 'Replace',
       blurb: {
         prudent: 'Lower returns, higher inflation, a longer life: a plan that holds here has room to spare.',

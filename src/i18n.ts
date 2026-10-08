@@ -136,7 +136,8 @@ export const FR = {
       earningsHint: 'Recopiez la liste de votre relevé. Une année laissée vide compte pour zéro.',
       earningsYear: (year: number) => `Revenus admissibles de ${year}`,
       fill: 'Estimer les années vides à partir du salaire actuel',
-      fillHint: 'Une estimation à corriger : elle déflate votre salaire actuel et ne touche jamais une année déjà saisie.',
+      fillHint: 'Une estimation à corriger : elle déflate votre salaire actuel, plafonné au maximum de chaque année (le relevé ne compte pas au-delà), et ne touche jamais une année déjà saisie.',
+      capped: 'plafond',
       filled: (n: number) => (n === 1 ? '1 année estimée' : `${n} années estimées`),
       fillUndo: 'Retirer les années estimées',
       nothingToFill: 'Aucune année à estimer : saisissez un salaire d’abord, ou toutes les années sont remplies.',
@@ -144,6 +145,7 @@ export const FR = {
     oas: {
       title: 'Pension de la Sécurité de la vieillesse (PSV)',
       residentSince: 'Résident du Canada depuis (année)',
+      sinceBirth: 'Depuis la naissance',
       residentHint: 'L’année où vous avez commencé à vivre au Canada, après vos 18 ans. Quarante ans de résidence donnent la pension complète.',
       startAge: 'Âge de début de la PSV',
       startHint: 'De 65 à 70 ans. Chaque mois reporté augmente la pension de 0,6 %.',
@@ -231,7 +233,9 @@ export const FR = {
       neutral: 'Neutre',
       bold: 'Audacieux',
       custom: 'Personnalisé',
-      confirmReplace: (name: string) => `Remplacer vos hypothèses personnalisées par le scénario ${name} ? Vos valeurs actuelles — inflation, salaires, rendements, horizon — seront écrasées.`,
+      confirmReplace: (name: string) => `Un scénario Personnalisé est déjà gardé de côté. Garder plutôt vos valeurs actuelles — inflation, salaires, rendements, horizon — avant de passer au scénario ${name} ? L’ancien Personnalisé sera remplacé.`,
+      kept: 'Vos valeurs personnalisées sont gardées : touchez « Personnalisé » pour y revenir.',
+      keptSummary: (summary: string) => `Personnalisé gardé : ${summary}`,
       confirmLabel: 'Remplacer',
       blurb: {
         prudent: 'Rendements plus bas, inflation plus haute, vie plus longue : un plan qui tient ici a de la marge.',

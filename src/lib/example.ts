@@ -14,5 +14,6 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
     household: structuredClone(e.household),
     children: [...e.children],
     assumptions: structuredClone(assumptions),
+    customScenario: null,
   }
 }

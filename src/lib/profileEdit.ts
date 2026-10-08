@@ -1,7 +1,7 @@
 import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
 import { rregopPension } from '../engine/presets.ts'
 import type { AccountKind, DbPension, Person, PersonId } from '../engine/types.ts'
-import { blankPerson, type Profile, type StoredAssumptions } from './schema.ts'
+import { blankPerson, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
 
 // Every way the pages change a profile, as a pure function from profile to profile. A page never builds a new
 // profile by hand: it calls one of these, which is why each can be tested without a browser and why the pages
@@ -26,10 +26,32 @@ export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): P
   return { ...p, assumptions: { ...p.assumptions, ...patch } }
 }
 
-/** Lay a ready-made set of assumptions over the profile's; the same object back when it is already exactly that set. */
+/** The four figures that make a scenario (what the three ready-made sets also fix). */
+export const scenarioOf = (a: Profile['assumptions']): CustomScenario => ({ inflation: a.inflation, wageGrowth: a.wageGrowth, returns: { ...a.returns }, horizonAge: a.horizonAge })
+
+/** Do these two scenarios hold the same figures (a typed « 3,1 » is 3.1 / 100, not always bit-equal)? */
+export function sameScenario(x: CustomScenario, y: CustomScenario): boolean {
+  const same = (a: number, b: number) => Math.abs(a - b) < 1e-9
+  return same(x.inflation, y.inflation) && same(x.wageGrowth, y.wageGrowth) && x.horizonAge === y.horizonAge && same(x.returns.rrsp, y.returns.rrsp) && same(x.returns.tfsa, y.returns.tfsa) && same(x.returns.nonReg, y.returns.nonReg)
+}
+
+/**
+ * Lay a ready-made set of assumptions over the profile's; the same object back when it is already exactly that set.
+ * When what is being replaced is the person's OWN scenario (it matches none of the three), it is kept aside in
+ * `customScenario` first — « Personnalisé » can then be taken back with `restoreCustom`, so choosing « Prudent » to look
+ * never costs the figures a person spent time typing.
+ */
 export function applyPreset(p: Profile, key: PresetKey): Profile {
   if (presetOf(p.assumptions) === key) return p
-  return { ...p, assumptions: withPreset(p.assumptions, key) }
+  const custom = presetOf(p.assumptions) === null ? scenarioOf(p.assumptions) : p.customScenario
+  return { ...p, assumptions: withPreset(p.assumptions, key), customScenario: custom }
+}
+
+/** Take the kept « Personnalisé » scenario back; the same object when none is kept or it is already what is in use. */
+export function restoreCustom(p: Profile): Profile {
+  const kept = p.customScenario
+  if (kept === null || sameScenario(kept, scenarioOf(p.assumptions))) return p
+  return { ...p, assumptions: { ...p.assumptions, inflation: kept.inflation, wageGrowth: kept.wageGrowth, returns: { ...kept.returns }, horizonAge: kept.horizonAge } }
 }
 
 export function setReturn(p: Profile, kind: AccountKind, value: number): Profile {

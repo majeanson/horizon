@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { EXAMPLE, seedProfile } from './seed'
+import { EXAMPLE, savedProfile, seedProfile } from './seed'
 
 // The results page keeps its three views and the map pinned under the top bar while it scrolls, and the chart's
 // « Détail » view shows the whole picture (sources, accounts, the three sets of hypotheses), not only the net worth.
@@ -135,4 +135,31 @@ test('two people on the Profil: sections start at the same height, the colour fo
   // No input clips its text (a box too narrow for « 1 000 000 » showed « 30 ( »).
   const clipped = await page.locator('.persons--aligned input').evaluateAll((els) => els.filter((e) => (e as HTMLInputElement).scrollWidth > (e as HTMLInputElement).clientWidth + 1).map((e) => e.id))
   expect(clipped).toEqual([])
+})
+
+test('« Depuis la naissance » sets the year of residence to the year of birth, and reads as chosen', async ({ page }) => {
+  await page.goto('/')
+  const person = (await savedProfile(page)).household.persons[0]
+  const chip = page.getByRole('button', { name: 'Depuis la naissance' }).first()
+  await expect(chip).toHaveAttribute('aria-pressed', 'false')
+  await chip.click()
+  await expect.poll(async () => (await savedProfile(page)).household.persons[0].oas.residentSince).toBe(person.birth.year)
+  await expect(chip).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('the estimate for a high salary stops at each year’s ceiling — the additional one from 2024 — and says so', async ({ page }) => {
+  // A history with nothing typed and a 120 000 $ salary: every past year is an estimate.
+  const seed = structuredClone(EXAMPLE) as { household: { persons: { salaryToday: number; earningsHistory: Record<string, number> }[] } }
+  seed.household.persons[0].salaryToday = 120_000
+  seed.household.persons[0].earningsHistory = {}
+  await seedProfile(page, seed)
+  await page.goto('/')
+  const section = page.locator('.persons .profile-section', { hasText: 'Revenus de travail admissibles par année' }).first()
+  await section.getByRole('button', { name: /Estimer les années vides/ }).click()
+  // 2025: the additional ceiling (81 200 $), not the plain maximum (71 300 $); the row says it is at the ceiling.
+  const row = section.locator('.earnings__row', { hasText: '2025' })
+  await expect(row.locator('input')).toHaveValue(/81\s?200/)
+  await expect(row).toContainText('plafond')
+  // 2023 (before the additional ceiling existed): the plain maximum, 66 600 $.
+  await expect(section.locator('.earnings__row', { hasText: '2023' }).locator('input')).toHaveValue(/66\s?600/)
 })

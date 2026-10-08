@@ -15,9 +15,10 @@ import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { formatPct } from '../lib/format'
-import { applyPreset, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
+import { applyPreset, restoreCustom, sameScenario, scenarioOf, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
+import { useNotice } from '../lib/toast'
 
 // What the household assumes about the future, and what it spends. These are the person's own numbers: nothing
 // here is an official figure, and the page says so. Each change is one pure profile edit (lib/profileEdit.ts).
@@ -29,10 +30,12 @@ export function Hypotheses() {
   const gaps = profileGaps(profile)
   const { lang } = useLang()
   const confirm = useConfirm()
+  const notice = useNotice()
+  const kept = profile.customScenario
   const active = presetOf(assumptions)
   const [sourcesOpen, setSourcesOpen] = useState(false)
-  const presetSummary = (key: PresetKey) => {
-    const v = ASSUMPTION_PRESETS[key]
+  const presetSummary = (key: PresetKey | 'kept') => {
+    const v = key === 'kept' ? kept! : ASSUMPTION_PRESETS[key]
     const pct = (x: number) => formatPct(x, lang, 1)
     return a.presets.summary(pct(v.inflation), pct(v.wageGrowth), [v.returns.rrsp, v.returns.tfsa, v.returns.nonReg].map(pct).join(' / '), v.horizonAge)
   }
@@ -54,19 +57,28 @@ export function Hypotheses() {
           value={active ?? 'custom'}
           options={[
             ...(['prudent', 'neutral', 'bold'] as const).map((key) => ({ key, label: a.presets[key], tone: key })),
-            ...(active === null ? [{ key: 'custom' as const, label: a.presets.custom }] : []),
+            // « Personnalisé » stays on offer while one is kept aside, so a ready-made scenario can be tried and left again.
+            ...(active === null || kept !== null ? [{ key: 'custom' as const, label: a.presets.custom }] : []),
           ]}
           onSelect={async (key) => {
-            if (key === 'custom') return
-            // Hand-tuned values are the one state a preset tap destroys with no way back: every other
-            // replace in the app confirms and names what is lost, so this one does too. From a preset,
-            // the tap is reversible (tap the old preset back) and asks nothing.
-            if (active === null && !(await confirm({ message: a.presets.confirmReplace(a.presets[key]), confirmLabel: a.presets.confirmLabel, tone: 'default' }))) return
+            if (key === 'custom') {
+              // Back to the kept hand-typed scenario (already the one in use: nothing to do).
+              if (active !== null) updateProfile(restoreCustom)
+              return
+            }
+            // Leaving the person's OWN scenario keeps it aside (« Personnalisé » takes it back), so nothing is lost and nothing is asked —
+            // except when that would replace a DIFFERENT one already kept: then it says so first.
+            if (active === null) {
+              if (kept !== null && !sameScenario(kept, scenarioOf(assumptions)) && !(await confirm({ message: a.presets.confirmReplace(a.presets[key]), confirmLabel: a.presets.confirmLabel, tone: 'default' }))) return
+              notice(a.presets.kept)
+            }
             updateProfile((p) => applyPreset(p, key))
           }}
         />
         <p className="field-row__hint">{active === null ? a.presets.blurb.custom : a.presets.blurb[active]}</p>
         {active !== null && <p className="field-row__hint mono">{presetSummary(active)}</p>}
+        {/* What « Personnalisé » holds while a ready-made scenario is on: the figures can be seen before going back to them. */}
+        {active !== null && kept !== null && <p className="field-row__hint mono">{a.presets.keptSummary(presetSummary('kept'))}</p>}
         <div className="preset-sources">
           {/* Folded by default: the provenance is for whoever asks, not for everyone who lands here. */}
           <Chip selected={sourcesOpen} expanded={sourcesOpen} onClick={() => setSourcesOpen((o) => !o)}>

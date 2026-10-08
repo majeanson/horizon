@@ -466,9 +466,22 @@ test('the scenario picker sets the economy, follows a hand edit, and the desktop
   await rrsp.press('Enter')
   await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveAttribute('aria-selected', 'true')
   await picker.getByRole('tab', { name: 'Neutre' }).click()
-  // Hand-tuned values are the one state a preset tap would destroy silently: it asks first, naming what is lost.
+  // Leaving « Personnalisé » keeps it aside: nothing is lost, so nothing is asked — and it stays on offer, to take back.
+  await expect(page.getByRole('alertdialog')).toHaveCount(0)
+  await expect.poll(async () => (await savedProfile(page)).assumptions.returns.rrsp).toBe(0.045)
+  await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveAttribute('aria-selected', 'false')
+  await expect(page.getByText(/Personnalisé gardé/)).toBeVisible()
+  await picker.getByRole('tab', { name: 'Personnalisé' }).click()
+  await expect.poll(async () => (await savedProfile(page)).assumptions.returns.rrsp).toBe(0.07)
+  await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveAttribute('aria-selected', 'true')
+  // A DIFFERENT hand-typed scenario, then a ready-made one: it would replace the one kept, so it asks first.
+  await rrsp.fill('8')
+  await rrsp.press('Enter')
+  await picker.getByRole('tab', { name: 'Prudent' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Remplacer' }).click()
-  await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveCount(0)
+  await picker.getByRole('tab', { name: 'Personnalisé' }).click()
+  await expect.poll(async () => (await savedProfile(page)).assumptions.returns.rrsp).toBe(0.08)
+  await picker.getByRole('tab', { name: 'Neutre' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.returns.rrsp).toBe(0.045)
 
   // Desktop: the field box and the pill stay a readable size, and the page is not glued to one side.

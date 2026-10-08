@@ -39,6 +39,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     const fixPerson = (p: unknown) => (typeof p === 'object' && p !== null && Array.isArray((p as Raw).pensions) ? { ...(p as Raw), pensions: ((p as Raw).pensions as unknown[]).map(fix) } : p)
     return { ...profile, household: { ...(household as Raw), persons: persons.map(fixPerson) } }
   },
+  // v6 → v7: the hand-typed « Personnalisé » scenario may be kept aside (`customScenario`) while a ready-made one is chosen.
+  // Every older file kept none: null.
+  (profile) => ({ ...profile, customScenario: null }),
 ]
 
 export type ReadResult =

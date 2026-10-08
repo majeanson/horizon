@@ -10,12 +10,15 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId }
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 6
+export const SCHEMA_VERSION = 7
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
 
 export type StoredAssumptions = Omit<Assumptions, 'today'>
+
+/** The economy a person typed by hand, kept while a ready-made scenario is chosen, so « Personnalisé » can be taken back. */
+export type CustomScenario = Pick<StoredAssumptions, 'inflation' | 'wageGrowth' | 'returns' | 'horizonAge'>
 
 export interface Profile {
   /** Marks a file as a Horizon profile (an import refuses anything else). */
@@ -25,6 +28,8 @@ export interface Profile {
   /** Birth years only: v1 has no child benefits, so a child changes nothing in the projection. */
   children: number[]
   assumptions: StoredAssumptions
+  /** The hand-typed scenario kept aside when a ready-made one replaced it; null when none is kept. */
+  customScenario: CustomScenario | null
 }
 
 /** What is wrong with one field of a profile read from outside (a file, or storage). The UI words each one. */
@@ -67,6 +72,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,
   },
+  customScenario: null,
 })
 
 // ── Validation: the gate every outside file passes through ──────────────────────────────────────────
@@ -285,6 +291,23 @@ export function validateProfile(raw: unknown): ProfileResult {
     pensionSplitting: r.bool(a.pensionSplitting, 'assumptions.pensionSplitting'),
   }
 
+  // The kept hand-typed scenario: null, or the same four figures as the assumptions, held to the same bounds.
+  let customScenario: CustomScenario | null = null
+  if (root.customScenario !== null) {
+    const c = r.obj(root.customScenario, 'customScenario') ?? {}
+    const cr = r.obj(c.returns, 'customScenario.returns') ?? {}
+    customScenario = {
+      inflation: r.num(c.inflation, 'customScenario.inflation', -0.02, 0.15),
+      wageGrowth: r.num(c.wageGrowth, 'customScenario.wageGrowth', -0.02, 0.15),
+      returns: {
+        nonReg: r.num(cr.nonReg, 'customScenario.returns.nonReg', -0.2, 0.3),
+        rrsp: r.num(cr.rrsp, 'customScenario.returns.rrsp', -0.2, 0.3),
+        tfsa: r.num(cr.tfsa, 'customScenario.returns.tfsa', -0.2, 0.3),
+      },
+      horizonAge: r.num(c.horizonAge, 'customScenario.horizonAge', 80, 110, true),
+    }
+  }
+
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow }, children, assumptions } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow }, children, assumptions, customScenario } }
 }
