@@ -129,8 +129,12 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   const column = async (col: number) => (await grids.locator(`tbody tr td:nth-child(${col})`).allTextContents()).map((x) => (x.trim() === '—' ? Infinity : Number(x))) // « — »: no age works, later than any
   for (const g of [0, 1, 2]) {
     await horizons.nth(g).click()
+    // The tab is the one shown, THEN its cells are real values: « no placeholder left » checked right after the click can pass
+    // against the grid that is about to be replaced, and the new one may still be streaming in from the worker.
+    await expect(horizons.nth(g)).toHaveAttribute('aria-selected', 'true')
     await expect(grids).toHaveCount(1)
     await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
+    await expect.poll(async () => (await column(3)).every((n) => !Number.isNaN(n)), { timeout: 60_000 }).toBe(true)
     const ages = await column(3) // inflation as set
     expect(ages[0]).toBeGreaterThanOrEqual(ages[1])
     expect(ages[1]).toBeGreaterThanOrEqual(ages[2])
