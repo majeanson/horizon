@@ -545,13 +545,13 @@ export const EN: typeof FR = {
       where: 'Your VRSP, LIRA or LIF statement: the « locked-in » part. In a VRSP it is the employer’s contributions; in a LIRA or LIF, the whole balance.',
       label: 'locked-in',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/work/voluntary-retirement-savings-plans-vrsps-transfer-withdrawal-instruments/voluntary-retirement-savings-plans-vrsps/workers-vrsps',
-      note: 'Before 55, a Québec LIF pays at most 6.25% of its balance a year (2026 rate); from 55, everything can come out. At 65, a balance of at most 40% of the maximum pensionable earnings (MPE) unlocks. A federal LIF follows other rules, which Horizon does not calculate: enter it here anyway.',
+      note: 'Before 55, a Québec LIF lets at most 6.25% of the balance out a year (2026 rate). From 55, all of it can come out. At 65, a small balance is freed at once: up to 40% of the maximum pensionable earnings. A federal LIF follows other rules: enter it here anyway.',
     },
     rrspRoom: {
       where: 'Your latest CRA notice of assessment (the RRSP deduction limit and available contribution room statement), or your CRA account.',
       label: 'RRSP deduction limit',
       url: 'https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4040/rrsps-other-registered-plans-retirement.html',
-      note: 'This limit is already reduced by your employer plan’s pension adjustment: do not subtract it again. Add your unused contributions reported in a past year.',
+      note: 'This limit already accounts for your employer plan (the “pension adjustment”): do not subtract it a second time. If the notice shows unused contributions from past years, add them.',
     },
     tfsaBalance: {
       where: 'Your financial institution’s statement, as of the last day of the month.',
@@ -563,7 +563,7 @@ export const EN: typeof FR = {
       where: 'CRA account ▸ Savings and pension plans ▸ View TFSA details ▸ Contribution room.',
       label: 'TFSA contribution room',
       url: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributing/calculate-room.html',
-      note: 'The CRA advises checking against your own records: its account is only updated once a year. The account summary reads “As of January 1” of the year: contributions and withdrawals made since are not in it.',
+      note: 'The CRA’s figure is as of January 1: what you have contributed or withdrawn since is not in it. The CRA itself advises checking against your own records.',
     },
     nonRegBalance: {
       where: 'Your financial institution’s statement, as of the last day of the month.',
@@ -614,23 +614,23 @@ export const EN: typeof FR = {
       note: 'The Neutral scenario uses 2.1% (the 2026 projection guidelines of FP Canada and the Institute of Financial Planning), Conservative 2.5% and Aggressive 2.0%.',
     },
     wageGrowth: {
-      where: 'Retraite Québec publishes each year’s maximum pensionable earnings (MPE), from 1966 to 2026: $74,600 in 2026. The ratio between two years gives wage growth.',
+      where: 'Retraite Québec publishes each year’s maximum pensionable earnings (MPE) since 1966: $74,600 in 2026. Comparing two years gives wage growth.',
       label: '',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions',
       note: 'From 2016 ($54,900) to 2026 ($74,600) the MPE grew about 3.1% a year; the 2026 guidelines use 3.1% too, and so does the Neutral scenario.',
     },
     returns: {
-      where: 'Each account’s return is on the annual statement from your broker or insurer (“personal rate of return” or annualised rate); their fees are on the annual fee report.',
+      where: 'The annual statement from your broker or insurer gives each account’s return (“personal rate of return”). Your fees are on its annual fee report.',
       label: '',
       url: 'https://institutpf.org/en/projection-assumption-guidelines',
       reference: true,
-      note: 'For a projection, use a return net of fees. The 2026 guidelines give returns before fees (Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2%) and say the fees paid must be subtracted. The Institute is a professional body, not a government department.',
+      note: 'Enter a return with your fees taken out. The 2026 guidelines give returns before fees: Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2%. Subtract your fees from them. The Institute is a professional body, not a government department.',
     },
     horizonAge: {
       where: 'No document prints it: it is a prudent choice. Statistics Canada publishes life expectancy by province and sex in its table 13-10-0114-01.',
       label: '',
       url: 'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401',
-      note: 'The table gives an average: half of people live longer. Hence a horizon beyond the average; Conservative goes to 100, Neutral 95, Aggressive 90.',
+      note: 'The table gives an average, and half of people live longer. So plan further out: Conservative goes to 100, Neutral 95, Aggressive 90.',
     },
   },
 }

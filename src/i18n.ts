@@ -567,13 +567,13 @@ export const FR = {
       where: 'Le relevé de votre RVER, CRI ou FRV : la part « immobilisée ». Dans un RVER, ce sont les cotisations de l’employeur ; dans un CRI ou un FRV, tout le solde.',
       label: 'immobilisé',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/regime-volontaire-epargne-retraite-rver-et-instruments-transfert-et-decaissement/regime-volontaire-epargne-retraite-rver/travailleur-et-rver',
-      note: 'Avant 55 ans, un FRV du Québec ne verse au plus que 6,25 % du solde par année (taux 2026) ; dès 55 ans, tout peut en sortir. À 65 ans, un solde d’au plus 40 % du maximum des gains admissibles (MGA) se débloque. Un FRV fédéral suit d’autres règles, qu’Horizon ne calcule pas : entrez-le ici quand même.',
+      note: 'Avant 55 ans, un FRV du Québec laisse sortir au plus 6,25 % du solde par année (taux 2026). Dès 55 ans, tout peut sortir. À 65 ans, un petit solde se libère d’un coup : jusqu’à 40 % du maximum des gains admissibles. Un FRV fédéral suit d’autres règles : entrez-le ici quand même.',
     },
     rrspRoom: {
       where: 'Votre dernier avis de cotisation de l’ARC (relevé du maximum déductible au titre des REER), ou votre compte de l’ARC.',
       label: 'Maximum déductible au titre des REER',
       url: 'https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4040/reer-autres-regimes-enregistres-retraite.html',
-      note: 'Ce maximum est déjà réduit du facteur d’équivalence de votre régime d’employeur : ne le soustrayez pas une seconde fois. Ajoutez-y vos cotisations inutilisées déclarées lors d’une année passée.',
+      note: 'Ce maximum tient déjà compte de votre régime d’employeur (le « facteur d’équivalence ») : ne le soustrayez pas une seconde fois. Si l’avis montre des cotisations inutilisées d’années passées, ajoutez-les.',
     },
     tfsaBalance: {
       where: 'Le relevé de votre institution financière, au dernier jour du mois.',
@@ -585,7 +585,7 @@ export const FR = {
       where: 'Compte de l’ARC ▸ Régimes d’épargne et de pension ▸ Afficher les détails du CELI ▸ Droits de cotisation.',
       label: 'Droits de cotisation',
       url: 'https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/compte-epargne-libre-impot/cotiser/calculer-droits.html',
-      note: 'L’ARC recommande de vérifier avec vos propres relevés : son compte n’est mis à jour qu’une fois par année. Le sommaire du compte écrit « Au 1er janvier » de l’année : les cotisations et retraits faits depuis n’y sont pas.',
+      note: 'Le chiffre de l’ARC date du 1er janvier : ce que vous avez cotisé ou retiré depuis n’y est pas. L’ARC elle-même recommande de vérifier avec vos relevés.',
     },
     nonRegBalance: {
       where: 'Le relevé de votre institution financière, au dernier jour du mois.',
@@ -636,23 +636,23 @@ export const FR = {
       note: 'Le scénario Neutre retient 2,1 % (normes de projection 2026 de FP Canada et de l’Institut de planification financière), Prudent 2,5 % et Audacieux 2,0 %.',
     },
     wageGrowth: {
-      where: 'Retraite Québec publie le maximum des gains admissibles (MGA) de chaque année, de 1966 à 2026 : 74 600 $ en 2026. Le rapport entre deux années donne la hausse des salaires.',
+      where: 'Retraite Québec publie le maximum des gains admissibles (MGA) de chaque année depuis 1966 : 74 600 $ en 2026. Comparer deux années donne la hausse des salaires.',
       label: '',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/programmes/regime-rentes-quebec/travail-et-cotisations/revenus-travail-admissibles-et-cotisations',
       note: 'De 2016 (54 900 $) à 2026 (74 600 $), le MGA a crû d’environ 3,1 % par année ; les normes 2026 retiennent 3,1 % aussi, et le scénario Neutre de même.',
     },
     returns: {
-      where: 'Le rendement de chaque compte figure sur le relevé annuel de votre courtier ou de votre assureur (« rendement personnel » ou taux annualisé) ; leurs frais, sur le rapport annuel sur les frais.',
+      where: 'Le relevé annuel de votre courtier ou de votre assureur donne le rendement de chaque compte (« rendement personnel »). Vos frais sont sur son rapport annuel sur les frais.',
       label: '',
       url: 'https://institutpf.org/normes-hypotheses-projection',
       reference: true,
-      note: 'Pour projeter, utilisez un rendement net des frais. Les normes 2026 donnent des rendements avant frais (actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 %) et demandent d’en soustraire les frais payés. L’Institut est un organisme professionnel, pas un ministère.',
+      note: 'Entrez un rendement une fois vos frais retirés. Les normes 2026 donnent des rendements avant frais : actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 %. Soustrayez-en vos frais. L’Institut est un ordre professionnel, pas un ministère.',
     },
     horizonAge: {
       where: 'Aucun document ne l’imprime : c’est un choix prudent. Statistique Canada publie l’espérance de vie, par province et par sexe, dans sa table 13-10-0114-01.',
       label: '',
       url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1310011401',
-      note: 'La table donne une moyenne : la moitié des gens vivent plus longtemps. D’où un horizon plus loin que la moyenne ; Prudent va jusqu’à 100 ans, Neutre 95, Audacieux 90.',
+      note: 'La table donne une moyenne, et la moitié des gens vivent plus longtemps. Planifiez donc plus loin : Prudent va jusqu’à 100 ans, Neutre 95, Audacieux 90.',
     },
   } satisfies Record<string, InfoEntry>,
 }
