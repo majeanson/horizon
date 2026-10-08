@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { AccountKind } from '../engine/types'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
@@ -8,7 +9,6 @@ import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
-import { SectionHeader } from '../components/SectionHeader'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
@@ -30,6 +30,7 @@ export function Hypotheses() {
   const { lang } = useLang()
   const confirm = useConfirm()
   const active = presetOf(assumptions)
+  const [sourcesOpen, setSourcesOpen] = useState(false)
   const presetSummary = (key: PresetKey) => {
     const v = ASSUMPTION_PRESETS[key]
     const pct = (x: number) => formatPct(x, lang, 1)
@@ -67,18 +68,25 @@ export function Hypotheses() {
         <p className="field-row__hint">{active === null ? a.presets.blurb.custom : a.presets.blurb[active]}</p>
         {active !== null && <p className="field-row__hint mono">{presetSummary(active)}</p>}
         <div className="preset-sources">
-          <SectionHeader title={a.presets.sourceTitle} />
-          <StatusMessage tone="info">{a.presets.source}</StatusMessage>
-          <ul className="info-links">
-            {a.presets.links.map((l) => (
-              <li key={l.url}>
-                <a className="info-note__link" href={l.url} target="_blank" rel="noopener noreferrer">
-                  {l.label}
-                  <Icon name="arrow-up-right-bold" size={14} />
-                </a>
-              </li>
-            ))}
-          </ul>
+          {/* Folded by default: the provenance is for whoever asks, not for everyone who lands here. */}
+          <Chip selected={sourcesOpen} expanded={sourcesOpen} onClick={() => setSourcesOpen((o) => !o)}>
+            {a.presets.sourceTitle}
+          </Chip>
+          {sourcesOpen && (
+            <>
+              <StatusMessage tone="info">{a.presets.source}</StatusMessage>
+              <ul className="info-links">
+                {a.presets.links.map((l) => (
+                  <li key={l.url}>
+                    <a className="info-note__link" href={l.url} target="_blank" rel="noopener noreferrer">
+                      {l.label}
+                      <Icon name="arrow-up-right-bold" size={14} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       </Section>
 

@@ -12,7 +12,7 @@ import { EXAMPLE, seedProfile } from './seed'
 // Best-practice rules are out of scope on purpose: they are advice, and a gate made of advice
 // gets disabled.
 
-const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
+const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
 interface State {
   name: string
@@ -95,3 +95,18 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
   expect(order.slice(0, 4)).toEqual(['Aller au contenu', 'Horizon', 'EN', ''])
   expect(order.slice(4, 8)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
 })
+
+// The page's outline is part of its accessibility tree (heading navigation in a screen reader, and the
+// text a browsing agent reads): every titled section holds a heading, and the h1 is alone.
+for (const [label, path, ready] of PAGES.slice(0, 4)) {
+  test(`${label} has an outline: one h1, a heading in every titled section`, async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.goto(path)
+    await page.locator(ready).waitFor()
+    await expect(page.locator('h1')).toHaveCount(1)
+    const bare = await page.evaluate(() =>
+      [...document.querySelectorAll('main section.profile-section[aria-label]')].filter((s) => !s.querySelector('h2, h3')).map((s) => s.getAttribute('aria-label')),
+    )
+    expect(bare).toEqual([])
+  })
+}

@@ -10,6 +10,7 @@ import { FieldRow } from '../components/FieldRow'
 import { NextStep } from '../components/NextStep'
 import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
+import { SectionLevel } from '../components/SectionHeader'
 import { StatusMessage } from '../components/StatusMessage'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
@@ -84,7 +85,9 @@ export function Profil() {
             // Keyed by person: a removed spouse unmounts, so no typed-but-uncommitted text crosses over.
             <section key={p.id} id={`person-${p.id}`} className="person" aria-label={name}>
               {spouse && <h2 className="person__title">{name}</h2>}
-              <PersonFields id={p.id} />
+              <SectionLevel.Provider value={spouse ? 3 : 2}>
+                <PersonFields id={p.id} />
+              </SectionLevel.Provider>
             </section>
           )
         })}

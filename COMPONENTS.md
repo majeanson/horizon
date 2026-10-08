@@ -65,7 +65,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 
 | Component | File | Purpose |
 | --- | --- | --- |
-| **SectionHeader** | `src/components/SectionHeader.tsx` | An optional icon, a title, a subtitle, a trailing action. One anatomy for every section. |
+| **SectionHeader** | `src/components/SectionHeader.tsx` | An optional icon, a title (a real `h2`; `h3` under a `SectionLevel` of 3), a subtitle, a trailing action. One anatomy for every section. |
 | **PageHead** | `src/components/PageHead.tsx` | The top of a page: its ONE `<h1>` and a quiet line under it. (A `SectionHeader` names a section inside a page.) |
 | **ImpactMeter** | `src/components/ImpactMeter.tsx` | « Where does this assumption sit, and what does it do to the plan? » A five-step track with a marker, the level and its lean in words (cautious / central / optimistic), and one « why it matters » sentence. The level comes from `engine/assumptionImpact.ts` (anchored on the three scenarios); the copy is `FR.assumptions.impact`. |
 | **EmptyState** | `src/components/EmptyState.tsx` | The calm « nothing here » line (`role="status"`). |
