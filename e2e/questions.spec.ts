@@ -79,6 +79,6 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   await page.getByRole('button', { name: 'Garder ce montant dans mes hypothèses' }).click()
   await expect(page).not.toHaveURL(/spend=/)
   await expect(page.getByText('Vous pouvez prendre votre retraite à 56 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
-  await expect(page.locator('#depenser')).toContainText('À 69 500 $ par année : dès 56 ans.')
-  await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses.')
+  await expect(page.locator('#depenser')).toContainText('À 69 500 $ par année : dès 56 ans.', { timeout: 30_000 })
+  await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses.', { timeout: 30_000 })
 })

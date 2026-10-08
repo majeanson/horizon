@@ -71,3 +71,19 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['de
       .toBe(true)
   })
 }
+
+test('the year-by-year table is ONE table; the scenario is chosen in its header and the export follows', async ({ page }) => {
+  await page.goto('/resultats?v=verify&ages=plan,60,65')
+  const block = page.locator('.year-table')
+  await expect(block.locator('table')).toHaveCount(1, { timeout: 30_000 })
+  const tabs = block.locator('.table-chooser').getByRole('tab')
+  await expect(tabs).toHaveCount(3)
+  const title = block.locator('.year-table__title')
+  const first = await title.textContent()
+  await tabs.nth(1).click()
+  await expect(title).not.toHaveText(first!)
+  await expect(block.locator('table')).toHaveCount(1)
+  const download = page.waitForEvent('download')
+  await block.getByRole('button', { name: /CSV|tableur/i }).click()
+  expect((await download).suggestedFilename()).toMatch(/[a-z]/i) // a readable name, not a row of dashes
+})

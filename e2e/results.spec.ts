@@ -101,11 +101,14 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
   await page.getByRole('tab', { name: 'Revenu garanti' }).click()
   await page.getByRole('tab', { name: 'Vérifier' }).click()
+  // One grid at a time: the horizon is chosen in the table's header (three tabs; the plan's own, 95, is open first).
   const grids = page.locator('.sensitivity__grids .table-wrap')
-  await expect(grids).toHaveCount(3, { timeout: 60_000 })
+  const horizons = page.locator('.sensitivity .table-chooser').getByRole('tab')
+  await expect(horizons).toHaveCount(3, { timeout: 60_000 })
+  await expect(grids).toHaveCount(1)
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
-  // 27 cells, each an age or a dash; the base cell of the 95-year grid is the plain verdict.
-  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27)
+  // 9 cells per grid, each an age or a dash; the base cell of the 95-year grid is the plain verdict.
+  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9)
   // …and the verdict's own range line reads prudent ≥ neutre ≥ audacieux (a more prudent future never retires earlier)
   // — the ONE place the three scenarios' ages are written; the grids detail it.
   await page.getByRole('tab', { name: 'Réponse' }).click()
@@ -119,14 +122,16 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
   await page.getByRole('tab', { name: 'Vérifier' }).click()
   // The panel mounts afresh with the view and computes again: wait for all of it.
-  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(27, { timeout: 60_000 })
+  await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9, { timeout: 60_000 })
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
-  const base = grids.nth(1).locator('td.is-base')
-  await expect(base).toHaveText('59')
-  // A worse future never retires earlier than a better one: down the return axis, the ages do not fall.
-  const column = async (g: number, col: number) => (await grids.nth(g).locator(`tbody tr td:nth-child(${col})`).allTextContents()).map(Number)
+  await expect(grids.locator('td.is-base')).toHaveText('59')
+  // A worse future never retires earlier than a better one: down the return axis, the ages do not fall — in each horizon.
+  const column = async (col: number) => (await grids.locator(`tbody tr td:nth-child(${col})`).allTextContents()).map(Number)
   for (const g of [0, 1, 2]) {
-    const ages = await column(g, 3) // inflation as set
+    await horizons.nth(g).click()
+    await expect(grids).toHaveCount(1)
+    await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
+    const ages = await column(3) // inflation as set
     expect(ages[0]).toBeGreaterThanOrEqual(ages[1])
     expect(ages[1]).toBeGreaterThanOrEqual(ages[2])
   }

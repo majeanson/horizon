@@ -8,7 +8,7 @@ import { useT } from '../i18n'
 // Reuse this rather than re-hand-rolling the .subtabs markup. Horizon uses it for the
 // « Moi / Conjoint·e » switch on the profile and for the scenario picker on the results.
 
-interface SubTabOption<K extends string> {
+export interface SubTabOption<K extends string> {
   key: K
   label: ReactNode
   // Optional leading glyph (the shared <Icon> set — never an emoji).

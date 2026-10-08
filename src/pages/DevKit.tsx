@@ -19,6 +19,7 @@ import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
+import { TableChooser } from '../components/TableChooser'
 import { useLang, useT } from '../i18n'
 import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type TextScale } from '../lib/accessibility'
 import { useConfirm } from '../lib/confirm'
@@ -173,6 +174,24 @@ function LineChartSpecimen() {
   )
 }
 
+function TableChooserSpecimen() {
+  const [k, setK] = useState<'prudent' | 'neutral' | 'bold'>('neutral')
+  return (
+    <TableChooser
+      label="Scénario"
+      ariaLabel="Exemple"
+      value={k}
+      onSelect={setK}
+      options={[
+        { key: 'prudent', label: 'Prudent' },
+        { key: 'neutral', label: 'Neutre' },
+        { key: 'bold', label: 'Audacieux' },
+      ]}
+      trailing={<Chip>CSV</Chip>}
+    />
+  )
+}
+
 function SubTabsSpecimen() {
   const [k, setK] = useState<'self' | 'spouse'>('self')
   return (
@@ -300,6 +319,7 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Saisie', name: 'Chip', file: 'src/components/Chip.tsx', exports: ['Chip', 'ChipGroup'], kw: 'pastille filtre bascule', render: () => <ChipSpecimen /> },
+    { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     {
       cat: 'Affichage',

@@ -28,6 +28,7 @@ import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
 import { StatusMessage } from '../StatusMessage'
 import { SubTabs } from '../SubTabs'
+import { TableChooser } from '../TableChooser'
 
 // « Mes années 60 à 70 » — the strategy view. For the person looked at: the plan year by year across the bridge years
 // (what the household spends, what the guaranteed pensions pay, what the nest has to cover and from which account, the tax,
@@ -254,46 +255,53 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
   )
 }
 
+const HYPOTHESES = ['prudent', 'neutral', 'bold'] as const
+
 function MatrixSection({ household, assumptions, levers, copy, ownerName }: { household: Household; assumptions: Assumptions; levers: BridgeLevers; copy: BridgeCopy; ownerName: string }) {
   const t = useT()
   const { value, busy } = useBridgeMatrix(household, assumptions, levers)
+  const [hyp, setHyp] = useState<(typeof HYPOTHESES)[number]>('neutral')
   if (value === null) return <Skeleton count={3} />
   return (
-    <div className="table-wrap" role="region" aria-label={copy.matrixTitle} tabIndex={0} aria-busy={busy}>
+    <div className="matrix" aria-busy={busy}>
       <p className="field-row__hint">{copy.matrixHint(ownerName)}</p>
       {busy && (
         <p className="bridge__updating" role="status">
           {copy.updating}
         </p>
       )}
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">{copy.strategyCol}</th>
-            {(['prudent', 'neutral', 'bold'] as const).map((k) => (
-              <th key={k} scope="col">
-                {t.assumptions.presets[k]}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {strategyKeysFor(household).map((key) => (
-            <tr key={key}>
-              <th scope="row">{copy.strategyName[key]}</th>
-              {(['prudent', 'neutral', 'bold'] as const).map((k) => {
-                const cell = value[key][k]
-                return (
-                  <td key={k} className={cell.ok ? undefined : 'bridge__cell--short'}>
+      {/* Three columns of hypotheses became one: the set is chosen in the header, the table shows its verdicts. */}
+      <TableChooser
+        label={t.assumptions.presets.title}
+        ariaLabel={copy.matrixTitle}
+        value={hyp}
+        options={HYPOTHESES.map((k) => ({ key: k, label: t.assumptions.presets[k] }))}
+        onSelect={setHyp}
+      />
+      <div className="table-wrap" role="region" aria-label={`${copy.matrixTitle} — ${t.assumptions.presets[hyp]}`} tabIndex={0}>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{copy.strategyCol}</th>
+              <th scope="col">{t.assumptions.presets[hyp]}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {strategyKeysFor(household).map((key) => {
+              const cell = value[key][hyp]
+              return (
+                <tr key={key}>
+                  <th scope="row">{copy.strategyName[key]}</th>
+                  <td className={cell.ok ? undefined : 'bridge__cell--short'}>
                     <span aria-hidden="true">{cell.ok ? '✓' : '!'} </span>
                     {cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}
                   </td>
-                )
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

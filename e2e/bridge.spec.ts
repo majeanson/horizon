@@ -118,13 +118,18 @@ test('« jusqu’à l’horizon » shows every year of the plan, and the bridge 
 test('the three sets of assumptions: eighteen answers, filled in by themselves off the page’s thread', async ({ page }) => {
   await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__verdict')).toBeVisible()
-  const matrix = page.getByRole('region', { name: 'Sous trois jeux d’hypothèses' })
+  // One table, the set of hypotheses chosen in its header (the neutral one first): six strategies, one verdict each.
+  const matrix = page.getByRole('region', { name: /Sous trois jeux d’hypothèses/ })
   await expect(matrix.locator('tbody tr')).toHaveCount(6, { timeout: 60_000 })
-  await expect(matrix.locator('tbody td')).toHaveCount(18)
-  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent', 'Neutre', 'Audacieux'])
+  await expect(matrix.locator('tbody td')).toHaveCount(6)
+  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Neutre'])
   // the neutral set holds for the golden couple; the prudent one does not, and says at what age
-  await expect(matrix.locator('tbody tr').first().locator('td').nth(1)).toContainText('Tient')
-  await expect(matrix.locator('tbody tr').first().locator('td').nth(0)).toContainText(/Manque à \d\d ans/)
+  await expect(matrix.locator('tbody tr').first().locator('td')).toContainText('Tient')
+  const chooser = page.locator('.matrix .table-chooser')
+  await expect(chooser.getByRole('tab')).toHaveText(['Prudent', 'Neutre', 'Audacieux'])
+  await chooser.getByRole('tab', { name: 'Prudent' }).click()
+  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent'])
+  await expect(matrix.locator('tbody tr').first().locator('td')).toContainText(/Manque à \d\d ans/)
 })
 
 test('English: the view speaks English and keeps the same choices', async ({ page }) => {

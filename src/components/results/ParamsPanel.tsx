@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { PARAM_LABELS } from '../../lib/paramLabels'
 import { useLang, useT } from '../../i18n'
 import { knownYears, paramRows } from '../../lib/paramsView'
+import { TableChooser } from '../TableChooser'
 
 // « Paramètres utilisés »: every government figure the result stands on, one row each, with the official page it was
 // read on and the day it was read. The rows are the same objects the engine reads (lib/paramsView.ts), so this panel
@@ -12,10 +14,15 @@ export function ParamsPanel() {
   const t = useT()
   const { lang } = useLang()
   const r = t.results
+  // One table: the tax year is chosen in its header (the latest first).
+  const years = knownYears()
+  const [picked, setPicked] = useState<number | null>(null)
+  const shownYear = picked !== null && years.includes(picked) ? picked : years[years.length - 1]
   return (
     <>
       <p className="field-row__hint">{r.params.note}</p>
-      {knownYears().map((year) => {
+      <TableChooser ariaLabel={r.params.figure} value={String(shownYear)} options={years.map((y) => ({ key: String(y), label: r.params.year(y) }))} onSelect={(k) => setPicked(Number(k))} />
+      {[shownYear].map((year) => {
         const rows = paramRows(year, lang, r.params.entries)
         return (
           <div key={year} className="params">

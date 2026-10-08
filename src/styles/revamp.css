@@ -214,3 +214,17 @@
   background: var(--who);
   flex: none;
 }
+
+/* ── A table's header: pick which data set it shows ──────────────────────── */
+/* Label, the segmented choice, then the table's own action — one wrapping row, so it holds at 360 px as well as at 1280. */
+.table-chooser {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  min-width: 0;
+}
+.table-chooser__label {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
