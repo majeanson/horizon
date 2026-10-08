@@ -1,6 +1,6 @@
 name: CI & Deploy
 
-# CI (typecheck · test · build · bundle budgets · dead code) runs on every push and PR, and GATES
+# CI (typecheck · test · build · bundle budgets · dead code) runs on every push to main and every PR, and GATES
 # the deploy. Deploy to the Cloudflare Worker is the same `npm run deploy` you run locally, gated
 # behind green CI.
 #
@@ -8,9 +8,11 @@ name: CI & Deploy
 # a push to main ships the moment CI is green, and the slower browser suite runs once afterward
 # for signal. It never blocks the deploy — check its run page for visual / flow regressions.
 
+# `push` is main only: a branch with an open PR is already covered by `pull_request`, and running both
+# doubled the minutes for every PR branch. (The workflow's own convention is to push straight to main.)
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

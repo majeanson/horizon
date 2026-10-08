@@ -8,6 +8,24 @@ import { Component, type ErrorInfo, type ReactNode } from 'react'
 //
 // « Tes données sont intactes » is a promise this app can keep: the profile lives in
 // localStorage, which a render error does not touch.
+// A crash on a bad profile would otherwise loop on reload with no way to reach the Données
+// page. Reads the stored text raw (no store, no schema — those are what may have failed) and
+// hands it back as a file, so the household's numbers can be rescued before anything is reset.
+function saveRawProfile() {
+  try {
+    const text = localStorage.getItem('horizon-profile')
+    if (text === null) return
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `horizon-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  } catch {
+    /* nothing more can be done from a fallback screen */
+  }
+}
+
 interface Props {
   children: ReactNode
 }
@@ -45,6 +63,9 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="errboundary__actions">
             <button type="button" className="btn btn--primary mono" onClick={() => window.location.reload()}>
               Recharger
+            </button>
+            <button type="button" className="btn btn--ghost mono" onClick={saveRawProfile}>
+              Télécharger mes données
             </button>
             <button type="button" className="btn btn--ghost mono" onClick={() => window.location.assign('/')}>
               Retour au début

@@ -85,6 +85,7 @@ function save(): void {
   }
   try {
     localStorage.setItem(KEY, JSON.stringify(current))
+    noteUnbackedEdit()
     if (issue === 'unavailable' || issue === 'unsaved' || issue === 'conflict') {
       issue = null
       notify()
@@ -94,6 +95,45 @@ function save(): void {
       issue = 'unavailable'
       notify()
     }
+  }
+}
+
+// THE BACKUP NUDGE. The device's copy is the only copy: « clear site data », a private window or a browser's idle-site
+// eviction takes it with no warning. Two small stamps (their own keys — the schema is untouched) say when the OLDEST
+// edit not yet exported was made; past BACKUP_AFTER_MS the shell asks for an export. The first successful save also asks
+// the browser to treat the storage as durable, which spares it the idle-site eviction.
+const UNBACKED_KEY = 'horizon-unbacked-since'
+const BACKUP_AFTER_MS = 30 * 24 * 3600 * 1000
+let persistAsked = false
+
+function noteUnbackedEdit(): void {
+  try {
+    if (localStorage.getItem(UNBACKED_KEY) === null) localStorage.setItem(UNBACKED_KEY, String(Date.now()))
+    if (!persistAsked) {
+      persistAsked = true
+      void navigator.storage?.persist?.().catch(() => undefined)
+    }
+  } catch {
+    /* a browser that keeps nothing cannot be nudged either; the 'unavailable' notice already says so */
+  }
+}
+
+/** Called when a profile file has just been handed to its owner. */
+export function markExported(): void {
+  try {
+    localStorage.removeItem(UNBACKED_KEY)
+  } catch {
+    /* see noteUnbackedEdit */
+  }
+  notify()
+}
+
+export function backupDue(): boolean {
+  try {
+    const since = Number(localStorage.getItem(UNBACKED_KEY))
+    return since > 0 && Date.now() - since > BACKUP_AFTER_MS
+  } catch {
+    return false
   }
 }
 
@@ -114,6 +154,7 @@ function subscribe(l: () => void): () => void {
 }
 
 export const useProfile = (): Profile => useSyncExternalStore(subscribe, getProfile, getProfile)
+export const useBackupDue = (): boolean => useSyncExternalStore(subscribe, backupDue, backupDue)
 export const useStorageIssue = (): StorageIssue => useSyncExternalStore(subscribe, getStorageIssue, getStorageIssue)
 
 /** Replace the profile (an import, the example, a reset). Saved immediately: these are deliberate acts. */

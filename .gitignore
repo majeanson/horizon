@@ -18,3 +18,8 @@ test-results/
 .vscode/*
 !.vscode/extensions.json
 *.code-workspace
+
+# StudioTax files dropped in docs/ for cross-checks hold a real household: never commit
+docs/*.25t
+# a profile exported from the app
+horizon-*.json
