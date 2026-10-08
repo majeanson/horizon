@@ -139,11 +139,22 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
     rules.livesAlone ?? true,
   )
 
+  const federalInput = ({ p, netIncome, splitIn, splitOut }: (typeof out)[number], transferIn = 0) => ({
+    age: p.age,
+    netIncome,
+    taxableIncome: netIncome,
+    employment: p.employment,
+    eligiblePension: eligibleFederal(p, splitIn, splitOut, rules.federal.pensionMinAge),
+    qppBase: p.rrqBase,
+    payrollPremiums: p.payrollPremiums,
+    transferIn,
+  })
+  // Schedule 2: a spouse's UNUSED age and pension amounts are claimed by the other. Each is first worked out on its own, then received.
+  const alone = out.map((o) => federalTax(federalInput(o), rules.federal))
+  const transferTo = (i: number): number => (out.length === 2 ? alone[i === 0 ? 1 : 0].unusedTransferable : 0)
+
   const results: PersonTax[] = out.map(({ p, income, before, recovery, netIncome, splitIn, splitOut }, i) => {
-    const federal = federalTax(
-      { age: p.age, netIncome, taxableIncome: netIncome, employment: p.employment, eligiblePension: eligibleFederal(p, splitIn, splitOut, rules.federal.pensionMinAge), qppBase: p.rrqBase, payrollPremiums: p.payrollPremiums },
-      rules.federal,
-    )
+    const federal = federalTax(federalInput({ p, income, before, recovery, netIncome, splitIn, splitOut }, transferTo(i)), rules.federal)
     const q = quebec.persons[i]
     const incomeTax = roundTo(federal.tax + q.tax, 0.01)
     return {

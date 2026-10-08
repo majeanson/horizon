@@ -170,7 +170,7 @@ Dépenses : 150 000 $ par année en travaillant, 130 000 $ à la retraite (d
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 165 402 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 169 558 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 57 ans.
 
 ### Le calcul des rentes
@@ -188,12 +188,12 @@ Dépenses : 150 000 $ par année en travaillant, 130 000 $ à la retraite (d
 | 55 | 150 000 $ | 335 981 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 87 828 $ | 2 637 126 $ | couvert |
 | 60 | 150 000 $ | 143 309 $ | 0 $ | 0 $ | 0 $ | 0 $ | 55 448 $ | 41 822 $ | 2 998 165 $ | tire du nid |
 | 65 | 130 000 $ | 0 $ | 0 $ | 14 879 $ | 6 100 $ | 1 774 $ | 109 729 $ | 2 482 $ | 2 824 561 $ | tire du nid |
-| 70 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 18 300 $ | 0 $ | 84 383 $ | 19 489 $ | 2 699 549 $ | tire du nid |
-| 75 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 18 910 $ | 0 $ | 107 451 $ | 40 810 $ | 2 475 061 $ | tire du nid |
-| 80 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 103 544 $ | 39 820 $ | 2 227 874 $ | tire du nid |
-| 85 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 547 $ | 39 088 $ | 1 957 716 $ | tire du nid |
-| 90 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 582 $ | 39 124 $ | 1 654 610 $ | tire du nid |
-| 95 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 103 904 $ | 40 023 $ | 1 313 154 $ | tire du nid |
+| 70 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 18 300 $ | 0 $ | 83 939 $ | 18 983 $ | 2 701 396 $ | tire du nid |
+| 75 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 18 910 $ | 0 $ | 107 617 $ | 40 873 $ | 2 477 519 $ | tire du nid |
+| 80 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 103 705 $ | 39 880 $ | 2 230 305 $ | tire du nid |
+| 85 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 547 $ | 39 088 $ | 1 960 313 $ | tire du nid |
+| 90 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 582 $ | 39 124 $ | 1 657 673 $ | tire du nid |
+| 95 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 615 $ | 39 156 $ | 1 317 122 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2039, en dollars d’aujourd’hui
 
@@ -264,7 +264,7 @@ Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 287 334 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 287 301 $ (dollars d’aujourd’hui).
 - Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
 
 ### Le calcul des rentes
@@ -278,13 +278,13 @@ Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 68 | 82 000 $ | 0 $ | 34 000 $ | 20 513 $ | 18 300 $ | 0 $ | 15 338 $ | 6 151 $ | 631 958 $ | tire du nid |
-| 70 | 82 000 $ | 0 $ | 33 304 $ | 20 513 $ | 18 300 $ | 0 $ | 16 035 $ | 6 153 $ | 628 903 $ | tire du nid |
-| 75 | 82 000 $ | 0 $ | 31 627 $ | 20 513 $ | 18 986 $ | 0 $ | 22 432 $ | 11 558 $ | 592 670 $ | tire du nid |
-| 80 | 82 000 $ | 0 $ | 30 033 $ | 20 513 $ | 20 130 $ | 0 $ | 22 955 $ | 11 632 $ | 544 563 $ | tire du nid |
-| 85 | 82 000 $ | 0 $ | 28 521 $ | 20 513 $ | 20 130 $ | 0 $ | 24 548 $ | 11 680 $ | 483 704 $ | tire du nid |
-| 90 | 82 000 $ | 0 $ | 27 084 $ | 20 513 $ | 20 130 $ | 0 $ | 26 007 $ | 11 724 $ | 407 237 $ | tire du nid |
-| 95 | 82 000 $ | 0 $ | 25 720 $ | 20 513 $ | 20 130 $ | 0 $ | 27 836 $ | 11 102 $ | 313 765 $ | tire du nid |
+| 68 | 82 000 $ | 0 $ | 34 000 $ | 20 513 $ | 18 300 $ | 0 $ | 15 354 $ | 6 152 $ | 631 958 $ | tire du nid |
+| 70 | 82 000 $ | 0 $ | 33 304 $ | 20 513 $ | 18 300 $ | 0 $ | 16 035 $ | 6 153 $ | 628 902 $ | tire du nid |
+| 75 | 82 000 $ | 0 $ | 31 627 $ | 20 513 $ | 18 986 $ | 0 $ | 22 432 $ | 11 558 $ | 592 635 $ | tire du nid |
+| 80 | 82 000 $ | 0 $ | 30 033 $ | 20 513 $ | 20 130 $ | 0 $ | 22 955 $ | 11 632 $ | 544 524 $ | tire du nid |
+| 85 | 82 000 $ | 0 $ | 28 521 $ | 20 513 $ | 20 130 $ | 0 $ | 24 548 $ | 11 680 $ | 483 660 $ | tire du nid |
+| 90 | 82 000 $ | 0 $ | 27 084 $ | 20 513 $ | 20 130 $ | 0 $ | 26 059 $ | 11 739 $ | 407 158 $ | tire du nid |
+| 95 | 82 000 $ | 0 $ | 25 720 $ | 20 513 $ | 20 130 $ | 0 $ | 27 066 $ | 10 555 $ | 313 720 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2026, en dollars d’aujourd’hui
 
@@ -292,7 +292,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Gilles | 68 | 0 $ | 34 000 $ | 10 766 $ | 9 150 $ | 0 $ | 45 633 $ | 2 101 $ | 2 462 $ | 0 $ |
+| Gilles | 68 | 0 $ | 34 000 $ | 10 766 $ | 9 150 $ | 0 $ | 45 635 $ | 2 101 $ | 2 462 $ | 0 $ |
 | Francine | 66 | 0 $ | 0 $ | 9 747 $ | 9 150 $ | 0 $ | 29 097 $ | 168 $ | 1 420 $ | 0 $ |
 
 ## newcomer — Arrivée au Canada à 30 ans

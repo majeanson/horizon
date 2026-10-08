@@ -17,7 +17,8 @@ import type { YearParams } from './params/types.ts'
 // reduce a tax that is already ≥ 0 it is modelled as a reduction of the basic federal tax.
 //
 // KNOWN SIMPLIFICATIONS (ENGINE.md §2): the QPP contribution's base/enhanced split is applied as the
-// current rates define it; no donation, medical, tuition or spouse credits; no minimum tax, no surtax,
+// current rates define it; no donation, medical, tuition or spouse-amount credits (the transfer of a spouse's UNUSED age and
+// pension amounts, Schedule 2, is modelled); no minimum tax, no surtax,
 // no dividend tax credit (the engine models no dividends).
 
 export type FederalRules = Plain<YearParams>['federal']
@@ -37,13 +38,15 @@ export interface FederalInput {
   qppBase: number
   /** The employee's EI and QPIP premiums: both are non-refundable credits (lines 31200 and 31205). */
   payrollPremiums: number
+  /** Credit AMOUNT (not tax) received from the spouse's unused age and pension amounts (Schedule 2, line 32600). Absent: none. */
+  transferIn?: number
 }
 
 export interface FederalResult {
   /** Tax on taxable income, by the brackets, before any credit. */
   taxOnIncome: number
   /** Each credit AMOUNT (before the 14 % conversion). */
-  amounts: { basic: number; age: number; pension: number; employment: number; qppBase: number; payroll: number }
+  amounts: { basic: number; age: number; pension: number; employment: number; qppBase: number; payroll: number; transferIn: number }
   /** What the credits take off the tax: Σ amounts × the credit rate. */
   creditValue: number
   /** Line 42900: tax after credits, never below zero. */
@@ -52,6 +55,8 @@ export interface FederalResult {
   abatement: number
   /** What the person pays the federal government: basic tax − abatement. */
   tax: number
+  /** The part of the age and pension amounts this person's own tax cannot use: what a spouse may claim (Schedule 2). */
+  unusedTransferable: number
 }
 
 /** Progressive tax on `taxable` by `brackets` (the top bracket is open). */
@@ -97,8 +102,14 @@ export function federalTax(i: FederalInput, r: FederalRules): FederalResult {
     employment: Math.min(r.employmentAmount, Math.max(0, i.employment)),
     qppBase: Math.max(0, i.qppBase),
     payroll: Math.max(0, i.payrollPremiums),
+    transferIn: Math.max(0, i.transferIn ?? 0),
   }
-  const creditValue = (amounts.basic + amounts.age + amounts.pension + amounts.employment + amounts.qppBase + amounts.payroll) * r.creditRate
+  const creditValue = (amounts.basic + amounts.age + amounts.pension + amounts.employment + amounts.qppBase + amounts.payroll + amounts.transferIn) * r.creditRate
+  // Schedule 2: what is left of the age and pension amounts once the person's own taxable income has used the basic amount and the
+  // other credits. (Line 12 of the schedule is the taxable income over those; the transfer is lines 1–5 less line 12.)
+  const agePension = amounts.age + amounts.pension
+  const absorbed = Math.max(0, i.taxableIncome - amounts.basic - amounts.employment - amounts.qppBase - amounts.payroll)
+  const unusedTransferable = Math.max(0, agePension - absorbed)
   const basicTax = Math.max(0, taxOnIncome - creditValue)
   const abatement = basicTax * r.quebecAbatement
   return {
@@ -108,5 +119,6 @@ export function federalTax(i: FederalInput, r: FederalRules): FederalResult {
     basicTax: roundTo(basicTax, 0.01),
     abatement: roundTo(abatement, 0.01),
     tax: roundTo(basicTax - abatement, 0.01),
+    unusedTransferable: roundTo(unusedTransferable, 0.01),
   }
 }
