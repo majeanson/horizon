@@ -27,6 +27,7 @@ import type { Dollars, Metric } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { parseBridgeParams } from '../lib/bridgeModel'
 import { presetOf } from '../engine/assumptionPresets'
+import { formatYearAge } from '../lib/format'
 import { RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
 import { scrollBehavior } from '../lib/motion'
@@ -69,6 +70,9 @@ export function Resultats() {
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
   const assumptions = assumptionsOf(profile, { year, month })
+  // A year is always said with the age(s) it comes with: « 2043 (63 ans) ».
+  const births = profile.household.persons.map((p) => p.birth.year)
+  const at = (y: number) => formatYearAge(y, births, lang)
   const isCouple = profile.household.persons.length === 2
   const earliestEachAnswer = useEarliestEach(profile.household, assumptions, isCouple && gaps.length === 0 && !retiredNow)
 
@@ -252,11 +256,11 @@ export function Resultats() {
         {retiredGlance ? (
           <>
             <p className="verdict__note">
-              {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(retiredGlance.now.firstShortfallYear!)}{' '}
+              {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(at(retiredGlance.now.firstShortfallYear!))}{' '}
               {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
             </p>
             {activePreset !== 'prudent' && (retiredGlance.prudent.ok !== retiredGlance.now.ok || retiredGlance.prudent.firstShortfallYear !== retiredGlance.now.firstShortfallYear) && (
-              <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear)}</p>
+              <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear === null ? null : at(retiredGlance.prudent.firstShortfallYear))}</p>
             )}
           </>
         ) : headline.kind === 'none' ? (
@@ -274,7 +278,7 @@ export function Resultats() {
               {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
             </p>
             {headline.earlierAge !== null && headline.earlierShortfallYear !== null && (
-              <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, headline.earlierShortfallYear)}</p>
+              <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear))}</p>
             )}
           </>
         )}
@@ -359,7 +363,7 @@ export function Resultats() {
               <span className="scenario__swatch" aria-hidden="true" />
               {r.scenario.retireAt(label(selection))}
             </p>
-            <p className={'scenario__verdict' + (result.ok ? '' : ' scenario__verdict--short')}>{result.ok ? r.scenario.works : r.scenario.fails(result.firstShortfallYear!)}</p>
+            <p className={'scenario__verdict' + (result.ok ? '' : ' scenario__verdict--short')}>{result.ok ? r.scenario.works : r.scenario.fails(at(result.firstShortfallYear!))}</p>
             <p className="scenario__worth mono">{r.scenario.endWorth(formatMoney(worthAtHorizon(result, dollars, assumptions), lang), dollars === 'today' ? r.chart.today : r.chart.nominal)}</p>
           </li>
         ))}
@@ -394,7 +398,7 @@ export function Resultats() {
       {stop !== null && (
         <section id="arreter" className="results-section" aria-label={rc.questions.tabs.stop}>
           <SectionHeader title={rc.questions.tabs.stop} subtitle={rc.questions.stop.hint} />
-          <StopView names={names} stop={stop} />
+          <StopView names={names} births={births} stop={stop} />
         </section>
       )}
       </section>

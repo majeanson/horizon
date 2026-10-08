@@ -362,7 +362,7 @@ export const EN: typeof FR = {
     scenario: {
       retireAt: (label: string) => `Retire: ${label}`,
       works: 'Lasts to the horizon',
-      fails: (year: number) => `Short from ${year}`,
+      fails: (year: string) => `Short from ${year}`,
       endWorth: (amount: string, unit: string) => `Net worth at the horizon: ${amount} (${unit})`,
     },
     table: {

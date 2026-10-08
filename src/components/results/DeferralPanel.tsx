@@ -2,7 +2,7 @@ import type { PersonDeferral, StartOption } from '../../engine/deferral'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { DEFERRAL_COPY, versusCell } from '../../lib/deferralCopy'
-import { formatPct } from '../../lib/format'
+import { formatPct, formatYearAge } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { useDeferral } from '../../lib/useDeferral'
 import { Skeleton } from '../Skeleton'
@@ -17,11 +17,14 @@ function OptionsTable({
   title,
   options,
   current,
+  births,
 }: {
   title: string
   options: StartOption[]
   /** The start age in the person's profile, flagged « votre plan actuel ». */
   current: number
+  /** Everyone's birth year: a year is said with the ages it comes with. */
+  births: readonly number[]
 }) {
   const { lang } = useLang()
   const d = DEFERRAL_COPY[lang]
@@ -56,7 +59,7 @@ function OptionsTable({
               <td>{money(o.monthly)}</td>
               <td>{versus(o)}</td>
               <td>{breakEven(o)}</td>
-              <td>{o.plan.ok ? d.works : d.fails(o.plan.firstShortfallYear ?? 0)}</td>
+              <td>{o.plan.ok ? d.works : d.fails(formatYearAge(o.plan.firstShortfallYear ?? 0, births, lang))}</td>
               <td>{d.earliest(o.plan.earliestOk)}</td>
               <td>{money(o.plan.netWorth85)}</td>
               <td>{money(o.plan.netWorth95)}</td>
@@ -86,8 +89,8 @@ export function DeferralPanel({ household, assumptions, who, name }: { household
         <Skeleton count={3} />
       ) : (
         <>
-          <OptionsTable title={d.rrqTitle} options={person.rrq} current={person.current.rrq} />
-          <OptionsTable title={d.oasTitle} options={person.oas} current={person.current.oas} />
+          <OptionsTable title={d.rrqTitle} options={person.rrq} current={person.current.rrq} births={household.persons.map((p) => p.birth.year)} />
+          <OptionsTable title={d.oasTitle} options={person.oas} current={person.current.oas} births={household.persons.map((p) => p.birth.year)} />
           <h3 className="deferral__title">{d.whyTitle}</h3>
           <ul className="deferral__list">
             <li>{d.whyLead(formatPct(view.facts.rrqLateMax, lang, 1), formatPct(view.facts.oasLateMax, lang, 0))}</li>

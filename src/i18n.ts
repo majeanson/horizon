@@ -378,7 +378,7 @@ export const FR = {
     scenario: {
       retireAt: (label: string) => `Départ : ${label}`,
       works: 'Tient jusqu’à l’horizon',
-      fails: (year: number) => `Manque dès ${year}`,
+      fails: (year: string) => `Manque dès ${year}`,
       endWorth: (amount: string, unit: string) => `Valeur nette à l’horizon : ${amount} (${unit})`,
     },
     table: {

@@ -35,7 +35,7 @@ export interface DeferralCopy {
   breakEvenNone: string
   breakEvenSelf: string
   works: string
-  fails: (year: number) => string
+  fails: (year: string) => string
   earliest: (age: number | null) => string
   noWorth: string
   whyTitle: string
@@ -74,7 +74,7 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       breakEvenNone: 'après l’horizon du plan',
       breakEvenSelf: '—',
       works: 'Tient',
-      fails: (year: number) => `Manque dès ${year}`,
+      fails: (year: string) => `Manque dès ${year}`,
       earliest: (age: number | null) => (age === null ? 'aucun âge' : `${age} ans`),
       noWorth: '—',
       whyTitle: 'Pourquoi reporter peut avoir du sens',
@@ -120,7 +120,7 @@ export const DEFERRAL_COPY: { fr: DeferralCopy; en: DeferralCopy } = {
       breakEvenNone: 'beyond the plan’s horizon',
       breakEvenSelf: '—',
       works: 'Holds',
-      fails: (year: number) => `Runs short from ${year}`,
+      fails: (year: string) => `Runs short from ${year}`,
       earliest: (age: number | null) => (age === null ? 'no age' : `${age}`),
       noWorth: '—',
       whyTitle: 'Why deferring can make sense',

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { agesLedger, planGlance } from '../../engine/ledger'
 import type { AccountKind, Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
-import { formatPct } from '../../lib/format'
+import { formatPct, formatYearAge } from '../../lib/format'
 import { LEDGER_COPY } from '../../lib/ledgerCopy'
 import { formatMoney } from '../../lib/money'
 import { mapPerson, setAssumptions, setReturn, setSpending } from '../../lib/profileEdit'
@@ -165,7 +165,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
       </section>
 
       <p className={'ledger__glance' + (glance.ok ? '' : ' scenario__verdict--short')} aria-live="polite">
-        {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(String(glance.firstShortfallYear))} {worthDelta}
+        {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(formatYearAge(glance.firstShortfallYear!, shown.persons.map((p) => p.birth.year), lang))} {worthDelta}
       </p>
       <p className="field-row__hint">{c.glanceNote}</p>
     </div>

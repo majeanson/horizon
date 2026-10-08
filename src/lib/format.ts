@@ -33,6 +33,14 @@ export function formatYear(n: number | null | undefined, lang: Lang): string {
   return nf(lang, 'year', { useGrouping: false, maximumFractionDigits: 0 }).format(n)
 }
 
+// A calendar year the way the plan says it: with the age(s) it comes with, « 2043 (63 ans) » — « 2043 (63 / 61 ans) » for a
+// couple, in the order of the household. A bare year asks the reader to do the subtraction.
+export function formatYearAge(year: number, birthYears: readonly number[], lang: Lang): string {
+  const ages = birthYears.map((b) => year - b).filter((a) => a >= 0)
+  const y = formatYear(year, lang)
+  return ages.length === 0 ? y : `${y} (${ages.join(' / ')} ${lang === 'fr' ? 'ans' : 'yrs old'})`
+}
+
 // 0.0525 → "5,25 %" / "5.25%". `digits` is the number of fraction digits shown (default 1).
 export function formatPct(fraction: number | null | undefined, lang: Lang, digits = 1): string {
   if (fraction == null || !Number.isFinite(fraction)) return ''

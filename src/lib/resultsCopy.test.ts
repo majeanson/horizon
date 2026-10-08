@@ -55,7 +55,7 @@ describe('the results-page copy, in both languages', () => {
   })
 
   it('names the tax in the stop-working answer: the pensions are counted AFTER tax', () => {
-    expect(fr.questions.stop.share('50 %', 2040)).toContain('après impôt')
-    expect(en.questions.stop.share('50%', 2040)).toContain('after tax')
+    expect(fr.questions.stop.share('50 %', '2040')).toContain('après impôt')
+    expect(en.questions.stop.share('50%', '2040')).toContain('after tax')
   })
 })
