@@ -35,6 +35,7 @@ import { usePresetRange } from '../lib/usePresetEarliest'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
+import { accuracyOf } from '../lib/facts'
 import { parseSpend } from '../lib/spendModel'
 import { stopWorking } from '../lib/stopWorking'
 import { useEarliestEach } from '../lib/useEarliestEach'
@@ -78,6 +79,7 @@ export function Resultats() {
   const births = profile.household.persons.map((p) => p.birth.year)
   const at = (y: number) => formatYearAge(y, births, lang)
   const isCouple = profile.household.persons.length === 2
+  const accuracy = useMemo(() => accuracyOf(profile), [profile])
   const earliestEachAnswer = useEarliestEach(profile.household, assumptions, isCouple && gaps.length === 0 && !retiredNow)
 
   const setParam = useCallback(
@@ -333,6 +335,15 @@ export function Resultats() {
             </dl>
             {range !== undefined && prudentGap && <p className="verdict__note">{rc.headline.rangeGap}</p>}
           </div>
+        )}
+        {/* How much of the answer stands on the person's own documents: the meter of the Profil, said where the answer is read. */}
+        {accuracy.total > 0 && (
+          <p className="verdict__note">
+            {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
+            <Link className="info-note__link" to="/">
+              {rc.headline.confidenceLink}
+            </Link>
+          </p>
         )}
         {/* The verdict is an estimate under stated assumptions, and it says so where it is read — quietly: it must
             be present, not compete with the answer. */}

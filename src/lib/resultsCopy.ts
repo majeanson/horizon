@@ -113,6 +113,9 @@ const FR_RESULTS = {
     },
   },
   headline: {
+    confidence: (confirmed: number, total: number) => `Votre profil : ${confirmed} sur ${total} chiffres confirmés ; le reste est estimé.`,
+    confidenceAll: 'Tous les chiffres de votre profil sont confirmés par vos documents.',
+    confidenceLink: 'Rendre mon profil exact',
     now: 'Vous pouvez déjà prendre votre retraite.',
     retired: (together: boolean): string => (together ? 'Vous êtes déjà tous les deux à la retraite.' : 'Vous êtes déjà à la retraite.'),
     runsOut: (year: string) => `Mais l’argent viendrait à manquer dès ${year}.`,
@@ -254,6 +257,9 @@ const EN_RESULTS: typeof FR_RESULTS = {
     },
   },
   headline: {
+    confidence: (confirmed: number, total: number) => `Your profile: ${confirmed} of ${total} figures confirmed; the rest is estimated.`,
+    confidenceAll: 'Every figure in your profile is confirmed by your documents.',
+    confidenceLink: 'Make my profile exact',
     now: 'You can already retire.',
     retired: (together: boolean): string => (together ? 'You are both already retired.' : 'You are already retired.'),
     runsOut: (year: string) => `But the money would run out in ${year}.`,

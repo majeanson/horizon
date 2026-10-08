@@ -15,7 +15,6 @@ import { SectionLevel } from '../components/SectionHeader'
 import { StatusMessage } from '../components/StatusMessage'
 import type { PersonId } from '../engine/types'
 import { useT } from '../i18n'
-import { factId } from '../lib/facts'
 import { hasSpouse, mapPerson, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
@@ -122,10 +121,16 @@ function QuickStart() {
           <NumberField kind="year" min={1900} max={2100} value={self.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
-      <FieldRow label={t.profile.welcome.salary} infoId="salary" fact={factId('self', 'salary')}>
+      <FieldRow label={t.profile.welcome.salary} infoId="salary">
         {(w) => <NumberField kind="money" max={1e8} value={self.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} />}
       </FieldRow>
-      <FieldRow label={t.profile.welcome.spending} infoId="spendingRetired" fact={factId('household', 'spendingRetired')}>
+      {/* The three account totals: the other numbers a first verdict leans on. One box each (the form below splits room, cost base and contributions). */}
+      {(['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
+        <FieldRow key={kind} label={`${t.profile.accounts[kind]} · ${t.profile.accounts.balance}`} infoId={kind === 'rrsp' ? 'rrspBalance' : kind === 'tfsa' ? 'tfsaBalance' : 'nonRegBalance'}>
+          {(w) => <NumberField kind="money" max={1e9} value={self.accounts[kind].balance} onChange={(balance) => edit((x) => ({ ...x, accounts: { ...x.accounts, [kind]: { ...x.accounts[kind], balance } } }))} id={w.id} />}
+        </FieldRow>
+      ))}
+      <FieldRow label={t.profile.welcome.spending} infoId="spendingRetired">
         {(w) => <NumberField kind="money" max={1e8} value={profile.household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
       </FieldRow>
     </div>

@@ -47,6 +47,10 @@ export interface GuideCopy {
     guideAll: string
     show: string
     estimatedNote: (estimated: number) => string
+    estimate: string
+    quickDoes: string
+    estimateDone: (years: number, rooms: number) => string
+    estimateNothing: string
   }
   docs: Record<DocId, DocCopy>
   guide: {
@@ -115,6 +119,10 @@ const FR: GuideCopy = {
     guideAll: 'Tout confirmer pas à pas',
     show: 'Aller aux champs',
     estimatedNote: (n) => (n === 1 ? 'Un chiffre du profil est encore une estimation.' : `${n} chiffres du profil sont encore des estimations.`),
+    estimate: 'Estimer ce qui manque',
+    quickDoes: 'Ce qu’il estime : votre historique de revenus (à partir de votre salaire) et vos droits de CELI (à partir de votre âge et de votre solde). Il ne touche jamais un chiffre déjà saisi.',
+    estimateDone: (years, rooms) => `${years === 1 ? '1 année de revenus estimée' : `${years} années de revenus estimées`}, ${rooms === 1 ? '1 droit de CELI estimé' : `${rooms} droits de CELI estimés`}. Rien n’est confirmé : à vérifier sur vos documents.`,
+    estimateNothing: 'Rien à estimer : tout est déjà rempli.',
   },
   docs: {
     rrq: {
@@ -226,6 +234,10 @@ const EN: GuideCopy = {
     guideAll: 'Confirm everything, step by step',
     show: 'Go to the fields',
     estimatedNote: (n) => (n === 1 ? 'One figure in the profile is still an estimate.' : `${n} figures in the profile are still estimates.`),
+    estimate: 'Estimate what is missing',
+    quickDoes: 'What it estimates: your earnings history (from your salary) and your TFSA room (from your age and balance). It never touches a figure you already typed.',
+    estimateDone: (years, rooms) => `${years === 1 ? '1 year of earnings estimated' : `${years} years of earnings estimated`}, ${rooms === 1 ? '1 TFSA room estimated' : `${rooms} TFSA rooms estimated`}. Nothing is confirmed: check it against your documents.`,
+    estimateNothing: 'Nothing to estimate: everything is already filled in.',
   },
   docs: {
     rrq: {

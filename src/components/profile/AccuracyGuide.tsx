@@ -4,7 +4,9 @@ import { accuracyOf, DOC_IDS, factsOf, type DocId, type Fact } from '../../lib/f
 import { setGuided } from '../../lib/guide'
 import { GUIDE_COPY } from '../../lib/guideCopy'
 import { scrollBehavior } from '../../lib/motion'
+import { estimateMissing } from '../../lib/estimates'
 import { setFacts } from '../../lib/profileEdit'
+import { today } from '../../lib/today'
 import { updateProfile, useProfile } from '../../lib/store'
 import { Chip } from '../Chip'
 import { Icon } from '../Icon'
@@ -39,6 +41,8 @@ export default function AccuracyGuide() {
   const acc = useMemo(() => accuracyOf(profile), [profile])
   // The guide in progress: the figures it will visit (fixed when it starts, so confirming one does not reshuffle the others), and where it is.
   const [tour, setTour] = useState<{ ids: string[]; at: number } | null>(null)
+  // What the quick estimate just did, said once under its button.
+  const [estimated, setEstimated] = useState<string | null>(null)
 
   const nameOf = (owner: Fact['owner']): string =>
     owner === 'household' ? c.guide.householdOwner : c.guide.owner(profile.household.persons.find((p) => p.id === owner)?.name.trim() || (owner === 'self' ? t.profile.self : t.profile.spouse))
@@ -76,6 +80,22 @@ export default function AccuracyGuide() {
               <span className="accuracy__mode-tag">1</span> {c.panel.quickTitle}
             </h3>
             <p className="field-row__hint">{c.panel.quick}</p>
+            <p className="field-row__hint">{c.panel.quickDoes}</p>
+            <Chip
+              icon="arrow-right-bold"
+              onClick={() => {
+                const e = estimateMissing(profile, today())
+                updateProfile((p) => estimateMissing(p, today()).profile)
+                setEstimated(e.years === 0 && e.rooms === 0 ? c.panel.estimateNothing : c.panel.estimateDone(e.years, e.rooms))
+              }}
+            >
+              {c.panel.estimate}
+            </Chip>
+            {estimated && (
+              <p className="field-row__hint" role="status">
+                {estimated}
+              </p>
+            )}
           </div>
           <div className="accuracy__mode accuracy__mode--exact">
             <h3 className="accuracy__mode-title">

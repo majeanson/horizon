@@ -3,6 +3,7 @@ import { PLAN_RREGOP } from './plans.ts'
 import { resolveYear, type Indexation } from './project.ts'
 import { P2026 } from './2026.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
+import { TFSA_LIMIT_HISTORY } from './tfsaHistory.ts'
 import type { YearParams } from './types.ts'
 
 // The registry of years whose figures a person can open and check, and the one function the
@@ -17,6 +18,7 @@ export const KNOWN: Readonly<Record<number, YearParams>> = { 2026: P2026 }
 export const SERIES: ReadonlyArray<{ name: string; cited: Cited<unknown> }> = [
   { name: 'rrq.mgaHistory', cited: RRQ_MGA_HISTORY },
   { name: 'rrq.yampeHistory', cited: RRQ_YAMPE_HISTORY },
+  { name: 'accounts.tfsaLimitHistory', cited: TFSA_LIMIT_HISTORY },
   // The rules of the pension plans the app can pre-fill (not a tax year's figures: they change by legislation).
   ...citedLeaves(PLAN_RREGOP, 'plan.rregop').map((l) => ({ name: l.path, cited: l.cited as Cited<unknown> })),
 ]

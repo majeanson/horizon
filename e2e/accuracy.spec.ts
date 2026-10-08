@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { EXAMPLE, savedProfile, seedProfile } from './seed'
+import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile } from './seed'
 
 // « RENDRE MON PROFIL EXACT »: each figure is confirmed (read off a document) or estimated; the meter counts them; the checklist
 // names the documents; the guide walks the real form one figure at a time.
@@ -100,4 +100,54 @@ test('on a phone the guide sits above the bottom navigation, inside the window, 
   expect(box.x + box.width).toBeLessThanOrEqual(390)
   expect(box.y + box.height).toBeLessThanOrEqual(nav.y + 1)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('the quick way: « Estimer ce qui manque » fills blank earnings years and a TFSA room left at 0, confirms nothing, and never touches what was typed', async ({ page }) => {
+  const seed = structuredClone(EXAMPLE) as { household: { persons: { salaryToday: number; earningsHistory: Record<string, number>; accounts: { tfsa: { balance: number; room: number } } }[] } }
+  const me = seed.household.persons[0]
+  me.salaryToday = 120_000
+  me.earningsHistory = { '2020': 55_000 }
+  me.accounts.tfsa.balance = 40_000
+  me.accounts.tfsa.room = 0
+  await page.goto('/')
+  await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
+  await page.reload()
+  const quick = panel(page).locator('.accuracy__mode', { hasText: 'Rapide' })
+  await expect(quick).toContainText('Ce qu’il estime')
+  await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
+  await expect(quick.getByRole('status')).toContainText(/années de revenus estimées/)
+  await expect(quick.getByRole('status')).toContainText('Rien n’est confirmé')
+  await expect.poll(async () => Object.keys((await savedProfile(page)).household.persons[0].earningsHistory).length).toBeGreaterThan(5)
+  const saved = (await savedProfile(page)).household.persons[0]
+  expect(saved.earningsHistory['2020']).toBe(55_000) // typed: untouched
+  expect(saved.accounts.tfsa.room).toBeGreaterThan(0) // an estimate of the room a person of that age has, less the balance
+  expect((await savedProfile(page)).confirmed).toEqual([]) // nothing is called real by an estimate
+  // a second press has nothing left to fill, and says so
+  await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
+  await expect(quick.getByRole('status')).toContainText('Rien à estimer')
+})
+
+test('a first visit asks for the account totals too: the figures a first verdict leans on', async ({ page }) => {
+  await page.goto('/')
+  await page.evaluate((key) => localStorage.removeItem(key), PROFILE_KEY)
+  await page.evaluate(() => sessionStorage.setItem('e2e-seeded', '1'))
+  await page.reload()
+  const card = page.locator('.welcome__fields')
+  await expect(card).toBeVisible()
+  for (const name of ['REER · Solde', 'CELI · Solde', 'Non enregistré · Solde']) await expect(card.getByRole('textbox', { name })).toBeVisible()
+  const rrsp = card.getByRole('textbox', { name: 'REER · Solde' })
+  await rrsp.fill('85000')
+  await rrsp.blur()
+  await expect.poll(async () => (await savedProfile(page))?.household.persons[0].accounts.rrsp.balance).toBe(85_000)
+})
+
+test('the results say how much of the answer stands on confirmed figures, and point back to the profile', async ({ page }) => {
+  await page.goto('/resultats')
+  const note = page.locator('.verdict').getByText(/chiffres confirmés/)
+  await expect(note).toContainText(/Votre profil : 0 sur \d+ chiffres confirmés ; le reste est estimé\./)
+  await note.getByRole('link', { name: 'Rendre mon profil exact' }).click()
+  await expect(page).toHaveURL(/\/$/)
+  await page.locator('[data-fact="self:rrspBalance"]').getByRole('button', { name: /^Estimé/ }).click()
+  await page.getByRole('link', { name: 'Résultats' }).first().click()
+  await expect(page.locator('.verdict')).toContainText(/Votre profil : 1 sur \d+ chiffres confirmés/)
 })
