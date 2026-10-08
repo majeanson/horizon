@@ -15,6 +15,10 @@ export const PARAM_LABELS: {
     "accounts.pensionAdjustmentOffset":
       "Facteur d’équivalence : montant soustrait (600 $)",
     "accounts.rrifConversionAge": "Âge limite de conversion du REER en FERR",
+    "accounts.lifFreeAge": "FRV : âge dès lequel le plafond de retrait disparaît",
+    "accounts.lifPrescribedRate": "FRV : taux prescrit (plafond de retrait avant 55 ans)",
+    "accounts.lifUnlockAge": "CRI/FRV : âge du remboursement d’un petit solde",
+    "accounts.lifUnlockShareOfMga": "CRI/FRV : part du MGA sous laquelle le solde se débloque",
     "accounts.rrifDivisor": "FERR : diviseur du retrait minimum",
     "accounts.rrifFactors": "FERR : pourcentage de retrait minimum, par âge",
     "accounts.rrspLimit": "Plafond de cotisation REER",
@@ -157,6 +161,10 @@ export const PARAM_LABELS: {
       "Pension adjustment: amount subtracted ($600)",
     "accounts.rrifConversionAge":
       "Age by which an RRSP must be converted to a RRIF",
+    "accounts.lifFreeAge": "LIF: age from which the withdrawal maximum no longer applies",
+    "accounts.lifPrescribedRate": "LIF: prescribed rate (withdrawal maximum before 55)",
+    "accounts.lifUnlockAge": "LIRA/LIF: age at which a small balance can be refunded",
+    "accounts.lifUnlockShareOfMga": "LIRA/LIF: share of the MPE under which the balance unlocks",
     "accounts.rrifDivisor": "RRIF minimum withdrawal divisor",
     "accounts.rrifFactors": "RRIF minimum withdrawal percentage, by age",
     "accounts.rrspLimit": "RRSP contribution dollar limit",

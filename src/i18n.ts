@@ -176,6 +176,11 @@ export const FR = {
       contributionHint: 'En dollars d’aujourd’hui, tant que le revenu de travail dure.',
       acb: 'Coût de base rajusté',
       acbHint: 'Ce que vous avez payé au total, rajusté. Sert à savoir quelle part d’un retrait est un gain imposable.',
+      lockedToggle: 'Une partie est immobilisée (RVER avec employeur, CRI, FRV)',
+      locked: 'Dont immobilisé',
+      lockedHint: 'Compris dans le solde ci-dessus. Avant 55 ans, cette part ne sort qu’en petits montants.',
+      employerContribution: 'Cotisation de l’employeur par année',
+      employerHint: 'RVER : ce que l’employeur verse, en dollars d’aujourd’hui. Immobilisé, sans sortir de votre poche, pris sur vos droits REER.',
     },
   },
 
@@ -381,7 +386,7 @@ export const FR = {
       need: 'Dépenses + impôt',
       balancesTitle: 'Ce que contiennent les comptes',
       balancesHint: 'Les soldes de fin d’année. Le surplus est épargné : CELI d’abord, puis non enregistré, qui grossit aussi de son rendement.',
-      balance: { rrsp: 'REER', tfsa: 'CELI', nonReg: 'Non enregistré', home: 'Maison (valeur nette)' },
+      balance: { rrsp: 'REER', tfsa: 'CELI', nonReg: 'Non enregistré', home: 'Maison (valeur nette)', rrspLocked: 'REER immobilisé' },
       hypTitle: 'Sous les trois jeux d’hypothèses',
       hypHint: 'La valeur nette du même scénario avec des rendements prudents, neutres ou audacieux (voir Hypothèses). Ce ne sont pas des prévisions.',
       hyp: { prudent: 'Prudent', neutral: 'Neutre', bold: 'Audacieux' },
@@ -408,6 +413,7 @@ export const FR = {
       netWorth: 'Valeur nette',
       mortgage: 'Hypothèque payée',
       homeEquity: 'Maison, valeur nette',
+      rrspLocked: 'REER immobilisé',
     },
     sensitivity: {
       title: 'Et si l’avenir est un peu moins bon ?',
@@ -551,7 +557,13 @@ export const FR = {
       where: 'Le relevé de votre institution financière, au dernier jour du mois.',
       label: '',
       url: '',
-      note: 'Additionnez tous vos REER. Un RVER ou un RPAC s’y ajoute : mêmes impôts, mêmes droits de cotisation. Prenez le solde total du relevé, part de l’employeur comprise.',
+      note: 'Additionnez tous vos REER (un RVER ou un RPAC s’y ajoute : mêmes impôts).',
+    },
+    rrspLocked: {
+      where: 'Le relevé de votre RVER, CRI ou FRV : la part « immobilisée ». Dans un RVER, ce sont les cotisations de l’employeur ; dans un CRI ou un FRV, tout le solde.',
+      label: 'immobilisé',
+      url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/regime-volontaire-epargne-retraite-rver-et-instruments-transfert-et-decaissement/regime-volontaire-epargne-retraite-rver/travailleur-et-rver',
+      note: 'Avant 55 ans, un FRV du Québec ne verse au plus que 6,25 % du solde par année (taux 2026) ; dès 55 ans, tout peut en sortir. À 65 ans, un solde d’au plus 40 % du MGA se débloque. Un FRV fédéral suit d’autres règles, non modélisées : entrez-le ici quand même.',
     },
     rrspRoom: {
       where: 'Votre dernier avis de cotisation de l’ARC (relevé du maximum déductible au titre des REER), ou votre compte de l’ARC.',

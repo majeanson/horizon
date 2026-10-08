@@ -52,6 +52,20 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v8 → v9: the figures the person has CONFIRMED against a document are remembered (`confirmed`, ids like « self:rrspBalance »).
   // Every older file confirmed none: every figure is an estimate until said otherwise.
   (profile) => ({ ...profile, confirmed: [] }),
+  // v9 → v10: the REER may carry a locked-in part (`lockedIn`: a LIRA / LIF, the employer share of a VRSP) and an employer's yearly VRSP
+  // contribution (`employerContribution`). Every older file had neither as far as the plan knew: 0 and 0, written out so the file is whole.
+  (profile) => {
+    const household = profile.household
+    if (typeof household !== 'object' || household === null || Array.isArray(household)) return profile
+    const persons = (household as Raw).persons
+    if (!Array.isArray(persons)) return profile
+    const isObj = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x)
+    const fixPerson = (p: unknown) => {
+      if (!isObj(p) || !isObj(p.accounts) || !isObj(p.accounts.rrsp)) return p
+      return { ...p, accounts: { ...p.accounts, rrsp: { lockedIn: 0, employerContribution: 0, ...p.accounts.rrsp } } }
+    }
+    return { ...profile, household: { ...(household as Raw), persons: persons.map(fixPerson) } }
+  },
 ]
 
 export type ReadResult =

@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 9
+export const SCHEMA_VERSION = 10
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -55,7 +55,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
   rrq: { startAge: 65 },
   oas: { startAge: 65, residentSince: today.year - 45 + 18 },
   accounts: {
-    rrsp: { balance: 0, room: 0, annualContribution: 0 },
+    rrsp: { balance: 0, room: 0, annualContribution: 0, lockedIn: 0, employerContribution: 0 },
     tfsa: { balance: 0, room: 0, annualContribution: 0 },
     nonReg: { balance: 0, acb: 0, annualContribution: 0 },
   },
@@ -124,6 +124,9 @@ class Reader {
   }
   count(path: string): void {
     this.bad(path, 'count')
+  }
+  range(path: string): void {
+    this.bad(path, 'range')
   }
 }
 
@@ -229,6 +232,10 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
   const rawPensions = r.arr(o.pensions, `${path}.pensions`) ?? []
   if (rawPensions.length > 8) r.count(`${path}.pensions`)
   const pensions = rawPensions.slice(0, 8).map((p, i) => readPension(r, p, `${path}.pensions[${i}]`))
+  // The locked-in part (a LIRA / LIF, the employer share of a VRSP) is PART of the balance: more locked than there is would leave the
+  // engine a negative free part.
+  const rrsp = readAccount(r, accounts.rrsp, `${path}.accounts.rrsp`, ['balance', 'room', 'annualContribution', 'lockedIn', 'employerContribution'] as const)
+  if (rrsp.lockedIn > rrsp.balance) r.range(`${path}.accounts.rrsp.lockedIn`)
   return {
     id: r.oneOf(o.id, `${path}.id`, [expected]),
     name: r.str(o.name, `${path}.name`, 60),
@@ -246,7 +253,7 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
       residentSince: r.num(oas.residentSince, `${path}.oas.residentSince`, 1900, 2100, true),
     },
     accounts: {
-      rrsp: readAccount(r, accounts.rrsp, `${path}.accounts.rrsp`, ['balance', 'room', 'annualContribution'] as const),
+      rrsp,
       tfsa: readAccount(r, accounts.tfsa, `${path}.accounts.tfsa`, ['balance', 'room', 'annualContribution'] as const),
       nonReg: readAccount(r, accounts.nonReg, `${path}.accounts.nonReg`, ['balance', 'acb', 'annualContribution'] as const),
     },

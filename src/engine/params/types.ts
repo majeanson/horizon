@@ -183,5 +183,12 @@ export interface YearParams {
     /** A defined-benefit plan's pension adjustment is (this × the benefit earned in the year) − the offset, never below zero. */
     pensionAdjustmentFactor: Cited
     pensionAdjustmentOffset: Cited
+    /** Québec LIF (FRV): under `lifFreeAge` a locked-in part pays at most this × its 1 January balance in the year. */
+    lifPrescribedRate: Cited
+    /** From this age (attained in the year) a Québec LIF has no maximum (since 1 January 2025). */
+    lifFreeAge: Cited
+    /** From this age a locked-in balance of at most `lifUnlockShareOfMga` × MGA may be refunded: it stops being locked. */
+    lifUnlockAge: Cited
+    lifUnlockShareOfMga: Cited
   }
 }

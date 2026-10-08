@@ -17,6 +17,7 @@ export type FactKind =
   | 'residence'
   | 'rrspBalance'
   | 'rrspRoom'
+  | 'rrspLocked'
   | 'tfsaBalance'
   | 'tfsaRoom'
   | 'nonRegBalance'
@@ -51,6 +52,8 @@ const FACTS: readonly FactDef[] = [
   { kind: 'residence', doc: 'residence', owner: 'person', info: 'oasResidence', applies: () => true },
   { kind: 'rrspBalance', doc: 'bank', owner: 'person', info: 'rrspBalance', applies: () => true },
   { kind: 'rrspRoom', doc: 'tax', owner: 'person', info: 'rrspRoom', applies: () => true },
+  // Only for someone who has a locked-in part: nothing is asked of anyone else.
+  { kind: 'rrspLocked', doc: 'bank', owner: 'person', info: 'rrspLocked', applies: (p, o) => (person(p, o)?.accounts.rrsp.lockedIn ?? 0) > 0 },
   { kind: 'tfsaBalance', doc: 'bank', owner: 'person', info: 'tfsaBalance', applies: () => true },
   { kind: 'tfsaRoom', doc: 'tax', owner: 'person', info: 'tfsaRoom', applies: () => true },
   { kind: 'nonRegBalance', doc: 'bank', owner: 'person', info: 'nonRegBalance', applies: () => true },

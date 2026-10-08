@@ -64,6 +64,32 @@ export function maxWithdraw(balance: number, rate: number): number {
   return Math.max(0, balance) * Math.min(1, (1 + rate) ** 0.5)
 }
 
+// ── The locked-in part of an RRSP ─────────────────────────────────────────────────────────────────
+// A Québec LIRA / LIF (CRI / FRV), or the employer share of an RVER, is RRSP money that can only be drawn through a life income
+// fund: before 55 the year's draw is capped, from 55 it is not (Retraite Québec, since 2025-01-01). Same tax, same return, same
+// order as the rest of the RRSP — only the amount that can leave differs. See ENGINE.md for what is and is not modelled.
+
+/**
+ * The most the LOCKED part can give in a year. Under `lifFreeAge` (55) a Québec LIF pays at most the prescribed rate × its
+ * 1 January balance; from 55 there is no maximum and it draws like the rest. Never more than `maxWithdraw` allows.
+ */
+export function lockedAvailable(age: number, lockedJan1: number, rate: number, rules: AccountRules): number {
+  const avail = maxWithdraw(lockedJan1, rate)
+  if (age >= rules.lifFreeAge) return avail
+  return Math.min(avail, roundTo(rules.lifPrescribedRate * Math.max(0, lockedJan1), 0.01))
+}
+
+/** An RRSP withdrawal (the RRIF minimum and the voluntary draw together) comes from the free part first, then from the locked part up to its cap. */
+export function splitRrspOut(out: number, freeAvail: number, lockedAvail: number): { free: number; locked: number } {
+  const locked = Math.min(Math.max(0, out - freeAvail), Math.max(0, lockedAvail))
+  return { free: out - locked, locked }
+}
+
+/** At `lifUnlockAge` (65) and over, a locked part of at most `lifUnlockShareOfMga` × the MGA may be refunded: it stops being locked. */
+export function unlocksAt65(age: number, lockedJan1: number, mga: number, rules: AccountRules): boolean {
+  return lockedJan1 > 0 && age >= rules.lifUnlockAge && lockedJan1 <= rules.lifUnlockShareOfMga * mga
+}
+
 // ── TFSA ──────────────────────────────────────────────────────────────────────────────────────────
 
 export interface TfsaState {

@@ -17,7 +17,7 @@
 
 ## 2026
 
-100 parameters.
+104 parameters.
 
 | Parameter | Value | Official page | Read on | Moves with | Note |
 | --- | --- | --- | --- | --- | --- |
@@ -120,6 +120,10 @@
 | `accounts.rrifDivisor` | 90 | [Chart - Prescribed factors](https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/completing-slips-summaries/t4rsp-t4rif-information-returns/payments/chart-prescribed-factors.html) · [version française](https://www.canada.ca/fr/agence-revenu/services/impot/entreprises/sujets/remplir-feuillets-sommaires/declaration-renseignements-t4rsp-t4rif/paiements/tableau-facteurs-prescrits.html) | 2026-10-06 | fixed | « If the age is 70 years or younger, the prescribed factor is calculated as follows: 1 divided by (90 minus the age). » |
 | `accounts.pensionAdjustmentFactor` | 9 | [Pension Adjustment Guide](https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html) · [version française](https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4084/guide-facteur-equivalence.html) | 2026-10-06 | fixed | « (9 × benefit earned) − $600 = pension credit » for a defined-benefit provision; « If the result is negative, the pension credit is zero » (the offset has been $600 since 1997). |
 | `accounts.pensionAdjustmentOffset` | 600 | [Pension Adjustment Guide](https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/t4084/pension-adjustment-guide.html) · [version française](https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/t4084/guide-facteur-equivalence.html) | 2026-10-06 | fixed | « (9 × benefit earned) − $600 = pension credit » for a defined-benefit provision; « If the result is negative, the pension credit is zero » (the offset has been $600 since 1997). |
+| `accounts.lifPrescribedRate` | 0.0625 | [Rates relating to LIF calculations](https://www.retraitequebec.gouv.qc.ca/en/professionals-employers/professionals-involved-pension-plans/liras-lifs/rates-relating-lif-calculations) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/professionnels-et-employeurs/professionnels-concernes-regimes-retraite/cri-et-frv/taux-relatifs-frv) | 2026-10-08 | fixed | Prescribed rate for persons under 55: 6.25 % for 2026 (6 % for 2025). Reset yearly by Retraite Québec; held flat in projection. « Upper limit of the life income = (Prescribed rate) × (LIF balance on 31 December or 1 January) ». |
+| `accounts.lifFreeAge` | 55 | [Characteristics of an LIF - Retraite Québec](https://www.retraitequebec.gouv.qc.ca/en/professionals-employers/professionals-involved-pension-plans/liras-lifs/characteristics-lif) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/professionnels-et-employeurs/professionnels-concernes-regimes-retraite/cri-et-frv/caracteristiques-frv) | 2026-10-08 | fixed | Since 1 January 2025, from 55 « the person can withdraw all or part of the balance, in one or more instalments, regardless of the life income established or paid for the year »; under 55 the upper limit applies. The minimum is the RRIF minimum (« The minimum is $0 the year in which the LIF is opened »). |
+| `accounts.lifUnlockAge` | 65 | [Flash Retirement - Capsule 41](https://www.retraitequebec.gouv.qc.ca/en/flash-retirement/flash-retirement-capsule-41) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/flash-retraite/flash-retraite-capsule-41) | 2026-10-08 | fixed | Refund of a locked-in balance: « The person is aged 65 or over and the total of the locked-in amounts does not exceed 40% of the maximum pensionable earnings (MPE) … that is, $29 840 in 2026. » |
+| `accounts.lifUnlockShareOfMga` | 0.4 | [Flash Retirement - Capsule 41](https://www.retraitequebec.gouv.qc.ca/en/flash-retirement/flash-retirement-capsule-41) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/flash-retraite/flash-retraite-capsule-41) | 2026-10-08 | fixed | The same rule: 40 % of the MPE (MGA) of the year of the request — $29 840 for 2026. |
 | `accounts.rrifConversionAge` | 71 | [RRSP options when you turn 71](https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/rrsp-options-when-you-turn-71.html) · [version française](https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/reer-regimes-connexes/options-vos-reer-lorsque-vous-atteignez-71-ans.html) | 2026-10-06 | fixed | « December 31 of the year you turn 71 years old is the last day that you can contribute to your RRSPs. » That year the RRSP must be withdrawn, transferred to a RRIF or used to buy an annuity. |
 
 ## Historical series
@@ -152,7 +156,7 @@
 
 ## Pages consulted
 
-40 official pages. A page cited by many figures is the first one to re-read.
+43 official pages. A page cited by many figures is the first one to re-read.
 
 | Official page | Figures | Last read |
 | --- | --- | --- |
@@ -186,6 +190,9 @@
 | [Revenu maximal assurable aux fins du Régime québécois d’assurance parentale (RQAP)](https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable) (French-language page only) | 1 | 2026-10-06 |
 | [Taux de cotisations au Régime québécois d’assurance parentale (RQAP)](https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations) (French-language page only) | 1 | 2026-10-06 |
 | [Calculation of Your Retirement Pension Under the Québec Pension Plan](https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/applying-your-retirement-pension/retirement-pension-quebec-pension-plan/calculation-your-retirement-pension) | 5 | 2026-10-06 |
+| [Flash Retirement - Capsule 41](https://www.retraitequebec.gouv.qc.ca/en/flash-retirement/flash-retirement-capsule-41) | 2 | 2026-10-08 |
+| [Characteristics of an LIF - Retraite Québec](https://www.retraitequebec.gouv.qc.ca/en/professionals-employers/professionals-involved-pension-plans/liras-lifs/characteristics-lif) | 1 | 2026-10-08 |
+| [Rates relating to LIF calculations](https://www.retraitequebec.gouv.qc.ca/en/professionals-employers/professionals-involved-pension-plans/liras-lifs/rates-relating-lif-calculations) | 1 | 2026-10-08 |
 | [The additional plan](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/additional-plan) | 4 | 2026-10-06 |
 | [Québec Pension Plan Figures](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/quebec-pension-plan-figures) | 5 | 2026-10-06 |
 | [Pensionable earnings and contributions](https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions) | 3 | 2026-10-06 |

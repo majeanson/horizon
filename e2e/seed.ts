@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import type { Page } from '@playwright/test'
 
 // Horizon has no API to stub: a spec « logs in » by putting a profile into localStorage BEFORE first paint, which
-// is exactly where the app itself keeps it. The example is the golden couple (src/lib/fixtures/profile.v9.json) —
+// is exactly where the app itself keeps it. The example is the golden couple (src/lib/fixtures/profile.v10.json) —
 // the same file the unit tests migrate and the golden snapshots are built from, so what a browser sees here is
 // what the engine tests pin. (When the schema moves on, point this at the new fixture: `schemaVersion.test.ts`
 // keeps one per version.)
@@ -11,7 +11,7 @@ export const PROFILE_KEY = 'horizon-profile'
 
 export type SeedProfile = Record<string, unknown>
 
-export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v9.json', 'utf8'))
+export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v10.json', 'utf8'))
 
 /** A blank single person with the defaults the app itself would start from. */
 export function blankSeed(): SeedProfile {
@@ -26,7 +26,7 @@ export function blankSeed(): SeedProfile {
     rrq: { startAge: 65 },
     oas: { startAge: 65, residentSince: 1999 },
     accounts: {
-      rrsp: { balance: 0, room: 0, annualContribution: 0 },
+      rrsp: { balance: 0, room: 0, annualContribution: 0, lockedIn: 0, employerContribution: 0 },
       tfsa: { balance: 0, room: 0, annualContribution: 0 },
       nonReg: { balance: 0, acb: 0, annualContribution: 0 },
     },

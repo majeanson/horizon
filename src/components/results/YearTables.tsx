@@ -4,7 +4,7 @@ import { formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { useNotice } from '../../lib/toast'
 import { useParamChoice } from '../../lib/useParamChoice'
-import { yearCsv } from '../../lib/yearCsv'
+import { lockedOf, yearCsv } from '../../lib/yearCsv'
 import { Chip } from '../Chip'
 import { TableChooser } from '../TableChooser'
 import type { Selection } from '../../lib/resultsModel'
@@ -58,6 +58,8 @@ export function YearTables({
   if (!shown) return null
   // The home's two columns appear only when the plan has a home (a column of dashes says nothing).
   const hasHome = shown.result.rows.some((row) => row.household.homeValueEnd > 0)
+  // …and the locked-in REER column only when someone has a locked part (an RVER with an employer, a CRI, a FRV).
+  const hasLocked = shown.result.rows.some((row) => lockedOf(row) > 0)
   return (
     <>
       <p className="field-row__hint year-table__unit">
@@ -88,6 +90,7 @@ export function YearTables({
                 <th scope="col">{r.table.spending}</th>
                 <th scope="col">{r.table.shortfall}</th>
                 <th scope="col">{r.table.netWorth}</th>
+                {hasLocked && <th scope="col">{r.table.rrspLocked}</th>}
                 {hasHome && <th scope="col">{r.table.mortgage}</th>}
                 {hasHome && <th scope="col">{r.table.homeEquity}</th>}
               </tr>
@@ -105,6 +108,7 @@ export function YearTables({
                   <td>{money(row.household.spending, row.year)}</td>
                   <td>{row.household.shortfall > 0 ? money(row.household.shortfall, row.year) : '—'}</td>
                   <td>{money(row.household.netWorthEnd, row.year)}</td>
+                  {hasLocked && <td>{money(lockedOf(row), row.year)}</td>}
                   {hasHome && <td>{row.household.mortgagePayment > 0 ? money(row.household.mortgagePayment, row.year) : '—'}</td>}
                   {hasHome && <td>{money(row.household.homeValueEnd - row.household.mortgageBalanceEnd, row.year)}</td>}
                 </tr>

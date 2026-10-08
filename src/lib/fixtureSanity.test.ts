@@ -78,6 +78,7 @@ function violations(h: Household, children: readonly number[] = []): string[] {
     if (p.salaryToday > 0 && rrsp.annualContribution > P.accounts.rrspRate * p.salaryToday + rrsp.room) {
       add('rrsp-contribution', who, `${rrsp.annualContribution} a year is more than 18 % of the salary plus all the room`)
     }
+    if ((rrsp.lockedIn ?? 0) > rrsp.balance) add('rrsp-locked', who, `${rrsp.lockedIn} locked in is more than the whole REER balance ${rrsp.balance}`)
     const earnedEver = years.reduce((s, y) => s + p.earningsHistory[y], 0) + p.salaryToday
     if (rrsp.room > P.accounts.rrspRate * earnedEver) add('rrsp-room', who, `${rrsp.room} of room is more than 18 % of everything ever earned`)
     if (nonReg.acb < 0 || nonReg.acb > Math.max(2 * nonReg.balance, 1000)) add('nonreg-acb', who, `cost base ${nonReg.acb} against a balance of ${nonReg.balance}`)
@@ -168,7 +169,7 @@ describe('the detector is pinned: a household built to break every rule is caugh
         oas: { startAge: 60, residentSince: 2010 },
         earningsHistory: { 2000: 10_000, 2005: -5, 2010: 999_999, 2030: 5_000 },
         accounts: {
-          rrsp: { balance: -1, room: 9_999_999, annualContribution: 99_999 },
+          rrsp: { balance: -1, room: 9_999_999, annualContribution: 99_999, lockedIn: 5 },
           tfsa: { balance: 0, room: 999_999, annualContribution: 99_999 },
           nonReg: { balance: 100, acb: 10_000, annualContribution: 0 },
         },
@@ -182,7 +183,7 @@ describe('the detector is pinned: a household built to break every rule is caugh
 
   it.each([
     'couple-lives-alone', 'age-gap', 'age', 'retirement-age', 'rrq-start', 'oas-start', 'residence', 'earnings-year', 'earnings-negative',
-    'earnings-over-ceiling', 'earnings-vs-salary', 'balance-negative', 'tfsa-room', 'tfsa-contribution', 'rrsp-contribution', 'rrsp-room',
+    'earnings-over-ceiling', 'earnings-vs-salary', 'balance-negative', 'tfsa-room', 'tfsa-contribution', 'rrsp-contribution', 'rrsp-room', 'rrsp-locked',
     'nonreg-acb', 'db-service', 'db-start', 'spending-vs-income', 'retired-spending', 'child',
   ])('rule « %s » fires', (rule) => {
     expect(found.has(rule), `${rule} did not fire on the broken household`).toBe(true)

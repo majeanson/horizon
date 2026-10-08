@@ -52,7 +52,8 @@ const average: Household = {
     person({
       id: 'spouse', name: 'Luc', birth: { year: 1982, month: 2 }, retirementAge: 63, salaryToday: 58_000, earningsHistory: history(1982, 24_500),
       accounts: {
-        rrsp: { balance: 55_000, room: 15_000, annualContribution: 3_000 },
+        // An RVER at work: 25 000 $ of the 55 000 $ is the employer's share (locked in until 55), and the employer adds 2 000 $ a year.
+        rrsp: { balance: 55_000, room: 15_000, annualContribution: 3_000, lockedIn: 25_000, employerContribution: 2_000 },
         tfsa: { balance: 40_000, room: 35_000, annualContribution: 5_000 },
         nonReg: none,
       },

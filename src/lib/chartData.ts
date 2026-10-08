@@ -68,8 +68,9 @@ export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: 'ink',
 export const BALANCE_SEGMENTS = ['rrsp', 'tfsa', 'nonReg'] as const
 export type BalanceSegment = (typeof BALANCE_SEGMENTS)[number]
 /** The house's equity: wealth beside the accounts, never drawn on — a segment only for the household, and only when it has a home. */
-export type BalanceBarSegment = BalanceSegment | 'home'
-export const BALANCE_COLOUR: Record<BalanceBarSegment, SeriesColour> = { rrsp: 'accent', tfsa: 'sage', nonReg: 'sky', home: 'berry' }
+export type BalanceBarSegment = BalanceSegment | 'rrspLocked' | 'home'
+/** `rrspLocked` splits the locked-in part out of the REER bar (the `rrsp` bar is then the free part): a segment only when someone has one. */
+export const BALANCE_COLOUR: Record<BalanceBarSegment, SeriesColour> = { rrsp: 'accent', rrspLocked: 'ink', tfsa: 'sage', nonReg: 'sky', home: 'berry' }
 
 interface Scale {
   dollars: Dollars
@@ -100,8 +101,13 @@ export function balanceBars(rows: readonly YearRow[], who: string | null, s: Sca
   return rows.map((row) => {
     const k = scaleOf(row, s)
     // The home belongs to the household, not to a person: it is in the household's bars only.
-    const out = { x: row.year, rrsp: 0, tfsa: 0, nonReg: 0, home: who === null ? (row.household.homeValueEnd - row.household.mortgageBalanceEnd) / k : 0 }
-    for (const p of peopleOf(row, who)) for (const a of BALANCE_SEGMENTS) out[a] += p.balancesEnd[a] / k
+    const out = { x: row.year, rrsp: 0, rrspLocked: 0, tfsa: 0, nonReg: 0, home: who === null ? (row.household.homeValueEnd - row.household.mortgageBalanceEnd) / k : 0 }
+    for (const p of peopleOf(row, who)) {
+      for (const a of BALANCE_SEGMENTS) out[a] += p.balancesEnd[a] / k
+      // the locked part is shown on its own: the REER bar is what is left of it
+      out.rrspLocked += p.rrspLockedEnd / k
+      out.rrsp -= p.rrspLockedEnd / k
+    }
     return out
   })
 }

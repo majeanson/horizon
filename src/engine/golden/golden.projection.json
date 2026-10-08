@@ -32,7 +32,8 @@
      "nonReg": 15600,
      "rrsp": 105408.51,
      "tfsa": 55771.13
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 45,
@@ -64,7 +65,8 @@
      "nonReg": 10400,
      "rrsp": 66789.01,
      "tfsa": 42429.54
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -112,7 +114,8 @@
      "nonReg": 16224,
      "rrsp": 116414.21,
      "tfsa": 64459.54
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 46,
@@ -144,7 +147,8 @@
      "nonReg": 10816,
      "rrsp": 73969.39,
      "tfsa": 49634.9
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -192,7 +196,8 @@
      "nonReg": 16872.96,
      "rrsp": 128046.68,
      "tfsa": 74130.92
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 47,
@@ -224,7 +229,8 @@
      "nonReg": 11248.64,
      "rrsp": 81560.56,
      "tfsa": 57671.93
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -272,7 +278,8 @@
      "nonReg": 17547.88,
      "rrsp": 135259.72,
      "tfsa": 85082.92
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 48,
@@ -304,7 +311,8 @@
      "nonReg": 11698.59,
      "rrsp": 89582.85,
      "tfsa": 69618.16
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -352,7 +360,8 @@
      "nonReg": 18249.8,
      "rrsp": 141959.76,
      "tfsa": 96687.7
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 49,
@@ -384,7 +393,8 @@
      "nonReg": 12166.53,
      "rrsp": 98057.54,
      "tfsa": 83772.76
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -432,7 +442,8 @@
      "nonReg": 18979.79,
      "rrsp": 148961.3,
      "tfsa": 108978
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 50,
@@ -464,7 +475,8 @@
      "nonReg": 12653.19,
      "rrsp": 107006.9,
      "tfsa": 99744.53
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -512,7 +524,8 @@
      "nonReg": 19738.98,
      "rrsp": 156277.91,
      "tfsa": 121988.09
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 51,
@@ -544,7 +557,8 @@
      "nonReg": 13159.32,
      "rrsp": 116454.25,
      "tfsa": 117670.18
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -592,7 +606,8 @@
      "nonReg": 20528.54,
      "rrsp": 163923.77,
      "tfsa": 143393.57
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 52,
@@ -624,7 +639,8 @@
      "nonReg": 13685.69,
      "rrsp": 126424.01,
      "tfsa": 130059.31
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -672,7 +688,8 @@
      "nonReg": 21349.68,
      "rrsp": 171913.69,
      "tfsa": 158296.39
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 53,
@@ -704,7 +721,8 @@
      "nonReg": 14233.12,
      "rrsp": 136941.72,
      "tfsa": 151996.72
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -752,7 +770,8 @@
      "nonReg": 22203.67,
      "rrsp": 180263.16,
      "tfsa": 184150.92
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 54,
@@ -784,7 +803,8 @@
      "nonReg": 14802.44,
      "rrsp": 148034.13,
      "tfsa": 166231.62
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -832,7 +852,8 @@
      "nonReg": 23091.82,
      "rrsp": 188988.35,
      "tfsa": 201289.49
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 55,
@@ -864,7 +885,8 @@
      "nonReg": 15394.54,
      "rrsp": 159729.23,
      "tfsa": 192642.85
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -912,7 +934,8 @@
      "nonReg": 24015.49,
      "rrsp": 198106.18,
      "tfsa": 222892.57
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 56,
@@ -944,7 +967,8 @@
      "nonReg": 23754.97,
      "rrsp": 172056.31,
      "tfsa": 210512.05
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -992,7 +1016,8 @@
      "nonReg": 24976.11,
      "rrsp": 207584.23,
      "tfsa": 232922.74
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 57,
@@ -1024,7 +1049,8 @@
      "nonReg": 24705.17,
      "rrsp": 184617.65,
      "tfsa": 219985.09
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1072,7 +1098,8 @@
      "nonReg": 25810.84,
      "rrsp": 216925.52,
      "tfsa": 243404.26
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 58,
@@ -1104,7 +1131,8 @@
      "nonReg": 25693.38,
      "rrsp": 192925.44,
      "tfsa": 229884.42
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1152,7 +1180,8 @@
      "nonReg": 26817.75,
      "rrsp": 226687.17,
      "tfsa": 254357.46
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 59,
@@ -1184,7 +1213,8 @@
      "nonReg": 26721.12,
      "rrsp": 201607.08,
      "tfsa": 240229.22
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1232,7 +1262,8 @@
      "nonReg": 27890.46,
      "rrsp": 236888.09,
      "tfsa": 265803.55
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 60,
@@ -1264,7 +1295,8 @@
      "nonReg": 27789.96,
      "rrsp": 210869.6,
      "tfsa": 251039.53
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1312,7 +1344,8 @@
      "nonReg": 29006.08,
      "rrsp": 247548.05,
      "tfsa": 277764.71
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 61,
@@ -1344,7 +1377,8 @@
      "nonReg": 28901.56,
      "rrsp": 220801.94,
      "tfsa": 262336.31
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1392,7 +1426,8 @@
      "nonReg": 30166.32,
      "rrsp": 258687.71,
      "tfsa": 290264.12
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 62,
@@ -1424,7 +1459,8 @@
      "nonReg": 23572.02,
      "rrsp": 230738.03,
      "tfsa": 274141.45
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1472,7 +1508,8 @@
      "nonReg": 609.24,
      "rrsp": 270328.66,
      "tfsa": 303326.01
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 63,
@@ -1504,7 +1541,8 @@
      "nonReg": 476.06,
      "rrsp": 240621.17,
      "tfsa": 286477.82
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1552,7 +1590,8 @@
      "nonReg": 12.3,
      "rrsp": 282493.45,
      "tfsa": 316975.68
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 64,
@@ -1584,7 +1623,8 @@
      "nonReg": 9.61,
      "rrsp": 179113.25,
      "tfsa": 299889.25
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1632,7 +1672,8 @@
      "nonReg": 0.25,
      "rrsp": 295205.66,
      "tfsa": 331743.5
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 65,
@@ -1664,7 +1705,8 @@
      "nonReg": 0.19,
      "rrsp": 126543.36,
      "tfsa": 313384.27
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1712,7 +1754,8 @@
      "nonReg": 0.01,
      "rrsp": 308489.91,
      "tfsa": 347221.11
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 66,
@@ -1744,7 +1787,8 @@
      "nonReg": 0,
      "rrsp": 105381.06,
      "tfsa": 327486.56
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1792,7 +1836,8 @@
      "nonReg": 0,
      "rrsp": 322371.96,
      "tfsa": 362846.06
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 67,
@@ -1824,7 +1869,8 @@
      "nonReg": 0,
      "rrsp": 82217.17,
      "tfsa": 342816.37
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1872,7 +1918,8 @@
      "nonReg": 0,
      "rrsp": 336878.7,
      "tfsa": 379811.97
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 68,
@@ -1904,7 +1951,8 @@
      "nonReg": 0,
      "rrsp": 56933.84,
      "tfsa": 358243.11
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -1952,7 +2000,8 @@
      "nonReg": 0,
      "rrsp": 333855.23,
      "tfsa": 396903.51
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 69,
@@ -1984,7 +2033,8 @@
      "nonReg": 0,
      "rrsp": 48569.96,
      "tfsa": 374364.05
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2032,7 +2082,8 @@
      "nonReg": 0,
      "rrsp": 330449.36,
      "tfsa": 414764.17
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 70,
@@ -2064,7 +2115,8 @@
      "nonReg": 0,
      "rrsp": 38997.65,
      "tfsa": 391220.34
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2112,7 +2164,8 @@
      "nonReg": 0,
      "rrsp": 326639.09,
      "tfsa": 433428.56
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 71,
@@ -2144,7 +2197,8 @@
      "nonReg": 0,
      "rrsp": 28130.35,
      "tfsa": 408851.68
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2192,7 +2246,8 @@
      "nonReg": 0,
      "rrsp": 322405.28,
      "tfsa": 452932.85
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 72,
@@ -2224,7 +2279,8 @@
      "nonReg": 0,
      "rrsp": 17174.92,
      "tfsa": 427250.01
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2272,7 +2328,8 @@
      "nonReg": 0,
      "rrsp": 317731.98,
      "tfsa": 473314.83
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 73,
@@ -2304,7 +2361,8 @@
      "nonReg": 0,
      "rrsp": 5272.62,
      "tfsa": 446476.26
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2352,7 +2410,8 @@
      "nonReg": 0,
      "rrsp": 304276.14,
      "tfsa": 494614
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 74,
@@ -2384,7 +2443,8 @@
      "nonReg": 0,
      "rrsp": 119.94,
      "tfsa": 466670.16
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2432,7 +2492,8 @@
      "nonReg": 0,
      "rrsp": 283781.33,
      "tfsa": 516871.63
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 75,
@@ -2464,7 +2525,8 @@
      "nonReg": 0,
      "rrsp": 2.73,
      "tfsa": 488048.72
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2512,7 +2574,8 @@
      "nonReg": 0,
      "rrsp": 262414.35,
      "tfsa": 540130.85
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 76,
@@ -2544,7 +2607,8 @@
      "nonReg": 0,
      "rrsp": 0.06,
      "tfsa": 510399.42
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2592,7 +2656,8 @@
      "nonReg": 0,
      "rrsp": 238766.43,
      "tfsa": 564913.31
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 77,
@@ -2624,7 +2689,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 533367.39
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2672,7 +2738,8 @@
      "nonReg": 0,
      "rrsp": 212644.55,
      "tfsa": 590334.41
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 78,
@@ -2704,7 +2771,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 557972.29
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2752,7 +2820,8 @@
      "nonReg": 0,
      "rrsp": 183861.4,
      "tfsa": 617660.85
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 79,
@@ -2784,7 +2853,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 583081.04
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2832,7 +2902,8 @@
      "nonReg": 0,
      "rrsp": 152234.92,
      "tfsa": 645455.59
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 80,
@@ -2864,7 +2935,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 610259.23
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2912,7 +2984,8 @@
      "nonReg": 0,
      "rrsp": 117566.71,
      "tfsa": 675644.97
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 81,
@@ -2944,7 +3017,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 637720.9
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -2992,7 +3066,8 @@
      "nonReg": 0,
      "rrsp": 79641.23,
      "tfsa": 706048.99
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 82,
@@ -3024,7 +3099,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 667797.21
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3072,7 +3148,8 @@
      "nonReg": 0,
      "rrsp": 38225.2,
      "tfsa": 739471.17
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 83,
@@ -3104,7 +3181,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 697848.08
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3152,7 +3230,8 @@
      "nonReg": 0,
      "rrsp": 869.53,
      "tfsa": 772747.37
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 84,
@@ -3184,7 +3263,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 725810.98
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3232,7 +3312,8 @@
      "nonReg": 0,
      "rrsp": 19.78,
      "tfsa": 807521
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 85,
@@ -3264,7 +3345,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 727042.63
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3312,7 +3394,8 @@
      "nonReg": 0,
      "rrsp": 0.45,
      "tfsa": 843859.45
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 86,
@@ -3344,7 +3427,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 726651.53
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3392,7 +3476,8 @@
      "nonReg": 0,
      "rrsp": 0.01,
      "tfsa": 881833.13
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 87,
@@ -3424,7 +3509,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 725148.02
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3472,7 +3558,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 921515.62
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 88,
@@ -3504,7 +3591,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 722468.45
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3552,7 +3640,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 962983.82
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 89,
@@ -3584,7 +3673,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 718533.35
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3632,7 +3722,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 1006318.09
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 90,
@@ -3664,7 +3755,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 713258.51
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3712,7 +3804,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 1051602.4
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 91,
@@ -3744,7 +3837,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 706554.57
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3792,7 +3886,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 1098924.51
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 92,
@@ -3824,7 +3919,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 698328.59
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3872,7 +3968,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 1148376.11
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 93,
@@ -3904,7 +4001,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 688481.99
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -3952,7 +4050,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 1200053.03
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 94,
@@ -3984,7 +4083,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 676911.76
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {
@@ -4032,7 +4132,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 1254055.42
-    }
+    },
+    "rrspLockedEnd": 0
    },
    "spouse": {
     "age": 95,
@@ -4064,7 +4165,8 @@
      "nonReg": 0,
      "rrsp": 0,
      "tfsa": 663509.28
-    }
+    },
+    "rrspLockedEnd": 0
    }
   },
   "household": {

@@ -32,7 +32,7 @@ function personTable(p: Person): string[] {
   const pension = p.pensions.map((d) => (d.inPay ? `${d.label} en cours : ${$(d.inPay.annual)} par année` : `${d.label} : ${d.serviceYearsToDate} ans de service, début à ${d.startAge} ans`)).join(' ; ') || 'aucune'
   return [
     `| ${p.name} | né·e en ${p.birth.year}-${String(p.birth.month).padStart(2, '0')} | retraite à ${p.retirementAge} ans | salaire ${$(p.salaryToday)} | RRQ à ${p.rrq.startAge} ans, PSV à ${p.oas.startAge} ans (au Canada depuis ${p.oas.residentSince}) |`,
-    `| ↳ comptes | REER ${$(a.rrsp.balance)} (+${$(a.rrsp.annualContribution)}/an) | CELI ${$(a.tfsa.balance)} (+${$(a.tfsa.annualContribution)}/an) | non enregistré ${$(a.nonReg.balance)} (+${$(a.nonReg.annualContribution)}/an) | rente d’employeur : ${pension} |`,
+    `| ↳ comptes | REER ${$(a.rrsp.balance)}${a.rrsp.lockedIn ? ` (dont immobilisé ${$(a.rrsp.lockedIn)})` : ''} (+${$(a.rrsp.annualContribution)}/an${a.rrsp.employerContribution ? `, employeur +${$(a.rrsp.employerContribution)}/an` : ''}) | CELI ${$(a.tfsa.balance)} (+${$(a.tfsa.annualContribution)}/an) | non enregistré ${$(a.nonReg.balance)} (+${$(a.nonReg.annualContribution)}/an) | rente d’employeur : ${pension} |`,
   ]
 }
 

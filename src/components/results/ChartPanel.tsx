@@ -154,6 +154,7 @@ function DetailView({
   const balances = useMemo(() => balanceBars(rows, personId, scale), [rows, personId, scale])
   // The house's equity is a segment of the household's bars when the plan has a home.
   const balanceSegments: BalanceBarSegment[] = ['rrsp', 'tfsa', 'nonReg']
+  if (rows.some((r) => Object.values(r.persons).some((p) => p.rrspLockedEnd > 0))) balanceSegments.splice(1, 0, 'rrspLocked') // right above the free REER
   if (personId === null && rows.some((r) => r.household.homeValueEnd > 0)) balanceSegments.push('home')
   const hypotheses = useMemo(
     () => hypothesisSeries(household, assumptions, scenarioOf(household, run.selection), scale, c.hyp),

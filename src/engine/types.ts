@@ -100,7 +100,15 @@ export interface Person {
     residentSince: number
   }
   accounts: {
-    rrsp: { balance: number; room: number; annualContribution: number }
+    rrsp: {
+      balance: number
+      room: number
+      annualContribution: number
+      /** The part of `balance` that is locked in (a LIRA / LIF, the employer share of a VRSP), today. Absent: none. */
+      lockedIn?: number
+      /** An employer's VRSP contribution per year, today's dollars, while working: it lands in the locked part, costs the person no cash and uses RRSP room. Absent: none. */
+      employerContribution?: number
+    }
     tfsa: { balance: number; room: number; annualContribution: number }
     nonReg: { balance: number; acb: number; annualContribution: number }
   }
@@ -196,6 +204,8 @@ export interface PersonYear {
   federalTax: number
   quebecTax: number
   balancesEnd: Record<AccountKind, number>
+  /** The locked-in part of `balancesEnd.rrsp` at year end (0 when there is none). */
+  rrspLockedEnd: number
 }
 
 export interface YearRow {

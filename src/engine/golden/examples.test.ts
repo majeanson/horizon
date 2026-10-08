@@ -54,6 +54,19 @@ describe('each story', () => {
     expect(planGlance(household, assumptions).ok).toBe(true)
   })
 
+  it('average: Luc has an RVER — a locked part that grows with the employer’s money, stays within the REER, and is free to draw long before he needs it', () => {
+    const { household, assumptions } = EXAMPLES.average
+    const luc = household.persons[1]
+    expect(luc.accounts.rrsp.lockedIn).toBe(25_000)
+    const rows = rowsOf('average')
+    const lucAt = (year: number) => rows.find((r) => r.year === year)!.persons.spouse!
+    expect(lucAt(2026).rrspLockedEnd).toBeGreaterThan(25_000) // the employer's 2 000 $ and a year of growth
+    for (const r of rows) expect(r.persons.spouse!.rrspLockedEnd).toBeLessThanOrEqual(r.persons.spouse!.balancesEnd.rrsp + 0.005)
+    // nothing drawn from it while he works; the plan, as ever, holds
+    expect(lucAt(2030).withdrawals.rrsp).toBe(0)
+    expect(planGlance(household, assumptions).ok).toBe(true)
+  })
+
   it('modest: the plan holds only just, and the GIS is a large part of why', () => {
     const { household, assumptions } = EXAMPLES.modest
     const g = planGlance(household, assumptions)

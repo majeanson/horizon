@@ -1,4 +1,4 @@
-import { ageAtJan1, firstRrifYear, grow, maxWithdraw, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, tfsaNextRoom, type NonRegState } from './accounts.ts'
+import { ageAtJan1, firstRrifYear, grow, lockedAvailable, maxWithdraw, nonRegContribute, nonRegWithdraw, rrifMinimum, rrspNextRoom, splitRrspOut, tfsaNextRoom, unlocksAt65, type NonRegState } from './accounts.ts'
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson } from './oas.ts'
 import { homeYear, initialHome, type HomeState } from './home.ts'
@@ -30,6 +30,8 @@ import type { AccountKind, Assumptions, Household, Person, PersonId, PersonYear,
 
 interface PersonState {
   rrsp: number
+  /** The locked-in part of `rrsp` (0 ≤ rrspLocked ≤ rrsp). */
+  rrspLocked: number
   rrspRoom: number
   tfsa: number
   tfsaRoom: number
@@ -104,6 +106,13 @@ interface FixedIncome {
   /** The member's own pension-plan contributions on the year's pay (deducted from income). */
   rppC: number
   rrspC: number
+  /** An employer's VRSP contribution: it lands in the locked part, costs no cash, and has first claim on the RRSP room. */
+  employerC: number
+  /** The locked part at 1 January, after the 65+ refund of a small balance. */
+  lockedJan1: number
+  /** What the free and the locked parts can each give this year (the locked one capped before 55). */
+  freeAvail: number
+  lockedAvail: number
   tfsaC: number
   nonRegC: number
 }
@@ -124,6 +133,7 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
 
   let states: PersonState[] = h.persons.map((p) => ({
     rrsp: p.accounts.rrsp.balance,
+    rrspLocked: Math.min(Math.max(0, p.accounts.rrsp.lockedIn ?? 0), p.accounts.rrsp.balance),
     rrspRoom: p.accounts.rrsp.room,
     tfsa: p.accounts.tfsa.balance,
     tfsaRoom: p.accounts.tfsa.room,
@@ -194,11 +204,18 @@ function simulateYear(
 
     // Savings the person has decided to make while still working, in today's dollars, grown with prices.
     const acct = r.p.accounts
-    const rrspC = working && age <= 71 ? Math.min(acct.rrsp.annualContribution * inflate, states[i].rrspRoom) : 0
+    // The locked-in part (accounts.ts): unless a small balance is refunded at 65+, what was locked in January stays locked; the free
+    // part and the locked part (capped before 55) are what the RRSP can give this year. The employer's VRSP contribution is not a
+    // choice, so it has first claim on the room; the person's own contribution takes what is left.
+    const lockedJan1 = unlocksAt65(age, states[i].rrspLocked, P.rrq.mga, P.accounts) ? 0 : states[i].rrspLocked
+    const freeAvail = maxWithdraw(states[i].rrsp - lockedJan1, a.returns.rrsp)
+    const lockedAvail = lockedAvailable(age, lockedJan1, a.returns.rrsp, P.accounts)
+    const employerC = working && age <= 71 ? Math.min((acct.rrsp.employerContribution ?? 0) * inflate, states[i].rrspRoom) : 0
+    const rrspC = working && age <= 71 ? Math.min(acct.rrsp.annualContribution * inflate, Math.max(0, states[i].rrspRoom - employerC)) : 0
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, a.returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, tfsaC, nonRegC }
+    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, a.returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -339,7 +356,7 @@ function simulateYear(
     for (const kind of a.withdrawalOrder) {
       if (need <= 0.005) break
       const room = people.map((_, i) =>
-        kind === 'rrsp' ? maxWithdraw(states[i].rrsp, a.returns.rrsp) - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, a.returns.tfsa) : maxWithdraw(states[i].nonReg.balance, a.returns.nonReg),
+        kind === 'rrsp' ? fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, a.returns.tfsa) : maxWithdraw(states[i].nonReg.balance, a.returns.nonReg),
       )
       const available = sum(room.map((x) => Math.max(0, x)))
       if (available <= 0.005) continue
@@ -449,7 +466,11 @@ function simulateYear(
     const rrspOut = fixed[i].rrifMin + draw.rrsp[i]
     const tfsaIn = fixed[i].tfsaC + extra.tfsa[i]
     const nonRegIn = fixed[i].nonRegC + extra.nonReg[i]
-    const rrspNext = grow(s.rrsp, fixed[i].rrspC - rrspOut, a.returns.rrsp)
+    const { locked: lockedOut } = splitRrspOut(rrspOut, fixed[i].freeAvail, fixed[i].lockedAvail)
+    const rrspNext = grow(s.rrsp, fixed[i].rrspC + fixed[i].employerC - rrspOut, a.returns.rrsp)
+    // The locked part grows on its own flows: the employer's money in, its share of the draw out. grow() is linear, so the two parts
+    // differ from the whole by cent-rounding only; the clamp keeps 0 ≤ locked ≤ rrsp whatever the rounding.
+    const rrspLockedNext = Math.min(Math.max(0, grow(fixed[i].lockedJan1, fixed[i].employerC - lockedOut, a.returns.rrsp)), rrspNext)
     const tfsaNext = grow(s.tfsa, tfsaIn - draw.tfsa[i], a.returns.tfsa)
     const afterWithdrawal = nonRegContribute(w.state, nonRegIn)
     // Mid-year like the other two accounts (accounts.ts « convention for flows »): the balance grows from its
@@ -462,7 +483,8 @@ function simulateYear(
     const pa = pensionAdjustment(r.p.pensions, earned, r.p.pensions.length > 0 && earned > 0, P.accounts)
     next.push({
       rrsp: rrspNext,
-      rrspRoom: rrspNextRoom(Math.max(0, s.rrspRoom - fixed[i].rrspC), earned, pa, nextParams.accounts, nextParams.accounts.rrspLimit),
+      rrspLocked: rrspLockedNext,
+      rrspRoom: rrspNextRoom(Math.max(0, s.rrspRoom - fixed[i].rrspC - fixed[i].employerC), earned, pa, nextParams.accounts, nextParams.accounts.rrspLimit),
       tfsa: tfsaNext,
       tfsaRoom: tfsaNextRoom(Math.max(0, s.tfsaRoom - tfsaIn), draw.tfsa[i], nextParams.accounts.tfsaLimit),
       nonReg: { balance: nonRegBalance, acb: afterWithdrawal.acb },
@@ -488,6 +510,7 @@ function simulateYear(
       federalTax: t.federal.tax,
       quebecTax: t.quebec.tax,
       balancesEnd: { nonReg: nonRegBalance, rrsp: rrspNext, tfsa: tfsaNext },
+      rrspLockedEnd: rrspLockedNext,
     }
   })
 

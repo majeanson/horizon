@@ -13,12 +13,15 @@ import type { YearParams } from './types.ts'
 // itself under `npm run sources`, and Node type-strips natively.
 
 const RETRIEVED = '2026-10-06'
-const src = (url: string, title: string, extra: { note?: string; verify?: string } = {}): Source => ({ url, title, retrieved: RETRIEVED, ...extra })
+const src = (url: string, title: string, extra: { note?: string; verify?: string; retrieved?: string } = {}): Source => ({ url, title, retrieved: RETRIEVED, ...extra })
 const c = <T>(value: T, index: IndexRule, source: Source, round?: number): Cited<T> => ({ value, source, index, ...(round === undefined ? {} : { round }) })
 
 // ── Retraite Québec ──────────────────────────────────────────────────────────────────────────────
 const RQ = 'https://www.retraitequebec.gouv.qc.ca'
 const LEAFLETS = `${RQ}/sites/default/files/SiteCollectionDocuments/RetraiteQuebec/en/publications/nos-programmes/regime-de-rentes/retraite`
+const RQ_LIF = src(`${RQ}/en/professionals-employers/professionals-involved-pension-plans/liras-lifs/characteristics-lif`, 'Characteristics of an LIF - Retraite Québec', { retrieved: '2026-10-08' })
+const RQ_LIF_RATES = src(`${RQ}/en/professionals-employers/professionals-involved-pension-plans/liras-lifs/rates-relating-lif-calculations`, 'Rates relating to LIF calculations', { retrieved: '2026-10-08' })
+const RQ_CAPSULE_41 = src(`${RQ}/en/flash-retirement/flash-retirement-capsule-41`, 'Flash Retirement - Capsule 41', { retrieved: '2026-10-08' })
 const RRQ_FIGURES = src(`${RQ}/en/programs/quebec-pension-plan/quebec-pension-plan-figures`, 'Québec Pension Plan Figures')
 const RRQ_ADDITIONAL = src(`${RQ}/en/programs/quebec-pension-plan/additional-plan`, 'The additional plan')
 const RRQ_EARNINGS = src(`${RQ}/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions`, 'Pensionable earnings and contributions')
@@ -310,6 +313,10 @@ export const P2026 = {
     rrifDivisor: c(90, 'fixed', { ...CRA_RRIF, note: '« If the age is 70 years or younger, the prescribed factor is calculated as follows: 1 divided by (90 minus the age). »' }),
     pensionAdjustmentFactor: c(9, 'fixed', CRA_PA),
     pensionAdjustmentOffset: c(600, 'fixed', CRA_PA),
+    lifPrescribedRate: c(0.0625, 'fixed', { ...RQ_LIF_RATES, note: 'Prescribed rate for persons under 55: 6.25 % for 2026 (6 % for 2025). Reset yearly by Retraite Québec; held flat in projection. « Upper limit of the life income = (Prescribed rate) × (LIF balance on 31 December or 1 January) ».' }),
+    lifFreeAge: c(55, 'fixed', { ...RQ_LIF, note: 'Since 1 January 2025, from 55 « the person can withdraw all or part of the balance, in one or more instalments, regardless of the life income established or paid for the year »; under 55 the upper limit applies. The minimum is the RRIF minimum (« The minimum is $0 the year in which the LIF is opened »).' }),
+    lifUnlockAge: c(65, 'fixed', { ...RQ_CAPSULE_41, note: 'Refund of a locked-in balance: « The person is aged 65 or over and the total of the locked-in amounts does not exceed 40% of the maximum pensionable earnings (MPE) … that is, $29 840 in 2026. »' }),
+    lifUnlockShareOfMga: c(0.4, 'fixed', { ...RQ_CAPSULE_41, note: 'The same rule: 40 % of the MPE (MGA) of the year of the request — $29 840 for 2026.' }),
     rrifConversionAge: c(71, 'fixed', { ...CRA_71, note: '« December 31 of the year you turn 71 years old is the last day that you can contribute to your RRSPs. » That year the RRSP must be withdrawn, transferred to a RRIF or used to buy an annuity.' }),
   },
 } satisfies YearParams

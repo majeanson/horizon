@@ -160,6 +160,11 @@ export const EN: typeof FR = {
       contributionHint: 'In today’s dollars, while work income lasts.',
       acb: 'Adjusted cost base',
       acbHint: 'What you paid in total, adjusted. It tells how much of a withdrawal is a taxable gain.',
+      lockedToggle: 'Part of it is locked in (VRSP with employer, LIRA, LIF)',
+      locked: 'Of which locked in',
+      lockedHint: 'Included in the balance above. Before 55, this part comes out only in small amounts.',
+      employerContribution: 'Employer contribution per year',
+      employerHint: 'VRSP: what the employer pays in, in today’s dollars. Locked in, not out of your pocket, and it uses your RRSP room.',
     },
   },
 
@@ -365,7 +370,7 @@ export const EN: typeof FR = {
       need: 'Spending + tax',
       balancesTitle: 'What the accounts hold',
       balancesHint: 'Year-end balances, by kind of account. What is left after spending, tax and your contributions is saved: first in the TFSA (as room allows), then in the non-registered account, which also grows with its return.',
-      balance: { rrsp: 'RRSP', tfsa: 'TFSA', nonReg: 'Non-registered', home: 'Home (net value)' },
+      balance: { rrsp: 'RRSP', tfsa: 'TFSA', nonReg: 'Non-registered', home: 'Home (net value)', rrspLocked: 'Locked-in RRSP' },
       hypTitle: 'Under the three sets of hypotheses',
       hypHint: 'The same scenario’s net worth with prudent, neutral or bold returns (see Assumptions). They are not forecasts.',
       hyp: { prudent: 'Prudent', neutral: 'Neutral', bold: 'Bold' },
@@ -392,6 +397,7 @@ export const EN: typeof FR = {
       netWorth: 'Net worth',
       mortgage: 'Mortgage paid',
       homeEquity: 'Home, net value',
+      rrspLocked: 'Locked-in RRSP',
     },
     sensitivity: {
       title: 'What if the future is a little worse?',
@@ -531,7 +537,13 @@ export const EN: typeof FR = {
       where: 'Your financial institution’s statement, as of the last day of the month.',
       label: '',
       url: '',
-      note: 'Add up all your RRSPs. A VRSP or PRPP goes in too: same tax, same contribution room. Take the statement’s total balance, employer share included.',
+      note: 'Add up all your RRSPs (a VRSP or PRPP goes in too: same tax).',
+    },
+    rrspLocked: {
+      where: 'Your VRSP, LIRA or LIF statement: the « locked-in » part. In a VRSP it is the employer’s contributions; in a LIRA or LIF, the whole balance.',
+      label: 'locked-in',
+      url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/work/voluntary-retirement-savings-plans-vrsps-transfer-withdrawal-instruments/voluntary-retirement-savings-plans-vrsps/workers-vrsps',
+      note: 'Before 55, a Québec LIF pays at most 6.25% of its balance a year (2026 rate); from 55, everything can come out. At 65, a balance of at most 40% of the MPE unlocks. A federal LIF follows other rules, not modelled: enter it here anyway.',
     },
     rrspRoom: {
       where: 'Your latest CRA notice of assessment (the RRSP deduction limit and available contribution room statement), or your CRA account.',

@@ -11,7 +11,12 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
   return {
     app: 'horizon',
     version: SCHEMA_VERSION,
-    household: { ...structuredClone(e.household), home: structuredClone(e.household.home ?? null) },
+    // The locked-in keys are optional in the engine and required in the saved file: write them out so every example saves.
+    household: {
+      ...structuredClone(e.household),
+      persons: structuredClone(e.household.persons).map((p) => ({ ...p, accounts: { ...p.accounts, rrsp: { lockedIn: 0, employerContribution: 0, ...p.accounts.rrsp } } })),
+      home: structuredClone(e.household.home ?? null),
+    },
     children: [...e.children],
     assumptions: structuredClone(assumptions),
     customScenario: null,

@@ -26,6 +26,16 @@ export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): P
   return { ...p, assumptions: { ...p.assumptions, ...patch } }
 }
 
+// ── The REER's locked-in part ──────────────────────────────────────────────────────────────────────────
+
+/** The REER balance. The locked part is PART of it, so lowering the balance lowers the locked part with it; the same person back when nothing changes. */
+export function setRrspBalance(person: Person, balance: number): Person {
+  const rrsp = person.accounts.rrsp
+  const lockedIn = Math.min(rrsp.lockedIn ?? 0, balance)
+  if (rrsp.balance === balance && (rrsp.lockedIn ?? 0) === lockedIn) return person
+  return { ...person, accounts: { ...person.accounts, rrsp: { ...rrsp, balance, lockedIn } } }
+}
+
 // ── Which figures are real ─────────────────────────────────────────────────────────────────────────
 
 /** Say a figure is confirmed (read off a document) or estimated again; the same profile back when it already is. */
