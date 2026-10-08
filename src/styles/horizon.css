@@ -473,28 +473,6 @@
   gap: 0.5rem;
 }
 
-/* ── The order of withdrawals ────────────────────────────────────────────── */
-.order-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.order-list__item {
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.25rem 0.25rem 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-}
-.order-list__pos {
-  color: var(--ink-soft);
-}
-
 /* ── Données ─────────────────────────────────────────────────────────────── */
 .import-errors {
   display: flex;
@@ -939,30 +917,6 @@
   margin: 0;
 }
 
-/* « Quand commencer ma rente ? »: two option tables and the case for and against deferring. */
-.deferral {
-  display: grid;
-  gap: var(--space-3, 0.75rem);
-}
-.deferral__title {
-  margin: var(--space-2, 0.5rem) 0 0;
-  font-size: var(--text-md, 1rem);
-}
-.deferral__list {
-  margin: 0;
-  padding-inline-start: 1.1rem;
-  display: grid;
-  gap: 0.35rem;
-}
-.deferral__yours {
-  font-weight: 400;
-  opacity: 0.8;
-}
-.deferral__row--yours th,
-.deferral__row--yours td {
-  background: var(--surface-2);
-}
-
 /* ── One question, one answer (Résultats ▸ « Ma question ») ───────────────────────────────────────────────────── */
 .answer {
   display: flex;
@@ -1217,4 +1171,16 @@
   display: grid;
   gap: 0.15rem;
   justify-items: start;
+}
+
+/* ── The strategy view's headings and lists (Résultats ▸ Stratégies) ───────────────────────────────────────────── */
+.bridge__heading {
+  margin: var(--space-2, 0.5rem) 0 0;
+  font-size: var(--text-md, 1rem);
+}
+.bridge__list {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
 }

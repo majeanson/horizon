@@ -1,5 +1,4 @@
 import type { AccountKind } from '../engine/types'
-import { Cluster } from '../components/Layout'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
@@ -16,7 +15,7 @@ import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { formatPct } from '../lib/format'
-import { applyPreset, moveInOrder, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
+import { applyPreset, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 
@@ -44,17 +43,6 @@ export function Hypotheses() {
     return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
   }
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
-  // Moving a row to an edge disables the very button that was pressed, and a disabled element drops
-  // focus to <body> — a keyboard user pressing Enter on « Monter » lost their place. The rows keep
-  // their DOM nodes (keyed by kind), so only that one case needs catching: when focus actually fell,
-  // give it to the row's still-enabled arrow.
-  const keepFocusInRow = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const row = e.currentTarget.closest('.order-list__item')
-    requestAnimationFrame(() => {
-      if (document.activeElement === document.body) row?.querySelector<HTMLButtonElement>('button:enabled')?.focus()
-    })
-  }
-
   return (
     <section className="page-body">
       <PageHead title={a.title} subtitle={a.subtitle} />
@@ -128,43 +116,6 @@ export function Hypotheses() {
           {(w) => <NumberField kind="int" min={80} max={110} unit={t.fields.years} value={assumptions.horizonAge} onChange={(horizonAge) => updateProfile((p) => setAssumptions(p, { horizonAge }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
         {meter('horizonAge', assumptions.horizonAge)}
-      </Section>
-
-      <Section title={a.order.title} subtitle={a.order.hint} icon="download-simple-bold">
-        <ol className="order-list">
-          {assumptions.withdrawalOrder.map((kind, i) => (
-            <li key={kind} className="order-list__item">
-              <span className="order-list__pos mono">{a.order.position(i + 1)}</span>
-              <span className="order-list__name">{accountName[kind]}</span>
-              <Cluster>
-                <button
-                  type="button"
-                  className="btn btn--icon btn--ghost"
-                  disabled={i === 0}
-                  aria-label={`${t.common.moveUp} : ${accountName[kind]}`}
-                  onClick={(e) => {
-                    updateProfile((p) => setAssumptions(p, { withdrawalOrder: moveInOrder(p.assumptions.withdrawalOrder, i, -1) }))
-                    keepFocusInRow(e)
-                  }}
-                >
-                  <Icon name="caret-up-bold" size={18} />
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--icon btn--ghost"
-                  disabled={i === assumptions.withdrawalOrder.length - 1}
-                  aria-label={`${t.common.moveDown} : ${accountName[kind]}`}
-                  onClick={(e) => {
-                    updateProfile((p) => setAssumptions(p, { withdrawalOrder: moveInOrder(p.assumptions.withdrawalOrder, i, 1) }))
-                    keepFocusInRow(e)
-                  }}
-                >
-                  <Icon name="caret-down-bold" size={18} />
-                </button>
-              </Cluster>
-            </li>
-          ))}
-        </ol>
       </Section>
 
       <Section title={a.splitting.title} icon="users-three-bold">

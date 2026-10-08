@@ -152,20 +152,6 @@ test('no chart or table runs past the right edge on a phone', async ({ page }) =
   expect(box.x + box.width).toBeLessThanOrEqual(361)
 })
 
-test('a couple can compare two different retirement ages and the card says who retires when', async ({ page }) => {
-  await page.goto('/resultats?ages=plan')
-  const [first, second] = [page.getByRole('textbox', { name: /Âge de départ de/ }).nth(0), page.getByRole('textbox', { name: /Âge de départ de/ }).nth(1)]
-  await first.fill('58')
-  await second.fill('64')
-  await page.getByRole('button', { name: 'Ajouter cette comparaison' }).click()
-  await expect(page).toHaveURL(/ages=plan(%2C|,)58-64/)
-  await expect(page.getByRole('button', { name: /58 ans · .* 64 ans/, pressed: true })).toBeVisible()
-  await expect(page.getByText(/Départ : .*58 ans · .*64 ans/).first()).toBeVisible()
-  // The chip is a toggle like any other: pressing it takes the card away.
-  await page.getByRole('button', { name: /58 ans · .* 64 ans/ }).click()
-  await expect(page).not.toHaveURL(/58-64/)
-})
-
 test('a couple gets each person\'s own earliest age, worked out off the page\'s thread, and can send the pair to the comparison', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
@@ -181,30 +167,3 @@ test('a couple gets each person\'s own earliest age, worked out off the page\'s 
   expect(problems).toEqual([])
 })
 
-// « Quand commencer ma rente ? » sits on the page and works out, off the page's thread, what starting the QPP
-// pension and the OAS at each age does. The numbers are pinned by unit tests (src/engine/deferral.test.ts); this pins that a
-// person can see the rule's own percentages beside the plan, tell which row is theirs, and switch person.
-test('« when should I start my pension » compares the start ages, flags the plan\'s own row and switches person', async ({ page }) => {
-  const problems = watchConsole(page)
-  await page.goto('/resultats?v=strategies')
-  const rrq = page.getByRole('region', { name: /Régime de rentes du Québec \(RRQ\)/ })
-  const oas = page.getByRole('region', { name: /Sécurité de la vieillesse \(PSV\)/ })
-  await expect(rrq).toBeVisible({ timeout: 60_000 })
-  await expect(rrq.locator('tbody tr')).toHaveCount(4)
-  await expect(oas.locator('tbody tr')).toHaveCount(2)
-  // The rule's own adjustments, in the reader's number format: +42,0 % at 70, +58,8 % at 72 (QPP); +36,0 % at 70 (OAS).
-  await expect(rrq.getByRole('row', { name: /^70 ans/ })).toContainText('+42,0 %')
-  await expect(rrq.getByRole('row', { name: /^72 ans/ })).toContainText('+58,8 %')
-  await expect(oas.getByRole('row', { name: /^70 ans/ })).toContainText('+36,0 %')
-  // The row of the profile's own start age (65) is named, and only that one.
-  await expect(rrq.getByText('votre plan actuel')).toHaveCount(1)
-  await expect(rrq.getByRole('row', { name: /^65 ans/ })).toContainText('votre plan actuel')
-  // The second person has their own comparison.
-  const before = await rrq.locator('tbody tr').first().innerText()
-  await page.getByRole('tablist', { name: 'Pour' }).getByRole('tab', { name: 'Alex' }).click()
-  await expect(page.getByRole('heading', { name: 'Pour Alex' })).toBeVisible()
-  await expect(rrq.locator('tbody tr').first()).not.toHaveText(before)
-  // It says what it leaves out.
-  await expect(page.getByText(/rente de conjoint survivant n’est pas modélisée/)).toBeVisible()
-  expect(problems).toEqual([])
-})

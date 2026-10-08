@@ -6,7 +6,6 @@ import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
-import { DeferralPanel } from '../components/results/DeferralPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { LedgerPanel } from '../components/results/LedgerPanel'
 import { OrderPanel } from '../components/results/OrderPanel'
@@ -16,7 +15,6 @@ import { StopView } from '../components/results/StopView'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
-import { SplitPicker } from '../components/results/SplitPicker'
 import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
@@ -26,7 +24,6 @@ import { withPreset } from '../engine/assumptionPresets'
 import { useLang, useT } from '../i18n'
 import type { Dollars, Metric } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
-import { parseBridgeParams } from '../lib/bridgeModel'
 import { presetOf } from '../engine/assumptionPresets'
 import { formatYearAge } from '../lib/format'
 import { RESULTS_COPY } from '../lib/resultsCopy'
@@ -190,8 +187,6 @@ export function Resultats() {
 
   // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
   const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
-
-  const deferralWho = parseBridgeParams(params, profile.household).levers.id
 
   if (gaps.length > 0) {
     return (
@@ -370,9 +365,6 @@ export function Resultats() {
           </Rail>
           {selections.length >= MAX_SELECTIONS && <p className="field-row__hint">{r.compare.max}</p>}
           {selections.includes('plan') && <p className="field-row__hint">{r.compare.planHint}</p>}
-          {profile.household.persons.length === 2 && (
-            <SplitPicker names={[names[0], names[1]]} defaults={[profile.household.persons[0].retirementAge, profile.household.persons[1].retirementAge === profile.household.persons[0].retirementAge ? Math.min(MAX_AGE, profile.household.persons[0].retirementAge + 5) : profile.household.persons[1].retirementAge]} onAdd={addSplit} disabled={selections.length >= MAX_SELECTIONS} />
-          )}
         </div>
       )}
 
@@ -429,10 +421,7 @@ export function Resultats() {
         <section className="arc" aria-label={rc.tabs.strategies}>
           {state.pensionsOpen && <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
             <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} />
-            <h3 className="deferral__title">{rc.pensions.planView}</h3>
             <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
-            <h3 className="deferral__title">{rc.pensions.ruleView}</h3>
-            <DeferralPanel household={profile.household} assumptions={assumptions} who={deferralWho} name={names[Math.max(0, profile.household.persons.findIndex((p) => p.id === deferralWho))] ?? ''} />
           </section>}
           <section id="ordre" className="results-section" aria-label={rc.orders.title}>
             <SectionHeader title={rc.orders.title} />

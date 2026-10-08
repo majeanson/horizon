@@ -148,7 +148,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
   if (rows.length === 0) return null
   return (
     <div className="bridge__charts">
-      <h3 className="deferral__title">{copy.barsTitle}</h3>
+      <h3 className="bridge__heading">{copy.barsTitle}</h3>
       <p className="field-row__hint">{copy.barsHint}</p>
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
@@ -164,7 +164,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
           />
         </Suspense>
       </div>
-      <h3 className="deferral__title">{copy.nestTitle}</h3>
+      <h3 className="bridge__heading">{copy.nestTitle}</h3>
       <p className="field-row__hint">{copy.nestHint(params.levers.rrqStartAge, params.levers.oasStartAge)}</p>
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
@@ -380,7 +380,7 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             {copy.verdict(verdict)}
           </p>
 
-          <h3 className="deferral__title">{copy.strategyTitle}</h3>
+          <h3 className="bridge__heading">{copy.strategyTitle}</h3>
           {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
           <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} />
           {applied !== null && (
@@ -417,8 +417,8 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
           <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
           <p className="field-row__hint">{copy.householdNote}</p>
 
-          <h3 className="deferral__title">{copy.whyTitle}</h3>
-          <ul className="deferral__list">
+          <h3 className="bridge__heading">{copy.whyTitle}</h3>
+          <ul className="bridge__list">
             <li>{standard && view.selected.summary.drawn6070 - standard.summary.drawn6070 > 50 ? copy.whyCost(money(view.selected.summary.drawn6070 - standard.summary.drawn6070)) : copy.whyCostNone}</li>
             <li>{copy.whyGis(money(view.selected.summary.gisTotal), money(view.selected.summary.oasRecoveryTotal))}</li>
             {copy.why({ rrqPerMonth: formatPct(view.facts.rrqPerMonth, lang, 1), rrqMax: formatPct(view.facts.rrqLateMax, lang, 1), oasPerMonth: formatPct(view.facts.oasPerMonth, lang, 1), oasMax: formatPct(view.facts.oasLateMax, lang, 0) }).map((line) => (
@@ -426,11 +426,11 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             ))}
           </ul>
 
-          <h3 className="deferral__title">{copy.matrixTitle}</h3>
+          <h3 className="bridge__heading">{copy.matrixTitle}</h3>
           <MatrixSection household={household} assumptions={assumptions} levers={levers} copy={copy} ownerName={ownerName} />
 
-          <h3 className="deferral__title">{copy.caveatTitle}</h3>
-          <ul className="deferral__list">
+          <h3 className="bridge__heading">{copy.caveatTitle}</h3>
+          <ul className="bridge__list">
             {copy.caveats.map((line) => (
               <li key={line}>{line}</li>
             ))}

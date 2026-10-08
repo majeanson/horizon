@@ -67,17 +67,6 @@ export function removeChild(p: Profile, index: number): Profile {
   return { ...p, children: p.children.filter((_, i) => i !== index) }
 }
 
-// ── The withdrawal order ────────────────────────────────────────────────────────────────────────────
-
-/** Move one account up (−1) or down (+1) in the order savings are drawn from. */
-export function moveInOrder(order: readonly AccountKind[], index: number, direction: -1 | 1): AccountKind[] {
-  const to = index + direction
-  if (index < 0 || index >= order.length || to < 0 || to >= order.length) return [...order]
-  const next = [...order]
-  ;[next[index], next[to]] = [next[to], next[index]]
-  return next
-}
-
 // ── Earnings history ────────────────────────────────────────────────────────────────────────────────
 
 /** Set (or, with null, clear) one year of pensionable earnings. */

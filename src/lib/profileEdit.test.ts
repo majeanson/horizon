@@ -7,7 +7,7 @@ import { makeRrqRules } from '../engine/rrqRules.ts'
 import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears, rrqEstimate } from './earnings.ts'
 import {
-  addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, moveInOrder, removeChild, removePension, removeSpouse,
+  addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, removeChild, removePension, removeSpouse,
   applyDeferredRule, isRregopRules, needsDeferredRule, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { profileGaps } from './profileGaps.ts'
@@ -72,12 +72,6 @@ describe('profile edits are pure, and never produce a profile the validator woul
     expect(setSpending(p, { retiredToday: 90_000 }).household.spending).toEqual({ workingToday: 88_000, retiredToday: 90_000 })
     expect(setAssumptions(p, { horizonAge: 100 }).assumptions.horizonAge).toBe(100)
     expect(setReturn(p, 'rrsp', 0.06).assumptions.returns).toEqual({ nonReg: 0.04, rrsp: 0.06, tfsa: 0.045 })
-  })
-
-  it('the withdrawal order moves one step, and stays a permutation at the ends', () => {
-    expect(moveInOrder(['nonReg', 'rrsp', 'tfsa'], 1, -1)).toEqual(['rrsp', 'nonReg', 'tfsa'])
-    expect(moveInOrder(['nonReg', 'rrsp', 'tfsa'], 2, 1)).toEqual(['nonReg', 'rrsp', 'tfsa'])
-    expect(moveInOrder(['nonReg', 'rrsp', 'tfsa'], 0, -1)).toEqual(['nonReg', 'rrsp', 'tfsa'])
   })
 
   it('one year of earnings is set, cleared, and unchanged when nothing changes', () => {

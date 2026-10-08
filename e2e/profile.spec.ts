@@ -270,15 +270,18 @@ test.describe('the example household', () => {
     await expect(box(page, 'Inflation annuelle')).toHaveValue('2,1')
   })
 
-  test('the assumptions page edits the profile, and the order of withdrawals moves', async ({ page }) => {
+  test('the assumptions page edits the profile, and the order of withdrawals is adopted from the comparison', async ({ page }) => {
     await page.goto('/hypotheses')
     const infl = box(page, 'Inflation annuelle')
     await infl.fill('2,5')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.025)
-    await page.getByRole('button', { name: 'Monter : CELI' }).click()
+    // The order has one home: the comparison on Résultats ▸ Stratégies, where a row is adopted in one tap.
+    await expect(page.getByRole('button', { name: /Monter/ })).toHaveCount(0)
+    await page.goto('/resultats?v=strategies')
+    const row = page.getByRole('row', { name: /^Non enregistré → CELI → REER/ })
+    await row.getByRole('button', { name: 'Utiliser' }).click()
     await expect.poll(async () => (await savedProfile(page)).assumptions.withdrawalOrder).toEqual(['nonReg', 'tfsa', 'rrsp'])
-    await expect(page.getByRole('button', { name: 'Monter : Non enregistré' })).toBeDisabled()
   })
 })
 

@@ -44,8 +44,6 @@ const FR_RESULTS = {
   pensions: {
     title: 'Quand commencer mes rentes ?',
     hint: 'Une décision, deux vues : ce que chaque façon de commencer fait à tout le plan, puis la règle, rente par rente.',
-    planView: 'L’effet sur tout le plan',
-    ruleView: 'La règle, rente par rente',
   },
   refine: {
     title: 'Préciser le calcul',
@@ -167,8 +165,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
   pensions: {
     title: 'When should my pensions start?',
     hint: 'One decision, two views: what each way of starting does to the whole plan, then the rule, pension by pension.',
-    planView: 'The effect on the whole plan',
-    ruleView: 'The rule, pension by pension',
   },
   refine: {
     title: 'Refine the calculation',
