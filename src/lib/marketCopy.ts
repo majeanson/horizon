@@ -5,6 +5,7 @@ import type { Lang } from '../i18n.ts'
 
 export interface MarketCopy {
   surplus: { title: string; on: string; hint: string }
+  stress: { title: string; active: (name: string) => string; none: (max: number) => string; age: (n: number) => string; hint: string; link: string }
   path: {
     title: string
     hint: string
@@ -22,6 +23,14 @@ const FR: MarketCopy = {
     title: 'L’argent qui reste',
     on: 'Placer d’abord le surplus dans le REER',
     hint: 'Quand une année de travail laisse de l’argent de côté et qu’il reste des droits de cotisation REER, cet argent va d’abord au REER (la déduction fait baisser l’impôt), puis au CELI, puis au compte non enregistré. Désactivé, il va d’abord au CELI.',
+  },
+  stress: {
+    title: 'Si les marchés tournent mal',
+    active: (name) => `Le calcul ci-dessus suit le parcours « ${name} ».`,
+    none: (max) => `aucun âge jusqu’à ${max} ans`,
+    age: (n) => `${n} ans`,
+    hint: 'Le même plan, avec un parcours de marché difficile en début de retraite. Ce sont des exemples, pas des prévisions.',
+    link: 'Choisir ou modifier le parcours',
   },
   path: {
     title: 'Le parcours des marchés',
@@ -46,6 +55,14 @@ const EN: MarketCopy = {
     title: 'The money left over',
     on: 'Put the surplus in the RRSP first',
     hint: 'When a working year leaves money over and RRSP room is open, it goes to the RRSP first (the deduction lowers the tax), then the TFSA, then the non-registered account. Off, it goes to the TFSA first.',
+  },
+  stress: {
+    title: 'If the markets go badly',
+    active: (name) => `The calculation above follows the “${name}” path.`,
+    none: (max) => `no age up to ${max}`,
+    age: (n) => `age ${n}`,
+    hint: 'The same plan, with a hard market path early in retirement. These are examples, not forecasts.',
+    link: 'Choose or edit the path',
   },
   path: {
     title: 'The path the markets take',

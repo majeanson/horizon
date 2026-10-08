@@ -32,6 +32,9 @@ import { RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
 import { scrollBehavior } from '../lib/motion'
 import { usePresetRange } from '../lib/usePresetEarliest'
+import { useMarketRange } from '../lib/useMarketRange'
+import { STRESS_PRESETS } from '../lib/marketRange'
+import { MARKET_COPY } from '../lib/marketCopy'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
@@ -153,6 +156,9 @@ export function Resultats() {
   // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
   const activePreset = presetOf(assumptions)
   const range = usePresetRange(profile.household, assumptions, gaps.length === 0)
+  const stress = useMarketRange(profile.household, assumptions, gaps.length === 0)
+  const mc = MARKET_COPY[lang]
+  const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
   // The verdict's age, put in dates: one cheap main-thread projection.
   const stop = useMemo(
@@ -334,6 +340,27 @@ export function Resultats() {
               ))}
             </dl>
             {range !== undefined && prudentGap && <p className="verdict__note">{rc.headline.rangeGap}</p>}
+          </div>
+        )}
+        {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. Boxes from the first paint. */}
+        {!retiredGlance && (
+          <div className="verdict__range">
+            <p className="verdict__range-title">{mc.stress.title}</p>
+            <dl className="verdict__range-list">
+              {(['smooth', ...STRESS_PRESETS] as const).map((k) => (
+                <div key={k} className={'verdict__range-item' + (pathName === k ? ' is-on' : '')}>
+                  <dt>{mc.path.names[k]}</dt>
+                  <dd className="mono">{stress === undefined ? '…' : stress[k] === null ? mc.stress.none(MAX_AGE) : mc.stress.age(stress[k]!)}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="verdict__note">
+              {pathName !== 'smooth' && <>{mc.stress.active(mc.path.names[pathName])} </>}
+              {mc.stress.hint}{' '}
+              <Link className="info-note__link" to="/hypotheses">
+                {mc.stress.link}
+              </Link>
+            </p>
           </div>
         )}
         {/* How much of the answer stands on the person's own documents: the meter of the Profil, said where the answer is read. */}
