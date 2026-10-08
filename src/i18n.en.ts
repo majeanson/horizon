@@ -518,7 +518,7 @@ export const EN: typeof FR = {
       note: 'Before 65 the pension is reduced by 0.5% to 0.6% a month; after 65 it grows by 0.7% a month, up to age 72.',
     },
     oasResidence: {
-      where: 'The number of years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40. Service Canada’s Old Age Security Benefits Estimator first asks, in step 4 (Residence), a Yes / No question for you and for your partner: “Since the age of 18, have you only lived in Canada?” Count your years yourself.',
+      where: 'Count the years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40.',
       label: '',
       url: 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/benefit-amount.html',
       note: 'At least 10 years of residence (20 if you live abroad) are needed to receive a pension.',
@@ -545,7 +545,7 @@ export const EN: typeof FR = {
       where: 'Your VRSP, LIRA or LIF statement: the « locked-in » part. In a VRSP it is the employer’s contributions; in a LIRA or LIF, the whole balance.',
       label: 'locked-in',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/work/voluntary-retirement-savings-plans-vrsps-transfer-withdrawal-instruments/voluntary-retirement-savings-plans-vrsps/workers-vrsps',
-      note: 'Before 55, a Québec LIF pays at most 6.25% of its balance a year (2026 rate); from 55, everything can come out. At 65, a balance of at most 40% of the MPE unlocks. A federal LIF follows other rules, not modelled: enter it here anyway.',
+      note: 'Before 55, a Québec LIF pays at most 6.25% of its balance a year (2026 rate); from 55, everything can come out. At 65, a balance of at most 40% of the maximum pensionable earnings (MPE) unlocks. A federal LIF follows other rules, which Horizon does not calculate: enter it here anyway.',
     },
     rrspRoom: {
       where: 'Your latest CRA notice of assessment (the RRSP deduction limit and available contribution room statement), or your CRA account.',

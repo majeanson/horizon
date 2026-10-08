@@ -30,7 +30,7 @@ import { presetOf } from '../engine/assumptionPresets'
 import { formatPct, formatYearAge } from '../lib/format'
 import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
-import { scrollBehavior } from '../lib/motion'
+import { scrollToSection } from '../lib/motion'
 import { usePresetRange } from '../lib/usePresetEarliest'
 import { useMarketRange } from '../lib/useMarketRange'
 import { STRESS_PRESETS } from '../lib/marketRange'
@@ -130,7 +130,7 @@ export function Resultats() {
   // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
   // scroll to an id that is not on the page did nothing, on the one screen (« no age works ») where the reader most needs it.
   const pendingScroll = useRef<string | null>(null)
-  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
+  const scrollTo = (id: string) => scrollToSection(id)
   const goTo = (target: View, id: string) => {
     if (target === view) return scrollTo(id)
     pendingScroll.current = id

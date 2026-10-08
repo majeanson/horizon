@@ -28,3 +28,26 @@ export function revealOnOpen(el: HTMLElement | null): () => void {
   })
   return () => cancelAnimationFrame(raf)
 }
+
+// « Take me to that section » — and KEEP me there while the page settles. On Résultats the sections above a target keep
+// streaming in for a moment (a worker's answer replacing a placeholder, a lazy chart), so a tapped section that had
+// stopped under the pinned bar slid up or down a beat later. The first scroll is the reader's (smooth, when allowed);
+// for the next two seconds any change of the page's height re-anchors the target without animation — until the reader
+// moves (wheel, touch, a key), which hands the scroll back at once. Returns a cancel.
+export function scrollToSection(id: string, settleMs = 2000): () => void {
+  const target = document.getElementById(id)
+  if (!target) return () => {}
+  target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
+  const hold = () => target.isConnected && target.scrollIntoView({ block: 'start' })
+  const observer = new ResizeObserver(hold)
+  observer.observe(document.body)
+  const events = ['wheel', 'touchstart', 'keydown'] as const
+  const release = () => {
+    observer.disconnect()
+    clearTimeout(timer)
+    for (const ev of events) window.removeEventListener(ev, release)
+  }
+  const timer = setTimeout(release, settleMs)
+  for (const ev of events) window.addEventListener(ev, release, { once: true, passive: true })
+  return release
+}

@@ -78,10 +78,12 @@ export const defaultProfile = (today: { year: number }): Profile => ({
   version: SCHEMA_VERSION,
   household: { livesAlone: true, persons: [blankPerson('self', today)], spending: { workingToday: 0, retiredToday: 0 }, home: null },
   children: [],
+  // The Neutre scenario, exactly (engine/assumptionPresets.ts): a first visit lands on a named, documented scenario, not
+  // on « Personnalisé » for figures nobody typed (the defaults used to be 2 / 3 / 5 / 5 / 4 %, matching no scenario).
   assumptions: {
-    inflation: 0.02,
-    wageGrowth: 0.03,
-    returns: { nonReg: 0.04, rrsp: 0.05, tfsa: 0.05 },
+    inflation: 0.021,
+    wageGrowth: 0.031,
+    returns: { nonReg: 0.04, rrsp: 0.045, tfsa: 0.045 },
     horizonAge: 95,
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,

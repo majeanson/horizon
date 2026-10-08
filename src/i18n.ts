@@ -540,7 +540,7 @@ export const FR = {
       note: 'Avant 65 ans la rente est réduite de 0,5 % à 0,6 % par mois ; après 65 ans, elle augmente de 0,7 % par mois, jusqu’à 72 ans.',
     },
     oasResidence: {
-      where: 'Le nombre d’années vécues au Canada depuis vos 18 ans : 40 ans donnent la pension complète, chaque année en vaut 1/40. L’Estimateur des prestations de la Sécurité de la vieillesse de Service Canada pose d’abord, à l’étape 4 (résidence), une question oui / non : avez-vous toujours vécu au Canada depuis vos 18 ans, vous et votre partenaire ? Comptez vos années vous-même.',
+      where: 'Comptez les années vécues au Canada depuis vos 18 ans : 40 ans donnent la pension complète, chaque année en vaut 1/40.',
       label: '',
       url: 'https://www.canada.ca/fr/services/prestations/pensionspubliques/securite-vieillesse/montant-prestation.html',
       note: 'Il faut au moins 10 ans de résidence (20 si vous vivez à l’étranger) pour toucher une pension.',
@@ -567,7 +567,7 @@ export const FR = {
       where: 'Le relevé de votre RVER, CRI ou FRV : la part « immobilisée ». Dans un RVER, ce sont les cotisations de l’employeur ; dans un CRI ou un FRV, tout le solde.',
       label: 'immobilisé',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/regime-volontaire-epargne-retraite-rver-et-instruments-transfert-et-decaissement/regime-volontaire-epargne-retraite-rver/travailleur-et-rver',
-      note: 'Avant 55 ans, un FRV du Québec ne verse au plus que 6,25 % du solde par année (taux 2026) ; dès 55 ans, tout peut en sortir. À 65 ans, un solde d’au plus 40 % du MGA se débloque. Un FRV fédéral suit d’autres règles, non modélisées : entrez-le ici quand même.',
+      note: 'Avant 55 ans, un FRV du Québec ne verse au plus que 6,25 % du solde par année (taux 2026) ; dès 55 ans, tout peut en sortir. À 65 ans, un solde d’au plus 40 % du maximum des gains admissibles (MGA) se débloque. Un FRV fédéral suit d’autres règles, qu’Horizon ne calcule pas : entrez-le ici quand même.',
     },
     rrspRoom: {
       where: 'Votre dernier avis de cotisation de l’ARC (relevé du maximum déductible au titre des REER), ou votre compte de l’ARC.',

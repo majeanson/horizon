@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { scrollBehavior } from '../lib/motion'
+import { scrollBehavior, scrollToSection } from '../lib/motion'
 import { Chip } from './Chip'
 import { Rail } from './Layout'
 
@@ -63,7 +63,7 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
               // Plain text, NOT aria-hidden: the grouping is wayfinding for a screen-reader user too.
               <span className="section-nav__arc mono">{l.arc}</span>
             )}
-            <Chip current={inView === l.id} onClick={() => document.getElementById(l.id)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })}>
+            <Chip current={inView === l.id} onClick={() => scrollToSection(l.id)}>
               {l.label}
             </Chip>
           </Fragment>
