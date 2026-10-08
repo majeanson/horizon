@@ -7,7 +7,6 @@ import { formatMoney } from '../../lib/money'
 import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
 import { useNotice } from '../../lib/toast'
-import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { EditField } from '../EditField'
@@ -131,7 +130,6 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
 export function PensionPlans({ person, edit }: PersonEditor) {
   const t = useT()
   const { lang } = useLang()
-  const thisYear = today().year
   const confirm = useConfirm()
   const notice = useNotice()
   const p = t.plans
@@ -188,39 +186,6 @@ export function PensionPlans({ person, edit }: PersonEditor) {
               <FieldRow label={p.inPayAnnual} hint={p.inPayHint}>
                 {(w) => (
                   <NumberField kind="money" min={0} max={MAX_IN_PAY_ANNUAL} value={pension.inPay!.annual} onChange={(annual) => set((x) => ({ ...x, inPay: { ...x.inPay, annual } }))} id={w.id} ariaDescribedBy={w.describedBy} />
-                )}
-              </FieldRow>
-              <FieldRow label={p.inPayAfter65} hint={p.inPayAfter65Hint}>
-                {(w) => (
-                  <NumberField
-                    kind="money"
-                    allowEmpty
-                    min={0}
-                    max={MAX_IN_PAY_ANNUAL}
-                    value={pension.inPay!.after65 ?? null}
-                    onChange={(after65) => set((x) => ({ ...x, inPay: { annual: x.inPay!.annual, ...(x.inPay!.since ? { since: x.inPay!.since } : {}), ...(after65 === null ? {} : { after65 }) } }))}
-                    id={w.id}
-                    ariaDescribedBy={w.describedBy}
-                  />
-                )}
-              </FieldRow>
-              <FieldRow label={p.inPaySince} hint={p.inPaySinceHint}>
-                {(w) => (
-                  <NumberField
-                    kind="int"
-                    allowEmpty
-                    min={1}
-                    max={12}
-                    value={pension.inPay!.since?.year === thisYear ? pension.inPay!.since.month : null}
-                    onChange={(month) =>
-                      set((x) => {
-                        const { since: _old, ...rest } = x.inPay!
-                        return { ...x, inPay: month === null ? rest : { ...rest, since: { year: thisYear, month } } }
-                      })
-                    }
-                    id={w.id}
-                    ariaDescribedBy={w.describedBy}
-                  />
                 )}
               </FieldRow>
               </>

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { presetOf } from '../engine/assumptionPresets.ts'
 import { makeRrqRules } from '../engine/rrqRules.ts'
 import { rregopPension } from '../engine/presets.ts'
-import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears, rrqEstimate } from './earnings.ts'
+import { ASSUMED_FIRST_JOB_AGE, fillFromSalary, historyYears } from './earnings.ts'
 import {
   addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, removeChild, removePension, removeSpouse,
   applyDeferredRule, isRregopRules, needsDeferredRule, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
@@ -148,19 +148,6 @@ describe('earnings helpers', () => {
     expect(fillFromSalary(none, TODAY, 0.03, rules.mga)).toEqual({})
   })
 
-  it('the RRQ estimate rises with the start age, as the relevé’s projected amount does', () => {
-    const p = person()
-    const at60 = rrqEstimate(p, TODAY, 60, rules)
-    const at65 = rrqEstimate(p, TODAY, 65, rules)
-    const at70 = rrqEstimate(p, TODAY, 70, rules)
-    expect(at60).toBeGreaterThan(0)
-    expect(at65).toBeGreaterThan(at60)
-    expect(at70).toBeGreaterThan(at65)
-    // The relevé's projected amount ignores the person's own retirement plan: it keeps earning until the pension starts.
-    expect(rrqEstimate({ ...p, retirementAge: 55 }, TODAY, 65, rules)).toBe(at65)
-    // …and a person with no current salary gets only what their typed history earned.
-    expect(rrqEstimate({ ...p, salaryToday: 0 }, TODAY, 65, rules)).toBeLessThan(at65)
-  })
 })
 
 describe('applying a ready-made scenario', () => {

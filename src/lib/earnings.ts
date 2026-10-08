@@ -1,8 +1,6 @@
-import { rrqPension, type RrqRules } from '../engine/rrq.ts'
 import type { Person } from '../engine/types.ts'
 
-// Two helpers around a person's pensionable earnings: filling the years they have not typed, and the check
-// that sets Horizon's own RRQ figure beside the one printed on their relevé.
+// Helpers around a person's pensionable earnings: filling the years they have not typed in.
 
 /** The age a first job is assumed to start when a history is filled in — an estimate, said to be one. */
 export const ASSUMED_FIRST_JOB_AGE = 22
@@ -35,15 +33,3 @@ export function fillFromSalary(
   return filled
 }
 
-/**
- * Horizon's own estimate of the person's monthly RRQ pension if it started at `startAge`, built the way the
- * relevé builds its « Montant projeté »: the typed history, then today's salary held level (capped at each
- * year's maximum) for every year until the pension starts — whatever the person's own retirement plan says, since
- * the relevé does not know it. A CHECK to set beside the relevé's figure, never an input to the projection.
- */
-export function rrqEstimate(person: Person, today: { year: number }, startAge: number, rules: RrqRules): number {
-  const earnings: Record<number, number> = { ...person.earningsHistory }
-  const lastYearBefore = person.birth.year + startAge - 1
-  for (let year = today.year; year <= lastYearBefore; year++) earnings[year] = Math.min(person.salaryToday, rules.mga(year))
-  return rrqPension({ birth: person.birth, earnings, startAge }, rules).monthly
-}

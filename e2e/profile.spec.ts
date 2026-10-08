@@ -47,12 +47,12 @@ test.describe('a blank profile', () => {
     await expect(box(page, 'Revenu de travail annuel actuel')).toHaveValue(/85\D000/)
   })
 
-  test('a comma decimal is read the Québécois way: « 1 507,65 » is fifteen hundred dollars and sixty-five cents', async ({ page }) => {
+  test('a comma decimal is read the Québécois way: « 85 000,50 » is eighty-five thousand dollars and fifty cents', async ({ page }) => {
     await page.goto('/')
-    const field = box(page, 'Montant projeté du relevé, rente à 65 ans (par mois)')
-    await field.fill('1 507,65')
+    const field = box(page, 'Revenu de travail annuel actuel')
+    await field.fill('85 000,50')
     await field.blur()
-    await expect.poll(async () => (await savedProfile(page)).household.persons[0].rrq.statementAt65).toBe(1507.65)
+    await expect.poll(() => savedSalary(page)).toBe(85000.5)
   })
 
   test('an out-of-range text is refused with its reason, kept on screen, and not saved', async ({ page }) => {

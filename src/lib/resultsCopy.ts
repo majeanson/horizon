@@ -50,7 +50,7 @@ const FR_RESULTS = {
     hint: 'Le verdict tient déjà debout ; ces chiffres le rendraient plus fidèle.',
     /** When the verdict is « ça ne tient pas », nothing « tient déjà debout ». */
     hintNone: 'Ces chiffres rendraient le calcul plus fidèle.',
-    statement: 'La rente projetée de votre relevé RRQ, ou vos revenus admissibles année par année.',
+    statement: 'Vos revenus admissibles de votre relevé RRQ, année par année.',
     accounts: 'Les soldes de vos comptes — REER, CELI, non enregistré.',
     spendingWork: 'Vos dépenses pendant les années de travail.',
     toProfile: 'Ouvrir le profil',
@@ -170,7 +170,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
     title: 'Refine the calculation',
     hint: 'The verdict already stands; these numbers would make it more faithful.',
     hintNone: 'These numbers would make the calculation more faithful.',
-    statement: 'The projected pension from your QPP statement, or your pensionable earnings year by year.',
+    statement: 'Your pensionable earnings from your QPP statement, year by year.',
     accounts: 'Your account balances — RRSP, TFSA, non-registered.',
     spendingWork: 'Your spending during the working years.',
     toProfile: 'Open the profile',

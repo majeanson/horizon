@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
 import { makeRrqRules } from '../../engine/rrqRules'
-import { useLang, useT } from '../../i18n'
-import { fillFromSalary, historyYears, rrqEstimate } from '../../lib/earnings'
-import { formatPct } from '../../lib/format'
-import { formatMoney } from '../../lib/money'
+import { useT } from '../../i18n'
+import { fillFromSalary, historyYears } from '../../lib/earnings'
 import { setEarning } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -15,18 +13,10 @@ import { SectionHeader } from '../SectionHeader'
 import { StatusMessage } from '../StatusMessage'
 import { Section, type PersonEditor } from './shared'
 
-// The RRQ: when the pension starts, the pensionable earnings the relevé lists year by year, and — the
-// counter-check this app is built around — Horizon's own figure set beside the one printed on the relevé.
-
-const SAME_WITHIN = 0.01 // a difference under 1 % reads as « the same »
-// A soft plausibility line, not a validation: the relevé prints MONTHLY amounts but never writes the
-// unit, so the classic mistake is pasting the annual figure. ~2× the published 2026 maximum at 65
-// (1 507,65 $) — no real monthly pension reaches it, every pasted annual one does.
-const MONTHLY_DOUBT = 3_000
+// The RRQ: when the pension starts, and the pensionable earnings the relevé lists year by year.
 
 export function RrqSection({ person, edit }: PersonEditor) {
   const t = useT()
-  const { lang } = useLang()
   const r = t.profile.rrq
   const { assumptions } = useProfile()
   const now = today()
@@ -62,16 +52,6 @@ export function RrqSection({ person, edit }: PersonEditor) {
     edit((x) => ({ ...x, earningsHistory: before }))
     setFilledNote(null)
   }
-
-  const canCheck = typed > 0 || person.salaryToday > 0
-  const checks = ([65, 60] as const).flatMap((age) => {
-    const stated = age === 65 ? person.rrq.statementAt65 : person.rrq.statementAt60
-    if (!canCheck || stated === undefined) return []
-    const own = rrqEstimate(person, now, age, rules)
-    const diff = own - stated
-    const pct = stated > 0 ? diff / stated : 0
-    return [{ age, own, stated, diff, pct }]
-  })
 
   return (
     <Section title={r.title} icon="calendar-blank-bold">
@@ -120,39 +100,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
           ))}
         </div>
 
-      <FieldRow label={r.statement65} infoId="rrqEstimate65" hint={r.statementHint}>
-        {(w) => (
-          <NumberField kind="money" allowEmpty max={100_000} value={person.rrq.statementAt65 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt65: v ?? undefined }) }))} id={w.id} ariaDescribedBy={w.describedBy} />
-        )}
-      </FieldRow>
-      {person.rrq.statementAt65 !== undefined && person.rrq.statementAt65 > MONTHLY_DOUBT && <StatusMessage tone="info">{r.monthlyDoubt}</StatusMessage>}
-      <FieldRow label={r.statement60} infoId="rrqEstimate60">
-        {(w) => (
-          <NumberField kind="money" allowEmpty max={100_000} value={person.rrq.statementAt60 ?? null} onChange={(v) => edit((x) => ({ ...x, rrq: withoutUndefined({ ...x.rrq, statementAt60: v ?? undefined }) }))} id={w.id} />
-        )}
-      </FieldRow>
-      {person.rrq.statementAt60 !== undefined && person.rrq.statementAt60 > MONTHLY_DOUBT && <StatusMessage tone="info">{r.monthlyDoubt}</StatusMessage>}
-
-      {checks.length > 0 && (
-        <div className="rrq-check" aria-label={r.checkTitle}>
-          {checks.map((c) => (
-            <div key={c.age}>
-              <p className="rrq-check__line">{r.checkHorizon(c.age, formatMoney(c.own, lang, { cents: true }))}</p>
-              {Math.abs(c.pct) <= SAME_WITHIN ? (
-                <StatusMessage tone="success">{r.checkSame}</StatusMessage>
-              ) : (
-                <StatusMessage tone="info">{r.checkDiff(formatMoney(c.diff, lang, { cents: true }), formatPct(c.pct, lang, 1))}</StatusMessage>
-              )}
-            </div>
-          ))}
-          <p className="field-row__hint">{r.checkNote}</p>
-        </div>
-      )}
     </Section>
   )
 }
 
-// A cleared optional figure is removed from the object, so a saved profile never carries `undefined` keys.
-function withoutUndefined<T extends object>(o: T): T {
-  return Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined)) as T
-}

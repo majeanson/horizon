@@ -216,7 +216,7 @@ export function Resultats() {
 
   // What would make the verdict more faithful — detectable absences only, never a guess about what the household owns.
   const refine = [
-    ...(profile.household.persons.some((p) => p.salaryToday > 0 && p.rrq.statementAt65 === undefined && Object.keys(p.earningsHistory).length === 0) ? (['statement'] as const) : []),
+    ...(profile.household.persons.some((p) => p.salaryToday > 0 && Object.keys(p.earningsHistory).length === 0) ? (['statement'] as const) : []),
     ...(profile.household.persons.every((p) => p.accounts.rrsp.balance + p.accounts.tfsa.balance + p.accounts.nonReg.balance === 0) ? (['accounts'] as const) : []),
     ...(profile.household.spending.workingToday <= 0 && !retiredNow ? (['spendingWork'] as const) : []),
   ]
