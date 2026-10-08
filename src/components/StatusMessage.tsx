@@ -27,7 +27,7 @@ export function StatusMessage({
   const glyph = icon === null ? null : (icon ?? TONE_ICON[tone])
   return (
     <p
-      className={`status-msg status-msg--${tone} mono` + (className ? ` ${className}` : '')}
+      className={`status-msg status-msg--${tone}` + (className ? ` ${className}` : '')}
       role={tone === 'error' ? 'alert' : 'status'}
     >
       {glyph && <InlineIcon name={glyph} />} {children}

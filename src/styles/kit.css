@@ -75,15 +75,19 @@
   flex-direction: column;
   min-width: 0;
 }
+/* A section's name is a HEADING: the display face, a step above the body — the cards used to run together because
+   their titles were body text in bold, one size from the field labels under them. */
 .section-header__title {
   margin: 0;
-  font: inherit;
+  font-family: var(--display);
   font-weight: 700;
-  letter-spacing: normal;
-  line-height: inherit;
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
+/* A subtitle is prose: the body face, never the code face — a 30-word explanation in monospace read as a terminal. */
 .section-header__sub {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 .section-header__action {
@@ -145,9 +149,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  font-family: var(--mono);
+  /* The body face at 600: a chip is a word a person reads and taps, not a code token (« Moi et mon ou ma partenaire »
+     in monospace wrapped into a tall block on a phone). */
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: var(--text-sm);
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.8rem;
   /* Chips ARE the navigation here (scenario picker, toggles) — keep them a
      comfortable thumb height, not a 32px sliver: 44px, the size the subtabs and the ⓘ buttons already are. */
   min-height: 44px;
@@ -163,13 +170,15 @@
   /* A selected chip said its own name in the RAW accent — marigold on cream, 2.07:1, on
      the control whose entire job is to say "this one is chosen" (axe, 2026-09-15).
      Mixed toward --ink, NOT set to --accent-ink: that token means "text on a marigold
-     FILL", and this chip's fill is --surface. Using it turned night into #1b1712 on a
+     FILL", and this chip's fill is the accent WASH. Using it turned night into #1b1712 on a
      dark surface — 1.1:1, worse than the bug. The mix is theme-correct by construction
      (--ink flips) and survives tintScope() re-pointing --accent on a themed tab.
      50%: sized against EVERY accent this chip can wear (raw marigold plus the six
      SECTION_TINT inks), worst case 5.08:1 — 30% left marigold at 3.44. */
   color: color-mix(in srgb, var(--accent) 50%, var(--ink));
-  background: var(--surface);
+  /* FILLED when chosen. Inside a card the old fill (--surface) was the card's own colour, so a chosen chip differed
+     from its neighbours by a 1 px border — the wash, plus the check Chip.tsx draws, is what makes « on » readable. */
+  background: var(--accent-soft);
 }
 /* In-app confirm dialog (src/lib/confirm) — the deliberate yes/no for HEAVY
    deletes (recipe, member, tag-everywhere). Its own backdrop sits above any open
@@ -303,4 +312,74 @@
 }
 .impact__why strong {
   color: var(--ink);
+}
+
+/* ── Switch (components/Switch.tsx): the one on/off setting ────────────────── */
+/* A knob on a track, the label beside it. The knob's position is the picture; the ARIA state and the label are the words. */
+.switch-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: var(--touch-target);
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.switch:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.switch__track {
+  position: relative;
+  flex: none;
+  width: 2.9rem;
+  height: 1.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--line-strong);
+  transition: background var(--dur-fast) ease;
+}
+.switch__knob {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.switch.is-on .switch__track {
+  background: var(--sage-deep);
+}
+.switch.is-on .switch__knob {
+  transform: translateX(1.2rem);
+}
+.switch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.switch__label {
+  min-width: 0;
+}
+.switch__hint {
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .switch__knob,
+  .switch__track {
+    transition: none;
+  }
 }

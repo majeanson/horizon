@@ -1,24 +1,27 @@
 import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
-import { useBackupDue, useStorageIssue } from '../lib/store'
+import { saveAsFile } from '../lib/download'
+import { exportFileName, exportProfileJson, getProfile, markExported, snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
+import { useNotice } from '../lib/toast'
 import { Icon, type IconName } from './Icon'
-import { Loading } from './Loading'
+import { Skeleton } from './Skeleton'
 import { StatusMessage } from './StatusMessage'
 
-// The chrome around every page: a top bar (name, language, day/night) and the main
+// The chrome around every page: a top bar (name, language, day/night, the settings gear) and the main
 // navigation — a bottom bar on a phone, a left rail on a wide screen. The switch between the
 // two is CSS only (styles/horizon.css), never a width check in JS: one markup, two layouts.
 //
-// The four destinations follow the order a person works in: who you are (Profil), what you
-// assume about the future (Hypothèses), what comes out (Résultats), and what is stored
-// where (Données).
+// THREE destinations, in the order a person works in: who you are (Profil), what comes out (Résultats), and what
+// you assume about the future (Hypothèses) — optional, since the defaults are the Neutre scenario, and reached from
+// the answer when the person wants to try another future. Saving a copy, restoring one, the examples and the display
+// settings are a fourth page (« Sauvegarde et réglages ») behind the gear in the top bar: used a few times a year,
+// it does not earn a quarter of the thumb bar.
 const TABS = [
   { to: '/', key: 'profile', icon: 'user-bold' },
-  { to: '/hypotheses', key: 'assumptions', icon: 'sliders-horizontal-bold' },
   { to: '/resultats', key: 'results', icon: 'chart-line-up-bold' },
-  { to: '/donnees', key: 'data', icon: 'download-simple-bold' },
+  { to: '/hypotheses', key: 'assumptions', icon: 'sliders-horizontal-bold' },
 ] as const satisfies ReadonlyArray<{ to: string; key: string; icon: IconName }>
 
 // Scroll and focus across navigations. #root is the single scroller, so the browser restores
@@ -55,6 +58,8 @@ function RouteChange() {
 export function AppShell() {
   const t = useT()
   const { lang, setLang } = useLang()
+  const { pathname } = useLocation()
+  const notice = useNotice()
   const [theme, setThemeState] = useState<Theme>(getTheme)
   // A deploy while the page is OPEN and VISIBLE: registerSw never reloads under a reader; it raises
   // this event instead, and the shell offers the reload as a one-line notice with a button.
@@ -67,7 +72,14 @@ export function AppShell() {
   // Whatever stops the profile from being kept — or read — must be said on EVERY page: a person who lost their plan to a
   // refused profile and finds a blank one on Profil would otherwise think the app simply forgot them.
   const storageIssue = useStorageIssue()
-  const backupDue = useBackupDue()
+  // The backup notice exports in ONE tap, right here, and can be put off for a week; it never shows on the page it
+  // points at. (It used to send the reader to that page to press a second button, and could not be dismissed.)
+  const backupDue = useBackupDue() && pathname !== '/donnees'
+  const exportNow = () => {
+    saveAsFile(exportProfileJson(getProfile()), exportFileName())
+    markExported()
+    notice(t.data.export.done)
+  }
   const themeLabel = theme === 'night' ? t.common.themeToDay : t.common.themeToNight
 
   return (
@@ -90,16 +102,19 @@ export function AppShell() {
         <div className="shell__actions">
           <button
             type="button"
-            className="btn btn--ghost btn--sm mono"
+            className="btn btn--ghost btn--sm"
             aria-label={t.common.langLabel}
             title={t.common.langLabel}
             onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
           >
             {t.common.lang}
           </button>
-          <button type="button" className="btn btn--icon" aria-label={themeLabel} title={themeLabel} onClick={() => setThemeState(toggleTheme())}>
+          <button type="button" className="btn btn--icon btn--ghost" aria-label={themeLabel} title={themeLabel} onClick={() => setThemeState(toggleTheme())}>
             <Icon name={theme === 'night' ? 'sun-bold' : 'moon-stars-bold'} size={20} />
           </button>
+          <NavLink to="/donnees" className={({ isActive }) => 'btn btn--icon btn--ghost' + (isActive ? ' is-active' : '')} aria-label={t.nav.data} title={t.nav.data}>
+            <Icon name="gear-six-bold" size={20} />
+          </NavLink>
         </div>
       </header>
       <nav className="shell__nav" aria-label={t.nav.label}>
@@ -114,23 +129,27 @@ export function AppShell() {
       <main className="shell__main" id="main" tabIndex={-1}>
         {storageIssue && <StatusMessage tone={storageIssue === 'unsaved' ? 'error' : 'info'}>{t.data.issue[storageIssue]}</StatusMessage>}
         {backupDue && (
-          <div className="sw-update">
+          <div className="shell__notice">
             <StatusMessage tone="info">{t.data.backup.due}</StatusMessage>
-            <NavLink to="/donnees" className="btn btn--sm">
+            <button type="button" className="btn btn--sm" onClick={exportNow}>
               {t.data.backup.button}
-            </NavLink>
+            </button>
+            <button type="button" className="btn btn--sm btn--ghost" onClick={snoozeBackup}>
+              {t.data.backup.later}
+            </button>
           </div>
         )}
         {swUpdate && (
-          <div className="sw-update">
+          <div className="shell__notice">
             <StatusMessage tone="info">{t.common.updateReady}</StatusMessage>
             <button type="button" className="btn btn--sm" onClick={() => window.location.reload()}>
               {t.common.updateReload}
             </button>
           </div>
         )}
-        {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched. */}
-        <Suspense fallback={<Loading />}>
+        {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched — and the
+            wait has a shape (a few quiet blocks where the page's cards will be), not a lone word. */}
+        <Suspense fallback={<Skeleton count={4} />}>
           <Outlet />
         </Suspense>
       </main>

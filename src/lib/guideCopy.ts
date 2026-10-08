@@ -33,10 +33,6 @@ export interface GuideCopy {
     count: (confirmed: number, total: number) => string
     none: string
     allDone: string
-    quickTitle: string
-    quick: string
-    exactTitle: string
-    exact: string
     legendConfirmed: string
     legendEstimated: string
     nothingHere: string
@@ -51,6 +47,7 @@ export interface GuideCopy {
     quickDoes: string
     estimateDone: (years: number, rooms: number) => string
     estimateNothing: string
+    estimateUndo: string
   }
   docs: Record<DocId, DocCopy>
   guide: {
@@ -62,7 +59,6 @@ export interface GuideCopy {
     confirm: string
     confirmed: string
     skip: string
-    back: string
     next: string
     close: string
     finished: string
@@ -74,10 +70,10 @@ export interface GuideCopy {
 
 const FR: GuideCopy = {
   fact: {
-    confirmed: (label) => `Confirmé : ${label}. Touchez pour le marquer comme estimé.`,
-    estimated: (label) => `Estimé : ${label}. Touchez quand vous l’avez lu sur votre document.`,
-    confirmedShort: 'Lu sur un document',
-    estimatedShort: 'De mémoire ou estimé',
+    confirmed: (label) => `Confirmé : ${label}. Touchez pour le marquer comme estimé.`,
+    estimated: (label) => `Estimé : ${label}. Touchez quand vous l’avez lu sur votre document.`,
+    confirmedShort: 'Lu sur un document : touchez pour le marquer comme estimé',
+    estimatedShort: 'De mémoire ou estimé : touchez quand vous l’avez lu sur un document',
   },
   kind: {
     salary: 'Revenu de travail',
@@ -89,7 +85,7 @@ const FR: GuideCopy = {
     tfsaBalance: 'Solde du CELI',
     tfsaRoom: 'Droits de cotisation CELI',
     nonRegBalance: 'Solde non enregistré',
-    nonRegAcb: 'Prix de base du non enregistré',
+    nonRegAcb: 'Prix de base rajusté (PBR) du non enregistré',
     pension: 'Régime de retraite de l’employeur',
     spendingWorking: 'Dépenses pendant le travail',
     spendingRetired: 'Dépenses à la retraite',
@@ -98,38 +94,35 @@ const FR: GuideCopy = {
   },
   where: {
     homeValue: 'L’évaluation municipale (compte de taxes), ou l’estimation récente d’un courtier ou d’un évaluateur.',
-    mortgage: 'Le relevé annuel de votre hypothèque : le solde, le taux et le paiement mensuel.',
+    mortgage: 'Le relevé annuel de votre hypothèque : le solde, le taux et le paiement mensuel.',
   },
   panel: {
     title: 'Rendre mon profil exact',
     lead: 'Chaque chiffre est soit lu sur un document (confirmé), soit une estimation. Voici les documents qui contiennent les vrais chiffres.',
     count: (c, t) => `${c} sur ${t} chiffres confirmés`,
-    none: 'Aucun chiffre n’est encore confirmé : le résultat repose sur des estimations.',
-    allDone: 'Tout est confirmé : votre profil repose sur vos documents.',
-    quickTitle: 'Rapide',
-    quick: 'Quelques chiffres, le reste estimé : en une minute vous avez une première réponse. Les chiffres estimés sont marqués.',
-    exactTitle: 'Exact',
-    exact: 'Vos documents en main : chaque chiffre est lu, puis confirmé. Le résultat devient le vôtre.',
+    none: 'Aucun chiffre n’est encore confirmé : le résultat repose sur des estimations.',
+    allDone: 'Tout est confirmé : votre profil repose sur vos documents.',
     legendConfirmed: 'Confirmé',
     legendEstimated: 'Estimé',
     nothingHere: 'Rien à confirmer ici pour l’instant.',
     figures: (n) => (n === 1 ? '1 chiffre' : `${n} chiffres`),
-    fills: 'Confirme :',
+    fills: 'Confirme :',
     openPage: 'Ouvrir la page officielle',
     guideMe: 'Me guider',
     guideAll: 'Tout confirmer pas à pas',
     show: 'Aller aux champs',
     estimatedNote: (n) => (n === 1 ? 'Un chiffre du profil est encore une estimation.' : `${n} chiffres du profil sont encore des estimations.`),
     estimate: 'Estimer ce qui manque',
-    quickDoes: 'Ce qu’il estime : votre historique de revenus (à partir de votre salaire) et vos droits de CELI (à partir de votre âge et de votre solde). Il ne touche jamais un chiffre déjà saisi.',
-    estimateDone: (years, rooms) => `${years === 1 ? '1 année de revenus estimée' : `${years} années de revenus estimées`}, ${rooms === 1 ? '1 droit de CELI estimé' : `${rooms} droits de CELI estimés`}. Rien n’est confirmé : à vérifier sur vos documents.`,
-    estimateNothing: 'Rien à estimer : tout est déjà rempli.',
+    quickDoes: 'L’estimation remplit votre historique de revenus (à partir de votre salaire) et vos droits de CELI (à partir de votre âge et de votre solde). Il ne touche jamais un chiffre déjà saisi.',
+    estimateDone: (years, rooms) => `${years === 1 ? '1 année de revenus estimée' : `${years} années de revenus estimées`}, ${rooms === 1 ? '1 droit de CELI estimé' : `${rooms} droits de CELI estimés`}. Rien n’est confirmé : à vérifier sur vos documents.`,
+    estimateNothing: 'Rien à estimer : tout est déjà rempli.',
+    estimateUndo: 'Retirer ces estimations',
   },
   docs: {
     rrq: {
       name: 'Relevé de participation au RRQ',
-      what: 'Vos revenus de travail admissibles, année par année : ils fixent votre rente du RRQ.',
-      how: 'Sur Retraite Québec, Mon dossier, « Relevé de participation ».',
+      what: 'Vos revenus de travail admissibles, année par année : ils fixent votre rente du RRQ.',
+      how: 'Sur Retraite Québec, Mon dossier, « Relevé de participation ».',
       link: 'earnings',
     },
     tax: {
@@ -141,13 +134,13 @@ const FR: GuideCopy = {
     bank: {
       name: 'Relevés de vos comptes',
       what: 'Ce que contiennent vos REER, CELI et comptes non enregistrés, et le prix de base de ces derniers.',
-      how: 'Le relevé de votre institution financière : un seul total par type de compte.',
+      how: 'Le relevé de votre institution financière : un seul total par type de compte.',
       link: null,
     },
     employer: {
       name: 'Relevé de votre régime de retraite',
       what: 'Les années de service et la formule de la rente de votre employeur.',
-      how: 'Le relevé annuel du régime, ou la brochure du régime (RREGOP : Retraite Québec).',
+      how: 'Le relevé annuel du régime, ou la brochure du régime (RREGOP : Retraite Québec).',
       link: 'dbService',
     },
     home: {
@@ -164,7 +157,7 @@ const FR: GuideCopy = {
     },
     residence: {
       name: 'Preuve de vos années au Canada',
-      what: 'Depuis quand vous résidez au Canada : 40 ans donnent la pleine PSV.',
+      what: 'Depuis quand vous résidez au Canada : 40 ans donnent la pleine PSV.',
       how: 'Vos documents d’immigration ou de citoyenneté, ou simplement votre histoire si vous êtes né ici.',
       link: 'oasResidence',
     },
@@ -178,7 +171,6 @@ const FR: GuideCopy = {
     confirm: 'C’est confirmé',
     confirmed: 'Confirmé',
     skip: 'Plus tard',
-    back: 'Précédent',
     next: 'Suivant',
     close: 'Fermer le guide',
     finished: 'Guide terminé',
@@ -192,8 +184,8 @@ const EN: GuideCopy = {
   fact: {
     confirmed: (label) => `Confirmed: ${label}. Tap to mark it as an estimate.`,
     estimated: (label) => `Estimated: ${label}. Tap once you have read it on your document.`,
-    confirmedShort: 'Read on a document',
-    estimatedShort: 'From memory or estimated',
+    confirmedShort: 'Read on a document: tap to mark it as an estimate',
+    estimatedShort: 'From memory or estimated: tap once you have read it on a document',
   },
   kind: {
     salary: 'Work income',
@@ -205,7 +197,7 @@ const EN: GuideCopy = {
     tfsaBalance: 'TFSA balance',
     tfsaRoom: 'TFSA contribution room',
     nonRegBalance: 'Non-registered balance',
-    nonRegAcb: 'Non-registered cost base',
+    nonRegAcb: 'Adjusted cost base (ACB) of the non-registered account',
     pension: 'Employer pension plan',
     spendingWorking: 'Spending while working',
     spendingRetired: 'Spending in retirement',
@@ -222,10 +214,6 @@ const EN: GuideCopy = {
     count: (c, t) => `${c} of ${t} figures confirmed`,
     none: 'No figure is confirmed yet: the result rests on estimates.',
     allDone: 'Everything is confirmed: your profile rests on your documents.',
-    quickTitle: 'Quick',
-    quick: 'A few figures, the rest estimated: a first answer in a minute. The estimated figures are marked.',
-    exactTitle: 'Exact',
-    exact: 'Your documents at hand: each figure is read, then confirmed. The result becomes yours.',
     legendConfirmed: 'Confirmed',
     legendEstimated: 'Estimated',
     nothingHere: 'Nothing to confirm here for now.',
@@ -237,15 +225,16 @@ const EN: GuideCopy = {
     show: 'Go to the fields',
     estimatedNote: (n) => (n === 1 ? 'One figure in the profile is still an estimate.' : `${n} figures in the profile are still estimates.`),
     estimate: 'Estimate what is missing',
-    quickDoes: 'What it estimates: your earnings history (from your salary) and your TFSA room (from your age and balance). It never touches a figure you already typed.',
+    quickDoes: 'The estimate fills your earnings history (from your salary) and your TFSA room (from your age and balance). It never touches a figure you already typed.',
     estimateDone: (years, rooms) => `${years === 1 ? '1 year of earnings estimated' : `${years} years of earnings estimated`}, ${rooms === 1 ? '1 TFSA room estimated' : `${rooms} TFSA rooms estimated`}. Nothing is confirmed: check it against your documents.`,
     estimateNothing: 'Nothing to estimate: everything is already filled in.',
+    estimateUndo: 'Remove these estimates',
   },
   docs: {
     rrq: {
       name: 'QPP statement of participation',
       what: 'Your pensionable earnings, year by year: they set your QPP pension.',
-      how: 'On Retraite Québec, My file, « Statement of participation ».',
+      how: 'On Retraite Québec, My file, « Statement of participation ».',
       link: 'earnings',
     },
     tax: {
@@ -294,7 +283,6 @@ const EN: GuideCopy = {
     confirm: 'It is confirmed',
     confirmed: 'Confirmed',
     skip: 'Later',
-    back: 'Previous',
     next: 'Next',
     close: 'Close the guide',
     finished: 'Guide finished',

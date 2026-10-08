@@ -45,27 +45,27 @@ test.describe('with the keyboard alone', () => {
   test('a field is reached, typed into, committed with Enter, and explained with Space — and the note opens in place', async ({ page }) => {
     await page.goto('/?form=1')
     await page.locator('.page-head__title').waitFor()
-    await tabTo(page, 'Revenu de travail annuel actuel')
-    await page.keyboard.press('Control+A')
-    await page.keyboard.type('85 000')
-    await page.keyboard.press('Enter')
-    await expect.poll(async () => (await savedProfile(page)).household.persons[0].salaryToday).toBe(85000)
-
-    // From the field, the next stops are its clear button and then its ⓘ.
-    await tabTo(page, /^Où trouver ce chiffre : Revenu de travail annuel actuel$/, 4)
-    const info = page.getByRole('button', { name: /^Où trouver ce chiffre : Revenu de travail annuel actuel$/ })
+    // The label line carries the field's tools: its estimé / confirmé mark, then its ⓘ, then the box itself.
+    await tabTo(page, /^Où trouver ce chiffre\s: Revenu de travail par année$/)
+    const info = page.getByRole('button', { name: /^Où trouver ce chiffre\s: Revenu de travail par année$/ })
     await expect(info).toHaveAttribute('aria-expanded', 'false')
     await page.keyboard.press('Space')
     await expect(info).toHaveAttribute('aria-expanded', 'true')
     await expect(page.locator('#' + (await info.getAttribute('aria-controls')))).toBeVisible()
     await page.keyboard.press('Enter')
     await expect(info).toHaveAttribute('aria-expanded', 'false')
+
+    await tabTo(page, 'Revenu de travail par année', 3)
+    await page.keyboard.press('Control+A')
+    await page.keyboard.type('85 000')
+    await page.keyboard.press('Enter')
+    await expect.poll(async () => (await savedProfile(page)).household.persons[0].salaryToday).toBe(85000)
   })
 
   test('the earnings grid sits on the page: its ⓘ, the fill action, the paste action and the first year are the next stops', async ({ page }) => {
     await page.goto('/?form=1')
     await page.locator('.page-head__title').waitFor()
-    await tabTo(page, /Où trouver ce chiffre : Revenus de travail admissibles par année/)
+    await tabTo(page, /Où trouver ce chiffre\s: Revenus de travail admissibles par année/)
     await page.keyboard.press('Tab')
     expect((await focused(page)).name).toBe('Estimer les années vides à partir du salaire actuel')
     await page.keyboard.press('Tab')
@@ -86,8 +86,8 @@ test.describe('with the keyboard alone', () => {
 
   test('a confirmation traps focus, closes on Escape, and gives focus back to the button that opened it', async ({ page }) => {
     await page.goto('/?form=1')
-    await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
-    const remove = page.getByRole('button', { name: 'Retirer le·la conjoint·e' })
+    await page.getByRole('button', { name: 'Ajouter mon ou ma partenaire' }).click()
+    const remove = page.getByRole('button', { name: 'Retirer mon ou ma partenaire' })
     await remove.focus()
     await page.keyboard.press('Enter')
     await expect(page.getByRole('alertdialog')).toBeVisible()

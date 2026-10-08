@@ -21,7 +21,7 @@ test('boots, renders the shell, and prints nothing to the console', async ({ pag
   await expect(page).toHaveTitle(/Horizon$/)
   await expect(page.locator('.shell__brand')).toHaveText('Horizon')
   await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
-  await expect(page.locator('.shell__tab')).toHaveCount(4)
+  await expect(page.locator('.shell__tab')).toHaveCount(3)
   await expect(page.locator('html')).toHaveAttribute('data-theme', /^(day|night)$/)
   expect(problems).toEqual([])
 })

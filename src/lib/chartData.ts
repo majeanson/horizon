@@ -1,7 +1,5 @@
 import type { ChartMarker, ChartSeries, SeriesColour } from '../components/charts/types.ts'
-import { PRESET_KEYS, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
-import { project } from '../engine/projection.ts'
-import type { AgeResult, Assumptions, Household, Scenario, YearRow } from '../engine/types.ts'
+import type { AgeResult, Household, YearRow } from '../engine/types.ts'
 import { selectionAge, type Selection } from './resultsModel.ts'
 
 // From the engine's year rows to what the chart draws: which number, in which dollars, for which scenario.
@@ -54,9 +52,9 @@ export function retirementMarkers(
 }
 
 // ── The whole picture, not only the net worth ────────────────────────────────────────────────────────────────────────
-// « Détail »: where each year's money comes from (work, pension plan, RRQ, OAS and its supplements, savings drawn), what the
-// accounts hold, and the same plan under the three sets of hypotheses. Everything is read from the engine's rows, for the
-// household or for one person, so the bars and the per-year table can never disagree.
+// « Détail »: where each year's money comes from (work, pension plan, RRQ, OAS and its supplements, savings drawn) and what
+// the accounts hold. Everything is read from the engine's rows, for the household or for one person, so the bars and the
+// per-year table can never disagree.
 
 /** The chart's choices: the two single-line measures, or the detail (bars). */
 export type ChartMetric = Metric | 'detail'
@@ -109,21 +107,5 @@ export function balanceBars(rows: readonly YearRow[], who: string | null, s: Sca
       out.rrsp -= p.rrspLockedEnd / k
     }
     return out
-  })
-}
-
-/** The same scenario's net worth under each set of hypotheses, one line each. */
-export function hypothesisSeries(
-  household: Household,
-  assumptions: Assumptions,
-  scenario: Scenario,
-  s: Scale,
-  labels: Record<PresetKey, string>,
-): ChartSeries[] {
-  const colour: Record<PresetKey, SeriesColour> = { prudent: 'sky', neutral: 'accent', bold: 'sage' }
-  return PRESET_KEYS.map((key) => {
-    const a = withPreset(assumptions, key)
-    const rows = project(household, a, scenario)
-    return { id: key, label: labels[key], colour: colour[key], points: rows.map((row) => ({ x: row.year, y: row.household.netWorthEnd / (s.dollars === 'today' ? deflator(row.year, s.todayYear, a.inflation) : 1) })) }
   })
 }

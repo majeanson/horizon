@@ -14,7 +14,7 @@ test('keep a plan, change the profile, open the plan again: the figures come bac
   await expect.poll(async () => (await savedProfile(page)).plans.length).toBe(1)
 
   await page.goto('/hypotheses')
-  await page.getByRole('button', { name: 'Mauvais départ' }).click()
+  await page.getByRole('tab', { name: 'Mauvais départ' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.marketPath.preset).toBe('badStart')
 
   await page.goto('/donnees')

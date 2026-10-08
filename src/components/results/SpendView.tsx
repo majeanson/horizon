@@ -81,7 +81,13 @@ export function SpendView({
           {q.updating}
         </p>
       )}
-      {age === undefined ? (
+      {/* At the profile's own amount the answer IS the one at the top of the page: say so and invite the slide, instead of
+          printing the same age a third time. */}
+      {isCurrent ? (
+        <p className="answer__note">
+          {q.sameAmount} {q.current}
+        </p>
+      ) : age === undefined ? (
         <Skeleton count={2} />
       ) : age === null ? (
         <p className="answer__big answer__big--short">{q.none(money(spend), maxAge)}</p>
@@ -89,9 +95,7 @@ export function SpendView({
         <p className="answer__big">{rightNow ? q.now(money(spend)) : q.at(money(spend), age)}</p>
       )}
       <p className="answer__note">{q.perMonth(money(spend / 12))}</p>
-      {isCurrent ? (
-        <p className="answer__note">{q.sameAmount}</p>
-      ) : (
+      {!isCurrent && (
         <>
           {delta !== null && <p className="answer__note">{delta}</p>}
           <Cluster>

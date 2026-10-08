@@ -140,7 +140,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
   const add = (pension: DbPension) => edit((x) => addPension(x, pension))
 
   return (
-    <Section title={p.title} subtitle={p.subtitle} icon="users-three-bold">
+    <Section title={p.title} subtitle={p.subtitle} icon="bank-bold">
       {person.pensions.length === 0 && <p className="field-row__hint">{p.empty}</p>}
       {person.pensions.length > 0 && (
         <div className={'fact-line' + (guided === factId(person.id, 'pension') ? ' fact-line--guided' : '')} data-fact={factId(person.id, 'pension')}>

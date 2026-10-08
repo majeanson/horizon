@@ -1,4 +1,5 @@
 import { Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { TwoLineTick } from './tick'
 import type { StackedBarChartProps, SeriesColour } from './types'
 
 // The ONE stacked bar chart: where each year's money comes from — plain bars, one segment per source, in the app's own
@@ -17,7 +18,8 @@ const COLOUR: Record<SeriesColour, string> = {
   ink: 'var(--ink-faint)',
 }
 
-export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat, xTitle, markers = [], ariaLabel, height = 300 }: StackedBarChartProps) {
+export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300 }: StackedBarChartProps) {
+  const bottom = xTick ? 18 : 4
   return (
     <figure className="chart" role="img" aria-label={ariaLabel}>
       <ul className="chart__legend" aria-hidden="true">
@@ -36,16 +38,16 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
       </ul>
       <div className="chart__plot" style={{ height }} aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data as unknown as Record<string, number>[]} margin={{ top: 8, right: 12, bottom: 4, left: 0 }} accessibilityLayer={false}>
+          <ComposedChart data={data as unknown as Record<string, number>[]} margin={{ top: 8, right: 12, bottom, left: 0 }} accessibilityLayer={false}>
             <CartesianGrid stroke="var(--hairline)" vertical={false} />
             <XAxis
               dataKey="x"
               type="category"
               tickLine={false}
               axisLine={{ stroke: 'var(--line-strong)' }}
-              tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }}
+              tick={xTick ? <TwoLineTick lines={xTick} /> : { fill: 'var(--ink-soft)', fontSize: '0.78rem' }}
               interval="preserveStartEnd"
-              minTickGap={16}
+              minTickGap={xTick ? 36 : 16}
             />
             <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(y: number) => yFormat(y)} />
             <Tooltip

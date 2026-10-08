@@ -153,7 +153,9 @@ export function EditField({
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(e.target.value),
     onBlur: handleBlur,
     placeholder,
-    'aria-label': ariaLabel ?? placeholder,
+    // The placeholder names the box only when nothing else can: a box with an `id` has a <label for> pointing at it,
+    // and an aria-label would silence that label (« Année de naissance » read as « ex. 1975 » to a screen reader).
+    'aria-label': ariaLabel ?? (id ? undefined : placeholder),
     'aria-describedby': ariaDescribedBy,
     autoFocus,
     disabled,

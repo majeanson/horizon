@@ -39,9 +39,11 @@ test('the checklist names the documents, what each confirms, and its official pa
   const docs = panel(page).locator('.doc')
   await expect(docs.first()).toContainText('Relevé de participation au RRQ')
   await expect(panel(page).locator('.doc', { hasText: 'Avis de cotisation' }).getByRole('link', { name: /page officielle/ })).toHaveAttribute('href', /^https:\/\/www\.canada\.ca\//)
-  // the quick and the exact ways are both said
-  await expect(panel(page)).toContainText('Rapide')
-  await expect(panel(page)).toContainText('Exact')
+  // the two ways are two chips: walk every figure with the guide, or estimate what is still blank
+  await expect(panel(page).getByRole('button', { name: 'Tout confirmer pas à pas' })).toBeVisible()
+  await expect(panel(page).getByRole('button', { name: 'Estimer ce qui manque' })).toBeVisible()
+  // the panel sits AFTER the form, and the one-line meter above the form leads to it
+  expect(await page.locator('.accuracy-line').evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(await panel(page).evaluate((el) => el.getBoundingClientRect().top))
   // a figure of the checklist scrolls to its field and lights it
   await panel(page).locator('.doc', { hasText: 'Relevés de vos comptes' }).getByRole('button', { name: /Solde du REER, .*Camille/ }).click()
   await expect(page.locator('[data-fact="self:rrspBalance"]')).toHaveClass(/field-row--guided/)
@@ -112,8 +114,8 @@ test('the quick way: « Estimer ce qui manque » fills blank earnings years and 
   await page.goto('/')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
-  const quick = panel(page).locator('.accuracy__mode', { hasText: 'Rapide' })
-  await expect(quick).toContainText('Ce qu’il estime')
+  const quick = panel(page)
+  await expect(quick).toContainText('L’estimation remplit')
   await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
   await expect(quick.getByRole('status')).toContainText(/années de revenus estimées/)
   await expect(quick.getByRole('status')).toContainText('Rien n’est confirmé')
@@ -122,18 +124,24 @@ test('the quick way: « Estimer ce qui manque » fills blank earnings years and 
   expect(saved.earningsHistory['2020']).toBe(55_000) // typed: untouched
   expect(saved.accounts.tfsa.room).toBeGreaterThan(0) // an estimate of the room a person of that age has, less the balance
   expect((await savedProfile(page)).confirmed).toEqual([]) // nothing is called real by an estimate
-  // a second press has nothing left to fill, and says so
+  // one tap wrote ~30 years and a room: the note carries the way back, and taking it restores exactly what was there
+  await quick.getByRole('button', { name: 'Retirer ces estimations' }).click()
+  await expect.poll(async () => Object.keys((await savedProfile(page)).household.persons[0].earningsHistory).length).toBe(1)
+  expect((await savedProfile(page)).household.persons[0].accounts.tfsa.room).toBe(0)
+  // estimating again, then a third press has nothing left to fill, and says so
+  await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
+  await expect(quick.getByRole('status')).toContainText(/années de revenus estimées/)
   await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
   await expect(quick.getByRole('status')).toContainText('Rien à estimer')
 })
 
 test('the results say how much of the answer stands on confirmed figures, and point back to the profile', async ({ page }) => {
   await page.goto('/resultats')
-  const note = page.locator('.verdict').getByText(/chiffres confirmés/)
-  await expect(note).toContainText(/Votre profil : 0 sur \d+ chiffres confirmés ; le reste est estimé\./)
+  const note = page.locator('.refine').getByText(/chiffres confirmés/)
+  await expect(note).toContainText(/Votre profil\s: 0 sur \d+ chiffres confirmés\s; le reste est estimé\./)
   await note.getByRole('link', { name: 'Rendre mon profil exact' }).click()
   await expect(page).toHaveURL(/\/$/)
   await page.locator('[data-fact="self:rrspBalance"]').getByRole('button', { name: /^Estimé/ }).click()
   await page.getByRole('link', { name: 'Résultats' }).first().click()
-  await expect(page.locator('.verdict')).toContainText(/Votre profil : 1 sur \d+ chiffres confirmés/)
+  await expect(page.locator('.refine')).toContainText(/Votre profil\s: 1 sur \d+ chiffres confirmés/)
 })

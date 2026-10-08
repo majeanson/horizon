@@ -1,4 +1,5 @@
 import { CartesianGrid, Line, LineChart as RLineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { TwoLineTick } from './tick'
 import type { ChartSeries, LineChartProps, SeriesColour } from './types'
 
 // The ONE line chart. A thin adapter over the chart library: it takes plain series, draws them in the app's own
@@ -32,8 +33,10 @@ function merge(series: readonly ChartSeries[]): Record<string, number>[] {
   return [...byX.values()].sort((a, b) => a.x - b.x)
 }
 
-export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, markers = [], ariaLabel, height = 300 }: LineChartProps) {
+export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300 }: LineChartProps) {
   const data = merge(series)
+  // A two-line tick (the year, then the age) wants more room under the plot than the library's one-line default.
+  const bottom = xTick ? 18 : 4
   return (
     <figure className="chart" role="img" aria-label={ariaLabel}>
       <ul className="chart__legend" aria-hidden="true">
@@ -48,9 +51,18 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, markers 
         <ResponsiveContainer width="100%" height="100%">
           {/* accessibilityLayer is OFF on purpose: it makes the SVG focusable, and the plot is aria-hidden (a picture — its
               text is the per-year table), so a focusable node inside it is an axe « aria-hidden-focus » violation. */}
-          <RLineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 0 }} accessibilityLayer={false}>
+          <RLineChart data={data} margin={{ top: 8, right: 12, bottom, left: 0 }} accessibilityLayer={false}>
             <CartesianGrid stroke="var(--hairline)" vertical={false} />
-            <XAxis dataKey="x" type="number" domain={['dataMin', 'dataMax']} tickLine={false} axisLine={{ stroke: 'var(--line-strong)' }} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(x: number) => String(x)} minTickGap={24} />
+            <XAxis
+              dataKey="x"
+              type="number"
+              domain={['dataMin', 'dataMax']}
+              tickLine={false}
+              axisLine={{ stroke: 'var(--line-strong)' }}
+              tick={xTick ? <TwoLineTick lines={xTick} /> : { fill: 'var(--ink-soft)', fontSize: '0.78rem' }}
+              tickFormatter={(x: number) => String(x)}
+              minTickGap={xTick ? 40 : 24}
+            />
             <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(y: number) => yFormat(y)} />
             <Tooltip
               cursor={{ stroke: 'var(--ink-faint)', strokeDasharray: '3 3' }}

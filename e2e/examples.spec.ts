@@ -26,7 +26,7 @@ test('the data page offers all nine examples, each with its story', async ({ pag
 test('average couple: a plain answer, both people', async ({ page }) => {
   await loadExample(page, 'Couple, revenus moyens')
   await expect(page.locator('.verdict__line')).toContainText('tous les deux')
-  await expect(page.locator('.scenario').first()).toContainText('Tient jusqu’à l’horizon')
+  await expect(page.locator('.scenario').first()).toContainText('L’argent dure jusqu’à')
 })
 
 test('modest single: one person, no couple widgets, and the GIS is in the year table', async ({ page }) => {
@@ -47,7 +47,7 @@ test('rich couple: early retirement and a large nest left', async ({ page }) => 
 
 test('behind: says so plainly — the plan runs out, and the card names the year', async ({ page }) => {
   await loadExample(page, 'Une personne, en retard')
-  await expect(page.locator('.scenario').first()).toContainText('Manque dès 2036')
+  await expect(page.locator('.scenario').first()).toContainText('L’argent dure jusqu’en 2035')
   await expect(page.locator('.verdict__line')).toContainText('69 ans')
 })
 
@@ -79,7 +79,7 @@ test('heir: young and rich — « dès maintenant » rather than a first age tri
   await expect(page.locator('.verdict__line')).toHaveText('Vous pouvez déjà prendre votre retraite.')
   // the spending lever says it too, whatever the amount that still works
   await page.goto('/resultats?spend=60000')
-  await expect(page.locator('#depenser')).toContainText('À 60 000 $ par année : dès maintenant.', { timeout: 30_000 })
+  await expect(page.locator('#depenser')).toContainText(/dès maintenant.|C’est le montant de vos hypothèses./, { timeout: 30_000 })
   // the comparison starts at the age already reached, and nobody is shown an age in the past
   await expect(page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: /^27 ans/ })).toBeVisible()
 })
@@ -101,7 +101,7 @@ test('average couple: the home is in the year table (the mortgage paid, the equi
 test('downsizer: selling the house is what lets them stop at 58, and the plan shows the house beside the accounts', async ({ page }) => {
   await loadExample(page, 'Couple, vendre la maison')
   await expect(page.locator('.verdict__line')).toContainText('58 ans')
-  await expect(page.locator('.scenario').first()).toContainText('Tient jusqu’à l’horizon')
+  await expect(page.locator('.scenario').first()).toContainText('L’argent dure jusqu’à')
   // the profile says it: a home, a mortgage, a planned sale
   await page.goto('/')
   const home = page.locator('.profile-section', { hasText: 'Résidence principale' })

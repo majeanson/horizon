@@ -9,8 +9,10 @@
 :root {
   /* The top bar's height, the ONE number the sticky offsets hang from (the desktop nav rail,
      the Résultats section map). It was a magic 3.6rem in three places while the real bar sat
-     at ~4rem (44px icon button + 0.6rem×2 padding) — everything sticky tucked ~6px under it. */
-  --bar-h: 4rem;
+     at ~4rem — everything sticky tucked ~6px under it. Brought down to 3.25rem (44px buttons +
+     0.25rem×2 padding) on 2026-10-08: with the bottom bar it was a sixth of a phone's screen
+     for a name, « EN » and a moon. */
+  --bar-h: calc(3.25rem + 1px);
 }
 .shell {
   min-height: 100%;
@@ -27,7 +29,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   min-height: var(--bar-h);
-  padding: 0.6rem var(--gutter);
+  padding: 0.25rem var(--gutter);
   /* A notched phone in landscape puts a ~48px inset where the 16px gutter was. */
   padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px));
   background: var(--paper);
@@ -54,10 +56,10 @@
   left: 0.5rem;
   z-index: 60;
   padding: 0.55rem 0.95rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--mono);
+  font-weight: 600;
   font-size: var(--text-sm);
   text-decoration: none;
   transform: translateY(calc(-100% - 1.5rem));
@@ -93,16 +95,26 @@
   min-height: 3.75rem;
   padding: 0.35rem 0.25rem;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  /* Four tabs share a 360 px bar, so each gets 90 px whatever the text size: « Hypothèses » and « Résultats » touched at
-     the largest step. This is the case --chrome-scale (core.css) exists for — fixed-count chrome with no room to grow. */
-  font-size: calc(var(--text-xs) * var(--chrome-scale, 1));
+  /* The body face at 600, not the code face: a destination is a word, and 12.5 px monospace read as a terminal to the
+     fifty-year-olds this is for. Three tabs share a 360 px bar, so each gets 120 px whatever the text size — the
+     labels still scale with --chrome-scale (core.css), the brake for fixed-count chrome with no room to grow. */
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--text-sm) * var(--chrome-scale, 1));
   text-decoration: none;
   text-align: center;
 }
+/* The open tab: its icon on a filled pill, like the desktop rail — a 3 px marigold line on cream (1.8:1) was the whole cue. */
+.shell__tab > svg {
+  padding: 0.15rem 0.7rem;
+  border-radius: var(--radius-pill);
+  box-sizing: content-box;
+}
 .shell__tab.is-on {
   color: var(--ink);
-  box-shadow: inset 0 3px 0 var(--accent);
+}
+.shell__tab.is-on > svg {
+  background: var(--accent-soft);
 }
 .shell__tab:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -154,7 +166,9 @@
   }
   .shell__tab.is-on {
     background: var(--accent-soft);
-    box-shadow: none;
+  }
+  .shell__tab.is-on > svg {
+    background: transparent;
   }
   .shell__main {
     margin: 0;
@@ -343,6 +357,22 @@
 }
 .earnings__tools .chip {
   justify-self: start;
+}
+.levers__list {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.levers__item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.65rem;
 }
 .plans__new {
   display: flex;

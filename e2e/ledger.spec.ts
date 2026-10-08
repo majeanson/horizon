@@ -26,7 +26,7 @@ test('a slider shows the calculation, previews while held, and saves the age in 
   await expect(panel.locator('.ledger__delta').first()).toContainText('de plus par mois')
   await expect.poll(async () => (await savedProfile(page)).household.persons[0].rrq.startAge).toBe(66)
   // the plan line is read aloud politely and names an outcome
-  await expect(panel.locator('.ledger__glance')).toContainText(/Le plan (tient|manque)/)
+  await expect(panel.locator('.ledger__glance')).toContainText(/L’argent dure/)
 })
 
 test('the page has no horizontal overflow at phone width with the panel open', async ({ page }) => {

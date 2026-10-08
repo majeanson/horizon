@@ -26,7 +26,7 @@ export function SectionHeader({
         {icon && <Icon name={icon} size={18} />}
         <div className="section-header__text">
           <Heading className="section-header__title">{title}</Heading>
-          {subtitle != null && <span className="section-header__sub mono">{subtitle}</span>}
+          {subtitle != null && <span className="section-header__sub">{subtitle}</span>}
         </div>
       </div>
       {action && <div className="section-header__action">{action}</div>}

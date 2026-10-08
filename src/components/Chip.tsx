@@ -87,17 +87,17 @@ export function Chip({
   // or a static label.
   const handler = onRemove ?? onClick
   const cls = 'chip' + (selected || current ? ' is-on' : '') + (className ? ` ${className}` : '')
-  // The space rides WITH the icon: `{icon && <I/>} {children}` puts a leading space
-  // in every icon-less chip too, which is a stray character in its accessible name.
+  // A chosen TOGGLE or RADIO says so with a check before its name, and a DISCLOSURE with a caret that turns: a filled
+  // pill alone was the same pill as the others to most eyes (the review's « I cannot tell a toggle from a link »). The
+  // glyphs are aria-hidden: the state is already in aria-pressed / aria-checked / aria-expanded.
+  const lead = expanded !== undefined ? (expanded ? 'caret-up-bold' : 'caret-down-bold') : selected && current === undefined && !onRemove ? 'check-bold' : icon
+  // No space character beside the glyph: the chip's own `gap` spaces it, and a space here was a stray character at the
+  // head of the chip's text (« Neutre 2,1 % » read as "  Neutre…" to a test matching the start of the name).
   const body = (
     <>
-      {icon && (
-        <>
-          <InlineIcon name={icon} />{' '}
-        </>
-      )}
+      {lead && <InlineIcon name={lead} />}
       {children}
-      {onRemove && <> <InlineIcon name="x-bold" size={12} /></>}
+      {onRemove && <InlineIcon name="x-bold" size={12} />}
     </>
   )
 
@@ -146,7 +146,7 @@ export function Chip({
 export function ChipGroup({ label, children }: { label?: ReactNode; children: ReactNode }) {
   return (
     <div className="chip-group">
-      {label != null && <span className="chip-group__label mono">{label}</span>}
+      {label != null && <span className="chip-group__label">{label}</span>}
       <div className="chip-group__chips">{children}</div>
     </div>
   )

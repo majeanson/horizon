@@ -2,8 +2,8 @@
 
 > The living inventory of the shared UI. Pair it with the **`/dev/kit`** gallery
 > (`src/pages/DevKit.tsx`) — a dev-only page that renders every shared primitive live, with
-> toggles for theme, language, contrast and text size. Reach it from **Données**, or go to
-> `/dev/kit`. Keep it open beside a chat to point at « this component, here » without running a
+> toggles for theme, language, contrast and text size. Reach it from the foot of **Sauvegarde et
+> réglages** (in development only), or go to `/dev/kit`. Keep it open beside a chat to point at « this component, here » without running a
 > flow.
 >
 > **Reach for a primitive before you write markup.** The recurring failure mode is building
@@ -58,7 +58,8 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **NumberField** | `src/components/NumberField.tsx` | The number box: owns the TEXT while it is typed and hands the page a NUMBER only when the text means one (FR-CA comma rules, `lib/money.ts`). Kinds `money` / `percent` / `decimal` / `year` / `int`; committed on Enter or blur; an out-of-range text stays on screen with its reason. `allowEmpty` makes an optional figure a number or `null`. |
 | **FieldRow** | `src/components/FieldRow.tsx` | One labelled field: label tied to the box, the box with its ⓘ, a quiet hint read with it. The control is a render function that receives the ids to wire — the caller never invents them. |
 | **FieldInfo** | `src/components/FieldInfo.tsx` | The ⓘ « where to find this number »: an inline note (not a popover) with WHERE the figure is, the document's own wording for it, and the official page. Wording lives in `FR.info.<id>`; `fieldInfoCopy.test.ts` holds every id to an entry and every link to an official host. |
-| **Chip** · ChipGroup | `src/components/Chip.tsx` | The ONE pill — toggle (`selected`), action (`onClick`), link (`to`), static label, expander (`expanded`), the « you are here » of a nav (`current`). A test (`chip-rule.test.ts`) fails the build on a hand-rolled `className="chip"`. |
+| **Chip** · ChipGroup | `src/components/Chip.tsx` | The ONE pill — toggle (`selected`, drawn with a check when on), action (`onClick`), link (`to`), static label, expander (`expanded`, drawn with a caret), the « you are here » of a nav (`current`). A test (`chip-rule.test.ts`) fails the build on a hand-rolled `className="chip"`. |
+| **Switch** | `src/components/Switch.tsx` | The ONE on/off setting (`role="switch"`): a knob on a track, the label beside it, an optional hint under. For a lone yes/no (« Placer d’abord le surplus dans le REER »); a choose-one among several is `SubTabs`. |
 | **TableChooser** | `src/components/TableChooser.tsx` | The header of a table that could hold several data sets (scenarios, hypotheses, horizons, years): ONE table below, this row picks which set it shows. A label, a SubTabs control, an optional trailing action; renders nothing when there is only one set. |
 | **SubTabs** | `src/components/SubTabs.tsx` | The segmented « one job at a time » control; keyboard-complete tablist, wheel-mapped, paging chevrons on a fine pointer. An option may carry `who` (0 / 1) to wear a person's colour dot. |
 
@@ -71,7 +72,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **ImpactMeter** | `src/components/ImpactMeter.tsx` | « Where does this assumption sit, and what does it do to the plan? » A five-step track with a marker, the level and its lean in words (cautious / central / optimistic), and one « why it matters » sentence. The level comes from `engine/assumptionImpact.ts` (anchored on the three scenarios); the copy is `FR.assumptions.impact`. |
 | **EmptyState** | `src/components/EmptyState.tsx` | The calm « nothing here » line (`role="status"`). |
 | **SectionNav** | `src/components/SectionNav.tsx` | The map of a long page: a sticky `Rail` of chips, one per section in reading order — a tap scrolls there, the section in view is marked (IntersectionObserver). Everything stays ON the page; the nav only moves the reader. |
-| **NextStep** | `src/components/NextStep.tsx` | The foot of a page: one line on what is missing (or that nothing is) and ONE primary action to the next page — Profil → Hypothèses → Résultats → Données. |
+| **NextStep** | `src/components/NextStep.tsx` | The foot of a page: one line on what is missing (or that nothing is) and ONE primary action to the next page — Profil → Résultats, Résultats → Hypothèses. |
 
 ### Charts
 
@@ -97,7 +98,7 @@ Pages compose the primitives above and own data and routing; a specimen of a pag
 screenshot, and the e2e suite takes those. They are listed so nobody looks for them here:
 `src/pages/Profil.tsx`, `Hypotheses.tsx`, `Resultats.tsx`, `Donnees.tsx` (the four destinations; their sections are
 `src/components/profile/*`; Résultats' panels are `src/components/results/*` — `BridgePanel`, `ChartPanel`,
-`SensitivityPanel`, `EarliestEachPanel`, `SaveView`, `StopView`, `SplitPicker`, `YearTables`, `ParamsPanel`) and `src/pages/DevKit.tsx` (the gallery itself).
+`SensitivityPanel`, `EarliestEachPanel`, `SaveView`, `SpendView`, `LedgerPanel`, `OrderPanel`, `YearTables`, `ParamsPanel`) and `src/pages/DevKit.tsx` (the gallery itself).
 
 ## CSS design system (condensed)
 

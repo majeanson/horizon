@@ -6,22 +6,26 @@ import { GUIDE_COPY } from '../../lib/guideCopy'
 import { scrollBehavior } from '../../lib/motion'
 import { estimateMissing } from '../../lib/estimates'
 import { setFacts } from '../../lib/profileEdit'
+import type { Profile } from '../../lib/schema'
 import { today } from '../../lib/today'
-import { updateProfile, useProfile } from '../../lib/store'
+import { replaceProfile, updateProfile, useProfile } from '../../lib/store'
 import { Chip } from '../Chip'
+import { Cluster } from '../Layout'
 import { Icon } from '../Icon'
+import { StatusMessage } from '../StatusMessage'
 import { Section } from './shared'
 
 // « Rendre mon profil exact » — the way from an estimated profile to one that stands on the person's own documents.
 //
 //   · a METER: how many of the figures this household has are confirmed (read off a document) rather than estimated;
-//   · two ways, said side by side — QUICK (a few figures, the rest estimated and marked) and EXACT (the documents in hand);
+//   · two chips: fill what is still blank with an ESTIMATE (and take it back), or walk EVERY unconfirmed figure with the guide;
 //   · the CHECKLIST of documents that hold the real numbers: what each settles, how to get it, its official page, and the
 //     figures it confirms, each a link to its field;
 //   · the GUIDE: a card docked at the bottom that walks the real form, one unconfirmed figure at a time — scrolling to it,
 //     saying where it is and in which words the document prints it (the ⓘ's own text), and confirming it on a tap.
 //
-// It reads the list of facts (lib/facts.ts) and writes only `confirmed`; it never touches a figure's value.
+// It reads the list of facts (lib/facts.ts) and writes only `confirmed`; it never touches a figure's value. It sits AFTER
+// the form: the first visit's path already was the quick way, and a returning reader comes to change a number.
 
 // Bring a figure's field on screen: centred, unless it is a tall block (the earnings list) — then its TOP, where its header and its
 // mark are, since the guide's card is docked over the lower part of the window.
@@ -41,8 +45,8 @@ export default function AccuracyGuide() {
   const acc = useMemo(() => accuracyOf(profile), [profile])
   // The guide in progress: the figures it will visit (fixed when it starts, so confirming one does not reshuffle the others), and where it is.
   const [tour, setTour] = useState<{ ids: string[]; at: number } | null>(null)
-  // What the quick estimate just did, said once under its button.
-  const [estimated, setEstimated] = useState<string | null>(null)
+  // What the estimate just did, said once under its chip — with the profile as it was, so one tap takes it back.
+  const [estimated, setEstimated] = useState<{ note: string; before: Profile | null } | null>(null)
 
   const nameOf = (owner: Fact['owner']): string =>
     owner === 'household' ? c.guide.householdOwner : c.guide.owner(profile.household.persons.find((p) => p.id === owner)?.name.trim() || (owner === 'self' ? t.profile.self : t.profile.spouse))
@@ -56,10 +60,20 @@ export default function AccuracyGuide() {
   const start = (ids: string[]) => ids.length > 0 && setTour({ ids, at: 0 })
   const unconfirmed = (doc?: DocId) => facts.filter((f) => !f.confirmed && (doc === undefined || f.doc === doc)).map((f) => f.id)
   const pct = acc.total === 0 ? 0 : Math.round((100 * acc.confirmed) / acc.total)
+  const estimate = () => {
+    const e = estimateMissing(profile, today())
+    if (e.years === 0 && e.rooms === 0) return setEstimated({ note: c.panel.estimateNothing, before: null })
+    updateProfile((p) => estimateMissing(p, today()).profile)
+    setEstimated({ note: c.panel.estimateDone(e.years, e.rooms), before: profile })
+  }
+  const undoEstimate = () => {
+    if (estimated?.before) replaceProfile(estimated.before)
+    setEstimated(null)
+  }
 
   return (
     <>
-      <Section title={c.panel.title} subtitle={c.panel.lead} icon="check-bold">
+      <Section id="exact" title={c.panel.title} subtitle={c.panel.lead} icon="check-bold">
         <div className="accuracy__meter">
           <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={acc.total} aria-valuenow={acc.confirmed} aria-label={c.panel.count(acc.confirmed, acc.total)}>
             <span className="meter__fill" style={{ width: `${pct}%` }} />
@@ -74,41 +88,21 @@ export default function AccuracyGuide() {
           <p className="field-row__hint">{acc.confirmed === 0 ? c.panel.none : acc.confirmed === acc.total ? c.panel.allDone : c.panel.estimatedNote(acc.total - acc.confirmed)}</p>
         </div>
 
-        <div className="accuracy__modes">
-          <div className="accuracy__mode">
-            <h3 className="accuracy__mode-title">
-              <span className="accuracy__mode-tag">1</span> {c.panel.quickTitle}
-            </h3>
-            <p className="field-row__hint">{c.panel.quick}</p>
-            <p className="field-row__hint">{c.panel.quickDoes}</p>
-            <Chip
-              icon="arrow-right-bold"
-              onClick={() => {
-                const e = estimateMissing(profile, today())
-                updateProfile((p) => estimateMissing(p, today()).profile)
-                setEstimated(e.years === 0 && e.rooms === 0 ? c.panel.estimateNothing : c.panel.estimateDone(e.years, e.rooms))
-              }}
-            >
-              {c.panel.estimate}
+        <Cluster>
+          {acc.confirmed < acc.total && (
+            <Chip icon="arrow-right-bold" onClick={() => start(unconfirmed())}>
+              {c.panel.guideAll}
             </Chip>
-            {estimated && (
-              <p className="field-row__hint" role="status">
-                {estimated}
-              </p>
-            )}
-          </div>
-          <div className="accuracy__mode accuracy__mode--exact">
-            <h3 className="accuracy__mode-title">
-              <span className="accuracy__mode-tag">2</span> {c.panel.exactTitle}
-            </h3>
-            <p className="field-row__hint">{c.panel.exact}</p>
-            {acc.confirmed < acc.total && (
-              <Chip icon="arrow-right-bold" onClick={() => start(unconfirmed())}>
-                {c.panel.guideAll}
-              </Chip>
-            )}
-          </div>
-        </div>
+          )}
+          <Chip onClick={estimate}>{c.panel.estimate}</Chip>
+        </Cluster>
+        <p className="field-row__hint">{c.panel.quickDoes}</p>
+        {estimated && (
+          <Cluster>
+            <StatusMessage tone="info">{estimated.note}</StatusMessage>
+            {estimated.before !== null && <Chip onClick={undoEstimate}>{c.panel.estimateUndo}</Chip>}
+          </Cluster>
+        )}
 
         <ol className="docs">
           {DOC_IDS.map((doc) => {
@@ -130,7 +124,7 @@ export default function AccuracyGuide() {
                 <ul className="doc__facts" aria-label={c.panel.fills}>
                   {mine.map((f) => (
                     <li key={f.id}>
-                      <button type="button" className={'doc__fact' + (f.confirmed ? ' is-on' : '')} onClick={() => jump(f.id)} aria-label={`${c.panel.show} : ${c.kind[f.kind]}, ${nameOf(f.owner)}, ${f.confirmed ? c.panel.legendConfirmed : c.panel.legendEstimated}`}>
+                      <button type="button" className={'doc__fact' + (f.confirmed ? ' is-on' : '')} onClick={() => jump(f.id)} aria-label={`${c.panel.show} : ${c.kind[f.kind]}, ${nameOf(f.owner)}, ${f.confirmed ? c.panel.legendConfirmed : c.panel.legendEstimated}`}>
                         <span className={'fact-dot' + (f.confirmed ? ' is-on' : '')} aria-hidden="true">
                           {f.confirmed && <Icon name="check-bold" size={10} />}
                         </span>
@@ -163,7 +157,8 @@ export default function AccuracyGuide() {
   )
 }
 
-// The card docked at the bottom while the guide runs: one figure at a time, on the real form.
+// The card docked at the bottom while the guide runs: one figure at a time, on the real form. Three actions, not four:
+// « C'est confirmé », « Plus tard » and the close — a « Précédent » in a bar already crowded on a phone was the one nobody used.
 function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: number; setAt: (at: number) => void; onClose: () => void }) {
   const t = useT()
   const { lang } = useLang()
@@ -210,19 +205,19 @@ function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: number; setA
         </>
       ) : (
         <>
-          <p className="guide-bar__step mono">
+          <p className="guide-bar__step">
             {c.guide.step(at + 1, ids.length)} · {owner}
           </p>
           <p className="guide-bar__title">{c.kind[fact.kind]}</p>
           <p className="guide-bar__doc">
-            <strong>{c.guide.document} :</strong> {c.docs[fact.doc].name}
+            <strong>{c.guide.document} :</strong> {c.docs[fact.doc].name}
           </p>
           <p className="guide-bar__where">
-            <strong>{c.guide.whereIs} :</strong> {where}
+            <strong>{c.guide.whereIs} :</strong> {where}
             {entry?.label ? (
               <>
                 {' '}
-                <strong>{c.guide.wording} :</strong> « {entry.label} »
+                <strong>{c.guide.wording} :</strong> « {entry.label} »
               </>
             ) : null}
           </p>
@@ -233,9 +228,6 @@ function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: number; setA
             </a>
           ) : null}
           <div className="guide-bar__actions">
-            <Chip onClick={() => setAt(Math.max(0, at - 1))} disabled={at === 0}>
-              {c.guide.back}
-            </Chip>
             <Chip
               icon="check-bold"
               selected={fact.confirmed}

@@ -32,7 +32,6 @@ export interface BridgeCopy {
   /** The scorecard. */
   lowestNestLabel: string
   selectedName: string
-  worth85: string
   worth95: string
   noWorth: string
   lifetime: string
@@ -90,67 +89,66 @@ export interface BridgeCopy {
   why: (f: { rrqPerMonth: string; rrqMax: string; oasPerMonth: string; oasMax: string }) => string[]
   caveatTitle: string
   caveats: string[]
-  /** The three sets of assumptions. */
-  matrixTitle: string
-  matrixHint: (name: string) => string
+  /** On each card: the same way of starting under each of the three scenarios, one mark per scenario. */
+  marksTitle: string
+  marksHint: (name: string) => string
+  marksPending: string
   matrixHolds: string
   matrixFails: (age: number) => string
-  strategyCol: string
 }
 
 export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
   fr: {
-    hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le nid doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si le plan tient. Tout est en dollars d’aujourd’hui.',
+    hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le nid (vos REER, CELI et placements) doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si l’argent dure. Tout est en dollars d’aujourd’hui.',
     updating: 'Mise à jour du calcul…',
     person: 'Pour',
-    agesLine: (retire, rrq, oas) => `Vos âges : retraite à ${retire}, RRQ à ${rrq}, PSV à ${oas}. Pour les changer : « Mes données et leur calcul ».`,
+    agesLine: (retire, rrq, oas) => `Vos âges : retraite à ${retire}, RRQ à ${rrq}, PSV à ${oas}. Pour les changer : « Mes chiffres », dans Vérifier.`,
     bothLabel: 'Pour les deux',
-    bothHint: 'L’autre personne commence son RRQ et sa PSV aux mêmes âges ; son âge de retraite reste celui de son profil.',
+    bothHint: 'L’autre personne commence son RRQ et sa PSV aux mêmes âges ; son âge de retraite reste celui de son profil.',
     age: (age) => `${age} ans`,
     strategyTitle: 'Façons de commencer vos rentes',
     strategyName: { mine: 'Mon plan', asap: 'Tout dès que possible', standard: 'Standard', max: 'Reporter au maximum', bridge: 'Pont jusqu’à 70 ans', both: 'Les deux à 70 ans' },
     strategyLine: {
       mine: 'Les âges de début de votre profil.',
-      asap: 'RRQ à 60 ans, PSV à 65 ans : le plus tôt permis.',
+      asap: 'RRQ à 60 ans, PSV à 65 ans : le plus tôt permis.',
       standard: 'RRQ et PSV à 65 ans.',
-      max: 'RRQ à 72 ans, PSV à 70 ans : les rentes les plus élevées.',
+      max: 'RRQ à 72 ans, PSV à 70 ans : les rentes les plus élevées.',
       bridge: 'Vivre du nid jusqu’à 70 ans, puis RRQ et PSV à 70 ans.',
       both: 'Comme le pont, mais l’autre personne reporte aussi son RRQ et sa PSV à 70 ans.',
     },
-    custom: 'Vos choix ne correspondent à aucune de ces façons : ils sont montrés sous « Mon plan ».',
+    custom: 'Vos choix ne correspondent à aucune de ces façons : ils sont montrés sous « Mon plan ».',
     applied: ({ name, rrq, oas, prevRrq, prevOas, both }) =>
-      `Profil mis à jour${name ? ` pour ${name}` : ''} : RRQ à ${rrq}, PSV à ${oas} (avant : RRQ à ${prevRrq}, PSV à ${prevOas}).${both ? ' L’autre personne suit les mêmes âges.' : ''}`,
+      `Profil mis à jour${name ? ` pour ${name}` : ''} : RRQ à ${rrq}, PSV à ${oas} (avant : RRQ à ${prevRrq}, PSV à ${prevOas}).${both ? ' L’autre personne suit les mêmes âges.' : ''}`,
     appliedUndo: 'Annuler ce changement',
     lowestNestLabel: 'Nid le plus bas, de 60 à 70 ans',
     selectedName: 'Votre choix actuel',
-    worth85: 'Valeur nette à 85 ans',
     worth95: 'Valeur nette à 95 ans',
     noWorth: '—',
     lifetime: 'Encaissé sur tout le plan, après impôt',
-    todayNote: 'Montants en dollars d’aujourd’hui ; « encaissé » compte aussi les retraits du nid.',
+    todayNote: 'Montants en dollars d’aujourd’hui ; « encaissé » compte aussi les retraits du nid.',
     standardIsMine: 'Standard (c’est aussi votre plan)',
     extraDrawn: (amount) => `${amount} de plus tirés du nid entre 60 et 69 ans que le standard`,
     lessDrawn: (amount) => `${amount} de moins tirés du nid entre 60 et 69 ans que le standard`,
     sameDrawn: 'Autant tiré du nid entre 60 et 69 ans que le standard',
     breakEvenLater: (age) => `Les rentes cumulées rattrapent le standard à ${age} ans`,
     breakEvenEarlier: (age) => `Attendre 65 ans rattrape cette façon à ${age} ans`,
-    breakEvenNone: 'Pas de point d’équilibre avant l’horizon du plan',
+    breakEvenNone: 'Pas de point d’équilibre avant la fin du plan',
     breakEvenSelf: 'La référence des comparaisons',
     // « L’horizon » is the verdict's own word for the plan's last year (the youngest person's 95): the age printed here is
     // the person looked at, which is NOT the youngest in a couple — so the person is named beside it.
     verdict: (v, who = null) =>
       v.kind === 'holds'
         ? v.defers
-          ? `Vous pouvez reporter : votre nid tient jusqu’à l’horizon (${who === null ? '' : `${who} : `}${v.horizonAge} ans).`
-          : `Ce plan tient jusqu’à l’horizon (${who === null ? '' : `${who} : `}${v.horizonAge} ans).`
+          ? `Vous pouvez reporter : votre nid dure jusqu’à la fin du plan (${who === null ? '' : `${who} : `}${v.horizonAge} ans).`
+          : `Avec ce plan, l’argent dure jusqu’à la fin du plan (${who === null ? '' : `${who} : `}${v.horizonAge} ans).`
         : v.defers && v.standardHolds
-          ? `Reporter épuise votre nid à ${v.age} ans ; prendre le RRQ et la PSV à 65 ans évite la pénurie.`
+          ? `Reporter épuise votre nid à ${v.age} ans ; prendre le RRQ et la PSV à 65 ans évite de manquer d’argent.`
           : v.defers && v.standardAge !== null
-            ? `Reporter épuise votre nid à ${v.age} ans, et prendre les rentes à 65 ans ne règle rien : le manque vient à ${v.standardAge} ans.`
-            : `Ce plan manque d’argent à ${v.age} ans.`,
+            ? `Reporter épuise votre nid à ${v.age} ans, et prendre les rentes à 65 ans ne règle rien : l’argent ne dure que jusqu’à ${v.standardAge} ans.`
+            : `Avec ce plan, l’argent ne dure que jusqu’à ${v.age} ans.`,
     windowLabel: 'Années montrées',
     windowBridge: '60 à 70 ans',
-    windowPlan: 'Jusqu’à l’horizon',
+    windowPlan: 'Jusqu’à la fin du plan',
     tableTitle: 'Année par année',
     colAge: 'Âge',
     colNeed: 'Dépenses',
@@ -166,46 +164,46 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     colTax: 'Impôt',
     colNest: 'Nid en fin d’année',
     colStatus: 'État',
-    status: { covered: 'Couvert par les revenus', drawing: 'Le nid est mis à contribution', short: 'Nid épuisé : pénurie' },
-    householdNote: 'Les revenus, les dépenses, l’impôt et le nid sont ceux du ménage ; l’âge est celui de la personne choisie.',
+    status: { covered: 'Couvert par les revenus', drawing: 'Le nid est mis à contribution', short: 'Nid épuisé : il manque de l’argent' },
+    householdNote: 'Les revenus, les dépenses, l’impôt et le nid sont ceux du ménage ; l’âge est celui de la personne choisie.',
     barsTitle: 'D’où vient l’argent, année par année',
-    barsHint: 'Chaque barre est une année : le travail, les rentes garanties et ce que le nid doit fournir. La ligne pointillée est ce qu’il faut couvrir (dépenses et impôt).',
+    barsHint: 'Chaque barre est une année : le travail, les rentes garanties et ce que le nid doit fournir. La ligne pointillée est ce qu’il faut couvrir (dépenses et impôt).',
     barsFigure: (from, to) => `Sources de revenus année par année, de ${from} à ${to} ans`,
     segment: { work: 'Travail', db: 'Rente de l’employeur', rrq: 'RRQ', oas: 'PSV, SRG et allocation', nest: 'Tiré du nid' },
     needLine: 'Dépenses + impôt',
     nestTitle: 'Le nid, selon la façon de commencer',
-    nestHint: (rrq, oas) => `Traits pointillés : début du RRQ (${rrq} ans) et de la PSV (${oas} ans) de votre choix. Reporter creuse le nid d’abord, puis le fait remonter.`,
+    nestHint: (rrq, oas) => `Traits pointillés : début du RRQ (${rrq} ans) et de la PSV (${oas} ans) de votre choix. Reporter creuse le nid d’abord, puis le fait remonter.`,
     nestFigure: (from, to) => `Nid en fin d’année selon la façon de commencer les rentes, de ${from} à ${to} ans`,
     markerRrq: 'RRQ',
     markerOas: 'PSV',
     tooltip: (age, year) => `${age} ans · ${year}`,
-    whyTitle: 'Pourquoi ?',
+    whyTitle: 'Pourquoi ?',
     whyCost: (amount) => `Le pont puise ${amount} de plus dans le nid entre 60 et 69 ans, par rapport à prendre les rentes à 65 ans (dollars d’aujourd’hui).`,
     whyCostNone: 'Entre 60 et 69 ans, ce plan ne tire pas plus du nid que le standard.',
-    whyGis: (gis, recovery) => `Sur tout le plan : ${gis} de Supplément de revenu garanti reçu et ${recovery} de PSV repris par l’impôt de récupération.`,
+    whyGis: (gis, recovery) => `Sur tout le plan : ${gis} de Supplément de revenu garanti reçu et ${recovery} de PSV repris par l’impôt de récupération.`,
     why: (f) => [
-      `Une rente reportée est plus élevée toute la vie et suit les prix : le RRQ gagne ${f.rrqPerMonth} par mois après 65 ans (jusqu’à ${f.rrqMax} de plus à 72 ans), la PSV ${f.oasPerMonth} par mois (jusqu’à ${f.oasMax} de plus à 70 ans).`,
-      'Les années du pont sont payées par le nid : plus il est gros au départ, plus le report est possible. Un nid qui s’épuise avant 70 ans ne peut pas le porter.',
-      'Le Supplément de revenu garanti se perd avec un revenu plus élevé : reporter la PSV reporte aussi le SRG qui l’accompagne. Au-delà d’un certain revenu, la PSV est reprise en partie par l’impôt de récupération.',
-      'Retirer du REER/FERR pendant le pont peut baisser l’impôt plus tard : les retraits sont faits à un taux plus bas qu’avec toutes les rentes en plus.',
+      `Une rente reportée est plus élevée toute la vie et suit les prix : le RRQ gagne ${f.rrqPerMonth} par mois après 65 ans (jusqu’à ${f.rrqMax} de plus à 72 ans), la PSV ${f.oasPerMonth} par mois (jusqu’à ${f.oasMax} de plus à 70 ans).`,
+      'Les années du pont sont payées par le nid : plus il est gros au départ, plus le report est possible. Un nid qui s’épuise avant 70 ans ne peut pas le porter.',
+      'Le Supplément de revenu garanti se perd avec un revenu plus élevé : reporter la PSV reporte aussi le SRG qui l’accompagne. Au-delà d’un certain revenu, la PSV est reprise en partie par l’impôt de récupération.',
+      'Retirer du REER/FERR pendant le pont peut baisser l’impôt plus tard : les retraits sont faits à un taux plus bas qu’avec toutes les rentes en plus.',
     ],
     caveatTitle: 'Ce que ces chiffres ne disent pas',
     caveats: [
-      'Une durée de vie : le point d’équilibre est un pari sur la longévité, pas une certitude.',
-      'Le décès du conjoint : la rente de survivant n’est pas modélisée.',
-      'Des marchés qui tournent mal au mauvais moment, et des dépenses qui changent avec l’âge : les jeux d’hypothèses prudentes, neutres et audacieuses donnent une fourchette, pas une prévision.',
+      'Une durée de vie : le point d’équilibre est un pari sur la longévité, pas une certitude.',
+      'Le décès du conjoint ou de la conjointe : la rente de survivant n’est pas calculée ici.',
+      'Des marchés qui tournent mal au mauvais moment, et des dépenses qui changent avec l’âge : les scénarios Prudent, Neutre et Audacieux donnent une fourchette, pas une prévision.',
     ],
-    matrixTitle: 'Sous trois jeux d’hypothèses',
-    matrixHint: (name) => `Chaque façon de commencer, avec les hypothèses prudentes, neutres et audacieuses de la page Hypothèses à la place des vôtres. L’âge de « Manque à… » est celui de ${name}.`,
-    matrixHolds: 'Tient',
-    matrixFails: (age) => `Manque à ${age} ans`,
-    strategyCol: 'Façon de commencer',
+    marksTitle: 'Selon le scénario',
+    marksHint: (name) => `Sous chaque façon de commencer : la même, avec les scénarios Prudent, Neutre et Audacieux de la page Hypothèses à la place de vos hypothèses. L’âge est celui de ${name}.`,
+    marksPending: '…',
+    matrixHolds: 'dure',
+    matrixFails: (age) => `jusqu’à ${age} ans`,
   },
   en: {
-    hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg has to cover, and what is left. Pick a way of starting your pensions to see whether the plan holds. Everything is in today’s dollars.',
+    hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg (your RRSPs, TFSAs and investments) has to cover, and what is left. Pick a way of starting your pensions to see whether the money lasts. Everything is in today’s dollars.',
     updating: 'Updating the calculation…',
     person: 'For',
-    agesLine: (retire, rrq, oas) => `Your ages: retire at ${retire}, QPP at ${rrq}, OAS at ${oas}. To change them: “My data and its calculation”.`,
+    agesLine: (retire, rrq, oas) => `Your ages: retire at ${retire}, QPP at ${rrq}, OAS at ${oas}. To change them: “My figures”, under Check.`,
     bothLabel: 'For both',
     bothHint: 'The other person starts their QPP and OAS at the same ages; their retirement age stays the one in their profile.',
     age: (age) => `age ${age}`,
@@ -225,7 +223,6 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     appliedUndo: 'Undo this change',
     lowestNestLabel: 'Lowest nest egg, ages 60 to 70',
     selectedName: 'Your current choice',
-    worth85: 'Net worth at 85',
     worth95: 'Net worth at 95',
     noWorth: '—',
     lifetime: 'Cashed over the whole plan, after tax',
@@ -236,21 +233,21 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     sameDrawn: 'As much drawn from the nest egg at 60 to 69 as the standard',
     breakEvenLater: (age) => `Cumulative pensions catch up with the standard at ${age}`,
     breakEvenEarlier: (age) => `Waiting until 65 catches up with this at ${age}`,
-    breakEvenNone: 'No break-even before the plan’s horizon',
+    breakEvenNone: 'No break-even before the end of the plan',
     breakEvenSelf: 'The reference for the comparisons',
     verdict: (v, who = null) =>
       v.kind === 'holds'
         ? v.defers
-          ? `You can defer: your nest egg lasts to the horizon (${who === null ? '' : `${who}: `}age ${v.horizonAge}).`
-          : `This plan holds to the horizon (${who === null ? '' : `${who}: `}age ${v.horizonAge}).`
+          ? `You can defer: your nest egg lasts to the end of the plan (${who === null ? '' : `${who}: `}age ${v.horizonAge}).`
+          : `With this plan, the money lasts to the end of the plan (${who === null ? '' : `${who}: `}age ${v.horizonAge}).`
         : v.defers && v.standardHolds
-          ? `Deferring uses up your nest egg at ${v.age}; taking the QPP and OAS at 65 avoids the shortfall.`
+          ? `Deferring uses up your nest egg at ${v.age}; taking the QPP and OAS at 65 avoids running out of money.`
           : v.defers && v.standardAge !== null
-            ? `Deferring uses up your nest egg at ${v.age}, and taking the pensions at 65 does not fix it: the shortfall comes at ${v.standardAge}.`
-            : `This plan runs out of money at ${v.age}.`,
+            ? `Deferring uses up your nest egg at ${v.age}, and taking the pensions at 65 does not fix it: the money only lasts to ${v.standardAge}.`
+            : `With this plan, the money only lasts to ${v.age}.`,
     windowLabel: 'Years shown',
     windowBridge: 'Ages 60 to 70',
-    windowPlan: 'To the horizon',
+    windowPlan: 'To the end of the plan',
     tableTitle: 'Year by year',
     colAge: 'Age',
     colNeed: 'Spending',
@@ -266,7 +263,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     colTax: 'Tax',
     colNest: 'Nest egg at year end',
     colStatus: 'Status',
-    status: { covered: 'Covered by income', drawing: 'The nest egg is being drawn', short: 'Nest egg empty: shortfall' },
+    status: { covered: 'Covered by income', drawing: 'The nest egg is being drawn', short: 'Nest egg empty: money runs short' },
     householdNote: 'Income, spending, tax and the nest egg are the household’s; the age is the chosen person’s.',
     barsTitle: 'Where the money comes from, year by year',
     barsHint: 'Each bar is a year: work, guaranteed pensions and what the nest egg has to supply. The dashed line is what has to be covered (spending and tax).',
@@ -292,13 +289,13 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     caveatTitle: 'What these figures leave out',
     caveats: [
       'A length of life: a break-even is a bet on longevity, not a certainty.',
-      'A spouse’s death: the survivor’s pension is not modelled.',
-      'Markets that go wrong at the wrong time, and spending that changes with age: the prudent, neutral and bold sets give a range, not a forecast.',
+      'A spouse’s death: the survivor’s pension is not calculated here.',
+      'Markets that go wrong at the wrong time, and spending that changes with age: the Conservative, Neutral and Aggressive scenarios give a range, not a forecast.',
     ],
-    matrixTitle: 'Under three sets of assumptions',
-    matrixHint: (name) => `Each way of starting, with the conservative, neutral and aggressive assumptions from the Assumptions page in place of yours. The age in “Short at…” is ${name}’s.`,
-    matrixHolds: 'Holds',
-    matrixFails: (age) => `Short at ${age}`,
-    strategyCol: 'Way of starting',
+    marksTitle: 'By scenario',
+    marksHint: (name) => `Under each way of starting: the same one, with the Conservative, Neutral and Aggressive scenarios from the Assumptions page in place of your assumptions. The age is ${name}’s.`,
+    marksPending: '…',
+    matrixHolds: 'lasts',
+    matrixFails: (age) => `to age ${age}`,
   },
 }

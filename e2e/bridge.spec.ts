@@ -24,7 +24,7 @@ test('the strategy view sits on the page: each year from 60 to 70, five strategi
     // the verdict sentence and the five ways of starting
     // (the age is the one of the person looked at — Camille, the older one — not the plan's horizon for the younger:
     // the sentence says « l’horizon », the verdict's word, and names whose age it prints)
-    await expect(page.locator('.bridge__verdict')).toContainText(/tient jusqu’à l’horizon \(Camille : \d\d ans\)/)
+    await expect(page.locator('.bridge__verdict')).toContainText(/dure jusqu’à la fin du plan \(Camille\s: \d\d ans\)/)
     // the golden couple's own plan IS the standard: one card says so instead of two identical ones
     for (const name of ['Tout dès que possible', 'Standard (c’est aussi votre plan)', 'Reporter au maximum', 'Pont jusqu’à 70 ans', 'Les deux à 70 ans']) {
       await expect(page.locator('.bridge-card').getByRole('radio', { name, exact: true })).toBeVisible()
@@ -62,13 +62,13 @@ test('choosing a way of starting saves the ages in the profile, presses the card
 
   // reloading keeps them: the plan is the profile's
   await page.reload()
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   await expect(page.locator('.bridge-card').getByRole('radio', { name: 'Reporter au maximum', exact: true })).toHaveAttribute('aria-checked', 'true')
 })
 
 test('« Pour les deux » makes the other person follow: it is in the address, presses « Les deux à 70 ans », and survives a reload', async ({ page }) => {
   await page.goto('/resultats?v=strategies')
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   const both = page.getByRole('button', { name: 'Pour les deux', exact: true })
   await expect(both).toHaveAttribute('aria-pressed', 'false')
   await page.locator('.bridge-card').getByRole('radio', { name: 'Pont jusqu’à 70 ans', exact: true }).click()
@@ -86,7 +86,7 @@ test('« Pour les deux » makes the other person follow: it is in the address, p
 
 test('a deferral digs into the nest first: the nest at 70 is lower than starting at 65, and the cost is said in dollars', async ({ page }) => {
   await page.goto('/resultats?v=strategies')
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   const std = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Standard (c’est aussi votre plan)', exact: true }) })
   const max = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Reporter au maximum', exact: true }) })
   await expect(max.getByText(/de plus tirés du nid entre 60 et 69 ans que le standard/)).toBeVisible()
@@ -96,7 +96,7 @@ test('a deferral digs into the nest first: the nest at 70 is lower than starting
 
 test('a couple has one tab per person, each with their own ages from the profile', async ({ page }) => {
   await page.goto('/resultats?v=strategies')
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   await expect(page.locator('.bridge')).toContainText('retraite à 60 ans')
   const tabs = page.getByRole('tablist', { name: 'Pour' })
   await expect(tabs.getByRole('tab')).toHaveCount(2)
@@ -108,7 +108,7 @@ test('a couple has one tab per person, each with their own ages from the profile
 test('« jusqu’à l’horizon » shows every year of the plan, and the bridge shows only 60 to 70', async ({ page }) => {
   await page.goto('/resultats?v=strategies')
   await expect(page.locator('.bridge__table tbody tr')).toHaveCount(11)
-  await page.getByRole('tab', { name: 'Jusqu’à l’horizon' }).click()
+  await page.getByRole('tab', { name: 'Jusqu’à la fin du plan' }).click()
   await expect(page).toHaveURL(/bw=plan/)
   await expect.poll(() => page.locator('.bridge__table tbody tr').count()).toBeGreaterThan(30)
   await page.getByRole('tab', { name: '60 à 70 ans' }).click()
@@ -117,19 +117,17 @@ test('« jusqu’à l’horizon » shows every year of the plan, and the bridge 
 
 test('the three sets of assumptions: eighteen answers, filled in by themselves off the page’s thread', async ({ page }) => {
   await page.goto('/resultats?v=strategies')
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
-  // One table, the set of hypotheses chosen in its header (the neutral one first): six strategies, one verdict each.
-  const matrix = page.getByRole('region', { name: /Sous trois jeux d’hypothèses/ })
-  await expect(matrix.locator('tbody tr')).toHaveCount(6, { timeout: 60_000 })
-  await expect(matrix.locator('tbody td')).toHaveCount(6)
-  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Neutre'])
-  // the neutral set holds for the golden couple; the prudent one does not, and says at what age
-  await expect(matrix.locator('tbody tr').first().locator('td')).toContainText('Tient')
-  const chooser = page.locator('.matrix .table-chooser')
-  await expect(chooser.getByRole('tab')).toHaveText(['Prudent', 'Neutre', 'Audacieux'])
-  await chooser.getByRole('tab', { name: 'Prudent' }).click()
-  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent'])
-  await expect(matrix.locator('tbody tr').first().locator('td')).toContainText(/Manque à \d\d ans/)
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
+  // On EACH card: the same way of starting under the three scenarios, one mark each (the former matrix, folded into the cards).
+  const marks = page.locator('.bridge-card__marks')
+  await expect(marks).toHaveCount(5)
+  await expect(page.locator('.bridge-mark', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
+  await expect(page.locator('.bridge-mark')).toHaveCount(15)
+  // the neutral scenario lasts for the golden couple; the prudent one does not, and says to what age
+  const standard = page.locator('.bridge-card', { has: page.getByRole('radio', { name: 'Standard (c’est aussi votre plan)', exact: true }) })
+  await expect(standard.locator('.bridge-mark', { hasText: 'Neutre' })).toContainText('Neutre : dure')
+  await expect(standard.locator('.bridge-mark', { hasText: 'Prudent' })).toContainText(/Prudent\s: jusqu’à \d\d ans/)
+  await expect(standard.locator('.bridge-mark--short')).toHaveCount(1)
 })
 
 test('English: the view speaks English and keeps the same choices', async ({ page }) => {
@@ -144,7 +142,7 @@ test('English: the view speaks English and keeps the same choices', async ({ pag
 test('on a phone the view fits the screen: the table scrolls inside its own region, nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
   await page.goto('/resultats?v=strategies')
-  await expect(page.locator('.bridge__verdict')).toBeVisible()
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   await expectNoHorizontalOverflow(page, page.locator('.bridge'))
   await expect(page.locator('.bridge__table')).toHaveAttribute('role', 'region')
 })

@@ -12,11 +12,11 @@ import { PageHead } from '../components/PageHead'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
+import { Switch } from '../components/Switch'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
-import { factId } from '../lib/facts'
 import { formatPct } from '../lib/format'
-import { applyPreset, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn, setSpending } from '../lib/profileEdit'
+import { applyPreset, hasSpouse, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn } from '../lib/profileEdit'
 import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
 import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
@@ -24,13 +24,16 @@ import { updateProfile, useProfile } from '../lib/store'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { useNotice } from '../lib/toast'
 
-// What the household assumes about the future, and what it spends. These are the person's own numbers: nothing
-// here is an official figure, and the page says so. Each change is one pure profile edit (lib/profileEdit.ts).
+// What the household assumes about the future. These are the person's own numbers: nothing here is an official figure,
+// and the page says so. The scenario comes first — it IS the page for most people (the Neutre set is already in place) —
+// then the few figures behind it, in plain words, then the two options and the path the markets take. Each change is
+// one pure profile edit (lib/profileEdit.ts). What the household SPENDS is a fact about it, not a guess about the
+// future: it lives on Profil (« Budget »), with the other facts a document confirms.
 export function Hypotheses() {
   const t = useT()
   const a = t.assumptions
   const profile = useProfile()
-  const { assumptions, household } = profile
+  const { assumptions } = profile
   const gaps = profileGaps(profile)
   const { lang } = useLang()
   const confirm = useConfirm()
@@ -52,6 +55,14 @@ export function Hypotheses() {
     return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
   }
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
+  // ONE return by default: most households hold the same mix in every account, so three boxes plus an averaged meter was
+  // extra work. The three open when the rates already differ, or when asked; closing them again makes them equal.
+  const { returns } = assumptions
+  const sameReturn = returns.rrsp === returns.tfsa && returns.tfsa === returns.nonReg
+  const [perAccount, setPerAccount] = useState(!sameReturn)
+  const setAllReturns = (v: number) => updateProfile((p) => setAssumptions(p, { returns: { rrsp: v, tfsa: v, nonReg: v } }))
+  const averageReturn = (returns.rrsp + returns.tfsa + returns.nonReg) / 3
+
   return (
     <section className="page-body">
       <PageHead title={a.title} subtitle={a.subtitle} />
@@ -81,12 +92,12 @@ export function Hypotheses() {
           }}
         />
         <p className="field-row__hint">{active === null ? a.presets.blurb.custom : a.presets.blurb[active]}</p>
-        {active !== null && <p className="field-row__hint mono">{presetSummary(active)}</p>}
+        {active !== null && <p className="field-row__hint">{presetSummary(active)}</p>}
         {/* What « Personnalisé » holds while a ready-made scenario is on: the figures can be seen before going back to them. */}
-        {active !== null && kept !== null && <p className="field-row__hint mono">{a.presets.keptSummary(presetSummary('kept'))}</p>}
+        {active !== null && kept !== null && <p className="field-row__hint">{a.presets.keptSummary(presetSummary('kept'))}</p>}
         <div className="preset-sources">
           {/* Folded by default: the provenance is for whoever asks, not for everyone who lands here. */}
-          <Chip selected={sourcesOpen} expanded={sourcesOpen} onClick={() => setSourcesOpen((o) => !o)}>
+          <Chip expanded={sourcesOpen} onClick={() => setSourcesOpen((o) => !o)}>
             {a.presets.sourceTitle}
           </Chip>
           {sourcesOpen && (
@@ -107,15 +118,6 @@ export function Hypotheses() {
         </div>
       </Section>
 
-      <Section title={a.spending.title} icon="house-bold">
-        <FieldRow label={a.spending.working} infoId="spendingWorking" hint={a.spending.hint} fact={factId('household', 'spendingWorking')}>
-          {(w) => <NumberField kind="money" max={1e8} value={household.spending.workingToday} onChange={(workingToday) => updateProfile((p) => setSpending(p, { workingToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-        </FieldRow>
-        <FieldRow label={a.spending.retired} infoId="spendingRetired" fact={factId('household', 'spendingRetired')}>
-          {(w) => <NumberField kind="money" max={1e8} value={household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
-        </FieldRow>
-      </Section>
-
       <Section title={a.economy.title} icon="chart-line-up-bold">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
@@ -127,13 +129,29 @@ export function Hypotheses() {
         {meter('wageGrowth', assumptions.wageGrowth)}
       </Section>
 
-      <Section title={a.returns.title} subtitle={a.returns.hint} icon="sliders-horizontal-bold">
-        {(['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
-          <FieldRow key={kind} label={accountName[kind]} infoId="returns">
-            {(w) => <NumberField kind="percent" min={-0.2} max={0.3} value={assumptions.returns[kind]} onChange={(v) => updateProfile((p) => setReturn(p, kind, v))} id={w.id} />}
+      <Section title={a.returns.title} subtitle={a.returns.hint} icon="chart-line-up-bold">
+        {perAccount ? (
+          (['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
+            <FieldRow key={kind} label={accountName[kind]} infoId="returns">
+              {(w) => <NumberField kind="percent" min={-0.2} max={0.3} value={assumptions.returns[kind]} onChange={(v) => updateProfile((p) => setReturn(p, kind, v))} id={w.id} />}
+            </FieldRow>
+          ))
+        ) : (
+          <FieldRow label={a.returns.all} infoId="returns">
+            {(w) => <NumberField kind="percent" min={-0.2} max={0.3} value={returns.rrsp} onChange={setAllReturns} id={w.id} />}
           </FieldRow>
-        ))}
-        {meter('returns', (assumptions.returns.rrsp + assumptions.returns.tfsa + assumptions.returns.nonReg) / 3)}
+        )}
+        <Chip
+          expanded={perAccount}
+          onClick={() => {
+            // Closing the three boxes makes the rates one again: the REER's, the one most people know.
+            if (perAccount && !sameReturn) setAllReturns(returns.rrsp)
+            setPerAccount((x) => !x)
+          }}
+        >
+          {a.returns.perAccount}
+        </Chip>
+        {meter('returns', averageReturn)}
       </Section>
 
       <Section title={a.horizon.title} icon="calendar-blank-bold">
@@ -143,21 +161,19 @@ export function Hypotheses() {
         {meter('horizonAge', assumptions.horizonAge)}
       </Section>
 
-      <Section title={a.splitting.title} icon="users-three-bold">
-        <Chip selected={assumptions.pensionSplitting} onClick={() => updateProfile((p) => setAssumptions(p, { pensionSplitting: !p.assumptions.pensionSplitting }))}>
-          {a.splitting.on}
-        </Chip>
-        <p className="field-row__hint">{a.splitting.hint}</p>
+      <Section title={a.options.title} icon="lock-bold">
+        {/* The splitting switch only when there is someone to split with. */}
+        {hasSpouse(profile) && <Switch checked={assumptions.pensionSplitting} onChange={(pensionSplitting) => updateProfile((p) => setAssumptions(p, { pensionSplitting }))} label={a.splitting.on} hint={a.splitting.hint} />}
+        <Switch checked={assumptions.surplusToRrsp === true} onChange={(surplusToRrsp) => updateProfile((p) => setAssumptions(p, { surplusToRrsp }))} label={m.surplus.on} hint={m.surplus.hint} />
       </Section>
 
       <Section title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
-        <Cluster>
-          {([...MARKET_PRESETS, 'custom'] as const).map((k) => (
-            <Chip key={k} selected={assumptions.marketPath.preset === k} onClick={() => updateProfile((p) => setMarketPreset(p, k))}>
-              {m.path.names[k]}
-            </Chip>
-          ))}
-        </Cluster>
+        <SubTabs
+          ariaLabel={m.path.title}
+          value={assumptions.marketPath.preset}
+          onSelect={(k) => updateProfile((p) => setMarketPreset(p, k))}
+          options={([...MARKET_PRESETS, 'custom'] as const).map((k) => ({ key: k, label: m.path.names[k] }))}
+        />
         <p className="field-row__hint">
           {m.path.about[assumptions.marketPath.preset]}
           {assumptions.marketPath.preset !== 'smooth' && assumptions.marketPath.preset !== 'custom' ? ` ${MARKET_PATHS[assumptions.marketPath.preset].map((r) => formatPct(r, lang, 0)).join(' · ')}` : ''}
@@ -166,23 +182,16 @@ export function Hypotheses() {
           <>
             {assumptions.marketPath.custom.map((v, i) => (
               <FieldRow key={i} label={m.path.year(i + 1)}>
-                {(w) => <NumberField kind="percent" min={-0.6} max={0.6} value={v ?? (assumptions.returns.rrsp + assumptions.returns.tfsa + assumptions.returns.nonReg) / 3} onChange={(x) => updateProfile((p) => setMarketYear(p, i, x))} id={w.id} />}
+                {(w) => <NumberField kind="percent" min={-0.6} max={0.6} value={v ?? averageReturn} onChange={(x) => updateProfile((p) => setMarketYear(p, i, x))} id={w.id} />}
               </FieldRow>
             ))}
             <Cluster>
-              <Chip onClick={() => updateProfile((p) => resizeMarketPath(p, 1, (p.assumptions.returns.rrsp + p.assumptions.returns.tfsa + p.assumptions.returns.nonReg) / 3))}>{m.path.add}</Chip>
-              <Chip onClick={() => updateProfile((p) => resizeMarketPath(p, -1, 0))}>{m.path.remove}</Chip>
+              <Chip icon="plus-bold" onClick={() => updateProfile((p) => resizeMarketPath(p, 1, (p.assumptions.returns.rrsp + p.assumptions.returns.tfsa + p.assumptions.returns.nonReg) / 3))}>{m.path.add}</Chip>
+              <Chip icon="minus-bold" onClick={() => updateProfile((p) => resizeMarketPath(p, -1, 0))}>{m.path.remove}</Chip>
             </Cluster>
             <p className="field-row__hint">{m.path.countsFrom}</p>
           </>
         )}
-      </Section>
-
-      <Section title={m.surplus.title} icon="lock-bold">
-        <Chip selected={assumptions.surplusToRrsp === true} onClick={() => updateProfile((p) => setAssumptions(p, { surplusToRrsp: p.assumptions.surplusToRrsp !== true }))}>
-          {m.surplus.on}
-        </Chip>
-        <p className="field-row__hint">{m.surplus.hint}</p>
       </Section>
 
       {gaps.length === 0 ? (
@@ -191,7 +200,12 @@ export function Hypotheses() {
         </NextStep>
       ) : (
         <NextStep to="/" label={t.next.toProfile}>
-          <p>{t.results.gaps.lead} {gaps.map((g) => t.results.gaps[g]).join(' ')}</p>
+          <p>{t.results.gaps.lead}</p>
+          <ul className="next__gaps">
+            {gaps.map((g) => (
+              <li key={g}>{t.results.gaps[g]}</li>
+            ))}
+          </ul>
         </NextStep>
       )}
     </section>

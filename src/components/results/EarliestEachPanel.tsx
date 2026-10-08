@@ -36,7 +36,7 @@ export function EarliestEachPanel({
       <h2 className="verdict__each-title">{e.title}</h2>
       <p className="verdict__note">{e.hint}</p>
       {answer === null ? (
-        <Skeleton count={2} />
+        <Skeleton count={2} className="skeleton--chip-rows" />
       ) : (
         <ul className="verdict__each-list">
           {answer.map((a) => {

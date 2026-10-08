@@ -7,11 +7,11 @@ test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('the surplus option: off by default, one tap turns it on, and it is saved', async ({ page }) => {
   await page.goto('/hypotheses')
-  const chip = page.getByRole('button', { name: 'Placer d’abord le surplus dans le REER' })
-  await expect(chip).toHaveAttribute('aria-pressed', 'false')
-  await expect(page.getByText('Quand une année de travail laisse de l’argent de côté')).toBeVisible()
+  const chip = page.getByRole('switch', { name: 'Placer d’abord le surplus dans le REER' })
+  await expect(chip).toHaveAttribute('aria-checked', 'false')
+  await expect(page.getByText('L’argent qui reste à la fin d’une année de travail')).toBeVisible()
   await chip.click()
-  await expect(chip).toHaveAttribute('aria-pressed', 'true')
+  await expect(chip).toHaveAttribute('aria-checked', 'true')
   await expect.poll(async () => (await savedProfile(page)).assumptions.surplusToRrsp).toBe(true)
   await chip.click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.surplusToRrsp).toBe(false)
@@ -19,7 +19,7 @@ test('the surplus option: off by default, one tap turns it on, and it is saved',
 
 test('turned on, the plan still answers (the results page runs the same engine)', async ({ page }) => {
   await page.goto('/hypotheses')
-  await page.getByRole('button', { name: 'Placer d’abord le surplus dans le REER' }).click()
+  await page.getByRole('switch', { name: 'Placer d’abord le surplus dans le REER' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.surplusToRrsp).toBe(true)
   await page.goto('/resultats')
   await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)/)).toBeVisible()
@@ -27,11 +27,11 @@ test('turned on, the plan still answers (the results page runs the same engine)'
 
 test('the market path: « Lisse » by default, a ready-made one is saved, « Personnalisé » opens its years for editing', async ({ page }) => {
   await page.goto('/hypotheses')
-  await expect(page.getByRole('button', { name: 'Lisse' })).toHaveAttribute('aria-pressed', 'true')
-  await page.getByRole('button', { name: 'Mauvais départ' }).click()
+  await expect(page.getByRole('tab', { name: 'Lisse' })).toHaveAttribute('aria-selected', 'true')
+  await page.getByRole('tab', { name: 'Mauvais départ' }).click()
   await expect(page.getByText('Une chute de 15 % la première année de retraite')).toBeVisible()
   await expect.poll(async () => (await savedProfile(page)).assumptions.marketPath.preset).toBe('badStart')
-  await page.getByRole('button', { name: 'Personnalisé' }).click()
+  await page.getByRole('tab', { name: 'Personnalisé' }).click()
   const first = page.getByRole('textbox', { name: 'Année 1 de retraite' })
   await expect(first).toBeVisible()
   await first.fill('-30')
@@ -43,7 +43,7 @@ test('the market path: « Lisse » by default, a ready-made one is saved, « Per
 
 test('with a bad start chosen, the results page still answers', async ({ page }) => {
   await page.goto('/hypotheses')
-  await page.getByRole('button', { name: 'Mauvais départ' }).click()
+  await page.getByRole('tab', { name: 'Mauvais départ' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.marketPath.preset).toBe('badStart')
   await page.goto('/resultats')
   await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)|ne tient pas|Aucun âge/)).toBeVisible()
@@ -62,4 +62,13 @@ test('the verdict shows the earliest age under a hard market, beside « Lisse »
 test('the verdict says what the age can fund each month, beside what is planned', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.getByText(/peut financer jusqu’à .* par mois \(après impôt\) — vous prévoyez/)).toBeVisible()
+})
+
+test('the verdict ranks what moves the answer most, each lever with its age', async ({ page }) => {
+  await page.goto('/resultats')
+  await expect(page.getByText('Ce qui change le plus')).toBeVisible()
+  const items = page.locator('.levers__item')
+  await expect(items).toHaveCount(4)
+  await expect(items.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
+  await expect(items.first()).toContainText(/plus tôt|pas de changement|plus tard|aucun âge|un âge existe/)
 })

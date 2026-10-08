@@ -26,7 +26,7 @@ const KB = 1024
 const CHUNK_BUDGET = 150 * KB // any lazy chunk
 const EAGER_CHUNKS = [
   // name pattern → its own budget (all load before first paint)
-  { re: /^index-/, cap: 42 * KB, label: 'eager entry' }, // 40 → 42 KB on 2026-10-08 (measured 40,6 KB): the saved profile now validates and migrates named plans (each a whole profile) and the market path, and profileEdit carries their edits — code every page's store reads, so it rides in the shell
+  { re: /^index-/, cap: 44 * KB, label: 'eager entry' }, // 42 → 44 KB on 2026-10-08 (measured 43,3 KB): the shell's backup notice exports in one tap (the file helper and the store's snooze ride in the shell), the settings gear, and a skeleton as the route fallback. 40 → 42 KB on 2026-10-08 (measured 40,6 KB): the saved profile now validates and migrates named plans (each a whole profile) and the market path, and profileEdit carries their edits — code every page's store reads, so it rides in the shell
   { re: /^react-vendor-/, cap: 280 * KB, label: 'eager react-vendor' },
   { re: /^i18n-/, cap: 34 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 33 → 34: the locked-in REER (the chip, two fields, one ⓘ: ~1 KB of French; the REER balance's note shortened to pay for part of it). 36 → 33: the results-only copy (the three questions, the headline, « each of us ») moved to lib/resultsCopy.ts, fetched with the results page; it was 31.2 KB measured after the move. 33 → 36: Simple/Full, the headline, the next steps and the three questions (~3 KB of French). 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
 ]
@@ -42,14 +42,16 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // The results page: 150 → 156 KB raw on 2026-10-08 (measured 151,7 KB). It now carries the « Détail » chart (sources, accounts, the three
 // hypotheses), one table per choice (TableChooser), the home and locked-in REER columns, the confidence note and the mortgage-aware
 // tables — most of it text the person reads, not a library. The cap sits just above today's size, so growth fails here.
+// 156 → 160 KB raw on 2026-10-08 (measured 156,4 KB): the answer in dates on the card, the « Autre âge » box, the levers block and
+// the per-card scenario marks that replaced the strategies' matrix table.
 const LAZY_CAPS = [
   { re: /^charts-[^.]*\.js$/, cap: 372 * KB },
-  { re: /^Resultats-[^.]*\.js$/, cap: 156 * KB },
+  { re: /^Resultats-[^.]*\.js$/, cap: 160 * KB },
 ]
 
 // The door.
 const CLOSURE_CHUNK_CAP = 6
-const CLOSURE_BUDGET = 330 * KB
+const CLOSURE_BUDGET = 334 * KB // 330 → 334 on 2026-10-08: the entry's own 2 KB (see its cap)
 // Any closure member that is not react / the dictionary / the entry is something that leaked
 // into boot.
 const EAGER_MEMBER_CAP = 32 * KB

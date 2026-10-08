@@ -31,10 +31,21 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
   const points = (delta: number) => Math.round(delta * 100)
   const find = (horizonAge: number, returnsDelta: number, inflationDelta: number) =>
     state.cells.find((c) => c.horizonAge === horizonAge && c.returnsDelta === returnsDelta && c.inflationDelta === inflationDelta)
+  // The one sentence over the grid: what the two moves that matter most do to the age, read off the cells themselves.
+  const base = find(horizonShown, 0, 0)
+  const moved = (cell: ReturnType<typeof find>) => {
+    if (base === undefined || cell === undefined || base.earliestOk === null) return null
+    if (cell.earliestOk === null) return s.noAge
+    const years = cell.earliestOk - base.earliestOk
+    return years <= 0 ? s.sameAge : s.laterBy(years)
+  }
+  const lessReturns = moved(find(horizonShown, -0.01, 0))
+  const moreInflation = moved(find(horizonShown, 0, 0.01))
 
   return (
     <div className="sensitivity" aria-busy={state.status !== 'done'}>
       <p className="field-row__hint">{s.hint}</p>
+      {lessReturns !== null && moreInflation !== null && <p className="answer__note sensitivity__sowhat">{s.soWhat(lessReturns, moreInflation)}</p>}
       {state.status === 'running' && (
         <p className="bridge__updating" role="status">
           {s.running}

@@ -146,7 +146,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
         return (
           <section key={l.id} className={`ledger__person person who who--${Math.min(i, 1)}`} aria-label={c.person(name)}>
             <h3 className="year-table__title">{c.person(name)}</h3>
-            <Chip to={`/?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
+            <Chip to={`/?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
             <div className="ledger__row">
               {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge, l.retirement.done)}
               <p className="ledger__calc">{c.retireCalc(monthYear(l.retirement.leaving))}</p>
@@ -190,7 +190,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
       </section>
 
       <p className={'ledger__glance' + (glance.ok ? '' : ' scenario__verdict--short')} aria-live="polite">
-        {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(formatYearAge(glance.firstShortfallYear!, shown.persons.map((p) => p.birth.year), lang))} {worthDelta}
+        {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(formatYearAge(glance.firstShortfallYear! - 1, shown.persons.map((p) => p.birth.year), lang))} {worthDelta}
       </p>
       <p className="field-row__hint">{c.glanceNote}</p>
     </div>

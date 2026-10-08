@@ -19,6 +19,7 @@ import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
+import { Switch } from '../components/Switch'
 import { TableChooser } from '../components/TableChooser'
 import { useLang, useT } from '../i18n'
 import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type TextScale } from '../lib/accessibility'
@@ -201,7 +202,7 @@ function SubTabsSpecimen() {
       onSelect={setK}
       options={[
         { key: 'self', label: 'Moi', icon: 'user-bold' },
-        { key: 'spouse', label: 'Conjoint·e', icon: 'users-three-bold' },
+        { key: 'spouse', label: 'Partenaire', icon: 'users-three-bold' },
       ]}
     />
   )
@@ -209,16 +210,25 @@ function SubTabsSpecimen() {
 
 function ChipSpecimen() {
   const [on, setOn] = useState(true)
+  const [open, setOpen] = useState(false)
   return (
-    <ChipGroup label="Quatre formes">
+    <ChipGroup label="Cinq formes">
       <Chip selected={on} onClick={() => setOn((x) => !x)}>
         bascule
       </Chip>
       <Chip onClick={() => {}}>action</Chip>
       <Chip to="/dev/kit">lien</Chip>
       <Chip>étiquette</Chip>
+      <Chip expanded={open} onClick={() => setOpen((x) => !x)}>
+        dépliant
+      </Chip>
     </ChipGroup>
   )
+}
+
+function SwitchSpecimen() {
+  const [on, setOn] = useState(true)
+  return <Switch checked={on} onChange={setOn} label="Répartir au mieux entre conjoints" hint="Un réglage oui / non : le bouton glisse, l’état est dit en mots." />
 }
 
 function ModalSpecimen() {
@@ -319,6 +329,7 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Saisie', name: 'Chip', file: 'src/components/Chip.tsx', exports: ['Chip', 'ChipGroup'], kw: 'pastille filtre bascule', render: () => <ChipSpecimen /> },
+    { cat: 'Saisie', name: 'Switch', file: 'src/components/Switch.tsx', kw: 'interrupteur oui non réglage bascule', render: () => <SwitchSpecimen /> },
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     {
@@ -345,8 +356,8 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
-    { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'Verdict', arc: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
-    { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/hypotheses" label="Suivant : mes hypothèses"><p>Votre profil est assez complet.</p></NextStep> },
+    { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
+    { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/resultats" label="Voir mon résultat"><p>Votre profil est assez complet pour une réponse.</p></NextStep> },
     {
       cat: 'Feedback',
       name: 'StatusMessage',

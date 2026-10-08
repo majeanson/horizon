@@ -1,17 +1,22 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
+import { BudgetSection } from '../components/profile/BudgetSection'
 import { HomeSection } from '../components/profile/HomeSection'
 import { FamilySection } from '../components/profile/FamilySection'
 import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
+import { Chip } from '../components/Chip'
 import { Loading } from '../components/Loading'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { SectionLevel } from '../components/SectionHeader'
 import type { PersonId } from '../engine/types'
-import { useT } from '../i18n'
+import { useLang, useT } from '../i18n'
+import { accuracyOf } from '../lib/facts'
+import { GUIDE_COPY } from '../lib/guideCopy'
+import { scrollBehavior } from '../lib/motion'
 import { hasSpouse, mapPerson } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
@@ -19,15 +24,20 @@ import { updateProfile, useProfile } from '../lib/store'
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
 const Onboarding = lazy(() => import('../components/Onboarding'))
 
-// The profile: the household, then EVERY person's fields on the page — side by side on a wide
-// screen, one after the other on a phone. Nothing sits behind a tab. Every field writes straight
-// to the store through lib/profileEdit.ts; there is no « save » — a profile is always as typed.
+// The profile: the household's facts (who is in it, what it spends, the home), then EVERY person's fields on the page —
+// side by side on a wide screen, one after the other on a phone — then « Rendre mon profil exact », the documents that
+// confirm each figure. Nothing sits behind a tab. Every field writes straight to the store through lib/profileEdit.ts;
+// there is no « save » — a profile is always as typed. The form comes FIRST and the meter is one quiet line above it: a
+// returning reader is here to change a number, not to be told their score.
 export function Profil() {
   const t = useT()
+  const { lang } = useLang()
   const profile = useProfile()
   const [params, setParams] = useSearchParams()
   const spouse = hasSpouse(profile)
   const gaps = profileGaps(profile)
+  const acc = useMemo(() => accuracyOf(profile), [profile])
+  const g = GUIDE_COPY[lang].panel
   // The welcome card's fate is decided at arrival: a first visit keeps it for the WHOLE visit, so
   // committing the last number (Enter or blur — possibly in a field inside the card) swaps its
   // content to « c'est assez » instead of yanking the card, and the focus with it, out of the page.
@@ -77,11 +87,19 @@ export function Profil() {
   return (
     <section className="page-body">
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
-      {/* « Rendre mon profil exact »: the meter, the documents and the guide — loaded on its own, the form never waits for it. */}
-      <Suspense fallback={null}>
-        <AccuracyGuide />
-      </Suspense>
+      {/* One line: how much of the profile stands on documents, and the door to the section that makes it exact. */}
+      {acc.total > 0 && (
+        <div className="accuracy-line">
+          <span className="accuracy-line__text">{acc.confirmed === acc.total ? g.allDone : g.count(acc.confirmed, acc.total)}</span>
+          {acc.confirmed < acc.total && (
+            <Chip icon="caret-down-bold" onClick={() => document.getElementById('exact')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })}>
+              {g.title}
+            </Chip>
+          )}
+        </div>
+      )}
       <FamilySection />
+      <BudgetSection />
       <HomeSection />
       <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
         {profile.household.persons.map((p, i) => {
@@ -97,8 +115,24 @@ export function Profil() {
           )
         })}
       </div>
-      <NextStep to="/hypotheses" label={t.next.toAssumptions}>
-        {gaps.length === 0 ? <p>{t.next.profileReady}</p> : <p>{t.results.gaps.lead} {gaps.map((g) => t.results.gaps[g]).join(' ')}</p>}
+      {/* « Rendre mon profil exact »: the meter, the documents and the guide — after the form, loaded on its own, the form never waits for it. */}
+      <Suspense fallback={null}>
+        <AccuracyGuide />
+      </Suspense>
+      {/* The one next thing: the answer. Hypothèses is optional (the defaults are the Neutre scenario) and reachable from the answer. */}
+      <NextStep to={gaps.length === 0 ? '/resultats' : '/'} label={gaps.length === 0 ? t.next.toResults : t.next.toProfile}>
+        {gaps.length === 0 ? (
+          <p>{t.next.profileReady}</p>
+        ) : (
+          <>
+            <p>{t.results.gaps.lead}</p>
+            <ul className="next__gaps">
+              {gaps.map((g) => (
+                <li key={g}>{t.results.gaps[g]}</li>
+              ))}
+            </ul>
+          </>
+        )}
       </NextStep>
     </section>
   )

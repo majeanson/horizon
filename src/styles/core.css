@@ -29,13 +29,10 @@
   --card: #fffcf5;
   --ink: #2c2722;
   --ink-soft: #6b6258;
-  /* Faint tier — hints + `.act .when` time labels. Darkened from #a99e8e (~2.6:1 on the
-     cream --card, an always-on AA fail) to clear 4.5:1 for small text, keeping the warm
-     taupe identity (AUJOURDHUI §5 P2, base-day contrast). Darkened again #7a7060 →
-     #6e6455 (bmad/08 A-10): the daypart papers shift warmer than --card, and the old
-     value slid to 4.18:1 on the dusk --paper — this one clears 4.5:1 on every daypart
-     paper AND paper-deep, worst case 4.6:1. */
-  --ink-faint: #6e6455;
+  /* The faint tier IS the soft tier by day (2026-10-08): the two greys were #6b6258 and #6e6455 — a difference no eye
+     reads, so a « fainter » line looked exactly like ordinary secondary text while claiming a third level. Hierarchy
+     comes from size and weight; one muted ink, 4.5:1 on every paper. The token stays so nothing has to be re-filed. */
+  --ink-faint: var(--ink-soft);
 
   --marigold: #f2a03d;
   /* Deep tier — glyphs/accents on their wash (identity discs, feature tiles). Bar:
@@ -118,12 +115,15 @@
      core.css + kit.css are converted here to establish the tokens. Off-ladder
      one-offs (0.72/0.74/0.8/0.82/0.88/0.92rem, px chrome) stay literal until the
      sweep decides their tier — don't force-fit. */
-  --text-xs: 0.78rem; /* small hints / zone titles / chip-group labels */
-  --text-sm: 0.85rem; /* secondary text, field labels, compact buttons */
-  --text-md: 0.95rem; /* default body / control label */
-  --text-lg: 1.1rem; /* emphasis / lead */
-  --text-xl: 1.5rem; /* small display (tonight meal) */
-  --text-2xl: 2.4rem; /* large display (board clock) */
+  /* THE FLOOR WAS RAISED (2026-10-08, the UI review): Horizon is read by people in their fifties and sixties, and 28
+     rules put text they must read — every hint, every « pourquoi ça compte » — at 12.5 px. The smallest step is now
+     14 px, the next 15 px; the ladder keeps its five tiers so nothing has to be re-filed. */
+  --text-xs: 0.875rem; /* small hints / zone titles / chip-group labels — never below 14 px */
+  --text-sm: 0.925rem; /* secondary text, field labels, compact buttons */
+  --text-md: 1rem; /* default body / control label */
+  --text-lg: 1.15rem; /* emphasis / lead / a section's title */
+  --text-xl: 1.5rem; /* small display (a page's title) */
+  --text-2xl: 2.4rem; /* large display (the answer's sentence) */
 
   /* ---- focus ring (a11y) ----
      A dedicated focus-visible colour rather than --accent: marigold on the cream
@@ -218,7 +218,7 @@
      14 and set --ink-faint #91887a, which restores a visible gap (ΔL 0.090) with
      everything ≥4.51:1. It repaints the night palette's warmth, so it wants eyes on
      it rather than a solo call. */
-  --ink-faint: #a09789;
+  --ink-faint: var(--ink-soft);
   --line: #38322a;
   --line-strong: #4a4239;
 
@@ -427,9 +427,11 @@ body::before {
 html.scroll-locked #root {
   overflow: hidden;
 }
+/* The code face is for FIGURES and IDENTIFIERS (an amount that must hold its width, a parameter id) — never for a
+   sentence. Prose in this face was the review's first visual complaint. */
 .mono {
   font-family: var(--mono);
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   letter-spacing: 0.01em;
 }
 h1,
@@ -485,8 +487,9 @@ button {
   font-size: var(--text-md);
   cursor: pointer;
   text-decoration: none;
+  /* --ease-out, not the overshooting --ease-soft: a money tool's buttons settle, they do not bounce. */
   transition:
-    transform var(--dur-fast) var(--ease-soft),
+    transform var(--dur-fast) var(--ease-out),
     box-shadow var(--dur-fast) ease,
     background var(--dur-fast) ease;
 }

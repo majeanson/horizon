@@ -39,17 +39,17 @@ test.describe('a blank profile', () => {
 
   test('a typed salary is saved, survives a reload, and drops the « no income » gap', async ({ page }) => {
     await page.goto('/?form=1')
-    const salary = box(page, 'Revenu de travail annuel actuel')
+    const salary = box(page, 'Revenu de travail par année')
     await salary.fill('85 000')
     await salary.press('Enter')
     await expect.poll(() => savedSalary(page)).toBe(85000)
     await page.reload()
-    await expect(box(page, 'Revenu de travail annuel actuel')).toHaveValue(/85\D000/)
+    await expect(box(page, 'Revenu de travail par année')).toHaveValue(/85\D000/)
   })
 
   test('a comma decimal is read the Québécois way: « 85 000,50 » is eighty-five thousand dollars and fifty cents', async ({ page }) => {
     await page.goto('/?form=1')
-    const field = box(page, 'Revenu de travail annuel actuel')
+    const field = box(page, 'Revenu de travail par année')
     await field.fill('85 000,50')
     await field.blur()
     await expect.poll(() => savedSalary(page)).toBe(85000.5)
@@ -57,7 +57,7 @@ test.describe('a blank profile', () => {
 
   test('an out-of-range text is refused with its reason, kept on screen, and not saved', async ({ page }) => {
     await page.goto('/?form=1')
-    const age = box(page, 'Âge où le revenu de travail s’arrête')
+    const age = box(page, 'Âge de retraite visé')
     await age.fill('12')
     await age.blur()
     await expect(page.getByRole('alert').filter({ hasText: 'Entre 18 et 80' })).toBeVisible()
@@ -87,32 +87,32 @@ test.describe('a blank profile', () => {
 
   test('adding a spouse gives a second column with its own numbers; removing asks first, in words that say what is lost', async ({ page }) => {
     await page.goto('/?form=1')
-    await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
+    await page.getByRole('button', { name: 'Ajouter mon ou ma partenaire' }).click()
     // Both people are on the page at once, each column named: no tab hides the other person.
     await expect(page.locator('#person-self').getByRole('heading', { name: 'Moi' })).toBeVisible()
     const spouseCol = page.locator('#person-spouse')
-    await expect(spouseCol.getByRole('heading', { name: 'Conjoint·e' })).toBeVisible()
-    const salary = spouseCol.getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })
+    await expect(spouseCol.getByRole('heading', { name: 'Partenaire' })).toBeVisible()
+    const salary = spouseCol.getByRole('textbox', { name: 'Revenu de travail par année', exact: true })
     await salary.fill('65000')
     await salary.press('Enter')
     await expect.poll(async () => (await savedProfile(page)).household.persons[1]?.salaryToday).toBe(65000)
     expect((await savedProfile(page)).household.persons[0].salaryToday).toBe(0)
 
-    await page.getByRole('button', { name: 'Retirer le·la conjoint·e' }).click()
+    await page.getByRole('button', { name: 'Retirer mon ou ma partenaire' }).click()
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText('Ses revenus, ses comptes et ses régimes seront effacés')
     await dialog.getByRole('button', { name: 'Annuler' }).click()
     expect((await savedProfile(page)).household.persons).toHaveLength(2)
-    await page.getByRole('button', { name: 'Retirer le·la conjoint·e' }).click()
+    await page.getByRole('button', { name: 'Retirer mon ou ma partenaire' }).click()
     await page.getByRole('alertdialog').getByRole('button', { name: 'Retirer' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.persons.length).toBe(1)
   })
 
-  test('« Je vis seul·e » is on for one adult, can be unticked (and says why), and is gone — and false — for a couple', async ({ page }) => {
+  test('« Je vis seul ou seule » is on for one adult, can be unticked (and says why), and is gone — and false — for a couple', async ({ page }) => {
     await page.goto('/?form=1')
-    const alone = page.getByRole('button', { name: 'Je vis seul·e' })
+    const alone = page.getByRole('button', { name: 'Je vis seul ou seule' })
     await expect(alone).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByText('Seul·e dans un logement distinct, toute l’année')).toBeVisible()
+    await expect(page.getByText('Seul ou seule dans un logement à vous, toute l’année')).toBeVisible()
     await alone.click()
     await expect(alone).toHaveAttribute('aria-pressed', 'false')
     await expect.poll(async () => (await savedProfile(page)).household.livesAlone).toBe(false)
@@ -120,8 +120,8 @@ test.describe('a blank profile', () => {
     await expect.poll(async () => (await savedProfile(page)).household.livesAlone).toBe(true)
 
     // A couple is never alone: the toggle disappears and the saved fact is false.
-    await page.getByRole('button', { name: 'Ajouter un·e conjoint·e' }).click()
-    await expect(page.getByRole('button', { name: 'Je vis seul·e' })).toHaveCount(0)
+    await page.getByRole('button', { name: 'Ajouter mon ou ma partenaire' }).click()
+    await expect(page.getByRole('button', { name: 'Je vis seul ou seule' })).toHaveCount(0)
     await expect.poll(async () => (await savedProfile(page)).household.livesAlone).toBe(false)
   })
 
@@ -158,7 +158,7 @@ test.describe('a blank profile', () => {
 
   test('the earnings years can be estimated from the salary — and a typed year is never overwritten', async ({ page }) => {
     await page.goto('/?form=1')
-    const salary = box(page, 'Revenu de travail annuel actuel')
+    const salary = box(page, 'Revenu de travail par année')
     await salary.fill('80000')
     await salary.press('Enter')
     // The earnings grid sits on the page itself: no disclosure to open first.
@@ -182,12 +182,12 @@ test.describe('first visit', () => {
 
   test('every page names the tab, so history and bookmarks are not all « Horizon »', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
-    for (const [path, title] of [['/', 'Profil · Horizon'], ['/hypotheses', 'Hypothèses · Horizon'], ['/resultats', 'Résultats · Horizon'], ['/donnees', 'Données · Horizon']] as const) {
+    for (const [path, title] of [['/', 'Profil · Horizon'], ['/hypotheses', 'Hypothèses · Horizon'], ['/resultats', 'Résultats · Horizon'], ['/donnees', 'Sauvegarde et réglages · Horizon']] as const) {
       await page.goto(path)
       await expect(page).toHaveTitle(title)
     }
     await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
-    await expect(page).toHaveTitle('Data · Horizon')
+    await expect(page).toHaveTitle('Backup and settings · Horizon')
   })
 })
 
@@ -205,16 +205,21 @@ test.describe('the example household', () => {
     await expect(chips.getByRole('button', { name: 'Mon plan', pressed: true })).toBeVisible()
     await expect(chips.getByRole('button', { name: '65 ans', pressed: true })).toBeVisible()
     await expect(page.locator('.scenario').getByText('Départ : Mon plan')).toBeVisible()
-    await expect(page.getByText('Tient jusqu’à l’horizon').first()).toBeVisible()
+    await expect(page.getByText('L’argent dure jusqu’à').first()).toBeVisible()
 
-    // A fifth comparison is refused.
-    // Clicked back to back ON PURPOSE: the second tap lands before the first one's re-render and must build on it, not on the old list
-    // (it used to be lost 1 run in ~10 under load — Resultats.tsx `pending`).
-    for (const age of ['55', '56']) await chips.getByRole('button', { name: `${age} ans` }).click()
+    // Any other age is typed in the one box beside the chips; a typed age becomes a chip, switched on.
+    // Typed back to back ON PURPOSE: the second commit lands before the first one's re-render and must build on it, not on the
+    // old list (it used to be lost 1 run in ~10 under load — Resultats.tsx `pending`).
+    const other = page.getByRole('textbox', { name: 'Autre âge' })
+    for (const age of ['55', '56']) {
+      await other.fill(age)
+      await other.press('Enter')
+    }
     for (const age of ['55', '56']) await expect(chips.getByRole('button', { name: `${age} ans`, pressed: true })).toBeVisible()
+    // A fifth comparison is refused: the box closes and the page says why.
     await expect(page.getByText('Quatre comparaisons au plus')).toBeVisible()
-    await chips.getByRole('button', { name: '57 ans' }).click()
-    await expect(chips.getByRole('button', { name: '57 ans', pressed: false })).toBeVisible()
+    await expect(other).toBeDisabled()
+    await expect(chips.getByRole('button', { name: '57 ans' })).toHaveCount(0)
     await expect(page).toHaveURL(/ages=plan%2C65%2C55%2C56|ages=plan,65,55,56/)
 
     await page.getByRole('tab', { name: 'Vérifier' }).click()
@@ -230,20 +235,20 @@ test.describe('the example household', () => {
 
   test('a plan that does not last says so and names the year it first falls short', async ({ page }) => {
     await page.goto('/resultats?ages=52')
-    await expect(page.getByText(/Manque dès \d{4}/)).toBeVisible()
+    await expect(page.getByText(/L’argent dure jusqu’en \d{4}/)).toBeVisible()
   })
 
   test('the profile page loads the golden couple’s numbers into the fields, one column each', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
-    await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/65\D000/)
+    await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/85\D000/)
+    await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/65\D000/)
     await page.goto('/hypotheses')
-    await expect(box(page, 'Inflation annuelle')).toHaveValue('2,1')
+    await expect(box(page, 'Hausse des prix (inflation), par année')).toHaveValue('2,1')
   })
 
   test('the assumptions page edits the profile, and the order of withdrawals is adopted from the comparison', async ({ page }) => {
     await page.goto('/hypotheses')
-    const infl = box(page, 'Inflation annuelle')
+    const infl = box(page, 'Hausse des prix (inflation), par année')
     await infl.fill('2,5')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.025)
@@ -251,7 +256,7 @@ test.describe('the example household', () => {
     await expect(page.getByRole('button', { name: /Monter/ })).toHaveCount(0)
     await page.goto('/resultats?v=strategies')
     const row = page.getByRole('row', { name: /^Non enregistré → CELI → REER/ })
-    await row.getByRole('button', { name: 'Utiliser' }).click()
+    await row.getByRole('button', { name: 'Choisir cet ordre' }).click()
     await expect.poll(async () => (await savedProfile(page)).assumptions.withdrawalOrder).toEqual(['nonReg', 'tfsa', 'rrsp'])
   })
 })
@@ -270,7 +275,7 @@ test.describe('data stays on this device', () => {
 
     // Change something, then import the file back.
     await page.goto('/hypotheses')
-    const infl = box(page, 'Inflation annuelle')
+    const infl = box(page, 'Hausse des prix (inflation), par année')
     await infl.fill('4')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.04)
@@ -278,7 +283,7 @@ test.describe('data stays on this device', () => {
     await page.locator('input[type=file]').setInputFiles(path)
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText('sera remplacé par celui du fichier')
-    await dialog.getByRole('button', { name: 'Importer' }).click()
+    await dialog.getByRole('button', { name: 'Restaurer' }).click()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.021)
   })
 
@@ -289,7 +294,7 @@ test.describe('data stays on this device', () => {
     await expect(page.getByRole('alert').first()).toContainText('Ce fichier semble incomplet ou modifié')
     await expect(page.getByText(/household\.persons — nombre non permis/)).toBeVisible()
     await page.locator('input[type=file]').setInputFiles({ name: 'y.json', mimeType: 'application/json', buffer: Buffer.from('not json') })
-    await expect(page.getByText('n’est pas un document JSON lisible')).toBeVisible()
+    await expect(page.getByText('ne vient pas d’Horizon, ou il est abîmé')).toBeVisible()
     expect(await savedProfile(page)).toEqual(before)
   })
 
@@ -347,7 +352,7 @@ test.describe('an unreadable stored profile', () => {
     await page.getByRole('link', { name: 'Hypothèses', exact: true }).click()
     await expect(banner).toBeVisible()
 
-    await page.getByRole('link', { name: 'Données', exact: true }).click()
+    await page.getByRole('link', { name: 'Sauvegarde et réglages', exact: true }).click()
     const downloading = page.waitForEvent('download')
     await page.getByRole('button', { name: 'Télécharger la copie illisible' }).click()
     const file = await downloading

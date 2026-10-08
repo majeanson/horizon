@@ -18,13 +18,14 @@ test('the views and the section map stay pinned while the page scrolls', async (
   await expect(pin.getByRole('tab').first()).toBeInViewport()
 })
 
-test('« Détail » shows where the money comes from, what the accounts hold, and the three sets of hypotheses', async ({ page }) => {
+test('« Détail » shows where the money comes from and what the accounts hold — and nothing the answer card already says', async ({ page }) => {
   await page.goto('/resultats?metric=detail')
   const chart = page.locator('.chart-panel')
-  await expect(chart.getByRole('img')).toHaveCount(3, { timeout: 30_000 })
+  await expect(chart.getByRole('img')).toHaveCount(2, { timeout: 30_000 })
   await expect(chart.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toBeVisible()
   await expect(chart.getByRole('heading', { name: 'Ce que contiennent les comptes' })).toBeVisible()
-  await expect(chart.getByRole('heading', { name: 'Sous les trois jeux d’hypothèses' })).toBeVisible()
+  // The three scenarios are said ONCE, on the answer card (and marked on the strategy cards): no third chart of them here.
+  await expect(chart.getByRole('heading', { name: /hypothèses/ })).toHaveCount(0)
 })
 
 // How much is pinned depends on the room: the views everywhere, the section map only from 860 px up. A tapped section
@@ -53,7 +54,7 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['de
         return same
       }, { intervals: [600] })
       .toBe(true)
-    await nav.getByRole('button', { name: 'Dépenser' }).click()
+    await nav.getByRole('button', { name: 'Dépenser moins' }).click()
     const target = page.locator('#depenser')
     // The page settles (a smooth scroll, the worker's answers replacing skeletons) before it is measured: poll the landing
     // spot until it holds, instead of guessing how long that takes.
@@ -89,16 +90,7 @@ test('the year-by-year table is ONE table; the scenario is chosen in its header 
 })
 
 test('what a table shows lives in the address: a link opens on the same set, the default writes nothing', async ({ page }) => {
-  // The set of hypotheses behind the strategies table…
-  await page.goto('/resultats?v=strategies&hyp=prudent')
-  const matrix = page.getByRole('region', { name: /Sous trois jeux d’hypothèses/ })
-  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent'], { timeout: 60_000 })
-  const chooser = page.locator('.matrix .table-chooser')
-  await chooser.getByRole('tab', { name: 'Audacieux' }).click()
-  await expect(page).toHaveURL(/hyp=bold/)
-  await chooser.getByRole('tab', { name: 'Neutre' }).click()
-  await expect(page).not.toHaveURL(/hyp=/)
-  // …and the scenario of the year-by-year table.
+  // The retirement age of the year-by-year table.
   await page.goto('/resultats?v=verify&ages=plan,60,65&table=65')
   const title = page.locator('.year-table .year-table__title')
   await expect(title).toContainText('65 ans', { timeout: 30_000 })
@@ -111,8 +103,8 @@ test('« Mon plan » always says its age', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.getByRole('button', { name: /^Mon plan \(\d+( \/ \d+)? ans\)$/ })).toBeVisible()
   await page.goto('/resultats?v=strategies')
-  // (the card for it is folded into « Standard » when the plan's pension ages ARE the standard: the table lists it always)
-  await expect(page.getByRole('rowheader', { name: /^Mon plan \(\d+ ans\)$/ })).toBeVisible({ timeout: 60_000 })
+  // (the card for it is folded into « Standard » when the plan's pension ages ARE the standard, and says so)
+  await expect(page.locator('.bridge-card').getByRole('radio', { name: /^Mon plan \(\d+ ans\)$|^Standard \(c’est aussi votre plan\)$/ })).toBeVisible({ timeout: 60_000 })
 })
 
 // Two people, one format: the same sections begin on the same line in both columns, each card wears its person's colour down
@@ -180,7 +172,7 @@ test('the home: owning one, its mortgage says when the payment stops, and it is 
   await section.getByRole('textbox', { name: 'Paiement mensuel' }).fill('1150')
   await section.getByRole('textbox', { name: 'Paiement mensuel' }).blur()
   // The payment stops on a stated date — the same year the plan's table stops charging it.
-  await expect(section).toContainText(/Hypothèque payée en \d{4}, dans \d+ ans : ce paiement cesse alors\./)
+  await expect(section).toContainText(/Hypothèque payée en \d{4}, dans \d+ ans\s: ce paiement cesse alors\./)
   await expect.poll(async () => (await savedProfile(page)).household.home).toMatchObject({ value: 520_000, mortgage: { balance: 150_000, rate: 0.049, monthlyPayment: 1_150 }, sale: null })
   // A payment that does not cover the interest says so, plainly.
   await section.getByRole('textbox', { name: 'Paiement mensuel' }).fill('300')

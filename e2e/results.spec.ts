@@ -22,7 +22,7 @@ test('the chart draws one line per comparison, a marker for each retirement, and
   const chart = page.locator('.chart-panel figure.chart')
   await expect(chart).toBeVisible()
   await expect(chart).toHaveAttribute('role', 'img')
-  await expect(chart).toHaveAttribute('aria-label', 'Valeur nette de 2026 à 2076 pour : Mon plan (60 / 62 ans), 65 ans.')
+  await expect(chart).toHaveAttribute('aria-label', 'Valeur nette de 2026 à 2076 pour : Mon plan (60 / 62 ans), 65 ans.')
   await expect(chart.locator('.chart__legend-item')).toHaveText(['Mon plan (60 / 62 ans)', '65 ans'])
   await expect(chart.locator('path.recharts-line-curve')).toHaveCount(2)
   await expect(chart.locator('.recharts-reference-line')).toHaveCount(2)
@@ -52,23 +52,26 @@ test('hovering the chart shows the year, the ages and each scenario’s exact fi
 test('the measure is chosen in the address, and the chart follows; today’s dollars have no switch, an old link still opens the year’s dollars', async ({ page }) => {
   await page.goto('/resultats')
   const chart = page.locator('.chart-panel figure.chart')
-  await page.getByRole('tab', { name: 'Revenu garanti' }).click()
+  await page.getByRole('tab', { name: 'Revenus hors épargne' }).click()
   await expect(page).toHaveURL(/metric=income/)
-  await expect(chart).toHaveAttribute('aria-label', /^Revenu garanti de 2026 à 2076/)
+  await expect(chart).toHaveAttribute('aria-label', /^Revenus hors épargne de 2026 à 2076/)
   await expect(page.getByRole('tab', { name: 'Dollars de l’année' })).toHaveCount(0)
   // The address alone restores the view — an old link with the year's dollars included.
   await page.goto('/resultats?metric=income&dollars=nominal&ages=62')
-  await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Revenu garanti de 2026 à 2076 pour : 62 ans.')
-  await expect(page.getByRole('tab', { name: 'Revenu garanti', selected: true })).toBeVisible()
-  await expect(page.getByText('Les dollars de chaque année, sans correction pour l’inflation.')).toBeVisible()
+  await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Revenus hors épargne de 2026 à 2076 pour : 62 ans.')
+  await expect(page.getByRole('tab', { name: 'Revenus hors épargne', selected: true })).toBeVisible()
+  await expect(page.getByText('Tous les montants sont dans les dollars de chaque année')).toBeVisible()
   // Choosing the default again takes the parameter back out of the address.
   await page.getByRole('tab', { name: 'Valeur nette' }).click()
   await expect(page).not.toHaveURL(/metric=/)
 })
 
-test('another comparison adds a line and keeps the other choices', async ({ page }) => {
+test('another comparison — typed in the « Autre âge » box — adds a line and keeps the other choices', async ({ page }) => {
   await page.goto('/resultats?dollars=nominal')
-  await page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans', exact: true }).click()
+  const other = page.getByRole('textbox', { name: 'Autre âge' })
+  await other.fill('62')
+  await other.press('Enter')
+  await expect(page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans', exact: true, pressed: true })).toBeVisible()
   await expect(page.locator('.chart-panel .chart__legend-item')).toHaveText(['Mon plan (60 / 62 ans)', '65 ans', '62 ans'])
   await expect(page.locator('.chart-panel path.recharts-line-curve')).toHaveCount(3)
   await expect(page).toHaveURL(/dollars=nominal/)
@@ -82,7 +85,7 @@ test('the year-by-year table says which dollars it holds, and its last net worth
   const last = tables.locator('.year-table').first().locator('tbody tr').last().locator('td').last()
   const worth = (await last.textContent())!.trim()
   await page.goto('/resultats')
-  await expect(page.locator('.scenario').first()).toContainText(`Valeur nette à l’horizon : ${worth} (Dollars d’aujourd’hui)`)
+  await expect(page.locator('.scenario').first()).toContainText(`Valeur nette à la fin du plan : ${worth}`)
   // An old link with the year's dollars still opens them, and says so.
   await page.goto('/resultats?v=verify&dollars=nominal')
   await expect(tables.locator('.year-table__unit')).toContainText('Dollars de l’année.')
@@ -92,14 +95,14 @@ test('the chart speaks English too', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
   await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan (age 60 / 62), 65.')
-  await expect(page.getByRole('tab', { name: 'Guaranteed income' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Income excluding savings' })).toBeVisible()
 })
 
 test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the page’s thread, and the middle is the verdict', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
   // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
-  await page.getByRole('tab', { name: 'Revenu garanti' }).click()
+  await page.getByRole('tab', { name: 'Revenus hors épargne' }).click()
   await page.getByRole('tab', { name: 'Vérifier' }).click()
   // One grid at a time: the horizon is chosen in the table's header (three tabs; the plan's own, 95, is open first).
   const grids = page.locator('.sensitivity__grids .table-wrap')

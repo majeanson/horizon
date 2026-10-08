@@ -36,6 +36,11 @@ const PRIMITIVE = 'a primitive forwarding its CALLER’s choice — the caller i
 
 const ALLOWED: Record<string, string> = {
   'components/EditField.tsx': PRIMITIVE,
+  'components/NumberField.tsx': PRIMITIVE,
+  // The first visit asks ONE question per screen: « Suivant » is the tap that reveals the next question's box in place,
+  // and the box it reveals is what the tap asked to type into. The first screen (who is this for?) has no box, so
+  // arriving on the page never summons the keyboard; only moving to a question with a box does.
+  'components/Onboarding.tsx': 'the box appears in place on the « Suivant » / « Précédent » tap that asked for it; the landing screen has no box',
 }
 
 function lineOf(src: string, index: number): number {

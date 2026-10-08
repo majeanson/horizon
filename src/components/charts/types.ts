@@ -34,6 +34,8 @@ export interface LineChartProps {
   yDetail?: (y: number) => string
   /** How the tooltip's title reads for an x. */
   xTitle: (x: number) => string
+  /** How an x reads on the axis, as up to two lines (« 2043 » over « 63 ans »): a year is always said with its age. Default: the x itself. */
+  xTick?: (x: number) => readonly string[]
   markers?: readonly ChartMarker[]
   /** The accessible name: the chart is a picture, and the per-year table beside it is its text. */
   ariaLabel: string
@@ -52,6 +54,7 @@ export interface StackedBarChartProps {
   yFormat: (y: number) => string
   yDetail?: (y: number) => string
   xTitle: (x: number) => string
+  xTick?: (x: number) => readonly string[]
   markers?: readonly ChartMarker[]
   ariaLabel: string
   height?: number

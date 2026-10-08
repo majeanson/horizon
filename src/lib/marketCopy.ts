@@ -23,7 +23,7 @@ const FR: MarketCopy = {
   surplus: {
     title: 'L’argent qui reste',
     on: 'Placer d’abord le surplus dans le REER',
-    hint: 'Quand une année de travail laisse de l’argent de côté et qu’il reste des droits de cotisation REER, cet argent va d’abord au REER (la déduction fait baisser l’impôt), puis au CELI, puis au compte non enregistré. Désactivé, il va d’abord au CELI.',
+    hint: 'L’argent qui reste à la fin d’une année de travail va d’abord au REER (la déduction baisse l’impôt), puis au CELI, puis au compte non enregistré. Désactivé : au CELI d’abord.',
   },
   income: {
     line: (age, perMonth, planned) => `À ${age} ans, le plan peut financer jusqu’à ${perMonth} par mois (après impôt) — vous prévoyez ${planned}.`,
@@ -32,7 +32,7 @@ const FR: MarketCopy = {
   },
   stress: {
     title: 'Si les marchés tournent mal',
-    active: (name) => `Le calcul ci-dessus suit le parcours « ${name} ».`,
+    active: (name) => `Le calcul ci-dessus suit le parcours « ${name} ».`,
     none: (max) => `aucun âge jusqu’à ${max} ans`,
     age: (n) => `${n} ans`,
     hint: 'Le même plan, avec un parcours de marché difficile en début de retraite. Ce sont des exemples, pas des prévisions.',
@@ -40,13 +40,13 @@ const FR: MarketCopy = {
   },
   path: {
     title: 'Le parcours des marchés',
-    hint: 'Les rendements ci-dessus sont des moyennes. Mais l’ordre des années compte : une baisse au début de la retraite coûte bien plus cher qu’une baisse vingt ans plus tard. Choisissez un parcours pour voir si votre plan tient.',
+    hint: 'Les rendements ci-dessus sont des moyennes. Mais l’ordre des années compte : une baisse au début de la retraite coûte bien plus cher qu’une baisse vingt ans plus tard. Choisissez un parcours pour voir si votre plan tient.',
     names: { smooth: 'Lisse', badStart: 'Mauvais départ', lostDecade: 'Décennie perdue', boomBust: 'Boom puis correction', custom: 'Personnalisé' },
     about: {
       smooth: 'Le rendement moyen, chaque année. C’est ce qui est calculé tant que vous n’en choisissez pas d’autre.',
-      badStart: 'Une chute de 15 % la première année de retraite, puis une reprise lente. Un exemple, pas une prévision.',
+      badStart: 'Une chute de 15 % la première année de retraite, puis une reprise lente. Un exemple, pas une prévision.',
       lostDecade: 'Dix années qui n’avancent presque pas, avec deux baisses. Un exemple, pas une prévision.',
-      boomBust: 'Trois belles années, puis une correction de 25 %. Un exemple, pas une prévision.',
+      boomBust: 'Trois belles années, puis une correction de 25 %. Un exemple, pas une prévision.',
       custom: 'Vos propres rendements, année par année. Une année que vous n’indiquez pas reçoit le rendement moyen.',
     },
     year: (n) => (n === 1 ? 'Année 1 de retraite' : `Année ${n} de retraite`),
@@ -60,7 +60,7 @@ const EN: MarketCopy = {
   surplus: {
     title: 'The money left over',
     on: 'Put the surplus in the RRSP first',
-    hint: 'When a working year leaves money over and RRSP room is open, it goes to the RRSP first (the deduction lowers the tax), then the TFSA, then the non-registered account. Off, it goes to the TFSA first.',
+    hint: 'The money left at the end of a working year goes to the RRSP first (the deduction lowers the tax), then the TFSA, then the non-registered account. Off: the TFSA first.',
   },
   income: {
     line: (age, perMonth, planned) => `At ${age}, the plan can fund up to ${perMonth} a month (after tax) — you plan ${planned}.`,

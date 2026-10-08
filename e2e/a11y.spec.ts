@@ -91,9 +91,9 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
     await page.keyboard.press('Tab')
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
-  // The skip link first — the whole point of one — then the top bar (name, language, theme), then the four destinations.
-  expect(order.slice(0, 4)).toEqual(['Aller au contenu', 'Horizon', 'EN', ''])
-  expect(order.slice(4, 8)).toEqual(['Profil', 'Hypothèses', 'Résultats', 'Données'])
+  // The skip link first — the whole point of one — then the top bar (name, language, theme, the settings gear), then the three destinations.
+  expect(order.slice(0, 5)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', ''])
+  expect(order.slice(5, 8)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
 })
 
 // The page's outline is part of its accessibility tree (heading navigation in a screen reader, and the

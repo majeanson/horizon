@@ -30,6 +30,8 @@ interface NumberFieldBase {
   unit?: string
   placeholder?: string
   disabled?: boolean
+  /** Forwarded to the box. Only for a field REVEALED by the tap that asked to type (lib/autofocus.test.ts judges the caller). */
+  autoFocus?: boolean
 }
 
 // Two shapes, so a page never handles a null it cannot receive: a field that `allowEmpty` (an optional figure)
@@ -42,7 +44,7 @@ export type NumberFieldProps = NumberFieldBase &
   )
 
 export function NumberField(props: NumberFieldProps) {
-  const { kind, min, max, id, ariaLabel, ariaDescribedBy, unit, placeholder, disabled } = props
+  const { kind, min, max, id, ariaLabel, ariaDescribedBy, unit, placeholder, disabled, autoFocus } = props
   const allowEmpty = props.allowEmpty === true
   const value: number | null = props.value
   const onChange = props.onChange as (value: number | null) => void
@@ -113,6 +115,7 @@ export function NumberField(props: NumberFieldProps) {
         inputMode={kind === 'year' || kind === 'int' ? 'numeric' : 'decimal'}
         placeholder={placeholder}
         disabled={disabled}
+        autoFocus={autoFocus}
         boxActions={adornment ? <span className="num-unit mono" aria-hidden="true">{adornment}</span> : undefined}
       />
       {error && (

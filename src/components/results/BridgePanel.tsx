@@ -1,10 +1,11 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { BridgeLevers, BridgeView, StrategyCard, StrategyKey } from '../../engine/bridge'
-import { leversFor, profileLevers, strategyKeysFor } from '../../engine/bridge'
+import { leversFor, profileLevers } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
+import type { BridgeMatrix } from '../../lib/bridge.worker'
 import {
   SEGMENT_COLOUR,
   SEGMENTS,
@@ -22,26 +23,26 @@ import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { mapPerson } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
-import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
 import { StatusMessage } from '../StatusMessage'
 import { SubTabs } from '../SubTabs'
-import { TableChooser } from '../TableChooser'
 
 // « Mes années 60 à 70 » — the strategy view. For the person looked at: the plan year by year across the bridge years
 // (what the household spends, what the guaranteed pensions pay, what the nest has to cover and from which account, the tax,
 // what is left), the three levers that decide it (retirement age, QPP start, OAS start), and five named ways of starting the
-// pensions side by side with a plain-language verdict each. Every choice lives in the address bar (lib/bridgeModel.ts); the
-// arithmetic is engine/bridge.ts, run in a worker (lib/useBridge.ts). The picture is optional: the table below it carries the
-// same numbers as text.
+// pensions side by side with a plain-language verdict each — and, on each card, whether that way lasts under each of the
+// three scenarios (the former « matrix », folded into the cards it qualified). Every choice lives in the address bar
+// (lib/bridgeModel.ts); the arithmetic is engine/bridge.ts, run in a worker (lib/useBridge.ts). The picture is optional:
+// the table below it carries the same numbers as text.
 
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
 const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m.StackedBarChart })))
 
 const STATUS_MARK = { covered: '✓', drawing: '↓', short: '!' } as const
+const SCENARIOS = ['prudent', 'neutral', 'bold'] as const
 
 // What the last card tap wrote into the profile, kept so the line under the cards can say it
 // happened — a card looks like a view toggle, but it IS a profile edit — and take it back.
@@ -62,6 +63,7 @@ function StrategyCards({
   onPick,
   horizonAge,
   who,
+  matrix,
 }: {
   view: BridgeView
   pressed: readonly StrategyKey[]
@@ -70,7 +72,10 @@ function StrategyCards({
   horizonAge: number
   /** The person `horizonAge` is counted for, named in a couple; null for a person alone. */
   who: string | null
+  /** Each strategy under each scenario; null while the worker is still at it. */
+  matrix: BridgeMatrix | null
 }) {
+  const t = useT()
   const { lang } = useLang()
   const standard = view.strategies.find((s) => s.key === 'standard')!
   // When the person's own start ages ARE the standard, one card says so instead of two identical ones (and « Mon plan » is never compared with itself).
@@ -89,8 +94,8 @@ function StrategyCards({
         <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v, who)}</p>
         <dl className="bridge-card__facts">
           <div>
-            <dt>{copy.worth85}</dt>
-            <dd className="mono">{money(s.summary.netWorth85)}</dd>
+            <dt>{copy.lifetime}</dt>
+            <dd className="mono">{formatMoney(s.summary.lifetimeAfterTax, lang)}</dd>
           </div>
           <div>
             <dt>{copy.worth95}</dt>
@@ -100,14 +105,22 @@ function StrategyCards({
             <dt>{copy.lowestNestLabel}</dt>
             <dd className="mono">{s.summary.lowestNest ? `${formatMoney(s.summary.lowestNest.amount, lang)} · ${copy.age(s.summary.lowestNest.age)}` : copy.noWorth}</dd>
           </div>
-          <div>
-            <dt>{copy.lifetime}</dt>
-            <dd className="mono">{formatMoney(s.summary.lifetimeAfterTax, lang)}</dd>
-          </div>
         </dl>
         <p className="field-row__hint">
           {s.key === 'standard' ? copy.breakEvenSelf : extra > 50 ? copy.extraDrawn(formatMoney(extra, lang)) : extra < -50 ? copy.lessDrawn(formatMoney(-extra, lang)) : copy.sameDrawn}
           {s.key !== 'standard' && ' · ' + (s.breakEven === null || s.breakEvenKind === null ? copy.breakEvenNone : s.breakEvenKind === 'later' ? copy.breakEvenLater(s.breakEven) : copy.breakEvenEarlier(s.breakEven))}
+        </p>
+        {/* The same way of starting under the three scenarios: one mark each, on the card it qualifies. */}
+        <p className="bridge-card__marks" aria-label={copy.marksTitle}>
+          {SCENARIOS.map((k) => {
+            const cell = matrix?.[s.key][k]
+            return (
+              <span key={k} className={'bridge-mark' + (cell === undefined ? '' : cell.ok ? ' bridge-mark--ok' : ' bridge-mark--short')}>
+                <span aria-hidden="true">{cell === undefined ? '' : cell.ok ? '✓ ' : '! '}</span>
+                {t.assumptions.presets[k]} : {cell === undefined ? copy.marksPending : cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}
+              </span>
+            )
+          })}
         </p>
       </li>
     )
@@ -150,6 +163,9 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
   }
   const markers = starts(yearOf)
   const barMarkers = starts((age) => age)
+  // Both pictures say the year AND the age on their axis, the same way round: the bars are keyed by age, the lines by year.
+  const ageTick = (age: number) => [copy.age(age), String(yearOf(age))]
+  const yearTick = (year: number) => [String(year), copy.age(year - person.birth.year)]
   if (rows.length === 0) return null
   return (
     <div className="bridge__charts">
@@ -164,6 +180,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
             yFormat={(y) => formatCompactMoney(y, lang)}
             yDetail={(y) => formatMoney(y, lang)}
             xTitle={(age) => copy.tooltip(age, yearOf(age))}
+            xTick={ageTick}
             markers={barMarkers}
             ariaLabel={copy.barsFigure(first, last)}
           />
@@ -179,6 +196,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
             yFormat={(y) => formatCompactMoney(y, lang)}
             yDetail={(y) => formatMoney(y, lang)}
             xTitle={(year) => copy.tooltip(year - person.birth.year, year)}
+            xTick={yearTick}
             ariaLabel={copy.nestFigure(first, last)}
           />
         </Suspense>
@@ -202,7 +220,7 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
   const showRrsp = some((r) => r.draws.rrsp)
   const showTfsa = some((r) => r.draws.tfsa)
   return (
-    <div className="table-wrap bridge__table" role="region" aria-label={copy.tableTitle} tabIndex={0}>
+    <div className="table-wrap table-wrap--pinned bridge__table" role="region" aria-label={copy.tableTitle} tabIndex={0}>
       <table>
         <caption className="sensitivity__caption">{copy.tableTitle}</caption>
         <thead>
@@ -256,59 +274,8 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
   )
 }
 
-const HYPOTHESES = ['prudent', 'neutral', 'bold'] as const
-
 // « Mon plan » always says the age it stands for: the retirement age the person's own start ages go with.
 const strategyLabel = (copy: BridgeCopy, key: StrategyKey, retirementAge: number) => (key === 'mine' ? `${copy.strategyName.mine} (${copy.age(retirementAge)})` : copy.strategyName[key])
-
-function MatrixSection({ household, assumptions, levers, copy, ownerName }: { household: Household; assumptions: Assumptions; levers: BridgeLevers; copy: BridgeCopy; ownerName: string }) {
-  const t = useT()
-  const { value, busy } = useBridgeMatrix(household, assumptions, levers)
-  const [hyp, setHyp] = useParamChoice('hyp', HYPOTHESES, 'neutral')
-  if (value === null) return <Skeleton count={3} />
-  return (
-    <div className="matrix" aria-busy={busy}>
-      <p className="field-row__hint">{copy.matrixHint(ownerName)}</p>
-      {busy && (
-        <p className="bridge__updating" role="status">
-          {copy.updating}
-        </p>
-      )}
-      {/* Three columns of hypotheses became one: the set is chosen in the header, the table shows its verdicts. */}
-      <TableChooser
-        label={t.assumptions.presets.title}
-        ariaLabel={copy.matrixTitle}
-        value={hyp}
-        options={HYPOTHESES.map((k) => ({ key: k, label: t.assumptions.presets[k], tone: k }))}
-        onSelect={setHyp}
-      />
-      <div className="table-wrap" role="region" aria-label={`${copy.matrixTitle} — ${t.assumptions.presets[hyp]}`} tabIndex={0}>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">{copy.strategyCol}</th>
-              <th scope="col">{t.assumptions.presets[hyp]}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {strategyKeysFor(household).map((key) => {
-              const cell = value[key][hyp]
-              return (
-                <tr key={key}>
-                  <th scope="row">{strategyLabel(copy, key, levers.retirementAge)}</th>
-                  <td className={cell.ok ? undefined : 'bridge__cell--short'}>
-                    <span aria-hidden="true">{cell.ok ? '✓' : '!'} </span>
-                    {cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
 
 export function BridgePanel({ household, assumptions, names }: { household: Household; assumptions: Assumptions; names: readonly string[] }) {
   const { lang } = useLang()
@@ -317,8 +284,10 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const state = useMemo(() => parseBridgeParams(params, household), [params, household])
   const { levers } = state
   const { value: view, busy } = useBridge(household, assumptions, levers)
+  // The three scenarios per strategy: fifteen more projections, started once the page is idle, marked on the cards as they land.
+  const { value: matrix } = useBridgeMatrix(household, assumptions, levers)
   const ownerName = names[Math.max(0, household.persons.findIndex((p) => p.id === levers.id))] ?? ''
-  // The ages under « tient jusqu'à » are this person's; in a couple that is not the youngest, so the verdict names them.
+  // The ages under « dure jusqu'à » are this person's; in a couple that is not the youngest, so the verdict names them.
   const who = household.persons.length > 1 ? ownerName : null
 
   // Every change is built from the address bar as it is NOW (like the comparison chips): two quick taps must compose.
@@ -330,7 +299,7 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
     }
     setParams(base, { replace: true })
   }
-  // The ages are the PROFILE's (« Mes données » and Profil edit the same ones): only the other-person toggle and the window live in the address.
+  // The ages are the PROFILE's (« Mes chiffres » and Profil edit the same ones): only the other-person toggle and the window live in the address.
   const change = (patch: Partial<Pick<BridgeLevers, 'both'>>, win?: BridgeWindow) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household)
     write({ levers: { ...cur.levers, ...patch }, window: win ?? cur.window })
@@ -399,7 +368,8 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
 
           <h3 className="bridge__heading">{copy.strategyTitle}</h3>
           {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
-          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} />
+          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} matrix={matrix} />
+          <p className="field-row__hint">{copy.marksHint(ownerName)}</p>
           {applied !== null && (
             <Cluster className="bridge__applied">
               <StatusMessage tone="success">
@@ -442,9 +412,6 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
               <li key={line}>{line}</li>
             ))}
           </ul>
-
-          <h3 className="bridge__heading">{copy.matrixTitle}</h3>
-          <MatrixSection household={household} assumptions={assumptions} levers={levers} copy={copy} ownerName={ownerName} />
 
           <h3 className="bridge__heading">{copy.caveatTitle}</h3>
           <ul className="bridge__list">

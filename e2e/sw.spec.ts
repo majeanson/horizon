@@ -173,7 +173,7 @@ test('offline, the saved profile is intact and the results — the chart and the
 
   // The profile page, offline, still holds what was saved (both people are on the page: scope to the first).
   await page.getByRole('link', { name: 'Profil', exact: true }).click()
-  await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail annuel actuel', exact: true })).toHaveValue(/85\D000/)
+  await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/85\D000/)
 
   // …and the worker runs offline: the « what if » grid starts by itself and fills from the cache.
   await page.getByRole('link', { name: 'Résultats', exact: true }).click()

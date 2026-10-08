@@ -17,7 +17,7 @@ export function FieldInfo({ id, label }: { id: InfoId; label?: string }) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const entry: InfoEntry = t.info[id]
-  const name = label ? `${t.common.whereToFind} : ${label}` : t.common.whereToFind
+  const name = label ? `${t.common.whereToFind} : ${label}` : t.common.whereToFind
   return (
     <>
       <button
@@ -37,7 +37,7 @@ export function FieldInfo({ id, label }: { id: InfoId; label?: string }) {
         </p>
         {entry.label && (
           <p>
-            <strong>{t.fields.infoLabel}</strong> « {entry.label} »
+            <strong>{t.fields.infoLabel}</strong> « {entry.label} »
           </p>
         )}
         {entry.note && <p className="info-note__extra">{entry.note}</p>}

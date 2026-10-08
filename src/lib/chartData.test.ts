@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { balanceBars, chartSeries, deflator, hypothesisSeries, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
-import { assumptionsOf, runSelections } from './resultsModel.ts'
+import { balanceBars, chartSeries, deflator, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
+import { runSelections } from './resultsModel.ts'
 import type { Profile } from './schema.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
@@ -86,13 +86,5 @@ describe('the detail view says what the rows say', () => {
     const today = balanceBars(rows, null, { ...scale, dollars: 'today' })
     const k = deflator(rows[10].year, 2026, 0.02)
     expect(today[10].rrsp).toBeCloseTo(balanceBars(rows, null, scale)[10].rrsp / k, 6)
-  })
-
-  it('the three sets of hypotheses are three lines, the bolder one ending richer', () => {
-    const a = assumptionsOf(profile, TODAY)
-    const lines = hypothesisSeries(profile.household, a, {}, scale, { prudent: 'P', neutral: 'N', bold: 'B' })
-    expect(lines.map((l) => l.id)).toEqual(['prudent', 'neutral', 'bold'])
-    const end = (id: string) => lines.find((l) => l.id === id)!.points.at(-1)!.y
-    expect(end('bold')).toBeGreaterThan(end('prudent'))
   })
 })

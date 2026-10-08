@@ -9,27 +9,19 @@ import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type Contrast, type TextScale } from '../lib/accessibility'
 import { useConfirm } from '../lib/confirm'
+import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
 import { exampleProfile } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
 import { clearProfile, exportFileName, exportProfileJson, getProfile, markExported, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
+import { getTheme, setTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 
-/** Hand a text to the browser as a file. */
-function saveAsFile(text: string, name: string): void {
-  const blob = new Blob([text], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = name
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-// Where the data goes — which is nowhere. Export a file to keep, import one back, load the fictional example,
-// or erase this device's copy. Every action that replaces the profile asks first, in words that say what is lost.
+// Where the figures go — which is nowhere — and the device's own settings. Save a copy to keep, restore one, see an
+// example household, set the display, or erase this device's copy. Every action that replaces the profile asks first,
+// in words that say what is lost. Behind the gear in the top bar: used a few times a year, not a main destination.
 export function Donnees() {
   const t = useT()
   const { lang } = useLang()
@@ -44,7 +36,7 @@ export function Donnees() {
   const [failure, setFailure] = useState<Extract<ReadResult, { ok: false }> | null>(null)
   // The profile as it was before the last replace or clear, held in memory for this visit: the confirm
   // promises « rétablir tout de suite après », and this is what keeps the promise. Gone on navigation —
-  // beyond the visit, the export file remains the only way back, as the confirm also says.
+  // beyond the visit, the saved copy remains the only way back, as the confirm also says.
   const [previous, setPrevious] = useState<Profile | null>(null)
   const restorePrevious = () => {
     if (previous === null) return
@@ -97,11 +89,10 @@ export function Donnees() {
         </Cluster>
       )}
 
-      <PlansSection onReplace={setPrevious} />
-
+      {/* The copy is the whole reason this page exists: its button is the one filled button here. */}
       <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
         <Cluster>
-          <button type="button" className="btn" onClick={download}>
+          <button type="button" className="btn btn--primary" onClick={download}>
             {d.export.button}
           </button>
         </Cluster>
@@ -151,6 +142,8 @@ export function Donnees() {
         )}
       </Section>
 
+      <PlansSection onReplace={setPrevious} />
+
       <Section title={d.example.title} subtitle={d.example.hint} icon="user-bold">
         <ul className="example-list">
           {EXAMPLE_IDS.map((id: ExampleId) => (
@@ -194,23 +187,47 @@ export function Donnees() {
         </Cluster>
       </Section>
 
-      <p className="data-foot mono">
-        {d.build(__BUILD_SHA__)} · <Link to="/dev/kit">{d.kit}</Link>
+      {/* The version, and — while developing only — the door to the component gallery: a reader of the live app has no use for it. */}
+      <p className="data-foot">
+        {d.build(__BUILD_SHA__)}
+        {import.meta.env.DEV && (
+          <>
+            {' '}
+            · <Link to="/dev/kit">{d.kit}</Link>
+          </>
+        )}
       </p>
     </section>
   )
 }
 
-// The reading settings the low-vision reader came for — the same contrast and text-size machinery the dev
-// gallery flips, but ON a page of the app. The setters write the DOM attribute (the cascade does the rest)
-// and persist to this device; local state only mirrors them so the control shows what is in force.
+// The reading settings in ONE place: the theme (the bar's moon is a shortcut to the same choice), the contrast and the
+// text size — the same machinery the dev gallery flips, but ON a page of the app. The setters write the DOM attribute
+// (the cascade does the rest) and persist to this device; local state only mirrors them so the control shows what is in force.
 function DisplaySection() {
   const t = useT()
   const d = t.data.display
+  const [theme, setThemeShown] = useState<Theme>(getTheme)
   const [contrast, setContrastShown] = useState<Contrast>(getContrast)
   const [scale, setScaleShown] = useState<TextScale>(getTextScale)
   return (
     <Section title={d.title} subtitle={d.hint} icon="sliders-horizontal-bold">
+      <div className="field-row">
+        <p className="field-row__label">{d.theme}</p>
+        <SubTabs
+          size="mini"
+          ariaLabel={d.theme}
+          value={theme}
+          onSelect={(v: Theme) => {
+            setTheme(v)
+            setThemeShown(v)
+          }}
+          options={[
+            { key: 'day', label: d.themeDay, icon: 'sun-bold' },
+            { key: 'night', label: d.themeNight, icon: 'moon-stars-bold' },
+          ]}
+        />
+      </div>
       <div className="field-row">
         <p className="field-row__label">{d.contrast}</p>
         <SubTabs

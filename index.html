@@ -39,7 +39,19 @@
     <script src="/theme-bootstrap.js"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- The shell's shape BEFORE a line of the app runs: the bar with the name, and quiet blocks where the first cards
+         will be. React replaces all of it on mount (createRoot, not hydration), so nothing here has to match the real
+         markup — it only has to look like the page that is coming instead of a blank cream screen. The classes are the
+         app's own, so the prod stylesheet (in <head>) dresses it; in dev the stylesheet arrives with the script and the
+         skeleton is a plain, unstyled line for a moment, which is fine. -->
+    <div id="root">
+      <div class="shell">
+        <header class="shell__bar"><span class="shell__brand">Horizon</span></header>
+        <main class="shell__main">
+          <div class="skeleton skeleton--row" aria-hidden="true"><div class="skeleton__block"></div><div class="skeleton__block"></div><div class="skeleton__block"></div></div>
+        </main>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

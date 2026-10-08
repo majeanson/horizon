@@ -17,7 +17,7 @@ export function OasSection({ person, edit }: PersonEditor) {
   const t = useT()
   const o = t.profile.oas
   return (
-    <Section title={o.title} icon="house-bold">
+    <Section title={o.title} icon="identification-card-bold">
       <FieldRow label={o.residentSince} infoId="oasResidence" hint={o.residentHint} fact={factId(person.id, 'residence')}>
         {(w) => (
           <NumberField kind="year" min={1900} max={2100} value={person.oas.residentSince} onChange={(residentSince) => edit((x) => ({ ...x, oas: { ...x.oas, residentSince } }))} id={w.id} ariaDescribedBy={w.describedBy} />
@@ -106,7 +106,7 @@ export function AccountsSection({ person, edit }: PersonEditor) {
   const nonReg = person.accounts.nonReg
   const setNonReg = (patch: Partial<typeof nonReg>) => edit((x) => ({ ...x, accounts: { ...x.accounts, nonReg: { ...x.accounts.nonReg, ...patch } } }))
   return (
-    <Section title={a.title} icon="lock-bold">
+    <Section title={a.title} icon="piggy-bank-bold">
       <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} />
       <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} />
       <Group title={a.nonReg}>

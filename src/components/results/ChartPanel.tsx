@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import type { AgeResult, Assumptions, Household } from '../../engine/types'
+import type { AgeResult, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import {
   BALANCE_COLOUR,
@@ -8,23 +8,24 @@ import {
   SOURCE_SEGMENTS,
   balanceBars,
   chartSeries,
-  hypothesisSeries,
   retirementMarkers,
   sourceBars,
   type ChartMetric,
   type Dollars,
 } from '../../lib/chartData'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
-import { scenarioOf, type Selection } from '../../lib/resultsModel'
+import type { Selection } from '../../lib/resultsModel'
 import { Loading } from '../Loading'
 import { SubTabs } from '../SubTabs'
 
-// The picture: the scenarios the person chose, drawn against the years, in one of three views and in today's or
-// the year's dollars. Two are single lines (net worth, guaranteed income); the third, « Détail », shows the whole
-// picture — where each year's money comes from, what the accounts hold, and the same plan under the three sets of
-// hypotheses — for the household or for each person. The chart library arrives in its own chunk (lazy), only when
-// this page is opened — it is the largest thing in the app and the first screen never needs it. The per-year table
-// below carries the same numbers as text, which is what makes the picture optional for anyone who cannot use it.
+// The picture: the retirement ages the person chose, drawn against the years, in one of three views and in today's or
+// the year's dollars. Two are single lines (net worth, income without drawing on savings); the third, « Détail », shows
+// where each year's money comes from and what the accounts hold — for the household or for each person. (The same plan
+// under the three scenarios is NOT drawn here: the answer card already says the three ages, and the strategy cards mark
+// each way of starting under each scenario — one more line chart of it was a third way of seeing one figure.) The chart
+// library arrives in its own chunk (lazy), only when this page is opened — it is the largest thing in the app and the
+// first screen never needs it. The per-year table below carries the same numbers as text, which is what makes the
+// picture optional for anyone who cannot use it.
 
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
 const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m.StackedBarChart })))
@@ -32,7 +33,6 @@ const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m
 export function ChartPanel({
   runs,
   household,
-  assumptions,
   names,
   todayYear,
   inflation,
@@ -43,7 +43,6 @@ export function ChartPanel({
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
   household: Household
-  assumptions: Assumptions
   /** Each person's display name, in household order. */
   names: readonly string[]
   todayYear: number
@@ -69,6 +68,8 @@ export function ChartPanel({
   const measure = metric === 'income' ? c.income : c.netWorth
   const years = runs[0]?.result.rows
   const scenarioNames = runs.map((r) => label(r.selection)).join(', ')
+  // The axis says the year AND the age(s): a hover tooltip is the wrong place for the age on a touch screen.
+  const xTick = (x: number) => [String(x), agesByYear.get(x) ?? '']
 
   return (
     <section className="chart-panel surface" aria-label={c.title}>
@@ -86,11 +87,11 @@ export function ChartPanel({
         />
       </div>
       {detail ? (
-        runs.length > 0 && <DetailView runs={runs} household={household} assumptions={assumptions} names={names} todayYear={todayYear} inflation={inflation} dollars={dollars} label={label} agesByYear={agesByYear} />
+        runs.length > 0 && <DetailView runs={runs} household={household} names={names} todayYear={todayYear} inflation={inflation} dollars={dollars} label={label} agesByYear={agesByYear} />
       ) : (
         <>
           <p className="field-row__hint">
-            {metric === 'netWorth' ? c.netWorthHint : c.incomeHint} {dollars === 'today' ? c.todayHint : c.nominalHint}
+            {metric === 'netWorth' ? c.netWorthHint : c.incomeHint}
             {/* The vertical dashed markers carried no key at all — a reader saw coloured lines and had to guess. */}
             {markers.length > 0 && <> {c.markersHint}</>}
           </p>
@@ -103,6 +104,7 @@ export function ChartPanel({
                   yFormat={(y) => formatCompactMoney(y, lang)}
                   yDetail={(y) => formatMoney(y, lang)}
                   xTitle={(x) => c.tooltip(x, agesByYear.get(x) ?? '')}
+                  xTick={xTick}
                   ariaLabel={c.figure(measure, years[0].year, years[years.length - 1].year, scenarioNames)}
                 />
               )}
@@ -114,13 +116,12 @@ export function ChartPanel({
   )
 }
 
-// « Détail »: one scenario at a time (the pickers appear only when there is a choice), for the whole household or one
-// person. The same two pickers are the same shape for one person or two: with one person the « who » row simply has
+// « Détail »: one retirement age at a time (the pickers appear only when there is a choice), for the whole household or
+// one person. The same two pickers are the same shape for one person or two: with one person the « who » row simply has
 // nothing to choose, and the person's name still heads the bars in their colour.
 function DetailView({
   runs,
   household,
-  assumptions,
   names,
   todayYear,
   inflation,
@@ -130,7 +131,6 @@ function DetailView({
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
   household: Household
-  assumptions: Assumptions
   names: readonly string[]
   todayYear: number
   inflation: number
@@ -156,22 +156,16 @@ function DetailView({
   const balanceSegments: BalanceBarSegment[] = ['rrsp', 'tfsa', 'nonReg']
   if (rows.some((r) => Object.values(r.persons).some((p) => p.rrspLockedEnd > 0))) balanceSegments.splice(1, 0, 'rrspLocked') // right above the free REER
   if (personId === null && rows.some((r) => r.household.homeValueEnd > 0)) balanceSegments.push('home')
-  const hypotheses = useMemo(
-    () => hypothesisSeries(household, assumptions, scenarioOf(household, run.selection), scale, c.hyp),
-    [household, assumptions, run.selection, scale, c.hyp],
-  )
   const first = rows[0].year
   const last = rows[rows.length - 1].year
   const xTitle = (x: number) => c.tooltip(x, agesByYear.get(x) ?? '')
+  const xTick = (x: number) => [String(x), agesByYear.get(x) ?? '']
   const yFormat = (y: number) => formatCompactMoney(y, lang)
   const yDetail = (y: number) => formatMoney(y, lang)
-  const retireMarkers = retirementMarkers(household, [run], label)
 
   return (
     <div className="chart-detail">
-      <p className="field-row__hint">
-        {c.detailHint} {dollars === 'today' ? c.todayHint : c.nominalHint}
-      </p>
+      <p className="field-row__hint">{c.detailHint}</p>
       {runs.length > 1 && (
         <SubTabs size="mini" ariaLabel={c.scenarioPick} value={String(Math.min(pickedRun, runs.length - 1))} onSelect={(k) => setPickedRun(Number(k))} options={runs.map((r, i) => ({ key: String(i), label: label(r.selection) }))} />
       )}
@@ -198,6 +192,7 @@ function DetailView({
             yFormat={yFormat}
             yDetail={yDetail}
             xTitle={xTitle}
+            xTick={xTick}
             markers={[]}
             ariaLabel={c.sourcesFigure(first, last)}
           />
@@ -214,17 +209,10 @@ function DetailView({
             yFormat={yFormat}
             yDetail={yDetail}
             xTitle={xTitle}
+            xTick={xTick}
             markers={[]}
             ariaLabel={c.balancesFigure(first, last)}
           />
-        </Suspense>
-      </div>
-
-      <h4 className="chart-detail__heading">{c.hypTitle}</h4>
-      <p className="field-row__hint">{c.hypHint}</p>
-      <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
-          <LineChart series={hypotheses} markers={retireMarkers} yFormat={yFormat} yDetail={yDetail} xTitle={xTitle} ariaLabel={c.hypFigure(first, last)} />
         </Suspense>
       </div>
     </div>

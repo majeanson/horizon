@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster, Rail } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
+import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
 import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
@@ -12,7 +13,6 @@ import { OrderPanel } from '../components/results/OrderPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SaveView } from '../components/results/SaveView'
 import { SpendView } from '../components/results/SpendView'
-import { StopView } from '../components/results/StopView'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
 import { usePinOffset } from '../lib/pinOffset'
@@ -27,14 +27,16 @@ import { useLang, useT } from '../i18n'
 import type { ChartMetric, Dollars } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { presetOf } from '../engine/assumptionPresets'
-import { formatYearAge } from '../lib/format'
-import { RESULTS_COPY } from '../lib/resultsCopy'
+import { formatPct, formatYearAge } from '../lib/format'
+import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
 import { headlineOf, prudentDiffers } from '../lib/headline'
 import { scrollBehavior } from '../lib/motion'
 import { usePresetRange } from '../lib/usePresetEarliest'
 import { useMarketRange } from '../lib/useMarketRange'
 import { STRESS_PRESETS } from '../lib/marketRange'
 import { MARKET_COPY } from '../lib/marketCopy'
+import { LEVERS_COPY } from '../lib/leversCopy'
+import { useLevers } from '../lib/useLevers'
 import { maxRetiredSpending } from '../engine/maxSpending'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
@@ -46,15 +48,23 @@ import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
 
-// The answer. A verdict first — the earliest age at which the plan lasts — then the comparison the person chooses
-// (« my plan », or one age for everyone) as scenario cards and a chart, and the detail behind it for whoever wants to
-// check: the year-by-year table, the parameters, and how fragile the verdict is. Nothing is shown until the profile
-// holds enough to mean something (profileGaps). Every choice lives in the address (`?ages=&metric=&dollars=`), so a
-// view can be bookmarked and the back button means what it says.
+// The answer. It comes FIRST on the page — one sentence, the age drawn large, in dates — then what the same answer looks
+// like under the three scenarios and a hard market, what would move it most, what would make it more precise, and the
+// comparison the person chooses (« my plan », or one age for everyone) as cards and a chart. Behind that, two more
+// views: the strategies (when to start the pensions, in which order to draw) and the check (every figure with its
+// calculation, the year-by-year table, the sensitivity, the parameters). Nothing is shown until the profile holds
+// enough to mean something (profileGaps). Every choice lives in the address (`?v=&ages=&metric=…`), so a view can be
+// bookmarked.
 
 type View = 'answer' | 'strategies' | 'verify'
 
 const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
+
+/** The ages offered as one-tap comparisons: the answer's own, the three milestones, and whatever is already chosen. */
+function milestoneAges(earliest: number | null, selections: readonly Selection[], firstAge: number): number[] {
+  const wanted = [earliest, 60, 65, 70, ...selections.filter((s): s is number => typeof s === 'number')]
+  return [...new Set(wanted.filter((a): a is number => a !== null && a >= firstAge && a <= MAX_AGE))].sort((a, b) => a - b)
+}
 
 export function Resultats() {
   const pinned = usePinOffset()
@@ -114,9 +124,28 @@ export function Resultats() {
     [profile, gaps.length, year, month, picked],
   )
 
-  // Old deep links chose one question (`?q=save|stop`); the three answers share the page now, so
-  // the link becomes a scroll to that section, and the key is dropped from the address. Read once,
-  // at mount: stripping the key must not re-run (and so cancel) the settling scroll below.
+  // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
+  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
+
+  // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
+  // scroll to an id that is not on the page did nothing, on the one screen (« no age works ») where the reader most needs it.
+  const pendingScroll = useRef<string | null>(null)
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
+  const goTo = (target: View, id: string) => {
+    if (target === view) return scrollTo(id)
+    pendingScroll.current = id
+    setParam('v', target === 'answer' ? null : target)
+  }
+  useEffect(() => {
+    const id = pendingScroll.current
+    if (id === null) return
+    pendingScroll.current = null
+    requestAnimationFrame(() => scrollTo(id))
+  }, [view])
+
+  // Old deep links chose one question (`?q=save|stop`); the answers share the page now, so the link becomes a scroll
+  // to its section, and the key is dropped from the address. Read once, at mount: stripping the key must not re-run
+  // (and so cancel) the settling scroll below.
   const [legacyQ] = useState(() => params.get('q'))
   useEffect(() => {
     if (legacyQ !== 'save' && legacyQ !== 'stop') return
@@ -137,11 +166,17 @@ export function Resultats() {
     }
   }, [legacyQ, setParam])
 
-  // On a phone the rail shows only its first chips: bring the ones already switched on into view, once, so the page
-  // never opens looking as if nothing were selected.
+  // On a phone the rail may show only its first chips: bring the ones already switched on into view, once. SIDEWAYS
+  // INSIDE THE RAIL ONLY — `scrollIntoView` scrolls every ancestor too, and with the rail below the fold it used to
+  // scroll the whole page down by the height of the answer, so the page opened with its first sentence hidden.
   const compareRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    compareRef.current?.querySelector<HTMLElement>('[aria-pressed="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+    const rail = compareRef.current?.querySelector<HTMLElement>('.rail')
+    const chip = rail?.querySelector<HTMLElement>('[aria-pressed="true"]')
+    if (!rail || !chip) return
+    const c = chip.getBoundingClientRect()
+    const box = rail.getBoundingClientRect()
+    if (c.left < box.left || c.right > box.right) rail.scrollTo({ left: Math.max(0, rail.scrollLeft + (c.left - box.left) - (box.width - c.width) / 2) })
   }, [gaps.length])
 
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
@@ -153,25 +188,26 @@ export function Resultats() {
     () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest, nowOk)),
     [profile, gaps.length, earliest, nowOk, firstAge, youngest, year, month],
   )
-  // The answer under each ready-made scenario (off the page's thread): the verdict's own range line, and the
+  // The answer under each ready-made scenario (off the page's thread): the answer's own range line, and the
   // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
   const activePreset = presetOf(assumptions)
   const range = usePresetRange(profile.household, assumptions, gaps.length === 0)
   const stress = useMarketRange(profile.household, assumptions, gaps.length === 0)
   const mc = MARKET_COPY[lang]
+  const lc = LEVERS_COPY[lang]
+  const levers = useLevers(profile.household, assumptions, gaps.length === 0)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
-  // What the verdict's age can fund each month: the retired spending turned round (engine/maxSpending.ts), after tax, today's dollars.
+  // What the answer's age can fund each month: the retired spending turned round (engine/maxSpending.ts), after tax, today's dollars.
   const comfort = useMemo(
     () => (gaps.length > 0 || headline.age === null ? undefined : maxRetiredSpending(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
     [profile, gaps.length, headline.age, year, month],
   )
-  // The verdict's age, put in dates: one cheap main-thread projection.
+  // The answer's age, put in dates: one cheap main-thread projection.
   const stop = useMemo(
     () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
     [profile, gaps.length, headline.age, year, month],
   )
-  const ages = Array.from({ length: MAX_AGE - firstAge + 1 }, (_, i) => firstAge + i)
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
   // re-rendered, and a quick second tap must build on the first, not on the stale list.
   const pending = useRef<{ text: string; at: number } | null>(null)
@@ -187,7 +223,7 @@ export function Resultats() {
     setParam('ages', text)
   }
   const toggle = (s: Selection) => commit(toggleSelection(latest(), s))
-  // A person with no name is « Moi » / « Conjoint·e », as on the profile page.
+  // A person with no name is « Moi » / « Partenaire », as on the profile page.
   const names = profile.household.persons.map((p, i) => p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse))
   // « Mon plan » always says the age: each person's own retirement age, once when they agree (« 60 »), else « 60 / 62 ».
   const planAges = [...new Set(profile.household.persons.map((p) => p.retirementAge))].join(' / ')
@@ -206,9 +242,15 @@ export function Resultats() {
     const cur = latest()
     if (!cur.includes(s)) commit(toggleSelection(cur, s))
   }
-
-  // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
-  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
+  // Any other age is typed: a box instead of one chip per age from today's to 70 — twenty look-alike pills were the page's
+  // loudest row, and the three milestones plus the answer's own age are what people actually compare against.
+  const [otherAge, setOtherAge] = useState<number | null>(null)
+  const addAge = (age: number | null) => {
+    setOtherAge(null)
+    if (age === null) return
+    const cur = latest()
+    if (!cur.includes(age)) commit(toggleSelection(cur, age))
+  }
 
   if (gaps.length > 0) {
     return (
@@ -221,11 +263,8 @@ export function Resultats() {
               <li key={g}>{r.gaps[g]}</li>
             ))}
           </ul>
-          <Link className="btn btn--sm" to="/">
+          <Link className="btn btn--primary btn--sm" to="/">
             {r.gaps.toProfile}
-          </Link>{' '}
-          <Link className="btn btn--sm btn--ghost" to="/hypotheses">
-            {r.gaps.toAssumptions}
           </Link>
         </div>
       </section>
@@ -237,306 +276,357 @@ export function Resultats() {
   const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
   // « Et si je dépensais moins ? » keeps its what-if amount in the address (`?spend=`) too; absent, the slider sits on the profile's own.
   const spend = parseSpend(params.get('spend')) ?? profile.household.spending.retiredToday
-  const toSpend = () => document.getElementById('depenser')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
 
-  // What would make the verdict more faithful — detectable absences only, never a guess about what the household owns.
+  // What would make the answer more precise — detectable absences only, never a guess about what the household owns.
   const refine = [
     ...(profile.household.persons.some((p) => p.salaryToday > 0 && Object.keys(p.earningsHistory).length === 0) ? (['statement'] as const) : []),
     ...(profile.household.persons.every((p) => p.accounts.rrsp.balance + p.accounts.tfsa.balance + p.accounts.nonReg.balance === 0) ? (['accounts'] as const) : []),
     ...(profile.household.spending.workingToday <= 0 && !retiredNow ? (['spendingWork'] as const) : []),
   ]
 
-  // The page's map, in reading order, grouped into its three arcs; a section that is not on the page has no chip.
+  // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [
-          { id: 'verdict', label: rc.nav.verdict },
-          { id: 'comparer', label: rc.nav.comparer },
-          { id: 'epargner', label: rc.nav.epargner },
-          ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }]),
-          ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
-        ]
+      ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }])]
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
         : [
-            { id: 'donnees-calcul', label: rc.nav.donneesCalcul },
+            { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
             { id: 'sensibilite', label: rc.nav.sensibilite },
             { id: 'parametres', label: rc.nav.parametres },
           ]
 
+  // The headline sentence with its age drawn large: the copy marks where the age sits, the page splits it there.
+  const sentence = retiredGlance ? rc.headline.retired(isCouple) : headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(AGE_TOKEN, isCouple)
+  const [sentenceBefore, sentenceAfter] = sentence.split(AGE_TOKEN)
+  const pct = (share: number) => formatPct(Math.min(1, share), lang, 0)
+  const money = (n: number) => formatMoney(n, lang)
+  const confidenceLine = accuracy.total > 0 && (
+    <p className="verdict__note refine__confidence">
+      {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
+      <Link className="info-note__link" to="/">
+        {rc.headline.confidenceLink}
+      </Link>
+    </p>
+  )
+
   return (
     <section className="page-body results-page" ref={pinned}>
-      <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
+      <PageHead title={r.title} />
+      {/* The three views stay pinned under the top bar while the page scrolls; the map of the open view pins under them from 860 px (usePinOffset measures both). */}
+      <div className="results-pin">
+        <SubTabs
+          ariaLabel={rc.tabs.label}
+          value={view}
+          onSelect={(v) => setParam('v', v === 'answer' ? null : v)}
+          options={[
+            { key: 'answer' as const, label: rc.tabs.answer },
+            { key: 'strategies' as const, label: rc.tabs.strategies },
+            { key: 'verify' as const, label: rc.tabs.verify },
+          ]}
+        />
+      </div>
+      <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
+
+      {/* 1 — what you asked: the answer, then the same answer compared, costed and dated. */}
+      {view === 'answer' && (
+        <section className="arc" aria-label={rc.tabs.answer}>
+          <div id="verdict" className="verdict surface results-section" aria-live="polite">
+            <p className="verdict__line">
+              {sentenceAfter === undefined ? (
+                sentenceBefore
+              ) : (
+                <>
+                  <span className="verdict__lead">{sentenceBefore}</span>
+                  <span className="verdict__big">
+                    <strong className="verdict__age">{rc.headline.ageText(headline.age!)}</strong>
+                    {sentenceAfter}
+                  </span>
+                </>
+              )}
+            </p>
+            {retiredGlance ? (
+              <>
+                <p className="verdict__note">
+                  {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(at(retiredGlance.now.firstShortfallYear! - 1))}{' '}
+                  {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
+                </p>
+                {activePreset !== 'prudent' && (retiredGlance.prudent.ok !== retiredGlance.now.ok || retiredGlance.prudent.firstShortfallYear !== retiredGlance.now.firstShortfallYear) && (
+                  <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear === null ? null : at(retiredGlance.prudent.firstShortfallYear - 1))}</p>
+                )}
+              </>
+            ) : headline.kind === 'none' ? (
+              <>
+                {/* The WORST answer must be the most actionable one: the nudge carries its doors, and each door opens. */}
+                <p className="verdict__note">{rc.headline.tryThis}</p>
+                <Cluster>
+                  <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
+                  <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
+                  <Chip onClick={() => goTo('verify', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
+                </Cluster>
+              </>
+            ) : (
+              <>
+                <p className="verdict__note">
+                  {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
+                </p>
+                {/* The answer in dates: the year each person reaches the age, and when the pensions carry the spending by themselves. */}
+                {stop !== null && (
+                  <div id="arreter" className="verdict__dates">
+                    <p className="verdict__range-title">{rc.questions.stop.title}</p>
+                    <ul className="verdict__dates-list">
+                      {stop.years.map((y, i) => (
+                        <li key={y.id}>{rc.questions.stop.when(names[i] ?? '', formatYearAge(y.year, births[i] === undefined ? [] : [births[i]], lang))}</li>
+                      ))}
+                      <li>{stop.pensionsStarted ? rc.questions.stop.share(pct(stop.pensionShare), at(stop.firstYear)) : rc.questions.stop.shareNone(at(stop.firstYear))}</li>
+                      {stop.allStarted !== null && <li>{rc.questions.stop.shareAll(pct(stop.allStarted.share), at(stop.allStarted.year))}</li>}
+                      <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
+                    </ul>
+                  </div>
+                )}
+                {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
+                <Cluster>
+                  <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
+                </Cluster>
+              </>
+            )}
+            {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,
+                not a joined sentence. The row is on the card from the first paint (… while the worker runs), so the
+                late answer fills boxes that already exist instead of growing the card under the reader. */}
+            {!retiredGlance && (
+              <div className="verdict__range">
+                <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
+                <dl className="verdict__range-list">
+                  {(['prudent', 'neutral', 'bold'] as const).map((k) => (
+                    <div key={k} className={'verdict__range-item' + (activePreset === k ? ' is-on' : '')}>
+                      <dt>{t.assumptions.presets[k]}</dt>
+                      <dd className="mono">{range === undefined ? '…' : range[k] === null ? rc.headline.rangeNone(MAX_AGE) : rc.headline.rangeAge(range[k]!)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {range !== undefined && prudentGap && (
+                  <Cluster className="verdict__gap">
+                    <p className="verdict__note">{rc.headline.rangeGap}</p>
+                    <Chip onClick={() => goTo('verify', 'sensibilite')}>{rc.headline.trySensitivity}</Chip>
+                  </Cluster>
+                )}
+              </div>
+            )}
+            {headline.age !== null && !retiredGlance && comfort !== undefined && (
+              <p className="verdict__note">
+                {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
+              </p>
+            )}
+            {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. Boxes from the first paint. */}
+            {!retiredGlance && (
+              <div className="verdict__range">
+                <p className="verdict__range-title">{mc.stress.title}</p>
+                <dl className="verdict__range-list">
+                  {(['smooth', ...STRESS_PRESETS] as const).map((k) => (
+                    <div key={k} className={'verdict__range-item' + (pathName === k ? ' is-on' : '')}>
+                      <dt>{mc.path.names[k]}</dt>
+                      <dd className="mono">{stress === undefined ? '…' : stress[k] === null ? mc.stress.none(MAX_AGE) : mc.stress.age(stress[k]!)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="verdict__note">
+                  {pathName !== 'smooth' && <>{mc.stress.active(mc.path.names[pathName])} </>}
+                  {mc.stress.hint}{' '}
+                  <Link className="info-note__link" to="/hypotheses">
+                    {mc.stress.link}
+                  </Link>
+                </p>
+              </div>
+            )}
+            {/* The changes a household could make, each tried alone and ranked by the years it gains. Rows from the first paint. */}
+            {!retiredGlance && (
+              <div className="verdict__range">
+                <p className="verdict__range-title">{lc.title}</p>
+                <ul className="levers__list">
+                  {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null }))).map((l) => (
+                    <li key={l.id} className="levers__item">
+                      <span>{lc.names[l.id]}</span>
+                      <span className="mono">
+                        {levers === undefined
+                          ? lc.pending
+                          : l.earliest === null
+                            ? lc.none
+                            : l.yearsGained === null
+                              ? lc.found(l.earliest)
+                              : l.yearsGained > 0
+                                ? lc.gain(l.yearsGained, l.earliest)
+                                : l.yearsGained === 0
+                                  ? lc.same
+                                  : lc.later(-l.yearsGained, l.earliest)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="verdict__note">{lc.hint}</p>
+              </div>
+            )}
+            {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
+                be present, not compete with the answer. */}
+            <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
+          </div>
+
+          {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
+          {(refine.length > 0 || accuracy.total > 0) && (
+            <div className="surface results-section refine" aria-label={rc.refine.title}>
+              <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
+              {confidenceLine}
+              {refine.length > 0 && (
+                <ul className="refine__list">
+                  {refine.map((k) => (
+                    <li key={k}>
+                      {rc.refine[k]} <Chip to="/">{rc.refine.toProfile}</Chip>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
+              is ONE section: the same runs, seen as cards, as a picture, and per person. */}
+          <section id="comparer" className="results-section" aria-label={r.compare.label}>
+            <SectionHeader title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} />
+            {!retiredNow && (
+              <div className="compare" ref={compareRef}>
+                <Rail role="group" aria-label={r.compare.label}>
+                  <Chip selected={selections.includes('plan')} onClick={() => toggle('plan')}>
+                    {r.compare.planAt(planAges)}
+                  </Chip>
+                  {milestoneAges(earliest, selections, firstAge).map((age) => (
+                    // The answer's own age wears a quiet accent dot: the one number the reader most wants to compare against.
+                    <Chip
+                      key={age}
+                      selected={selections.includes(age)}
+                      onClick={() => toggle(age)}
+                      className={age === earliest ? 'chip--earliest' : undefined}
+                      ariaLabel={age === earliest ? `${r.compare.age(age)} — ${rc.headline.earliestChip}` : undefined}
+                      title={age === earliest ? rc.headline.earliestChip : undefined}
+                    >
+                      {r.compare.age(age)}
+                    </Chip>
+                  ))}
+                  {selections.filter(isSplit).map((s) => (
+                    <Chip key={s} selected onClick={() => toggle(s)}>
+                      {label(s)}
+                    </Chip>
+                  ))}
+                </Rail>
+                <div className="compare__other">
+                  <label className="field-row__label" htmlFor="compare-other-age">
+                    {r.compare.otherAge}
+                  </label>
+                  <NumberField kind="int" allowEmpty min={firstAge} max={MAX_AGE} unit={t.fields.years} value={otherAge} onChange={addAge} id="compare-other-age" disabled={selections.length >= MAX_SELECTIONS} />
+                </div>
+                {selections.length >= MAX_SELECTIONS && <p className="field-row__hint">{r.compare.max}</p>}
+                {selections.includes('plan') && <p className="field-row__hint">{r.compare.planHint}</p>}
+              </div>
+            )}
+
+            <ul className="scenarios">
+              {runs.map(({ selection, result }, i) => (
+                <li key={String(selection)} className={`scenario scenario--${SERIES_CLASS[i]} surface`}>
+                  <p className="scenario__title">
+                    <span className="scenario__swatch" aria-hidden="true" />
+                    {r.scenario.retireAt(label(selection))}
+                  </p>
+                  <p className={'scenario__verdict' + (result.ok ? '' : ' scenario__verdict--short')}>{result.ok ? r.scenario.works(assumptions.horizonAge) : r.scenario.lastsUntil(at(result.firstShortfallYear! - 1))}</p>
+                  <p className="scenario__worth mono">{r.scenario.endWorth(money(worthAtHorizon(result, dollars, assumptions)))}</p>
+                </li>
+              ))}
+            </ul>
+            {/* The unit of every figure of the comparison, said once. */}
+            <p className="field-row__hint">{dollars === 'today' ? r.chart.todayHint : r.chart.nominalHint}</p>
+
+            {runs.length > 0 && (
+              <ChartPanel
+                runs={runs}
+                household={profile.household}
+                names={names}
+                todayYear={year}
+                inflation={assumptions.inflation}
+                metric={metric}
+                dollars={dollars}
+                onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}
+                label={label}
+              />
+            )}
+
+            {isCouple && !retiredNow && (
+              <div className="surface">
+                <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
+              </div>
+            )}
+          </section>
+
+          {/* The two other questions, answered in the same arc: views over the same profile and assumptions. */}
+          <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
+            <SectionHeader title={rc.questions.tabs.save} />
+            <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
+          </section>
+          {!retiredNow && (
+            <section id="depenser" className="results-section" aria-label={rc.questions.tabs.spend}>
+              <SectionHeader title={rc.questions.tabs.spend} />
+              <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
+            </section>
+          )}
+        </section>
+      )}
+
+      {/* 2 — two decisions: when to start the QPP and the OAS, and in which order to draw the accounts. Once every start is behind the household, nothing to choose. */}
+      {view === 'strategies' && (
+        <section className="arc" aria-label={rc.tabs.strategies}>
+          {state.pensionsOpen && (
+            <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
+              <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} />
+              <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
+            </section>
+          )}
+          <section id="ordre" className="results-section" aria-label={rc.orders.title}>
+            <SectionHeader title={rc.orders.title} />
+            {/* The age is the answer's; when no age works, the plan's own. Never the « Combien épargner ? » box from another view. */}
+            <OrderPanel household={profile.household} assumptions={assumptions} age={earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))} firstAge={firstAge} />
+          </section>
+        </section>
+      )}
+
+      {view === 'verify' && (
+        <section className="arc" aria-label={rc.tabs.verify}>
+          {/* The ages and figures that set the answer, with their calculation and a slider each. */}
+          <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
+            <SectionHeader title={LEDGER_COPY[lang].title} />
+            <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
+          </section>
+
+          <section id="tableau" className="results-section" aria-label={r.table.title}>
+            <SectionHeader title={r.table.title} />
+            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} />
+          </section>
+
+          <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
+            <SectionHeader title={r.sensitivity.title} subtitle={rc.headline.sensitivityDetail} />
+            <SensitivityPanel household={profile.household} assumptions={assumptions} />
+          </section>
+
+          <section id="parametres" className="results-section" aria-label={r.params.title}>
+            <SectionHeader title={r.params.title} />
+            <ParamsPanel />
+          </section>
+        </section>
+      )}
+
       {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
       <Cluster className="no-print">
         <Chip icon="printer-bold" onClick={() => window.print()}>
           {rc.out.print}
         </Chip>
       </Cluster>
-      {/* The three views stay pinned under the top bar while the page scrolls; the map of the open view pins under them from 860 px (usePinOffset measures both). */}
-      <div className="results-pin">
-      <SubTabs
-        ariaLabel={rc.tabs.label}
-        value={view}
-        onSelect={(v) => setParam('v', v === 'answer' ? null : v)}
-        options={[
-          { key: 'answer' as const, label: rc.tabs.answer },
-          { key: 'strategies' as const, label: rc.tabs.strategies },
-          { key: 'verify' as const, label: rc.tabs.verify },
-        ]}
-      />
-      </div>
-      <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
-
-      {/* 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
-      {view === 'answer' && (
-      <section className="arc" aria-label={rc.tabs.answer}>
-
-      <div id="verdict" className="verdict surface results-section" aria-live="polite">
-        <p className="verdict__line">
-          {retiredGlance ? rc.headline.retired(isCouple) : headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(headline.age!, isCouple)}
-        </p>
-        {retiredGlance ? (
-          <>
-            <p className="verdict__note">
-              {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(at(retiredGlance.now.firstShortfallYear!))}{' '}
-              {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
-            </p>
-            {activePreset !== 'prudent' && (retiredGlance.prudent.ok !== retiredGlance.now.ok || retiredGlance.prudent.firstShortfallYear !== retiredGlance.now.firstShortfallYear) && (
-              <p className="verdict__note">{rc.headline.retiredPrudent(t.assumptions.presets.prudent, retiredGlance.prudent.ok, retiredGlance.prudent.firstShortfallYear === null ? null : at(retiredGlance.prudent.firstShortfallYear))}</p>
-            )}
-          </>
-        ) : headline.kind === 'none' ? (
-          <>
-            {/* The WORST verdict must be the most actionable one: the nudge carries its two doors. */}
-            <p className="verdict__note">{rc.headline.tryThis}</p>
-            <Cluster>
-              <Chip icon="caret-down-bold" onClick={toSpend}>{rc.headline.trySpend}</Chip>
-              <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
-              <Chip onClick={() => document.getElementById('donnees-calcul')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })}>{rc.headline.tryLedger}</Chip>
-            </Cluster>
-          </>
-        ) : (
-          <>
-            <p className="verdict__note">
-              {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
-            </p>
-            {headline.earlierAge !== null && headline.earlierShortfallYear !== null && (
-              <p className="verdict__note">{rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear))}</p>
-            )}
-            {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
-            <Cluster>
-              <Chip icon="caret-down-bold" onClick={toSpend}>{rc.headline.trySpend}</Chip>
-            </Cluster>
-          </>
-        )}
-        {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,
-            not a joined sentence. The row is on the card from the first paint (… while the worker runs), so the
-            late answer fills boxes that already exist instead of growing the card under the reader. */}
-        {!retiredGlance && (
-          <div className="verdict__range">
-            <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
-            <dl className="verdict__range-list">
-              {(['prudent', 'neutral', 'bold'] as const).map((k) => (
-                <div key={k} className={'verdict__range-item' + (activePreset === k ? ' is-on' : '')}>
-                  <dt>{t.assumptions.presets[k]}</dt>
-                  <dd className="mono">{range === undefined ? '…' : range[k] === null ? rc.headline.rangeNone(MAX_AGE) : rc.headline.rangeAge(range[k]!)}</dd>
-                </div>
-              ))}
-            </dl>
-            {range !== undefined && prudentGap && <p className="verdict__note">{rc.headline.rangeGap}</p>}
-          </div>
-        )}
-        {headline.age !== null && !retiredGlance && comfort !== undefined && (
-          <p className="verdict__note">
-            {comfort === null
-              ? mc.income.none(headline.age)
-              : mc.income.line(headline.age, formatMoney(Math.round(comfort / 12 / 10) * 10, lang), formatMoney(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10, lang))}{' '}
-            {mc.income.note}
-          </p>
-        )}
-        {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. Boxes from the first paint. */}
-        {!retiredGlance && (
-          <div className="verdict__range">
-            <p className="verdict__range-title">{mc.stress.title}</p>
-            <dl className="verdict__range-list">
-              {(['smooth', ...STRESS_PRESETS] as const).map((k) => (
-                <div key={k} className={'verdict__range-item' + (pathName === k ? ' is-on' : '')}>
-                  <dt>{mc.path.names[k]}</dt>
-                  <dd className="mono">{stress === undefined ? '…' : stress[k] === null ? mc.stress.none(MAX_AGE) : mc.stress.age(stress[k]!)}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="verdict__note">
-              {pathName !== 'smooth' && <>{mc.stress.active(mc.path.names[pathName])} </>}
-              {mc.stress.hint}{' '}
-              <Link className="info-note__link" to="/hypotheses">
-                {mc.stress.link}
-              </Link>
-            </p>
-          </div>
-        )}
-        {/* How much of the answer stands on the person's own documents: the meter of the Profil, said where the answer is read. */}
-        {accuracy.total > 0 && (
-          <p className="verdict__note">
-            {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
-            <Link className="info-note__link" to="/">
-              {rc.headline.confidenceLink}
-            </Link>
-          </p>
-        )}
-        {/* The verdict is an estimate under stated assumptions, and it says so where it is read — quietly: it must
-            be present, not compete with the answer. */}
-        <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
-      </div>
-
-      {/* The refinement loop: the verdict stands on three numbers; these would sharpen it, each a link to its field. */}
-      {refine.length > 0 && (
-        <div className="surface results-section refine" aria-label={rc.refine.title}>
-          <SectionHeader title={rc.refine.title} subtitle={headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
-          <ul className="refine__list">
-            {refine.map((k) => (
-              <li key={k}>
-                {rc.refine[k]} <Chip to={k === 'spendingWork' ? '/hypotheses' : '/'}>{k === 'spendingWork' ? rc.refine.toAssumptions : rc.refine.toProfile}</Chip>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
-          is ONE section: the same runs, seen as cards, as a picture, and per person. */}
-      <section id="comparer" className="results-section" aria-label={r.compare.label}>
-      <SectionHeader title={r.compare.label} />
-      {!retiredNow && (
-        <div className="compare" ref={compareRef}>
-          <Rail role="group" aria-label={r.compare.label}>
-            <Chip selected={selections.includes('plan')} onClick={() => toggle('plan')}>
-              {r.compare.planAt(planAges)}
-            </Chip>
-            {ages.map((age) => (
-              // The verdict's own age wears a quiet accent dot: among ~20 look-alike chips, the one
-              // number the reader most wants to compare against must not be indistinguishable at #12.
-              <Chip
-                key={age}
-                selected={selections.includes(age)}
-                onClick={() => toggle(age)}
-                className={age === earliest ? 'chip--earliest' : undefined}
-                ariaLabel={age === earliest ? `${r.compare.age(age)} — ${rc.headline.earliestChip}` : undefined}
-                title={age === earliest ? rc.headline.earliestChip : undefined}
-              >
-                {r.compare.age(age)}
-              </Chip>
-            ))}
-            {selections.filter(isSplit).map((s) => (
-              <Chip key={s} selected onClick={() => toggle(s)}>
-                {label(s)}
-              </Chip>
-            ))}
-          </Rail>
-          {selections.length >= MAX_SELECTIONS && <p className="field-row__hint">{r.compare.max}</p>}
-          {selections.includes('plan') && <p className="field-row__hint">{r.compare.planHint}</p>}
-        </div>
-      )}
-
-      <ul className="scenarios">
-        {runs.map(({ selection, result }, i) => (
-          <li key={String(selection)} className={`scenario scenario--${SERIES_CLASS[i]} surface`}>
-            <p className="scenario__title">
-              <span className="scenario__swatch" aria-hidden="true" />
-              {r.scenario.retireAt(label(selection))}
-            </p>
-            <p className={'scenario__verdict' + (result.ok ? '' : ' scenario__verdict--short')}>{result.ok ? r.scenario.works : r.scenario.fails(at(result.firstShortfallYear!))}</p>
-            <p className="scenario__worth mono">{r.scenario.endWorth(formatMoney(worthAtHorizon(result, dollars, assumptions), lang), dollars === 'today' ? r.chart.today : r.chart.nominal)}</p>
-          </li>
-        ))}
-      </ul>
-
-      {runs.length > 0 && (
-        <ChartPanel
-          runs={runs}
-          household={profile.household}
-          assumptions={assumptions}
-          names={names}
-          todayYear={year}
-          inflation={assumptions.inflation}
-          metric={metric}
-          dollars={dollars}
-          onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}
-          label={label}
-        />
-      )}
-
-      {isCouple && !retiredNow && (
-        <div className="surface">
-          <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
-        </div>
-      )}
-      </section>
-
-      {/* The two other questions, answered in the same arc: views over the same profile and assumptions. */}
-      <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
-        <SectionHeader title={rc.questions.tabs.save} />
-        <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
-      </section>
-      {!retiredNow && (
-        <section id="depenser" className="results-section" aria-label={rc.questions.tabs.spend}>
-          <SectionHeader title={rc.questions.tabs.spend} />
-          <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
-        </section>
-      )}
-      {stop !== null && (
-        <section id="arreter" className="results-section" aria-label={rc.questions.tabs.stop}>
-          <SectionHeader title={rc.questions.tabs.stop} subtitle={rc.questions.stop.hint} />
-          <StopView names={names} births={births} stop={stop} />
-        </section>
-      )}
-      </section>
-      )}
-
-      {/* 2 — ONE decision (when to start the QPP and the OAS), two views of it: the strategies' effect on the
-          whole plan, then the rule, pension by pension. Once every start is behind the household, nothing to choose. */}
-      {view === 'strategies' && (
-        <section className="arc" aria-label={rc.tabs.strategies}>
-          {state.pensionsOpen && <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
-            <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} />
-            <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
-          </section>}
-          <section id="ordre" className="results-section" aria-label={rc.orders.title}>
-            <SectionHeader title={rc.orders.title} />
-            <OrderPanel household={profile.household} assumptions={assumptions} age={earliest ?? saveAge} firstAge={firstAge} />
-          </section>
-        </section>
-      )}
-
-      {view === 'verify' && (
-      <section className="arc" aria-label={rc.tabs.verify}>
-
-      {/* The ages and figures that set the answer, with their calculation and a slider each. */}
-      <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
-        <SectionHeader title={LEDGER_COPY[lang].title} />
-        <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
-      </section>
-
-      <section id="tableau" className="results-section" aria-label={r.table.title}>
-        <SectionHeader title={r.table.title} />
-        <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} />
-      </section>
-
-      <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
-        <SectionHeader title={r.sensitivity.title} subtitle={rc.headline.sensitivityDetail} />
-        <SensitivityPanel household={profile.household} assumptions={assumptions} />
-      </section>
-
-      <section id="parametres" className="results-section" aria-label={r.params.title}>
-        <SectionHeader title={r.params.title} />
-        <ParamsPanel />
-      </section>
-      </section>
-      )}
-
-      <NextStep to="/donnees" label={t.next.toData}>
+      <NextStep to="/hypotheses" label={t.next.adjustAssumptions}>
         <p>{t.next.resultsHint}</p>
       </NextStep>
     </section>

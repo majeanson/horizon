@@ -103,7 +103,10 @@ function save(): void {
 // edit not yet exported was made; past BACKUP_AFTER_MS the shell asks for an export. The first successful save also asks
 // the browser to treat the storage as durable, which spares it the idle-site eviction.
 const UNBACKED_KEY = 'horizon-unbacked-since'
+// « Plus tard » on the notice: it comes back after a week, not at the next reload — a nudge a person cannot put off is a nag.
+const SNOOZED_KEY = 'horizon-backup-snoozed-until'
 const BACKUP_AFTER_MS = 30 * 24 * 3600 * 1000
+const SNOOZE_MS = 7 * 24 * 3600 * 1000
 let persistAsked = false
 
 function noteUnbackedEdit(): void {
@@ -128,10 +131,21 @@ export function markExported(): void {
   notify()
 }
 
+/** « Plus tard » on the backup notice: silence it for a week. */
+export function snoozeBackup(): void {
+  try {
+    localStorage.setItem(SNOOZED_KEY, String(Date.now() + SNOOZE_MS))
+  } catch {
+    /* see noteUnbackedEdit */
+  }
+  notify()
+}
+
 export function backupDue(): boolean {
   try {
     const since = Number(localStorage.getItem(UNBACKED_KEY))
-    return since > 0 && Date.now() - since > BACKUP_AFTER_MS
+    const snoozedUntil = Number(localStorage.getItem(SNOOZED_KEY))
+    return since > 0 && Date.now() - since > BACKUP_AFTER_MS && !(snoozedUntil > Date.now())
   } catch {
     return false
   }
