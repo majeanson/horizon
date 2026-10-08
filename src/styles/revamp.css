@@ -113,33 +113,40 @@
 /* Account groups and a pension plan's rules are long runs of the same FieldRow. Stacked (label over box) they read as a
    wall; on a line (label left, box right) the eye runs down the labels and the amounts line up. The hint, when there is
    one, drops under the pair. Scoped to those containers: the quick start and the assumptions keep the stacked form. */
-.account-group .field-row,
-.plan-card .field-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(7.5rem, 11rem);
-  align-items: center;
-  column-gap: 0.75rem;
-  row-gap: 0.15rem;
+/* Only where the card is wide enough for a label AND a box that shows a nine-digit amount in full (a container query on the
+   section): in a half-width column, or on a phone, the field stays stacked — label over box — and nothing is ever cut off. */
+.profile-section {
+  container-type: inline-size;
 }
-.account-group .field-row__control,
-.plan-card .field-row__control {
-  grid-column: 2;
-  grid-row: 1;
-}
-.account-group .field-row__label,
-.plan-card .field-row__label {
-  grid-column: 1;
-  grid-row: 1;
-  font-weight: 500;
-}
-.account-group .field-row__hint,
-.plan-card .field-row__hint {
-  grid-column: 1 / -1;
-  grid-row: 2;
-}
-/* The plan's name is a text box: it needs the width, so it stays stacked. */
-.plan-card > .field-row:has(.edit-field) {
-  display: flex;
+@container (min-width: 32rem) {
+  .account-group .field-row,
+  .plan-card .field-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+    align-items: center;
+    column-gap: 0.75rem;
+    row-gap: 0.15rem;
+  }
+  .account-group .field-row__control,
+  .plan-card .field-row__control {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .account-group .field-row__label,
+  .plan-card .field-row__label {
+    grid-column: 1;
+    grid-row: 1;
+    font-weight: 500;
+  }
+  .account-group .field-row__hint,
+  .plan-card .field-row__hint {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  /* The plan's name is a text box: it needs the width, so it stays stacked. */
+  .plan-card > .field-row:has(.edit-field) {
+    display: flex;
+  }
 }
 
 /* ── Who: each person of a household has a quiet colour of their own ─────── */
@@ -158,11 +165,24 @@
   border-left: 4px solid var(--who);
   padding-left: 0.6rem;
 }
-.person.who {
+/* On the Profil the colour is not a bar over the column but the rounded left edge of EVERY card under the person (the edge
+   follows the card's corners), so it runs all the way down; the name above wears it too. */
+.persons--aligned .person.who {
   padding-left: 0;
   border-left: 0;
-  border-top: 4px solid var(--who);
-  padding-top: 0.6rem;
+}
+.persons--aligned .person.who > .profile-section {
+  border-left: 4px solid var(--who);
+}
+.person.who > .person__title {
+  border-left: 4px solid var(--who);
+  padding-left: 0.6rem;
+}
+/* The sliders panel: one block per person, the same edge (it has no cards inside). */
+.ledger__person.person.who {
+  border-left: 4px solid var(--who);
+  padding-left: 0.75rem;
+  border-radius: var(--radius-md);
 }
 
 /* ── Résultats: the views (and, from 860 px, the section map) pinned under the top bar ─────────────────────────────── */
@@ -272,4 +292,25 @@
   border-radius: 50%;
   background: var(--tone);
   flex: none;
+}
+
+/* ── Profil, two people: each section starts at the same height in both columns ──────────────────────────────────── */
+/* The two person columns share ONE set of rows (subgrid): the name, then the five sections in the same order, so « Pension de
+   la Sécurité de la vieillesse » begins at the same line for both, whatever the earnings history or the accounts add above it.
+   Side by side from 860 px only; below that they stack and there is nothing to align. */
+@media (min-width: 860px) {
+  .persons--aligned {
+    grid-template-rows: repeat(6, auto);
+    row-gap: 0;
+  }
+  .persons--aligned > .person {
+    display: grid;
+    grid-row: span 6;
+    grid-template-rows: subgrid;
+    row-gap: 1rem;
+    align-items: stretch;
+  }
+  .persons--aligned > .person > .profile-section {
+    align-self: stretch;
+  }
 }

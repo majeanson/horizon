@@ -78,7 +78,7 @@ export function Profil() {
         </aside>
       )}
       <FamilySection />
-      <div className={'persons' + (spouse ? ' persons--two' : '')}>
+      <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
         {profile.household.persons.map((p, i) => {
           const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
           return (

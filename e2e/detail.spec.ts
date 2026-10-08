@@ -114,3 +114,25 @@ test('« Mon plan » always says its age', async ({ page }) => {
   // (the card for it is folded into « Standard » when the plan's pension ages ARE the standard: the table lists it always)
   await expect(page.getByRole('rowheader', { name: /^Mon plan \(\d+ ans\)$/ })).toBeVisible({ timeout: 60_000 })
 })
+
+// Two people, one format: the same sections begin on the same line in both columns, each card wears its person's colour down
+// the left edge, and no amount is ever cut off by a box that is too narrow.
+test('two people on the Profil: sections start at the same height, the colour follows down, every input shows in full', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/')
+  const columns = page.locator('.persons--aligned > .person')
+  await expect(columns).toHaveCount(2)
+  const tops = async (col: number) => columns.nth(col).locator(':scope > .profile-section').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top + (document.getElementById('root')?.scrollTop ?? 0))))
+  expect(await tops(0)).toEqual(await tops(1))
+  expect((await tops(0)).length).toBe(5)
+  // The colour is the rounded left edge of every card, and the two people's differ.
+  const edge = (col: number) => columns.nth(col).locator(':scope > .profile-section').evaluateAll((els) => els.map((e) => getComputedStyle(e).borderLeftColor))
+  const first = await edge(0)
+  const second = await edge(1)
+  expect(new Set(first).size).toBe(1)
+  expect(new Set(second).size).toBe(1)
+  expect(first[0]).not.toBe(second[0])
+  // No input clips its text (a box too narrow for « 1 000 000 » showed « 30 ( »).
+  const clipped = await page.locator('.persons--aligned input').evaluateAll((els) => els.filter((e) => (e as HTMLInputElement).scrollWidth > (e as HTMLInputElement).clientWidth + 1).map((e) => e.id))
+  expect(clipped).toEqual([])
+})
