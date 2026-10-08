@@ -18,7 +18,7 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
       home: structuredClone(e.household.home ?? null),
     },
     children: [...e.children],
-    assumptions: structuredClone(assumptions),
+    assumptions: { surplusToRrsp: false, ...structuredClone(assumptions) },
     customScenario: null,
     confirmed: [],
   }

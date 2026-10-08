@@ -19,6 +19,7 @@ import { formatPct } from '../lib/format'
 import { applyPreset, restoreCustom, sameScenario, scenarioOf, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
+import { MARKET_COPY } from '../lib/marketCopy'
 import { useNotice } from '../lib/toast'
 
 // What the household assumes about the future, and what it spends. These are the person's own numbers: nothing
@@ -34,6 +35,7 @@ export function Hypotheses() {
   const notice = useNotice()
   const kept = profile.customScenario
   const active = presetOf(assumptions)
+  const m = MARKET_COPY[lang]
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const presetSummary = (key: PresetKey | 'kept') => {
     const v = key === 'kept' ? kept! : ASSUMPTION_PRESETS[key]
@@ -144,6 +146,13 @@ export function Hypotheses() {
           {a.splitting.on}
         </Chip>
         <p className="field-row__hint">{a.splitting.hint}</p>
+      </Section>
+
+      <Section title={m.surplus.title} icon="lock-bold">
+        <Chip selected={assumptions.surplusToRrsp === true} onClick={() => updateProfile((p) => setAssumptions(p, { surplusToRrsp: p.assumptions.surplusToRrsp !== true }))}>
+          {m.surplus.on}
+        </Chip>
+        <p className="field-row__hint">{m.surplus.hint}</p>
       </Section>
 
       {gaps.length === 0 ? (

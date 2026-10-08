@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 10
+export const SCHEMA_VERSION = 11
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -74,6 +74,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     horizonAge: 95,
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,
+    surplusToRrsp: false,
   },
   customScenario: null,
   confirmed: [],
@@ -321,6 +322,7 @@ export function validateProfile(raw: unknown): ProfileResult {
     horizonAge: r.num(a.horizonAge, 'assumptions.horizonAge', 80, 110, true),
     withdrawalOrder: order,
     pensionSplitting: r.bool(a.pensionSplitting, 'assumptions.pensionSplitting'),
+    surplusToRrsp: r.bool(a.surplusToRrsp, 'assumptions.surplusToRrsp'),
   }
 
   // The kept hand-typed scenario: null, or the same four figures as the assumptions, held to the same bounds.

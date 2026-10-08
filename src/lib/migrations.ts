@@ -66,6 +66,13 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     }
     return { ...profile, household: { ...(household as Raw), persons: persons.map(fixPerson) } }
   },
+  // v10 → v11: the assumptions may ask for the surplus to go to the REER first (`surplusToRrsp`). Every older file was computed with the
+  // surplus going to the TFSA and then the non-registered account: false.
+  (profile) => {
+    const a = profile.assumptions
+    if (typeof a !== 'object' || a === null || Array.isArray(a)) return profile
+    return { ...profile, assumptions: { surplusToRrsp: false, ...(a as Raw) } }
+  },
 ]
 
 export type ReadResult =

@@ -350,6 +350,34 @@ function simulateYear(
     baseBest = a.pensionSplitting && couple ? householdTax(baseIncomes, rules, { splitting: true }).split : { from: null, amount: 0 }
   }
 
+  // ── 2c. the surplus goes to the RRSP first, when the person asked for it and there is room ─────────────────────────
+  // A year that covers its spending with cash to spare, for someone still working with RRSP room open: the largest extra
+  // contribution (up to the room) that still leaves the year covered. It costs x and brings its deduction back, so the search
+  // runs on the tax function like every other decision here; whatever is left after it (the refund, the rest) goes to the TFSA
+  // and then the non-registered account below. Highest earner first (the deduction is worth most there).
+  if (a.surplusToRrsp === true && evaluate(fixedSplit()).cash - spending > 0.005) {
+    for (const i of people.map((_, k) => k).sort((x, y) => fixed[y].employment - fixed[x].employment)) {
+      const roomLeft = fixed[i].employment > 0 && fixed[i].age <= 71 ? Math.max(0, states[i].rrspRoom - fixed[i].rrspC - fixed[i].employerC) : 0
+      if (roomLeft <= 0.005) continue
+      const base = fixed[i].rrspC
+      const slack = (x: number) => {
+        fixed[i].rrspC = base + x
+        return evaluate(fixedSplit()).cash - spending
+      }
+      let lo = 0
+      let hi = roomLeft
+      if (slack(hi) >= -0.005) lo = hi
+      else for (let it = 0; it < 40 && hi - lo > 0.01; it++) {
+        const mid = (lo + hi) / 2
+        if (slack(mid) >= -0.005) lo = mid
+        else hi = mid
+      }
+      fixed[i].rrspC = base + lo
+    }
+    baseIncomes = incomes().persons
+    baseBest = a.pensionSplitting && couple ? householdTax(baseIncomes, rules, { splitting: true }).split : { from: null, amount: 0 }
+  }
+
   // ── 3–4. draw on the accounts, in order, until the need is met ────────────────────────────────
   let need = spending - evaluate(fixedSplit()).cash
   if (need > 0.005) {
