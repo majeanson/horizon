@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster, Rail } from '../components/Layout'
@@ -73,16 +73,22 @@ export function Resultats() {
   const r = t.results
   const rc = RESULTS_COPY[lang]
   const profile = useProfile()
+  // The ANSWER is derived from a deferred copy of the profile: a slider held on the arrow key or a figure typed digit by
+  // digit writes the profile many times a second, and the thirty-odd projections behind the answer (the earliest age, the
+  // monthly comfort, the comparisons, the dates) used to run again on EVERY write, on the page's own thread — twenty seconds
+  // of a frozen page for twenty key presses. Deferred, React lets the controls paint first and skips the answers nobody
+  // would have seen; the verdict catches up a beat after the hand stops. The controls themselves read the live profile.
+  const slow = useDeferredValue(profile)
   const [params, setParams] = useSearchParams()
   const { year, month } = today()
+  const slowAssumptions = useMemo(() => assumptionsOf(slow, { year, month }), [slow, year, month])
   // Everybody already stopped working: « when can I retire? » is answered, and what is left to say is whether the money lasts.
-  const state = useMemo(() => retirementState(profile.household, assumptionsOf(profile, { year, month })), [profile, year, month])
+  const state = useMemo(() => retirementState(slow.household, slowAssumptions), [slow, slowAssumptions])
   const retiredNow = state.everyoneRetired && profileGaps(profile).length === 0
   const retiredGlance = useMemo(() => {
     if (!retiredNow) return null
-    const a = assumptionsOf(profile, { year, month })
-    return { now: planGlance(profile.household, a), prudent: planGlance(profile.household, withPreset(a, 'prudent')) }
-  }, [retiredNow, profile, year, month])
+    return { now: planGlance(slow.household, slowAssumptions), prudent: planGlance(slow.household, withPreset(slowAssumptions, 'prudent')) }
+  }, [retiredNow, slow, slowAssumptions])
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
   const selections = parseSelections(params.get('ages'), defaultSelections(profile.household, state.everyoneRetired)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
   const metric: ChartMetric = params.get('metric') === 'income' ? 'income' : params.get('metric') === 'detail' ? 'detail' : 'netWorth'
@@ -94,7 +100,7 @@ export function Resultats() {
   const at = (y: number) => formatYearAge(y, births, lang)
   const isCouple = profile.household.persons.length === 2
   const accuracy = useMemo(() => accuracyOf(profile), [profile])
-  const earliestEachAnswer = useEarliestEach(profile.household, assumptions, isCouple && gaps.length === 0 && !retiredNow)
+  const earliestEachAnswer = useEarliestEach(slow.household, slowAssumptions, isCouple && gaps.length === 0 && !retiredNow)
 
   const setParam = useCallback(
     (key: string, value: string | null) =>
@@ -113,15 +119,15 @@ export function Resultats() {
   )
 
   const earliest = useMemo(
-    () => (gaps.length > 0 ? null : retireAt(profile.household, assumptionsOf(profile, { year, month }), { stopAtFirstOk: true }).earliestOk),
-    [profile, gaps.length, year, month],
+    () => (gaps.length > 0 ? null : retireAt(slow.household, slowAssumptions, { stopAtFirstOk: true }).earliestOk),
+    [slow, slowAssumptions, gaps.length],
   )
   // « Dès maintenant »: the earliest age found is only the first one tried (the oldest person's age today) and stopping today works.
-  const nowOk = useMemo(() => gaps.length === 0 && worksNow(profile.household, assumptionsOf(profile, { year, month }), earliest), [profile, gaps.length, earliest, year, month])
+  const nowOk = useMemo(() => gaps.length === 0 && worksNow(slow.household, slowAssumptions, earliest), [slow, slowAssumptions, gaps.length, earliest])
   const picked = formatSelections(selections)
   const runs = useMemo(
-    () => (gaps.length > 0 ? [] : runSelections(profile, { year, month }, parseSelections(picked, []))),
-    [profile, gaps.length, year, month, picked],
+    () => (gaps.length > 0 ? [] : runSelections(slow, { year, month }, parseSelections(picked, []))),
+    [slow, gaps.length, year, month, picked],
   )
 
   // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
@@ -185,28 +191,28 @@ export function Resultats() {
   // an empty compare rail and an age box whose min sat over its max.
   const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, oldest))
   const headline = useMemo(
-    () => (gaps.length > 0 ? headlineOf(profile.household, assumptionsOf(profile, { year, month }), null, firstAge, youngest) : headlineOf(profile.household, assumptionsOf(profile, { year, month }), earliest, firstAge, youngest, nowOk)),
-    [profile, gaps.length, earliest, nowOk, firstAge, youngest, year, month],
+    () => (gaps.length > 0 ? headlineOf(slow.household, slowAssumptions, null, firstAge, youngest) : headlineOf(slow.household, slowAssumptions, earliest, firstAge, youngest, nowOk)),
+    [slow, slowAssumptions, gaps.length, earliest, nowOk, firstAge, youngest],
   )
   // The answer under each ready-made scenario (off the page's thread): the answer's own range line, and the
   // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
   const activePreset = presetOf(assumptions)
-  const range = usePresetRange(profile.household, assumptions, gaps.length === 0)
-  const stress = useMarketRange(profile.household, assumptions, gaps.length === 0)
+  const range = usePresetRange(slow.household, slowAssumptions, gaps.length === 0)
+  const stress = useMarketRange(slow.household, slowAssumptions, gaps.length === 0)
   const mc = MARKET_COPY[lang]
   const lc = LEVERS_COPY[lang]
-  const levers = useLevers(profile.household, assumptions, gaps.length === 0)
+  const levers = useLevers(slow.household, slowAssumptions, gaps.length === 0)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
   // What the answer's age can fund each month: the retired spending turned round (engine/maxSpending.ts), after tax, today's dollars.
   const comfort = useMemo(
-    () => (gaps.length > 0 || headline.age === null ? undefined : maxRetiredSpending(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
-    [profile, gaps.length, headline.age, year, month],
+    () => (gaps.length > 0 || headline.age === null ? undefined : maxRetiredSpending(slow.household, slowAssumptions, headline.age)),
+    [slow, slowAssumptions, gaps.length, headline.age],
   )
   // The answer's age, put in dates: one cheap main-thread projection.
   const stop = useMemo(
-    () => (gaps.length > 0 || headline.age === null ? null : stopWorking(profile.household, assumptionsOf(profile, { year, month }), headline.age)),
-    [profile, gaps.length, headline.age, year, month],
+    () => (gaps.length > 0 || headline.age === null ? null : stopWorking(slow.household, slowAssumptions, headline.age)),
+    [slow, slowAssumptions, gaps.length, headline.age],
   )
   // The comparisons as the LAST click left them: the URL (and so `selections`) only catches up when the page has
   // re-rendered, and a quick second tap must build on the first, not on the stale list.
