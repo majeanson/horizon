@@ -60,7 +60,7 @@ test.describe('a blank profile', () => {
     const age = box(page, 'Âge où le revenu de travail s’arrête')
     await age.fill('12')
     await age.blur()
-    await expect(page.getByRole('alert').filter({ hasText: 'Entre 40 et 80' })).toBeVisible()
+    await expect(page.getByRole('alert').filter({ hasText: 'Entre 18 et 80' })).toBeVisible()
     await expect(age).toHaveValue('12')
     expect((await savedProfile(page)).household.persons[0].retirementAge).toBe(65)
     await age.fill('62')

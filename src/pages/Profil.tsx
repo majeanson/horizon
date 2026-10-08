@@ -83,9 +83,9 @@ export function Profil() {
           const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
           return (
             // Keyed by person: a removed spouse unmounts, so no typed-but-uncommitted text crosses over.
-            <section key={p.id} id={`person-${p.id}`} className="person" aria-label={name}>
-              {spouse && <h2 className="person__title">{name}</h2>}
-              <SectionLevel.Provider value={spouse ? 3 : 2}>
+            <section key={p.id} id={`person-${p.id}`} className={`person who who--${Math.min(i, 1)}`} aria-label={name}>
+              <h2 className="person__title">{name}</h2>
+              <SectionLevel.Provider value={3}>
                 <PersonFields id={p.id} />
               </SectionLevel.Provider>
             </section>

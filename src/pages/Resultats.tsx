@@ -23,7 +23,7 @@ import { retireAt } from '../engine/retireAt'
 import { planGlance, retirementState } from '../engine/ledger'
 import { withPreset } from '../engine/assumptionPresets'
 import { useLang, useT } from '../i18n'
-import type { Dollars, Metric } from '../lib/chartData'
+import type { ChartMetric, Dollars } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { presetOf } from '../engine/assumptionPresets'
 import { formatYearAge } from '../lib/format'
@@ -68,7 +68,7 @@ export function Resultats() {
   }, [retiredNow, profile, year, month])
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
   const selections = parseSelections(params.get('ages'), defaultSelections(profile.household, state.everyoneRetired)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
-  const metric: Metric = params.get('metric') === 'income' ? 'income' : 'netWorth'
+  const metric: ChartMetric = params.get('metric') === 'income' ? 'income' : params.get('metric') === 'detail' ? 'detail' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
   const gaps = profileGaps(profile)
   const assumptions = assumptionsOf(profile, { year, month })
@@ -248,6 +248,14 @@ export function Resultats() {
   return (
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
+      {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
+      <Cluster className="no-print">
+        <Chip icon="printer-bold" onClick={() => window.print()}>
+          {rc.out.print}
+        </Chip>
+      </Cluster>
+      {/* The three views and the map of the open one stay pinned under the top bar while the page scrolls. */}
+      <div className="results-pin">
       <SubTabs
         ariaLabel={rc.tabs.label}
         value={view}
@@ -259,12 +267,7 @@ export function Resultats() {
         ]}
       />
       <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
-      {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
-      <Cluster className="no-print">
-        <Chip icon="printer-bold" onClick={() => window.print()}>
-          {rc.out.print}
-        </Chip>
-      </Cluster>
+      </div>
 
       {/* 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
       {view === 'answer' && (
@@ -396,6 +399,8 @@ export function Resultats() {
         <ChartPanel
           runs={runs}
           household={profile.household}
+          assumptions={assumptions}
+          names={names}
           todayYear={year}
           inflation={assumptions.inflation}
           metric={metric}

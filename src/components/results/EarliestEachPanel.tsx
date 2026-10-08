@@ -47,7 +47,7 @@ export function EarliestEachPanel({
             const firstIsMe = household.persons[0].id === a.id
             const pair: [number, number] = firstIsMe ? [a.earliestOk, a.other.heldAt] : [a.other.heldAt, a.earliestOk]
             return (
-              <li key={a.id} className="verdict__each-row">
+              <li key={a.id} className={`verdict__each-row who who--${Math.min(household.persons.findIndex((p) => p.id === a.id), 1)}`}>
                 <span>{e.line(me, a.earliestOk, other, a.other.heldAt)}</span>{' '}
                 <Chip onClick={() => onCompare(pair[0], pair[1])} disabled={compareDisabled} ariaLabel={e.compareLabel(me, a.earliestOk, other, a.other.heldAt)}>
                   {e.compare}

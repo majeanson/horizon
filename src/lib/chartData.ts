@@ -1,5 +1,7 @@
 import type { ChartMarker, ChartSeries, SeriesColour } from '../components/charts/types.ts'
-import type { AgeResult, Household, YearRow } from '../engine/types.ts'
+import { PRESET_KEYS, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
+import { project } from '../engine/projection.ts'
+import type { AgeResult, Assumptions, Household, Scenario, YearRow } from '../engine/types.ts'
 import { selectionAge, type Selection } from './resultsModel.ts'
 
 // From the engine's year rows to what the chart draws: which number, in which dollars, for which scenario.
@@ -49,4 +51,70 @@ export function retirementMarkers(
     label: label(selection),
     colour: SERIES_COLOURS[i % SERIES_COLOURS.length],
   }))
+}
+
+// ── The whole picture, not only the net worth ────────────────────────────────────────────────────────────────────────
+// « Détail »: where each year's money comes from (work, pension plan, RRQ, OAS and its supplements, savings drawn), what the
+// accounts hold, and the same plan under the three sets of hypotheses. Everything is read from the engine's rows, for the
+// household or for one person, so the bars and the per-year table can never disagree.
+
+/** The chart's choices: the two single-line measures, or the detail (bars). */
+export type ChartMetric = Metric | 'detail'
+
+export const SOURCE_SEGMENTS = ['work', 'db', 'rrq', 'oas', 'nest'] as const
+export type SourceSegment = (typeof SOURCE_SEGMENTS)[number]
+export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: 'ink', db: 'sky', rrq: 'sage', oas: 'berry', nest: 'accent' }
+
+export const BALANCE_SEGMENTS = ['rrsp', 'tfsa', 'nonReg'] as const
+export type BalanceSegment = (typeof BALANCE_SEGMENTS)[number]
+export const BALANCE_COLOUR: Record<BalanceSegment, SeriesColour> = { rrsp: 'accent', tfsa: 'sage', nonReg: 'sky' }
+
+interface Scale {
+  dollars: Dollars
+  todayYear: number
+  inflation: number
+}
+const scaleOf = (row: YearRow, s: Scale): number => (s.dollars === 'today' ? deflator(row.year, s.todayYear, s.inflation) : 1)
+const peopleOf = (row: YearRow, who: string | null) => Object.entries(row.persons).filter(([id]) => who === null || id === who).map(([, p]) => p)
+
+/** One bar per year: the sources of the year's money, for the household (`who` null) or one person. `need` (spending + tax) is the household's only. */
+export function sourceBars(rows: readonly YearRow[], who: string | null, s: Scale): ({ x: number; need: number } & Record<SourceSegment, number>)[] {
+  return rows.map((row) => {
+    const k = scaleOf(row, s)
+    let work = 0, db = 0, rrq = 0, oas = 0, nest = 0
+    for (const p of peopleOf(row, who)) {
+      work += p.employment
+      db += p.db
+      rrq += p.rrq
+      oas += p.oas + p.allowance + p.gis
+      nest += p.withdrawals.rrsp + p.withdrawals.tfsa + p.withdrawals.nonReg
+    }
+    return { x: row.year, need: who === null ? (row.household.spending + row.household.tax) / k : 0, work: work / k, db: db / k, rrq: rrq / k, oas: oas / k, nest: nest / k }
+  })
+}
+
+/** One bar per year: what each kind of account holds at year end. */
+export function balanceBars(rows: readonly YearRow[], who: string | null, s: Scale): ({ x: number } & Record<BalanceSegment, number>)[] {
+  return rows.map((row) => {
+    const k = scaleOf(row, s)
+    const out = { x: row.year, rrsp: 0, tfsa: 0, nonReg: 0 }
+    for (const p of peopleOf(row, who)) for (const a of BALANCE_SEGMENTS) out[a] += p.balancesEnd[a] / k
+    return out
+  })
+}
+
+/** The same scenario's net worth under each set of hypotheses, one line each. */
+export function hypothesisSeries(
+  household: Household,
+  assumptions: Assumptions,
+  scenario: Scenario,
+  s: Scale,
+  labels: Record<PresetKey, string>,
+): ChartSeries[] {
+  const colour: Record<PresetKey, SeriesColour> = { prudent: 'sky', neutral: 'accent', bold: 'sage' }
+  return PRESET_KEYS.map((key) => {
+    const a = withPreset(assumptions, key)
+    const rows = project(household, a, scenario)
+    return { id: key, label: labels[key], colour: colour[key], points: rows.map((row) => ({ x: row.year, y: row.household.netWorthEnd / (s.dollars === 'today' ? deflator(row.year, s.todayYear, a.inflation) : 1) })) }
+  })
 }

@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { makeRrqRules } from '../../engine/rrqRules'
-import { useT } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { fillFromSalary, historyYears } from '../../lib/earnings'
+import { formatYearAge } from '../../lib/format'
 import { setEarning } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -17,23 +18,12 @@ import { Section, type PersonEditor } from './shared'
 
 export function RrqSection({ person, edit }: PersonEditor) {
   const t = useT()
+  const { lang } = useLang()
   const r = t.profile.rrq
   const { assumptions } = useProfile()
   const now = today()
   const rules = useMemo(() => makeRrqRules({ inflation: assumptions.inflation, wageGrowth: assumptions.wageGrowth }), [assumptions.inflation, assumptions.wageGrowth])
   const years = useMemo(() => historyYears(person, now.year - 1), [person, now.year])
-  // The grid in decades, mirroring the relevé's own table, so a 40-year history reads as four
-  // labelled bands instead of one unbroken wall of boxes.
-  const decades = useMemo(() => {
-    const groups: { from: number; years: number[] }[] = []
-    for (const y of years) {
-      const from = Math.floor(y / 10) * 10
-      const last = groups[groups.length - 1]
-      if (last && last.from === from) last.years.push(y)
-      else groups.push({ from, years: [y] })
-    }
-    return groups
-  }, [years])
   const typed = Object.keys(person.earningsHistory).length
   // The note under the fill action and, while nothing else has been touched since, the way back:
   // one tap writes ~30 estimated years that are indistinguishable from typed ones afterward, so the
@@ -75,29 +65,29 @@ export function RrqSection({ person, edit }: PersonEditor) {
               {filledNote.before !== null && <Chip onClick={unfill}>{r.fillUndo}</Chip>}
             </div>
           )}
-          {decades.map((d) => (
-            <div key={d.from} className="earnings__decade">
-              <p className="earnings__decade-label mono">{r.decade(d.from)}</p>
-              <div className="earnings__grid">
-                {d.years.map((year) => (
-                  <div key={year} className="earnings__cell">
-                    <span className="earnings__year mono" aria-hidden="true">{year}</span>
-                    <NumberField
-                      kind="money"
-                      allowEmpty
-                      max={1e9}
-                      value={person.earningsHistory[year] ?? null}
-                      onChange={(v) => {
-                        setFilledNote(null)
-                        edit((x) => setEarning(x, year, v))
-                      }}
-                      ariaLabel={r.earningsYear(year)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          {/* One line per year, oldest first, like the relevé: the year (with the age it falls at) on the left, the amount on the right. */}
+          <div className="earnings__head" aria-hidden="true">
+            <span>{r.colYear}</span>
+            <span>{r.colAmount}</span>
+          </div>
+          <ul className="earnings__list">
+            {years.map((year) => (
+              <li key={year} className="earnings__row">
+                <span className="earnings__year mono" aria-hidden="true">{formatYearAge(year, [person.birth.year], lang)}</span>
+                <NumberField
+                  kind="money"
+                  allowEmpty
+                  max={1e9}
+                  value={person.earningsHistory[year] ?? null}
+                  onChange={(v) => {
+                    setFilledNote(null)
+                    edit((x) => setEarning(x, year, v))
+                  }}
+                  ariaLabel={r.earningsYear(year)}
+                />
+              </li>
+            ))}
+          </ul>
         </div>
 
     </Section>

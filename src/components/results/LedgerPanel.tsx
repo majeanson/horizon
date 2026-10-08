@@ -137,13 +137,15 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
       <p className="field-row__hint">{c.hint}</p>
       {/* Two views, one store: these sliders and the Profil / Hypothèses fields write the same profile. */}
       <p className="field-row__hint">{c.sameStore}</p>
+      {/* The same frame as the Profil: one column per person, a coloured top bar and the name — whether there is one or two. */}
+      <div className={'persons' + (ledger.length > 1 ? ' persons--two' : '')}>
       {ledger.map((l, i) => {
         const was = opened.ledger.find((x) => x.id === l.id)!
         const name = names[i] ?? ''
         const p = household.persons[i]
         return (
-          <section key={l.id} className="ledger__person" aria-label={c.person(name)}>
-            {household.persons.length > 1 && <h3 className="year-table__title">{c.person(name)}</h3>}
+          <section key={l.id} className={`ledger__person person who who--${Math.min(i, 1)}`} aria-label={c.person(name)}>
+            <h3 className="year-table__title">{c.person(name)}</h3>
             <Chip to={`/?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
             <div className="ledger__row">
               {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge, l.retirement.done)}
@@ -168,6 +170,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
           </section>
         )
       })}
+      </div>
 
       <section className="ledger__person" aria-label={c.moneyTitle}>
         <h3 className="year-table__title">{c.moneyTitle}</h3>

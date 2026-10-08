@@ -7,6 +7,9 @@ import type { AgeResult, Assumptions, Household, PersonId, RetireAtResult, Scena
 // horizon age of the youngest person. That is a deliberately plain definition — it says nothing about how
 // comfortable the end is, which is what the net worth at the horizon is shown for.
 
+/** The youngest retirement age anyone is asked about: the age of majority, so any adult can check their own case. */
+export const MIN_TRY_AGE = 18
+
 const lastRow = (rows: readonly YearRow[]): YearRow => rows[rows.length - 1]
 
 /** The household's own age: the age a person reaches this calendar year. */
@@ -28,7 +31,7 @@ export function runScenario(h: Household, a: Assumptions, scenario: Scenario, ag
 }
 
 export interface RetireAtOptions {
-  /** The youngest age to try (default 50). Never below an age someone has already passed. */
+  /** The youngest age to try (default 18, the age of majority — so anyone can check). Never below an age someone has already passed. */
   from?: number
   /** The oldest age to try (default 70). */
   to?: number
@@ -44,7 +47,7 @@ export interface RetireAtOptions {
  */
 export function retireAt(h: Household, a: Assumptions, options: RetireAtOptions = {}): RetireAtResult {
   const oldest = Math.max(0, ...h.persons.map((p) => ageThisYear(h, a, p.id)))
-  const from = Math.max(options.from ?? 50, oldest)
+  const from = Math.max(options.from ?? MIN_TRY_AGE, oldest)
   const to = Math.max(from, options.to ?? 70)
   const build = options.scenario ?? ((age: number) => everyoneAt(h, age))
   const byAge: AgeResult[] = []
@@ -95,7 +98,7 @@ export function earliestEach(h: Household, a: Assumptions, options: EarliestEach
   return h.persons.map((p) => {
     const other = h.persons.length === 2 ? h.persons.find((q) => q.id !== p.id)! : null
     const heldAt = other ? (options.heldAt?.[other.id] ?? other.retirementAge) : 0
-    const from = Math.max(options.from ?? 50, ageThisYear(h, a, p.id))
+    const from = Math.max(options.from ?? MIN_TRY_AGE, ageThisYear(h, a, p.id))
     const to = Math.max(from, options.to ?? 70)
     const scenario = (age: number): Scenario => ({ retirementAge: { ...(other ? { [other.id]: heldAt } : {}), [p.id]: age } })
     // Not `retireAt`: it never tries an age below the OLDEST person's, and here each person's range starts at their own.

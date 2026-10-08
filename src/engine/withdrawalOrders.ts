@@ -1,4 +1,4 @@
-import { everyoneAt, retireAt, runScenario } from './retireAt.ts'
+import { MIN_TRY_AGE, everyoneAt, retireAt, runScenario } from './retireAt.ts'
 import type { AccountKind, Assumptions, Household } from './types.ts'
 
 // « In which order should the accounts be drawn? » — the same plan run once per order of the three accounts (six), so a
@@ -45,7 +45,7 @@ export interface WithdrawalOrders {
 
 const sameOrder = (a: readonly AccountKind[], b: readonly AccountKind[]) => a.length === b.length && a.every((k, i) => k === b[i])
 
-export function withdrawalOrders(h: Household, a: Assumptions, age: number, firstAge = 50, lastAge = 70): WithdrawalOrders {
+export function withdrawalOrders(h: Household, a: Assumptions, age: number, firstAge = MIN_TRY_AGE, lastAge = 70): WithdrawalOrders {
   const outcomes: OrderOutcome[] = ALL_ORDERS.map((order) => {
     const withOrder: Assumptions = { ...a, withdrawalOrder: order }
     const earliestOk = retireAt(h, withOrder, { from: firstAge, to: lastAge, stopAtFirstOk: true }).earliestOk

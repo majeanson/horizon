@@ -27,7 +27,7 @@ export function AboutSection({ person, edit }: PersonEditor) {
       </FieldRow>
       <FieldRow label={a.retirementAge} hint={a.retirementHint}>
         {(w) => (
-          <NumberField kind="int" min={40} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
+          <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
       <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint}>

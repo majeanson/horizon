@@ -43,7 +43,15 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
   // inside the rail ('nearest': it only moves when the mark actually left the visible run).
   useEffect(() => {
     if (inView === null) return
-    navRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest', inline: 'nearest' })
+    // Sideways inside the rail ONLY. `scrollIntoView` also scrolls every ancestor, and while a tapped chip's smooth scroll is
+    // still running it cancelled the page's own scroll half-way (the map is now pinned, so the chip is always « in view »
+    // vertically and the browser had nothing to do but fight the page).
+    const rail = navRef.current?.querySelector<HTMLElement>('.rail')
+    const chip = navRef.current?.querySelector<HTMLElement>('[aria-current="true"]')
+    if (!rail || !chip) return
+    const c = chip.getBoundingClientRect()
+    const box = rail.getBoundingClientRect()
+    if (c.left < box.left || c.right > box.right) rail.scrollTo({ left: Math.max(0, rail.scrollLeft + (c.left - box.left) - (box.width - c.width) / 2), behavior: scrollBehavior() })
   }, [inView])
 
   return (

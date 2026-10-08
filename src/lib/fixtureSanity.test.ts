@@ -41,7 +41,7 @@ function violations(h: Household, children: readonly number[] = []): string[] {
     const who = p.id
     const a = age(p.birth.year)
     if (a < 18 || a > 100) add('age', who, `${a} years old`)
-    if (p.retirementAge < 50 || p.retirementAge > 75) add('retirement-age', who, `retires at ${p.retirementAge}`)
+    if (p.retirementAge < 18 || p.retirementAge > 75) add('retirement-age', who, `retires at ${p.retirementAge}`)
     if (p.rrq.startAge < 60 || p.rrq.startAge > 72) add('rrq-start', who, `QPP at ${p.rrq.startAge}`)
     if (p.oas.startAge < 65 || p.oas.startAge > 70) add('oas-start', who, `OAS at ${p.oas.startAge}`)
     if (p.oas.residentSince < p.birth.year + 18) add('residence', who, `resident since ${p.oas.residentSince}, before turning 18`)

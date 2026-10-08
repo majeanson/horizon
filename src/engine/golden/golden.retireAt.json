@@ -2,6 +2,18 @@
  "earliestOk": 59,
  "byAge": [
   {
+   "age": 48,
+   "ok": false,
+   "firstShortfallYear": 2030,
+   "netWorthAtHorizon": 0
+  },
+  {
+   "age": 49,
+   "ok": false,
+   "firstShortfallYear": 2032,
+   "netWorthAtHorizon": 0
+  },
+  {
    "age": 50,
    "ok": false,
    "firstShortfallYear": 2033,

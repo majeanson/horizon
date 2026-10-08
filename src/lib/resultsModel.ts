@@ -1,4 +1,4 @@
-import { everyoneAt, runScenario } from '../engine/retireAt.ts'
+import { MIN_TRY_AGE, everyoneAt, runScenario } from '../engine/retireAt.ts'
 import type { AgeResult, Assumptions, Household, Scenario } from '../engine/types.ts'
 import type { Profile } from './schema.ts'
 
@@ -12,7 +12,7 @@ import type { Profile } from './schema.ts'
 export type Split = `${number}-${number}`
 export type Selection = 'plan' | number | Split
 
-export const MIN_AGE = 50
+export const MIN_AGE = MIN_TRY_AGE
 export const MAX_AGE = 70
 export const MAX_SELECTIONS = 4
 

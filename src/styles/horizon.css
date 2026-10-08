@@ -344,22 +344,28 @@
 .earnings__tools .chip {
   justify-self: start;
 }
-.earnings__grid {
+/* One line per year, like the relevé: the year with its age on the left, the amount on the right.
+   The two columns are shared by the header and every row so the amounts line up down the page. */
+.earnings__head,
+.earnings__row {
   display: grid;
-  /* 8.5rem: two columns fit a 360 px phone (the cells hold a 6-digit amount, nothing longer).
-     At 11rem the grid collapsed to ONE column there — a 30-to-60-field scroll that buried the
-     statement-check fields below it. */
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  grid-template-columns: minmax(8rem, 40%) minmax(0, 1fr);
+  align-items: center;
   gap: 0.6rem;
 }
-/* The grid in decades, like the relevé's own table: the eye lands on « Années 1990 » on both. */
-.earnings__decade {
-  margin-top: 0.6rem;
-}
-.earnings__decade-label {
-  margin: 0 0 0.35rem;
+.earnings__head {
   font-size: var(--text-xs);
   color: var(--ink-soft);
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.earnings__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 /* The « nouvelle version prête » row: the deploy notice that replaced the under-the-reader reload. */
 .sw-update {
@@ -380,12 +386,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.3rem 0.75rem;
-}
-.earnings__cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
 }
 .earnings__year {
   font-size: var(--text-xs);

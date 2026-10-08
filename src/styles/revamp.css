@@ -53,7 +53,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  scroll-margin-top: 7.5rem;
+  /* clear of the top bar AND the pinned views + map (.results-pin) */
+  scroll-margin-top: 13rem;
   min-width: 0;
 }
 /* A group label inside the sticky map: reading order only, never a control. */
@@ -106,4 +107,98 @@
   gap: 0.6rem;
   padding-top: 0.6rem;
   border-top: 1px solid var(--line);
+}
+
+/* ── Dense forms: one line per field ─────────────────────────────────────── */
+/* Account groups and a pension plan's rules are long runs of the same FieldRow. Stacked (label over box) they read as a
+   wall; on a line (label left, box right) the eye runs down the labels and the amounts line up. The hint, when there is
+   one, drops under the pair. Scoped to those containers: the quick start and the assumptions keep the stacked form. */
+.account-group .field-row,
+.plan-card .field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(7.5rem, 11rem);
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.15rem;
+}
+.account-group .field-row__control,
+.plan-card .field-row__control {
+  grid-column: 2;
+  grid-row: 1;
+}
+.account-group .field-row__label,
+.plan-card .field-row__label {
+  grid-column: 1;
+  grid-row: 1;
+  font-weight: 500;
+}
+.account-group .field-row__hint,
+.plan-card .field-row__hint {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+/* The plan's name is a text box: it needs the width, so it stays stacked. */
+.plan-card > .field-row:has(.edit-field) {
+  display: flex;
+}
+
+/* ── Who: each person of a household has a quiet colour of their own ─────── */
+/* The first person is the marigold accent, the second the sky: a bar beside a name, never the only cue (the name is
+   always written). Index = position in the household, so it holds on every page. */
+.who--0 {
+  --who: var(--marigold-deep);
+}
+.who--1 {
+  --who: var(--sky-deep);
+}
+.who--all {
+  --who: var(--ink-faint);
+}
+.who {
+  border-left: 4px solid var(--who);
+  padding-left: 0.6rem;
+}
+.person.who {
+  padding-left: 0;
+  border-left: 0;
+  border-top: 4px solid var(--who);
+  padding-top: 0.6rem;
+}
+
+/* ── Résultats: the views and the section map pinned together ────────────── */
+/* One sticky block (not two stacked sticky rows, whose offsets drift with text size): the three views, then the map of
+   the open one. It rides under the top bar on every width, so a reader deep in the table can still switch view. */
+.results-pin {
+  position: sticky;
+  top: var(--bar-h);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0.35rem var(--gutter) 0;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.results-pin .section-nav {
+  position: static;
+  margin: 0;
+  padding: 0 0 0.35rem;
+  border-bottom: 0;
+}
+
+/* ── Résultats: the chart's « Détail » view — the same shape for one person or two ─────────────────────── */
+.chart-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.chart-detail__who {
+  margin: 0.25rem 0 0;
+  font-size: var(--text-md);
+}
+.chart-detail__heading {
+  margin: 0.6rem 0 0;
+  font-size: var(--text-sm);
 }

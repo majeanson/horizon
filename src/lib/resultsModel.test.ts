@@ -47,7 +47,7 @@ describe('the chips in the address bar', () => {
 
   it('reads « plan » and ages, drops what is unreadable or out of range, and de-duplicates', () => {
     expect(parseSelections('plan,60,65', NONE)).toEqual(['plan', 60, 65])
-    expect(parseSelections('49,71,abc,60,60,6', NONE)).toEqual([60])
+    expect(parseSelections('17,71,abc,60,60,6', NONE)).toEqual([60])
     expect(parseSelections('', NONE)).toEqual([])
   })
 
@@ -83,7 +83,7 @@ describe('a couple that retires at two different ages', () => {
 
   it('reads splits from the address, drops the unreadable, the out-of-range and the pair that is just one age', () => {
     expect(parseSelections('plan,58-64,60', NONE)).toEqual(['plan', '58-64', 60])
-    expect(parseSelections('58-58,49-60,60-71,5-6,58-64-65', NONE)).toEqual([])
+    expect(parseSelections('58-58,17-60,60-71,5-6,58-64-65', NONE)).toEqual([])
     expect(formatSelections(parseSelections('58-64,plan', NONE))).toBe('58-64,plan')
   })
 

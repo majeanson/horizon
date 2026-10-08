@@ -223,7 +223,7 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
     id: r.oneOf(o.id, `${path}.id`, [expected]),
     name: r.str(o.name, `${path}.name`, 60),
     birth: { year: r.num(birth.year, `${path}.birth.year`, 1900, 2100, true), month: r.num(birth.month, `${path}.birth.month`, 1, 12, true) },
-    retirementAge: r.num(o.retirementAge, `${path}.retirementAge`, 40, 80, true),
+    retirementAge: r.num(o.retirementAge, `${path}.retirementAge`, 18, 80, true),
     salaryToday: r.num(o.salaryToday, `${path}.salaryToday`, 0, 1e8),
     earningsHistory,
     rrq: {

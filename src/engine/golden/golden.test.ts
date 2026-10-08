@@ -15,7 +15,7 @@ describe('golden household — the committed answers', () => {
     await expect(JSON.stringify(project(H, A, {}), null, 1)).toMatchFileSnapshot('./golden.projection.json')
   })
 
-  it('« when can we retire »: every age from 50 to 70', async () => {
+  it('« when can we retire »: every age from 18 (or the oldest person’s own age) to 70', async () => {
     const r = retireAt(H, A)
     const summary = { earliestOk: r.earliestOk, byAge: r.byAge.map(({ age, ok, firstShortfallYear, netWorthAtHorizon }) => ({ age, ok, firstShortfallYear, netWorthAtHorizon })) }
     await expect(JSON.stringify(summary, null, 1)).toMatchFileSnapshot('./golden.retireAt.json')

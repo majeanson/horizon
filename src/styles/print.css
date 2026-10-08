@@ -42,6 +42,13 @@
   .next {
     display: none !important;
   }
+  /* The pinned views + map: the map is gone above; what is left (the views) flows like any other block. */
+  .results-pin {
+    position: static;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
   .shell {
     display: block;
   }
