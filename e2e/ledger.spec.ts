@@ -51,3 +51,24 @@ test('spending and the economy are sliders too: releasing one saves it, and the 
   await page.keyboard.press('ArrowRight')
   await expect.poll(async () => (await savedProfile(page)).household.spending.retiredToday).toBe(spend + 500)
 })
+
+test('a slider says what its number means while it moves: the three scenarios on the track, the band and the reason; a step button is one exact step', async ({ page }) => {
+  await page.goto('/resultats?v=verify')
+  const row = page.locator('.ledger__row', { has: page.getByRole('slider', { name: 'Inflation' }) })
+  // The prudent / neutral / bold values are printed under the track…
+  await expect(row.locator('.slider__marks')).toContainText('Prudent')
+  await expect(row.locator('.slider__marks')).toContainText('Neutre')
+  await expect(row.locator('.slider__marks')).toContainText('Audacieux')
+  // …and the live band follows the thumb: a typical inflation, then a very high one.
+  await expect(row.locator('.impact__level')).toHaveText('Typique')
+  const infl = row.getByRole('slider', { name: 'Inflation' })
+  await infl.focus()
+  for (let i = 0; i < 20; i++) await page.keyboard.press('ArrowRight')
+  await expect(row.locator('.impact__level')).toHaveText(/Élevé|Très élevé/)
+  // The « + » / « − » buttons move one exact step and save it at once.
+  const before = (await savedProfile(page)).assumptions.inflation
+  await row.getByRole('button', { name: 'Moins : Inflation' }).click()
+  await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(before - 0.001, 5)
+  // A pension's start age carries its reference ages under the track.
+  await expect(page.locator('.ledger .slider__marks').filter({ hasText: '60' }).first()).toContainText('65')
+})

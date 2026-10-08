@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
+import { ASSUMPTION_PRESETS } from '../../engine/assumptionPresets'
+import { impactOf, impactOfReturn } from '../../engine/assumptionImpact'
 import { agesLedger, planGlance } from '../../engine/ledger'
 import type { AccountKind, Assumptions, Household, PersonId } from '../../engine/types'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { formatPct, formatYearAge } from '../../lib/format'
 import { LEDGER_COPY } from '../../lib/ledgerCopy'
 import { formatMoney } from '../../lib/money'
@@ -9,7 +11,8 @@ import { mapPerson, setAssumptions, setReturn, setSpending } from '../../lib/pro
 import { MAX_AGE, MIN_AGE } from '../../lib/resultsModel'
 import { updateProfile } from '../../lib/store'
 import { Chip } from '../Chip'
-import { Slider } from '../Slider'
+import { ImpactMeter } from '../ImpactMeter'
+import { Slider, type SliderMark } from '../Slider'
 
 // « Mes données et leur calcul »: every number that sets the answer, as a slider, with the calculation it triggers and the
 // amount it becomes — and what the plan does as the slider moves. The ages (when the pay stops, when the QPP starts, when
@@ -23,6 +26,12 @@ type Key = `${PersonId}:${AgeField}` | SpendKey | 'inflation' | `return:${Accoun
 type Preview = Partial<Record<Key, number>>
 
 const RANGES = { retirement: { min: MIN_AGE, max: MAX_AGE }, rrq: { min: 60, max: 72 }, oas: { min: 65, max: 70 } } as const
+// Where the rules turn, printed under the track: the QPP at 60 · 65 · 70, the OAS at 65 · 70.
+const AGE_MARKS: Record<AgeField, readonly SliderMark[] | undefined> = {
+  retirement: undefined,
+  rrq: [60, 65, 70].map((v) => ({ value: v, label: String(v) })),
+  oas: [65, 70].map((v) => ({ value: v, label: String(v) })),
+}
 const KINDS: readonly AccountKind[] = ['rrsp', 'tfsa', 'nonReg']
 
 const isSpend = (key: Key): key is SpendKey => key === 'spend:workingToday' || key === 'spend:retiredToday'
@@ -50,6 +59,7 @@ const monthYear = (ym: { year: number; month: number }) => `${String(ym.month).p
 export function LedgerPanel({ household, assumptions, names }: { household: Household; assumptions: Assumptions; names: readonly string[] }) {
   const { lang } = useLang()
   const c = LEDGER_COPY[lang]
+  const t = useT()
   const [preview, setPreview] = useState<Preview>({})
 
   // What the page would be if the sliders were where they are being held.
@@ -79,8 +89,10 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   }
   const worthDelta = delta(glance.netWorthEnd, opened.glance.netWorthEnd, c.glanceMore, c.glanceLess)
 
-  const slider = (key: Key, label: string, value: number, min: number, max: number, step: number, text: (v: number) => string) => (
+  const slider = (key: Key, label: string, value: number, min: number, max: number, step: number, text: (v: number) => string, marks?: readonly SliderMark[], info?: (v: number) => ReactNode) => (
     <Slider
+      marks={marks}
+      info={info}
       label={label}
       value={value}
       min={Math.min(min, value)}
@@ -97,9 +109,19 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
         <span className="field-row__label">{label}</span> <span className="mono">{c.age(String(value))} · {c.done}</span>
       </p>
     ) : (
-      slider(`${id}:${field}`, label, value, RANGES[field].min, RANGES[field].max, 1, (v) => c.age(String(v)))
+      slider(`${id}:${field}`, label, value, RANGES[field].min, RANGES[field].max, 1, (v) => c.age(String(v)), AGE_MARKS[field])
     )
   const pct = (perMille: number) => formatPct(perMille / 1000, lang, 1)
+  // The three scenarios as marks on the track, and — while the thumb moves — the band the value falls in and why it matters
+  // (the same words as Hypothèses): the slider says what it is doing, not only where it is.
+  const impact = t.assumptions.impact
+  const scenarioMarks = (valueOf: (k: 'prudent' | 'neutral' | 'bold') => number): SliderMark[] =>
+    (['prudent', 'neutral', 'bold'] as const).map((k) => ({ value: Math.round(valueOf(k) * 1000), label: t.assumptions.presets[k] }))
+  const band = (field: 'inflation' | 'returns', kind?: AccountKind) => (perMille: number) => {
+    const { level, tilt } = field === 'inflation' ? impactOf('inflation', perMille / 1000) : impactOfReturn(kind!, perMille / 1000)
+    const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level
+    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
+  }
   const spend = (key: SpendKey, label: string) => {
     const now = shown.spending[spendField(key)]
     return (
@@ -153,12 +175,12 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
         {spend('spend:workingToday', c.spendWorkLabel)}
         {spend('spend:retiredToday', c.spendRetLabel)}
         <div className="ledger__row">
-          {slider('inflation', c.inflationLabel, Math.round(assumptions.inflation * 1000), 0, 60, 1, pct)}
+          {slider('inflation', c.inflationLabel, Math.round(assumptions.inflation * 1000), 0, 60, 1, pct, scenarioMarks((k) => ASSUMPTION_PRESETS[k].inflation), band('inflation'))}
           <p className="ledger__calc">{c.inflationCalc(pct(Math.round(shownA.inflation * 1000)), money(1000 * (1 + shownA.inflation) ** 10))}</p>
         </div>
         {KINDS.map((kind) => (
           <div key={kind} className="ledger__row">
-            {slider(`return:${kind}`, c.returnLabel[kind], Math.round(assumptions.returns[kind] * 1000), 0, 120, 1, pct)}
+            {slider(`return:${kind}`, c.returnLabel[kind], Math.round(assumptions.returns[kind] * 1000), 0, 120, 1, pct, scenarioMarks((k) => ASSUMPTION_PRESETS[k].returns[kind]), band('returns', kind))}
             <p className="ledger__calc">{c.returnCalc(pct(Math.round(shownA.returns[kind] * 1000)), formatPct((1 + shownA.returns[kind]) / (1 + shownA.inflation) - 1, lang, 1))}</p>
           </div>
         ))}

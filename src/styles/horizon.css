@@ -1110,15 +1110,103 @@
 .slider__value {
   font-weight: 600;
 }
+/* The row: a step button each side of the track. The thumb is 1.75 rem on a 0.6 rem track (a finger finds it), and a vertical
+   swipe still scrolls the page — only a sideways drag moves the value. */
+.slider__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+.slider__step {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+.slider__track {
+  position: relative;
+  --thumb: 1.75rem;
+  padding-bottom: calc(0.4rem + var(--lines, 1) * 1.1rem); /* room for the marks */
+}
 .slider__input {
   width: 100%;
   min-height: 2.75rem;
-  accent-color: var(--ink);
+  margin: 0;
+  background: transparent;
   cursor: pointer;
+  touch-action: pan-y;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.slider__input::-webkit-slider-runnable-track {
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--line);
+}
+.slider__input::-moz-range-track {
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--line);
+}
+.slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--thumb);
+  height: var(--thumb);
+  margin-top: calc((0.6rem - var(--thumb)) / 2);
+  border-radius: 50%;
+  border: 3px solid var(--paper);
+  background: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.slider__input::-moz-range-thumb {
+  width: calc(var(--thumb) - 6px);
+  height: calc(var(--thumb) - 6px);
+  border-radius: 50%;
+  border: 3px solid var(--paper);
+  background: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.slider__input:active::-webkit-slider-thumb {
+  transform: scale(1.15);
 }
 .slider__input:focus-visible {
   outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+/* Reference marks under the track, placed where the value sits (the thumb's centre travels inside half a thumb each side). */
+.slider__marks {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: calc(0.4rem + var(--lines, 1) * 1.1rem);
+  pointer-events: none;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.slider__mark {
+  position: absolute;
+  left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  white-space: nowrap;
+  top: 0;
+}
+.slider__tick {
+  width: 2px;
+  height: calc(0.4rem + var(--line, 0) * 1.1rem); /* a deeper label hangs from a longer tick */
+  background: var(--ink-soft);
+}
+/* A label sits over the ticks of the marks below it, so the words stay whole. */
+.slider__label {
+  position: relative;
+  z-index: 1;
+  padding-inline: 0.2rem;
+  background: var(--paper);
+}
+.slider__info {
+  margin-top: 0.25rem;
 }
 .slider__ends {
   display: flex;

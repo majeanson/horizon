@@ -1,12 +1,24 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { useT } from '../i18n'
+import { Icon } from './Icon'
 
-// A range control for a whole-number choice (an age) whose effect is worth SEEING while it moves.
+// A range control for a number whose effect is worth SEEING while it moves.
 //
 // It owns the position while the thumb is dragged (or a key is held) and reports it twice: `onPreview` on every step —
 // cheap, the caller shows what the number would do — and `onCommit` once when the person lets go (pointer up, key up,
 // focus leaving), which is when the caller saves it and the heavy answers are recomputed. The number is always readable
-// beside the thumb (`valueText`), and the arrow keys move one step, so a slider is never the only way to a value:
-// pair it with a NumberField where a precise typed value matters.
+// beside the thumb (`valueText`).
+//
+// Easy to move, on a finger and on a mouse: a large thumb on a thick track, a vertical swipe that still scrolls the
+// page (`touch-action: pan-y`), and a « − » / « + » button each side for the exact step — the keyboard, a mouse and a
+// shaky hand all get the same one-step path. `marks` print the reference values under the track (the prudent / neutral /
+// bold scenarios, a pension's 60 · 65 · 70), and `info` is what to say ABOUT the value while it moves: it is given the live
+// number, so a band label and a reason can follow the thumb.
+
+export interface SliderMark {
+  value: number
+  label: string
+}
 
 export function Slider({
   label,
@@ -18,6 +30,8 @@ export function Slider({
   onPreview,
   onCommit,
   describedBy,
+  marks,
+  info,
 }: {
   label: string
   value: number
@@ -29,8 +43,12 @@ export function Slider({
   onPreview?: (v: number) => void
   onCommit: (v: number) => void
   describedBy?: string
+  marks?: readonly SliderMark[]
+  /** What to say about the live value: a band, a reason. Rendered under the track and follows the thumb. */
+  info?: (v: number) => ReactNode
 }) {
   const id = useId()
+  const t = useT()
   const [local, setLocal] = useState(value)
   const dragging = useRef(false)
 
@@ -49,6 +67,21 @@ export function Slider({
     dragging.current = false
     if (local !== value) onCommit(local)
   }
+  // The exact step: one tap is a whole gesture, so it commits at once.
+  const nudge = (direction: -1 | 1) => {
+    const next = Math.min(max, Math.max(min, Math.round((local + direction * step) / step) * step))
+    if (next === local) return
+    setLocal(next)
+    onPreview?.(next)
+    onCommit(next)
+  }
+  const at = (v: number) => (max === min ? 0 : (v - min) / (max - min))
+  // Marks that sit close together (prudent 2,5 · neutre 2,1 · audacieux 2,0) would print on top of each other: each one
+  // that lands within a fifth of the track of the one before steps down a line.
+  const shown = (marks ?? []).filter((m) => m.value >= min && m.value <= max).sort((a, b) => a.value - b.value)
+  const lines: number[] = []
+  shown.forEach((m, i) => lines.push(i > 0 && at(m.value) - at(shown[i - 1].value) < 0.2 ? (lines[i - 1] + 1) % 3 : 0))
+  const depth = Math.max(0, ...lines) + 1
 
   return (
     <div className="slider">
@@ -60,25 +93,46 @@ export function Slider({
           {valueText(local)}
         </output>
       </div>
-      <input
-        id={id}
-        className="slider__input"
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={local}
-        aria-valuetext={valueText(local)}
-        aria-describedby={describedBy}
-        onChange={(e) => move(Number(e.currentTarget.value))}
-        onPointerUp={end}
-        onKeyUp={end}
-        onBlur={end}
-      />
+      <div className="slider__row">
+        <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.less} : ${label}`} disabled={local <= min} onClick={() => nudge(-1)}>
+          <Icon name="minus-bold" size={18} />
+        </button>
+        <div className="slider__track" style={{ ['--lines' as string]: depth }}>
+          <input
+            id={id}
+            className="slider__input"
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={local}
+            aria-valuetext={valueText(local)}
+            aria-describedby={describedBy}
+            onChange={(e) => move(Number(e.currentTarget.value))}
+            onPointerUp={end}
+            onKeyUp={end}
+            onBlur={end}
+          />
+          {shown.length > 0 && (
+            <div className="slider__marks mono" aria-hidden="true">
+              {shown.map((m, i) => (
+                <span key={m.label + m.value} className="slider__mark" style={{ ['--at' as string]: at(m.value), ['--line' as string]: lines[i] }}>
+                  <span className="slider__tick" />
+                  <span className="slider__label">{m.label}</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.more} : ${label}`} disabled={local >= max} onClick={() => nudge(1)}>
+          <Icon name="plus-bold" size={18} />
+        </button>
+      </div>
       <div className="slider__ends mono" aria-hidden="true">
         <span>{min}</span>
         <span>{max}</span>
       </div>
+      {info && <div className="slider__info">{info(local)}</div>}
     </div>
   )
 }

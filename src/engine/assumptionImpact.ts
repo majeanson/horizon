@@ -33,10 +33,19 @@ export function impactAnchors(field: ImpactField): readonly [number, number, num
 const EPS = 1e-9 // a typed « 3,1 » is 3.1 / 100, not always bit-equal to the preset's own
 
 export function impactOf(field: ImpactField, value: number): AssumptionImpact {
-  const [lo, mid, hi] = impactAnchors(field)
+  return impactAmong(impactAnchors(field), value, HIGHER_IS_BETTER[field])
+}
+
+/** One account's return against the prudent / neutral / bold return OF THAT ACCOUNT (the sliders are per account). */
+export function impactOfReturn(kind: 'rrsp' | 'tfsa' | 'nonReg', value: number): AssumptionImpact {
+  const v = (['prudent', 'neutral', 'bold'] as const).map((k) => ASSUMPTION_PRESETS[k].returns[kind]).sort((a, b) => a - b)
+  return impactAmong([v[0], v[1], v[2]], value, true)
+}
+
+function impactAmong(anchors: readonly [number, number, number], value: number, higherIsBetter: boolean): AssumptionImpact {
+  const [lo, mid, hi] = anchors
   const level: ImpactLevel =
     value < lo - EPS ? 'below' : value > hi + EPS ? 'above' : value <= (lo + mid) / 2 + EPS ? 'low' : value <= (mid + hi) / 2 + EPS ? 'typical' : 'high'
-  const higherIsBetter = HIGHER_IS_BETTER[field]
   const high = level === 'high' || level === 'above'
   const tilt: ImpactTilt = level === 'typical' ? 'middle' : high === higherIsBetter ? 'optimistic' : 'cautious'
   return { level, tilt }

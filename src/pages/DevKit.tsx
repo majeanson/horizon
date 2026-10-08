@@ -78,7 +78,7 @@ function SliderSpecimen() {
   const [seen, setSeen] = useState(65)
   return (
     <>
-      <Slider label="Début de la rente" value={age} min={60} max={72} valueText={(v) => `${v} ans`} onPreview={setSeen} onCommit={setAge} />
+      <Slider label="Début de la rente" value={age} min={60} max={72} valueText={(v) => `${v} ans`} onPreview={setSeen} onCommit={setAge} marks={[60, 65, 70].map((v) => ({ value: v, label: String(v) }))} info={(v) => <p className="field-row__hint">{v < 65 ? 'Avant 65 ans : la rente est réduite.' : v === 65 ? 'À 65 ans : le montant de référence.' : 'Après 65 ans : la rente est majorée.'}</p>} />
       <p className="field-row__hint">En mouvement : {seen} · enregistré : {age}</p>
     </>
   )
