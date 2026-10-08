@@ -116,7 +116,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   // (the same words as Hypothèses): the slider says what it is doing, not only where it is.
   const impact = t.assumptions.impact
   const scenarioMarks = (valueOf: (k: 'prudent' | 'neutral' | 'bold') => number): SliderMark[] =>
-    (['prudent', 'neutral', 'bold'] as const).map((k) => ({ value: Math.round(valueOf(k) * 1000), label: t.assumptions.presets[k] }))
+    (['prudent', 'neutral', 'bold'] as const).map((k) => ({ value: Math.round(valueOf(k) * 1000), label: t.assumptions.presets[k], tone: k }))
   const band = (field: 'inflation' | 'returns', kind?: AccountKind) => (perMille: number) => {
     const { level, tilt } = field === 'inflation' ? impactOf('inflation', perMille / 1000) : impactOfReturn(kind!, perMille / 1000)
     const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level

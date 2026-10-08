@@ -22,8 +22,8 @@ test('the chart draws one line per comparison, a marker for each retirement, and
   const chart = page.locator('.chart-panel figure.chart')
   await expect(chart).toBeVisible()
   await expect(chart).toHaveAttribute('role', 'img')
-  await expect(chart).toHaveAttribute('aria-label', 'Valeur nette de 2026 à 2076 pour : Mon plan, 65 ans.')
-  await expect(chart.locator('.chart__legend-item')).toHaveText(['Mon plan', '65 ans'])
+  await expect(chart).toHaveAttribute('aria-label', 'Valeur nette de 2026 à 2076 pour : Mon plan (60 / 62 ans), 65 ans.')
+  await expect(chart.locator('.chart__legend-item')).toHaveText(['Mon plan (60 / 62 ans)', '65 ans'])
   await expect(chart.locator('path.recharts-line-curve')).toHaveCount(2)
   await expect(chart.locator('.recharts-reference-line')).toHaveCount(2)
   // The plot has a real size (a zero-sized chart is the classic silent failure).
@@ -46,7 +46,7 @@ test('hovering the chart shows the year, the ages and each scenario’s exact fi
   await expect(tip).toBeVisible()
   await expect(tip.locator('.chart-tip__title')).toContainText(/^\d{4} · \d{2} \/ \d{2}$/)
   await expect(tip.locator('.chart-tip__row')).toHaveCount(2)
-  await expect(tip.locator('.chart-tip__row').first()).toContainText(/Mon plan: .*\$/)
+  await expect(tip.locator('.chart-tip__row').first()).toContainText(/Mon plan \(60 \/ 62 ans\): .*\$/)
 })
 
 test('the measure is chosen in the address, and the chart follows; today’s dollars have no switch, an old link still opens the year’s dollars', async ({ page }) => {
@@ -68,8 +68,8 @@ test('the measure is chosen in the address, and the chart follows; today’s dol
 
 test('another comparison adds a line and keeps the other choices', async ({ page }) => {
   await page.goto('/resultats?dollars=nominal')
-  await page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans' }).click()
-  await expect(page.locator('.chart-panel .chart__legend-item')).toHaveText(['Mon plan', '65 ans', '62 ans'])
+  await page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: '62 ans', exact: true }).click()
+  await expect(page.locator('.chart-panel .chart__legend-item')).toHaveText(['Mon plan (60 / 62 ans)', '65 ans', '62 ans'])
   await expect(page.locator('.chart-panel path.recharts-line-curve')).toHaveCount(3)
   await expect(page).toHaveURL(/dollars=nominal/)
 })
@@ -91,7 +91,7 @@ test('the year-by-year table says which dollars it holds, and its last net worth
 test('the chart speaks English too', async ({ page }) => {
   await page.goto('/resultats')
   await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
-  await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan, 65.')
+  await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan (age 60 / 62), 65.')
   await expect(page.getByRole('tab', { name: 'Guaranteed income' })).toBeVisible()
 })
 

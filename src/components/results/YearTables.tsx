@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import { useLang, useT } from '../../i18n'
 import { deflator, type Dollars } from '../../lib/chartData'
 import { formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { useNotice } from '../../lib/toast'
+import { useParamChoice } from '../../lib/useParamChoice'
 import { yearCsv } from '../../lib/yearCsv'
 import { Chip } from '../Chip'
 import { TableChooser } from '../TableChooser'
@@ -38,9 +38,10 @@ export function YearTables({
   const c = r.chart
   const out = RESULTS_COPY[lang].out
   const notice = useNotice()
-  const [picked, setPicked] = useState(0)
-  const index = Math.min(picked, runs.length - 1)
-  const shown = runs[index]
+  // The scenario shown is kept in the address (`?table=60`), so a link opens on the same table.
+  const keys = runs.map((x) => String(x.selection))
+  const [key, setKey] = useParamChoice('table', keys, keys[0] ?? '')
+  const shown = runs[Math.max(0, keys.indexOf(key))]
   const factor = (year: number) => (dollars === 'today' ? deflator(year, todayYear, inflation) : 1)
   const money = (n: number, year: number) => formatMoney(n / factor(year), lang)
   const unit = dollars === 'today' ? c.today : c.nominal
@@ -64,9 +65,9 @@ export function YearTables({
         <TableChooser
           label={r.table.scenario}
           ariaLabel={r.table.scenario}
-          value={String(index)}
-          options={runs.map((x, i) => ({ key: String(i), label: label(x.selection) }))}
-          onSelect={(k) => setPicked(Number(k))}
+          value={key}
+          options={runs.map((x) => ({ key: String(x.selection), label: label(x.selection) }))}
+          onSelect={setKey}
           trailing={
             <Chip className="no-print" icon="download-simple-bold" onClick={() => saveCsv(shown.selection, shown.result)}>
               {out.csv}

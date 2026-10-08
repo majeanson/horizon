@@ -314,7 +314,7 @@ export const EN: typeof FR = {
     },
     compare: {
       label: 'Compare retirement ages',
-      plan: 'My plan',
+      planAt: (ages: string) => `My plan (age ${ages})`,
       planHint: 'Each person retires at the age set in the profile.',
       age: (age: number) => `${age}`,
       max: 'Four comparisons at most: remove one to add another.',

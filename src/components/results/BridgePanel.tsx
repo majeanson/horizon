@@ -22,6 +22,7 @@ import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { mapPerson } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
+import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
@@ -82,7 +83,7 @@ function StrategyCards({
     return (
       <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short')}>
         <Chip radio selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
-          {s.key === 'standard' && mineIsStandard ? copy.standardIsMine : copy.strategyName[s.key]}
+          {s.key === 'standard' && mineIsStandard ? copy.standardIsMine : strategyLabel(copy, s.key, s.levers.retirementAge)}
         </Chip>
         <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>
         <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v, who)}</p>
@@ -257,10 +258,13 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
 
 const HYPOTHESES = ['prudent', 'neutral', 'bold'] as const
 
+// « Mon plan » always says the age it stands for: the retirement age the person's own start ages go with.
+const strategyLabel = (copy: BridgeCopy, key: StrategyKey, retirementAge: number) => (key === 'mine' ? `${copy.strategyName.mine} (${copy.age(retirementAge)})` : copy.strategyName[key])
+
 function MatrixSection({ household, assumptions, levers, copy, ownerName }: { household: Household; assumptions: Assumptions; levers: BridgeLevers; copy: BridgeCopy; ownerName: string }) {
   const t = useT()
   const { value, busy } = useBridgeMatrix(household, assumptions, levers)
-  const [hyp, setHyp] = useState<(typeof HYPOTHESES)[number]>('neutral')
+  const [hyp, setHyp] = useParamChoice('hyp', HYPOTHESES, 'neutral')
   if (value === null) return <Skeleton count={3} />
   return (
     <div className="matrix" aria-busy={busy}>
@@ -275,7 +279,7 @@ function MatrixSection({ household, assumptions, levers, copy, ownerName }: { ho
         label={t.assumptions.presets.title}
         ariaLabel={copy.matrixTitle}
         value={hyp}
-        options={HYPOTHESES.map((k) => ({ key: k, label: t.assumptions.presets[k] }))}
+        options={HYPOTHESES.map((k) => ({ key: k, label: t.assumptions.presets[k], tone: k }))}
         onSelect={setHyp}
       />
       <div className="table-wrap" role="region" aria-label={`${copy.matrixTitle} — ${t.assumptions.presets[hyp]}`} tabIndex={0}>
@@ -291,7 +295,7 @@ function MatrixSection({ household, assumptions, levers, copy, ownerName }: { ho
               const cell = value[key][hyp]
               return (
                 <tr key={key}>
-                  <th scope="row">{copy.strategyName[key]}</th>
+                  <th scope="row">{strategyLabel(copy, key, levers.retirementAge)}</th>
                   <td className={cell.ok ? undefined : 'bridge__cell--short'}>
                     <span aria-hidden="true">{cell.ok ? '✓' : '!'} </span>
                     {cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}

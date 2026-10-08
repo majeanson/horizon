@@ -173,15 +173,17 @@ export function Resultats() {
   const toggle = (s: Selection) => commit(toggleSelection(latest(), s))
   // A person with no name is « Moi » / « Conjoint·e », as on the profile page.
   const names = profile.household.persons.map((p, i) => p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse))
+  // « Mon plan » always says the age: each person's own retirement age, once when they agree (« 60 »), else « 60 / 62 ».
+  const planAges = [...new Set(profile.household.persons.map((p) => p.retirementAge))].join(' / ')
   const label = useCallback(
     (s: Selection) => {
-      if (s === 'plan') return r.compare.plan
+      if (s === 'plan') return r.compare.planAt(planAges)
       if (!isSplit(s)) return r.compare.age(s)
       const [a, b] = splitAges(s)
       return r.compare.split(names[0] ?? '', a, names[1] ?? '', b)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [r, names.join('|')],
+    [r, names.join('|'), planAges],
   )
   const addSplit = (first: number, second: number) => {
     const s = splitOf(first, second)
@@ -357,7 +359,7 @@ export function Resultats() {
         <div className="compare" ref={compareRef}>
           <Rail role="group" aria-label={r.compare.label}>
             <Chip selected={selections.includes('plan')} onClick={() => toggle('plan')}>
-              {r.compare.plan}
+              {r.compare.planAt(planAges)}
             </Chip>
             {ages.map((age) => (
               // The verdict's own age wears a quiet accent dot: among ~20 look-alike chips, the one

@@ -19,6 +19,9 @@ export interface SubTabOption<K extends string> {
   // The household position (0 first person, 1 second) of a tab that stands for a PERSON: a dot in that person's colour
   // before the name — never the only cue, the name is the label.
   who?: 0 | 1
+  // A tab that stands for one of the three scenarios (prudent · neutral · bold): a dot in the scenario's colour, the same
+  // hue as on the sliders and in the charts. The name stays the label.
+  tone?: 'prudent' | 'neutral' | 'bold'
 }
 
 export function SubTabs<K extends string>({
@@ -118,12 +121,13 @@ export function SubTabs<K extends string>({
             role="tab"
             aria-selected={value === o.key}
             tabIndex={value === o.key ? 0 : -1}
-            className={'subtabs__opt' + (value === o.key ? ' is-on' : '') + (o.who === undefined ? '' : ` who--${o.who}`)}
+            className={'subtabs__opt' + (value === o.key ? ' is-on' : '') + (o.who === undefined ? '' : ` who--${o.who}`) + (o.tone === undefined ? '' : ` tone--${o.tone}`)}
             aria-label={o.ariaLabel}
             title={o.ariaLabel}
             onClick={() => onSelect(o.key)}
           >
             {o.who !== undefined && <span className="who-dot" aria-hidden="true" />}
+            {o.tone !== undefined && <span className="tone__dot" aria-hidden="true" />}
             {o.icon && <InlineIcon name={o.icon} size={15} />}
             {o.label}
           </button>

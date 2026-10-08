@@ -55,10 +55,11 @@ test('spending and the economy are sliders too: releasing one saves it, and the 
 test('a slider says what its number means while it moves: the three scenarios on the track, the band and the reason; a step button is one exact step', async ({ page }) => {
   await page.goto('/resultats?v=verify')
   const row = page.locator('.ledger__row', { has: page.getByRole('slider', { name: 'Inflation' }) })
-  // The prudent / neutral / bold values are printed under the track…
-  await expect(row.locator('.slider__marks')).toContainText('Prudent')
-  await expect(row.locator('.slider__marks')).toContainText('Neutre')
-  await expect(row.locator('.slider__marks')).toContainText('Audacieux')
+  // The prudent / neutral / bold scenarios are three coloured dots on the track and, under it, a legend that names each,
+  // says its value — always in that order — and applies it in one tap.
+  await expect(row.locator('.slider__dot')).toHaveCount(3)
+  const legend = row.locator('.slider__legend')
+  await expect(legend.getByRole('radio')).toHaveText([/^Prudent\s+\d/, /^Neutre\s+\d/, /^Audacieux\s+\d/])
   // …and the live band follows the thumb: a typical inflation, then a very high one.
   await expect(row.locator('.impact__level')).toHaveText('Typique')
   const infl = row.getByRole('slider', { name: 'Inflation' })
@@ -69,6 +70,10 @@ test('a slider says what its number means while it moves: the three scenarios on
   const before = (await savedProfile(page)).assumptions.inflation
   await row.getByRole('button', { name: 'Moins : Inflation' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(before - 0.001, 5)
+  // A tap on a scenario in the legend sets the slider to it and saves it at once; the chip then reads as chosen.
+  await legend.getByRole('radio', { name: /^Audacieux/ }).click()
+  await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBeCloseTo(0.02, 5)
+  await expect(legend.getByRole('radio', { name: /^Audacieux/ })).toHaveAttribute('aria-checked', 'true')
   // A pension's start age carries its reference ages under the track.
   await expect(page.locator('.ledger .slider__marks').filter({ hasText: '60' }).first()).toContainText('65')
 })

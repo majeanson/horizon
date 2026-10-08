@@ -330,7 +330,7 @@ export const FR = {
     },
     compare: {
       label: 'Comparer des âges de départ',
-      plan: 'Mon plan',
+      planAt: (ages: string) => `Mon plan (${ages} ans)`,
       planHint: 'Chacun part à l’âge indiqué dans le profil.',
       age: (age: number) => `${age} ans`,
       max: 'Quatre comparaisons au plus : retirez-en une pour en ajouter une autre.',

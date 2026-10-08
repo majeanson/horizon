@@ -228,3 +228,48 @@
   font-size: var(--text-xs);
   color: var(--ink-soft);
 }
+
+/* ── Prudent · Neutre · Audacieux: one colour each, everywhere they appear ─ */
+/* The same three hues as the chart's « Détail » lines: prudent = sky, neutral = marigold, bold = sage. A scenario is a dot on
+   the slider's track and a chip in the legend under it, so the words never collide and a tap applies the scenario. */
+.tone--prudent {
+  --tone: var(--sky-deep);
+}
+.tone--neutral {
+  --tone: var(--marigold-deep);
+}
+.tone--bold {
+  --tone: var(--sage-deep);
+}
+.slider__dots {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2.75rem; /* the input's own height: the dots ride the track's centre line */
+  pointer-events: none;
+}
+.slider__dot {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+  width: 0.9rem;
+  height: 0.9rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--tone);
+  box-shadow: 0 0 0 2px var(--paper);
+}
+.slider__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.tone__dot {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-inline-end: 0.4rem;
+  border-radius: 50%;
+  background: var(--tone);
+  flex: none;
+}

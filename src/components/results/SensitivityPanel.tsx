@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useT } from '../../i18n'
 import { sensitivityAxes } from '../../engine/simulate'
 import type { Assumptions, Household } from '../../engine/types'
+import { useParamChoice } from '../../lib/useParamChoice'
 import { useSensitivity } from '../../lib/useSensitivity'
 import { Skeleton } from '../Skeleton'
 import { StatusMessage } from '../StatusMessage'
@@ -24,9 +25,9 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
   }, [key, run])
   const axes = sensitivityAxes(assumptions)
   // One grid at a time: the horizon is chosen in the table's header (the plan's own horizon first).
-  const [pickedHorizon, setPickedHorizon] = useState<number | null>(null)
-  const horizonShown =
-    pickedHorizon !== null && axes.horizonAges.includes(pickedHorizon) ? pickedHorizon : axes.horizonAges.includes(assumptions.horizonAge) ? assumptions.horizonAge : axes.horizonAges[0]
+  const horizonKeys = axes.horizonAges.map(String)
+  const [horizonKey, setHorizonKey] = useParamChoice('horizon', horizonKeys, horizonKeys.includes(String(assumptions.horizonAge)) ? String(assumptions.horizonAge) : horizonKeys[0])
+  const horizonShown = Number(horizonKey)
   const points = (delta: number) => Math.round(delta * 100)
   const find = (horizonAge: number, returnsDelta: number, inflationDelta: number) =>
     state.cells.find((c) => c.horizonAge === horizonAge && c.returnsDelta === returnsDelta && c.inflationDelta === inflationDelta)
@@ -44,7 +45,7 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
       ) : (
         <>
           <div className="sensitivity__grids">
-            <TableChooser ariaLabel={s.axes} value={String(horizonShown)} options={axes.horizonAges.map((age) => ({ key: String(age), label: s.horizon(age) }))} onSelect={(k) => setPickedHorizon(Number(k))} />
+            <TableChooser ariaLabel={s.axes} value={horizonKey} options={axes.horizonAges.map((age) => ({ key: String(age), label: s.horizon(age) }))} onSelect={setHorizonKey} />
             {[horizonShown].map((horizonAge) => {
               // The grid's story is « how fast does the answer degrade » — told by tone, not only by
               // reading 27 numbers: later-than-base cells are tinted, no-age-lasts cells are dark.

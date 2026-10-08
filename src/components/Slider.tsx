@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { useT } from '../i18n'
+import { Chip } from './Chip'
 import { Icon } from './Icon'
 
 // A range control for a number whose effect is worth SEEING while it moves.
@@ -15,9 +16,13 @@ import { Icon } from './Icon'
 // bold scenarios, a pension's 60 · 65 · 70), and `info` is what to say ABOUT the value while it moves: it is given the live
 // number, so a band label and a reason can follow the thumb.
 
+export type SliderTone = 'prudent' | 'neutral' | 'bold'
+
 export interface SliderMark {
   value: number
   label: string
+  /** A scenario mark (prudent · neutral · bold): drawn as a coloured dot on the track and listed in a legend of chips that apply it. */
+  tone?: SliderTone
 }
 
 export function Slider({
@@ -81,7 +86,15 @@ export function Slider({
   const shown = (marks ?? []).filter((m) => m.value >= min && m.value <= max).sort((a, b) => a.value - b.value)
   const lines: number[] = []
   shown.forEach((m, i) => lines.push(i > 0 && at(m.value) - at(shown[i - 1].value) < 0.2 ? (lines[i - 1] + 1) % 3 : 0))
-  const depth = Math.max(0, ...lines) + 1
+  // Scenario marks (prudent · neutral · bold) are not labelled on the track — three words would collide: each is a coloured
+  // dot there, and a legend under the track names it, says its value and applies it in one tap.
+  const scenarios = shown.length > 0 && shown.every((m) => m.tone !== undefined)
+  const depth = scenarios ? 0 : Math.max(0, ...lines) + 1
+  const apply = (v: number) => {
+    setLocal(v)
+    onPreview?.(v)
+    if (v !== value) onCommit(v)
+  }
 
   return (
     <div className="slider">
@@ -113,7 +126,14 @@ export function Slider({
             onKeyUp={end}
             onBlur={end}
           />
-          {shown.length > 0 && (
+          {scenarios && (
+            <div className="slider__dots" aria-hidden="true">
+              {shown.map((m) => (
+                <span key={m.label + m.value} className={`slider__dot tone--${m.tone}`} style={{ ['--at' as string]: at(m.value) }} />
+              ))}
+            </div>
+          )}
+          {shown.length > 0 && !scenarios && (
             <div className="slider__marks mono" aria-hidden="true">
               {shown.map((m, i) => (
                 <span key={m.label + m.value} className="slider__mark" style={{ ['--at' as string]: at(m.value), ['--line' as string]: lines[i] }}>
@@ -132,6 +152,17 @@ export function Slider({
         <span>{min}</span>
         <span>{max}</span>
       </div>
+      {scenarios && (
+        <div className="slider__legend" role="group" aria-label={label}>
+          {/* In the caller's order (prudent · neutral · bold), not the track's: the words keep one reading order everywhere. */}
+          {(marks ?? []).filter((m) => m.value >= min && m.value <= max).map((m) => (
+            <Chip key={m.label + m.value} radio selected={local === m.value} onClick={() => apply(m.value)} className={`tone tone--${m.tone}`}>
+              <span className="tone__dot" aria-hidden="true" />
+              {m.label} <span className="mono">{valueText(m.value)}</span>
+            </Chip>
+          ))}
+        </div>
+      )}
       {info && <div className="slider__info">{info(local)}</div>}
     </div>
   )

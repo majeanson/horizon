@@ -75,6 +75,9 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   // The slider's step button is one exact step, kept in the address.
   await page.getByRole('button', { name: 'Moins : Dépenses à la retraite' }).click()
   await expect(page).toHaveURL(/spend=69500/)
+  // The address changes a beat before the page re-renders with the new amount; « Garder » keeps what the PAGE shows, so wait
+  // for the page (the monthly figure is read straight from the amount) — a click in that gap would keep the old 70 000.
+  await expect(page.locator('#depenser')).toContainText('Soit 5 792 $ par mois')
   // Keeping the amount writes it to the profile: the verdict follows, the address forgets the what-if.
   await page.getByRole('button', { name: 'Garder ce montant dans mes hypothèses' }).click()
   await expect(page).not.toHaveURL(/spend=/)

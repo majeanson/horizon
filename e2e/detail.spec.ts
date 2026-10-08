@@ -87,3 +87,30 @@ test('the year-by-year table is ONE table; the scenario is chosen in its header 
   await block.getByRole('button', { name: /CSV|tableur/i }).click()
   expect((await download).suggestedFilename()).toMatch(/[a-z]/i) // a readable name, not a row of dashes
 })
+
+test('what a table shows lives in the address: a link opens on the same set, the default writes nothing', async ({ page }) => {
+  // The set of hypotheses behind the strategies table…
+  await page.goto('/resultats?v=strategies&hyp=prudent')
+  const matrix = page.getByRole('region', { name: /Sous trois jeux d’hypothèses/ })
+  await expect(matrix.getByRole('columnheader')).toHaveText(['Façon de commencer', 'Prudent'], { timeout: 60_000 })
+  const chooser = page.locator('.matrix .table-chooser')
+  await chooser.getByRole('tab', { name: 'Audacieux' }).click()
+  await expect(page).toHaveURL(/hyp=bold/)
+  await chooser.getByRole('tab', { name: 'Neutre' }).click()
+  await expect(page).not.toHaveURL(/hyp=/)
+  // …and the scenario of the year-by-year table.
+  await page.goto('/resultats?v=verify&ages=plan,60,65&table=65')
+  const title = page.locator('.year-table .year-table__title')
+  await expect(title).toContainText('65 ans', { timeout: 30_000 })
+  await page.locator('.year-table .table-chooser').getByRole('tab', { name: '60 ans', exact: true }).click()
+  await expect(page).toHaveURL(/table=60/)
+  await expect(title).toContainText('60 ans')
+});
+
+test('« Mon plan » always says its age', async ({ page }) => {
+  await page.goto('/resultats')
+  await expect(page.getByRole('button', { name: /^Mon plan \(\d+( \/ \d+)? ans\)$/ })).toBeVisible()
+  await page.goto('/resultats?v=strategies')
+  // (the card for it is folded into « Standard » when the plan's pension ages ARE the standard: the table lists it always)
+  await expect(page.getByRole('rowheader', { name: /^Mon plan \(\d+ ans\)$/ })).toBeVisible({ timeout: 60_000 })
+})

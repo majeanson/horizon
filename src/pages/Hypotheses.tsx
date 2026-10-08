@@ -53,7 +53,7 @@ export function Hypotheses() {
           ariaLabel={a.presets.label}
           value={active ?? 'custom'}
           options={[
-            ...(['prudent', 'neutral', 'bold'] as const).map((key) => ({ key, label: a.presets[key] })),
+            ...(['prudent', 'neutral', 'bold'] as const).map((key) => ({ key, label: a.presets[key], tone: key })),
             ...(active === null ? [{ key: 'custom' as const, label: a.presets.custom }] : []),
           ]}
           onSelect={async (key) => {
