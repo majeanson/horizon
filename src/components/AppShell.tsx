@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
-import { useStorageIssue } from '../lib/store'
+import { useBackupDue, useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { Icon, type IconName } from './Icon'
 import { Loading } from './Loading'
@@ -67,6 +67,7 @@ export function AppShell() {
   // Whatever stops the profile from being kept — or read — must be said on EVERY page: a person who lost their plan to a
   // refused profile and finds a blank one on Profil would otherwise think the app simply forgot them.
   const storageIssue = useStorageIssue()
+  const backupDue = useBackupDue()
   const themeLabel = theme === 'night' ? t.common.themeToDay : t.common.themeToNight
 
   return (
@@ -112,6 +113,14 @@ export function AppShell() {
       {/* tabIndex -1: the skip link's target and where focus lands after a navigation — never a tab stop itself. */}
       <main className="shell__main" id="main" tabIndex={-1}>
         {storageIssue && <StatusMessage tone={storageIssue === 'unsaved' ? 'error' : 'info'}>{t.data.issue[storageIssue]}</StatusMessage>}
+        {backupDue && (
+          <div className="sw-update">
+            <StatusMessage tone="info">{t.data.backup.due}</StatusMessage>
+            <NavLink to="/donnees" className="btn btn--sm">
+              {t.data.backup.button}
+            </NavLink>
+          </div>
+        )}
         {swUpdate && (
           <div className="sw-update">
             <StatusMessage tone="info">{t.common.updateReady}</StatusMessage>

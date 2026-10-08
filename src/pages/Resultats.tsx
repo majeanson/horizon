@@ -9,6 +9,7 @@ import { ChartPanel } from '../components/results/ChartPanel'
 import { DeferralPanel } from '../components/results/DeferralPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { LedgerPanel } from '../components/results/LedgerPanel'
+import { OrderPanel } from '../components/results/OrderPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
 import { SaveView } from '../components/results/SaveView'
 import { StopView } from '../components/results/StopView'
@@ -223,6 +224,7 @@ export function Resultats() {
     ...(stop !== null ? [{ id: 'arreter', label: rc.nav.arreter }] : []),
     ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, arc: rc.arcs.pensions }] : []),
     { id: 'donnees-calcul', label: rc.nav.donneesCalcul, arc: rc.arcs.verify },
+    { id: 'ordre', label: rc.nav.ordre },
     { id: 'tableau', label: rc.nav.tableau },
     { id: 'sensibilite', label: rc.nav.sensibilite },
     { id: 'parametres', label: rc.nav.parametres },
@@ -232,6 +234,12 @@ export function Resultats() {
     <section className="page-body">
       <PageHead title={r.title} subtitle={r.verdict.explain(assumptions.horizonAge)} />
       <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
+      {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
+      <Cluster className="no-print">
+        <Chip icon="printer-bold" onClick={() => window.print()}>
+          {rc.out.print}
+        </Chip>
+      </Cluster>
 
       {/* Arc 1 — what you asked: the verdict, and the same answer compared, costed and dated. */}
       <section className="arc" aria-label={rc.arcs.answer}>
@@ -413,6 +421,11 @@ export function Resultats() {
       <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
         <SectionHeader title={LEDGER_COPY[lang].title} />
         <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
+      </section>
+
+      <section id="ordre" className="results-section" aria-label={rc.orders.title}>
+        <SectionHeader title={rc.orders.title} />
+        <OrderPanel household={profile.household} assumptions={assumptions} age={earliest ?? saveAge} firstAge={firstAge} />
       </section>
 
       <section id="tableau" className="results-section" aria-label={r.table.title}>

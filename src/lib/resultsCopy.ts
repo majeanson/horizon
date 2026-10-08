@@ -5,6 +5,36 @@
 // typed as the French one, so the two cannot drift apart; lib/resultsCopy.test.ts holds them to non-empty and translated.
 
 const FR_RESULTS = {
+  orders: {
+    title: 'Dans quel ordre puiser ?',
+    hint: (age: number) => `Votre plan, retraite à ${age} ans, refait avec chacun des six ordres de retrait des comptes. Les retraits sont recalculés année par année avec l’impôt, la RRQ, la PSV et le SRG.`,
+    keep: 'Votre ordre actuel est le meilleur, ou l’écart est trop petit pour valoir un changement.',
+    better: (name: string, bestAge: number | null, ownAge: number | null, saved: string) => {
+      const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
+      if (bestAge !== null && (ownAge === null || bestAge < ownAge)) {
+        return `« ${name} » permet de prendre sa retraite ${ownAge === null ? `à ${bestAge} ans, alors que votre ordre ne tient à aucun âge` : `${years(ownAge - bestAge)} plus tôt`}.`
+      }
+      return `« ${name} » coûte environ ${saved} d’impôt de moins sur tout le plan (en dollars d’aujourd’hui).`
+    },
+    order: 'Ordre',
+    earliest: 'Retraite au plus tôt',
+    tax: 'Impôt sur tout le plan',
+    worth: 'Valeur nette à l’horizon',
+    use: 'Utiliser',
+    yours: '(votre ordre)',
+    ahead: '(en tête)',
+    age: (n: number) => `${n} ans`,
+    updating: 'Mise à jour…',
+    caveat:
+      'La valeur nette compte ce qui reste dans le REER à sa pleine valeur, sans l’impôt qu’il faudrait encore payer : un ordre qui garde le REER pour la fin paraît plus riche qu’il ne l’est. Le classement va donc d’abord à l’âge, puis à l’impôt. « REER d’abord » est la forme simple d’une décumulation : le calcul ne remplit pas une tranche d’impôt pour s’arrêter ensuite. Le FERR minimum est versé dans tous les cas.',
+  },
+  /** The plan leaving the device: on paper, or as a spreadsheet — no network either way. */
+  out: {
+    print: 'Imprimer le plan',
+    csv: 'Télécharger en tableur (CSV)',
+    csvDone: 'Tableau exporté',
+    csvFile: (label: string) => `horizon-annee-par-annee-${label}.csv`,
+  },
   arcs: {
     answer: 'La réponse',
     pensions: 'Vos rentes publiques',
@@ -35,6 +65,7 @@ const FR_RESULTS = {
     epargner: 'Épargner',
     arreter: 'Arrêter',
     donneesCalcul: 'Mes données',
+    ordre: 'Ordre de retrait',
     tableau: 'Année par année',
     sensibilite: 'Sensibilité',
     parametres: 'Paramètres',
@@ -97,6 +128,35 @@ const FR_RESULTS = {
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
+  orders: {
+    title: 'In which order should I draw?',
+    hint: (age: number) => `Your plan, retiring at ${age}, rerun with each of the six orders of drawing the accounts. Withdrawals are recomputed year by year with tax, QPP, OAS and GIS.`,
+    keep: 'Your current order is the best one, or the gap is too small to be worth a change.',
+    better: (name: string, bestAge: number | null, ownAge: number | null, saved: string) => {
+      const years = (n: number) => `${n} year${n > 1 ? 's' : ''}`
+      if (bestAge !== null && (ownAge === null || bestAge < ownAge)) {
+        return `“${name}” lets you retire ${ownAge === null ? `at ${bestAge}, where your order lasts at no age` : `${years(ownAge - bestAge)} earlier`}.`
+      }
+      return `“${name}” costs about ${saved} less tax over the whole plan (in today’s dollars).`
+    },
+    order: 'Order',
+    earliest: 'Earliest retirement',
+    tax: 'Tax over the plan',
+    worth: 'Net worth at the horizon',
+    use: 'Use',
+    yours: '(your order)',
+    ahead: '(ahead)',
+    age: (n: number) => `${n}`,
+    updating: 'Updating…',
+    caveat:
+      'Net worth counts what is left in the RRSP at its full value, without the tax still owed on it: an order that keeps the RRSP for last looks richer than it is. The ranking therefore goes first to the age, then to the tax. “RRSP first” is the plain form of a meltdown: the calculation does not fill a tax bracket and then stop. The minimum RRIF payment is made in every case.',
+  },
+  out: {
+    print: 'Print the plan',
+    csv: 'Download as a spreadsheet (CSV)',
+    csvDone: 'Table exported',
+    csvFile: (label: string) => `horizon-year-by-year-${label}.csv`,
+  },
   arcs: {
     answer: 'The answer',
     pensions: 'Your public pensions',
@@ -126,6 +186,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
     epargner: 'Save',
     arreter: 'Stop',
     donneesCalcul: 'My data',
+    ordre: 'Withdrawal order',
     tableau: 'Year by year',
     sensibilite: 'Sensitivity',
     parametres: 'Parameters',

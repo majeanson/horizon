@@ -450,6 +450,10 @@ export const EN: typeof FR = {
       unsaved: 'A figure is outside the allowed limits: the profile was not saved. Correct the figure concerned.',
       conflict: 'Another tab saved while you were typing: its version was taken, and your last change was not kept.',
     },
+    backup: {
+      due: 'Your data lives only on this device and has not been exported in over a month.',
+      button: 'Export',
+    },
     rescue: {
       title: 'Unreadable copy',
       hint: 'The profile this device could not read was left in place. Download it before erasing anything: a file like this can often be mended by hand.',

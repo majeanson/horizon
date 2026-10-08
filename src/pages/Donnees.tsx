@@ -13,7 +13,7 @@ import { exampleProfile } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
-import { clearProfile, exportFileName, exportProfileJson, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
+import { clearProfile, exportFileName, exportProfileJson, getProfile, markExported, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { useNotice } from '../lib/toast'
 
 /** Hand a text to the browser as a file. */
@@ -54,6 +54,7 @@ export function Donnees() {
 
   const download = () => {
     saveAsFile(exportProfileJson(getProfile()), exportFileName())
+    markExported()
     notice(d.export.done)
   }
 

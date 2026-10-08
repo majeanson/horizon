@@ -1,5 +1,9 @@
 import { useLang, useT } from '../../i18n'
 import { formatMoney } from '../../lib/money'
+import { RESULTS_COPY } from '../../lib/resultsCopy'
+import { useNotice } from '../../lib/toast'
+import { yearCsv } from '../../lib/yearCsv'
+import { Chip } from '../Chip'
 import type { Selection } from '../../lib/resultsModel'
 import type { AgeResult } from '../../engine/types'
 
@@ -11,11 +15,26 @@ export function YearTables({ runs, label }: { runs: readonly { selection: Select
   const t = useT()
   const { lang } = useLang()
   const r = t.results
+  const out = RESULTS_COPY[lang].out
+  const notice = useNotice()
+  const saveCsv = (selection: Selection, result: AgeResult) => {
+    const csv = yearCsv(result, r.table, lang)
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = out.csvFile(label(selection).replace(/[^p{L}p{N}]+/gu, '-').replace(/^-|-$/g, ''))
+    a.click()
+    URL.revokeObjectURL(url)
+    notice(out.csvDone)
+  }
   return (
     <>
       {runs.map(({ selection, result }) => (
         <div key={String(selection)} className="year-table">
           <h3 className="year-table__title">{r.scenario.retireAt(label(selection))}</h3>
+          <Chip className="no-print" icon="download-simple-bold" onClick={() => saveCsv(selection, result)}>
+            {out.csv}
+          </Chip>
           <div className="table-wrap" role="region" aria-label={`${r.table.title} — ${label(selection)}`} tabIndex={0}>
             <table>
               <thead>

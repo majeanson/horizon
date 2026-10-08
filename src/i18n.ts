@@ -467,6 +467,10 @@ export const FR = {
       unsaved: 'Un chiffre dépasse les limites permises : le profil n’a pas été enregistré. Corrigez le chiffre en cause.',
       conflict: 'Un autre onglet a enregistré pendant votre saisie : sa version a été reprise, et votre dernière modification n’a pas été conservée.',
     },
+    backup: {
+      due: 'Vos données ne vivent que sur cet appareil et n’ont pas été exportées depuis plus d’un mois.',
+      button: 'Exporter',
+    },
     rescue: {
       title: 'Copie illisible',
       hint: 'Le profil que cet appareil n’a pas pu lire est resté sur place. Téléchargez-le avant d’effacer quoi que ce soit : un fichier de cette sorte se répare souvent à la main.',

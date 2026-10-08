@@ -38,6 +38,7 @@
   .skip-link,
   .section-nav,
   .toast-region,
+  .no-print,
   .next {
     display: none !important;
   }
