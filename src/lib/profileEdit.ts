@@ -1,4 +1,5 @@
 import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
+import { CUSTOM_PATH_YEARS, MARKET_PATHS } from '../engine/marketPaths.ts'
 import { rregopPension } from '../engine/presets.ts'
 import type { AccountKind, DbPension, Home, Person, PersonId } from '../engine/types.ts'
 import { blankPerson, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
@@ -94,6 +95,35 @@ export function restoreCustom(p: Profile): Profile {
   const kept = p.customScenario
   if (kept === null || sameScenario(kept, scenarioOf(p.assumptions))) return p
   return { ...p, assumptions: { ...p.assumptions, inflation: kept.inflation, wageGrowth: kept.wageGrowth, returns: { ...kept.returns }, horizonAge: kept.horizonAge } }
+}
+
+// ── The path the markets take ───────────────────────────────────────────────────────────────────────
+
+type PathPreset = StoredAssumptions['marketPath']['preset']
+
+/** Choose a path. « Personnalisé » opens on the returns of the path it replaces, so it is edited, not started from a blank page. */
+export function setMarketPreset(p: Profile, preset: PathPreset): Profile {
+  const now = p.assumptions.marketPath
+  if (now.preset === preset) return p
+  if (preset !== 'custom') return setAssumptions(p, { marketPath: { preset, custom: now.custom } })
+  const from = now.custom.length > 0 ? now.custom : MARKET_PATHS[now.preset === 'custom' ? 'badStart' : now.preset]
+  const seed = from.length > 0 ? [...from] : [-0.1, 0.02, 0.05]
+  return setAssumptions(p, { marketPath: { preset, custom: seed.slice(0, CUSTOM_PATH_YEARS) } })
+}
+
+/** One year of the custom path, counted from the first retirement year. */
+export function setMarketYear(p: Profile, index: number, value: number): Profile {
+  const custom = p.assumptions.marketPath.custom
+  if (index < 0 || index >= custom.length || custom[index] === value) return p
+  return setAssumptions(p, { marketPath: { preset: 'custom', custom: custom.map((v, i) => (i === index ? value : v)) } })
+}
+
+/** One more year at the end (the average return, until it is edited), or the last one fewer. */
+export function resizeMarketPath(p: Profile, delta: 1 | -1, average: number): Profile {
+  const custom = p.assumptions.marketPath.custom
+  if (delta === 1 && custom.length >= CUSTOM_PATH_YEARS) return p
+  if (delta === -1 && custom.length <= 1) return p
+  return setAssumptions(p, { marketPath: { preset: 'custom', custom: delta === 1 ? [...custom, average] : custom.slice(0, -1) } })
 }
 
 export function setReturn(p: Profile, kind: AccountKind, value: number): Profile {

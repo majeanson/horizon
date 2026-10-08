@@ -3,6 +3,7 @@ import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from '.
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson } from './oas.ts'
 import { homeYear, initialHome, type HomeState } from './home.ts'
 import { memberContribution } from './memberContribution.ts'
+import { pathReturn, resolvePath } from './marketPaths.ts'
 import { payrollContribution } from './payroll.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
 import { roundTo, type Indexation } from './params/project.ts'
@@ -140,6 +141,15 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
     nonReg: { balance: p.accounts.nonReg.balance, acb: p.accounts.nonReg.acb },
   }))
 
+  // The returns of a year: each account's average, unless a market path bends it. The path is counted from the first year anyone is
+  // retired, so it follows the retirement age being tried (engine/marketPaths.ts).
+  const path = resolvePath(a.marketPath)
+  const firstRetired = Math.min(...people.map((r) => r.leaving.year))
+  const returnsOf = (year: number): Record<AccountKind, number> =>
+    path.length === 0
+      ? a.returns
+      : { nonReg: pathReturn(path, year - firstRetired, a.returns.nonReg), rrsp: pathReturn(path, year - firstRetired, a.returns.rrsp), tfsa: pathReturn(path, year - firstRetired, a.returns.tfsa) }
+
   const rows: YearRow[] = []
   let home: HomeState | null = h.home ? initialHome(h.home) : null
   for (let year = a.today.year; year <= endYear; year++) {
@@ -152,7 +162,7 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
       home = step.next
       if (step.released > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + step.released, acb: s.nonReg.acb + step.released } } : s))
     }
-    const out = simulateYear(year, h, a, people, states, paramsOf, indexation, housing)
+    const out = simulateYear(year, h, a, people, states, paramsOf, indexation, housing, returnsOf(year))
     rows.push(out.row)
     states = out.next
   }
@@ -177,6 +187,7 @@ function simulateYear(
   paramsOf: (y: number) => PlainYear,
   indexation: Indexation,
   housing: Housing,
+  returns: Record<AccountKind, number>,
 ): { row: YearRow; next: PersonState[] } {
   const P = paramsOf(year)
   const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, livesAlone: h.livesAlone }
@@ -208,14 +219,14 @@ function simulateYear(
     // part and the locked part (capped before 55) are what the RRSP can give this year. The employer's VRSP contribution is not a
     // choice, so it has first claim on the room; the person's own contribution takes what is left.
     const lockedJan1 = unlocksAt65(age, states[i].rrspLocked, P.rrq.mga, P.accounts) ? 0 : states[i].rrspLocked
-    const freeAvail = maxWithdraw(states[i].rrsp - lockedJan1, a.returns.rrsp)
-    const lockedAvail = lockedAvailable(age, lockedJan1, a.returns.rrsp, P.accounts)
+    const freeAvail = maxWithdraw(states[i].rrsp - lockedJan1, returns.rrsp)
+    const lockedAvail = lockedAvailable(age, lockedJan1, returns.rrsp, P.accounts)
     const employerC = working && age <= 71 ? Math.min((acct.rrsp.employerContribution ?? 0) * inflate, states[i].rrspRoom) : 0
     const rrspC = working && age <= 71 ? Math.min(acct.rrsp.annualContribution * inflate, Math.max(0, states[i].rrspRoom - employerC)) : 0
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, a.returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC }
+    return { age, employment, rrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -384,7 +395,7 @@ function simulateYear(
     for (const kind of a.withdrawalOrder) {
       if (need <= 0.005) break
       const room = people.map((_, i) =>
-        kind === 'rrsp' ? fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, a.returns.tfsa) : maxWithdraw(states[i].nonReg.balance, a.returns.nonReg),
+        kind === 'rrsp' ? fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, returns.tfsa) : maxWithdraw(states[i].nonReg.balance, returns.nonReg),
       )
       const available = sum(room.map((x) => Math.max(0, x)))
       if (available <= 0.005) continue
@@ -495,16 +506,16 @@ function simulateYear(
     const tfsaIn = fixed[i].tfsaC + extra.tfsa[i]
     const nonRegIn = fixed[i].nonRegC + extra.nonReg[i]
     const { locked: lockedOut } = splitRrspOut(rrspOut, fixed[i].freeAvail, fixed[i].lockedAvail)
-    const rrspNext = grow(s.rrsp, fixed[i].rrspC + fixed[i].employerC - rrspOut, a.returns.rrsp)
+    const rrspNext = grow(s.rrsp, fixed[i].rrspC + fixed[i].employerC - rrspOut, returns.rrsp)
     // The locked part grows on its own flows: the employer's money in, its share of the draw out. grow() is linear, so the two parts
     // differ from the whole by cent-rounding only; the clamp keeps 0 ≤ locked ≤ rrsp whatever the rounding.
-    const rrspLockedNext = Math.min(Math.max(0, grow(fixed[i].lockedJan1, fixed[i].employerC - lockedOut, a.returns.rrsp)), rrspNext)
-    const tfsaNext = grow(s.tfsa, tfsaIn - draw.tfsa[i], a.returns.tfsa)
+    const rrspLockedNext = Math.min(Math.max(0, grow(fixed[i].lockedJan1, fixed[i].employerC - lockedOut, returns.rrsp)), rrspNext)
+    const tfsaNext = grow(s.tfsa, tfsaIn - draw.tfsa[i], returns.tfsa)
     const afterWithdrawal = nonRegContribute(w.state, nonRegIn)
     // Mid-year like the other two accounts (accounts.ts « convention for flows »): the balance grows from its
     // JANUARY level and half a year on the net flow. The gain realized by the withdrawal is still measured against
     // the January balance and cost base, which is what `nonRegWithdraw` does.
-    const nonRegBalance = grow(s.nonReg.balance, nonRegIn - w.taken, a.returns.nonReg)
+    const nonRegBalance = grow(s.nonReg.balance, nonRegIn - w.taken, returns.nonReg)
 
     // Rooms for next January.
     const earned = fixed[i].employment

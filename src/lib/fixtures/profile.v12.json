@@ -1,0 +1,212 @@
+{
+  "app": "horizon",
+  "version": 12,
+  "household": {
+    "livesAlone": false,
+    "persons": [
+      {
+        "id": "self",
+        "name": "Camille",
+        "birth": {
+          "year": 1978,
+          "month": 3
+        },
+        "retirementAge": 60,
+        "salaryToday": 85000,
+        "earningsHistory": {
+          "1999": 30000,
+          "2000": 31200,
+          "2001": 32448,
+          "2002": 33746,
+          "2003": 35096,
+          "2004": 36500,
+          "2005": 37960,
+          "2006": 39478,
+          "2007": 41057,
+          "2008": 42699,
+          "2009": 44407,
+          "2010": 46184,
+          "2011": 48031,
+          "2012": 49952,
+          "2013": 51100,
+          "2014": 52500,
+          "2015": 53600,
+          "2016": 54900,
+          "2017": 55300,
+          "2018": 55900,
+          "2019": 57400,
+          "2020": 58700,
+          "2021": 61600,
+          "2022": 64900,
+          "2023": 66600,
+          "2024": 73200,
+          "2025": 81200
+        },
+        "rrq": {
+          "startAge": 65
+        },
+        "oas": {
+          "startAge": 65,
+          "residentSince": 1996
+        },
+        "accounts": {
+          "rrsp": {
+            "lockedIn": 0,
+            "employerContribution": 0,
+            "balance": 95000,
+            "room": 18000,
+            "annualContribution": 6000
+          },
+          "tfsa": {
+            "balance": 48000,
+            "room": 24000,
+            "annualContribution": 7000
+          },
+          "nonReg": {
+            "balance": 15000,
+            "acb": 12000,
+            "annualContribution": 0
+          }
+        },
+        "pensions": [
+          {
+            "label": "RREGOP",
+            "accrualRate": 0.02,
+            "maxServiceYears": 40,
+            "serviceYearsToDate": 12,
+            "serviceRatePerYear": 1,
+            "averagingYears": 5,
+            "coordination": {
+              "rate": 0.007,
+              "fromAge": 65,
+              "maxYears": 35
+            },
+            "earliestAge": 55,
+            "unreduced": {
+              "age": 61,
+              "serviceYears": 35,
+              "factor": {
+                "minAge": 60,
+                "total": 90
+              }
+            },
+            "earlyReductionPerYear": 0.06,
+            "bridge": null,
+            "indexation": {
+              "share": 0.5,
+              "minus": 0.03
+            },
+            "startAge": 60,
+            "deferred": {
+              "toAge": 65,
+              "indexation": {
+                "share": 1,
+                "minus": 0
+              }
+            },
+            "memberContribution": {
+              "rate": 0.0863,
+              "exemptionShare": 0.25,
+              "reductionFactor": 0.0153
+            }
+          }
+        ]
+      },
+      {
+        "id": "spouse",
+        "name": "Alex",
+        "birth": {
+          "year": 1981,
+          "month": 9
+        },
+        "retirementAge": 62,
+        "salaryToday": 65000,
+        "earningsHistory": {
+          "2002": 25000,
+          "2003": 26000,
+          "2004": 27040,
+          "2005": 28122,
+          "2006": 29246,
+          "2007": 30416,
+          "2008": 31633,
+          "2009": 32898,
+          "2010": 34214,
+          "2011": 35583,
+          "2012": 37006,
+          "2013": 38486,
+          "2014": 40026,
+          "2015": 41627,
+          "2016": 43292,
+          "2017": 45024,
+          "2018": 46825,
+          "2019": 48698,
+          "2020": 50645,
+          "2021": 52671,
+          "2022": 54778,
+          "2023": 56969,
+          "2024": 59248,
+          "2025": 61618
+        },
+        "rrq": {
+          "startAge": 65
+        },
+        "oas": {
+          "startAge": 65,
+          "residentSince": 1999
+        },
+        "accounts": {
+          "rrsp": {
+            "lockedIn": 0,
+            "employerContribution": 0,
+            "balance": 60000,
+            "room": 12000,
+            "annualContribution": 4000
+          },
+          "tfsa": {
+            "balance": 36000,
+            "room": 30000,
+            "annualContribution": 6000
+          },
+          "nonReg": {
+            "balance": 10000,
+            "acb": 9000,
+            "annualContribution": 0
+          }
+        },
+        "pensions": []
+      }
+    ],
+    "spending": {
+      "workingToday": 88000,
+      "retiredToday": 90000
+    },
+    "home": null
+  },
+  "children": [
+    2012,
+    2015
+  ],
+  "assumptions": {
+    "marketPath": {
+      "preset": "smooth",
+      "custom": []
+    },
+    "surplusToRrsp": false,
+    "inflation": 0.021,
+    "wageGrowth": 0.031,
+    "returns": {
+      "nonReg": 0.04,
+      "rrsp": 0.045,
+      "tfsa": 0.045
+    },
+    "horizonAge": 95,
+    "withdrawalOrder": [
+      "nonReg",
+      "rrsp",
+      "tfsa"
+    ],
+    "pensionSplitting": true
+  },
+  "customScenario": null,
+  "confirmed": []
+}

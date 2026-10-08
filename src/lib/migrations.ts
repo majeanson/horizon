@@ -73,6 +73,12 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     if (typeof a !== 'object' || a === null || Array.isArray(a)) return profile
     return { ...profile, assumptions: { surplusToRrsp: false, ...(a as Raw) } }
   },
+  // v11 → v12: the assumptions may bend the markets' path (`marketPath`). Every older file was computed with the average return every year: « lisse », no custom years.
+  (profile) => {
+    const a = profile.assumptions
+    if (typeof a !== 'object' || a === null || Array.isArray(a)) return profile
+    return { ...profile, assumptions: { marketPath: { preset: 'smooth', custom: [] }, ...(a as Raw) } }
+  },
 ]
 
 export type ReadResult =

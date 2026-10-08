@@ -16,7 +16,9 @@ import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { factId } from '../lib/facts'
 import { formatPct } from '../lib/format'
-import { applyPreset, restoreCustom, sameScenario, scenarioOf, setAssumptions, setReturn, setSpending } from '../lib/profileEdit'
+import { applyPreset, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn, setSpending } from '../lib/profileEdit'
+import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
+import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 import { MARKET_COPY } from '../lib/marketCopy'
@@ -146,6 +148,34 @@ export function Hypotheses() {
           {a.splitting.on}
         </Chip>
         <p className="field-row__hint">{a.splitting.hint}</p>
+      </Section>
+
+      <Section title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
+        <Cluster>
+          {([...MARKET_PRESETS, 'custom'] as const).map((k) => (
+            <Chip key={k} selected={assumptions.marketPath.preset === k} onClick={() => updateProfile((p) => setMarketPreset(p, k))}>
+              {m.path.names[k]}
+            </Chip>
+          ))}
+        </Cluster>
+        <p className="field-row__hint">
+          {m.path.about[assumptions.marketPath.preset]}
+          {assumptions.marketPath.preset !== 'smooth' && assumptions.marketPath.preset !== 'custom' ? ` ${MARKET_PATHS[assumptions.marketPath.preset].map((r) => formatPct(r, lang, 0)).join(' · ')}` : ''}
+        </p>
+        {assumptions.marketPath.preset === 'custom' && (
+          <>
+            {assumptions.marketPath.custom.map((v, i) => (
+              <FieldRow key={i} label={m.path.year(i + 1)}>
+                {(w) => <NumberField kind="percent" min={-0.6} max={0.6} value={v ?? (assumptions.returns.rrsp + assumptions.returns.tfsa + assumptions.returns.nonReg) / 3} onChange={(x) => updateProfile((p) => setMarketYear(p, i, x))} id={w.id} />}
+              </FieldRow>
+            ))}
+            <Cluster>
+              <Chip onClick={() => updateProfile((p) => resizeMarketPath(p, 1, (p.assumptions.returns.rrsp + p.assumptions.returns.tfsa + p.assumptions.returns.nonReg) / 3))}>{m.path.add}</Chip>
+              <Chip onClick={() => updateProfile((p) => resizeMarketPath(p, -1, 0))}>{m.path.remove}</Chip>
+            </Cluster>
+            <p className="field-row__hint">{m.path.countsFrom}</p>
+          </>
+        )}
       </Section>
 
       <Section title={m.surplus.title} icon="lock-bold">

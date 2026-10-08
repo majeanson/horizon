@@ -135,6 +135,15 @@ export interface Home {
   sale: { age: number; replacementCost: number } | null
 }
 
+/**
+ * A market path as the person chose it: a ready-made one, or their own list of yearly returns counted from the first retirement year
+ * (`null`: that year earns the average). The ready-made names are in engine/marketPaths.ts.
+ */
+export interface MarketPath {
+  preset: 'smooth' | 'badStart' | 'lostDecade' | 'boomBust' | 'custom'
+  custom: readonly (number | null)[]
+}
+
 export interface Household {
   /**
    * Whether the household is ONE adult who lives alone — the condition for Québec's living-alone amount. Ignored for a
@@ -175,6 +184,8 @@ export interface Assumptions {
    * Absent / false: the surplus goes to the TFSA, then non-registered, and the RRSP only gets what the person entered.
    */
   surplusToRrsp?: boolean
+  /** The path the markets take (engine/marketPaths.ts). Absent: the average return, every year. */
+  marketPath?: MarketPath
 }
 
 /** The question being asked: « what if … ». Overrides the profile's own choices for one run. */

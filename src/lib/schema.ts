@@ -1,4 +1,4 @@
-import type { AccountKind, Assumptions, DbPension, Home, Household, Person, PersonId } from '../engine/types.ts'
+import type { AccountKind, Assumptions, DbPension, Home, Household, MarketPath, Person, PersonId } from '../engine/types.ts'
 import { FACT_ID_PATTERN } from './facts.ts'
 
 // THE SHAPE OF A SAVED PROFILE — what is written to this device's storage and to an exported file.
@@ -11,12 +11,12 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 11
+export const SCHEMA_VERSION = 12
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
 
-export type StoredAssumptions = Omit<Assumptions, 'today'>
+export type StoredAssumptions = Omit<Assumptions, 'today' | 'marketPath'> & { marketPath: MarketPath }
 
 /** The economy a person typed by hand, kept while a ready-made scenario is chosen, so « Personnalisé » can be taken back. */
 export type CustomScenario = Pick<StoredAssumptions, 'inflation' | 'wageGrowth' | 'returns' | 'horizonAge'>
@@ -75,6 +75,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,
     surplusToRrsp: false,
+    marketPath: { preset: 'smooth', custom: [] },
   },
   customScenario: null,
   confirmed: [],
@@ -311,6 +312,9 @@ export function validateProfile(raw: unknown): ProfileResult {
   const orderRaw = r.arr(a.withdrawalOrder, 'assumptions.withdrawalOrder') ?? []
   const order = orderRaw.map((k, i) => r.oneOf(k, `assumptions.withdrawalOrder[${i}]`, ACCOUNT_KINDS))
   if (order.length !== 3 || new Set(order).size !== 3) r.count('assumptions.withdrawalOrder')
+  const mp = r.obj(a.marketPath, 'assumptions.marketPath') ?? {}
+  const customRaw = r.arr(mp.custom, 'assumptions.marketPath.custom') ?? []
+  if (customRaw.length > 10) r.count('assumptions.marketPath.custom')
   const assumptions: StoredAssumptions = {
     inflation: r.num(a.inflation, 'assumptions.inflation', -0.02, 0.15),
     wageGrowth: r.num(a.wageGrowth, 'assumptions.wageGrowth', -0.02, 0.15),
@@ -323,6 +327,10 @@ export function validateProfile(raw: unknown): ProfileResult {
     withdrawalOrder: order,
     pensionSplitting: r.bool(a.pensionSplitting, 'assumptions.pensionSplitting'),
     surplusToRrsp: r.bool(a.surplusToRrsp, 'assumptions.surplusToRrsp'),
+    marketPath: {
+      preset: r.oneOf(mp.preset, 'assumptions.marketPath.preset', ['smooth', 'badStart', 'lostDecade', 'boomBust', 'custom'] as const),
+      custom: customRaw.map((v, i) => (v === null ? null : r.num(v, `assumptions.marketPath.custom[${i}]`, -0.6, 0.6))),
+    },
   }
 
   // The kept hand-typed scenario: null, or the same four figures as the assumptions, held to the same bounds.
