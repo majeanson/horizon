@@ -13,9 +13,10 @@ test('eight steps, the first about the household, and the step is in the address
   await expect(page.getByText('Étape 1 sur 8')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Vous et votre ménage', level: 2 })).toBeVisible()
   await page.getByRole('button', { name: 'Suivant' }).click()
-  await expect(page).toHaveURL(/etape=rrq/)
+  // the documents come most important first: the spending budget, then the tax notice…
+  await expect(page).toHaveURL(/etape=budget/)
   await expect(page.getByText('Étape 2 sur 8')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Relevé de participation au RRQ', level: 2 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vos dépenses des 12 derniers mois', level: 2 })).toBeVisible()
   await page.getByRole('button', { name: 'Précédent' }).click()
   await expect(page.getByText('Étape 1 sur 8')).toBeVisible()
 })

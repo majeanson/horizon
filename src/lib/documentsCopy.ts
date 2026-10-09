@@ -1,5 +1,6 @@
 import type { Lang } from '../i18n.ts'
 import type { DocId } from './facts.ts'
+import type { DocWeight } from './documentsList.ts'
 
 // THE WORDS OF « DOCUMENTS À RASSEMBLER » (the page of that name). The documents' own names, what each is for and how to get it are the profile guide's
 // (lib/guideCopy.ts): one wording, so the list and the guide can never disagree.
@@ -9,6 +10,10 @@ export interface DocumentsCopy {
   subtitle: string
   intro: string
   progress: (done: number, total: number) => string
+  /** The list is in order of weight: what it means, and the three tags. */
+  rankNote: string
+  importance: string
+  weights: Record<DocWeight, string>
   progressAll: string
   print: string
   download: string
@@ -43,6 +48,9 @@ const FR: DocumentsCopy = {
   intro: 'Cochez au fur et à mesure, téléchargez ou imprimez la liste, rassemblez vos documents, puis saisissez les chiffres dans Profil quand vous voulez. Une fois ouvert, Horizon fonctionne sans connexion, et rien de ce que vous saisissez ne quitte l’appareil.',
   progress: (done, total) => `${done} sur ${total} rassemblés`,
   progressAll: 'Tout est rassemblé : vous pouvez saisir.',
+  rankNote: 'Du plus au moins important pour la réponse : on a mesuré de combien d’années elle bouge quand les chiffres de chaque document se trompent de 15 %. Commencez par le haut ; ce qui ne vous concerne pas peut attendre.',
+  importance: 'Importance',
+  weights: { high: 'Très important', medium: 'Important', situational: 'Selon votre situation' },
   print: 'Imprimer la liste',
   download: 'Télécharger la liste',
   reset: 'Tout décocher',
@@ -79,6 +87,9 @@ const EN: DocumentsCopy = {
   intro: 'Tick as you go, download or print the list, gather your documents, then type the figures into Profile whenever you like. Once open, Horizon works without a connection, and nothing you type leaves the device.',
   progress: (done, total) => `${done} of ${total} gathered`,
   progressAll: 'Everything is gathered: you can start typing.',
+  rankNote: 'From most to least important for the answer: we measured by how many years it moves when each document’s figures are off by 15%. Start at the top; what does not concern you can wait.',
+  importance: 'Importance',
+  weights: { high: 'Very important', medium: 'Important', situational: 'Depends on your situation' },
   print: 'Print the list',
   download: 'Download the list',
   reset: 'Untick all',

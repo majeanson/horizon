@@ -39,6 +39,15 @@ describe('documentItems', () => {
     }
   })
 
+  it('the list runs from the most important document to the least: the spending budget and the tax notice first, the situational ones last', () => {
+    const items = documentItems(couple, GUIDE_COPY.fr, urlOf)
+    expect(DOC_IDS).toEqual(['budget', 'tax', 'bank', 'rrq', 'home', 'employer', 'residence'])
+    const rank = { high: 0, medium: 1, situational: 2 } as const
+    for (let i = 1; i < items.length; i++) expect(rank[items[i].weight], items[i].id).toBeGreaterThanOrEqual(rank[items[i - 1].weight])
+    expect(items[0].doc).toBe('budget')
+    expect(items[items.length - 1].doc).toBe('residence')
+  })
+
   it('says the same in both languages: as many items, in the same order, each named differently', () => {
     const fr = documentItems(couple, GUIDE_COPY.fr, urlOf)
     const en = documentItems(couple, GUIDE_COPY.en, urlOf)
@@ -50,7 +59,7 @@ describe('documentItems', () => {
 describe('documentsText', () => {
   const head = (lang: 'fr' | 'en') => {
     const c = DOCUMENTS_COPY[lang]
-    return { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official }
+    return { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights }
   }
   it('is a plain list to keep beside the documents: a box to tick, what it is for, where it is — and the official page only when there is one', () => {
     const items = documentItems(couple, GUIDE_COPY.fr, urlOf)

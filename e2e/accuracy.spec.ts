@@ -37,7 +37,9 @@ test('a figure is estimated until the person says it is real; the mark, the mete
 test('the checklist names the documents, what each confirms, and its official page; a figure in it leads to its field', async ({ page }) => {
   await page.goto('/')
   const docs = panel(page).locator('.doc')
-  await expect(docs.first()).toContainText('Relevé de participation au RRQ')
+  // the documents come most important first: the spending budget leads
+  await expect(docs.first()).toContainText('Vos dépenses des 12 derniers mois')
+  await expect(docs.filter({ hasText: 'Relevé de participation au RRQ' })).toHaveCount(1)
   await expect(panel(page).locator('.doc', { hasText: 'Avis de cotisation' }).getByRole('link', { name: /page officielle/ })).toHaveAttribute('href', /^https:\/\/www\.canada\.ca\//)
   // the two ways are two chips: walk every figure with the guide, or estimate what is still blank
   await expect(panel(page).getByRole('button', { name: 'Tout confirmer pas à pas' })).toBeVisible()

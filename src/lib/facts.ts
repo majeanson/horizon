@@ -28,9 +28,15 @@ export type FactKind =
   | 'homeValue'
   | 'mortgage'
 
-/** The documents that hold the real numbers, in the order a person is most likely to have them to hand. */
 export type DocId = 'rrq' | 'tax' | 'bank' | 'employer' | 'home' | 'budget' | 'residence'
-export const DOC_IDS: readonly DocId[] = ['rrq', 'tax', 'bank', 'employer', 'home', 'budget', 'residence']
+/**
+ * The documents that hold the real numbers, MOST IMPORTANT FIRST: the order of the checklist, of the entry by document and of the panel. Measured on the nine
+ * example households (engine/factImpact.ts: each figure nudged 15 % each way, how many years the answer moves, summed per document): the spending
+ * budget moves it most (about 4 years), then the tax notice — the salary and the room (about 2) — then the account balances (about 1), then the QPP
+ * statement (about ½). The home, the employer pension and the proof of residence matter little on average and a great deal to whoever has them, so they
+ * come last, the more common first.
+ */
+export const DOC_IDS: readonly DocId[] = ['budget', 'tax', 'bank', 'rrq', 'home', 'employer', 'residence']
 
 export type FactOwner = PersonId | 'household'
 

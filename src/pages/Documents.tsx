@@ -32,13 +32,14 @@ export function Documents() {
   const items = documentItems(people, guide, urlOf)
   const done = items.filter((it) => ticked.has(it.id)).length
   const download = () => {
-    saveAsFile(documentsText(items, ticked, { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official }), c.file, 'text/plain;charset=utf-8')
+    saveAsFile(documentsText(items, ticked, { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights }), c.file, 'text/plain;charset=utf-8')
     notice(c.downloaded)
   }
   return (
     <section className="page-body docs-page">
       <PageHead title={c.title} subtitle={c.subtitle} />
       <p className="docs-page__intro">{c.intro}</p>
+      <p className="docs-page__intro">{c.rankNote}</p>
       <Cluster className="no-print">
         <Chip icon="printer-bold" onClick={() => window.print()}>
           {c.print}
@@ -66,6 +67,9 @@ export function Documents() {
               </label>
               <div className="docs-item__body">
                 <h2 className="docs-item__name">{it.name}</h2>
+                <p className={`docs-item__weight docs-item__weight--${it.weight} mono`}>
+                  {c.importance} : {c.weights[it.weight]}
+                </p>
                 {who !== null && <p className="docs-item__who">{who}</p>}
                 {c.when[it.doc] && <p className="field-row__hint">{c.when[it.doc]}</p>}
                 <p>{it.what}</p>
