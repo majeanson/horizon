@@ -3,13 +3,16 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { presetOf } from '../engine/assumptionPresets.ts'
+import { plain } from '../engine/params/cited.ts'
+import { knownYear } from '../engine/params/index.ts'
+import { residenceFraction } from '../engine/oas.ts'
 import { rrqPension } from '../engine/rrq.ts'
 import { makeRrqRules } from '../engine/rrqRules.ts'
 import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, earningsCeiling, fillFromSalary, historyYears } from './earnings.ts'
 import {
   addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, removeChild, removePension, removeSpouse,
-  applyDeferredRule, isRregopRules, needsDeferredRule, restoreCustom, scenarioOf, setAssumptions, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
+  applyDeferredRule, isRregopRules, needsDeferredRule, restoreCustom, scenarioOf, setAssumptions, setBirthYear, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { migrateProfile } from './migrations.ts'
 import { profileGaps } from './profileGaps.ts'
@@ -275,5 +278,32 @@ describe('removing the spouse', () => {
     const after = removeSpouse(p)
     expect((after.household.flows ?? []).map((f) => [f.label, f.owner])).toEqual([['Héritage', 'self'], ['Toit', 'self']])
     valid(after)
+  })
+})
+
+describe('the year of birth', () => {
+  const person = (birthYear: number, residentSince: number) => {
+    const p = defaultProfile({ year: 2026 }).household.persons[0]
+    return { ...p, birth: { year: birthYear, month: 1 }, oas: { ...p.oas, residentSince } }
+  }
+
+  it('carries a lifelong residence with it: typing the real year of birth must not shorten the OAS residence', () => {
+    // a first visit: birth 1981 and a residence 18 years later, both from today's date; the person types 1960
+    const first = defaultProfile({ year: 2026 }).household.persons[0]
+    expect(first.oas.residentSince).toBe(first.birth.year + 18)
+    const typed = setBirthYear(first, 1960)
+    expect(typed.birth.year).toBe(1960)
+    expect(typed.oas.residentSince).toBe(1978)
+    expect(residenceFraction({ birth: typed.birth, startAge: 65, residentSince: typed.oas.residentSince }, 2025, plain(knownYear(2026).oas))).toBe(1)
+  })
+
+  it('carries « born here » (a residence from the year of birth) too', () => {
+    expect(setBirthYear(person(1981, 1981), 1975).oas.residentSince).toBe(1975)
+  })
+
+  it('leaves alone someone who came later, and returns the same person when nothing changes', () => {
+    const arrived = person(1974, 1999)
+    expect(setBirthYear(arrived, 1975).oas.residentSince).toBe(1999)
+    expect(setBirthYear(arrived, 1974)).toBe(arrived)
   })
 })

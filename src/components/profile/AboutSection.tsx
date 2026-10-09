@@ -1,5 +1,6 @@
 import { useT } from '../../i18n'
 import { factId } from '../../lib/facts'
+import { setBirthYear } from '../../lib/profileEdit'
 import { EditField } from '../EditField'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
@@ -19,7 +20,7 @@ export function AboutSection({ person, edit, withoutSalary = false }: PersonEdit
       </FieldRow>
       <FieldRow label={a.birthYear}>
         {(w) => (
-          <NumberField kind="year" min={1900} max={2100} value={person.birth.year} onChange={(year) => edit((x) => ({ ...x, birth: { ...x.birth, year } }))} id={w.id} />
+          <NumberField kind="year" min={1900} max={2100} value={person.birth.year} onChange={(year) => edit((x) => setBirthYear(x, year))} id={w.id} />
         )}
       </FieldRow>
       <FieldRow label={a.birthMonth} hint={a.birthHint}>

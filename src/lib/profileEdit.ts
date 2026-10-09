@@ -29,6 +29,19 @@ export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): P
 
 // ── The REER's locked-in part ──────────────────────────────────────────────────────────────────────────
 
+/**
+ * The year of birth. A person who has lived here since turning 18 (or since birth) STILL has when the year changes: the residence moves with it. A
+ * profile starts with a year of birth and a residence 18 years later, both from today's date; typing the real year of birth used to leave the residence
+ * where it was, and the OAS counts only the years from the later of the two — someone born in 1960 was quietly given 26 years of residence instead of 40.
+ * Someone who came later (a residence after their 18th birthday) keeps their own year.
+ */
+export function setBirthYear(person: Person, year: number): Person {
+  if (person.birth.year === year) return person
+  const lifelong = person.oas.residentSince <= person.birth.year + 18
+  const residentSince = lifelong ? person.oas.residentSince + (year - person.birth.year) : person.oas.residentSince
+  return { ...person, birth: { ...person.birth, year }, oas: { ...person.oas, residentSince } }
+}
+
 /** The REER balance. The locked part is PART of it, so lowering the balance lowers the locked part with it; the same person back when nothing changes. */
 export function setRrspBalance(person: Person, balance: number): Person {
   const rrsp = person.accounts.rrsp

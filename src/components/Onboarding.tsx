@@ -7,7 +7,7 @@ import { useConfirm } from '../lib/confirm'
 import { formatMoney } from '../lib/money'
 import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { ONBOARD_COPY } from '../lib/onboardCopy'
-import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, removeSpouse, setSpending, updateHome, updatePension } from '../lib/profileEdit'
+import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, setBirthYear, removeSpouse, setSpending, updateHome, updatePension } from '../lib/profileEdit'
 import { profileGaps, type ProfileGap } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 import { today } from '../lib/today'
@@ -98,7 +98,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
             onChange={(year) => {
               if (year === null) return
               setBirthTyped((b) => ({ ...b, [id]: true }))
-              edit(id, (x) => ({ ...x, birth: { ...x.birth, year } }))
+              edit(id, (x) => setBirthYear(x, year))
             }}
             id={w.id}
             autoFocus={focus}
