@@ -60,7 +60,7 @@ const FR: DocumentsCopy = {
   file: 'horizon-documents.txt',
   fileTitle: 'Horizon : documents à rassembler',
   fileIntro: 'Cochez [x] ce que vous avez. Chaque document dit ce qu’on y lit et où le trouver. Rien de ce que vous saisissez ensuite ne quitte votre appareil.',
-  glossaryNote: 'Un sigle vous échappe ?',
+  glossaryNote: 'Un sigle vous échappe ?',
   glossaryLink: 'Le glossaire les explique',
   next: 'Quand tout est rassemblé',
   nextGo: 'Commencer avec Profil',
