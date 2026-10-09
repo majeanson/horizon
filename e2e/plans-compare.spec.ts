@@ -11,7 +11,8 @@ test('a kept plan shows beside the current one, with how far apart they are; wit
   await seedProfile(page, profile)
   await page.goto('/resultats')
   await expect(page.getByText('Mes plans, côte à côte')).toBeVisible({ timeout: 60_000 })
-  await expect(page.locator('.levers__item strong', { hasText: /^Plan actuel$/ })).toBeVisible()
+  // The block shows at once; its rows come last (the page queues its heavy searches behind the earlier ones), so on a slow runner they take a while.
+  await expect(page.locator('.levers__item strong', { hasText: /^Plan actuel$/ })).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText('Dépenses plus hautes', { exact: true })).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText(/plus tard que le plan actuel/)).toBeVisible({ timeout: 60_000 })
 })
