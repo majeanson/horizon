@@ -89,6 +89,7 @@ export function Donnees() {
         </Cluster>
       )}
 
+      <div className="data-pair">
       {/* The copy is the whole reason this page exists: its button is the one filled button here. */}
       <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
         <Cluster>
@@ -141,6 +142,7 @@ export function Donnees() {
           </div>
         )}
       </Section>
+      </div>
 
       <PlansSection onReplace={setPrevious} />
 

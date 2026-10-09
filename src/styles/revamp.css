@@ -926,3 +926,75 @@
   opacity: 0.6;
   transition: opacity 0.2s ease-out;
 }
+
+/* ── « Solidité de la réponse » (2026-10-08): the scenarios and the hard market side by side, the levers under them ── */
+.firm {
+  display: grid;
+  gap: 1rem;
+}
+.firm__pair {
+  display: grid;
+  gap: 1rem;
+}
+.firm .verdict__range {
+  margin-top: 0;
+}
+@media (min-width: 900px) {
+  .firm__pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+/* The relevé is thirty-odd lines: it scrolls inside its own box instead of lengthening the whole page (the inputs stay in
+   the tab order, so the box is reachable by keyboard). */
+.earnings__list {
+  max-height: 24rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+}
+
+/* The relevé's own heading already names it: the status line under it keeps the name for screen readers only. */
+.earnings .fact-line__row {
+  justify-content: flex-end;
+}
+.earnings .fact-line__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Vérifier › « Dépenses et hypothèses »: six sliders read as a grid, not a column, once there is room. */
+@media (min-width: 900px) {
+  .ledger > .ledger__person:not(.person) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.5rem;
+    align-items: start;
+  }
+  .ledger > .ledger__person:not(.person) > .year-table__title,
+  .ledger > .ledger__person:not(.person) > .chip {
+    grid-column: 1 / -1;
+  }
+}
+
+/* « Et si je change mon plan ? »: the ranked changes, then the saving and the spending what-ifs, one after the other. */
+.ajuster {
+  display: grid;
+  gap: 1rem;
+}
+.ajuster__levers {
+  margin-top: 0;
+}
+
+/* Sauvegarde et réglages: the copy out and the copy back in sit side by side once there is room. */
+.data-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+  align-items: start;
+}

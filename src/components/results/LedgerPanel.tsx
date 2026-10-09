@@ -125,10 +125,10 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   const impact = t.assumptions.impact
   const scenarioMarks = (valueOf: (k: 'prudent' | 'neutral' | 'bold') => number): SliderMark[] =>
     (['prudent', 'neutral', 'bold'] as const).map((k) => ({ value: Math.round(valueOf(k) * 1000), label: t.assumptions.presets[k], tone: k }))
-  const band = (field: 'inflation' | 'returns', kind?: AccountKind) => (perMille: number) => {
+  const band = (field: 'inflation' | 'returns', kind?: AccountKind, withWhy = true) => (perMille: number) => {
     const { level, tilt } = field === 'inflation' ? impactOf('inflation', perMille / 1000) : impactOfReturn(kind!, perMille / 1000)
     const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level
-    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
+    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={withWhy ? impact.why[field][side] : undefined} whyTitle={impact.whyTitle} outside={impact.outside} />
   }
   const spend = (key: SpendKey, label: string) => {
     const now = shown.spending[spendField(key)]
@@ -191,7 +191,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
         </div>
         {KINDS.map((kind) => (
           <div key={kind} className="ledger__row">
-            {slider(`return:${kind}`, c.returnLabel[kind], Math.round(assumptions.returns[kind] * 1000), 0, 120, 1, pct, scenarioMarks((k) => ASSUMPTION_PRESETS[k].returns[kind]), band('returns', kind))}
+            {slider(`return:${kind}`, c.returnLabel[kind], Math.round(assumptions.returns[kind] * 1000), 0, 120, 1, pct, scenarioMarks((k) => ASSUMPTION_PRESETS[k].returns[kind]), band('returns', kind, kind === KINDS[0]))}
             <p className="ledger__calc">{c.returnCalc(pct(Math.round(shownA.returns[kind] * 1000)), formatPct((1 + shownA.returns[kind]) / (1 + shownA.inflation) - 1, lang, 1))}</p>
           </div>
         ))}

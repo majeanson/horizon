@@ -19,7 +19,8 @@ export function ImpactMeter({
   tilt: ImpactTilt
   levelLabel: string
   tiltLabel: string
-  why: string
+  /** Absent when a neighbouring meter already says it (the three account rates share one reason). */
+  why?: string
   whyTitle: string
   /** Shown when the value is past the range the three scenarios span. */
   outside?: string
@@ -37,9 +38,11 @@ export function ImpactMeter({
         <span className="impact__tilt">{tiltLabel}</span>
       </div>
       {outside && (level === 'below' || level === 'above') && <p className="impact__outside">{outside}</p>}
-      <p className="impact__why">
-        <strong>{whyTitle}</strong> {why}
-      </p>
+      {why !== undefined && (
+        <p className="impact__why">
+          <strong>{whyTitle}</strong> {why}
+        </p>
+      )}
     </div>
   )
 }

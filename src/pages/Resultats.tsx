@@ -289,7 +289,7 @@ export function Resultats() {
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }])]
+      ? [{ id: 'verdict', label: rc.nav.reponse }, ...(retiredNow ? [] : [{ id: 'solidite', label: rc.nav.solidite }]), { id: 'comparer', label: rc.nav.comparer }, { id: 'ajuster', label: rc.nav.ajuster }]
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
         : [
@@ -399,11 +399,22 @@ export function Resultats() {
               )}
               </>
             )}
-            {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,
-                not a joined sentence. The row is on the card from the first paint (… while the worker runs), so the
-                late answer fills boxes that already exist instead of growing the card under the reader. */}
-            {!retiredNow && (
-              <div className="verdict__range">
+            {headline.age !== null && !retiredNow && comfort !== undefined && (
+              <p className="verdict__note">
+                {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
+              </p>
+            )}
+            {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
+                be present, not compete with the answer. */}
+            <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
+          </div>
+
+          {/* How firm the answer is: the same plan under the three scenarios and a hard market side by side, then what would move it. Rows from the first paint. */}
+          {!retiredNow && (
+            <div id="solidite" className="surface results-section firm" aria-label={rc.headline.firmTitle}>
+              <SectionHeader title={rc.headline.firmTitle} />
+              <div className="firm__pair">
+                <div className="verdict__range">
                 <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
                 <dl className="verdict__range-list">
                   {(['prudent', 'neutral', 'bold'] as const).map((k) => (
@@ -420,14 +431,7 @@ export function Resultats() {
                   </Cluster>
                 )}
               </div>
-            )}
-            {headline.age !== null && !retiredNow && comfort !== undefined && (
-              <p className="verdict__note">
-                {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
-              </p>
-            )}
-            {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. Boxes from the first paint. */}
-            {!retiredNow && (
+              {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. */}
               <div className="verdict__range">
                 <p className="verdict__range-title">{mc.stress.title}</p>
                 <dl className="verdict__range-list">
@@ -446,38 +450,9 @@ export function Resultats() {
                   </Link>
                 </p>
               </div>
-            )}
-            {/* The changes a household could make, each tried alone and ranked by the years it gains. Rows from the first paint. */}
-            {!retiredNow && (
-              <div className="verdict__range">
-                <p className="verdict__range-title">{lc.title}</p>
-                <ul className="levers__list">
-                  {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null }))).map((l) => (
-                    <li key={l.id} className="levers__item">
-                      <span>{lc.names[l.id]}</span>
-                      <span className="mono">
-                        {levers === undefined
-                          ? lc.pending
-                          : l.earliest === null
-                            ? lc.none
-                            : l.yearsGained === null
-                              ? lc.found(l.earliest)
-                              : l.yearsGained > 0
-                                ? lc.gain(l.yearsGained, l.earliest)
-                                : l.yearsGained === 0
-                                  ? lc.same
-                                  : lc.later(-l.yearsGained, l.earliest)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="verdict__note">{lc.hint}</p>
-              </div>
-            )}
-            {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
-                be present, not compete with the answer. */}
-            <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
-          </div>
+                </div>
+            </div>
+          )}
 
           {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
           {(refine.length > 0 || accuracy.total > 0) && (
@@ -573,17 +548,50 @@ export function Resultats() {
             )}
           </section>
 
-          {/* The two other questions, answered in the same arc: views over the same profile and assumptions. */}
-          <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
-            <SectionHeader title={rc.questions.tabs.save} />
-            <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
-          </section>
-          {!retiredNow && (
-            <section id="depenser" className="results-section" aria-label={rc.questions.tabs.spend}>
-              <SectionHeader title={rc.questions.tabs.spend} />
-              <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
+          {/* What the household could DO about it — three ways of changing the plan, none of them an assumption (those live on Hypothèses): the changes ranked by the years they gain, the saving needed for an age, and the spending that moves it. */}
+          <section id="ajuster" className="results-section ajuster" aria-label={rc.headline.adjustTitle}>
+            <SectionHeader title={rc.headline.adjustTitle} />
+            {!retiredNow && (
+              <div className="surface">
+                {/* The changes a household could make, each tried alone and ranked by the years it gains. */}
+                <div className="verdict__range ajuster__levers">
+                  <p className="verdict__range-title">{lc.title}</p>
+                  <ul className="levers__list">
+                    {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null }))).map((l) => (
+                      <li key={l.id} className="levers__item">
+                        <span>{lc.names[l.id]}</span>
+                        <span className="mono">
+                          {levers === undefined
+                            ? lc.pending
+                            : l.earliest === null
+                              ? lc.none
+                              : l.yearsGained === null
+                                ? lc.found(l.earliest)
+                                : l.yearsGained > 0
+                                  ? lc.gain(l.yearsGained, l.earliest)
+                                  : l.yearsGained === 0
+                                    ? lc.same
+                                    : lc.later(-l.yearsGained, l.earliest)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="verdict__note">{lc.hint}</p>
+                </div>
+              </div>
+            )}
+            {/* The two other questions, answered in the same arc: views over the same profile and assumptions. */}
+            <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
+              <SectionHeader title={rc.questions.tabs.save} />
+              <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
             </section>
-          )}
+            {!retiredNow && (
+              <section id="depenser" className="results-section" aria-label={rc.questions.tabs.spend}>
+                <SectionHeader title={rc.questions.tabs.spend} />
+                <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
+              </section>
+            )}
+          </section>
         </section>
       )}
 
