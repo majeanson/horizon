@@ -95,6 +95,19 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
       : household.persons
     return { ...profile, household: { ...household, persons }, assumptions: { ...((profile.assumptions ?? {}) as Raw), survivorSpending: 0.7 } }
   },
+  // v15 → v16: the children move INTO the household (the engine reads them now, to drop what each costs once they leave home), and four
+  // optional parts of a life appear — what a child costs inside the budget (none), dated flows (none), work kept after the retirement age
+  // (none), and how the retired budget slows with age (level). Every older file meant exactly that: nothing of them.
+  (profile) => {
+    const { children, ...rest } = profile
+    const household = (rest.household ?? {}) as Raw
+    const persons = Array.isArray(household.persons) ? (household.persons as Raw[]).map((p) => ({ ...p, partTime: null })) : household.persons
+    return {
+      ...rest,
+      household: { ...household, persons, children: Array.isArray(children) ? children : [], childSpending: null, flows: [] },
+      assumptions: { ...((rest.assumptions ?? {}) as Raw), retiredSpendingDrift: 0 },
+    }
+  },
 ]
 
 export type ReadResult =

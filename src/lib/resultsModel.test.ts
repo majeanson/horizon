@@ -14,8 +14,8 @@ const TODAY = { year: 2026, month: 10 }
 
 describe('the profile becomes the engine\'s inputs, exactly', () => {
   it('the stored assumptions plus today are the engine\'s assumptions — the golden ones', () => {
-    // the stored file spells out « the surplus goes to the REER first: no »; the engine's golden assumptions leave it unsaid (the same thing)
-    expect(assumptionsOf(profile(), TODAY)).toEqual({ ...GOLDEN_ASSUMPTIONS, surplusToRrsp: false, marketPath: { preset: 'smooth', custom: [] } })
+    // the stored file spells out « the surplus goes to the REER first: no »; the engine's golden assumptions leave it unsaid (the same thing), and a retired budget that stays level (drift 0)
+    expect(assumptionsOf(profile(), TODAY)).toEqual({ ...GOLDEN_ASSUMPTIONS, surplusToRrsp: false, retiredSpendingDrift: 0, marketPath: { preset: 'smooth', custom: [] } })
   })
 
   it('« my plan » is the profile as it stands; an age sends everyone home at that age', () => {

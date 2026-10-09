@@ -96,6 +96,12 @@ export interface Person {
   horizonAge?: number | null
   /** Gross employment income now, in today's dollars. The engine grows it by wage growth until retirement. */
   salaryToday: number
+  /**
+   * Work kept after the retirement age: a `share` of the salary (0 to 1) until the person reaches `untilAge`. It is paid, taxed and charged EI, QPIP and
+   * QPP contributions like any employment; the savings the person chose to make "while working", and the employer-plan contributions, are NOT
+   * made on it. Absent or null: none.
+   */
+  partTime?: { untilAge: number; share: number } | null
   /** Pensionable earnings by past calendar year, as the relevé's « Revenus de travail admissibles » prints them. */
   earningsHistory: Readonly<Record<number, number>>
   rrq: {
@@ -156,6 +162,22 @@ export interface MarketPath {
   custom: readonly (number | null)[]
 }
 
+/**
+ * A dated flow of money that is neither the budget nor a pension: an inheritance, a car, a roof, rent from a flat, a care reserve. Amounts are
+ * in TODAY's dollars and grow with prices. `windfall`: received once, in `fromYear`, tax-free, into the non-registered account of the first
+ * person alive. `expense`: paid every year from `fromYear` to `toYear` (the same year: once), on top of the budget. `income`: received every
+ * year from `fromYear` to `toYear` by `owner` (whoever is alive takes it over after a death), taxed as ordinary income (`taxable`) or not.
+ */
+export interface Flow {
+  label: string
+  kind: 'windfall' | 'expense' | 'income'
+  amount: number
+  fromYear: number
+  toYear: number
+  owner: PersonId
+  taxable: boolean
+}
+
 export interface Household {
   /**
    * Whether the household is ONE adult who lives alone — the condition for Québec's living-alone amount. Ignored for a
@@ -166,6 +188,15 @@ export interface Household {
   persons: Person[]
   /** The principal residence. Absent or null: the household owns none (or does not want it counted). */
   home?: Home | null
+  /** Birth years of the children (the profile's own list: it is the engine's too, since v16). */
+  children?: readonly number[]
+  /**
+   * What each child costs inside the budget, until they leave: once a child reaches `untilAge` (they leave home), `perChild` (today's dollars a year,
+   * already part of `spending.workingToday`) drops out of the working-years budget. Absent or null: the budget does not change as children leave.
+   */
+  childSpending?: { perChild: number; untilAge: number } | null
+  /** The dated flows (see Flow). Absent: none. */
+  flows?: readonly Flow[]
   spending: {
     /** Household spending while anyone still works, in today's dollars. */
     workingToday: number
@@ -203,6 +234,11 @@ export interface Assumptions {
    * Absent / false: the surplus goes to the TFSA, then non-registered, and the RRSP only gets what the person entered.
    */
   surplusToRrsp?: boolean
+  /**
+   * How the retired household's spending changes with age, in REAL terms a year, from age 70 (the oldest person alive): −0.01 is the often-observed
+   * slowing of spending in later retirement. A choice, not an official figure. Absent or 0: spending stays level.
+   */
+  retiredSpendingDrift?: number
   /** The path the markets take (engine/marketPaths.ts). Absent: the average return, every year. */
   marketPath?: MarketPath
 }
@@ -239,6 +275,8 @@ export interface PersonYear {
   payrollContribution: number
   /** The member's own employer-pension-plan contributions out of this year's pay. */
   pensionContribution: number
+  /** Income from a dated `income` flow (rent…), taxed as ordinary income when the flow says so. Present only in a year that has some. */
+  otherIncome?: number
   /** Net income (line 23600): what the tax and the credits read. */
   netIncome: number
   oasRecovery: number

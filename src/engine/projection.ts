@@ -2,6 +2,7 @@ import { ageAtJan1, firstRrifYear, grow, lockedAvailable, maxWithdraw, nonRegCon
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, survivorAllowanceMonthly, type GisCategoryName, type OasPerson } from './oas.ts'
 import { homeYear, initialHome, type HomeState } from './home.ts'
+import { childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
 import { pathReturn, resolvePath } from './marketPaths.ts'
 import { payrollContribution } from './payroll.ts'
@@ -135,6 +136,9 @@ interface FixedIncome {
   lockedAvail: number
   tfsaC: number
   nonRegC: number
+  /** Dated income (rent…): taxed as ordinary income, and not taxed. */
+  other: number
+  otherFree: number
 }
 
 export function project(h: Household, a: Assumptions, scenario: Scenario = {}): YearRow[] {
@@ -194,6 +198,9 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
       home = step.next
       if (step.released > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + step.released, acb: s.nonReg.acb + step.released } } : s))
     }
+    // A windfall (an inheritance, a gift): tax-free money into the first person alive's non-registered account before the year's tax and withdrawals.
+    const lump = flowWindfalls(h, year) * (1 + a.inflation) ** (year - a.today.year)
+    if (lump > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + lump, acb: s.nonReg.acb + lump } } : s))
     const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, indexation, housing, returnsOf(year), rrqRules, survivorOf)
     rows.push(out.row)
     states = out.next
@@ -268,11 +275,17 @@ function simulateYear(
   const inflate = (1 + a.inflation) ** (year - a.today.year)
   const couple = people.length === 2
 
+  const dated = flowIncome(h, year, people.map((r) => r.p.id))
+
   // ── 1–2. what needs no decision ───────────────────────────────────────────────────────────────
   const fixed: FixedIncome[] = people.map((r, i) => {
     const age = year - r.p.birth.year
-    const employment = salaryAt(r.p, year, a) * workFraction(r, year)
-    const working = employment > 0
+    const worked = workFraction(r, year)
+    const employment = salaryAt(r.p, year, a) * worked + partTimePay(r.p.partTime, salaryAt(r.p, year, a), worked, year - r.p.birth.year)
+    // Pay of any kind brings the payroll premiums and the QPP contribution; only FULL-TIME work (before the retirement date) is the work the
+    // person's chosen savings and employer-plan contributions were set for.
+    const paid = employment > 0
+    const working = salaryAt(r.p, year, a) * worked > 0
 
     const rrqMonths = year < r.rrq.start.year ? 0 : year === r.rrq.start.year ? 13 - r.rrq.start.month : 12
     const rrq = year < r.rrq.start.year ? 0 : roundTo(r.rrq.monthly * rrqMonths * (1 + a.inflation) ** (year - r.rrq.start.year), 0.01)
@@ -306,10 +319,10 @@ function simulateYear(
 
     const rrifMin = year >= firstRrifYear(r.p.birth.year, P.accounts) ? rrifMinimum(ageAtJan1(year, r.p.birth.year), states[i].rrsp, P.accounts) : 0
 
-    const rrqC = working && age < 72 ? rrqContribution(employment, rrqContributionRulesFor(year, indexation)) : { base: 0, additionalFirst: 0, additionalSecond: 0, total: 0 }
+    const rrqC = paid && age < 72 ? rrqContribution(employment, rrqContributionRulesFor(year, indexation)) : { base: 0, additionalFirst: 0, additionalSecond: 0, total: 0 }
 
-    const payrollC = working ? payrollContribution(employment, P.payroll).total : 0
-    const rppC = working ? roundTo(sum(r.p.pensions.map((d) => (d.memberContribution && !d.inPay ? memberContribution(employment, workFraction(r, year), P.rrq.mga, d.memberContribution) : 0))), 0.01) : 0
+    const payrollC = paid ? payrollContribution(employment, P.payroll).total : 0
+    const rppC = working ? roundTo(sum(r.p.pensions.map((d) => (d.memberContribution && !d.inPay ? memberContribution(salaryAt(r.p, year, a) * worked, worked, P.rrq.mga, d.memberContribution) : 0))), 0.01) : 0
 
     // Savings the person has decided to make while still working, in today's dollars, grown with prices.
     const acct = r.p.accounts
@@ -324,12 +337,13 @@ function simulateYear(
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC }
+    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate, otherFree: dated[i].free * inflate }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
   // What the household must pay: its living costs, plus the mortgage (which ENDS) and a replacement home's extra cost in a sale year.
-  const spending = roundTo((retiredAll ? h.spending.retiredToday : h.spending.workingToday) * inflate * (survivorOf ? (a.survivorSpending ?? 1) : 1) + housing.payment + housing.extraNeed, 0.01)
+  const budget = retiredAll ? h.spending.retiredToday * retiredDriftFactor(a, Math.max(...people.map((r) => year - r.p.birth.year))) : Math.max(0, h.spending.workingToday - childStepDown(h, a, year))
+  const spending = roundTo(budget * inflate * (survivorOf ? (a.survivorSpending ?? 1) : 1) + housing.payment + housing.extraNeed + flowExpenses(h, year) * inflate, 0.01)
 
   // ── withdrawals are the unknown: one amount per person per account, solved below ──────────────
   const draw: Record<AccountKind, number[]> = { nonReg: people.map(() => 0), rrsp: people.map(() => 0), tfsa: people.map(() => 0) }
@@ -352,6 +366,7 @@ function simulateYear(
         payrollPremiums: fixed[i].payrollC,
         rrspDeduction: fixed[i].rrspC,
         rppDeduction: fixed[i].rppC,
+        other: fixed[i].other,
       })),
     }
   }
@@ -429,7 +444,7 @@ function simulateYear(
     const { persons: base, realized } = incomes()
     const { tax, persons, allowance } = taxWithAllowance(base, (p) => householdTaxWithSplit(p, rules, split))
     const gis = gisFor(persons, tax.persons.map((t) => t.netIncomeBeforeAdjustments))
-    const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + allowance[i] + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + gis[i]))
+    const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + allowance[i] + fixed[i].db + fixed[i].other + fixed[i].otherFree + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + gis[i]))
     const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].payrollC + fixed[i].rppC + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
     return { tax, gis, realized, cash: cashIn - tax.total - out }
   }
@@ -588,7 +603,7 @@ function simulateYear(
   const finalAllowance = settled.allowance
   const finalGis = gisFor(settled.persons, finalTax.persons.map((t) => t.netIncomeBeforeAdjustments))
   const out = sum(people.map((_, i) => fixed[i].rrqC.total + fixed[i].payrollC + fixed[i].rppC + fixed[i].rrspC + fixed[i].tfsaC + fixed[i].nonRegC))
-  const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + finalAllowance[i] + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
+  const cashIn = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + finalAllowance[i] + fixed[i].db + fixed[i].other + fixed[i].otherFree + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
   const cash = cashIn - finalTax.total - out
   const shortfall = roundTo(Math.max(0, spending - cash), 0.01)
   let surplus = Math.max(0, cash - spending)
@@ -653,6 +668,7 @@ function simulateYear(
       allowance: finalAllowance[i],
       gis: finalGis[i],
       db: fixed[i].db,
+      ...(fixed[i].other + fixed[i].otherFree > 0 ? { otherIncome: roundTo(fixed[i].other + fixed[i].otherFree, 0.01) } : {}),
       rrifMinimum: fixed[i].rrifMin,
       withdrawals: { nonReg: roundTo(draw.nonReg[i], 0.01), rrsp: roundTo(rrspOut, 0.01), tfsa: roundTo(draw.tfsa[i], 0.01) },
       contributions: { nonReg: roundTo(nonRegIn, 0.01), rrsp: roundTo(fixed[i].rrspC, 0.01), tfsa: roundTo(tfsaIn, 0.01) },
@@ -668,7 +684,7 @@ function simulateYear(
     }
   })
 
-  const grossIncome = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + finalAllowance[i] + fixed[i].db + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
+  const grossIncome = sum(people.map((_, i) => fixed[i].employment + fixed[i].rrq + fixed[i].oas + finalAllowance[i] + fixed[i].db + fixed[i].other + fixed[i].otherFree + fixed[i].rrifMin + draw.rrsp[i] + draw.nonReg[i] + draw.tfsa[i] + finalGis[i]))
   const row: YearRow = {
     year,
     persons,

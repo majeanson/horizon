@@ -73,11 +73,11 @@ export function FamilySection() {
 
       <div className="family__children">
         <p className="field-row__hint">{f.childrenHint}</p>
-        {profile.children.length === 0 ? (
+        {(profile.household.children ?? []).length === 0 ? (
           <p className="field-row__hint">{f.none}</p>
         ) : (
           <ChipGroup label={f.children}>
-            {profile.children.map((y, i) => (
+            {(profile.household.children ?? []).map((y, i) => (
               <Chip key={`${y}-${i}`} onRemove={() => updateProfile((p) => removeChild(p, i))} removeLabel={f.removeChild(y)}>
                 {y}
               </Chip>

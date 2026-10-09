@@ -56,7 +56,15 @@ describe('validateProfile — the gate every outside file passes through', () =>
     ['an earnings year spelled 0x7CF', (p) => set(p, (x) => ((x.household.persons[0].earningsHistory as Record<string, number>)['0x7CF'] = 0)), 'household.persons[0].earningsHistory.0x7CF', 'count'],
     ['an earnings year spelled 1999.0', (p) => set(p, (x) => ((x.household.persons[0].earningsHistory as Record<string, number>)['1999.0'] = 0)), 'household.persons[0].earningsHistory.1999.0', 'count'],
     ['an earnings year spelled 1.999e3', (p) => set(p, (x) => ((x.household.persons[0].earningsHistory as Record<string, number>)['1.999e3'] = 0)), 'household.persons[0].earningsHistory.1.999e3', 'count'],
-    ['thirteen children', (p) => set(p, (x) => (x.children = Array.from({ length: 13 }, () => 2015))), 'children', 'count'],
+    ['a part-time share of 2', (p) => set(p, (x) => (x.household.persons[0].partTime = { untilAge: 65, share: 2 })), 'household.persons[0].partTime.share', 'range'],
+    ['a part-time end age of 30', (p) => set(p, (x) => (x.household.persons[0].partTime = { untilAge: 30, share: 0.5 })), 'household.persons[0].partTime.untilAge', 'range'],
+    ['a child who leaves at 5', (p) => set(p, (x) => (x.household.childSpending = { perChild: 5000, untilAge: 5 })), 'household.childSpending.untilAge', 'range'],
+    ['a flow of a kind nobody knows', (p) => set(p, (x) => (x.household.flows = [{ label: 'x', kind: 'gift' as never, amount: 1, fromYear: 2030, toYear: 2030, owner: 'self', taxable: false }])), 'household.flows[0].kind', 'enum'],
+    ['a flow that ends before it starts', (p) => set(p, (x) => (x.household.flows = [{ label: 'x', kind: 'expense', amount: 1, fromYear: 2035, toYear: 2030, owner: 'self', taxable: false }])), 'household.flows[0].toYear', 'range'],
+    ['a flow owned by a spouse in a household of one', (p) => set(p, (x) => ((x.household.persons = [x.household.persons[0]]), (x.household.flows = [{ label: 'x', kind: 'income', amount: 1, fromYear: 2030, toYear: 2031, owner: 'spouse', taxable: true }]))), 'household.flows[0].owner', 'range'],
+    ['twenty-one flows', (p) => set(p, (x) => (x.household.flows = Array.from({ length: 21 }, () => ({ label: 'x', kind: 'expense' as const, amount: 1, fromYear: 2030, toYear: 2030, owner: 'self' as const, taxable: false })))), 'household.flows', 'count'],
+    ['a spending drift of 50 %', (p) => set(p, (x) => (x.assumptions.retiredSpendingDrift = 0.5)), 'assumptions.retiredSpendingDrift', 'range'],
+    ['thirteen children', (p) => set(p, (x) => (x.household.children = Array.from({ length: 13 }, () => 2015))), 'household.children', 'count'],
   ]
 
   it.each(BAD)('rejects %s, and says which field', (_label, mutate, path, problem) => {
@@ -94,12 +102,12 @@ describe('validateProfile — a hostile file is refused cheaply', () => {
 
   it('more than twelve children are counted and refused WITHOUT reading the extras', () => {
     const p = fixture()
-    ;(p as { children: unknown[] }).children = [...Array.from({ length: 12 }, () => 2015), 'garbage', 'garbage']
+    ;(p.household as unknown as { children: unknown[] }).children = [...Array.from({ length: 12 }, () => 2015), 'garbage', 'garbage']
     const result = validateProfile(p)
     expect(result.ok).toBe(false)
     const paths = result.ok ? [] : result.problems.map((q) => q.path)
-    expect(paths).toContain('children')
-    expect(paths.filter((x) => x === 'children[12]' || x === 'children[13]')).toEqual([])
+    expect(paths).toContain('household.children')
+    expect(paths.filter((x) => x === 'household.children[12]' || x === 'household.children[13]')).toEqual([])
   })
 })
 
@@ -253,5 +261,54 @@ describe('the store — one profile on this device', () => {
     window.dispatchEvent(new StorageEvent('storage', { key: 'horizon-profile' }))
     expect(getProfile().household.spending.workingToday).toBe(12_345)
     expect(getStorageIssue()).toBeNull()
+  })
+})
+
+describe('schema v16 — a life beyond the budget', () => {
+  it('an older file arrives with its children INSIDE the household, and nothing else of it', () => {
+    const v15 = oldFixture(15)
+    const result = migrateProfile(v15)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const p = result.profile as Profile & { children?: unknown }
+    expect(p.version).toBe(SCHEMA_VERSION)
+    expect(p.household.children).toEqual(v15.children)
+    expect(p.children).toBeUndefined()
+    expect(p.household.childSpending).toBeNull()
+    expect(p.household.flows).toEqual([])
+    expect(p.household.persons.every((x) => x.partTime === null)).toBe(true)
+    expect(p.assumptions.retiredSpendingDrift).toBe(0)
+  })
+
+  it('every older version still arrives with its children where the engine reads them', () => {
+    for (let v = 1; v < SCHEMA_VERSION; v++) {
+      const raw = oldFixture(v)
+      const result = migrateProfile(raw)
+      expect(result.ok, `v${v}`).toBe(true)
+      if (result.ok) expect(result.profile.household.children, `v${v}`).toEqual(raw.children)
+    }
+  })
+
+  it('a kept plan from before is brought to the new shape too, children included', () => {
+    const outer = oldFixture(15)
+    const inner = oldFixture(15)
+    inner.children = [2001]
+    const result = migrateProfile({ ...outer, plans: [{ name: 'before', profile: inner }] })
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.profile.plans[0].profile.household.children).toEqual([2001])
+  })
+
+  it('accepts every new field at its edges, and round-trips them', () => {
+    const p = fixture()
+    p.household.childSpending = { perChild: 7000, untilAge: 25 }
+    p.household.flows = [
+      { label: 'Héritage', kind: 'windfall', amount: 150000, fromYear: 2040, toYear: 2040, owner: 'self', taxable: false },
+      { label: 'Loyer', kind: 'income', amount: 9000, fromYear: 2045, toYear: 2060, owner: 'spouse', taxable: true },
+      { label: 'Toit', kind: 'expense', amount: 25000, fromYear: 2032, toYear: 2032, owner: 'self', taxable: false },
+    ]
+    p.household.persons[0].partTime = { untilAge: 64, share: 0.4 }
+    p.assumptions.retiredSpendingDrift = -0.01
+    const back = readProfileJson(exportProfileJson(p))
+    expect(back.ok && back.profile).toEqual(p)
   })
 })

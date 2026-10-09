@@ -1,4 +1,4 @@
-import type { AccountKind, Assumptions, DbPension, Home, Household, MarketPath, Person, PersonId } from '../engine/types.ts'
+import type { AccountKind, Assumptions, DbPension, Flow, Home, Household, MarketPath, Person, PersonId } from '../engine/types.ts'
 import { FACT_ID_PATTERN } from './facts.ts'
 
 // THE SHAPE OF A SAVED PROFILE — what is written to this device's storage and to an exported file.
@@ -11,12 +11,12 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 15
+export const SCHEMA_VERSION = 16
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
 
-export type StoredAssumptions = Omit<Assumptions, 'today' | 'marketPath'> & { marketPath: MarketPath }
+export type StoredAssumptions = Omit<Assumptions, 'today' | 'marketPath' | 'retiredSpendingDrift'> & { marketPath: MarketPath; retiredSpendingDrift: number }
 
 /** The economy a person typed by hand, kept while a ready-made scenario is chosen, so « Personnalisé » can be taken back. */
 export type CustomScenario = Pick<StoredAssumptions, 'inflation' | 'wageGrowth' | 'returns' | 'horizonAge'>
@@ -26,8 +26,6 @@ export interface Profile {
   app: 'horizon'
   version: number
   household: Household
-  /** Birth years only: v1 has no child benefits, so a child changes nothing in the projection. */
-  children: number[]
   assumptions: StoredAssumptions
   /** The hand-typed scenario kept aside when a ready-made one replaced it; null when none is kept. */
   customScenario: CustomScenario | null
@@ -45,6 +43,8 @@ export interface SavedPlan {
 
 export const MAX_PLANS = 6
 export const MAX_PLAN_NAME = 40
+/** The most dated flows a household may carry. */
+export const MAX_FLOWS = 20
 
 /** What is wrong with one field of a profile read from outside (a file, or storage). The UI words each one. */
 export interface ProfileProblem {
@@ -62,6 +62,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
   birth: { year: today.year - 45, month: 1 },
   retirementAge: 65,
   horizonAge: null,
+  partTime: null,
   salaryToday: 0,
   earningsHistory: {},
   rrq: { startAge: 65 },
@@ -77,8 +78,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
 export const defaultProfile = (today: { year: number }): Profile => ({
   app: 'horizon',
   version: SCHEMA_VERSION,
-  household: { livesAlone: true, persons: [blankPerson('self', today)], spending: { workingToday: 0, retiredToday: 0 }, home: null },
-  children: [],
+  household: { livesAlone: true, persons: [blankPerson('self', today)], children: [], childSpending: null, flows: [], spending: { workingToday: 0, retiredToday: 0 }, home: null },
   // The Neutre scenario, exactly (engine/assumptionPresets.ts): a first visit lands on a named, documented scenario, not
   // on « Personnalisé » for figures nobody typed (the defaults used to be 2 / 3 / 5 / 5 / 4 %, matching no scenario).
   assumptions: {
@@ -90,6 +90,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,
     surplusToRrsp: false,
+    retiredSpendingDrift: 0,
     marketPath: { preset: 'smooth', custom: [] },
   },
   customScenario: null,
@@ -225,6 +226,34 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
   }
 }
 
+function readPartTime(r: Reader, v: unknown, path: string): Person['partTime'] {
+  if (v === undefined || v === null) return null
+  const o = r.obj(v, path) ?? {}
+  return { untilAge: r.num(o.untilAge, `${path}.untilAge`, 50, 80, true), share: r.num(o.share, `${path}.share`, 0, 1) }
+}
+
+function readFlows(r: Reader, v: unknown, persons: number): Flow[] {
+  if (v === undefined || v === null) return []
+  const raw = r.arr(v, 'household.flows') ?? []
+  if (raw.length > MAX_FLOWS) r.count('household.flows')
+  return raw.slice(0, MAX_FLOWS).map((entry, i) => {
+    const path = `household.flows[${i}]`
+    const o = r.obj(entry, path) ?? {}
+    const fromYear = r.num(o.fromYear, `${path}.fromYear`, 2000, 2150, true)
+    const owner = r.oneOf(o.owner, `${path}.owner`, ['self', 'spouse'] as const)
+    if (owner === 'spouse' && persons < 2) r.range(`${path}.owner`)
+    return {
+      label: r.str(o.label, `${path}.label`, 60),
+      kind: r.oneOf(o.kind, `${path}.kind`, ['windfall', 'expense', 'income'] as const),
+      amount: r.num(o.amount, `${path}.amount`, 0, 1e8),
+      fromYear,
+      toYear: r.num(o.toYear, `${path}.toYear`, fromYear, 2150, true),
+      owner,
+      taxable: r.bool(o.taxable, `${path}.taxable`),
+    }
+  })
+}
+
 function readAccount<K extends string>(r: Reader, v: unknown, path: string, keys: readonly K[]): Record<K, number> {
   const o = r.obj(v, path) ?? {}
   const out = {} as Record<K, number>
@@ -262,6 +291,8 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
     retirementAge: r.num(o.retirementAge, `${path}.retirementAge`, 18, 80, true),
     // Their own horizon age, or null to follow the scenario (v15). An older file has neither: it follows.
     horizonAge: o.horizonAge === undefined ? null : r.nullableNum(o.horizonAge, `${path}.horizonAge`, 50, 110),
+    // Work kept after the retirement age (v16): a share of the salary until an age, or none. An older file has none.
+    partTime: readPartTime(r, o.partTime, `${path}.partTime`),
     salaryToday: r.num(o.salaryToday, `${path}.salaryToday`, 0, 1e8),
     earningsHistory,
     rrq: {
@@ -322,9 +353,16 @@ export function validateProfile(raw: unknown): ProfileResult {
     }
   }
 
-  const rawChildren = r.arr(root.children, 'children') ?? []
-  if (rawChildren.length > 12) r.count('children')
-  const children = rawChildren.slice(0, 12).map((c, i) => r.num(c, `children[${i}]`, 1950, 2100, true))
+  // The children (birth years) live in the household since v16: the engine reads them, to drop what each costs once they leave home.
+  const rawChildren = r.arr(household.children ?? [], 'household.children') ?? []
+  if (rawChildren.length > 12) r.count('household.children')
+  const children = rawChildren.slice(0, 12).map((c, i) => r.num(c, `household.children[${i}]`, 1950, 2100, true))
+  let childSpending: Household['childSpending'] = null
+  if (household.childSpending !== undefined && household.childSpending !== null) {
+    const cs = r.obj(household.childSpending, 'household.childSpending') ?? {}
+    childSpending = { perChild: r.num(cs.perChild, 'household.childSpending.perChild', 0, 1e6), untilAge: r.num(cs.untilAge, 'household.childSpending.untilAge', 16, 35, true) }
+  }
+  const flows = readFlows(r, household.flows, persons.length)
 
   const a = r.obj(root.assumptions, 'assumptions') ?? {}
   const returns = r.obj(a.returns, 'assumptions.returns') ?? {}
@@ -347,6 +385,8 @@ export function validateProfile(raw: unknown): ProfileResult {
     withdrawalOrder: order,
     pensionSplitting: r.bool(a.pensionSplitting, 'assumptions.pensionSplitting'),
     surplusToRrsp: r.bool(a.surplusToRrsp, 'assumptions.surplusToRrsp'),
+    // How the retired budget slows with age, real a year from 70 (v16). An older file's budget stayed level: 0.
+    retiredSpendingDrift: a.retiredSpendingDrift === undefined ? 0 : r.num(a.retiredSpendingDrift, 'assumptions.retiredSpendingDrift', -0.05, 0.03),
     marketPath: {
       preset: r.oneOf(mp.preset, 'assumptions.marketPath.preset', ['smooth', 'badStart', 'lostDecade', 'boomBust', 'custom'] as const),
       custom: customRaw.map((v, i) => (v === null ? null : r.num(v, `assumptions.marketPath.custom[${i}]`, -0.6, 0.6))),
@@ -396,5 +436,5 @@ export function validateProfile(raw: unknown): ProfileResult {
   })
 
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, spending: spendingNow, home }, children, assumptions, customScenario, confirmed, plans } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, children, childSpending, flows, spending: spendingNow, home }, assumptions, customScenario, confirmed, plans } }
 }

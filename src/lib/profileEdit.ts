@@ -187,13 +187,15 @@ export function setLivesAlone(p: Profile, value: boolean): Profile {
 }
 
 export function addChild(p: Profile, birthYear: number): Profile {
-  if (p.children.length >= 12) return p
-  return { ...p, children: [...p.children, birthYear].sort((a, b) => a - b) }
+  const children = p.household.children ?? []
+  if (children.length >= 12) return p
+  return { ...p, household: { ...p.household, children: [...children, birthYear].sort((a, b) => a - b) } }
 }
 
 export function removeChild(p: Profile, index: number): Profile {
-  if (index < 0 || index >= p.children.length) return p
-  return { ...p, children: p.children.filter((_, i) => i !== index) }
+  const children = p.household.children ?? []
+  if (index < 0 || index >= children.length) return p
+  return { ...p, household: { ...p.household, children: children.filter((_, i) => i !== index) } }
 }
 
 // ── Earnings history ────────────────────────────────────────────────────────────────────────────────

@@ -15,9 +15,9 @@ import { SCHEMA_VERSION } from './schema.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 
-// The pinned hash of schema.ts at SCHEMA_VERSION = 15. Update it in the same commit that raises the version.
-const PINNED_SCHEMA_HASH = '43024c9a4e45bee9'
-const PINNED_FOR_VERSION = 15
+// The pinned hash of schema.ts at SCHEMA_VERSION = 16. Update it in the same commit that raises the version.
+const PINNED_SCHEMA_HASH = '37f2430fd8e41616'
+const PINNED_FOR_VERSION = 16
 
 function codeOf(file: string): string {
   const src = readFileSync(file, 'utf8')

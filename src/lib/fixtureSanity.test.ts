@@ -113,7 +113,7 @@ function violations(h: Household, children: readonly number[] = []): string[] {
 const dir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures')
 const FIXTURES = [1, 2, 3, 4, 5].map((v) => {
   const j = JSON.parse(readFileSync(join(dir, `profile.v${v}.json`), 'utf8')) as { household: Household; children: number[] }
-  return { name: `profile.v${v}.json`, household: j.household, children: j.children }
+  return { name: `profile.v${v}.json`, household: j.household, children: j.children ?? [] }
 })
 
 const FROZEN =
@@ -129,7 +129,7 @@ const ALLOWED: Record<string, Record<string, string>> = {
 
 const SOURCES = [
   { name: 'the golden household', household: GOLDEN_HOUSEHOLD, children: [2012, 2015] },
-  ...EXAMPLE_IDS.map((id) => ({ name: `the « ${id} » example`, household: exampleProfile(id).household, children: exampleProfile(id).children })),
+  ...EXAMPLE_IDS.map((id) => ({ name: `the « ${id} » example`, household: exampleProfile(id).household, children: exampleProfile(id).household.children ?? [] })),
   ...FIXTURES,
 ]
 

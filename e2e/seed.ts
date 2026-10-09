@@ -19,11 +19,11 @@ export const PROFILE_KEY = 'horizon-profile'
 
 export type SeedProfile = Record<string, unknown>
 
-export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v15.json', 'utf8'))
+export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v16.json', 'utf8'))
 
 /** A blank single person with the defaults the app itself would start from. */
 export function blankSeed(): SeedProfile {
-  const e = structuredClone(EXAMPLE) as { household: { livesAlone: boolean; persons: Record<string, unknown>[]; spending: Record<string, number> }; children: number[] }
+  const e = structuredClone(EXAMPLE) as { household: { livesAlone: boolean; persons: Record<string, unknown>[]; spending: Record<string, number>; children: number[] } }
   const self = e.household.persons[0]
   Object.assign(self, {
     name: '',
@@ -43,7 +43,7 @@ export function blankSeed(): SeedProfile {
   e.household.persons = [self]
   e.household.livesAlone = true
   e.household.spending = { workingToday: 0, retiredToday: 0 }
-  e.children = []
+  e.household.children = []
   return e as unknown as SeedProfile
 }
 

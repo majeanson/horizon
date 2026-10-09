@@ -52,11 +52,11 @@ describe('profile edits are pure, and never produce a profile the validator woul
   it('children: kept sorted, capped at 12, removable by position', () => {
     let p = defaultProfile(TODAY)
     p = addChild(addChild(addChild(p, 2015), 2012), 2019)
-    expect(p.children).toEqual([2012, 2015, 2019])
-    expect(removeChild(p, 1).children).toEqual([2012, 2019])
+    expect(p.household.children).toEqual([2012, 2015, 2019])
+    expect(removeChild(p, 1).household.children).toEqual([2012, 2019])
     expect(removeChild(p, 9)).toBe(p)
     for (let i = 0; i < 20; i++) p = addChild(p, 2020)
-    expect(p.children).toHaveLength(12)
+    expect(p.household.children).toHaveLength(12)
     valid(p)
   })
 
