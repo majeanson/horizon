@@ -43,7 +43,9 @@ import { useLevers } from '../lib/useLevers'
 import { formatCompactMoney, formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
-import { accuracyOf } from '../lib/facts'
+import { accuracyOf, factsOf } from '../lib/facts'
+import { GUIDE_COPY } from '../lib/guideCopy'
+import { useFactImpact } from '../lib/useFactImpact'
 import { parseSpend } from '../lib/spendModel'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
@@ -211,6 +213,16 @@ export function Resultats() {
   const mc = MARKET_COPY[lang]
   const lc = LEVERS_COPY[lang]
   const levers = useLevers(slow.household, slowAssumptions, answered)
+  // The figures not yet read off a document, and how far the answer moves if each were off: idle work, after everything above it.
+  const unconfirmed = useMemo(() => factsOf(slow).filter((f) => !f.confirmed).map((f) => ({ id: f.id, owner: f.owner, kind: f.kind })), [slow])
+  const impact = useFactImpact(slow.household, slowAssumptions, unconfirmed, answered && !retiredNow)
+  const gc = GUIDE_COPY[lang]
+  const factName = (id: string): string => {
+    const f = unconfirmed.find((x) => x.id === id)!
+    const who = f.owner === 'household' ? gc.guide.householdOwner : gc.guide.owner(profile.household.persons.find((p) => p.id === f.owner)?.name.trim() || (f.owner === 'self' ? t.profile.self : t.profile.spouse))
+    return `${gc.kind[f.kind]} — ${who}`
+  }
+  const movers = impact === undefined ? [] : unconfirmed.filter((f) => (impact.swings[f.id]?.years ?? 0) > 0).sort((x, y) => impact.swings[y.id].years - impact.swings[x.id].years).slice(0, 4)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
   // What the answer's age can fund each month (engine/maxSpending.ts, after tax, today's dollars), and the age put in dates.
@@ -465,6 +477,19 @@ export function Resultats() {
             <div className="surface results-section refine" aria-label={rc.refine.title}>
               <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
               {confidenceLine}
+              {movers.length > 0 && (
+                <div className="refine__moves">
+                  <p className="verdict__range-title">{rc.refine.moves}</p>
+                  <ul className="refine__list">
+                    {movers.map((f) => (
+                      <li key={f.id}>
+                        <span>{factName(f.id)}</span> <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span> <Chip to={`/?fact=${encodeURIComponent(f.id)}`}>{rc.refine.find}</Chip>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="verdict__note">{rc.refine.movesHint}</p>
+                </div>
+              )}
               {refine.length > 0 && (
                 <ul className="refine__list">
                   {refine.map((k) => (

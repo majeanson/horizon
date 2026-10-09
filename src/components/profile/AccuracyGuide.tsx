@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLang, useT } from '../../i18n'
 import { accuracyOf, DOC_IDS, factsOf, type DocId, type Fact } from '../../lib/facts'
-import { setGuided } from '../../lib/guide'
+import { bringIntoView, setGuided } from '../../lib/guide'
 import { GUIDE_COPY } from '../../lib/guideCopy'
-import { scrollBehavior } from '../../lib/motion'
 import { estimateMissing } from '../../lib/estimates'
 import { setFacts } from '../../lib/profileEdit'
 import type { Profile } from '../../lib/schema'
@@ -26,15 +25,6 @@ import { Section } from './shared'
 //
 // It reads the list of facts (lib/facts.ts) and writes only `confirmed`; it never touches a figure's value. It sits AFTER
 // the form: the first visit's path already was the quick way, and a returning reader comes to change a number.
-
-// Bring a figure's field on screen: centred, unless it is a tall block (the earnings list) — then its TOP, where its header and its
-// mark are, since the guide's card is docked over the lower part of the window.
-function bringIntoView(id: string): void {
-  const el = document.querySelector(`[data-fact="${id}"]`)
-  if (!el) return
-  const tall = el.getBoundingClientRect().height > window.innerHeight * 0.4
-  el.scrollIntoView({ behavior: scrollBehavior(), block: tall ? 'start' : 'center' })
-}
 
 export default function AccuracyGuide() {
   const t = useT()

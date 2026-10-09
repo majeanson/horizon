@@ -1068,3 +1068,11 @@
 .live-answer__see {
   margin-left: auto;
 }
+
+/* « Les chiffres qui déplaceraient le plus la réponse »: the figure, how far it moves the answer, the way to it — on one wrapping line. */
+.refine__moves .refine__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+}

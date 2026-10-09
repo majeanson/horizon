@@ -57,6 +57,11 @@ const FR_RESULTS = {
     spendingWork: 'Vos dépenses pendant les années de travail.',
     toProfile: 'Ouvrir le profil',
     toAssumptions: 'Ouvrir les hypothèses',
+    /** The unconfirmed figures ranked by how far the answer moves if each were off by 15 %. */
+    moves: 'Les chiffres qui déplaceraient le plus la réponse',
+    movesHint: 'Chaque chiffre non confirmé est poussé de 15 % dans un sens, puis dans l’autre ; la réponse dit de combien d’années elle bouge. C’est un classement, pas une marge d’erreur.',
+    swing: (years: number) => `jusqu’à ${years} ${years === 1 ? 'an' : 'ans'}`,
+    find: 'Le trouver',
   },
   /** The page's map: one short noun per section, the same word as the section's own title. */
   nav: {
@@ -206,6 +211,10 @@ const EN_RESULTS: typeof FR_RESULTS = {
     spendingWork: 'Your spending during the working years.',
     toProfile: 'Open the profile',
     toAssumptions: 'Open the assumptions',
+    moves: 'The figures that would move the answer most',
+    movesHint: 'Each unconfirmed figure is pushed 15% one way, then the other; the answer says by how many years it moves. A ranking, not a margin of error.',
+    swing: (years: number) => `up to ${years} ${years === 1 ? 'year' : 'years'}`,
+    find: 'Find it',
   },
   nav: {
     label: 'Results sections',

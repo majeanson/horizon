@@ -15,6 +15,7 @@ import { SectionLevel } from '../components/SectionHeader'
 import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
 import { accuracyOf } from '../lib/facts'
+import { bringIntoView, setGuided } from '../lib/guide'
 import { GUIDE_COPY } from '../lib/guideCopy'
 import { scrollBehavior } from '../lib/motion'
 import { hasSpouse, mapPerson } from '../lib/profileEdit'
@@ -58,6 +59,27 @@ export function Profil() {
       { replace: true },
     )
   }, [linked, spouse, setParams])
+
+  // A link from the results page to ONE figure (`?fact=self:rrspBalance`, the ids of lib/facts.ts): scroll to its field and light it for
+  // a moment, then drop the key from the address. Waits a beat for the page's sections to be on screen.
+  const wantedFact = params.get('fact')
+  useEffect(() => {
+    if (wantedFact === null) return
+    // No cleanup on purpose: dropping the key re-renders with `wantedFact` null, and a cleanup would cancel the very timers started here.
+    window.setTimeout(() => {
+      setGuided(wantedFact)
+      bringIntoView(wantedFact)
+    }, 250)
+    window.setTimeout(() => setGuided(null), 3000)
+    setParams(
+      () => {
+        const next = new URLSearchParams(window.location.search)
+        next.delete('fact')
+        return next
+      },
+      { replace: true },
+    )
+  }, [wantedFact, setParams])
 
   // First visit: a blank form is a wall. The page IS one question at a time (components/Onboarding.tsx) until the person finishes it or
   // asks for the full form (`?form=1`, which the path writes and a link can carry). Decided at arrival, like the card it replaces: a
