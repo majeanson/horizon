@@ -42,6 +42,12 @@ const FR_RESULTS = {
   /** The plan leaving the device: on paper, or as a spreadsheet — no network either way. */
   out: {
     print: 'Imprimer le plan',
+    /** A plain-text summary of the answer for a message or an email: nothing leaves the device but what the reader pastes. */
+    copy: 'Copier le résumé',
+    copied: 'Résumé copié.',
+    summaryMade: (month: number, year: number) => `Résumé fait en ${MONTHS_FR[month - 1]} ${year}`,
+    copyFailed: 'La copie n’a pas fonctionné : sélectionnez le texte de la réponse à la main.',
+    summaryFoot: 'Une estimation selon vos hypothèses, pas un conseil financier.',
     /** The head and foot of the printed plan: what it is, when it was made, and what it is not. */
     /** What the government figures stand on, said under the answer: the tax year, the day the newest was read — and, once the calendar has moved on, that this year's are projected. */
     vintage: (year: number, read: string) => `Barèmes et rentes de ${year}, lus sur les pages officielles jusqu’au ${read}.`,
@@ -204,6 +210,11 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   out: {
     print: 'Print the plan',
+    copy: 'Copy the summary',
+    copied: 'Summary copied.',
+    summaryMade: (month: number, year: number) => `Summary made in ${MONTHS_EN[month - 1]} ${year}`,
+    copyFailed: 'Copying did not work: select the text of the answer by hand.',
+    summaryFoot: 'An estimate based on your assumptions, not financial advice.',
     vintage: (year: number, read: string) => `${year} tax and pension figures, read on the official pages up to ${read}.`,
     vintageProjected: (known: number, now: number) => `The ${now} figures are not in Horizon yet: the ${known} ones are projected with inflation. Check your ${now} statements as soon as they are out.`,
     printTitle: 'Horizon — my retirement plan',

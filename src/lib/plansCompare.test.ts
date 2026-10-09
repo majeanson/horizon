@@ -15,7 +15,7 @@ describe('comparePlans', () => {
   it('a plan with an age states what that age can fund; a plan with none states nothing', () => {
     for (const a of comparePlans([q('a', 'average'), q('b', 'behind')])) {
       if (a.earliest === null) expect(a.comfort).toBeUndefined()
-      else expect(a.comfort === null || a.comfort > 0).toBe(true)
+      else expect(a.comfort === null || (a.comfort ?? 1) > 0).toBe(true)
     }
   })
   it('the same plan twice gives the same answer twice', () => {

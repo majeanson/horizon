@@ -37,6 +37,7 @@ import { useRuns } from '../lib/useRuns'
 import { scrollToSection } from '../lib/motion'
 import { usePrinting } from '../lib/usePrinting'
 import { useSettled } from '../lib/useSettled'
+import { useNotice } from '../lib/toast'
 import { usePresetRange } from '../lib/usePresetEarliest'
 import { useMarketRange } from '../lib/useMarketRange'
 import { STRESS_PRESETS } from '../lib/marketRange'
@@ -75,6 +76,7 @@ function milestoneAges(earliest: number | null, selections: readonly Selection[]
 export function Resultats() {
   const pinned = usePinOffset()
   const printing = usePrinting()
+  const notice = useNotice()
   const vintage = useMemo(paramsVintage, [])
   const t = useT()
   const { lang } = useLang()
@@ -327,6 +329,29 @@ export function Resultats() {
   const [sentenceBefore, sentenceAfter] = sentence.split(AGE_TOKEN)
   const pct = (share: number) => formatPct(Math.min(1, share), lang, 0)
   const money = (n: number) => formatMoney(n, lang)
+  // The answer as plain text, for a message or an email: read from the card as it is on screen, so it says exactly what the screen says, in
+  // the reader's language, with the assumptions beside it. Handed to the browser's clipboard; nothing is sent anywhere.
+  const copySummary = async () => {
+    const card = document.getElementById('verdict')
+    if (!card) return
+    const text = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ').trim()
+    const lines = [
+      rc.out.printTitle,
+      rc.out.summaryMade(month, year),
+      names.join(' · '),
+      '',
+      ...[...card.querySelectorAll('.verdict__line, .verdict__note:not(.verdict__note--caveat), .verdict__dates-list li')].map((el) => (el.tagName === 'LI' ? '- ' : '') + text(el)),
+      '',
+      t.assumptions.presets.summary(formatPct(assumptions.inflation, lang, 1), formatPct(assumptions.wageGrowth, lang, 1), [assumptions.returns.rrsp, assumptions.returns.tfsa, assumptions.returns.nonReg].map((x) => formatPct(x, lang, 1)).join(' / '), assumptions.horizonAge),
+      rc.out.summaryFoot,
+    ]
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'))
+      notice(rc.out.copied)
+    } catch {
+      notice(rc.out.copyFailed, 'error')
+    }
+  }
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
       {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
@@ -706,6 +731,7 @@ export function Resultats() {
 
       {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
       <Cluster className="no-print">
+        {view === 'answer' && !answerPending && gaps.length === 0 && <Chip onClick={copySummary}>{rc.out.copy}</Chip>}
         <Chip icon="printer-bold" onClick={() => window.print()}>
           {rc.out.print}
         </Chip>
