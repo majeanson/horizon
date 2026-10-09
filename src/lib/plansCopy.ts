@@ -24,6 +24,20 @@ export interface PlansCopy {
   removed: (name: string) => string
   kept: (name: string) => string
   current: string
+  /** The kept plans side by side, on the results page (components/results/PlansCompare.tsx). */
+  compare: {
+    title: string
+    hint: string
+    /** The plan on screen, first in the list. */
+    current: string
+    at: (age: number) => string
+    now: string
+    none: (max: number) => string
+    /** What the answer's age can fund each month, after tax, in today's dollars. */
+    monthly: (amount: string) => string
+    earlier: (years: number) => string
+    later: (years: number) => string
+  }
 }
 
 const FR: PlansCopy = {
@@ -48,6 +62,17 @@ const FR: PlansCopy = {
   removed: (name) => `Plan « ${name} » retiré.`,
   kept: (name) => `Plan « ${name} » gardé.`,
   current: 'C’est ce que vous voyez maintenant',
+  compare: {
+    title: 'Mes plans, côte à côte',
+    hint: 'Chaque plan gardé, avec ses propres chiffres et ses propres hypothèses, passé au même calcul que la réponse. Pour en ouvrir un : « Sauvegarde et réglages ».',
+    current: 'Plan actuel',
+    at: (age) => `${age} ans`,
+    now: 'dès maintenant',
+    none: (max) => `aucun âge jusqu’à ${max} ans`,
+    monthly: (amount) => `${amount} par mois`,
+    earlier: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tôt que le plan actuel`,
+    later: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tard que le plan actuel`,
+  },
 }
 
 const EN: PlansCopy = {
@@ -72,6 +97,17 @@ const EN: PlansCopy = {
   removed: (name) => `Plan “${name}” removed.`,
   kept: (name) => `Plan “${name}” kept.`,
   current: 'This is what you see now',
+  compare: {
+    title: 'My plans, side by side',
+    hint: 'Each kept plan, with its own figures and its own assumptions, put through the same calculation as the answer. To open one: “Backup and settings”.',
+    current: 'Current plan',
+    at: (age) => `age ${age}`,
+    now: 'right now',
+    none: (max) => `no age up to ${max}`,
+    monthly: (amount) => `${amount} a month`,
+    earlier: (years) => `${years} ${years === 1 ? 'year' : 'years'} earlier than the current plan`,
+    later: (years) => `${years} ${years === 1 ? 'year' : 'years'} later than the current plan`,
+  },
 }
 
 export const PLANS_COPY: Record<Lang, PlansCopy> = { fr: FR, en: EN }

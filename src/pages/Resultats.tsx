@@ -8,6 +8,7 @@ import { PageHead } from '../components/PageHead'
 import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
+import { PlansCompare } from '../components/results/PlansCompare'
 import { LedgerPanel } from '../components/results/LedgerPanel'
 import { OrderPanel } from '../components/results/OrderPanel'
 import { ParamsPanel } from '../components/results/ParamsPanel'
@@ -586,6 +587,11 @@ export function Resultats() {
             {isCouple && !retiredNow && (
               <div className="surface">
                 <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
+              </div>
+            )}
+            {!retiredNow && profile.plans.length > 0 && (
+              <div className="surface">
+                <PlansCompare profile={slow} enabled={answered} />
               </div>
             )}
           </section>
