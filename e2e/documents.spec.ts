@@ -14,11 +14,16 @@ test('the list names every document, per person where each has their own, and a 
   // most important first: the spending budget, then the tax notice; the situational documents last
   await expect(items.first().getByRole('heading', { name: 'Vos dépenses des 12 derniers mois' })).toBeVisible()
   await expect(items.first()).toContainText('Très important')
-  await expect(items.nth(1)).toContainText('Avis de cotisation')
   await expect(items.last().getByRole('heading', { name: 'Preuve de vos années au Canada' })).toBeVisible()
   await expect(items.last()).toContainText('Selon votre situation')
-  const rrq = items.filter({ hasText: 'Relevé de participation au RRQ' }).first()
-  await expect(rrq).toContainText('Pour Camille')
+  // grouped like the inputs: the household's documents, then a column for each person, each in order of importance
+  await expect(page.getByRole('region', { name: 'Pour le ménage' }).locator('.docs-item')).toHaveCount(2)
+  const camille = page.getByRole('region', { name: 'Camille' })
+  await expect(camille.locator('.docs-item')).toHaveCount(5)
+  await expect(camille.locator('.docs-item').first()).toContainText('Avis de cotisation')
+  await expect(camille.locator('.docs-item').nth(2)).toContainText('Relevé de participation au RRQ')
+  await expect(page.getByRole('region', { name: 'Alex' }).locator('.docs-item')).toHaveCount(5)
+  const rrq = camille.locator('.docs-item', { hasText: 'Relevé de participation au RRQ' })
   await expect(rrq).toContainText('Vous y lirez')
   await expect(rrq.getByRole('link', { name: 'Ouvrir la page officielle' })).toHaveAttribute('href', /^https:\/\/www\.retraitequebec\.gouv\.qc\.ca\//)
   await rrq.getByRole('checkbox').check()
@@ -33,7 +38,7 @@ test('the list names every document, per person where each has their own, and a 
 test('the list downloads as a text file that carries the ticks, and prints without its controls', async ({ page }) => {
   await seedProfile(page)
   await page.goto('/documents')
-  await page.locator('.docs-item', { hasText: 'Relevé de participation au RRQ' }).first().getByRole('checkbox').check()
+  await page.getByRole('region', { name: 'Camille' }).locator('.docs-item', { hasText: 'Relevé de participation au RRQ' }).getByRole('checkbox').check()
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Télécharger la liste' }).click()
   const file = await download
@@ -41,6 +46,8 @@ test('the list downloads as a text file that carries the ticks, and prints witho
   const text = await readFile((await file.path())!, 'utf8')
   expect(text).toContain('[x] Relevé de participation au RRQ — Camille')
   expect(text).toContain('[ ] Relevé de participation au RRQ — Alex')
+  expect(text.indexOf('== Camille ==')).toBeLessThan(text.indexOf('== Alex =='))
+  expect(text.indexOf('== Pour le ménage ==')).toBeLessThan(text.indexOf('== Camille =='))
   await page.emulateMedia({ media: 'print' })
   await expect(page.getByRole('button', { name: 'Télécharger la liste' })).toBeHidden()
   await expect(page.locator('.docs-item').first()).toBeVisible()

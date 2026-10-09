@@ -43,8 +43,11 @@ describe('documentItems', () => {
     const items = documentItems(couple, GUIDE_COPY.fr, urlOf)
     expect(DOC_IDS).toEqual(['budget', 'tax', 'bank', 'rrq', 'home', 'employer', 'residence'])
     const rank = { high: 0, medium: 1, situational: 2 } as const
-    for (let i = 1; i < items.length; i++) expect(rank[items[i].weight], items[i].id).toBeGreaterThanOrEqual(rank[items[i - 1].weight])
+    // grouped like the inputs — the household's documents, then each person's — and within a group, most important first
+    expect(items.map((i) => i.owner)).toEqual(['household', 'household', ...Array(5).fill('self'), ...Array(5).fill('spouse')])
+    for (let i = 1; i < items.length; i++) if (items[i].owner === items[i - 1].owner) expect(rank[items[i].weight], items[i].id).toBeGreaterThanOrEqual(rank[items[i - 1].weight])
     expect(items[0].doc).toBe('budget')
+    expect(items.filter((i) => i.owner === 'self').map((i) => i.doc)).toEqual(['tax', 'bank', 'rrq', 'employer', 'residence'])
     expect(items[items.length - 1].doc).toBe('residence')
   })
 
@@ -59,7 +62,7 @@ describe('documentItems', () => {
 describe('documentsText', () => {
   const head = (lang: 'fr' | 'en') => {
     const c = DOCUMENTS_COPY[lang]
-    return { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights }
+    return { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights, household: c.household, you: c.you }
   }
   it('is a plain list to keep beside the documents: a box to tick, what it is for, where it is — and the official page only when there is one', () => {
     const items = documentItems(couple, GUIDE_COPY.fr, urlOf)
@@ -68,6 +71,8 @@ describe('documentsText', () => {
     expect(text).toContain('[x] ' + GUIDE_COPY.fr.docs.rrq.name + ' — Camille')
     expect(text).toContain('[ ] ' + GUIDE_COPY.fr.docs.rrq.name + ' — Alex')
     expect((text.match(/^\[[ x]\] /gm) ?? []).length).toBe(12)
+    // a heading each time the owner changes: the household's, then each person's
+    expect((text.match(/^== .+ ==$/gm) ?? [])).toEqual([`== ${DOCUMENTS_COPY.fr.household} ==`, '== Camille ==', '== Alex =='])
     expect((text.match(/https:\/\/example\.test\/releve/g) ?? []).length).toBe(2)
     expect(text).toContain(GUIDE_COPY.fr.docs.home.how)
   })

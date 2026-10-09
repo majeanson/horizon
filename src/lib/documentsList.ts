@@ -30,19 +30,23 @@ export interface DocItem {
 export function documentItems(persons: readonly { id: PersonId; name: string }[], guide: GuideCopy, urlOf: (doc: DocId) => string | null): DocItem[] {
   const out: DocItem[] = []
   const couple = persons.length > 1
-  for (const doc of DOC_IDS) {
-    const { kinds, owner } = docFigures(doc)
-    const base = { doc, name: guide.docs[doc].name, what: guide.docs[doc].what, how: guide.docs[doc].how, figures: kinds.map((k) => guide.kind[k]), url: urlOf(doc), weight: DOC_WEIGHT[doc] }
-    if (owner === 'household') out.push({ ...base, id: `${doc}:household`, owner: 'household', who: null })
-    else for (const p of persons) out.push({ ...base, id: `${doc}:${p.id}`, owner: p.id, who: couple ? p.name : null })
-  }
+  const base = (doc: DocId) => ({ doc, name: guide.docs[doc].name, what: guide.docs[doc].what, how: guide.docs[doc].how, figures: docFigures(doc).kinds.map((k) => guide.kind[k]), url: urlOf(doc), weight: DOC_WEIGHT[doc] })
+  // The household's own (the budget, the home), then each person's documents — the way Profil groups its inputs; within a group, most important first.
+  for (const doc of DOC_IDS) if (docFigures(doc).owner === 'household') out.push({ ...base(doc), id: `${doc}:household`, owner: 'household', who: null })
+  for (const p of persons) for (const doc of DOC_IDS) if (docFigures(doc).owner === 'person') out.push({ ...base(doc), id: `${doc}:${p.id}`, owner: p.id, who: couple ? p.name : null })
   return out
 }
 
 /** The list as plain text, for a file to keep beside the documents: a box to tick, the document, what it is for, where it is. */
-export function documentsText(items: readonly DocItem[], ticked: ReadonlySet<string>, head: { title: string; intro: string; readOff: string; where: string; official: string; importance: string; weights: Record<DocWeight, string> }): string {
+export function documentsText(items: readonly DocItem[], ticked: ReadonlySet<string>, head: { title: string; intro: string; readOff: string; where: string; official: string; importance: string; weights: Record<DocWeight, string>; household: string; you: string }): string {
   const lines = [head.title, '', head.intro, '']
+  let group: string | null = null
   for (const it of items) {
+    // a heading each time the document's owner changes: the household's, then each person's
+    if (it.owner !== group) {
+      group = it.owner
+      lines.push(`== ${it.owner === 'household' ? head.household : (it.who ?? head.you)} ==`, '')
+    }
     lines.push(`[${ticked.has(it.id) ? 'x' : ' '}] ${it.name}${it.who ? ` — ${it.who}` : ''}`)
     lines.push(`    ${head.importance}: ${head.weights[it.weight]}`)
     lines.push(`    ${it.what}`)

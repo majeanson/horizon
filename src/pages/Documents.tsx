@@ -32,9 +32,43 @@ export function Documents() {
   const items = documentItems(people, guide, urlOf)
   const done = items.filter((it) => ticked.has(it.id)).length
   const download = () => {
-    saveAsFile(documentsText(items, ticked, { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights }), c.file, 'text/plain;charset=utf-8')
+    saveAsFile(documentsText(items, ticked, { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights, household: c.household, you: c.you }), c.file, 'text/plain;charset=utf-8')
     notice(c.downloaded)
   }
+  const household = items.filter((it) => it.owner === 'household')
+  const renderItem = (it: (typeof items)[number]) => {
+          const on = ticked.has(it.id)
+          const label = `${c.have} : ${it.name}${it.who ? ` — ${it.who}` : ''}`
+          return (
+            <li key={it.id} className={'docs-item surface' + (on ? ' is-done' : '')}>
+              <label className="docs-item__check">
+                <input type="checkbox" checked={on} onChange={() => toggleTick(it.id)} aria-label={label} />
+                <span>{c.have}</span>
+              </label>
+              <div className="docs-item__body">
+                <h3 className="docs-item__name">{it.name}</h3>
+                <p className={`docs-item__weight docs-item__weight--${it.weight} mono`}>
+                  {c.importance} : {c.weights[it.weight]}
+                </p>
+                {c.when[it.doc] && <p className="field-row__hint">{c.when[it.doc]}</p>}
+                <p>{it.what}</p>
+                <p className="docs-item__figures">
+                  <strong>{c.readOff}</strong> {it.figures.join(' · ')}
+                </p>
+                <p>
+                  <strong>{c.where}</strong> {it.how}
+                </p>
+                {it.url !== null ? (
+                  <a className="info-note__link" href={it.url} target="_blank" rel="noopener noreferrer">
+                    {c.openOfficial}
+                  </a>
+                ) : (
+                  <p className="field-row__hint">{c.noPage}</p>
+                )}
+              </div>
+            </li>
+          )
+        }
   return (
     <section className="page-body docs-page">
       <PageHead title={c.title} subtitle={c.subtitle} />
@@ -54,43 +88,20 @@ export function Documents() {
       <p className="docs-page__progress" role="status">
         {done === items.length ? c.progressAll : c.progress(done, items.length)}
       </p>
-      <ul className="docs-list">
-        {items.map((it) => {
-          const on = ticked.has(it.id)
-          const who = it.owner === 'household' ? c.household : it.who !== null ? c.forWho(it.who) : null
-          const label = `${c.have} : ${it.name}${it.who ? ` — ${it.who}` : ''}`
-          return (
-            <li key={it.id} className={'docs-item surface' + (on ? ' is-done' : '')}>
-              <label className="docs-item__check">
-                <input type="checkbox" checked={on} onChange={() => toggleTick(it.id)} aria-label={label} />
-                <span>{c.have}</span>
-              </label>
-              <div className="docs-item__body">
-                <h2 className="docs-item__name">{it.name}</h2>
-                <p className={`docs-item__weight docs-item__weight--${it.weight} mono`}>
-                  {c.importance} : {c.weights[it.weight]}
-                </p>
-                {who !== null && <p className="docs-item__who">{who}</p>}
-                {c.when[it.doc] && <p className="field-row__hint">{c.when[it.doc]}</p>}
-                <p>{it.what}</p>
-                <p className="docs-item__figures">
-                  <strong>{c.readOff}</strong> {it.figures.join(' · ')}
-                </p>
-                <p>
-                  <strong>{c.where}</strong> {it.how}
-                </p>
-                {it.url !== null ? (
-                  <a className="info-note__link" href={it.url} target="_blank" rel="noopener noreferrer">
-                    {c.openOfficial}
-                  </a>
-                ) : (
-                  <p className="field-row__hint">{c.noPage}</p>
-                )}
-              </div>
-            </li>
-          )
-        })}
-      </ul>
+      {household.length > 0 && (
+        <section className="docs-group" aria-label={c.household}>
+          <h2 className="docs-group__title">{c.household}</h2>
+          <ul className="docs-list">{household.map(renderItem)}</ul>
+        </section>
+      )}
+      <div className={'persons' + (people.length > 1 ? ' persons--two persons--aligned' : '')}>
+        {people.map((p, i) => (
+          <section key={p.id} className={`person who who--${Math.min(i, 1)}`} aria-label={p.name}>
+            <h2 className="person__title">{people.length > 1 ? p.name : c.you}</h2>
+            <ul className="docs-list">{items.filter((it) => it.owner === p.id).map(renderItem)}</ul>
+          </section>
+        ))}
+      </div>
       <p className="field-row__hint no-print">
         {c.glossaryNote} <Link to="/glossaire#documents">{c.glossaryLink}</Link>.
       </p>

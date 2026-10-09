@@ -27,6 +27,8 @@ export interface DocumentsCopy {
   when: Partial<Record<DocId, string>>
   forWho: (name: string) => string
   household: string
+  /** The heading of the only person's group when there is no name to tell it from a partner's. */
+  you: string
   file: string
   fileTitle: string
   fileIntro: string
@@ -68,6 +70,7 @@ const FR: DocumentsCopy = {
   },
   forWho: (name) => `Pour ${name}`,
   household: 'Pour le ménage',
+  you: 'Pour vous',
   file: 'horizon-documents.txt',
   fileTitle: 'Horizon : documents à rassembler',
   fileIntro: 'Cochez [x] ce que vous avez. Chaque document dit ce qu’on y lit et où le trouver. Rien de ce que vous saisissez ensuite ne quitte votre appareil.',
@@ -107,6 +110,7 @@ const EN: DocumentsCopy = {
   },
   forWho: (name) => `For ${name}`,
   household: 'For the household',
+  you: 'For you',
   file: 'horizon-documents.txt',
   fileTitle: 'Horizon: documents to gather',
   fileIntro: 'Tick [x] what you have. Each document says what you read off it and where to find it. Nothing you type afterwards leaves your device.',
