@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 13
+export const SCHEMA_VERSION = 14
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000

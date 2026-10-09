@@ -81,6 +81,10 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   },
   // v12 → v13: named plans (`plans`) kept beside the profile. Every older file has none.
   (profile) => ({ plans: [], ...profile }),
+  // v13 → v14: nothing in the SHAPE changed. The blank profile's default assumptions became the Neutre scenario's figures
+  // (inflation 2,1 %, wages 3,1 %, returns 4 / 4,5 / 4,5 %); a saved file keeps the figures it has — the step is the identity,
+  // and the version exists so the ceremony (a fixture of the old file, this note) records the change where every other one is.
+  (profile) => profile,
 ]
 
 export type ReadResult =

@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import type { Page } from '@playwright/test'
+import { test, type Page } from '@playwright/test'
 
 // Horizon has no API to stub: a spec « logs in » by putting a profile into localStorage BEFORE first paint, which
 // is exactly where the app itself keeps it. The example is the golden couple (src/lib/fixtures/profile.v10.json) —
@@ -7,11 +7,19 @@ import type { Page } from '@playwright/test'
 // what the engine tests pin. (When the schema moves on, point this at the new fixture: `schemaVersion.test.ts`
 // keeps one per version.)
 
+/** CI's two-core runner, on demand: `playwright.slow.config.ts` sets `cpuThrottle` and every seeded page asks Chromium for it. */
+export async function slowCpu(page: Page): Promise<void> {
+  const rate = (test.info().project.use as { cpuThrottle?: number }).cpuThrottle
+  if (!rate || rate <= 1) return
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate })
+}
+
 export const PROFILE_KEY = 'horizon-profile'
 
 export type SeedProfile = Record<string, unknown>
 
-export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v13.json', 'utf8'))
+export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v14.json', 'utf8'))
 
 /** A blank single person with the defaults the app itself would start from. */
 export function blankSeed(): SeedProfile {
@@ -41,6 +49,7 @@ export function blankSeed(): SeedProfile {
 
 /** Put a profile in storage before the page's own scripts run — once per tab, so a reload keeps what was typed. */
 export async function seedProfile(page: Page, profile: SeedProfile = EXAMPLE): Promise<void> {
+  await slowCpu(page)
   await page.addInitScript(
     ([key, value]) => {
       if (sessionStorage.getItem('e2e-seeded')) return
