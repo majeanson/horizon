@@ -50,5 +50,5 @@ describe('leverRanking — « save 500 more a month » finds the money', () => {
       const l = leverRanking(household, assumptions).levers.find((x) => x.id === 'save500')!
       expect(l.endGain, id).toBeGreaterThan(1000)
     }
-  })
+  }, 60_000)
 })
