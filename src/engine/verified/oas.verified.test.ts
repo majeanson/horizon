@@ -12,7 +12,7 @@
 //   · https://laws-lois.justice.gc.ca/eng/acts/o-9/FullText.html — Old Age Security Act, ss. 3, 7.1, 12, 12.1.
 import { describe, expect, it } from 'vitest'
 import { knownYear } from '../params/index.ts'
-import { allowanceMonthly, deferralMultiplier, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasFullRecoveryIncome, oasRecovery, oasStart, oasYear, residenceFraction, type GisCategoryName, type OasPerson, type OasRules } from '../oas.ts'
+import { allowanceMonthly, deferralMultiplier, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasFullRecoveryIncome, oasRecovery, oasStart, oasYear, residenceFraction, survivorAllowanceMonthly, type GisCategoryName, type OasPerson, type OasRules } from '../oas.ts'
 
 const RULES: OasRules = knownYear(2026).oas
 
@@ -397,5 +397,35 @@ describe('the OAS Benefits Estimator, Oct–Dec 2026, a couple with a 63-year-ol
   })
   it('once she is 65 both are pensioners: the ordinary couple\'s GIS at the same income, $427.57 each', () => {
     expect(Math.abs(gisMonthly(10_000, gisCategory({ present: true, receivesOas: true }), RULES) - 427.57)).toBeLessThan(1)
+  })
+})
+
+// ── The Allowance for the Survivor (a widowed 60–64-year-old) — Table 5 of the same dataset, Oct–Dec 2026 ──
+// https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0 — « Table 5 - Allowance for the Survivor »: 1 220 rows,
+// one per 48 $ of the survivor's own income. The copy beside this test keeps the file as published (six columns, the last the amount).
+// Maximum and cut-off: https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/guaranteed-income-supplement/allowance-survivor/benefit-amount.html
+// (« $1,726.18 », « less than $31,152 », October to December 2026), read 2026-10-08.
+describe('the Allowance for the Survivor, row by row against the official table', () => {
+  const lines = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'data', 'oas-table5-2026q4.csv'), 'utf8').replace(/^\uFEFF/, '').trim().split(/\r?\n/).slice(1)
+  const table = lines.map((l) => l.split(',')).map((c) => [Number(c[3]), Number(c[4]), Number(c[5])] as const) // from, to, amount
+
+  it('the copy is the whole table: 1 220 bands from 0 to the cut-off, the first at the maximum', () => {
+    expect(table.length).toBe(1220)
+    expect(table[0][0]).toBe(0)
+    expect(Math.ceil(table[table.length - 1][1])).toBe(RULES.survivorAllowanceCutoff)
+    expect(table[0][2]).toBe(RULES.survivorAllowanceMax)
+  })
+
+  it('the Allowance for the Survivor is within $1 a month of the table at the lower edge of every band', () => {
+    let worst = 0
+    for (const [from, , amount] of table) worst = Math.max(worst, Math.abs(survivorAllowanceMonthly(from, RULES) - amount))
+    expect(worst).toBeLessThan(1.0001)
+  })
+
+  it('is the maximum with no income, falls as income rises, and is nil at the cut-off', () => {
+    expect(survivorAllowanceMonthly(0, RULES)).toBe(1_726.18)
+    expect(survivorAllowanceMonthly(20_000, RULES)).toBeLessThan(survivorAllowanceMonthly(10_000, RULES))
+    expect(survivorAllowanceMonthly(RULES.survivorAllowanceCutoff, RULES)).toBe(0)
+    expect(survivorAllowanceMonthly(60_000, RULES)).toBe(0)
   })
 })

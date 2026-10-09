@@ -84,4 +84,6 @@ export const GOLDEN_ASSUMPTIONS: Assumptions = {
   ...ASSUMPTION_PRESETS.neutral,
   withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
   pensionSplitting: true,
+  // The product's default (lib/schema.ts): after the first death the survivor keeps 70 % of the household's spending.
+  survivorSpending: 0.7,
 }

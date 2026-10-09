@@ -62,6 +62,21 @@ export interface YearParams {
     normalAge: Cited
     earliestAge: Cited
     latestAge: Cited
+    /**
+     * The surviving spouse's pension (Loi sur le régime de rentes du Québec, ss. 133–137.2): the shares of the deceased's
+     * base component paid to a survivor under 65 and from 65, the share of the two additional components, the share of
+     * the survivor's OWN base pension that offsets it from 65, and the flat-rate portion (« prestation uniforme ») a survivor
+     * under 65 adds — the Act's 1994 amounts indexed to this year.
+     */
+    survivorBaseShareUnder65: Cited
+    survivorBaseShare65: Cited
+    survivorAdditionalShare: Cited
+    survivorOwnPensionOffset: Cited
+    survivorFlatRate45to64: Cited
+    survivorFlatRateUnder45: Cited
+    /** CHECK FIGURES, never inputs: the published maximum monthly surviving spouse's pension, 45–64 and 65+. */
+    survivorMaxUnder65: Cited
+    survivorMax65: Cited
   }
 
   /** Old Age Security and the Guaranteed Income Supplement — Service Canada. */
@@ -92,6 +107,13 @@ export interface YearParams {
      */
     allowanceCurve: Cited<Record<number, number>>
     gisAllowanceCurve: Cited<Record<number, number>>
+    /**
+     * The Allowance for the Survivor (a widowed 60–64-year-old): its maximum monthly amount, the survivor's own annual income
+     * cut-off, and the shape between them — breakpoints of Table 5 (annual income → monthly dollars) at the quarter read.
+     */
+    survivorAllowanceMax: Cited
+    survivorAllowanceCutoff: Cited
+    survivorAllowanceCurve: Cited<Record<number, number>>
     gis: {
       /** Single, widowed or divorced. */
       single: GisCategory

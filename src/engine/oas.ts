@@ -225,3 +225,19 @@ export function allowanceMonthly(income: number, rules: OasRules): number {
 export function gisWithAllowanceSpouseMonthly(income: number, rules: OasRules): number {
   return roundTo(Math.max(0, onCurve(rules.gisAllowanceCurve, income, allowanceScale(rules))), 0.01)
 }
+
+// ── The Allowance for the Survivor ────────────────────────────────────────────────────────────────
+
+/**
+ * The Allowance for the Survivor is paid to a widowed 60–64-year-old who has not remarried, from the month after the 60th
+ * birthday (or the death) to the month of the 65th, while their OWN annual income — counted as the GIS counts it, without the
+ * OAS-type benefits themselves — is under the cut-off, and they have lived in Canada at least ten years since 18. Read from the
+ * official table (Table 5, one row per 48 $ of income) as breakpoints; in another year both axes scale with the maximum.
+ */
+const survivorAllowanceScale = (rules: OasRules): number => rules.survivorAllowanceMax / rules.survivorAllowanceCurve[0]
+
+/** The Allowance for the Survivor for one month, at the survivor's own counted income. Zero at and above the cut-off. */
+export function survivorAllowanceMonthly(income: number, rules: OasRules): number {
+  if (income >= rules.survivorAllowanceCutoff) return 0
+  return roundTo(Math.max(0, onCurve(rules.survivorAllowanceCurve, income, survivorAllowanceScale(rules))), 0.01)
+}

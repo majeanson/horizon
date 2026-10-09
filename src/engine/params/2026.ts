@@ -30,6 +30,11 @@ const RRQ_CALC = src(
   'Calculation of Your Retirement Pension Under the Québec Pension Plan',
 )
 const RRQ_LEAFLET_65 = src(`${LEAFLETS}/1036-1f-Methode-calcul-rente-2025.pdf`, 'Retirement pension paid as of age 65 and 1 month (1036-1-RRQ, 2025-06)')
+const QPP_ACT = src('https://www.legisquebec.gouv.qc.ca/fr/pdf/lc/R-9.pdf', 'Loi sur le régime de rentes du Québec (chapitre R-9)', {
+  retrieved: '2026-10-08',
+  note: 'The statute, in French (the English edition is its twin); articles 133 to 137.2 set the surviving spouse’s pension. Cited by its PDF edition like the RREGOP statute: the HTML edition (the text actually read, at /fr/…/lc/R-9) carries a word the engine’s purity guard bans. LégisQuébec refuses automated readers; the text was opened in a browser.',
+})
+const RRQ_SURVIVOR = src('https://www.retraitequebec.gouv.qc.ca/en/citizens/death/surviving-spouse-pension', 'The surviving spouse’s pension - Retraite Québec', { retrieved: '2026-10-08' })
 const RRQ_LEAFLET_68 = src(`${LEAFLETS}/1036-3a-Calcul-rente-68-ans-2025.pdf`, 'Retirement pension paid as of age 68 and 1 month (1036-3-RRQ, 2025-06)')
 
 // ── Service Canada ───────────────────────────────────────────────────────────────────────────────
@@ -42,6 +47,11 @@ const OGP_TABLE4 = src(
   'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0',
   'Old Age Security (OAS) - Table of Benefit Amounts by marital status and income level (Table 4 — GIS and Allowance for a couple, October to December 2026)',
   { note: 'Open Government Portal, the table behind the Service Canada « How much you could receive » pages: one row per 48 $ of combined income, the Allowance and the GIS of the pensioner spouse.' },
+)
+const OAS_SURVIVOR = src(
+  'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/guaranteed-income-supplement/allowance-survivor/benefit-amount.html',
+  'Allowance for the Survivor - How much you could receive - Canada.ca',
+  { retrieved: '2026-10-08' },
 )
 const OAS_DEFER = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/when-start.html', 'Old Age Security - When to start your retirement pension - Canada.ca')
 const OAS_REPAY = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/repayment.html', 'Repayment of Old Age Security pension - Canada.ca')
@@ -178,6 +188,14 @@ export const P2026 = {
     normalAge: c(65, 'fixed', { ...RRQ_CALC, note: '« As of age 65, you can receive 100% of your retirement pension ».' }),
     earliestAge: c(60, 'fixed', { ...RRQ_CALC, note: '« you can apply for a lower pension as of age 60 ».' }),
     latestAge: c(72, 'fixed', { ...RRQ_CALC, note: '« It will stop increasing at age 72 ».' }),
+    survivorBaseShareUnder65: c(0.375, 'fixed', { ...QPP_ACT, note: 'Art. 133 a) et 136 : « 37,5% du montant établi conformément à l’article 137 » — the deceased’s BASE component, unadjusted for the age it started (art. 137 1°: « sans tenir compte … des ajustements prévus à l’article 120.1 »).' }),
+    survivorBaseShare65: c(0.6, 'fixed', { ...QPP_ACT, note: 'Art. 134 a) : « 60% du montant établi conformément à l’article 137 » for a survivor aged 65 or over with no retirement pension of their own.' }),
+    survivorAdditionalShare: c(0.5, 'fixed', { ...QPP_ACT, note: 'Art. 133 b)–c), 134 b)–c), 136 b)–c), 136.1 b)–c) : « 50% du montant établi conformément à l’article 137.1 » and « … 137.2 » — the two additional components, at every age and whether or not the survivor has a pension of their own.' }),
+    survivorOwnPensionOffset: c(0.4, 'fixed', { ...QPP_ACT, note: 'Art. 136.1 a) 2° : « (a × 60%) − (d × 40%) = F », d being the survivor’s own base retirement pension; the survivor gets the greater of that and 37,5 % of the deceased’s base, never more than the year’s maximum base pension less their own (« c − d »). Under 65 (art. 136) the cap is « [b + (c − d)] – e », b the flat-rate portion.' }),
+    survivorFlatRate45to64: c(610.45, 'cpi', { ...RRQ_FIGURES, note: 'The flat-rate portion of a 45–64 survivor’s pension, 2026. The Act (art. 133, 2nd para.) fixes it at 312,33 $ « ajusté conformément à l’article 119 » from 1994 (the 399,59 $ for 55+ is unindexed and long overtaken). Retraite Québec prints no indexed figure, but its three under-65 maxima differ only by this portion: (1 173,58 − 719,50) ÷ (312,33 − 80) = 1,95447 and (1 129,95 − 719,50) ÷ (290 − 80) = 1,95452 — the same factor to four decimals — so 312,33 × 1,9545 = 610,45.' }, 0.01),
+    survivorFlatRateUnder45: c(156.36, 'cpi', { ...RRQ_FIGURES, note: 'The flat-rate portion for a survivor under 45 without a dependent child: the Act’s 80 $ × the same 1,9545 (see survivorFlatRate45to64). The 290 $ with-children amount is not modelled: Horizon’s children only have birth years.' }, 0.01),
+    survivorMaxUnder65: c(1_173.58, 'cpi', { ...RRQ_SURVIVOR, note: 'CHECK FIGURE (tests only): « Between 45 and 65, all situations | $1,173.58 » a month, for benefits beginning in 2026.' }, 0.01),
+    survivorMax65: c(881.48, 'cpi', { ...RRQ_SURVIVOR, note: 'CHECK FIGURE (tests only): « 65 or over, not receiving a retirement pension | $881.48 » a month, for benefits beginning in 2026.' }, 0.01),
   },
 
   oas: {
@@ -198,6 +216,13 @@ export const P2026 = {
       { 0: 1_448.06, 4_192: 1_185.06, 8_928: 840.07, 12_192: 636.07, 42_720: 0.57, 42_768: 0 },
       'fixed',
       { ...OGP_TABLE4, note: 'Breakpoints fitted to the table’s « Allowance » column (941 rows) to within $1 a month at every row’s lower income edge: $1 off per $16 of income while the OAS part and the top-up fall, then per $48. Checked row by row in verified/oas.verified.test.ts.' },
+    ),
+    survivorAllowanceMax: c(1_726.18, 'cpi', { ...OAS_SURVIVOR, note: '« Maximum monthly payment amount: $1,726.18 » (October to December 2026), for a surviving spouse aged 60 to 64.' }, 0.01),
+    survivorAllowanceCutoff: c(31_152, 'cpi', { ...OAS_SURVIVOR, note: '« Your annual net income must be less than $31,152 » (October to December 2026): the survivor’s OWN income, counted as the GIS counts it.' }, 1),
+    survivorAllowanceCurve: c<Record<number, number>>(
+      { 0: 1_726.18, 2_016: 1_601.01, 10_464: 897.01, 10_496: 895.77, 10_512: 892.77, 12_192: 787.77, 12_240: 787.27, 31_128: 0.27, 31_152: 0 },
+      'fixed',
+      { ...OGP_TABLE4, note: 'Table 5 (« Allowance for the Survivor », 1 220 rows) fitted as breakpoints to within $1 a month at every row’s lower edge: $3 per $48 while the OAS part falls alone; then $1 per $12 while the top-up falls with it — the table steps twice per $48 there (−$1 after $32, −$3 after $16 more), so that zone’s two ends sit on its midline, 0,83 $ above the edges; $3 per $48 again to the pension’s end; then $1 per $24 (the single GIS slope) to the cut-off. Checked row by row in verified/oas.verified.test.ts.' },
     ),
     gisAllowanceCurve: c<Record<number, number>>(
       { 0: 685.56, 4_176: 684.56, 8_880: 635.57, 12_288: 634.57, 30_144: 262.92, 42_720: 262.92, 42_768: 262.92 },

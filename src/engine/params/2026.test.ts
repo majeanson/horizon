@@ -22,6 +22,10 @@ const LEAFLET_68 = `${RQ}/sites/default/files/SiteCollectionDocuments/RetraiteQu
 const Q4 = 'https://www.canada.ca/en/employment-social-development/programs/pensions/pension/statistics/2026-quarterly-october-december.html'
 const OAS = 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security'
 const ACT = 'https://laws-lois.justice.gc.ca/eng/acts/o-9/FullText.html'
+const QPP_ACT = 'https://www.legisquebec.gouv.qc.ca/fr/pdf/lc/R-9.pdf'
+const SURVIVOR = `${RQ}/en/citizens/death/surviving-spouse-pension`
+const OAS_SURVIVOR = 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/guaranteed-income-supplement/allowance-survivor/benefit-amount.html'
+const OGP = 'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0'
 const CRA = 'https://www.canada.ca/en/revenue-agency/services/tax/individuals'
 const LINES = `${CRA}/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses`
 const QC_PDF = 'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf'
@@ -57,6 +61,15 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'rrq.normalAge': [65, CALC],
   'rrq.earliestAge': [60, CALC],
   'rrq.latestAge': [72, CALC],
+  // The surviving spouse's pension — Loi sur le régime de rentes du Québec, arts. 133–137.2 (shares), Retraite Québec (the flat rate derived, the maxima).
+  'rrq.survivorBaseShareUnder65': [0.375, QPP_ACT],
+  'rrq.survivorBaseShare65': [0.6, QPP_ACT],
+  'rrq.survivorAdditionalShare': [0.5, QPP_ACT],
+  'rrq.survivorOwnPensionOffset': [0.4, QPP_ACT],
+  'rrq.survivorFlatRate45to64': [610.45, FIGURES],
+  'rrq.survivorFlatRateUnder45': [156.36, FIGURES],
+  'rrq.survivorMaxUnder65': [1_173.58, SURVIVOR],
+  'rrq.survivorMax65': [881.48, SURVIVOR],
 
   // ── Service Canada ──────────────────────────────────────────────────────────────────────────
   'oas.monthly65to74': [762.5, Q4],
@@ -72,6 +85,9 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'oas.recoveryRate': [0.15, `${OAS}/repayment.html`],
   'oas.allowanceMax': [1_448.06, Q4],
   'oas.allowanceCutoff': [42_768, Q4],
+  'oas.survivorAllowanceMax': [1_726.18, OAS_SURVIVOR],
+  'oas.survivorAllowanceCutoff': [31_152, OAS_SURVIVOR],
+  'oas.survivorAllowanceCurve': [{ 0: 1_726.18, 2_016: 1_601.01, 10_464: 897.01, 10_496: 895.77, 10_512: 892.77, 12_192: 787.77, 12_240: 787.27, 31_128: 0.27, 31_152: 0 }, OGP],
   'oas.allowanceCurve': [{ 0: 1_448.06, 4_192: 1_185.06, 8_928: 840.07, 12_192: 636.07, 42_720: 0.57, 42_768: 0 }, 'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0'],
   'oas.gisAllowanceCurve': [{ 0: 685.56, 4_176: 684.56, 8_880: 635.57, 12_288: 634.57, 30_144: 262.92, 42_720: 262.92, 42_768: 262.92 }, 'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0'],
   'oas.gis.single.max': [1_138.9, Q4],

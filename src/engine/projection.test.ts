@@ -86,11 +86,13 @@ describe('projection — the books always balance', () => {
     expect(worked, 'the golden household works for years').toBeGreaterThan(10)
   })
 
-  it('spending grows with inflation, and drops to the retired figure only once EVERYONE has retired', () => {
+  it('spending grows with inflation, drops to the retired figure only once EVERYONE has retired, and to the survivor’s share after the first death', () => {
     const base = (y: number, today: number) => today * (1 + A.inflation) ** (y - A.today.year)
     for (const r of rows) {
       const everyoneRetired = r.year >= 1978 + 60 && r.year >= 1981 + 62
-      const expected = base(r.year, everyoneRetired ? H.spending.retiredToday : H.spending.workingToday)
+      // Camille (1978) reaches the scenario's 95 in 2073 and is gone from 2074: the spouse alone spends the survivor's share.
+      const share = r.persons.self && r.persons.spouse ? 1 : A.survivorSpending!
+      const expected = base(r.year, everyoneRetired ? H.spending.retiredToday : H.spending.workingToday) * share
       expect(r.household.spending, `${r.year}`).toBeCloseTo(expected, 1)
     }
   })
@@ -237,7 +239,7 @@ describe('projection — the accounts behave', () => {
   it('after the year they turn 71 a person is forced to take at least the RRIF minimum from the RRSP, and gets it taxed', () => {
     const rich = withPerson(H, 'self', { accounts: { ...H.persons[0].accounts, rrsp: { balance: 3_000_000, room: 0, annualContribution: 0 } } })
     const rows = project({ ...rich, spending: { workingToday: 20_000, retiredToday: 20_000 } }, A, {})
-    const forced = rows.filter((r) => r.persons.self!.age >= 73)
+    const forced = rows.filter((r) => r.persons.self !== undefined && r.persons.self.age >= 73) // he is in the rows until his horizon age
     expect(forced.length).toBeGreaterThan(5)
     for (const r of forced) {
       expect(r.persons.self!.rrifMinimum, `${r.year}`).toBeGreaterThan(0)
@@ -470,7 +472,7 @@ describe('projection — the income-tested benefits are wired in', () => {
   it('a large RRIF pushes net income over the threshold: part of the OAS is recovered, never more than the OAS itself', () => {
     const rich = withPerson(H, 'self', { accounts: { ...H.persons[0].accounts, rrsp: { balance: 3_000_000, room: 0, annualContribution: 0 } } })
     const rows = project(rich, A, {})
-    const hit = rows.filter((r) => r.persons.self!.oasRecovery > 0)
+    const hit = rows.filter((r) => r.persons.self !== undefined && r.persons.self.oasRecovery > 0)
     expect(hit.length).toBeGreaterThan(3)
     for (const r of hit) expect(r.persons.self!.oasRecovery).toBeLessThanOrEqual(r.persons.self!.oas + 0.01)
   })

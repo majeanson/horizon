@@ -21,6 +21,10 @@ const RREGOP_WHEN = src(
 )
 const R10 = src('https://www.legisquebec.gouv.qc.ca/en/pdf/cs/R-10.pdf', 'Act respecting the Government and Public Employees Retirement Plan (chapter R-10)', 'Updated to August 12, 2026.')
 
+const RREGOP_DEATH = src(
+  'https://www.retraitequebec.gouv.qc.ca/en/argent-retraite/rrsp/Pages/en-cas-de-deces-quest-ce-que-le-rregop-prevoit-pour-vos-proches.aspx',
+  'In the Event of Death, What Does RREGOP Provide for Your Loved Ones?',
+)
 const RREGOP_CONTRIB = src(
   'https://www.retraitequebec.gouv.qc.ca/fr/guide-employeur/education/77766',
   'Méthode de calcul des cotisations pour le RREGOP, le RRCE, le RRPE, le RRAS et le RRAPSC',
@@ -46,5 +50,8 @@ export const PLAN_RREGOP = {
   deferredIndexationShare: c(1, { ...RREGOP_PAGE, note: 'Même section : cette rente « sera indexée (réajustée) pleinement du 1er janvier suivant la date de fin de votre participation au régime au 1er janvier de l’année où vous commencerez à la recevoir » — le taux entier de l’indice des rentes, sans réduction.' }),
   deferredIndexationMinus: c(0, { ...RREGOP_PAGE, note: 'Pleine indexation : aucun retranchement au taux de l’indice des rentes (voir deferredIndexationShare).' }),
   indexationShare: c(0.5, { ...RREGOP_PAGE, note: 'For service since 1 January 2000: « the more advantageous of … 50% of the rate of increase of the Pension Index, the rate of increase of the Pension Index minus 3% » (statute s. 77(3)).' }),
+  survivorShare: c(0.5, { ...RREGOP_DEATH, note: 'A retiree’s death: the surviving spouse receives « 50% of your pension » for life; the retiree may instead reduce their own pension by 2 % « to leave your spouse with 60% of your pension instead of 50% ». Death before 65: half « after the reduction that applies at age 65 » — the coordination with the RRQ applies to the spouse at once.' }),
+  survivorShareOption: c(0.6, { ...RREGOP_DEATH, note: 'The 60 % option, at the cost of 2 % of the retiree’s own pension (see survivorShare).' }),
+  survivorOptionCost: c(0.02, { ...RREGOP_DEATH, note: '« reduce your pension by 2% » for the 60 % option.' }),
   indexationMinus: c(0.03, { ...RREGOP_PAGE, note: 'Service from 1 July 1982 to 31 December 1999 is indexed at the rate minus 3 % and service before 1 July 1982 at the full rate: the engine applies the post-1999 rule to the whole pension (ENGINE.md §2).' }),
 }

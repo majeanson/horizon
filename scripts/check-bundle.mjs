@@ -28,7 +28,7 @@ const EAGER_CHUNKS = [
   // name pattern → its own budget (all load before first paint)
   { re: /^index-/, cap: 44 * KB, label: 'eager entry' }, // 42 → 44 KB on 2026-10-08 (measured 43,3 KB): the shell's backup notice exports in one tap (the file helper and the store's snooze ride in the shell), the settings gear, and a skeleton as the route fallback. 40 → 42 KB on 2026-10-08 (measured 40,6 KB): the saved profile now validates and migrates named plans (each a whole profile) and the market path, and profileEdit carries their edits — code every page's store reads, so it rides in the shell
   { re: /^react-vendor-/, cap: 280 * KB, label: 'eager react-vendor' },
-  { re: /^i18n-/, cap: 34 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 33 → 34: the locked-in REER (the chip, two fields, one ⓘ: ~1 KB of French; the REER balance's note shortened to pay for part of it). 36 → 33: the results-only copy (the three questions, the headline, « each of us ») moved to lib/resultsCopy.ts, fetched with the results page; it was 31.2 KB measured after the move. 33 → 36: Simple/Full, the headline, the next steps and the three questions (~3 KB of French). 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
+  { re: /^i18n-/, cap: 36 * KB, label: 'eager i18n (FR only — EN lazy-loads as its own chunk)' }, // 34 → 36 (2026-10-08, measured 34,6 KB): each person's horizon age, the survivor's spending share, a pension's survivor share and their two ⓘ notes. 33 → 34: the locked-in REER (the chip, two fields, one ⓘ: ~1 KB of French; the REER balance's note shortened to pay for part of it). 36 → 33: the results-only copy (the three questions, the headline, « each of us ») moved to lib/resultsCopy.ts, fetched with the results page; it was 31.2 KB measured after the move. 33 → 36: Simple/Full, the headline, the next steps and the three questions (~3 KB of French). 30 → 33: the couple's per-person verdict, the pension start month and the deferred-rule offer (~2 KB of French); splitting the results copy into its own lazy chunk is the next step if this grows
 ]
 // Chunks that are lazy AND deliberately un-precached (see ONLINE_ONLY_CHUNKS in vite.config.ts).
 const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
@@ -44,9 +44,11 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // tables — most of it text the person reads, not a library. The cap sits just above today's size, so growth fails here.
 // 156 → 160 KB raw on 2026-10-08 (measured 156,4 KB): the answer in dates on the card, the « Autre âge » box, the levers block and
 // the per-card scenario marks that replaced the strategies' matrix table.
+// 160 → 166 KB raw on 2026-10-08 (measured 164,2 KB): the engine's surviving spouse's pension (survivor.ts), the Allowance for
+// the Survivor and the names of their fourteen figures ride in the results closure with the rest of the engine.
 const LAZY_CAPS = [
   { re: /^charts-[^.]*\.js$/, cap: 372 * KB },
-  { re: /^Resultats-[^.]*\.js$/, cap: 160 * KB },
+  { re: /^Resultats-[^.]*\.js$/, cap: 166 * KB },
 ]
 
 // The door.

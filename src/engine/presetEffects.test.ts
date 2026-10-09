@@ -49,7 +49,9 @@ describe('the starting point is the same under every set — only compounding se
     for (const k of PRESET_KEYS) {
       const a = withPreset(GOLDEN_ASSUMPTIONS, k)
       for (const r of at(60, a)) {
-        const todays = r.household.spending / (1 + a.inflation) ** (r.year - a.today.year)
+        // …at the survivor's share (70 %) once the first of them has died — the older one at the set's horizon age.
+        const share = r.persons.self && r.persons.spouse ? 1 : a.survivorSpending!
+        const todays = r.household.spending / (1 + a.inflation) ** (r.year - a.today.year) / share
         // retired figure once both have left work, the working figure before — never anything else
         expect([88_000, 90_000].some((v) => Math.abs(todays - v) < 1), `${k} ${r.year}`).toBe(true)
       }
@@ -63,13 +65,16 @@ describe('the starting point is the same under every set — only compounding se
   })
 })
 
-describe('the horizon only changes how long the plan runs, never what happens before it', () => {
-  it('a shorter horizon is exactly the first rows of a longer one', () => {
+describe('the horizon only changes how long the plan runs — and, since it is each person’s age, when the first of them dies', () => {
+  it('a shorter horizon is exactly the first rows of a longer one, up to the older person’s death (born 1978)', () => {
     const long = at(60, { ...NEUTRAL, horizonAge: 100 })
     for (const horizonAge of [90, 95]) {
       const short = at(60, { ...NEUTRAL, horizonAge })
       expect(short.length).toBe(1981 + horizonAge - NEUTRAL.today.year + 1)
-      expect(short).toEqual(long.slice(0, short.length))
+      // Camille reaches the horizon age in 1978 + horizonAge and is gone from the next year; the longer plan still has her then.
+      const same = short.filter((r) => r.year <= 1978 + horizonAge)
+      expect(same).toEqual(long.slice(0, same.length))
+      expect(short.slice(same.length).every((r) => r.persons.self === undefined)).toBe(true)
     }
   })
 

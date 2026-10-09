@@ -94,6 +94,7 @@ describe('a pension in pay that changes at 65', () => {
     const step = project(house(10_000), A, {})
     const born = GOLDEN_HOUSEHOLD.persons.find((x) => x.id === ('self' as PersonId))!.birth.year
     flat.forEach((row, i) => {
+      if (!row.persons.self) return // gone after his horizon age
       const db = step[i].persons.self!.db
       if (row.year < born + 65) expect(db, String(row.year)).toBeCloseTo(row.persons.self!.db, 2)
       else expect(db, String(row.year)).toBeLessThan(row.persons.self!.db)

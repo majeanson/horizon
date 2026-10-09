@@ -61,7 +61,7 @@ describe('each story', () => {
     const rows = rowsOf('average')
     const lucAt = (year: number) => rows.find((r) => r.year === year)!.persons.spouse!
     expect(lucAt(2026).rrspLockedEnd).toBeGreaterThan(25_000) // the employer's 2 000 $ and a year of growth
-    for (const r of rows) expect(r.persons.spouse!.rrspLockedEnd).toBeLessThanOrEqual(r.persons.spouse!.balancesEnd.rrsp + 0.005)
+    for (const r of rows.filter((x) => x.persons.spouse)) expect(r.persons.spouse!.rrspLockedEnd).toBeLessThanOrEqual(r.persons.spouse!.balancesEnd.rrsp + 0.005)
     // nothing drawn from it while he works; the plan, as ever, holds
     expect(lucAt(2030).withdrawals.rrsp).toBe(0)
     expect(planGlance(household, assumptions).ok).toBe(true)

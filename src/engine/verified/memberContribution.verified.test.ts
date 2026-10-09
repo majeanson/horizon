@@ -41,10 +41,10 @@ describe('RREGOP member contributions — in the projection', () => {
     const paying = rows.filter((r) => (r.persons[member.id]?.employment ?? 0) > 0)
     expect(paying.length).toBeGreaterThan(0)
     for (const r of paying) expect(r.persons[member.id]!.pensionContribution, `${r.year}`).toBeGreaterThan(0)
-    for (const r of rows.filter((x) => (x.persons[member.id]?.employment ?? 0) === 0)) expect(r.persons[member.id]!.pensionContribution, `${r.year}`).toBe(0)
+    for (const r of rows.filter((x) => x.persons[member.id] && x.persons[member.id]!.employment === 0)) expect(r.persons[member.id]!.pensionContribution, `${r.year}`).toBe(0)
   })
   it('a person with no such pension pays none, however much they earn', () => {
-    for (const r of rows) expect(r.persons[other.id]!.pensionContribution, `${r.year}`).toBe(0)
+    for (const r of rows.filter((x) => x.persons[other.id])) expect(r.persons[other.id]!.pensionContribution, `${r.year}`).toBe(0)
   })
   it('the contribution is deducted from income: the member\'s net income is lower than without it', () => {
     const without = project({ ...GOLDEN_HOUSEHOLD, persons: GOLDEN_HOUSEHOLD.persons.map((p) => ({ ...p, pensions: p.pensions.map(({ memberContribution: _m, ...d }) => d) })) }, GOLDEN_ASSUMPTIONS)

@@ -174,7 +174,8 @@ describe('a couple of whom one has retired and one still works', () => {
   const rows = project(h, A, {})
 
   it('the retired one has no pay, no premium and no RRSP deduction in any year; the other has all three until the retirement month', () => {
-    for (const r of rows) {
+    for (const r of rows.filter((x) => x.persons.self)) {
+      // (he is in the rows until his horizon age, 1966 + 95)
       const s = at(r, 'self')
       expect(s.employment, `${r.year}`).toBe(0)
       expect(s.payrollContribution, `${r.year}`).toBe(0)
@@ -192,7 +193,9 @@ describe('a couple of whom one has retired and one still works', () => {
   it('the household spends the « still working » figure until the LAST of them retires, then the retired one', () => {
     const spouseLeaves = 1971 + 62 // 2033
     for (const r of rows) {
-      const want = (r.year < spouseLeaves ? 52_000 : 45_000) * inflate(r.year)
+      // …and the survivor's share (70 %) once one of them is gone after their horizon age.
+      const share = r.persons.self && r.persons.spouse ? 1 : A.survivorSpending!
+      const want = (r.year < spouseLeaves ? 52_000 : 45_000) * inflate(r.year) * share
       expect(r.household.spending, `${r.year}`).toBeCloseTo(want, 1)
     }
   })
@@ -230,7 +233,8 @@ describe('a household with a pension in pay and no work at all', () => {
     expect(at(rowOf(rows, 2026)).db).toBe(36_000)
     expect(at(rowOf(rows, 2027)).db).toBeCloseTo(36_000 * (1 + A.inflation), 2)
     expect(at(rowOf(rows, 2030)).db).toBeCloseTo(36_000 * (1 + A.inflation) ** 4, 2)
-    for (const r of rows) {
+    for (const r of rows.filter((x) => x.persons.self)) {
+      // (in the rows until her horizon age)
       const p = at(r)
       expect(p.employment, `${r.year}`).toBe(0)
       expect(p.payrollContribution, `${r.year}`).toBe(0)
@@ -287,6 +291,7 @@ describe('over many households: whoever has retired earns nothing and every acco
     for (const { h, label } of sample) {
       for (const row of project(h, A, {})) {
         for (const p of h.persons) {
+          if (!row.persons[p.id]) continue // gone after their horizon age
           if (row.year <= p.birth.year + p.retirementAge) continue
           const y = at(row, p.id)
           checked++
@@ -304,6 +309,7 @@ describe('over many households: whoever has retired earns nothing and every acco
     for (const { h, label } of sample) {
       for (const row of project(h, A, {})) {
         for (const p of h.persons) {
+          if (!row.persons[p.id]) continue // gone after their horizon age
           const y = at(row, p.id)
           if (row.year < p.birth.year + p.rrq.startAge) expect(y.rrq, `${label} ${p.id} ${row.year}: QPP before its start`).toBe(0)
           if (row.year < p.birth.year + p.oas.startAge) expect(y.oas, `${label} ${p.id} ${row.year}: OAS before its start`).toBe(0)

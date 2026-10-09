@@ -29,6 +29,8 @@ export function shifted(a: Assumptions, returnsDelta: number, inflationDelta: nu
     inflation: a.inflation + inflationDelta,
     returns: { nonReg: a.returns.nonReg + returnsDelta, rrsp: a.returns.rrsp + returnsDelta, tfsa: a.returns.tfsa + returnsDelta },
     horizonAge,
+    // The grid asks « and if the money has to last to 90 / 100? » of EVERYONE: a person's own horizon age yields to the axis here.
+    horizonForAll: horizonAge,
   }
 }
 

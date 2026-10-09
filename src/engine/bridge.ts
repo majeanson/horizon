@@ -181,7 +181,7 @@ const scenarioOf = (h: Household, l: BridgeLevers): Scenario => {
 
 const inflator = (a: Assumptions) => (year: number) => (1 + a.inflation) ** (year - a.today.year)
 
-function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): BridgeYear {
+function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, birthYear: number): BridgeYear {
   const d = deflate(r.year)
   const people = Object.values(r.persons)
   const pick = (f: (p: NonNullable<(typeof people)[number]>) => number) => sum(people.map((p) => f(p!))) / d
@@ -192,7 +192,8 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number): Br
   const shortfall = r.household.shortfall / d
   return {
     year: r.year,
-    age: r.persons[id]?.age ?? 0,
+    // The person's age in the year — from their birth year, so the rows after their death (they leave the rows at their horizon age) still read in order.
+    age: r.year - birthYear,
     spending: r.household.spending / d,
     employment: pick((p) => p.employment),
     db: pick((p) => p.db),
@@ -245,7 +246,8 @@ function summarise(a: Assumptions, rows: readonly BridgeYear[], raw: readonly Ye
 export function bridgeRun(h: Household, a: Assumptions, levers: BridgeLevers): BridgeRun {
   const raw = project(h, a, scenarioOf(h, levers))
   const deflate = inflator(a)
-  const rows = raw.map((r) => yearOf(r, levers.id, deflate))
+  const birthYear = (h.persons.find((p) => p.id === levers.id) ?? h.persons[0]).birth.year
+  const rows = raw.map((r) => yearOf(r, levers.id, deflate, birthYear))
   return { levers, rows, summary: summarise(a, rows, raw) }
 }
 

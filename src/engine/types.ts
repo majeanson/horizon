@@ -51,6 +51,12 @@ export interface DbPension {
   /** The age the person starts the pension (≥ earliestAge). */
   startAge: number
   /**
+   * The share of the pension paid to a surviving spouse for life after the member's death (RREGOP: 0.5, or 0.6 at the cost of 2 %
+   * of the member's own pension). Absent: none is paid. Death before the pension starts: the share of the pension the member would
+   * have been entitled to at death, coordinated as from 65.
+   */
+  survivorShare?: number
+  /**
    * The plan's rule for a member who LEAVES before being eligible for any pension (a « deferred » pension): the permanent
    * reduction counts the years from the start to `toAge` instead of to the unreduced age; the RRQ coordination then applies
    * from the start, cut by the same share; and until the pension starts it is indexed by `indexation` (RREGOP: in full).
@@ -82,6 +88,12 @@ export interface Person {
   birth: YearMonth
   /** The age at which employment income stops. */
   retirementAge: number
+  /**
+   * The age this person's plan runs to — their own « jusqu'à quel âge ». The person is alive through the year they reach it and
+   * gone from the next; in a couple the first death switches the plan to the survivor's rules (projection.ts). Null or absent:
+   * the scenario's horizonAge (Assumptions).
+   */
+  horizonAge?: number | null
   /** Gross employment income now, in today's dollars. The engine grows it by wage growth until retirement. */
   salaryToday: number
   /** Pensionable earnings by past calendar year, as the relevé's « Revenus de travail admissibles » prints them. */
@@ -172,8 +184,15 @@ export interface Assumptions {
   wageGrowth: number
   /** Nominal annual return by account. */
   returns: Record<AccountKind, number>
-  /** The plan must last until the YOUNGEST person reaches this age. */
+  /** The age each person's plan runs to unless they set their own (Person.horizonAge); the plan ends when the last person reaches theirs. */
   horizonAge: number
+  /** Set by the sensitivity grid only: every person's horizon, overriding their own. Absent otherwise. */
+  horizonForAll?: number
+  /**
+   * In a couple, the share of the household's spending the survivor keeps after the first death (0.7 = 70 %). A choice, not an
+   * official figure. Absent: 1 — spending does not change.
+   */
+  survivorSpending?: number
   /** Which account to draw on first, second, third when savings are needed. */
   withdrawalOrder: readonly AccountKind[]
   /** Try every 5 % allocation of pension income between the spouses and keep the cheapest. */
@@ -199,7 +218,10 @@ export interface Scenario {
 export interface PersonYear {
   age: number
   employment: number
+  /** RRQ pension received in the year — the person's own, plus the surviving spouse's pension after a death. */
   rrq: number
+  /** The part of rrq that is the surviving spouse's pension (0 while both are alive). */
+  survivorPension: number
   oas: number
   /** The Allowance: paid to the 60–64 spouse of a pensioner on the GIS, taxable, income-tested (nothing once the couple's income is over the cut-off). */
   allowance: number
