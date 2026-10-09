@@ -52,19 +52,14 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 1 — parameters for 2026, with their sources
 
-- [x] `Cited` / `Plain` types, `plain()`, `paramsFor()` and the projection of future years (`params/machinery.test.ts`)
-- [x] `params/2026.ts` — every leaf from its official page; the 6,30 % splits 5,3 base + 1,0 first additional (settled)
-- [x] `2026.test.ts` (one literal per leaf), `cited.test.ts`, `crosscheck.test.ts`, `lib/enginePurity.test.ts` — each planted red
+- [x] The parameter machinery: `Cited` / `Plain`, `params/2026.ts` (every leaf from its official page), the literal tests, `cited.test.ts`, `crosscheck.test.ts`, `enginePurity` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
 - [x] No figure carries a `verify` reason any more: the Québec brackets, the line-361 age rule and the worker-deduction rate (browser screenshot + `docs/TP-1.G(2025-12).pdf`), the four GIS divisors (OAS Benefits Estimator, ≤ 1 $/month apart), the TFSA total (the CRA's limits table + a real room history); ratchet 11 → 0 on 2026-10-06
 - [ ] **Needs a human with a browser** (revenuquebec.ca refuses every automated client; legisquebec.gouv.qc.ca opens in the in-app Browser pane, which settled the QPP Act's 15 % drop-out on 2026-10-07: rounded UP, s. 116.4 « counting any fraction of a month as a whole month », `verified/rrqDropOut.verified.test.ts`, engine fixed; the 72nd-birthday-month boundary was confirmed on the calculation page on 2026-10-06): (the CRA's T5008 page read 2026-10-07: « The amount in box 20 may or may not reflect your adjusted cost base (ACB) » — what the ⓘ already says); (the OAS estimator's residence wording was read on 2026-10-06: step 4 asks « Since the age of 18, have you only lived in Canada? » Yes/No; answering No asks for the years lived when the pension STARTED (a partner not yet on it: the years so far) — read 2026-10-07, and 35 years gave the engine's 35/40 exactly)
 
 ### Phase 2 — RRQ
 
-- [x] Contributions; contributory period, 15 % drop-out and the base 25 % — the leaflet's worked example to the cent; a full career yields the published $1 441.25 base maximum
-- [x] The two additional components (phase-in 15/30/50/75 %, 480 months) — the published 2026 maximum $1 507.65 reproduced
-- [x] Early / late adjustment (the sliding 0,5–0,6 % rule, settled; the 72-year cap)
-- [x] RRQ property tests (monotone in earnings, linear below the ceiling, zero career → zero) — `engine/rrq.props.test.ts`
+- [x] RRQ: contributions, the 15 % drop-out and base 25 %, the two additional components, the early / late adjustment, property tests — the leaflet’s worked example and the published 2026 maximums to the cent (ENGINE.md)
 
 ### Phase 3 — OAS and GIS
 
@@ -76,9 +71,7 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ### Phase 4 — taxes
 
-- [x] Federal brackets, BPA phase-down, abatement; age, pension-income and QPP credits — Finance Canada's test case reproduced
-- [x] Québec brackets, BPA, the shared age / living-alone / retirement amount — DERIVED examples (Revenu Québec publishes none readable)
-- [x] `householdTax` and pension splitting; the top marginal rate 53.31 % and the lowest 25.69 % reproduced; FSS, RAMQ, prior-year OAS basis flagged in ENGINE.md
+- [x] Taxes: federal and Québec brackets, credits, the abatement, `householdTax` and pension splitting; the top marginal rate 53.31 % and the lowest 25.69 % reproduced (ENGINE.md names what is simplified)
 - [ ] Re-check against Revenu Québec's TP-1.G guide (now in `docs/`): the base-QPP-contribution treatment and the 14 % conversion rate (the line-361 age gate is confirmed)
 
 ### Phase 5 — accounts and defined-benefit pensions
@@ -148,6 +141,12 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] **The fresh-eyes UX pass (2026-10-08)**: the answer FIRST on Résultats (the age drawn large, the dates on the card; the page no longer opens scrolled past it — a `scrollIntoView` on the compare rail moved the whole page), one vocabulary (« réponse », « départ », « scénario », « l’argent dure jusqu’à », « partenaire » — the memory note `horizon-glossary`), each figure said once (the strategies' matrix table became three marks per card; the chart's third « hypothèses » line is gone; the compare rail is the milestones plus an « Autre âge » box), three tabs (Profil · Résultats · Hypothèses) with « Sauvegarde et réglages » behind the gear, spending on Profil (« Budget »), the first visit asks the employer plan and types the year of birth, the body face everywhere prose is (no monospace), a 14 px floor, a `Switch` primitive, the field's tools on its label line, French non-breaking spaces held by `lib/frenchSpacing.test.ts`. ❓ Still open from the review: the defaults equal the Neutre scenario (schema), a plain-language pass over the longest ⓘ notes
 - [x] **Closed the same day**: the comparisons and the retired glance run in workers too (`lib/runs.worker.ts`, `computeAnswer`), and the range / stress / levers / per-person searches start once the first answer is in; schema v14 by the ceremony (identity step, v14 fixture) instead of a moved pin; `npm run e2e:slow` runs every spec in CI’s shape at 4× CPU throttle (180 green, slowest 17,7 s); all 42 ⓘ texts reviewed one by one, 12 rewritten (commit 7ee0234 records each verdict).
 - [x] **Each their own horizon age, and a death in the household (2026-10-08, asked by Marc)**: `Person.horizonAge` (null → the scenario’s) on Hypothèses with a « Comme le scénario » chip; the plan runs to the LAST person; a couple’s first death hands the accounts to the survivor untaxed and switches to the survivor’s rules — the QPP surviving spouse’s pension from the Act (arts. 133–137.2, `engine/survivor.ts`, 8 cited figures), the Allowance for the Survivor (Table 5 verified row by row), RREGOP’s 50 % share (`DbPension.survivorShare`), single-filer tax, spending at `survivorSpending` (70 %). Schema v15. The flat-rate portion rests on a printed figure — Service Canada’s quarterly report (558,71 $, 2023) indexed by the QPP’s January rates — and the derivation from the three published maxima agrees within two cents (`verified/survivor.verified.test.ts`). The death benefit (2 500 $) is paid the year after. Left out by design, with the reason in ENGINE.md: a survivor under 45 with a dependent child, a disabled survivor, the orphan’s pension; the year of death is an ordinary year, as a spousal rollover makes it.
+
+### Phase 12 — a life beyond the budget, and a plan that explains itself (2026-10-09, « fresh ideas… do all »)
+
+- [x] The answer explains itself: each lever in money too (`endGain`), the sturdiest way to start, the unconfirmed figures ranked by how far the answer moves (`engine/factImpact.ts`, « Le trouver » → `/?fact=`), « Mes plans, côte à côte », « Votre réponse » live on Profil and Hypothèses, the figures’ vintage and the new-year warning, the full printed plan, « Copier le résumé », the address keys as a contract (`addressKeys.test.ts`)
+- [x] **Schema v16**: children move into the household; `childSpending`, dated `flows`, `partTime`, `retiredSpendingDrift` (`engine/lifeEvents.ts`, `LifeSection`, `PartTimeFields`); a household that states none projects exactly as before (the golden snapshots did not move)
+- [ ] ❓ Left out on purpose, ask before reopening: a first-run tour and a re-split of the Réponse view (both against the same-day « answer first, fewer views » rule). Not built: a tenth example that uses the new fields (EXAMPLES.md is nine by design), dated events in the CSV, an RRSP-shaped windfall, REEE and child benefits
 
 ## 5. Lessons carried over from Babillard
 
