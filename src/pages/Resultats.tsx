@@ -222,7 +222,10 @@ export function Resultats() {
   const levers = useLevers(slow.household, slowAssumptions, answered)
   // The figures not yet read off a document, and how far the answer moves if each were off: idle work, after everything above it.
   const unconfirmed = useMemo(() => factsOf(slow).filter((f) => !f.confirmed).map((f) => ({ id: f.id, owner: f.owner, kind: f.kind })), [slow])
-  const impact = useFactImpact(slow.household, slowAssumptions, unconfirmed, answered && !retiredNow)
+  // The heaviest searches of the page (two walks of projections for EVERY unconfirmed figure, one answer per kept plan) come LAST: on a two-core
+  // machine they would otherwise run beside the range, the stress and the levers and slow the very figures the reader is waiting for.
+  const firstSearchesIn = range !== undefined && stress !== undefined && levers !== undefined
+  const impact = useFactImpact(slow.household, slowAssumptions, unconfirmed, answered && firstSearchesIn && !retiredNow)
   const gc = GUIDE_COPY[lang]
   const factName = (id: string): string => {
     const f = unconfirmed.find((x) => x.id === id)!
@@ -616,7 +619,7 @@ export function Resultats() {
             )}
             {!retiredNow && profile.plans.length > 0 && (
               <div className="surface">
-                <PlansCompare profile={slow} enabled={answered} />
+                <PlansCompare profile={slow} enabled={answered && firstSearchesIn} />
               </div>
             )}
           </section>
