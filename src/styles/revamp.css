@@ -949,7 +949,7 @@
 /* The relevé is thirty-odd lines: it scrolls inside its own box instead of lengthening the whole page (the inputs stay in
    the tab order, so the box is reachable by keyboard). */
 .earnings__list {
-  max-height: 24rem;
+  max-height: min(24rem, 60vh);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 0.25rem;
@@ -997,4 +997,12 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: 1rem;
   align-items: start;
+}
+
+/* On paper the relevé is the whole list, not a box with a scroll bar. */
+@media print {
+  .earnings__list {
+    max-height: none;
+    overflow: visible;
+  }
 }
