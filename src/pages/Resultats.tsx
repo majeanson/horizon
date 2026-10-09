@@ -21,8 +21,7 @@ import { SensitivityPanel } from '../components/results/SensitivityPanel'
 import { YearTables } from '../components/results/YearTables'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
-import { planGlance, retirementState } from '../engine/ledger'
-import { withPreset } from '../engine/assumptionPresets'
+import { retirementState } from '../engine/ledger'
 import { useLang, useT } from '../i18n'
 import type { ChartMetric, Dollars } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
@@ -32,6 +31,7 @@ import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
 import { prudentDiffers } from '../lib/headline'
 import { NO_HEADLINE } from '../lib/answer'
 import { useAnswer } from '../lib/useAnswer'
+import { useRuns } from '../lib/useRuns'
 import { scrollToSection } from '../lib/motion'
 import { useSettled } from '../lib/useSettled'
 import { usePresetRange } from '../lib/usePresetEarliest'
@@ -42,7 +42,7 @@ import { LEVERS_COPY } from '../lib/leversCopy'
 import { useLevers } from '../lib/useLevers'
 import { formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
-import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, runSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
+import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
 import { accuracyOf } from '../lib/facts'
 import { parseSpend } from '../lib/spendModel'
 import { useEarliestEach } from '../lib/useEarliestEach'
@@ -86,10 +86,6 @@ export function Resultats() {
   // Everybody already stopped working: « when can I retire? » is answered, and what is left to say is whether the money lasts.
   const state = useMemo(() => retirementState(slow.household, slowAssumptions), [slow, slowAssumptions])
   const retiredNow = state.everyoneRetired && profileGaps(profile).length === 0
-  const retiredGlance = useMemo(() => {
-    if (!retiredNow) return null
-    return { now: planGlance(slow.household, slowAssumptions), prudent: planGlance(slow.household, withPreset(slowAssumptions, 'prudent')) }
-  }, [retiredNow, slow, slowAssumptions])
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
   const selections = parseSelections(params.get('ages'), defaultSelections(profile.household, state.everyoneRetired)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
   const metric: ChartMetric = params.get('metric') === 'income' ? 'income' : params.get('metric') === 'detail' ? 'detail' : 'netWorth'
@@ -101,7 +97,6 @@ export function Resultats() {
   const at = (y: number) => formatYearAge(y, births, lang)
   const isCouple = profile.household.persons.length === 2
   const accuracy = useMemo(() => accuracyOf(profile), [profile])
-  const earliestEachAnswer = useEarliestEach(slow.household, slowAssumptions, isCouple && gaps.length === 0 && !retiredNow)
 
   const setParam = useCallback(
     (key: string, value: string | null) =>
@@ -127,16 +122,24 @@ export function Resultats() {
   // THE answer — the earliest age, « dès maintenant », the headline, the monthly comfort, the dates — is one job worked out
   // off the page's thread (lib/answer.ts): null until the first one is in (the card shows a skeleton), then the LAST one
   // while a re-asked question runs (the card says it is busy). Forty projections never again run between two taps.
-  const answer = useAnswer(slow.household, slowAssumptions, firstAge, youngest, gaps.length === 0)
+  const answer = useAnswer(slow.household, slowAssumptions, firstAge, youngest, state.everyoneRetired, gaps.length === 0)
   const got = gaps.length === 0 ? answer.value : null
   const answerPending = gaps.length === 0 && got === null
   const earliest = got?.earliest ?? null
   const nowOk = got?.nowOk ?? false
+  // A household that has already stopped working reads its plan at a glance instead of an age (it comes with the answer).
+  const retiredGlance = retiredNow ? (got?.glance ?? null) : null
+  // THE ANSWER FIRST: the other workers (the range under the three scenarios, the market stress, the levers, each person's
+  // own earliest) wait for the first answer to land, so that on a two-core machine six searches do not race the one the
+  // page opens with. Afterwards they re-ask alongside it — the last answer stays on screen meanwhile.
+  const answered = gaps.length === 0 && got !== null
+  const earliestEachAnswer = useEarliestEach(slow.household, slowAssumptions, answered && isCouple && !retiredNow)
   const picked = formatSelections(selections)
-  const runs = useMemo(
-    () => (gaps.length > 0 ? [] : runSelections(slow, { year, month }, parseSelections(picked, []))),
-    [slow, gaps.length, year, month, picked],
-  )
+  // The comparisons — one full projection per chosen age — off the page's thread as well (lib/useRuns.ts): null until the
+  // first ones are in (the cards, the chart and the tables show a skeleton), then the LAST ones while a re-ask runs.
+  const runsAnswer = useRuns(slow, { year, month }, parseSelections(picked, []), gaps.length === 0)
+  const runs = gaps.length > 0 ? [] : (runsAnswer.value ?? [])
+  const runsPending = gaps.length === 0 && runsAnswer.value === null
 
   // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
   const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
@@ -197,11 +200,11 @@ export function Resultats() {
   // The answer under each ready-made scenario (off the page's thread): the answer's own range line, and the
   // figure the sensitivity grids detail. ONE home for these three ages — nothing else restates them.
   const activePreset = presetOf(assumptions)
-  const range = usePresetRange(slow.household, slowAssumptions, gaps.length === 0)
-  const stress = useMarketRange(slow.household, slowAssumptions, gaps.length === 0)
+  const range = usePresetRange(slow.household, slowAssumptions, answered)
+  const stress = useMarketRange(slow.household, slowAssumptions, answered)
   const mc = MARKET_COPY[lang]
   const lc = LEVERS_COPY[lang]
-  const levers = useLevers(slow.household, slowAssumptions, gaps.length === 0)
+  const levers = useLevers(slow.household, slowAssumptions, answered)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
   // What the answer's age can fund each month (engine/maxSpending.ts, after tax, today's dollars), and the age put in dates.
@@ -332,7 +335,7 @@ export function Resultats() {
       {view === 'answer' && (
         <section className="arc" aria-label={rc.tabs.answer}>
           <div id="verdict" className={'verdict surface results-section' + (answer.busy ? ' is-busy' : '')} aria-live="polite" aria-busy={answer.busy || undefined}>
-            {answerPending && !retiredGlance ? (
+            {answerPending ? (
               <Skeleton count={3} className="skeleton--verdict" />
             ) : (
               <>
@@ -399,7 +402,7 @@ export function Resultats() {
             {/* The answer's own range — the ONE place the three scenarios' ages are written: three labelled figures,
                 not a joined sentence. The row is on the card from the first paint (… while the worker runs), so the
                 late answer fills boxes that already exist instead of growing the card under the reader. */}
-            {!retiredGlance && (
+            {!retiredNow && (
               <div className="verdict__range">
                 <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
                 <dl className="verdict__range-list">
@@ -418,13 +421,13 @@ export function Resultats() {
                 )}
               </div>
             )}
-            {headline.age !== null && !retiredGlance && comfort !== undefined && (
+            {headline.age !== null && !retiredNow && comfort !== undefined && (
               <p className="verdict__note">
                 {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
               </p>
             )}
             {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. Boxes from the first paint. */}
-            {!retiredGlance && (
+            {!retiredNow && (
               <div className="verdict__range">
                 <p className="verdict__range-title">{mc.stress.title}</p>
                 <dl className="verdict__range-list">
@@ -445,7 +448,7 @@ export function Resultats() {
               </div>
             )}
             {/* The changes a household could make, each tried alone and ranked by the years it gains. Rows from the first paint. */}
-            {!retiredGlance && (
+            {!retiredNow && (
               <div className="verdict__range">
                 <p className="verdict__range-title">{lc.title}</p>
                 <ul className="levers__list">
@@ -533,6 +536,7 @@ export function Resultats() {
               </div>
             )}
 
+            {runsPending && <Skeleton count={2} variant="card" />}
             <ul className="scenarios">
               {runs.map(({ selection, result }, i) => (
                 <li key={String(selection)} className={`scenario scenario--${SERIES_CLASS[i]} surface`}>
@@ -610,6 +614,7 @@ export function Resultats() {
 
           <section id="tableau" className="results-section" aria-label={r.table.title}>
             <SectionHeader title={r.table.title} />
+            {runsPending && <Skeleton count={6} />}
             <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} />
           </section>
 
