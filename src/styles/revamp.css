@@ -1571,3 +1571,15 @@
   color: var(--ink);
   font-weight: 700;
 }
+
+/* « Je ne connais pas mes chiffres »: the level picker, the helper under a figure, the range on the results page. */
+.levels-says { list-style: none; margin: var(--space-2, 0.5rem) 0 0; padding: 0; display: grid; gap: 0.15rem; }
+.levels-how { display: grid; gap: var(--space-3, 0.75rem); margin-top: var(--space-2, 0.5rem); }
+.levels-how ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.levels-sources { list-style: none; padding-left: 0 !important; }
+.levels-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.levels-table caption { text-align: left; font-weight: 600; padding-bottom: 0.35rem; }
+.levels-table th, .levels-table td { padding: 0.3rem 0.4rem; border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12)); text-align: right; overflow-wrap: anywhere; }
+.levels-table th[scope='row'], .levels-table thead th:first-child { text-align: left; font-weight: 500; }
+.level-helper { display: grid; gap: 0.25rem; margin: -0.25rem 0 var(--space-2, 0.5rem); }
+.level-range { display: grid; gap: var(--space-2, 0.5rem); }

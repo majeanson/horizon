@@ -9,6 +9,7 @@ import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { Section, type PersonEditor } from './shared'
+import { LevelSlot } from './LevelSlot'
 
 // Old Age Security (when it starts, and the residence that decides how much), then the three kinds of savings
 // account. Grouped in one file because each is a short list of the same FieldRow + NumberField pair.
@@ -89,6 +90,7 @@ function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & 
       <FieldRow label={a.balance} infoId={info.balance} fact={factId(person.id, kind === 'rrsp' ? 'rrspBalance' : 'tfsaBalance')}>
         {(w) => <NumberField kind="money" max={1e9} value={account.balance} onChange={(balance) => (kind === 'rrsp' ? edit((x) => setRrspBalance(x, balance)) : set({ balance }))} id={w.id} />}
       </FieldRow>
+      <LevelSlot kind={kind === 'rrsp' ? 'rrspBalance' : 'tfsaBalance'} owner={person.id} />
       {withRoom && (
         <FieldRow label={a.room} infoId={info.room} fact={factId(person.id, kind === 'rrsp' ? 'rrspRoom' : 'tfsaRoom')}>
           {(w) => <NumberField kind="money" max={1e9} value={account.room} onChange={(room) => set({ room })} id={w.id} />}
@@ -115,6 +117,7 @@ export function AccountsSection({ person, edit, withoutRoom = false }: PersonEdi
         <FieldRow label={a.balance} infoId="nonRegBalance" fact={factId(person.id, 'nonRegBalance')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
         </FieldRow>
+        <LevelSlot kind="nonRegBalance" owner={person.id} />
         <FieldRow label={a.acb} infoId="nonRegAcb" hint={a.acbHint} fact={factId(person.id, 'nonRegAcb')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.acb} onChange={(acb) => setNonReg({ acb })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>

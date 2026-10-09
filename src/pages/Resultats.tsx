@@ -8,6 +8,7 @@ import { PageHead } from '../components/PageHead'
 import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
 import { HowToRead } from '../components/results/HowToRead'
+import { LevelRange } from '../components/results/LevelRange'
 import { TimelineStrip } from '../components/results/TimelineStrip'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { PlansCompare } from '../components/results/PlansCompare'
@@ -476,6 +477,7 @@ export function Resultats() {
 
           {!answerPending && gaps.length === 0 && <TimelineStrip household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />}
           {!answerPending && gaps.length === 0 && <HowToRead />}
+          {!answerPending && gaps.length === 0 && !retiredNow && <LevelRange profile={slow} enabled={answered && firstSearchesIn} />}
 
           {/* How firm the answer is: the same plan under the three scenarios and a hard market side by side, then what would move it. Rows from the first paint. */}
           {!retiredNow && (

@@ -10,6 +10,7 @@ import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { StatusMessage } from '../StatusMessage'
+import { LevelSlot } from './LevelSlot'
 import { Section } from './shared'
 
 // The principal residence: what it is worth, what is still owed on it, and — if the person plans it — when it is sold or traded
@@ -46,6 +47,7 @@ export function HomeSection() {
           <FieldRow label={h.value} hint={h.valueHint} fact={factId('household', 'homeValue')}>
             {(w) => <NumberField kind="money" max={1e8} value={home.value} onChange={(value) => updateProfile((p) => updateHome(p, (x) => ({ ...x, value })))} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
+          <LevelSlot kind="homeValue" owner="household" />
           <FieldRow label={h.balance} fact={factId('household', 'mortgage')}>
             {(w) => <NumberField kind="money" max={1e8} value={home.mortgage.balance} onChange={(balance) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, balance } })))} id={w.id} />}
           </FieldRow>

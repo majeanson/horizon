@@ -4,6 +4,7 @@ import { resolveYear, type Indexation } from './project.ts'
 import { P2026 } from './2026.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
 import { TFSA_LIMIT_HISTORY } from './tfsaHistory.ts'
+import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME } from './typical.ts'
 import type { YearParams } from './types.ts'
 
 // The registry of years whose figures a person can open and check, and the one function the
@@ -19,6 +20,12 @@ export const SERIES: ReadonlyArray<{ name: string; cited: Cited<unknown> }> = [
   { name: 'rrq.mgaHistory', cited: RRQ_MGA_HISTORY },
   { name: 'rrq.yampeHistory', cited: RRQ_YAMPE_HISTORY },
   { name: 'accounts.tfsaLimitHistory', cited: TFSA_LIMIT_HISTORY },
+  // What a typical Canadian household holds and spends (Statistics Canada): the start of an estimate for someone who cannot read their own figures.
+  { name: 'typical.holdingsByAge', cited: TYPICAL_BY_AGE },
+  { name: 'typical.holdingsByWealth', cited: TYPICAL_BY_WEALTH },
+  { name: 'typical.spendingByHousehold', cited: TYPICAL_SPENDING_BY_HOUSEHOLD },
+  { name: 'typical.spendingByIncome', cited: TYPICAL_SPENDING_BY_INCOME },
+  { name: 'typical.spendingByAge', cited: TYPICAL_SPENDING_BY_AGE },
   // The rules of the pension plans the app can pre-fill (not a tax year's figures: they change by legislation).
   ...citedLeaves(PLAN_RREGOP, 'plan.rregop').map((l) => ({ name: l.path, cited: l.cited as Cited<unknown> })),
 ]

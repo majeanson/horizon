@@ -29,6 +29,7 @@ import { updateProfile, useProfile } from '../lib/store'
 
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
 const Onboarding = lazy(() => import('../components/Onboarding'))
+const LevelPicker = lazy(() => import('../components/profile/LevelPicker'))
 
 // The profile: the household's facts (who is in it, what it spends, the home), then EVERY person's fields on the page —
 // side by side on a wide screen, one after the other on a phone — then « Rendre mon profil exact », the documents that
@@ -136,6 +137,10 @@ export function Profil() {
         </div>
       )}
       <FamilySection />
+      {/* « Je ne connais pas mes chiffres »: a level fills what is blank; loaded on its own (it carries the official tables). */}
+      <Suspense fallback={null}>
+        <LevelPicker />
+      </Suspense>
       <BudgetSection />
       <HomeSection />
       <LifeSection />
