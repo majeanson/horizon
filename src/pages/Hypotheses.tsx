@@ -16,7 +16,7 @@ import { Switch } from '../components/Switch'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { formatPct } from '../lib/format'
-import { applyPreset, hasSpouse, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn } from '../lib/profileEdit'
+import { applyPreset, hasSpouse, mapPerson, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn } from '../lib/profileEdit'
 import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
 import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
@@ -154,11 +154,44 @@ export function Hypotheses() {
         {meter('returns', averageReturn)}
       </Section>
 
-      <Section title={a.horizon.title} icon="calendar-blank-bold">
-        <FieldRow label={a.horizon.age} infoId="horizonAge" hint={a.horizon.hint}>
-          {(w) => <NumberField kind="int" min={80} max={110} unit={t.fields.years} value={assumptions.horizonAge} onChange={(horizonAge) => updateProfile((p) => setAssumptions(p, { horizonAge }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-        </FieldRow>
-        {meter('horizonAge', assumptions.horizonAge)}
+      {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
+          first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
+      <Section title={a.horizon.title} subtitle={a.horizon.hint} icon="calendar-blank-bold">
+        {profile.household.persons.map((person, i) => {
+          const own = person.horizonAge ?? null
+          const name = person.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
+          return (
+            <div key={person.id} className="horizon-person">
+              <FieldRow label={profile.household.persons.length === 1 ? a.horizon.age : a.horizon.person(name)} infoId="horizonAge" hint={own === null ? a.horizon.followHint : undefined}>
+                {(w) => (
+                  <NumberField
+                    kind="int"
+                    min={50}
+                    max={110}
+                    unit={t.fields.years}
+                    value={own ?? assumptions.horizonAge}
+                    onChange={(horizonAge) => updateProfile((p) => mapPerson(p, person.id, (x) => ({ ...x, horizonAge })))}
+                    id={w.id}
+                    ariaDescribedBy={w.describedBy}
+                  />
+                )}
+              </FieldRow>
+              {own !== null && (
+                <Cluster>
+                  <Chip onClick={() => updateProfile((p) => mapPerson(p, person.id, (x) => ({ ...x, horizonAge: null })))}>{a.horizon.follow(assumptions.horizonAge)}</Chip>
+                </Cluster>
+              )}
+            </div>
+          )
+        })}
+        {meter('horizonAge', Math.max(...profile.household.persons.map((p) => p.horizonAge ?? assumptions.horizonAge)))}
+        {hasSpouse(profile) && (
+          <FieldRow label={a.horizon.survivor} infoId="survivorSpending" hint={a.horizon.survivorHint}>
+            {(w) => (
+              <NumberField kind="percent" min={0.3} max={1} value={assumptions.survivorSpending ?? 0.7} onChange={(survivorSpending) => updateProfile((p) => setAssumptions(p, { survivorSpending }))} id={w.id} ariaDescribedBy={w.describedBy} />
+            )}
+          </FieldRow>
+        )}
       </Section>
 
       <Section title={a.options.title} icon="lock-bold">

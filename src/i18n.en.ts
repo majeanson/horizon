@@ -221,6 +221,8 @@ export const EN: typeof FR = {
     bridgeUntil: 'Until (age)',
     indexShare: 'Share of inflation granted',
     indexMinus: 'Or inflation minus',
+    survivorShare: 'Share paid to a surviving spouse',
+    survivorShareHint: 'At your death, the share of your pension the plan pays your spouse for life. RREGOP: 50%, or 60% for a pension reduced by 2%.',
     indexHint: 'Each year the pension rises by the greater of the two: that share of inflation, or inflation minus this amount.',
     summary: (rate: string, service: string, age: number) => `${rate} per year × ${service} years · from age ${age}`,
     unnamed: 'Unnamed plan',
@@ -313,7 +315,12 @@ export const EN: typeof FR = {
     horizon: {
       title: 'Until what age to plan',
       age: 'The money must last until age',
-      hint: 'The age reached by the youngest person. Better a plan that lasts too long than one that is too short.',
+      person: (name: string) => `${name} lives until age`,
+      hint: 'Each their own age. The plan runs until the last one; in a couple, the first death moves the household to the rules for the one who remains. Better a plan that lasts too long than one that is too short.',
+      follow: (age: number) => `Same as the scenario (${age})`,
+      followHint: 'Without an age of their own, a person follows the scenario’s.',
+      survivor: 'Spending of the one who remains',
+      survivorHint: 'After the first death, the share of the household’s spending the one who remains keeps.',
     },
     options: { title: 'Options' },
     splitting: {
@@ -631,6 +638,18 @@ export const EN: typeof FR = {
       label: '',
       url: 'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401',
       note: 'The table gives an average, and half of people live longer. So plan further out: Conservative goes to 100, Neutral 95, Aggressive 90.',
+    },
+    survivorSpending: {
+      where: 'No document prints it: it is a choice. One person spends less than a couple, but not half: the home stays.',
+      label: '',
+      url: '',
+      note: 'At that death, Horizon pays the one who remains the QPP surviving spouse’s pension, the employer pension’s survivor share and, from 60 to 64, the Allowance for the Survivor. The deceased’s accounts pass to them untaxed.',
+    },
+    dbSurvivorShare: {
+      where: 'Your plan’s booklet or page. For RREGOP, Retraite Québec’s page “In the Event of Death, What Does RREGOP Provide for Your Loved Ones?”.',
+      label: '50% of your pension',
+      url: 'https://www.retraitequebec.gouv.qc.ca/en/argent-retraite/rrsp/Pages/en-cas-de-deces-quest-ce-que-le-rregop-prevoit-pour-vos-proches.aspx',
+      note: 'Under RREGOP the share is 50%, or 60% if you accept a pension reduced by 2%. A death before 65: the reduction set for 65 still applies to the spouse.',
     },
   },
 }

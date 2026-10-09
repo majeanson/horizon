@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 14
+export const SCHEMA_VERSION = 15
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -61,6 +61,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
   name: '',
   birth: { year: today.year - 45, month: 1 },
   retirementAge: 65,
+  horizonAge: null,
   salaryToday: 0,
   earningsHistory: {},
   rrq: { startAge: 65 },
@@ -85,6 +86,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     wageGrowth: 0.031,
     returns: { nonReg: 0.04, rrsp: 0.045, tfsa: 0.045 },
     horizonAge: 95,
+    survivorSpending: 0.7,
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,
     surplusToRrsp: false,
@@ -161,6 +163,7 @@ function readPension(r: Reader, v: unknown, path: string): DbPension {
   const sinceRaw = inPay && inPay.since !== undefined ? r.obj(inPay.since, `${path}.inPay.since`) : null
   return {
     label: r.str(o.label, `${path}.label`, 60),
+    ...(o.survivorShare === undefined ? {} : { survivorShare: r.num(o.survivorShare, `${path}.survivorShare`, 0, 1) }),
     accrualRate: r.num(o.accrualRate, `${path}.accrualRate`, 0, 0.1),
     maxServiceYears: r.nullableNum(o.maxServiceYears, `${path}.maxServiceYears`, 1, 60),
     serviceYearsToDate: r.num(o.serviceYearsToDate, `${path}.serviceYearsToDate`, 0, 60),
@@ -257,6 +260,8 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
     name: r.str(o.name, `${path}.name`, 60),
     birth: { year: r.num(birth.year, `${path}.birth.year`, 1900, 2100, true), month: r.num(birth.month, `${path}.birth.month`, 1, 12, true) },
     retirementAge: r.num(o.retirementAge, `${path}.retirementAge`, 18, 80, true),
+    // Their own horizon age, or null to follow the scenario (v15). An older file has neither: it follows.
+    horizonAge: o.horizonAge === undefined ? null : r.nullableNum(o.horizonAge, `${path}.horizonAge`, 50, 110),
     salaryToday: r.num(o.salaryToday, `${path}.salaryToday`, 0, 1e8),
     earningsHistory,
     rrq: {
@@ -338,6 +343,7 @@ export function validateProfile(raw: unknown): ProfileResult {
       tfsa: r.num(returns.tfsa, 'assumptions.returns.tfsa', -0.2, 0.3),
     },
     horizonAge: r.num(a.horizonAge, 'assumptions.horizonAge', 80, 110, true),
+    survivorSpending: r.num(a.survivorSpending, 'assumptions.survivorSpending', 0.3, 1),
     withdrawalOrder: order,
     pensionSplitting: r.bool(a.pensionSplitting, 'assumptions.pensionSplitting'),
     surplusToRrsp: r.bool(a.surplusToRrsp, 'assumptions.surplusToRrsp'),

@@ -43,6 +43,7 @@ const OWN_STATEMENTS = 'the figure lives on the person’s own statements, which
 const NO_PRINTED_FIGURE = 'a choice or an estimate: no document prints the figure, so there is no wording to quote'
 
 const ALLOWED_NO_URL: Record<string, string> = {
+  survivorSpending: 'a share the household chooses — no official page sets what a survivor spends',
   salary: OWN_STATEMENTS,
   rrspBalance: OWN_STATEMENTS,
   tfsaBalance: OWN_STATEMENTS,
@@ -52,6 +53,7 @@ const ALLOWED_NO_URL: Record<string, string> = {
 }
 
 const ALLOWED_NO_LABEL: Record<string, string> = {
+  survivorSpending: 'a choice, not a printed figure',
   rrqStartAge: NO_PRINTED_FIGURE,
   oasStartAge: NO_PRINTED_FIGURE,
   oasResidence: 'the estimator asks a yes / no question (« only lived in Canada since 18 »), not a number of years, so there is no printed figure to quote; the ⓘ describes the question instead',

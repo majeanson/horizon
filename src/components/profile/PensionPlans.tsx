@@ -126,6 +126,10 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
       <FieldRow label={p.indexMinus}>
         {(w) => <NumberField kind="percent" min={0} max={0.1} value={pension.indexation.minus} onChange={(minus) => set((x) => ({ ...x, indexation: { ...x.indexation, minus } }))} id={w.id} />}
       </FieldRow>
+      {/* What the plan pays a surviving spouse (the projection pays it after the member's death). */}
+      <FieldRow label={p.survivorShare} infoId="dbSurvivorShare" hint={p.survivorShareHint}>
+        {(w) => <NumberField kind="percent" min={0} max={1} value={pension.survivorShare ?? 0} onChange={(survivorShare) => set((x) => ({ ...x, survivorShare }))} id={w.id} ariaDescribedBy={w.describedBy} />}
+      </FieldRow>
     </div>
   )
 }

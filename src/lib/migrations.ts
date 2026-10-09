@@ -85,6 +85,16 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // (inflation 2,1 %, wages 3,1 %, returns 4 / 4,5 / 4,5 %); a saved file keeps the figures it has — the step is the identity,
   // and the version exists so the ceremony (a fixture of the old file, this note) records the change where every other one is.
   (profile) => profile,
+  // v14 → v15: each person may have their OWN horizon age (null: the scenario's — what every older file meant), each employer
+  // pension says what share it pays a surviving spouse (50 %, RREGOP's rule and the only plan the app pre-fills), and the
+  // assumptions carry the survivor's spending share (70 %, the default a new profile gets).
+  (profile) => {
+    const household = (profile.household ?? {}) as Raw
+    const persons = Array.isArray(household.persons)
+      ? (household.persons as Raw[]).map((p) => ({ ...p, horizonAge: null, pensions: Array.isArray(p.pensions) ? (p.pensions as Raw[]).map((d) => ({ ...d, survivorShare: 0.5 })) : p.pensions }))
+      : household.persons
+    return { ...profile, household: { ...household, persons }, assumptions: { ...((profile.assumptions ?? {}) as Raw), survivorSpending: 0.7 } }
+  },
 ]
 
 export type ReadResult =

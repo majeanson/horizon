@@ -237,6 +237,8 @@ export const FR = {
     bridgeUntil: 'Jusqu’à (âge)',
     indexShare: 'Part de l’inflation accordée',
     indexMinus: 'Ou inflation moins',
+    survivorShare: 'Part versée au conjoint survivant',
+    survivorShareHint: 'À votre décès, la part de votre rente que le régime verse à votre conjoint, sa vie durant. RREGOP : 50 %, ou 60 % contre une rente réduite de 2 %.',
     indexHint: 'La rente augmente chaque année du plus élevé des deux : cette part de l’inflation, ou l’inflation moins ce montant.',
     summary: (rate: string, service: string, age: number) => `${rate} par année × ${service} ans · dès ${age} ans`,
     unnamed: 'Régime sans nom',
@@ -329,7 +331,12 @@ export const FR = {
     horizon: {
       title: 'Jusqu’à quel âge planifier',
       age: 'L’argent doit durer jusqu’à l’âge de',
-      hint: 'L’âge atteint par la personne la plus jeune. Mieux vaut un plan qui dure trop longtemps qu’un plan trop court.',
+      person: (name: string) => `${name} vit jusqu’à l’âge de`,
+      hint: 'Chacun son âge. Le plan dure jusqu’au dernier ; dans un couple, le premier décès fait passer la maison aux règles de la personne qui reste. Mieux vaut un plan qui dure trop longtemps qu’un plan trop court.',
+      follow: (age: number) => `Comme le scénario (${age} ans)`,
+      followHint: 'Sans âge à soi, la personne suit celui du scénario.',
+      survivor: 'Dépenses de la personne qui reste',
+      survivorHint: 'Après le premier décès, la part des dépenses du ménage que garde la personne qui reste.',
     },
     options: { title: 'Options' },
     splitting: {
@@ -653,6 +660,18 @@ export const FR = {
       label: '',
       url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1310011401',
       note: 'La table donne une moyenne, et la moitié des gens vivent plus longtemps. Planifiez donc plus loin : Prudent va jusqu’à 100 ans, Neutre 95, Audacieux 90.',
+    },
+    survivorSpending: {
+      where: 'Aucun document ne l’imprime : c’est un choix. Une personne seule dépense moins qu’un couple, mais pas la moitié : le logement reste.',
+      label: '',
+      url: '',
+      note: 'À ce décès, Horizon verse à la personne qui reste la rente de conjoint survivant du RRQ, la part prévue de la rente d’employeur et, de 60 à 64 ans, l’Allocation au survivant. Les comptes de la personne décédée lui passent sans impôt.',
+    },
+    dbSurvivorShare: {
+      where: 'Le livret ou la page de votre régime. Pour le RREGOP, la page « En cas de décès, qu’est-ce que le RREGOP prévoit pour vos proches ? » de Retraite Québec.',
+      label: '50 % de votre rente',
+      url: 'https://www.retraitequebec.gouv.qc.ca/fr/savoir-faire-pousser-ble/fonction-publique-sante-et-services-sociaux-et-education/cas-deces-est-que-rregop-prevoit-proches',
+      note: 'Au RREGOP, la part est de 50 %, ou de 60 % si vous acceptez une rente réduite de 2 %. Un décès avant 65 ans : la réduction prévue à 65 ans s’applique quand même au conjoint.',
     },
   } satisfies Record<string, InfoEntry>,
 }
