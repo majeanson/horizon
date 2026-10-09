@@ -91,6 +91,9 @@ export interface BridgeCopy {
   caveats: string[]
   /** On each card: the same way of starting under each of the three scenarios, one mark per scenario. */
   marksTitle: string
+  /** The way whose money lasts under the most scenarios, said above the cards, and the badge on its card. `holds`: scenarios it holds under (of three); `next`: the runner-up's. */
+  sturdiest: (name: string, holds: number, next: number) => string
+  sturdiestBadge: string
   marksHint: (name: string) => string
   marksPending: string
   matrixHolds: string
@@ -194,6 +197,9 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       'Des marchés qui tournent mal au mauvais moment, et des dépenses qui changent avec l’âge : les scénarios Prudent, Neutre et Audacieux donnent une fourchette, pas une prévision.',
     ],
     marksTitle: 'Selon le scénario',
+    sturdiest: (name, holds, next) =>
+      `La plus solide selon vos hypothèses : « ${name} ». ${holds === 3 ? 'L’argent dure dans les trois scénarios' : `L’argent dure dans ${holds} scénario${holds > 1 ? 's' : ''} sur 3`}${next < holds ? `, là où la suivante en tient ${next}` : ', et c’est celle qui laisse le plus à la fin du plan'}. C’est une solidité, pas un gain : elle ne dit pas laquelle rapporte le plus sur une vie, ni quelle vie vous aurez.`,
+    sturdiestBadge: 'La plus solide',
     marksHint: (name) => `Sous chaque façon de commencer : la même, avec les scénarios Prudent, Neutre et Audacieux de la page Hypothèses à la place de vos hypothèses. L’âge est celui de ${name}.`,
     marksPending: '…',
     matrixHolds: 'dure',
@@ -293,6 +299,9 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       'Markets that go wrong at the wrong time, and spending that changes with age: the Conservative, Neutral and Aggressive scenarios give a range, not a forecast.',
     ],
     marksTitle: 'By scenario',
+    sturdiest: (name, holds, next) =>
+      `Sturdiest on your assumptions: “${name}”. The money lasts in ${holds === 3 ? 'all three scenarios' : `${holds} of 3 scenarios`}${next < holds ? `, where the next one holds in ${next}` : ', and it leaves the most at the end of the plan'}. That is sturdiness, not a payout: it does not say which pays most over a lifetime, or how long a life you will have.`,
+    sturdiestBadge: 'Sturdiest',
     marksHint: (name) => `Under each way of starting: the same one, with the Conservative, Neutral and Aggressive scenarios from the Assumptions page in place of your assumptions. The age is ${name}’s.`,
     marksPending: '…',
     matrixHolds: 'lasts',

@@ -1011,3 +1011,29 @@
     overflow: visible;
   }
 }
+
+/* « Ce qui change le plus »: the years a change gains, then — on its own line, quieter — what it does to the nest at the end. */
+.levers__result {
+  display: grid;
+  justify-items: end;
+  text-align: right;
+}
+.levers__end {
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+
+/* « La plus solide »: one sentence above the strategy cards, one badge on the card it names. */
+.bridge-sturdiest {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid var(--accent);
+  background: var(--card);
+  border-radius: var(--radius-sm);
+}
+.bridge-card__badge {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

@@ -13,6 +13,7 @@ import {
   bridgeQuery,
   parseBridgeParams,
   shownPlan,
+  sturdiest,
   verdictOf,
   windowRows,
   type BridgeParams,
@@ -82,11 +83,15 @@ function StrategyCards({
   const mine = view.strategies.find((s) => s.key === 'mine')!
   const mineIsStandard = mine.levers.rrqStartAge === standard.levers.rrqStartAge && mine.levers.oasStartAge === standard.levers.oasStartAge
   const money = (n: number | null) => (n === null ? copy.noWorth : formatMoney(n, lang))
+  const best = sturdiest(view.strategies, matrix)
+  // « Standard » and « Mon plan » can be one card: the badge goes to the card that is on the screen.
+  const bestKey = best !== null && best.key === 'mine' && mineIsStandard ? 'standard' : (best?.key ?? null)
   const card = (s: StrategyCard) => {
     const v = verdictOf(s.levers, s.summary, standard.summary, horizonAge)
     const extra = s.extraDrawn6070
     return (
       <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short')}>
+        {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
         <Chip radio selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
           {s.key === 'standard' && mineIsStandard ? copy.standardIsMine : strategyLabel(copy, s.key, s.levers.retirementAge)}
         </Chip>
@@ -127,6 +132,9 @@ function StrategyCards({
   }
   return (
     <div role="radiogroup" aria-label={copy.strategyTitle}>
+      {best !== null && (
+        <p className="bridge-sturdiest">{copy.sturdiest(best.key === 'mine' && mineIsStandard ? copy.strategyName.standard : strategyLabel(copy, best.key, view.strategies.find((c) => c.key === best.key)!.levers.retirementAge), best.holds, best.next)}</p>
+      )}
       <ul className="bridge-cards">{view.strategies.filter((s) => !(s.key === 'mine' && mineIsStandard)).map(card)}</ul>
     </div>
   )

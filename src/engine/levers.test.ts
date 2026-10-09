@@ -24,3 +24,21 @@ describe('leverRanking', () => {
     }
   })
 });
+
+describe('leverRanking — the money each change adds at the end of the plan', () => {
+  it('spending less and a better return leave MORE at the end; a lever with no working age has no figure', () => {
+    const { household, assumptions } = EXAMPLES.average
+    const r = leverRanking(household, assumptions)
+    expect(r.base).not.toBeNull()
+    for (const id of ['spend10', 'returns1'] as const) expect(r.levers.find((l) => l.id === id)!.endGain, id).toBeGreaterThan(0)
+    const behind = leverRanking(EXAMPLES.behind.household, EXAMPLES.behind.assumptions)
+    if (behind.base === null) for (const l of behind.levers) expect(l.endGain).toBeNull()
+  })
+  it('equal years: the change worth more money comes first', () => {
+    const { household, assumptions } = EXAMPLES.average
+    const { levers } = leverRanking(household, assumptions)
+    for (let i = 1; i < levers.length; i++) {
+      if (levers[i - 1].yearsGained === levers[i].yearsGained) expect(levers[i - 1].endGain ?? 0).toBeGreaterThanOrEqual(levers[i].endGain ?? 0)
+    }
+  })
+})

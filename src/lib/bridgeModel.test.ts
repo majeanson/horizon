@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { bridgeRun, bridgeView, leversFor, profileLevers, type BridgeLevers } from '../engine/bridge.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
-import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, shownPlan, strategiesOf, verdictOf, windowRows } from './bridgeModel.ts'
+import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, shownPlan, strategiesOf, sturdiest, verdictOf, windowRows } from './bridgeModel.ts'
 
 const H = GOLDEN_HOUSEHOLD
 const q = (s: string) => new URLSearchParams(s)
@@ -147,5 +147,31 @@ describe('the sentence is about the answer on screen, not about the controls', (
     const plan = shownPlan(view, done, H, A.horizonAge)
     const last = view.selected.rows[view.selected.rows.length - 1]
     expect(plan.endAge).toBe(last.age)
+  })
+})
+
+describe('the sturdiest way to start', () => {
+  const sum = (netWorth95: number | null) => ({ netWorth95, lowestNest: { amount: 1000, age: 62 } }) as never
+  const row = (key: string, w: number | null) => ({ key, summary: sum(w) }) as never
+  const held = (prudent: boolean, neutral: boolean, bold: boolean) => ({ prudent: { ok: prudent }, neutral: { ok: neutral }, bold: { ok: bold } })
+  const matrixOf = (m: Record<string, ReturnType<typeof held>>) => m as never
+
+  it('says nothing while the scenarios are still being worked out, or for one way alone', () => {
+    expect(sturdiest([row('standard', 100) , row('max', 200)] as never, null)).toBeNull()
+    expect(sturdiest([row('standard', 100)] as never, matrixOf({ standard: held(true, true, true) }))).toBeNull()
+  })
+  it('the most scenarios held wins, whatever it leaves', () => {
+    const r = sturdiest([row('standard', 900), row('max', 100)] as never, matrixOf({ standard: held(false, true, true), max: held(true, true, true) }))
+    expect(r).toEqual({ key: 'max', holds: 3, next: 2 })
+  })
+  it('equal scenarios: the one that leaves the most at the end of the plan', () => {
+    const r = sturdiest([row('standard', 100), row('max', 300), row('asap', 200)] as never, matrixOf({ standard: held(true, true, true), max: held(true, true, true), asap: held(true, true, true) }))
+    expect(r?.key).toBe('max')
+  })
+  it('nothing sets one apart → no crown; nothing lasting under any scenario → no crown', () => {
+    const same = matrixOf({ standard: held(true, true, true), max: held(true, true, true) })
+    expect(sturdiest([row('standard', 100), row('max', 100)] as never, same)).toBeNull()
+    const none = matrixOf({ standard: held(false, false, false), max: held(false, false, false) })
+    expect(sturdiest([row('standard', 100), row('max', 300)] as never, none)).toBeNull()
   })
 })

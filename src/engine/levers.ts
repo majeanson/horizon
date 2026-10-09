@@ -1,4 +1,4 @@
-import { retireAt } from './retireAt.ts'
+import { everyoneAt, retireAt, runScenario } from './retireAt.ts'
 import type { Assumptions, Household } from './types.ts'
 
 // « WHAT MOVES THE ANSWER MOST? » — a handful of changes a household could actually make, each tried on its own against the plan as it
@@ -34,17 +34,32 @@ export interface LeverResult {
   earliest: number | null
   /** Years earlier than the plan as it stands (negative: later; null: either side has no age to compare). */
   yearsGained: number | null
+  /**
+   * What the change does to the net worth at the END of the plan, retiring at the age that works as the plan stands, in today's dollars
+   * (null: no age works as it stands). A whole-year answer says « no change » to most single changes; this is the same change in money.
+   */
+  endGain: number | null
 }
 
 /** The earliest age as the plan stands, and each lever's, best first (a lever that finds an age where there was none counts as the best). */
 export function leverRanking(h: Household, a: Assumptions): { base: number | null; levers: LeverResult[] } {
   const earliest = (hh: Household, aa: Assumptions) => retireAt(hh, aa, { stopAtFirstOk: true }).earliestOk
   const base = earliest(h, a)
+  // The end of the plan in today's dollars, at the base age: the same prices-deflator the rest of the engine's « today's dollars » use.
+  const endWorth = (hh: Household, aa: Assumptions): number | null => {
+    if (base === null) return null
+    const r = runScenario(hh, aa, everyoneAt(hh, base), base)
+    const last = r.rows[r.rows.length - 1]
+    return r.netWorthAtHorizon / (1 + aa.inflation) ** (last.year - aa.today.year)
+  }
+  const baseWorth = endWorth(h, a)
   const levers = LEVER_IDS.map((id): LeverResult => {
     const [hh, aa] = CHANGES[id](h, a)
     const e = earliest(hh, aa)
-    return { id, earliest: e, yearsGained: base !== null && e !== null ? base - e : null }
+    const w = endWorth(hh, aa)
+    return { id, earliest: e, yearsGained: base !== null && e !== null ? base - e : null, endGain: w !== null && baseWorth !== null ? w - baseWorth : null }
   })
   const score = (l: LeverResult) => (l.yearsGained !== null ? l.yearsGained : base === null && l.earliest !== null ? 1000 : -1000)
-  return { base, levers: levers.sort((x, y) => score(y) - score(x)) }
+  // Equal years: the change worth more money at the end of the plan comes first.
+  return { base, levers: levers.sort((x, y) => score(y) - score(x) || (y.endGain ?? 0) - (x.endGain ?? 0)) }
 }

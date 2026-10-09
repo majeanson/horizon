@@ -100,3 +100,37 @@ export function shownPlan(
   const endAge = view?.selected.rows[view.selected.rows.length - 1]?.age ?? horizonAge
   return { shown, pressed: strategiesOf(shown, household), endAge, verdict: view && standard ? verdictOf(shown, view.selected.summary, standard.summary, endAge) : null }
 }
+
+/** The scenarios a strategy is held to, in the order the cards mark them. */
+const HELD_UNDER = ['prudent', 'neutral', 'bold'] as const
+
+export interface Sturdiest {
+  key: StrategyKey
+  /** How many of the three scenarios its money lasts under (0–3). */
+  holds: number
+  /** The runner-up's count — the reason says « in all three, where the next one holds in two ». */
+  next: number
+}
+
+/**
+ * THE STURDIEST WAY TO START, by a rule anyone can check on the cards: the one whose money lasts under the MOST of the three
+ * scenarios, then the one that leaves the most at the end of the plan (the 95-year figure the card prints; the lowest nest of the
+ * bridge years when the plan ends before it), then the standard way, then the person's own. It is a sturdiness, not a payout: a way
+ * that leaves more at 95 has not paid more over a life (the card's « encaissé » says that). null when nothing sets one apart — every
+ * way equal under every scenario and in what it leaves — or while the scenarios are still being worked out.
+ */
+export function sturdiest(strategies: readonly { key: StrategyKey; summary: BridgeSummary }[], matrix: Record<StrategyKey, Record<'prudent' | 'neutral' | 'bold', { ok: boolean }>> | null): Sturdiest | null {
+  if (matrix === null || strategies.length < 2) return null
+  const left = (s: BridgeSummary): number => s.netWorth95 ?? s.lowestNest?.amount ?? -1e15
+  const holds = (k: StrategyKey): number => HELD_UNDER.filter((p) => matrix[k]?.[p]?.ok).length
+  const order: StrategyKey[] = ['standard', 'mine']
+  const rank = (k: StrategyKey): number => (order.includes(k) ? order.indexOf(k) : order.length)
+  const sorted = [...strategies].sort((a, b) => holds(b.key) - holds(a.key) || left(b.summary) - left(a.summary) || rank(a.key) - rank(b.key))
+  const [best, second] = sorted
+  const same = (a: { key: StrategyKey; summary: BridgeSummary }, b: { key: StrategyKey; summary: BridgeSummary }): boolean =>
+    holds(a.key) === holds(b.key) && Math.abs(left(a.summary) - left(b.summary)) < 1
+  if (same(best, second) && sorted.every((s) => same(best, s))) return null
+  // A way that lasts under no scenario is not « sturdy »: say nothing rather than crown the least bad.
+  if (holds(best.key) === 0) return null
+  return { key: best.key, holds: holds(best.key), next: holds(second.key) }
+}

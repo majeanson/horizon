@@ -40,7 +40,7 @@ import { STRESS_PRESETS } from '../lib/marketRange'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { LEVERS_COPY } from '../lib/leversCopy'
 import { useLevers } from '../lib/useLevers'
-import { formatMoney } from '../lib/money'
+import { formatCompactMoney, formatMoney } from '../lib/money'
 import { profileGaps } from '../lib/profileGaps'
 import { MAX_AGE, MAX_SELECTIONS, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, worthAtHorizon, type Selection } from '../lib/resultsModel'
 import { accuracyOf } from '../lib/facts'
@@ -563,10 +563,10 @@ export function Resultats() {
                 <div className="verdict__range ajuster__levers">
                   <p className="verdict__range-title">{lc.title}</p>
                   <ul className="levers__list">
-                    {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null }))).map((l) => (
+                    {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null, endGain: null }))).map((l) => (
                       <li key={l.id} className="levers__item">
                         <span>{lc.names[l.id]}</span>
-                        <span className="mono">
+                        <span className="mono levers__result">
                           {levers === undefined
                             ? lc.pending
                             : l.earliest === null
@@ -578,6 +578,9 @@ export function Resultats() {
                                   : l.yearsGained === 0
                                     ? lc.same
                                     : lc.later(-l.yearsGained, l.earliest)}
+                          {levers !== undefined && l.endGain !== null && Math.abs(l.endGain) >= 1000 && (
+                            <span className="levers__end">{lc.end((l.endGain > 0 ? '+' : '−') + formatCompactMoney(Math.abs(l.endGain), lang))}</span>
+                          )}
                         </span>
                       </li>
                     ))}
