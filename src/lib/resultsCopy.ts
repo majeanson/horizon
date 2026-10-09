@@ -39,6 +39,10 @@ const FR_RESULTS = {
   /** The plan leaving the device: on paper, or as a spreadsheet — no network either way. */
   out: {
     print: 'Imprimer le plan',
+    /** The head and foot of the printed plan: what it is, when it was made, and what it is not. */
+    printTitle: 'Horizon — mon plan de retraite',
+    printedOn: (month: number, year: number) => `Imprimé en ${['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'][month - 1]} ${year}`,
+    printFoot: 'Une estimation selon vos hypothèses, pas un conseil financier. Chaque chiffre du gouvernement est cité, avec sa page officielle, sous « Paramètres utilisés ».',
     csv: 'Télécharger en tableur (CSV)',
     csvDone: 'Tableau exporté',
     csvFile: (label: string) => `horizon-annee-par-annee-${label}.csv`,
@@ -194,6 +198,9 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   out: {
     print: 'Print the plan',
+    printTitle: 'Horizon — my retirement plan',
+    printedOn: (month: number, year: number) => `Printed in ${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]} ${year}`,
+    printFoot: 'An estimate based on your assumptions, not financial advice. Every government figure is cited, with its official page, under “Parameters used”.',
     csv: 'Download as a spreadsheet (CSV)',
     csvDone: 'Table exported',
     csvFile: (label: string) => `horizon-year-by-year-${label}.csv`,

@@ -78,3 +78,41 @@
     break-inside: avoid;
   }
 }
+
+/* The printed plan's head and foot, and the views' tabs (navigation, not the plan). Both parts exist only while printing (lib/usePrinting.ts). */
+@media print {
+  .results-pin .subtabs {
+    display: none !important;
+  }
+  .print-head {
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+  .print-head p {
+    margin: 0;
+  }
+  .print-head__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .print-appendix {
+    break-before: page;
+  }
+  .print-foot {
+    margin-top: 1rem;
+    border-top: 1px solid #000;
+    padding-top: 0.4rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* A door to another page (« Le trouver », « Voir la sensibilité », « Et si je dépensais moins ? ») leads nowhere on paper. */
+@media print {
+  .results-page a.chip,
+  .verdict .chip,
+  .firm .chip,
+  .refine .chip {
+    display: none !important;
+  }
+}
