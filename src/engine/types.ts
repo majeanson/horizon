@@ -143,8 +143,16 @@ export interface Home {
     balance: number
     /** The stated annual rate (0.05 = 5 %); compounded semi-annually, as Canadian fixed-rate mortgages are. */
     rate: number
-    /** The payment, each month, in nominal dollars. */
+    /** The payment, each month, in nominal dollars (a weekly or fortnightly payment is stored as its monthly equivalent: × payments a year ÷ 12). */
     monthlyPayment: number
+    /** How the person's statement counts the payment: the screen shows and takes it in that unit. It changes nothing in the calculation. Absent: monthly. */
+    frequency?: 'monthly' | 'biweekly' | 'weekly'
+    /**
+     * The term ends: from January of `year` the rate is `rate`, and either the person's payment stays what it is (the payoff date moves) or the payoff
+     * date stays and the payment changes (the new payment pays the balance of that year over the months that were left). Null or absent: the rate
+     * never changes.
+     */
+    renewal?: { year: number; rate: number; keep: 'payment' | 'amortization' } | null
   }
   /**
    * Sold (or traded down) when the FIRST person reaches `age`; `replacementCost` is the new home's price in today's dollars

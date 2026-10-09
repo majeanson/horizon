@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 16
+export const SCHEMA_VERSION = 17
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -232,6 +232,17 @@ function readPartTime(r: Reader, v: unknown, path: string): Person['partTime'] {
   return { untilAge: r.num(o.untilAge, `${path}.untilAge`, 50, 80, true), share: r.num(o.share, `${path}.share`, 0, 1) }
 }
 
+// A stated renewal (v17): from January of `year` the mortgage's rate is `rate`, and the payment either stays or is worked out again to keep the payoff date.
+function readRenewal(r: Reader, v: unknown): NonNullable<Home['mortgage']['renewal']> | null {
+  if (v === undefined || v === null) return null
+  const o = r.obj(v, 'household.home.mortgage.renewal') ?? {}
+  return {
+    year: r.num(o.year, 'household.home.mortgage.renewal.year', 2000, 2100, true),
+    rate: r.num(o.rate, 'household.home.mortgage.renewal.rate', 0, 0.25),
+    keep: r.oneOf(o.keep, 'household.home.mortgage.renewal.keep', ['payment', 'amortization'] as const),
+  }
+}
+
 function readFlows(r: Reader, v: unknown, persons: number): Flow[] {
   if (v === undefined || v === null) return []
   const raw = r.arr(v, 'household.flows') ?? []
@@ -348,6 +359,8 @@ export function validateProfile(raw: unknown): ProfileResult {
         balance: r.num(mg.balance, 'household.home.mortgage.balance', 0, 1e8),
         rate: r.num(mg.rate, 'household.home.mortgage.rate', 0, 0.25),
         monthlyPayment: r.num(mg.monthlyPayment, 'household.home.mortgage.monthlyPayment', 0, 1e6),
+        frequency: mg.frequency === undefined ? 'monthly' : r.oneOf(mg.frequency, 'household.home.mortgage.frequency', ['monthly', 'biweekly', 'weekly'] as const),
+        renewal: readRenewal(r, mg.renewal),
       },
       sale,
     }

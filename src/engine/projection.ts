@@ -193,7 +193,7 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
     // non-registered account, before the year's tax and withdrawals are worked out) or the extra a dearer home costs.
     let housing: Housing = NO_HOUSING
     if (h.home && home) {
-      const step = homeYear(home, h.home, year - h.persons[0].birth.year, a.inflation, (1 + a.inflation) ** (year - a.today.year))
+      const step = homeYear(home, h.home, year - h.persons[0].birth.year, a.inflation, (1 + a.inflation) ** (year - a.today.year), year)
       housing = { payment: step.payment, extraNeed: step.extraNeed, valueEnd: step.valueEnd, balanceEnd: step.balanceEnd }
       home = step.next
       if (step.released > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + step.released, acb: s.nonReg.acb + step.released } } : s))

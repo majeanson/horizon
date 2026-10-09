@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { EXAMPLES } from './golden/examples.ts'
-import { amortizeYear, homeYear, initialHome, monthlyRate, monthsToPayoff, payoffYear } from './home.ts'
+import { PAYMENTS_PER_YEAR, amortizeYear, homeYear, initialHome, levelPayment, monthlyRate, monthsToPayoff, payoffMonths, payoffYear, termsAtRenewal } from './home.ts'
 import { project } from './projection.ts'
 import { retireAt } from './retireAt.ts'
 import type { Home } from './types.ts'
@@ -135,5 +135,101 @@ describe('the house through the years', () => {
     const slow = project(withHome(home({ mortgage: { balance: 300_000, rate: 0.05, monthlyPayment: 1_745 } })), assumptions).find((r) => r.household.mortgageBalanceEnd === 0)!.year
     const fast = project(withHome(home({ mortgage: { balance: 300_000, rate: 0.05, monthlyPayment: 2_500 } })), assumptions).find((r) => r.household.mortgageBalanceEnd === 0)!.year
     expect(fast).toBeLessThan(slow)
+  })
+})
+
+describe('a renewal: the rate changes at the end of a term', () => {
+  const mortgage = (renewal: NonNullable<Home['mortgage']['renewal']> | null) => ({ balance: 266_000, rate: 0.0389, monthlyPayment: 1_761.11, renewal })
+  const FROM = 2026
+
+  it('without a renewal nothing changes: the payoff is the one the payment alone gives', () => {
+    expect(payoffMonths(mortgage(null), FROM)).toBe(monthsToPayoff(266_000, 0.0389, 1_761.11))
+    expect(payoffMonths({ balance: 0, rate: 0.05, monthlyPayment: 0 }, FROM)).toBe(0)
+  })
+
+  it('a level payment pays the balance off in exactly the months it was worked out for', () => {
+    const p = levelPayment(266_000, 0.0389, 207)
+    expect(monthsToPayoff(266_000, 0.0389, p)).toBe(207)
+    expect(levelPayment(120_000, 0, 120)).toBe(1_000)
+  })
+
+  it('keeping the PAYMENT at a higher rate moves the payoff later; at a lower rate, sooner', () => {
+    const plain = payoffMonths(mortgage(null), FROM)!
+    const dearer = payoffMonths(mortgage({ year: 2029, rate: 0.055, keep: 'payment' }), FROM)!
+    const cheaper = payoffMonths(mortgage({ year: 2029, rate: 0.025, keep: 'payment' }), FROM)!
+    expect(dearer).toBeGreaterThan(plain)
+    expect(cheaper).toBeLessThan(plain)
+  })
+
+  it('keeping the PAYOFF DATE at a higher rate moves the payment up instead, and the date stays', () => {
+    const plain = payoffMonths(mortgage(null), FROM)!
+    const kept = payoffMonths(mortgage({ year: 2029, rate: 0.055, keep: 'amortization' }), FROM)!
+    expect(Math.abs(kept - plain)).toBeLessThanOrEqual(1)
+    // the payment the plan then pays is higher than the one before the renewal
+    const m = mortgage({ year: 2029, rate: 0.055, keep: 'amortization' })
+    let state = initialHome({ value: 650_000, mortgage: m, sale: null })
+    const paid: number[] = []
+    for (let y = FROM; y < 2032; y++) {
+      const step = homeYear(state, { value: 650_000, mortgage: m, sale: null }, 40, 0.02, 1, y)
+      paid.push(step.payment)
+      state = step.next
+    }
+    expect(paid[0]).toBeCloseTo(1_761.11 * 12, 0)
+    expect(paid[2]).toBeCloseTo(1_761.11 * 12, 0) // 2028: still the old terms
+    expect(paid[3]).toBeGreaterThan(paid[2]) // 2029: the renewal
+  })
+
+  it('the date shown and the plan agree: the year the plan\'s balance reaches zero is the year the last payment falls in, with a renewal too', () => {
+    for (const keep of ['payment', 'amortization'] as const) {
+      const m = mortgage({ year: 2030, rate: 0.06, keep })
+      const hm: Home = { value: 650_000, mortgage: m, sale: null }
+      let state = initialHome(hm)
+      let zeroAt: number | null = null
+      for (let y = FROM; y < FROM + 50 && zeroAt === null; y++) {
+        const step = homeYear(state, hm, 40, 0.02, 1, y)
+        state = step.next
+        if (step.balanceEnd === 0) zeroAt = y
+      }
+      expect(zeroAt, keep).toBe(payoffYear(FROM, payoffMonths(m, FROM)!))
+    }
+  })
+
+  it('a renewal that was in the past is ignored, and a payment that cannot cover the new rate never pays off', () => {
+    expect(payoffMonths(mortgage({ year: 2020, rate: 0.09, keep: 'payment' }), FROM)).toBe(payoffMonths(mortgage(null), FROM))
+    expect(payoffMonths({ balance: 266_000, rate: 0.0389, monthlyPayment: 1_000, renewal: { year: 2028, rate: 0.12, keep: 'payment' } }, FROM)).toBeNull()
+  })
+
+  it('a household with no renewal is untouched by the feature: the plan is the same as with the field absent', () => {
+    const a = project(withHome(home()), assumptions)
+    const b = project(withHome(home({ mortgage: { balance: 300_000, rate: 0.05, monthlyPayment: 1_745, renewal: null, frequency: 'monthly' } })), assumptions)
+    expect(b).toEqual(a)
+  })
+
+  it('a payment counted in another unit is the same payment: 26 fortnightly payments are 12 monthly ones of 26 ÷ 12 the size', () => {
+    expect(PAYMENTS_PER_YEAR).toEqual({ monthly: 12, biweekly: 26, weekly: 52 })
+    expect((812.82 * PAYMENTS_PER_YEAR.biweekly) / 12).toBeCloseTo(1_761.11, 2)
+  })
+})
+
+describe('what the terms become at a renewal', () => {
+  const m = (renewal: NonNullable<Home['mortgage']['renewal']> | null) => ({ balance: 266_000, rate: 0.0389, monthlyPayment: 1_761.11, renewal })
+
+  it('nothing without a renewal, and nothing when the loan is paid off before it', () => {
+    expect(termsAtRenewal(m(null), 2026)).toBeNull()
+    expect(termsAtRenewal({ balance: 20_000, rate: 0.05, monthlyPayment: 2_000, renewal: { year: 2040, rate: 0.06, keep: 'payment' } }, 2026)).toBeNull()
+  })
+
+  it('at the start year the balance is today\'s; keeping the date raises the payment at a higher rate, keeping the payment leaves it', () => {
+    const now = termsAtRenewal(m({ year: 2026, rate: 0.055, keep: 'amortization' }), 2026)!
+    expect(now.balance).toBeCloseTo(266_000, 2)
+    expect(now.payment).toBeGreaterThan(1_761.11)
+    expect(termsAtRenewal(m({ year: 2026, rate: 0.055, keep: 'payment' }), 2026)!.payment).toBe(1_761.11)
+  })
+
+  it('three years in, less is owed, and the new payment still pays the rest off by the old date', () => {
+    const at = termsAtRenewal(m({ year: 2029, rate: 0.055, keep: 'amortization' }), 2026)!
+    expect(at.balance).toBeLessThan(266_000)
+    const oldDate = monthsToPayoff(266_000, 0.0389, 1_761.11)!
+    expect(monthsToPayoff(at.balance, 0.055, at.payment)! + 36).toBeCloseTo(oldDate, 0)
   })
 })

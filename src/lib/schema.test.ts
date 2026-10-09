@@ -281,7 +281,7 @@ describe('schema v16 — a life beyond the budget', () => {
   })
 
   it('every older version still arrives with its children where the engine reads them', () => {
-    for (let v = 1; v < SCHEMA_VERSION; v++) {
+    for (let v = 1; v < 16; v++) {
       const raw = oldFixture(v)
       const result = migrateProfile(raw)
       expect(result.ok, `v${v}`).toBe(true)
@@ -310,5 +310,37 @@ describe('schema v16 — a life beyond the budget', () => {
     p.assumptions.retiredSpendingDrift = -0.01
     const back = readProfileJson(exportProfileJson(p))
     expect(back.ok && back.profile).toEqual(p)
+  })
+})
+
+describe('schema v17 — a mortgage that says how its payment is counted, and when its rate renews', () => {
+  const withHome = (mortgage: Record<string, unknown>, version = 16) => {
+    const p = JSON.parse(JSON.stringify(oldFixture(version))) as { household: { home: unknown } }
+    p.household.home = { value: 650_000, mortgage: { balance: 266_000, rate: 0.0389, monthlyPayment: 1_761.11, ...mortgage }, sale: null }
+    return p
+  }
+
+  it('an older home arrives with a monthly payment and no renewal — exactly what it always meant', () => {
+    const result = migrateProfile(withHome({}))
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.profile.household.home?.mortgage).toEqual({ balance: 266_000, rate: 0.0389, monthlyPayment: 1_761.11, frequency: 'monthly', renewal: null })
+  })
+
+  it('a renewal and a frequency survive a round trip, and a malformed one is refused', () => {
+    const renewal = { year: 2029, rate: 0.055, keep: 'amortization' }
+    const ok = migrateProfile(withHome({ frequency: 'biweekly', renewal }, 17))
+    expect(ok.ok).toBe(true)
+    if (ok.ok) expect(ok.profile.household.home?.mortgage).toMatchObject({ frequency: 'biweekly', renewal })
+    for (const bad of [{ frequency: 'daily' }, { renewal: { year: 2029, rate: 0.055, keep: 'maybe' } }, { renewal: { year: 1800, rate: 0.05, keep: 'payment' } }, { renewal: { year: 2029, rate: 0.9, keep: 'payment' } }]) {
+      const v = migrateProfile(withHome(bad, 17))
+      expect(v.ok, JSON.stringify(bad)).toBe(false)
+    }
+  })
+
+  it('a home with nothing to say is the same file as before, version apart', () => {
+    const raw = oldFixture(16)
+    const result = migrateProfile(raw)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.profile.household.home ?? null).toBe(((raw.household as { home?: unknown }).home ?? null) as null)
   })
 })

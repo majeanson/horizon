@@ -1,5 +1,5 @@
 import { useLang, useT } from '../../i18n'
-import { monthsToPayoff, payoffYear } from '../../engine/home'
+import { payoffMonths, payoffYear } from '../../engine/home'
 import { useConfirm } from '../../lib/confirm'
 import { factId } from '../../lib/facts'
 import { formatMoney } from '../../lib/money'
@@ -10,7 +10,9 @@ import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { StatusMessage } from '../StatusMessage'
+import { HOME_COPY } from '../../lib/homeCopy'
 import { LevelSlot } from './LevelSlot'
+import { MortgageTerms } from './MortgageTerms'
 import { Section } from './shared'
 
 // The principal residence: what it is worth, what is still owed on it, and — if the person plans it — when it is sold or traded
@@ -30,7 +32,7 @@ export function HomeSection() {
 
   const payoff = (() => {
     if (home === null || home.mortgage.balance <= 0) return null
-    const months = monthsToPayoff(home.mortgage.balance, home.mortgage.rate, home.mortgage.monthlyPayment)
+    const months = payoffMonths(home.mortgage, now.year)
     if (months === null) return 'never' as const
     return { year: payoffYear(now.year, months), years: Math.ceil(months / 12) }
   })()
@@ -56,9 +58,7 @@ export function HomeSection() {
               <FieldRow label={h.rate} hint={h.rateHint}>
                 {(w) => <NumberField kind="percent" min={0} max={0.25} value={home.mortgage.rate} onChange={(rate) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, rate } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
               </FieldRow>
-              <FieldRow label={h.payment}>
-                {(w) => <NumberField kind="money" max={1e6} value={home.mortgage.monthlyPayment} onChange={(monthlyPayment) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, monthlyPayment } })))} id={w.id} />}
-              </FieldRow>
+              <MortgageTerms home={home} label={h.payment} />
               {/* What the payment means: the day the cost stops — or, plainly, that it never does. */}
               {payoff === 'never' ? (
                 <StatusMessage tone="error">{h.noPayoff}</StatusMessage>
@@ -69,6 +69,7 @@ export function HomeSection() {
           )}
           {home.mortgage.balance <= 0 && <p className="field-row__hint">{h.paidOff}</p>}
           <p className="field-row__hint">{h.equity(money(Math.max(0, home.value - home.mortgage.balance)))}</p>
+          <p className="field-row__hint">{HOME_COPY[lang].nudge}</p>
 
           <Chip selected={home.sale !== null} expanded={home.sale !== null} onClick={() => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: x.sale ? null : { age: 75, replacementCost: 0 } })))}>
             {h.sell}

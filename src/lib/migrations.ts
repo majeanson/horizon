@@ -108,6 +108,15 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
       assumptions: { ...((rest.assumptions ?? {}) as Raw), retiredSpendingDrift: 0 },
     }
   },
+  // v16 → v17: a mortgage can say how its payment is counted (monthly, every 2 weeks, weekly — the screen's unit, never the calculation's) and can state
+  // a RENEWAL (a new rate from a year, and whether the payment or the payoff date stays). Every older file meant exactly that: monthly, no renewal.
+  (profile) => {
+    const household = (profile.household ?? {}) as Raw
+    const home = household.home as Raw | null | undefined
+    if (!home || typeof home !== 'object') return profile
+    const mortgage = { ...((home.mortgage ?? {}) as Raw), frequency: 'monthly', renewal: null }
+    return { ...profile, household: { ...household, home: { ...home, mortgage } } }
+  },
 ]
 
 export type ReadResult =
