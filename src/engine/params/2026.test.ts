@@ -26,6 +26,7 @@ const QPP_ACT = 'https://www.legisquebec.gouv.qc.ca/fr/pdf/lc/R-9.pdf'
 const SURVIVOR = `${RQ}/en/citizens/death/surviving-spouse-pension`
 const OAS_SURVIVOR = 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/guaranteed-income-supplement/allowance-survivor/benefit-amount.html'
 const OGP = 'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0'
+const ESDC_2023Q1 = 'https://www.canada.ca/fr/emploi-developpement-social/programmes/pensions/pension/statistiques/rapport-trimestriel/2023-trimestriel-janvier-mars.html'
 const CRA = 'https://www.canada.ca/en/revenue-agency/services/tax/individuals'
 const LINES = `${CRA}/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses`
 const QC_PDF = 'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf'
@@ -66,8 +67,8 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'rrq.survivorBaseShare65': [0.6, QPP_ACT],
   'rrq.survivorAdditionalShare': [0.5, QPP_ACT],
   'rrq.survivorOwnPensionOffset': [0.4, QPP_ACT],
-  'rrq.survivorFlatRate45to64': [610.45, FIGURES],
-  'rrq.survivorFlatRateUnder45': [156.36, FIGURES],
+  'rrq.survivorFlatRate45to64': [610.43, ESDC_2023Q1],
+  'rrq.survivorFlatRateUnder45': [156.35, ESDC_2023Q1],
   'rrq.survivorMaxUnder65': [1_173.58, SURVIVOR],
   'rrq.survivorMax65': [881.48, SURVIVOR],
 
