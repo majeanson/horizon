@@ -250,7 +250,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       },
       diesAt: 'Décès à',
       best: '▲ le plus élevé de la colonne',
-      bestNarrow: 'Souligné : le plus élevé de la colonne.',
+      bestNarrow: 'Souligné : le plus élevé de la colonne.',
       agesNote: 'Colonnes : l’âge au décès.',
       unitsNote: 'Montants en milliers (k) ou en millions (M) de dollars.',
       short: '! l’argent ne dure pas jusqu’à la fin du plan',
