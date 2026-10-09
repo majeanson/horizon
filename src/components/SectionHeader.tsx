@@ -1,4 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react'
+import { glossed } from './Gloss'
 import { Icon, type IconName } from './Icon'
 
 // A small section header: an optional icon, a title, an optional subtitle, and an optional
@@ -26,7 +27,7 @@ export function SectionHeader({
         {icon && <Icon name={icon} size={18} />}
         <div className="section-header__text">
           <Heading className="section-header__title">{title}</Heading>
-          {subtitle != null && <span className="section-header__sub">{subtitle}</span>}
+          {subtitle != null && <span className="section-header__sub">{glossed(subtitle)}</span>}
         </div>
       </div>
       {action && <div className="section-header__action">{action}</div>}

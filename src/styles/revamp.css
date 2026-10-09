@@ -1131,6 +1131,54 @@
   font-size: var(--text-sm);
 }
 
+/* ── Glossaire — a definition list: the abbreviation big, its full name beside it, then the plain sentence and the page. ── */
+.glossary__intro {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.glossary {
+  margin: 0;
+  display: grid;
+  gap: 0;
+}
+.glossary__term {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line);
+}
+.glossary__term:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.glossary dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+}
+.glossary__abbr {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.glossary__name {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.glossary dd {
+  margin: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+.glossary dd p {
+  margin: 0;
+}
+/* A group scrolled to by the map must not hide under the sticky bars. */
+.page-body > .profile-section[id^='glossaire-'] {
+  scroll-margin-top: 7rem;
+}
+
 /* ── The ways of starting the pensions: cards (closed) or a table, the reader's choice ─────────────────────── */
 .strategies {
   display: grid;

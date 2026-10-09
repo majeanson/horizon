@@ -68,7 +68,8 @@ test('« où trouver ce chiffre »: the statement’s « immobilisé » part, wi
   const note = row.getByRole('note')
   await expect(note).toContainText('immobilisé')
   await expect(note).toContainText('55 ans')
-  await expect(note.getByRole('link')).toHaveAttribute('href', /^https:\/\/www\.retraitequebec\.gouv\.qc\.ca\/fr\//)
+  // The note also carries glossary links (RVER, CRI, FRV): the OFFICIAL page is the one that leaves the app.
+  await expect(note.locator('a.info-note__link')).toHaveAttribute('href', /^https:\/\/www\.retraitequebec\.gouv\.qc\.ca\/fr\//)
 })
 
 test('the example with an RVER shows it opened, and the results carry the locked part in the table and the chart', async ({ page }) => {

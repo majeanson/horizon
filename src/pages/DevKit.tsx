@@ -15,6 +15,7 @@ import { Slider } from '../components/Slider'
 import { PageHead } from '../components/PageHead'
 import { Cluster, Rail } from '../components/Layout'
 import { SectionHeader } from '../components/SectionHeader'
+import { Gloss } from '../components/Gloss'
 import { SectionNav } from '../components/SectionNav'
 import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
@@ -357,6 +358,7 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
+    { cat: 'Affichage', name: 'Gloss', file: 'src/components/Gloss.tsx', exports: ['Gloss', 'glossed'], kw: 'glossaire sigle abréviation lien explication', render: () => <p><Gloss>Votre rente du RRQ et la PSV commencent à l’âge choisi ; le REER et le CELI s’ajoutent.</Gloss></p> },
     { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
     { cat: 'Affichage', name: 'LiveAnswer', file: 'src/components/LiveAnswer.tsx', kw: 'réponse en direct âge bandeau', render: () => <LiveAnswer /> },
     { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/resultats" label="Voir mon résultat"><p>Votre profil est assez complet pour une réponse.</p></NextStep> },

@@ -112,6 +112,9 @@ export function AppShell() {
           <button type="button" className="btn btn--icon btn--ghost" aria-label={themeLabel} title={themeLabel} onClick={() => setThemeState(toggleTheme())}>
             <Icon name={theme === 'night' ? 'sun-bold' : 'moon-stars-bold'} size={20} />
           </button>
+          <NavLink to="/glossaire" className={({ isActive }) => 'btn btn--icon btn--ghost' + (isActive ? ' is-active' : '')} aria-label={t.nav.glossary} title={t.nav.glossary}>
+            <Icon name="book-open-text-bold" size={20} />
+          </NavLink>
           <NavLink to="/donnees" className={({ isActive }) => 'btn btn--icon btn--ghost' + (isActive ? ' is-active' : '')} aria-label={t.nav.data} title={t.nav.data}>
             <Icon name="gear-six-bold" size={20} />
           </NavLink>

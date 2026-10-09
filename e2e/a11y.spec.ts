@@ -60,6 +60,7 @@ const PAGES = [
   ['the assumptions', '/hypotheses', '.page-head__title'],
   ['the results', '/resultats', '.page-head__title'],
   ['the data page', '/donnees', '.page-head__title'],
+  ['the glossary', '/glossaire', '.page-head__title'],
   ['the component gallery', '/dev/kit', '.devkit'],
 ] as const
 
@@ -87,18 +88,18 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
   const order: string[] = []
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 10; i++) {
     await page.keyboard.press('Tab')
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
-  // The skip link first — the whole point of one — then the top bar (name, language, theme, the settings gear), then the three destinations.
-  expect(order.slice(0, 5)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', ''])
-  expect(order.slice(5, 8)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
+  // The skip link first — the whole point of one — then the top bar (name, language, theme, the glossary, the settings gear), then the three destinations.
+  expect(order.slice(0, 6)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', '', ''])
+  expect(order.slice(6, 9)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
 })
 
 // The page's outline is part of its accessibility tree (heading navigation in a screen reader, and the
 // text a browsing agent reads): every titled section holds a heading, and the h1 is alone.
-for (const [label, path, ready] of PAGES.slice(0, 4)) {
+for (const [label, path, ready] of PAGES.slice(0, 5)) {
   test(`${label} has an outline: one h1, a heading in every titled section`, async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.goto(path)

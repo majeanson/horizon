@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
 import { useT, type InfoEntry, type InfoId } from '../i18n'
+import { glossed } from './Gloss'
 import { Icon } from './Icon'
 
 // « Où trouver ce chiffre » — the ⓘ beside every number the person has to type. It opens, in place, a short
@@ -33,14 +34,14 @@ export function FieldInfo({ id, label }: { id: InfoId; label?: string }) {
       </button>
       <div id={panelId} className="info-note" role="note" hidden={!open}>
         <p>
-          <strong>{t.fields.infoWhere}</strong> {entry.where}
+          <strong>{t.fields.infoWhere}</strong> {glossed(entry.where)}
         </p>
         {entry.label && (
           <p>
             <strong>{t.fields.infoLabel}</strong> « {entry.label} »
           </p>
         )}
-        {entry.note && <p className="info-note__extra">{entry.note}</p>}
+        {entry.note && <p className="info-note__extra">{glossed(entry.note)}</p>}
         {entry.url ? (
           <a className="info-note__link" href={entry.url} target="_blank" rel="noopener noreferrer">
             {entry.reference ? t.fields.infoOpenReference : t.fields.infoOpen}

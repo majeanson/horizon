@@ -10,6 +10,7 @@ const Profil = lazy(() => import('./pages/Profil').then((m) => ({ default: m.Pro
 const Hypotheses = lazy(() => import('./pages/Hypotheses').then((m) => ({ default: m.Hypotheses })))
 const Resultats = lazy(() => import('./pages/Resultats').then((m) => ({ default: m.Resultats })))
 const Donnees = lazy(() => import('./pages/Donnees').then((m) => ({ default: m.Donnees })))
+const Glossaire = lazy(() => import('./pages/Glossaire').then((m) => ({ default: m.Glossaire })))
 const DevKit = lazy(() => import('./pages/DevKit').then((m) => ({ default: m.DevKit })))
 
 export function AppRoutes() {
@@ -20,6 +21,7 @@ export function AppRoutes() {
           <Route index element={<Profil />} />
           <Route path="hypotheses" element={<Hypotheses />} />
           <Route path="resultats" element={<Resultats />} />
+          <Route path="glossaire" element={<Glossaire />} />
           <Route path="donnees" element={<Donnees />} />
           {/* Unknown paths land on the first page rather than a dead end — and the ADDRESS follows:
               rendering Profil under /typo left no nav tab active and a wrong URL to re-bookmark. */}

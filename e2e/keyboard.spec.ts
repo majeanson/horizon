@@ -106,7 +106,7 @@ test.describe('with the keyboard alone', () => {
 test.describe('on every page', () => {
   test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
-  for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
+  for (const path of ['/', '/hypotheses', '/resultats', '/donnees', '/glossaire']) {
     test(`${path}: focus moves in reading order, always shows where it is, and no tabindex fights the order`, async ({ page }) => {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()

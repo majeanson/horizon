@@ -43,6 +43,7 @@ export const FR = {
     confirmTitle: 'Confirmer',
     clear: 'Effacer le texte',
     whereToFind: 'Où trouver ce chiffre',
+    inGlossary: 'Voir dans le glossaire',
     openPage: 'Ouvrir la page officielle',
     projected: 'projeté',
     themeToNight: 'Passer au mode nuit',
@@ -70,6 +71,7 @@ export const FR = {
     assumptions: 'Hypothèses',
     results: 'Résultats',
     data: 'Sauvegarde et réglages',
+    glossary: 'Glossaire : les sigles expliqués',
   },
 
   fields: {

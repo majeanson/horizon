@@ -27,6 +27,7 @@ export const EN: typeof FR = {
     confirmTitle: 'Confirm',
     clear: 'Clear text',
     whereToFind: 'Where to find this number',
+    inGlossary: 'See in the glossary',
     openPage: 'Open the official page',
     projected: 'projected',
     themeToNight: 'Switch to night mode',
@@ -54,6 +55,7 @@ export const EN: typeof FR = {
     assumptions: 'Assumptions',
     results: 'Results',
     data: 'Backup and settings',
+    glossary: 'Glossary: abbreviations explained',
   },
 
   fields: {

@@ -3,6 +3,7 @@ import type { InfoId } from '../i18n'
 import { useGuided } from '../lib/guide'
 import { FactMark } from './FactMark'
 import { FieldInfo } from './FieldInfo'
+import { glossed } from './Gloss'
 
 // One labelled field of a form: the label on its own line with, at its right, the ⓘ and — for a figure a document
 // confirms — the « estimé / confirmé » mark; the box under them, with the whole width; a quiet hint under the box.
@@ -53,7 +54,7 @@ export function FieldRow({
       </div>
       {hint && (
         <p id={hintId} className="field-row__hint">
-          {hint}
+          {glossed(hint)}
         </p>
       )}
     </div>
