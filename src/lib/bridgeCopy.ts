@@ -198,7 +198,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     ],
     marksTitle: 'Selon le scénario',
     sturdiest: (name, holds, next) =>
-      `La plus solide selon vos hypothèses : « ${name} ». ${holds === 3 ? 'L’argent dure dans les trois scénarios' : `L’argent dure dans ${holds} scénario${holds > 1 ? 's' : ''} sur 3`}${next < holds ? `, là où la suivante en tient ${next}` : ', et c’est celle qui laisse le plus à la fin du plan'}. C’est une solidité, pas un gain : elle ne dit pas laquelle rapporte le plus sur une vie, ni quelle vie vous aurez.`,
+      `La plus solide selon vos hypothèses : « ${name} ». ${holds === 3 ? 'L’argent dure dans les trois scénarios' : `L’argent dure dans ${holds} scénario${holds > 1 ? 's' : ''} sur 3`}${next < holds ? `, là où la suivante en tient ${next}` : ', et c’est celle qui laisse le plus à la fin du plan'}. C’est une solidité, pas un gain : elle ne dit pas laquelle rapporte le plus sur une vie, ni quelle vie vous aurez.`,
     sturdiestBadge: 'La plus solide',
     marksHint: (name) => `Sous chaque façon de commencer : la même, avec les scénarios Prudent, Neutre et Audacieux de la page Hypothèses à la place de vos hypothèses. L’âge est celui de ${name}.`,
     marksPending: '…',

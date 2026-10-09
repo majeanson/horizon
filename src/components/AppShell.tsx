@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
 import { saveAsFile } from '../lib/download'
 import { exportFileName, exportProfileJson, getProfile, markExported, snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
@@ -8,6 +8,10 @@ import { useNotice } from '../lib/toast'
 import { Icon, type IconName } from './Icon'
 import { Skeleton } from './Skeleton'
 import { StatusMessage } from './StatusMessage'
+
+// The live answer rides on the two pages that EDIT the plan; its own chunk, so the shell carries neither the worker nor its words.
+const LiveAnswer = lazy(() => import('./LiveAnswer').then((m) => ({ default: m.LiveAnswer })))
+const EDITS_THE_PLAN = new Set(['/', '/hypotheses'])
 
 // The chrome around every page: a top bar (name, language, day/night, the settings gear) and the main
 // navigation — a bottom bar on a phone, a left rail on a wide screen. The switch between the
@@ -138,6 +142,11 @@ export function AppShell() {
               {t.data.backup.later}
             </button>
           </div>
+        )}
+        {EDITS_THE_PLAN.has(pathname) && (
+          <Suspense fallback={null}>
+            <LiveAnswer />
+          </Suspense>
         )}
         {swUpdate && (
           <div className="shell__notice">

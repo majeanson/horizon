@@ -1037,3 +1037,34 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+/* « Votre réponse », above the pages that edit the plan: one quiet line, pinned under the top bar so a typed figure moves it in view. */
+.live-answer {
+  position: sticky;
+  top: var(--bar-h);
+  z-index: 14;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.75rem;
+  padding: 0.45rem var(--gutter);
+  margin: -1rem calc(-1 * var(--gutter)) 0.75rem;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-sm);
+}
+.live-answer.is-busy .live-answer__age {
+  opacity: 0.6;
+}
+.live-answer__label {
+  color: var(--ink-soft);
+}
+.live-answer__moved {
+  color: var(--ink-soft);
+}
+.live-answer__moved.is-better {
+  color: var(--sage-ink, var(--ink));
+}
+.live-answer__see {
+  margin-left: auto;
+}
