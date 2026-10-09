@@ -65,6 +65,8 @@ export interface BridgeYear {
   ownPension: number
   /** The two halves of `ownPension`. */
   ownRrq: number
+  /** The QPP surviving spouse's pension the household received (0 while both are alive), today's dollars. */
+  survivor: number
   ownOas: number
   /** DB + QPP + OAS + GIS: income that needs no decision once begun. */
   guaranteed: number
@@ -206,6 +208,7 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
     gis: pick((p) => p.gis + p.allowance),
     ownPension: ((r.persons[id]?.rrq ?? 0) + (r.persons[id]?.oas ?? 0)) / d,
     ownRrq: (r.persons[id]?.rrq ?? 0) / d,
+    survivor: pick((p) => p.survivorPension),
     ownOas: (r.persons[id]?.oas ?? 0) / d,
     guaranteed,
     draws,
@@ -276,6 +279,14 @@ function pensionCumulative(rows: readonly BridgeYear[], offset: number): Map<num
     out.set(r.age, s)
   }
   return out
+}
+
+/** Everything the person's own QPP + OAS paid over the run (today's dollars, before tax), the payments made before the projection began included. */
+export function ownPensionTotal(h: Household, a: Assumptions, run: BridgeRun): number {
+  const cum = pensionCumulative(run.rows, missedBefore(h, a, run.rows, run.levers))
+  let last = 0
+  for (const v of cum.values()) last = v
+  return last
 }
 
 /**

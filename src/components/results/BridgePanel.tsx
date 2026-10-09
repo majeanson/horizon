@@ -21,10 +21,12 @@ import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { mapPerson } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
+import { useDeathSweep } from '../../lib/useDeathSweep'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
+import { DeathSweepPanel } from './DeathSweepPanel'
 import { StrategyViews, type StrategyLayout } from './StrategyViews'
 import { StatusMessage } from '../StatusMessage'
 import { SubTabs } from '../SubTabs'
@@ -206,6 +208,8 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const { value: view, busy } = useBridge(household, assumptions, levers)
   // The three scenarios per strategy: fifteen more projections, started once the page is idle, marked on the cards as they land.
   const { value: matrix } = useBridgeMatrix(household, assumptions, levers)
+  // « Et si l'un de nous décède plus tôt ? »: thirty projections, started once the cards' scenarios are in.
+  const sweep = useDeathSweep(household, assumptions, levers, matrix !== null)
   const ownerName = names[Math.max(0, household.persons.findIndex((p) => p.id === levers.id))] ?? ''
   // The ages under « dure jusqu'à » are this person's; in a couple that is not the youngest, so the verdict names them.
   const who = household.persons.length > 1 ? ownerName : null
@@ -260,6 +264,9 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   // Everything below the controls describes the levers the data was computed FOR (lib/bridgeModel.ts, shownPlan).
   const { shown, pressed, endAge, verdict } = shownPlan(view, levers, household, assumptions.horizonAge)
   const standard = view?.strategies.find((s) => s.key === 'standard')
+  const mineStrategy = view?.strategies.find((s) => s.key === 'mine')
+  // When the person's own start ages ARE the standard, the standard's row says so and « Mon plan » is not shown twice.
+  const mineIsStandard = standard !== undefined && mineStrategy !== undefined && mineStrategy.levers.rrqStartAge === standard.levers.rrqStartAge && mineStrategy.levers.oasStartAge === standard.levers.oasStartAge
   const windowShown: BridgeWindow = view && windowRows(view.selected.rows, state.window).length === 0 ? 'plan' : state.window
   const money = (n: number) => formatMoney(n, lang)
 
@@ -329,6 +336,15 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             </Cluster>
           )}
           <p className="field-row__hint">{copy.todayNote}</p>
+
+          <DeathSweepPanel
+            sweep={sweep}
+            copy={copy}
+            who={who}
+            couple={household.persons.length > 1}
+            hideMine={mineIsStandard}
+            label={(k) => (k === 'standard' && mineIsStandard ? copy.standardIsMine : k === 'mine' ? `${copy.strategyName.mine} (${copy.age(levers.retirementAge)})` : copy.strategyName[k])}
+          />
 
           <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
           <p className="field-row__hint">{copy.householdNote}</p>

@@ -33,7 +33,13 @@ const VERDICTS: Verdict[] = [
 function texts(c: BridgeCopy): [string, string][] {
   const out: [string, string][] = []
   for (const [k, v] of Object.entries(c)) {
-    if (typeof v === 'string') out.push([k, v])
+    if (k === 'sweep') {
+      const s = c.sweep
+      out.push(['sweep.title.alone', s.title(null)], ['sweep.title.named', s.title('Camille')], ['sweep.hint.alone', s.hint(null)], ['sweep.hint.named', s.hint('Camille')])
+      for (const [kk, vv] of Object.entries(s.tabs)) out.push([`sweep.tabs.${kk}`, vv])
+      for (const [kk, vv] of Object.entries(s.tabHint)) out.push([`sweep.tabHint.${kk}`, vv])
+      out.push(['sweep.diesAt', s.diesAt], ['sweep.agesNote', s.agesNote], ['sweep.unitsNote', s.unitsNote], ['sweep.best', s.best], ['sweep.bestNarrow', s.bestNarrow], ['sweep.short', s.short], ['sweep.shortCell', s.shortCell(81)], ['sweep.empty', s.empty], ['sweep.pending', s.pending])
+    } else if (typeof v === 'string') out.push([k, v])
     else if (Array.isArray(v)) v.forEach((line, i) => out.push([`${k}.${i}`, line]))
     else if (typeof v === 'function') {
       if (k === 'why') c.why(whyArgs(c === en ? 'en' : 'fr')).forEach((line, i) => out.push([`why.${i}`, line]))

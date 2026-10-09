@@ -105,6 +105,23 @@ export interface BridgeCopy {
   rowExtra: string
   rowBreakEven: string
   dotsLegend: (prudent: string, neutral: string, bold: string) => string
+  /** « Et si l'un de nous décède plus tôt ? »: the same ways of starting, one life ending at each of a few ages. `who`: the person, named in a couple; null alone. */
+  sweep: {
+    title: (who: string | null) => string
+    hint: (who: string | null) => string
+    tabs: { pensions: string; nest: string; survivor: string }
+    tabHint: { pensions: string; nest: string; survivor: string }
+    diesAt: string
+    best: string
+    bestNarrow: string
+    /** The phone’s compact form: what the columns are, and the units. */
+    agesNote: string
+    unitsNote: string
+    short: string
+    shortCell: (age: number) => string
+    empty: string
+    pending: string
+  }
   /** The way whose money lasts under the most scenarios, said above the cards, and the badge on its card. `holds`: scenarios it holds under (of three); `next`: the runner-up's. */
   sturdiest: (name: string, holds: number, next: number) => string
   sturdiestBadge: string
@@ -222,6 +239,25 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     rowWhat: 'En bref',
     rowExtra: 'Tiré du nid de plus que le standard, de 60 à 69 ans',
     rowBreakEven: 'Point d’équilibre',
+    sweep: {
+      title: (who) => (who === null ? 'Et si vous décédiez plus tôt ?' : `Et si ${who} décédait plus tôt ?`),
+      hint: (who) => `Le même plan, avec la vie ${who === null ? 'de la personne' : `de ${who}`} qui s’arrête à l’âge indiqué (l’autre garde le sien). Une rente reportée rapporte plus quand on vit longtemps, moins quand la vie est courte : voici de combien. Montants en dollars d’aujourd’hui.`,
+      tabs: { pensions: 'Rentes reçues', nest: 'Nid à la fin du plan', survivor: 'Rente de survivant' },
+      tabHint: {
+        pensions: 'Ce que la personne a reçu en RRQ et en PSV jusqu’à son décès, avant impôt.',
+        nest: 'Ce que le ménage possède quand le plan se termine, après ce décès (la personne qui reste garde les comptes).',
+        survivor: 'Ce que la personne qui reste a reçu en rente de survivant du RRQ, jusqu’à la fin du plan.',
+      },
+      diesAt: 'Décès à',
+      best: '▲ le plus élevé de la colonne',
+      bestNarrow: 'Souligné : le plus élevé de la colonne.',
+      agesNote: 'Colonnes : l’âge au décès.',
+      unitsNote: 'Montants en milliers (k) ou en millions (M) de dollars.',
+      short: '! l’argent ne dure pas jusqu’à la fin du plan',
+      shortCell: (age) => `manque dès ${age} ans`,
+      empty: 'Rien à comparer : aucun des âges proposés ne tombe avant la fin de votre plan.',
+      pending: 'Calcul en cours…',
+    },
     dotsLegend: (prudent, neutral, bold) => `Trois points : ${prudent} · ${neutral} · ${bold}. Plein : l’argent dure. Vide : il ne dure pas.`,
     sturdiest: (name, holds, next) =>
       `La plus solide selon vos hypothèses : « ${name} ». ${holds === 3 ? 'L’argent dure dans les trois scénarios' : `L’argent dure dans ${holds} scénario${holds > 1 ? 's' : ''} sur 3`}${next < holds ? `, là où la suivante en tient ${next}` : ', et c’est celle qui laisse le plus à la fin du plan'}. C’est une solidité, pas un gain : elle ne dit pas laquelle rapporte le plus sur une vie, ni quelle vie vous aurez.`,
@@ -336,6 +372,25 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     rowWhat: 'In short',
     rowExtra: 'Drawn from the nest beyond the standard, ages 60 to 69',
     rowBreakEven: 'Break-even age',
+    sweep: {
+      title: (who) => (who === null ? 'What if you died earlier?' : `What if ${who} died earlier?`),
+      hint: (who) => `The same plan, with ${who === null ? 'the person’s' : `${who}’s`} life ending at the age shown (the other keeps theirs). A deferred pension pays more for a long life and less for a short one: here is by how much. Amounts in today’s dollars.`,
+      tabs: { pensions: 'Pensions received', nest: 'Nest at the end of the plan', survivor: 'Survivor’s pension' },
+      tabHint: {
+        pensions: 'What the person received in QPP and OAS until their death, before tax.',
+        nest: 'What the household owns when the plan ends, after this death (whoever is left keeps the accounts).',
+        survivor: 'What the person left behind received as the QPP survivor’s pension, to the end of the plan.',
+      },
+      diesAt: 'Death at',
+      best: '▲ the highest in the column',
+      bestNarrow: 'Underlined: the highest in the column.',
+      agesNote: 'Columns: age at death.',
+      unitsNote: 'Amounts in thousands (k) or millions (M) of dollars.',
+      short: '! the money does not last to the end of the plan',
+      shortCell: (age) => `short from age ${age}`,
+      empty: 'Nothing to compare: none of the ages offered falls before the end of your plan.',
+      pending: 'Working it out…',
+    },
     dotsLegend: (prudent, neutral, bold) => `Three dots: ${prudent} · ${neutral} · ${bold}. Filled: the money lasts. Empty: it does not.`,
     sturdiest: (name, holds, next) =>
       `Sturdiest on your assumptions: “${name}”. The money lasts in ${holds === 3 ? 'all three scenarios' : `${holds} of 3 scenarios`}${next < holds ? `, where the next one holds in ${next}` : ', and it leaves the most at the end of the plan'}. That is sturdiness, not a payout: it does not say which pays most over a lifetime, or how long a life you will have.`,

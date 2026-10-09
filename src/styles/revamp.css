@@ -1362,3 +1362,51 @@
   color: var(--ink-soft);
   font-size: var(--text-sm);
 }
+
+/* « Et si l'un de nous décède plus tôt ? »: ways of starting down, death ages across — the figures right-aligned, the best of a column bold with a mark. */
+.sweep {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.sweep__table td.mono {
+  text-align: right;
+  white-space: nowrap;
+}
+.sweep__table th.sweep__age {
+  text-align: right;
+  white-space: normal;
+}
+.sweep__dies {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+.sweep__table td.is-short {
+  color: var(--terracotta-ink);
+}
+.sweep__table--narrow thead th:first-child,
+.sweep__table--narrow tbody th {
+  width: 32%;
+}
+.sweep__table--narrow th,
+.sweep__table--narrow td {
+  padding: 0.4rem 0.3rem;
+}
+.sweep__table--narrow td.mono {
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+.sweep__table--narrow td.is-best::before {
+  content: none;
+}
+.sweep__table--narrow td.is-best {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sweep__table--narrow thead th:first-child,
+.sweep__table--narrow tbody th {
+  width: 30%;
+}

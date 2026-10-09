@@ -72,3 +72,35 @@ test('« Votre plan en une ligne »: one bar per person, with the dates ahead, i
   await expect(strip.getByText('RRQ à 65 ans').first()).toBeVisible()
   await expect(strip.getByText('Fin du plan, 95 ans').first()).toBeVisible()
 })
+
+test('« Et si Camille décédait plus tôt ? » compares every way of starting at five death ages, and the best of a column is marked', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/resultats?v=strategies')
+  const panel = page.locator('.sweep')
+  await expect(panel.getByRole('heading', { name: /Et si Camille décédait plus tôt/ })).toBeVisible({ timeout: 60_000 })
+  const table = panel.locator('table')
+  await expect(table).toBeVisible({ timeout: 90_000 })
+  await expect(table.locator('thead th')).toHaveCount(6) // the row label + five death ages
+  await expect(table.locator('thead th').nth(1)).toContainText('70 ans')
+  await expect(table.locator('thead th').nth(5)).toContainText('90 ans')
+  await expect(table.locator('tbody tr')).toHaveCount(5)
+  // the break-even, seen from the other side: dying at 70 the early QPP has paid the most; dying at 90 the deferral has
+  const first = table.locator('tbody tr').nth(0)
+  await expect(first).toContainText('Tout dès que possible')
+  await expect(first.locator('td').nth(0)).toHaveClass(/is-best/)
+  await expect(table.locator('tbody tr', { hasText: 'Reporter au maximum' }).locator('td').nth(4)).toHaveClass(/is-best/)
+  // the other readings: the nest at the end, and — for a couple — what the survivor was paid
+  await panel.getByRole('button', { name: 'Nid à la fin du plan' }).click()
+  await expect(panel.getByText('Ce que le ménage possède quand le plan se termine')).toBeVisible()
+  await panel.getByRole('button', { name: 'Rente de survivant' }).click()
+  await expect(panel.getByText('Ce que la personne qui reste a reçu')).toBeVisible()
+})
+
+test('a phone gets the compact table: ages as bare numbers, amounts in k and M', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/resultats?v=strategies')
+  const panel = page.locator('.sweep')
+  await expect(panel.locator('table')).toBeVisible({ timeout: 90_000 })
+  await expect(panel.getByText('Colonnes : l’âge au décès.', { exact: false })).toBeVisible()
+  await expect(panel.locator('tbody td').first()).toContainText(/\d+ k|\d+ M/)
+})
