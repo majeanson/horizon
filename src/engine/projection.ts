@@ -37,7 +37,9 @@ import type { AccountKind, Assumptions, Household, Person, PersonId, PersonYear,
 // splitting, the GIS of a single pensioner, spending at the survivor's share (`Assumptions.survivorSpending`). The survivor
 // receives the QPP surviving spouse's pension (survivor.ts, taxed as QPP income), the share of the deceased's employer
 // pensions their plans pay a spouse, and — widowed and 60 to 64 — the Allowance for the Survivor instead of the Allowance.
-// The year of death itself is an ordinary year; the final return, the death benefit and the orphan's pension are not modelled.
+// The survivor also receives the QPP death benefit (2 500 $) once, the year after. The year of death itself is an ordinary year — which
+// is what a spousal rollover makes the final return. Not modelled, by design: a survivor under 45 with a dependent child (Horizon plans
+// the retirement of adults whose children are grown), a disabled survivor (no disability is modelled anywhere), the orphan's pension.
 
 interface PersonState {
   rrsp: number
@@ -113,6 +115,7 @@ interface FixedIncome {
   /** The person's own QPP pension plus, after a spouse's death, the surviving spouse's pension. */
   rrq: number
   survivorRrq: number
+  deathBenefit: number
   oas: number
   oasMonths: number
   db: number
@@ -295,6 +298,8 @@ function simulateYear(
       )
       survivorRrq = roundTo(monthly * 12, 0.01)
     }
+    // The death benefit: one payment, the year after the death, taxed as the survivor's income (it is the estate's or the recipient's).
+    const deathBenefit = survivorOf && year === survivorOf.deathYear + 1 ? P.rrq.deathBenefit : 0
 
     const oasY = oasYear(year, r.oas, P.oas)
     const db = sum(r.db.map((d) => dbYear(d.start, year, a.inflation))) + (survivorOf ? roundTo(survivorDb(survivorOf, year, a.inflation), 0.01) : 0)
@@ -319,7 +324,7 @@ function simulateYear(
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq: roundTo(rrq + survivorRrq, 0.01), survivorRrq, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC }
+    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -643,6 +648,7 @@ function simulateYear(
       employment: roundTo(fixed[i].employment, 0.01),
       rrq: fixed[i].rrq,
       survivorPension: fixed[i].survivorRrq,
+      deathBenefit: fixed[i].deathBenefit,
       oas: fixed[i].oas,
       allowance: finalAllowance[i],
       gis: finalGis[i],

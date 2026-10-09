@@ -201,6 +201,7 @@ export const P2026 = {
     survivorFlatRateUnder45: c(156.35, 'cpi', { ...ESDC_2023Q1, note: 'The flat-rate portion for a survivor under 45 without a dependent child (the Act’s 80 $, indexed): « moins de 45 ans, non invalide, sans enfant | Montant uniforme 143,10 $ » (January–March 2023), indexed 4,4 % · 2,6 % · 2,00 %: 149,40 → 153,28 → 156,35. The 290 $ with-children amount (518,78 $ in 2023) is not modelled: Horizon’s children only have birth years.' }, 0.01),
     survivorMaxUnder65: c(1_173.58, 'cpi', { ...RRQ_SURVIVOR, note: 'CHECK FIGURE (tests only): « Between 45 and 65, all situations | $1,173.58 » a month, for benefits beginning in 2026.' }, 0.01),
     survivorMax65: c(881.48, 'cpi', { ...RRQ_SURVIVOR, note: 'CHECK FIGURE (tests only): « 65 or over, not receiving a retirement pension | $881.48 » a month, for benefits beginning in 2026.' }, 0.01),
+    deathBenefit: c(2_500, 'fixed', { ...RRQ_FIGURES, note: '« Maximum amount for single payment — Maximum amount for death benefit | $2500 » (2026); the 2024 edition says « lump-sum ». Not indexed: the same 2 500 $ in 2024 and 2026. A single payment the month after a contributor’s death, taxable income of the estate or of the person who receives it — in Horizon, the survivor’s, the year after the death.' }, 1),
   },
 
   oas: {

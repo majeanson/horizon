@@ -222,6 +222,8 @@ export interface PersonYear {
   rrq: number
   /** The part of rrq that is the surviving spouse's pension (0 while both are alive). */
   survivorPension: number
+  /** The QPP death benefit, inside rrq: the single payment received the year after a spouse's death, 0 in every other year. */
+  deathBenefit: number
   oas: number
   /** The Allowance: paid to the 60–64 spouse of a pensioner on the GIS, taxable, income-tested (nothing once the couple's income is over the cut-off). */
   allowance: number

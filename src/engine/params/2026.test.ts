@@ -71,6 +71,7 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'rrq.survivorFlatRateUnder45': [156.35, ESDC_2023Q1],
   'rrq.survivorMaxUnder65': [1_173.58, SURVIVOR],
   'rrq.survivorMax65': [881.48, SURVIVOR],
+  'rrq.deathBenefit': [2_500, FIGURES],
 
   // ── Service Canada ──────────────────────────────────────────────────────────────────────────
   'oas.monthly65to74': [762.5, Q4],

@@ -77,6 +77,8 @@ export interface YearParams {
     /** CHECK FIGURES, never inputs: the published maximum monthly surviving spouse's pension, 45–64 and 65+. */
     survivorMaxUnder65: Cited
     survivorMax65: Cited
+    /** The death benefit: a single payment to the estate or the person who paid the funeral, the month after a contributor’s death. */
+    deathBenefit: Cited
   }
 
   /** Old Age Security and the Guaranteed Income Supplement — Service Canada. */

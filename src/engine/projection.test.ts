@@ -273,6 +273,9 @@ describe('projection — the accounts behave', () => {
   })
 })
 
+// 120 households × a full projection each: 2–4 s on an idle box, 6–9 s on a loaded one. The default 5 s made load a red run.
+const HEAVY = 30_000
+
 describe('projection — the withdrawal solver is precise and shares a couple fairly, over many households', () => {
   // These pin the solver's internals directly. Before them, a ×100 looser bisection tolerance and a flipped
   // couple-allocation weight were caught only by the golden snapshot — which is regenerated, not argued with.
@@ -318,7 +321,7 @@ describe('projection — the withdrawal solver is precise and shares a couple fa
       }
     }
     expect(checked, 'the sample must contain solved years').toBeGreaterThan(40)
-  })
+  }, HEAVY)
 
   // The couple's allocation hands each chunk to whoever has the LOWER taxable income and still has money in that
   // account; a non-registered dollar counts for half (only its gain is taxed). So, while neither person's account is
@@ -351,11 +354,11 @@ describe('projection — the withdrawal solver is precise and shares a couple fa
 
   it('RRSP: a spouse who ends with the higher taxable income took a chunk only while within one chunk of the other', () => {
     expect(fairness('rrsp', 1), 'the sample must contain shared RRSP draws').toBeGreaterThan(0)
-  })
+  }, HEAVY)
 
   it('non-registered: the same, counting a dollar as half taxable', () => {
     expect(fairness('nonReg', 0.5), 'the sample must contain shared non-registered draws').toBeGreaterThan(0)
-  })
+  }, HEAVY)
 })
 
 describe('projection — more is never worse, over many households', () => {

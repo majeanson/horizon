@@ -40,6 +40,13 @@ describe('a death in the household', () => {
     expect(total(hers)).toBeGreaterThan(total(hersBefore))
   })
 
+  it('she receives the death benefit once, the year after the death, inside her QPP income', () => {
+    expect(before.persons.self!.deathBenefit).toBe(0)
+    expect(hers().deathBenefit).toBe(2500)
+    expect(hers().rrq).toBeGreaterThanOrEqual(hers().survivorPension + 2500)
+    expect(rows.find((r) => r.year === deathYear + 2)!.persons.self!.deathBenefit).toBe(0)
+  })
+
   it('she receives the surviving spouse’s pension, inside her QPP income, from the year after the death', () => {
     expect(before.persons.self!.survivorPension).toBe(0)
     expect(hers().survivorPension).toBeGreaterThan(0)
