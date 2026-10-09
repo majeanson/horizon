@@ -104,7 +104,7 @@ export function shownPlan(
 /** The scenarios a strategy is held to, in the order the cards mark them. */
 const HELD_UNDER = ['prudent', 'neutral', 'bold'] as const
 
-export interface Sturdiest {
+interface Sturdiest {
   key: StrategyKey
   /** How many of the three scenarios its money lasts under (0–3). */
   holds: number

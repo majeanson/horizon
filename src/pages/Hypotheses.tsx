@@ -8,6 +8,7 @@ import { NextStep } from '../components/NextStep'
 import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
+import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
@@ -65,6 +66,7 @@ export function Hypotheses() {
 
   return (
     <section className="page-body">
+      <LiveAnswer />
       <PageHead title={a.title} subtitle={a.subtitle} />
 
       <Section title={a.presets.title} subtitle={a.presets.hint} icon="sliders-horizontal-bold">

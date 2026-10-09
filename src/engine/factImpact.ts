@@ -30,8 +30,8 @@ export const IMPACT_KINDS = [
 export type ImpactKind = (typeof IMPACT_KINDS)[number]
 
 /** How far a figure is nudged each way (a share), and the years of residence. */
-export const NUDGE = 0.15
-export const NUDGE_RESIDENCE_YEARS = 3
+const NUDGE = 0.15
+const NUDGE_RESIDENCE_YEARS = 3
 
 /** Past the oldest age the search tries, « no age works » counts as one more year, so a figure that tips the plan over the edge ranks high. */
 const NO_AGE = 71
