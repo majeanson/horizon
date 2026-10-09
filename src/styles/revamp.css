@@ -1076,3 +1076,11 @@
   align-items: center;
   gap: 0.25rem 0.75rem;
 }
+
+/* A wide desktop gives the page more of the window: the two people's columns on Profil, the year-by-year tables and the strategy cards
+   all had room to spare beside a 56 rem column. From 1200 px the column grows to 66 rem; below it nothing changes. */
+@media (min-width: 1200px) {
+  .shell__main {
+    max-width: 66rem;
+  }
+}
