@@ -1,4 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
+import { slowCpu } from './seed'
+
+// The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
+test.beforeEach(({ page }) => slowCpu(page))
 
 // EVERY EXAMPLE, THROUGH THE REAL PAGES. The nine example households (src/engine/golden/examples.ts) are loaded the way a person
 // loads them — the data page — and each one must read as its own story on the results page: the headline, the cards, the ledger,

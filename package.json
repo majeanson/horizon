@@ -14,6 +14,7 @@
     "test:engine": "vitest run src/engine",
     "e2e": "playwright test",
     "e2e:ci": "playwright test --workers=1 --retries=0 --forbid-only",
+    "e2e:slow": "playwright test -c playwright.slow.config.ts",
     "e2e:sw": "playwright test -c e2e/sw.config.ts",
     "check:bundle": "node scripts/check-bundle.mjs",
     "sources": "node scripts/gen-sources.ts",

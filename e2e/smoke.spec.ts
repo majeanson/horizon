@@ -1,5 +1,9 @@
 import { test, expect, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
+import { slowCpu } from './seed'
+
+// The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
+test.beforeEach(({ page }) => slowCpu(page))
 
 // The scaffold's proof of life: the app boots, the shell renders, every control on it works, and
 // nothing is printed to the console. A console error on a clean load is a real defect (a

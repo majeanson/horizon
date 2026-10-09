@@ -119,6 +119,7 @@ npm run check:bundle   # size budgets + the offline precache check (needs dist/)
 npm run knip           # dead-code gate (CI only: its parser needs a >4 GiB buffer that a memory-tight Windows box refuses)
 npm run e2e            # Playwright against Vite, profile seeded into localStorage
 npm run e2e:ci         # …in CI's shape (1 worker, 0 retries) — run THIS before pushing shared machinery
+npm run e2e:slow       # …CI's shape AND its speed: 1 worker, CPU throttled 4× — run THIS before pushing anything that changes what runs per profile write on Résultats
 npm run e2e:sw         # the service-worker offline harness on the PROD bundle
 npm run deploy         # build + wrangler deploy
 ```
