@@ -18,6 +18,22 @@ export const LEVELS: readonly Level[] = ['modest', 'average', 'comfortable']
 /** The net-worth fifth each level stands for (the lowest and the highest fifth are left out: their figures are not a plan's centre). */
 const FIFTH: Record<Level, Wealth> = { modest: 'second', average: 'middle', comfortable: 'fourth' }
 
+/**
+ * How the retirement budget is set from the working one. « observed »: what Statistics Canada saw (the households of 65 and over spend about 68 % of
+ * those of 55 to 64). « cautious »: never under CAUTIOUS_SHARE of it — those households are smaller, so a couple retiring together drops less than the
+ * average says, and a budget set too low makes the answer too rosy. CAUTIOUS_SHARE is a choice of this app's, not an official figure, and says so on screen.
+ */
+export type RetiredBasis = 'observed' | 'cautious'
+export const BASES: readonly RetiredBasis[] = ['observed', 'cautious']
+export const CAUTIOUS_SHARE = 0.8
+
+/** The share of the working budget a retired household spends under this basis (a fraction, 0.68 · 0.8). */
+export function retiredShare(basis: RetiredBasis): number {
+  const age = plain(TYPICAL_SPENDING_BY_AGE)
+  const observed = age.age65plus / age.age55to64
+  return basis === 'cautious' ? Math.max(observed, CAUTIOUS_SHARE) : observed
+}
+
 /** The figures a level can supply, one per kind. */
 export const LEVEL_KINDS: readonly FactKind[] = ['rrspBalance', 'tfsaBalance', 'nonRegBalance', 'homeValue', 'spendingWorking', 'spendingRetired']
 
@@ -48,23 +64,22 @@ function holdingFigure(birthYear: number, kind: HoldingKey, level: Level, todayY
 }
 
 /** The yearly current spending of a household like this one at this level: working years, then retirement. */
-export function spendingFigures(h: Household, level: Level, todayYear: number): { working: number; retired: number } {
+export function spendingFigures(h: Household, level: Level, todayYear: number, basis: RetiredBasis = 'observed'): { working: number; retired: number } {
   const base = plain(TYPICAL_SPENDING_BY_HOUSEHOLD)
   const kids = (h.children ?? []).some((y) => todayYear - y < 18)
   const alone = h.persons.length === 1
   const typical = alone ? (kids ? base.loneParent : base.alone) : kids ? base.coupleWithChildren : base.couple
   const income = plain(TYPICAL_SPENDING_BY_INCOME)
   const working = sayBudget((typical * income[FIFTH[level]]) / income.all)
-  const age = plain(TYPICAL_SPENDING_BY_AGE)
-  // What the households of 65 and over spend against those of 55 to 64 (smaller households, a paid-off home): the same drop, applied to this one.
-  return { working, retired: sayBudget((working * age.age65plus) / age.age55to64) }
+  // What the households of 65 and over spend against those of 55 to 64 (smaller households, a paid-off home): the same drop, or a gentler one (see RetiredBasis).
+  return { working, retired: sayBudget(working * retiredShare(basis)) }
 }
 
 /** What this level says a figure is, or null when it says nothing about it (a figure the household does not have). */
-export function levelFigure(p: Profile, kind: FactKind, owner: FactOwner, level: Level, todayYear: number): number | null {
+export function levelFigure(p: Profile, kind: FactKind, owner: FactOwner, level: Level, todayYear: number, basis: RetiredBasis = 'observed'): number | null {
   if (kind === 'spendingWorking' || kind === 'spendingRetired') {
     if (owner !== 'household') return null
-    const s = spendingFigures(p.household, level, todayYear)
+    const s = spendingFigures(p.household, level, todayYear, basis)
     return kind === 'spendingWorking' ? s.working : s.retired
   }
   const key = HOLDING_OF[kind]
@@ -99,7 +114,8 @@ export function isOpen(p: Profile, kind: FactKind, owner: FactOwner, todayYear: 
   const now = current(p, kind, owner)
   if (now === null) return false
   if (now === 0) return true
-  return LEVELS.some((l) => levelFigure(p, kind, owner, l, todayYear) === now)
+  // what a level put there under either basis: a person who changes the basis must find their estimated figures still open
+  return LEVELS.some((l) => BASES.some((b) => levelFigure(p, kind, owner, l, todayYear, b) === now))
 }
 
 function put(p: Profile, kind: FactKind, owner: FactOwner, value: number): Profile {
@@ -138,14 +154,14 @@ interface Leveled {
  * The profile with `level` standing in for every figure that is open (blank, or a previous level's). The same profile comes back
  * when there is nothing to fill. The TFSA room and the earnings years follow, from the balances and the salary.
  */
-export function applyLevel(p: Profile, level: Level, today: { year: number }): Leveled {
+export function applyLevel(p: Profile, level: Level, today: { year: number }, basis: RetiredBasis = 'observed'): Leveled {
   const changes: LevelChange[] = []
   let out = p
   const owners: FactOwner[] = [...p.household.persons.map((x) => x.id), 'household']
   for (const owner of owners) {
     for (const kind of LEVEL_KINDS) {
       if (!isOpen(out, kind, owner, today.year)) continue
-      const to = levelFigure(out, kind, owner, level, today.year)
+      const to = levelFigure(out, kind, owner, level, today.year, basis)
       const from = current(out, kind, owner)
       if (to === null || from === null || to === from) continue
       out = put(out, kind, owner, to)
@@ -164,7 +180,7 @@ export function levelOf(p: Profile, todayYear: number): Level | null {
     for (const kind of LEVEL_KINDS) {
       const now = current(p, kind, owner)
       if (now === null || now === 0 || p.confirmed.includes(factId(owner, kind))) continue
-      const match = LEVELS.find((l) => levelFigure(p, kind, owner, l, todayYear) === now)
+      const match = LEVELS.find((l) => BASES.some((b) => levelFigure(p, kind, owner, l, todayYear, b) === now))
       if (match !== undefined) seen.add(match)
     }
   }
@@ -175,9 +191,9 @@ export function levelOf(p: Profile, todayYear: number): Level | null {
  * ONE figure from a level — what the « Je ne sais pas » helper under a field does. Unlike applyLevel it touches nothing else, except that
  * a TFSA balance brings its blank room with it (the room is what is left of the limits since 18, less the balance).
  */
-export function setFigure(p: Profile, kind: FactKind, owner: FactOwner, level: Level, today: { year: number }): Profile {
+export function setFigure(p: Profile, kind: FactKind, owner: FactOwner, level: Level, today: { year: number }, basis: RetiredBasis = 'observed'): Profile {
   if (p.confirmed.includes(factId(owner, kind))) return p
-  const to = levelFigure(p, kind, owner, level, today.year)
+  const to = levelFigure(p, kind, owner, level, today.year, basis)
   if (to === null || to === current(p, kind, owner)) return p
   const out = put(p, kind, owner, to)
   if (kind !== 'tfsaBalance') return out

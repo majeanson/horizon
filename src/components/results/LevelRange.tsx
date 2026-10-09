@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useLang } from '../../i18n'
 import { applyLevel, LEVELS, needsLevel } from '../../lib/levels'
+import { useBasis } from '../../lib/levelBasis'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
 import { formatMoney } from '../../lib/money'
 import { assumptionsOf } from '../../lib/resultsModel'
@@ -18,15 +19,16 @@ export function LevelRange({ profile, enabled }: { profile: Profile; enabled: bo
   const c = LEVELS_COPY[lang]
   const { year, month } = today()
   const open = needsLevel(profile, year)
+  const basis = useBasis()
   const questions = useMemo(
     () =>
       !open
         ? []
         : LEVELS.map((level) => {
-            const p = applyLevel(profile, level, { year }).profile
+            const p = applyLevel(profile, level, { year }, basis).profile
             return { name: c.levels[level].name, household: p.household, assumptions: assumptionsOf(p, { year, month }) }
           }),
-    [open, profile, c.levels, year, month],
+    [open, profile, c.levels, year, month, basis],
   )
   const answers = usePlansCompare(questions, enabled && open)
   if (!open) return null

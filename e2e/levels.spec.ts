@@ -113,3 +113,26 @@ test('English', async ({ page }) => {
   await page.getByRole('radio', { name: 'Comfortable', exact: true }).click()
   await expect(page.getByText(/figures filled with this level/)).toBeVisible()
 })
+
+test('the retirement budget can be set as observed or cautiously, and the screen says why', async ({ page }) => {
+  await seedProfile(page, blankWithSalary())
+  await page.goto('/?form=1')
+  const retired = page.locator('[data-fact="household:spendingRetired"] input')
+  const amount = async () => Number((await retired.inputValue()).replace(/\D/g, ''))
+  await page.getByRole('radio', { name: 'Moyen', exact: true }).click()
+  await expect(retired).not.toHaveValue(/^0?$/)
+  const observed = await amount()
+  const working = Number((await page.locator('[data-fact="household:spendingWorking"] input').inputValue()).replace(/\D/g, ''))
+  expect(observed / working).toBeGreaterThan(0.66)
+  expect(observed / working).toBeLessThan(0.7)
+  // the cautious choice re-fills what the level filled — to at least 80 % — and leaves the working budget alone
+  await page.getByRole('radio', { name: /Prudent : au moins/ }).click()
+  await expect.poll(amount).toBeGreaterThan(observed)
+  expect((await amount()) / working).toBeGreaterThan(0.79)
+  expect(Number((await page.locator('[data-fact="household:spendingWorking"] input').inputValue()).replace(/\D/g, ''))).toBe(working)
+  await expect(page.getByText(/Ce seuil est un choix d’Horizon, pas un chiffre officiel/)).toBeVisible()
+  // the chosen basis is kept
+  await page.waitForFunction(() => localStorage.getItem('horizon-level-basis') === 'cautious')
+  await page.reload()
+  await expect(page.getByRole('radio', { name: /Prudent : au moins/ })).toBeChecked()
+})

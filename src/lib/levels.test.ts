@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { ageBandOf, applyLevel, hasOpenFigures, isOpen, levelFigure, levelOf, LEVELS, needsLevel, say, spendingFigures } from './levels.ts'
+import { ageBandOf, applyLevel, hasOpenFigures, isOpen, levelFigure, levelOf, LEVELS, needsLevel, retiredShare, say, spendingFigures } from './levels.ts'
 import { setFact } from './profileEdit.ts'
 import { defaultProfile } from './schema.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
@@ -133,5 +133,32 @@ describe('when a level is worth offering', () => {
     expect(needsLevel(typedOver, TODAY.year)).toBe(true) // … and the budget still stands on the level
     const withBudget = { ...typedOver, household: { ...typedOver.household, spending: { workingToday: 52_000, retiredToday: 40_000 } } }
     expect(needsLevel(withBudget, TODAY.year)).toBe(false)
+  })
+})
+
+describe('the retirement budget basis', () => {
+  it('observed is the ratio Statistics Canada saw; cautious never goes under 80 % of the working budget', () => {
+    expect(retiredShare('observed')).toBeCloseTo(52_446 / 76_902, 6)
+    expect(retiredShare('cautious')).toBe(0.8)
+  })
+
+  it('changes the retirement budget and nothing else', () => {
+    const h = blank().household
+    for (const level of LEVELS) {
+      const observed = spendingFigures(h, level, TODAY.year, 'observed')
+      const cautious = spendingFigures(h, level, TODAY.year, 'cautious')
+      expect(cautious.working, level).toBe(observed.working)
+      expect(cautious.retired, level).toBeGreaterThan(observed.retired)
+      expect(cautious.retired / cautious.working, level).toBeCloseTo(0.8, 2)
+    }
+  })
+
+  it('a figure filled under one basis stays « estimated » under the other, and the other basis replaces it', () => {
+    const observed = applyLevel(blank(), 'average', TODAY, 'observed').profile
+    expect(isOpen(observed, 'spendingRetired', 'household', TODAY.year)).toBe(true)
+    const cautious = applyLevel(observed, 'average', TODAY, 'cautious')
+    expect(cautious.changes.map((c) => c.kind)).toEqual(['spendingRetired'])
+    expect(cautious.profile.household.spending.retiredToday).toBe(spendingFigures(blank().household, 'average', TODAY.year, 'cautious').retired)
+    expect(levelOf(cautious.profile, TODAY.year)).toBe('average')
   })
 })

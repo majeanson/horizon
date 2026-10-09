@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLang } from '../../i18n'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
-import { current, isOpen, levelFigure, LEVELS, setFigure } from '../../lib/levels'
+import { BASES, current, isOpen, levelFigure, LEVELS, setFigure } from '../../lib/levels'
+import { useBasis } from '../../lib/levelBasis'
 import type { FactKind, FactOwner } from '../../lib/facts'
 import { formatMoney } from '../../lib/money'
 import { updateProfile, useProfile } from '../../lib/store'
@@ -18,10 +19,12 @@ export default function LevelHelper({ kind, owner }: { kind: FactKind; owner: Fa
   const profile = useProfile()
   const now = today()
   const [open, setOpen] = useState(false)
+  const basis = useBasis()
   if (!isOpen(profile, kind, owner, now.year)) return null
-  const figures = LEVELS.map((l) => ({ level: l, value: levelFigure(profile, kind, owner, l, now.year) }))
+  const figures = LEVELS.map((l) => ({ level: l, value: levelFigure(profile, kind, owner, l, now.year, basis) }))
   if (figures.some((f) => f.value === null)) return null
-  const picked = figures.find((f) => f.value === current(profile, kind, owner))?.level ?? null
+  // the level a figure stands at, under either basis: a figure a level filled stays « estimated » when the basis changes
+  const picked = LEVELS.find((l) => BASES.some((b) => levelFigure(profile, kind, owner, l, now.year, b) === current(profile, kind, owner))) ?? null
   return (
     <div className="level-helper">
       {picked !== null && !open && <p className="field-row__hint">{c.helper.estimated(c.levels[picked].name)}</p>}
@@ -33,7 +36,7 @@ export default function LevelHelper({ kind, owner }: { kind: FactKind; owner: Fa
       {open && (
         <Cluster role="group" aria-label={`${c.helper.group} : ${c.kind[kind as keyof typeof c.kind]}`}>
           {figures.map((f) => (
-            <Chip key={f.level} radio selected={picked === f.level} onClick={() => updateProfile((p) => setFigure(p, kind, owner, f.level, now))}>
+            <Chip key={f.level} radio selected={picked === f.level} onClick={() => updateProfile((p) => setFigure(p, kind, owner, f.level, now, basis))}>
               {c.levels[f.level].name} · {formatMoney(f.value, lang)}
             </Chip>
           ))}

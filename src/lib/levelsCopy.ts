@@ -15,6 +15,8 @@ interface LevelsCopy {
   nothing: string
   undo: string
   matches: (name: string) => string
+  /** How the retirement budget is set from the working one. */
+  basis: { title: string; observed: (pct: number) => string; cautious: (pct: number) => string; why: (observedPct: number, cautiousPct: number) => string }
   /** The helper under one figure. */
   helper: { ask: string; change: string; estimated: (name: string) => string; group: string }
   /** What a level fills, by name of figure. */
@@ -37,6 +39,13 @@ const FR: LevelsCopy = {
   nothing: 'Rien à remplir : chaque chiffre est déjà saisi ou confirmé. Un chiffre que vous avez tapé n’est jamais remplacé.',
   undo: 'Annuler',
   matches: (name) => `Les chiffres estimés correspondent au niveau « ${name} ».`,
+  basis: {
+    title: 'Budget à la retraite',
+    observed: (pct) => `Comme observé : ${pct} % du budget d’avant`,
+    cautious: (pct) => `Prudent : au moins ${pct} %`,
+    why: (observedPct, cautiousPct) =>
+      `Les ménages de 65 ans et plus dépensent environ ${observedPct} % de ce que dépensent ceux de 55 à 64 ans (Statistique Canada). Mais ils sont plus petits : un couple qui prend sa retraite ensemble baisse moins que la moyenne. Un budget trop bas rend la réponse trop optimiste, alors le choix prudent garde au moins ${cautiousPct} %. Ce seuil est un choix d’Horizon, pas un chiffre officiel.`,
+  },
   helper: { ask: 'Je ne sais pas', change: 'Changer', estimated: (name) => `Estimé : niveau « ${name} », d’après des ménages canadiens de votre âge.`, group: 'Estimation selon un niveau de vie' },
   kind: {
     rrspBalance: 'Solde du REER',
@@ -87,6 +96,13 @@ const EN: LevelsCopy = {
   nothing: 'Nothing to fill: every figure is already typed or confirmed. A figure you typed is never replaced.',
   undo: 'Undo',
   matches: (name) => `The estimated figures match the “${name}” level.`,
+  basis: {
+    title: 'Retirement budget',
+    observed: (pct) => `As observed: ${pct}% of the budget before`,
+    cautious: (pct) => `Cautious: at least ${pct}%`,
+    why: (observedPct, cautiousPct) =>
+      `Households aged 65 and over spend about ${observedPct}% of what those aged 55 to 64 spend (Statistics Canada). But they are smaller: a couple retiring together drops less than the average. A budget set too low makes the answer too optimistic, so the cautious choice keeps at least ${cautiousPct}%. That floor is Horizon’s own choice, not an official figure.`,
+  },
   helper: { ask: 'I don’t know', change: 'Change', estimated: (name) => `Estimated: “${name}” level, from Canadian households of your age.`, group: 'Estimate by standard of living' },
   kind: {
     rrspBalance: 'RRSP balance',

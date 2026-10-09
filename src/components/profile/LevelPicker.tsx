@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME } from '../../engine/params/typical'
 import { useLang } from '../../i18n'
 import { pageFor } from '../../engine/params/twins'
-import { applyLevel, levelFigure, levelOf, LEVELS, LEVEL_KINDS, needsLevel, type Level } from '../../lib/levels'
+import { applyLevel, levelFigure, levelOf, LEVELS, LEVEL_KINDS, needsLevel, retiredShare, type Level, type RetiredBasis } from '../../lib/levels'
+import { setBasis, useBasis } from '../../lib/levelBasis'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
 import { formatMoney } from '../../lib/money'
 import type { Profile } from '../../lib/schema'
@@ -27,13 +28,20 @@ export default function LevelPicker() {
   const [done, setDone] = useState<{ note: string; before: Profile | null } | null>(null)
   const [showHow, setShowHow] = useState(false)
   const current = levelOf(profile, now.year)
+  const basis = useBasis()
   if (!needsLevel(profile, now.year) && done === null) return null
 
   const pick = (level: Level) => {
-    const e = applyLevel(profile, level, now)
+    const e = applyLevel(profile, level, now, basis)
     if (e.profile === profile) return setDone({ note: c.nothing, before: null })
-    updateProfile((p) => applyLevel(p, level, now).profile)
+    updateProfile((p) => applyLevel(p, level, now, basis).profile)
     setDone({ note: c.filled(e.changes.length), before: profile })
+  }
+  // Changing how the retirement budget is set re-fills the figures a level put there (never one the person typed).
+  const chooseBasis = (next: RetiredBasis) => {
+    if (next === basis) return
+    setBasis(next)
+    if (current !== null) updateProfile((p) => applyLevel(p, current, now, next).profile)
   }
   const undo = () => {
     if (done?.before) replaceProfile(done.before)
@@ -42,7 +50,7 @@ export default function LevelPicker() {
   const money = (n: number | null) => (n === null ? '' : formatMoney(n, lang))
   const rows = LEVEL_KINDS.map((kind) => {
     const owner = kind === 'spendingWorking' || kind === 'spendingRetired' || kind === 'homeValue' ? ('household' as const) : ('self' as const)
-    const values = LEVELS.map((l) => levelFigure(profile, kind, owner, l, now.year))
+    const values = LEVELS.map((l) => levelFigure(profile, kind, owner, l, now.year, basis))
     return { kind, values }
   }).filter((r) => r.values.every((v) => v !== null))
 
@@ -62,6 +70,15 @@ export default function LevelPicker() {
           </li>
         ))}
       </ul>
+      <Cluster role="radiogroup" aria-label={c.basis.title}>
+        <Chip radio selected={basis === 'observed'} onClick={() => chooseBasis('observed')}>
+          {c.basis.observed(Math.round(retiredShare('observed') * 100))}
+        </Chip>
+        <Chip radio selected={basis === 'cautious'} onClick={() => chooseBasis('cautious')}>
+          {c.basis.cautious(Math.round(retiredShare('cautious') * 100))}
+        </Chip>
+      </Cluster>
+      <p className="field-row__hint">{c.basis.why(Math.round(retiredShare('observed') * 100), Math.round(retiredShare('cautious') * 100))}</p>
       {current !== null && done === null && <p className="field-row__hint">{c.matches(c.levels[current].name)}</p>}
       {done && (
         <Cluster>
