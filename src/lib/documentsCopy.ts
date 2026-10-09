@@ -29,6 +29,9 @@ export interface DocumentsCopy {
   glossaryLink: string
   next: string
   nextGo: string
+  /** The way from the checklist to typing: one document at a time. */
+  entry: string
+  entryHint: string
   /** The small link to this page, from Profil, the first visit and the glossary. */
   link: string
   downloaded: string
@@ -64,6 +67,8 @@ const FR: DocumentsCopy = {
   glossaryLink: 'Le glossaire les explique',
   next: 'Quand tout est rassemblé',
   nextGo: 'Commencer avec Profil',
+  entry: 'Saisie par document',
+  entryHint: 'Une étape par document : seuls ses chiffres s’affichent, pour vous et votre partenaire côte à côte.',
   link: 'Documents à rassembler',
   downloaded: 'Liste téléchargée.',
 }
@@ -98,6 +103,8 @@ const EN: DocumentsCopy = {
   glossaryLink: 'The glossary explains them',
   next: 'When everything is gathered',
   nextGo: 'Start with Profile',
+  entry: 'Entry by document',
+  entryHint: 'One step per document: only its figures are shown, for you and your partner side by side.',
   link: 'Documents to gather',
   downloaded: 'List downloaded.',
 }

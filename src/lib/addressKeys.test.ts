@@ -37,6 +37,7 @@ const KEYS: Record<string, string> = {
   q: 'Résultats: an OLD deep link (`?q=save|stop`) turned into a scroll once, then dropped from the address.',
   person: 'Profil: an OLD deep link naming one person, turned into a scroll once, then dropped from the address.',
   form: 'Profil: « 1 » skips the first-visit question path and opens the full form.',
+  etape: 'Saisie par document: the step open (you · rrq · tax · bank · employer · home · budget · residence). Anything else lands on the first step.',
   fact: 'Profil: one figure’s id (« self:rrspBalance »): scroll to its field and light it once, then drop the key from the address. An unknown id scrolls nowhere.',
 }
 

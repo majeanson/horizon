@@ -10,6 +10,7 @@ const Profil = lazy(() => import('./pages/Profil').then((m) => ({ default: m.Pro
 const Hypotheses = lazy(() => import('./pages/Hypotheses').then((m) => ({ default: m.Hypotheses })))
 const Resultats = lazy(() => import('./pages/Resultats').then((m) => ({ default: m.Resultats })))
 const Donnees = lazy(() => import('./pages/Donnees').then((m) => ({ default: m.Donnees })))
+const Saisie = lazy(() => import('./pages/Saisie').then((m) => ({ default: m.Saisie })))
 const Documents = lazy(() => import('./pages/Documents').then((m) => ({ default: m.Documents })))
 const Glossaire = lazy(() => import('./pages/Glossaire').then((m) => ({ default: m.Glossaire })))
 const DevKit = lazy(() => import('./pages/DevKit').then((m) => ({ default: m.DevKit })))
@@ -23,6 +24,7 @@ export function AppRoutes() {
           <Route path="hypotheses" element={<Hypotheses />} />
           <Route path="resultats" element={<Resultats />} />
           <Route path="documents" element={<Documents />} />
+          <Route path="saisie" element={<Saisie />} />
           <Route path="glossaire" element={<Glossaire />} />
           <Route path="donnees" element={<Donnees />} />
           {/* Unknown paths land on the first page rather than a dead end — and the ADDRESS follows:

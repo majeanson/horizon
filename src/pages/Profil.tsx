@@ -120,6 +120,9 @@ export function Profil() {
         <Chip to="/documents" icon="identification-card-bold">
           {DOCUMENTS_COPY[lang].link}
         </Chip>
+        <Chip to="/saisie" icon="pencil-simple-bold">
+          {DOCUMENTS_COPY[lang].entry}
+        </Chip>
       </Cluster>
       {/* One line: how much of the profile stands on documents, and the door to the section that makes it exact. */}
       {acc.total > 0 && (

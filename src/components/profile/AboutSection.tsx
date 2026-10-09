@@ -7,7 +7,7 @@ import { PartTimeFields } from './PartTimeFields'
 import { Section, type PersonEditor } from './shared'
 
 // Who this person is, and when their work income stops. Everything else in the form hangs off these.
-export function AboutSection({ person, edit }: PersonEditor) {
+export function AboutSection({ person, edit, withoutSalary = false }: PersonEditor & { /** The salary belongs to the tax notice: the stepper asks for it there. */ withoutSalary?: boolean }) {
   const t = useT()
   const a = t.profile.about
   return (
@@ -32,9 +32,11 @@ export function AboutSection({ person, edit }: PersonEditor) {
           <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
+      {!withoutSalary && (
       <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint} fact={factId(person.id, 'salary')}>
         {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
+      )}
       <PartTimeFields person={person} edit={edit} />
     </Section>
   )

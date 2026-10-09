@@ -90,8 +90,12 @@ export function Documents() {
       <p className="field-row__hint no-print">
         {c.glossaryNote} <Link to="/glossaire#documents">{c.glossaryLink}</Link>.
       </p>
-      <NextStep to="/" label={c.nextGo}>
+      <NextStep to="/saisie" label={c.entry}>
         <p>{c.next}</p>
+        <p>{c.entryHint}</p>
+        <p>
+          <Link to="/">{c.nextGo}</Link>
+        </p>
       </NextStep>
     </section>
   )

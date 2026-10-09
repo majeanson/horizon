@@ -79,7 +79,7 @@ function LockedPart({ person, set }: { person: Person; set: (patch: Partial<Pers
 }
 
 // One registered account: its balance, the room left, and what the person plans to add each year.
-function RegisteredGroup({ kind, person, edit, info }: PersonEditor & { kind: Registered; info: { balance: InfoId; room: InfoId } }) {
+function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & { kind: Registered; info: { balance: InfoId; room: InfoId }; withRoom: boolean }) {
   const t = useT()
   const a = t.profile.accounts
   const account = person.accounts[kind]
@@ -89,9 +89,11 @@ function RegisteredGroup({ kind, person, edit, info }: PersonEditor & { kind: Re
       <FieldRow label={a.balance} infoId={info.balance} fact={factId(person.id, kind === 'rrsp' ? 'rrspBalance' : 'tfsaBalance')}>
         {(w) => <NumberField kind="money" max={1e9} value={account.balance} onChange={(balance) => (kind === 'rrsp' ? edit((x) => setRrspBalance(x, balance)) : set({ balance }))} id={w.id} />}
       </FieldRow>
-      <FieldRow label={a.room} infoId={info.room} fact={factId(person.id, kind === 'rrsp' ? 'rrspRoom' : 'tfsaRoom')}>
-        {(w) => <NumberField kind="money" max={1e9} value={account.room} onChange={(room) => set({ room })} id={w.id} />}
-      </FieldRow>
+      {withRoom && (
+        <FieldRow label={a.room} infoId={info.room} fact={factId(person.id, kind === 'rrsp' ? 'rrspRoom' : 'tfsaRoom')}>
+          {(w) => <NumberField kind="money" max={1e9} value={account.room} onChange={(room) => set({ room })} id={w.id} />}
+        </FieldRow>
+      )}
       <FieldRow label={a.contribution} hint={a.contributionHint}>
         {(w) => <NumberField kind="money" max={1e9} value={account.annualContribution} onChange={(annualContribution) => set({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
@@ -100,15 +102,15 @@ function RegisteredGroup({ kind, person, edit, info }: PersonEditor & { kind: Re
   )
 }
 
-export function AccountsSection({ person, edit }: PersonEditor) {
+export function AccountsSection({ person, edit, withoutRoom = false }: PersonEditor & { /** The room left comes from the tax notice: the stepper asks for it there. */ withoutRoom?: boolean }) {
   const t = useT()
   const a = t.profile.accounts
   const nonReg = person.accounts.nonReg
   const setNonReg = (patch: Partial<typeof nonReg>) => edit((x) => ({ ...x, accounts: { ...x.accounts, nonReg: { ...x.accounts.nonReg, ...patch } } }))
   return (
     <Section title={a.title} icon="piggy-bank-bold">
-      <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} />
-      <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} />
+      <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} withRoom={!withoutRoom} />
+      <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} withRoom={!withoutRoom} />
       <Group title={a.nonReg}>
         <FieldRow label={a.balance} infoId="nonRegBalance" fact={factId(person.id, 'nonRegBalance')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
