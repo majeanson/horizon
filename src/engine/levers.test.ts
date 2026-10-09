@@ -42,3 +42,13 @@ describe('leverRanking — the money each change adds at the end of the plan', (
     }
   })
 })
+
+describe('leverRanking — « save 500 more a month » finds the money', () => {
+  it('it leaves more at the end than the plan as it stands (it used to change nothing: a surplus was saved anyway)', () => {
+    for (const id of ['average', 'golden'] as const) {
+      const { household, assumptions } = EXAMPLES[id]
+      const l = leverRanking(household, assumptions).levers.find((x) => x.id === 'save500')!
+      expect(l.endGain, id).toBeGreaterThan(1000)
+    }
+  })
+})

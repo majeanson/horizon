@@ -22,7 +22,7 @@ const FR: LeversCopy = {
   hint: 'Chaque changement est essayé seul, sur votre plan tel qu’il est. Ce sont des essais, pas des conseils.',
   names: {
     spend10: 'Dépenser 10 % de moins à la retraite',
-    save500: 'Épargner 500 $ de plus par mois (CELI)',
+    save500: 'Épargner 500 $ de plus par mois (CELI), en dépensant moins pendant le travail',
     returns1: 'Un point de rendement de plus par année',
     pensions70: 'Commencer la RRQ et la PSV à 70 ans',
   },
@@ -40,7 +40,7 @@ const EN: LeversCopy = {
   hint: 'Each change is tried alone, on your plan as it stands. They are experiments, not advice.',
   names: {
     spend10: 'Spend 10% less in retirement',
-    save500: 'Save $500 more a month (TFSA)',
+    save500: 'Save $500 more a month (TFSA), by spending less while working',
     returns1: 'One more point of return a year',
     pensions70: 'Start the QPP and OAS at 70',
   },

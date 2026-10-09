@@ -16,11 +16,14 @@ type Change = (h: Household, a: Assumptions) => [Household, Assumptions]
 const CHANGES: Record<LeverId, Change> = {
   // Live on 10 % less in retirement.
   spend10: (h, a) => [{ ...h, spending: { ...h.spending, retiredToday: h.spending.retiredToday * 0.9 } }, a],
-  // Put 500 $ a month more into the TFSA of whoever is working longest (the account whose growth is never taxed).
+  // Put 500 $ a month more into the TFSA of whoever is working longest (the account whose growth is never taxed) — FOUND by spending that much
+  // less while anyone works. Without the cut the lever did nothing at all: a household with cash to spare already saves all of it (the
+  // projection puts every surplus dollar into the TFSA, then the non-registered account), so a bigger « committed » saving only replaced
+  // money that was being saved anyway.
   save500: (h, a) => {
     const i = h.persons.reduce((best, p, k) => (p.retirementAge - (a.today.year - p.birth.year) > h.persons[best].retirementAge - (a.today.year - h.persons[best].birth.year) ? k : best), 0)
     const persons = h.persons.map((p, k) => (k === i ? { ...p, accounts: { ...p.accounts, tfsa: { ...p.accounts.tfsa, annualContribution: p.accounts.tfsa.annualContribution + SAVE_MORE_PER_MONTH * 12 } } } : p))
-    return [{ ...h, persons }, a]
+    return [{ ...h, persons, spending: { ...h.spending, workingToday: Math.max(0, h.spending.workingToday - SAVE_MORE_PER_MONTH * 12) } }, a]
   },
   // One point more a year on every account.
   returns1: (h, a) => [h, { ...a, returns: { nonReg: a.returns.nonReg + 0.01, rrsp: a.returns.rrsp + 0.01, tfsa: a.returns.tfsa + 0.01 } }],
