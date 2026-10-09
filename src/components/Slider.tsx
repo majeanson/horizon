@@ -149,8 +149,8 @@ export function Slider({
         </button>
       </div>
       <div className="slider__ends mono" aria-hidden="true">
-        <span>{min}</span>
-        <span>{max}</span>
+        <span>{valueText(min)}</span>
+        <span>{valueText(max)}</span>
       </div>
       {scenarios && (
         <div className="slider__legend" role="group" aria-label={label}>

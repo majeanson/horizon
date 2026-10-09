@@ -143,6 +143,12 @@ export function Resultats() {
 
   // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
   const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
+  // A view this page does not have (a typo, an old link) lands on the answer — and the ADDRESS follows, as the router's catch-all
+  // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
+  const rawView = params.get('v')
+  useEffect(() => {
+    if (rawView !== null && rawView !== view) setParam('v', null)
+  }, [rawView, view, setParam])
 
   // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
   // scroll to an id that is not on the page did nothing, on the one screen (« no age works ») where the reader most needs it.

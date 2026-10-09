@@ -57,6 +57,11 @@
   scroll-margin-top: calc(var(--bar-h) + var(--pin-h, 7rem) + 0.75rem);
   min-width: 0;
 }
+/* A section that IS a card (Solidité, Préciser le calcul) breathes like the answer card above it: the surface carries no padding
+   of its own, and without this the title and the tiles sat on the card's edge. */
+.results-section.surface {
+  padding: 1rem 1.2rem;
+}
 /* A group label inside the sticky map: reading order only, never a control. */
 .section-nav__arc {
   align-self: center;
