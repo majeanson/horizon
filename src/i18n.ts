@@ -537,7 +537,7 @@ export const FR = {
       where: 'C’est votre choix : aucune pièce ne l’imprime. La page officielle montre l’effet de chaque mois plus tôt ou plus tard.',
       label: '',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/retraite-et-planification/demandez-rente-retraite/rente-retraite-regime-rentes-quebec/quel-age-devriez-vous-demander-rente-retraite',
-      note: 'Avant 65 ans la rente est réduite de 0,5 % à 0,6 % par mois ; après 65 ans, elle augmente de 0,7 % par mois, jusqu’à 72 ans.',
+      note: 'Chaque mois avant 65 ans réduit la rente de 0,5 % à 0,6 %. Chaque mois après 65 ans l’augmente de 0,7 %, jusqu’à 72 ans.',
     },
     oasResidence: {
       where: 'Comptez les années vécues au Canada depuis vos 18 ans : 40 ans donnent la pension complète, chaque année en vaut 1/40.',
@@ -561,7 +561,7 @@ export const FR = {
       where: 'Le relevé de votre institution financière, au dernier jour du mois.',
       label: '',
       url: '',
-      note: 'Additionnez tous vos REER (un RVER ou un RPAC s’y ajoute : mêmes impôts).',
+      note: 'Additionnez tous vos REER. Un RVER ou un RPAC s’y ajoute : mêmes impôts.',
     },
     rrspLocked: {
       where: 'Le relevé de votre RVER, CRI ou FRV : la part « immobilisée ». Dans un RVER, ce sont les cotisations de l’employeur ; dans un CRI ou un FRV, tout le solde.',
@@ -633,13 +633,13 @@ export const FR = {
       where: 'La cible officielle de la Banque du Canada est de 2 %, au milieu d’une fourchette de 1 % à 3 %. Pour votre propre inflation, comparez vos dépenses d’une année à l’autre.',
       label: '',
       url: 'https://www.banqueducanada.ca/grandes-fonctions/politique-monetaire/ententes-relatives-cible-maitrise-inflation/',
-      note: 'Le scénario Neutre retient 2,1 % (normes de projection 2026 de FP Canada et de l’Institut de planification financière), Prudent 2,5 % et Audacieux 2,0 %.',
+      note: 'Le scénario Neutre retient 2,1 %, Prudent 2,5 % et Audacieux 2,0 %. Le 2,1 % vient des normes de projection 2026 de FP Canada et de l’Institut de planification financière.',
     },
     wageGrowth: {
       where: 'Retraite Québec publie le maximum des gains admissibles (MGA) de chaque année depuis 1966 : 74 600 $ en 2026. Comparer deux années donne la hausse des salaires.',
       label: '',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/programmes/regime-rentes-quebec/travail-et-cotisations/revenus-travail-admissibles-et-cotisations',
-      note: 'De 2016 (54 900 $) à 2026 (74 600 $), le MGA a crû d’environ 3,1 % par année ; les normes 2026 retiennent 3,1 % aussi, et le scénario Neutre de même.',
+      note: 'Le MGA est passé de 54 900 $ en 2016 à 74 600 $ en 2026 : environ 3,1 % par année. Les normes 2026 et le scénario Neutre retiennent 3,1 % aussi.',
     },
     returns: {
       where: 'Le relevé annuel de votre courtier ou de votre assureur donne le rendement de chaque compte (« rendement personnel »). Vos frais sont sur son rapport annuel sur les frais.',

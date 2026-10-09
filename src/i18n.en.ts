@@ -515,7 +515,7 @@ export const EN: typeof FR = {
       where: 'It is your choice: no document prints it. The official page shows the effect of each month earlier or later.',
       label: '',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/applying-your-retirement-pension/retirement-pension-quebec-pension-plan/what-age-should-you-apply-your-retirement-pension',
-      note: 'Before 65 the pension is reduced by 0.5% to 0.6% a month; after 65 it grows by 0.7% a month, up to age 72.',
+      note: 'Each month before 65 reduces the pension by 0.5% to 0.6%. Each month after 65 raises it by 0.7%, up to 72.',
     },
     oasResidence: {
       where: 'Count the years you have lived in Canada since turning 18: 40 years give the full pension, each year is worth 1/40.',
@@ -539,7 +539,7 @@ export const EN: typeof FR = {
       where: 'Your financial institution’s statement, as of the last day of the month.',
       label: '',
       url: '',
-      note: 'Add up all your RRSPs (a VRSP or PRPP goes in too: same tax).',
+      note: 'Add up all your RRSPs. A VRSP or a PRPP counts too: same taxes.',
     },
     rrspLocked: {
       where: 'Your VRSP, LIRA or LIF statement: the « locked-in » part. In a VRSP it is the employer’s contributions; in a LIRA or LIF, the whole balance.',
@@ -611,13 +611,13 @@ export const EN: typeof FR = {
       where: 'The Bank of Canada’s official target is 2%, the midpoint of a 1% to 3% range. For your own inflation, compare your spending from one year to the next.',
       label: '',
       url: 'https://www.bankofcanada.ca/core-functions/monetary-policy/inflation-control-target/',
-      note: 'The Neutral scenario uses 2.1% (the 2026 projection guidelines of FP Canada and the Institute of Financial Planning), Conservative 2.5% and Aggressive 2.0%.',
+      note: 'The Neutral scenario uses 2.1%, Conservative 2.5% and Aggressive 2.0%. The 2.1% comes from the 2026 projection guidelines of FP Canada and the Institute of Financial Planning.',
     },
     wageGrowth: {
       where: 'Retraite Québec publishes each year’s maximum pensionable earnings (MPE) since 1966: $74,600 in 2026. Comparing two years gives wage growth.',
       label: '',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions',
-      note: 'From 2016 ($54,900) to 2026 ($74,600) the MPE grew about 3.1% a year; the 2026 guidelines use 3.1% too, and so does the Neutral scenario.',
+      note: 'The MPE went from $54,900 in 2016 to $74,600 in 2026: about 3.1% a year. The 2026 guidelines and the Neutral scenario use 3.1% too.',
     },
     returns: {
       where: 'The annual statement from your broker or insurer gives each account’s return (“personal rate of return”). Your fees are on its annual fee report.',
