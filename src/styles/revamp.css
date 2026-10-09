@@ -1458,3 +1458,10 @@
 .sweep__table--narrow tbody th {
   width: 30%;
 }
+
+/* Over the year-by-year table: when the money runs out, in words (the red rows alone were a wall of colour with no sentence). */
+.year-table__short {
+  margin: 0;
+  color: var(--terracotta-ink);
+  font-weight: 600;
+}

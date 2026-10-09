@@ -1,5 +1,6 @@
 import { useLang, useT } from '../../i18n'
 import { deflator, type Dollars } from '../../lib/chartData'
+import { formatYearAge } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { useNotice } from '../../lib/toast'
@@ -27,12 +28,15 @@ export function YearTables({
   dollars,
   todayYear,
   inflation,
+  births,
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
   label: (s: Selection) => string
   dollars: Dollars
   todayYear: number
   inflation: number
+  /** The birth years of the household, for the « year (ages) » of the first year that falls short. */
+  births: readonly number[]
 }) {
   const t = useT()
   const { lang } = useLang()
@@ -64,6 +68,7 @@ export function YearTables({
   const hasHome = rows.some((row) => row.household.homeValueEnd > 0)
   const hasLocked = rows.some((row) => lockedOf(row) > 0)
   const hasShortfall = rows.some((row) => row.household.shortfall > 0)
+  const firstShort = rows.find((row) => row.household.shortfall > 0)
   return (
     <div className="year-table">
       <TableChooser
@@ -80,6 +85,7 @@ export function YearTables({
       />
       <h3 className="year-table__title">{r.scenario.retireAt(label(shown.selection))}</h3>
       <p className="field-row__hint year-table__unit">{unit}.</p>
+      {firstShort !== undefined && <p className="year-table__short">{RESULTS_COPY[lang].shortage.from(formatYearAge(firstShort.year, births, lang), r.table.shortfall)}</p>}
       <div className="table-wrap table-wrap--pinned" role="region" aria-label={`${r.table.title} — ${label(shown.selection)} (${unit})`} tabIndex={0}>
         <table>
           <thead>

@@ -39,6 +39,10 @@ const FR_RESULTS = {
     aria: (name: string, parts: string) => `${name} : ${parts}`,
     stretch: (kind: string, from: number, to: number) => `${kind} de ${from} à ${to} ans`,
   },
+  /** Over the year-by-year table, when some year falls short: when the money runs out, and what the red rows are. */
+  shortage: {
+    from: (yearAge: string, column: string) => `L’argent manque dès ${yearAge} : les lignes en rouge sont les années où les dépenses ne sont pas couvertes (colonne « ${column} »).`,
+  },
   tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Ajuster', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
     title: 'Dans quel ordre puiser ?',
@@ -233,6 +237,9 @@ const EN_RESULTS: typeof FR_RESULTS = {
     end: (age: number) => `End of the plan, age ${age}`,
     aria: (name: string, parts: string) => `${name}: ${parts}`,
     stretch: (kind: string, from: number, to: number) => `${kind} from ${from} to ${to}`,
+  },
+  shortage: {
+    from: (yearAge: string, column: string) => `The money runs out from ${yearAge}: the red rows are the years when spending is not covered (column “${column}”).`,
   },
   tabs: { label: 'Results views', answer: 'Answer', adjust: 'Adjust', strategies: 'Strategies', verify: 'Check' },
   orders: {

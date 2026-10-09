@@ -718,7 +718,7 @@ export function Resultats() {
           <section id="tableau" className="results-section" aria-label={r.table.title}>
             <SectionHeader title={r.table.title} />
             {runsPending && <Skeleton count={6} />}
-            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} />
+            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
           </section>
 
           <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
@@ -738,7 +738,7 @@ export function Resultats() {
         <section className="arc print-appendix" aria-label={rc.tabs.verify}>
           <section className="results-section" aria-label={r.table.title}>
             <SectionHeader title={r.table.title} />
-            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} />
+            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
           </section>
           <section className="results-section" aria-label={r.params.title}>
             <SectionHeader title={r.params.title} />
