@@ -1130,3 +1130,235 @@
   color: var(--ink-soft);
   font-size: var(--text-sm);
 }
+
+/* ── The ways of starting the pensions: cards (closed) or a table, the reader's choice ─────────────────────── */
+.strategies {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.strategies__bar {
+  display: grid;
+  gap: 0.35rem;
+}
+.strategies__layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.strategies__legend {
+  margin: 0;
+}
+/* The three dots: filled = the money lasts under that scenario, an empty ring = it does not, a dashed ring = still being worked out. Shape, not only colour. */
+.dots {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+.dots__dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  border: 2px solid var(--sage-ink);
+  box-sizing: border-box;
+}
+.dots__dot.is-ok {
+  background: var(--sage-ink);
+}
+.dots__dot.is-short {
+  border-color: var(--terracotta-ink);
+  background: transparent;
+}
+.dots__dot.is-pending {
+  border-style: dashed;
+  border-color: var(--ink-faint);
+}
+.bridge-card__glance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 0.75rem;
+  width: 100%;
+}
+.bridge-card__glance-label {
+  display: block;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+/* The table form: text cells wrap and read from the left; the wide table's columns share the width evenly after the row labels. */
+.strategies__table {
+  max-height: none;
+}
+.strategies__table table {
+  table-layout: fixed;
+}
+.strategies__table th,
+.strategies__table td {
+  white-space: normal;
+  text-align: left;
+  vertical-align: top;
+}
+.strategies__table thead th:first-child,
+.strategies__table tbody th {
+  width: 9.5rem;
+}
+.strategies__table tbody th {
+  font-weight: 600;
+}
+.strategies__table th .chip {
+  white-space: normal;
+  text-align: left;
+}
+/* On a phone the ways are the rows: the name (and its dots) first, then the two figures, right-aligned and unbroken. */
+.strategies__table--narrow thead th:first-child,
+.strategies__table--narrow tbody th {
+  width: 38%;
+}
+.strategies__table--narrow td.mono {
+  text-align: right;
+  white-space: nowrap;
+}
+.strategies__table--narrow th .dots {
+  margin-top: 0.4rem;
+}
+.strategies__table td.is-ok {
+  color: var(--sage-ink);
+}
+.strategies__table td.is-short {
+  color: var(--terracotta-ink);
+}
+/* The best of a row: bold with a mark in front, never colour alone. */
+.strategies__table td.is-best {
+  font-weight: 700;
+}
+.strategies__table td.is-best::before {
+  content: '▲ ';
+  font-size: 0.7em;
+  color: var(--sage-ink);
+}
+
+/* « Votre plan en une ligne »: a thin bar per person, three stretches, the dates ahead under it. The stretches differ by tone AND by their label. */
+.timeline {
+  margin: 0;
+  padding: 0.85rem 1.2rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.timeline__title {
+  font-weight: 700;
+}
+.timeline__hint {
+  margin: 0;
+}
+.timeline__person {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.timeline__name {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+.timeline__bar {
+  display: flex;
+  gap: 2px;
+  height: 1.7rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.timeline__phase {
+  flex-basis: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 0.4rem;
+  color: var(--accent-ink);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.timeline__phase--work {
+  background: var(--line-strong);
+  color: var(--ink);
+}
+.timeline__phase--bridge {
+  background: repeating-linear-gradient(135deg, var(--accent) 0 0.4rem, color-mix(in srgb, var(--accent) 55%, var(--card)) 0.4rem 0.8rem);
+}
+.timeline__phase--pensions {
+  background: color-mix(in srgb, var(--sage) 70%, var(--card));
+  color: var(--ink);
+}
+.timeline__marks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+}
+.timeline__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.timeline__swatch {
+  display: inline-block;
+  width: 1.1rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  vertical-align: middle;
+  padding: 0;
+}
+
+/* A sigle in running text that opens its glossary entry (components/Gloss.tsx): reads as text, shows it is tappable. */
+.gloss {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.18em;
+}
+.gloss:hover,
+.gloss:focus-visible {
+  text-decoration-style: solid;
+}
+/* The entry a hint sent the reader to. */
+.glossary__term.is-target {
+  background: var(--accent-soft, var(--paper-2, transparent));
+  border-radius: var(--radius-md);
+  padding-inline: 0.6rem;
+  margin-inline: -0.6rem;
+}
+.glossary__term {
+  scroll-margin-top: 6rem;
+}
+
+/* The documents to gather and the places to go next: a short list, each item a bold name, what it gives, how to get it. */
+.glossary-docs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+.glossary-docs__item {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line);
+}
+.glossary-docs__item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.glossary-docs__how {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}

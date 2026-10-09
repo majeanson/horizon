@@ -93,6 +93,18 @@ export interface BridgeCopy {
   caveats: string[]
   /** On each card: the same way of starting under each of the three scenarios, one mark per scenario. */
   marksTitle: string
+  /** The comparison of the ways of starting: cards or table, the dots, the rows of the table. */
+  layoutLabel: string
+  layoutCards: string
+  layoutTable: string
+  details: string
+  colStrategy: string
+  worth95Short: string
+  lowestNestShort: string
+  rowWhat: string
+  rowExtra: string
+  rowBreakEven: string
+  dotsLegend: (prudent: string, neutral: string, bold: string) => string
   /** The way whose money lasts under the most scenarios, said above the cards, and the badge on its card. `holds`: scenarios it holds under (of three); `next`: the runner-up's. */
   sturdiest: (name: string, holds: number, next: number) => string
   sturdiestBadge: string
@@ -200,6 +212,17 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       'Des marchés qui tournent mal au mauvais moment, et des dépenses qui changent avec l’âge : les scénarios Prudent, Neutre et Audacieux donnent une fourchette, pas une prévision.',
     ],
     marksTitle: 'Selon le scénario',
+    layoutLabel: 'Façon de montrer la comparaison',
+    layoutCards: 'Cartes',
+    layoutTable: 'Tableau',
+    details: 'Détails',
+    colStrategy: 'Façon de commencer',
+    worth95Short: 'Valeur nette à 95 ans',
+    lowestNestShort: 'Nid le plus bas',
+    rowWhat: 'En bref',
+    rowExtra: 'Tiré du nid de plus que le standard, de 60 à 69 ans',
+    rowBreakEven: 'Point d’équilibre',
+    dotsLegend: (prudent, neutral, bold) => `Trois points : ${prudent} · ${neutral} · ${bold}. Plein : l’argent dure. Vide : il ne dure pas.`,
     sturdiest: (name, holds, next) =>
       `La plus solide selon vos hypothèses : « ${name} ». ${holds === 3 ? 'L’argent dure dans les trois scénarios' : `L’argent dure dans ${holds} scénario${holds > 1 ? 's' : ''} sur 3`}${next < holds ? `, là où la suivante en tient ${next}` : ', et c’est celle qui laisse le plus à la fin du plan'}. C’est une solidité, pas un gain : elle ne dit pas laquelle rapporte le plus sur une vie, ni quelle vie vous aurez.`,
     sturdiestBadge: 'La plus solide',
@@ -303,6 +326,17 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
       'Markets that go wrong at the wrong time, and spending that changes with age: the Conservative, Neutral and Aggressive scenarios give a range, not a forecast.',
     ],
     marksTitle: 'By scenario',
+    layoutLabel: 'How to show the comparison',
+    layoutCards: 'Cards',
+    layoutTable: 'Table',
+    details: 'Details',
+    colStrategy: 'Way of starting',
+    worth95Short: 'Net worth at 95',
+    lowestNestShort: 'Lowest nest',
+    rowWhat: 'In short',
+    rowExtra: 'Drawn from the nest beyond the standard, ages 60 to 69',
+    rowBreakEven: 'Break-even age',
+    dotsLegend: (prudent, neutral, bold) => `Three dots: ${prudent} · ${neutral} · ${bold}. Filled: the money lasts. Empty: it does not.`,
     sturdiest: (name, holds, next) =>
       `Sturdiest on your assumptions: “${name}”. The money lasts in ${holds === 3 ? 'all three scenarios' : `${holds} of 3 scenarios`}${next < holds ? `, where the next one holds in ${next}` : ', and it leaves the most at the end of the plan'}. That is sturdiness, not a payout: it does not say which pays most over a lifetime, or how long a life you will have.`,
     sturdiestBadge: 'Sturdiest',

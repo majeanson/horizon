@@ -102,7 +102,7 @@ test('what a table shows lives in the address: a link opens on the same set, the
 test('« Mon plan » always says its age', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.getByRole('button', { name: /^Mon plan \(\d+( \/ \d+)? ans\)$/ })).toBeVisible()
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=strategies&bt=cards')
   // (the card for it is folded into « Standard » when the plan's pension ages ARE the standard, and says so)
   await expect(page.locator('.bridge-card').getByRole('radio', { name: /^Mon plan \(\d+ ans\)$|^Standard \(c’est aussi votre plan\)$/ })).toBeVisible({ timeout: 60_000 })
 })

@@ -26,6 +26,19 @@ const FR_RESULTS = {
       ['Le nid', 'ce que vous avez dans vos REER, CELI et comptes non enregistrés.'],
     ] as readonly (readonly [string, string])[],
   },
+  /** « Votre plan en une ligne »: each person from today to the end of the plan in three stretches, by the ages the profile states. */
+  timeline: {
+    title: 'Votre plan en une ligne',
+    hint: 'Selon les âges de votre profil : le travail, les années sur le nid (retraité, sans rente encore), puis les rentes.',
+    phases: { work: 'Travail', bridge: 'Sur le nid', pensions: 'Rentes' },
+    now: (age: number) => `Aujourd’hui, ${age} ans`,
+    retire: (age: number) => `Retraite à ${age} ans`,
+    rrq: (age: number) => `RRQ à ${age} ans`,
+    oas: (age: number) => `PSV à ${age} ans`,
+    end: (age: number) => `Fin du plan, ${age} ans`,
+    aria: (name: string, parts: string) => `${name} : ${parts}`,
+    stretch: (kind: string, from: number, to: number) => `${kind} de ${from} à ${to} ans`,
+  },
   tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Ajuster', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
     title: 'Dans quel ordre puiser ?',
@@ -208,6 +221,18 @@ const EN_RESULTS: typeof FR_RESULTS = {
       ['Adjust', 'what you could change (spending, saving) to leave earlier.'],
       ['The nest', 'what you hold in your RRSP, TFSA and non-registered accounts.'],
     ] as readonly (readonly [string, string])[],
+  },
+  timeline: {
+    title: 'Your plan in one line',
+    hint: 'By the ages in your profile: work, the years on the nest (retired, no pension yet), then pensions.',
+    phases: { work: 'Work', bridge: 'On the nest', pensions: 'Pensions' },
+    now: (age: number) => `Today, age ${age}`,
+    retire: (age: number) => `Retire at ${age}`,
+    rrq: (age: number) => `QPP at ${age}`,
+    oas: (age: number) => `OAS at ${age}`,
+    end: (age: number) => `End of the plan, age ${age}`,
+    aria: (name: string, parts: string) => `${name}: ${parts}`,
+    stretch: (kind: string, from: number, to: number) => `${kind} from ${from} to ${to}`,
   },
   tabs: { label: 'Results views', answer: 'Answer', adjust: 'Adjust', strategies: 'Strategies', verify: 'Check' },
   orders: {

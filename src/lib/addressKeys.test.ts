@@ -32,6 +32,7 @@ const KEYS: Record<string, string> = {
   spend: 'Résultats: the « Et si je dépensais moins ? » what-if amount. Unreadable is ignored: the slider sits on the profile’s own spending.',
   bp: 'Résultats › Stratégies: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Stratégies: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
+  bt: 'Résultats › Stratégies: how the ways of starting are compared (cards · table). Anything else, or no key: the screen’s width chooses — a table from 860 px, cards below.',
   bw: 'Résultats › Stratégies: the window (bridge years or the whole plan). Unknown is the bridge years.',
   q: 'Résultats: an OLD deep link (`?q=save|stop`) turned into a scroll once, then dropped from the address.',
   person: 'Profil: an OLD deep link naming one person, turned into a scroll once, then dropped from the address.',

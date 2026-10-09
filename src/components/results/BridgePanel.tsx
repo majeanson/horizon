@@ -1,11 +1,10 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { BridgeLevers, BridgeView, StrategyCard, StrategyKey } from '../../engine/bridge'
+import type { BridgeLevers, BridgeView, StrategyKey } from '../../engine/bridge'
 import { leversFor, profileLevers } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
-import { useLang, useT } from '../../i18n'
+import { useLang } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
-import type { BridgeMatrix } from '../../lib/bridge.worker'
 import {
   SEGMENT_COLOUR,
   SEGMENTS,
@@ -13,8 +12,6 @@ import {
   bridgeQuery,
   parseBridgeParams,
   shownPlan,
-  sturdiest,
-  verdictOf,
   windowRows,
   type BridgeParams,
   type BridgeWindow,
@@ -28,6 +25,7 @@ import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
+import { StrategyViews, type StrategyLayout } from './StrategyViews'
 import { StatusMessage } from '../StatusMessage'
 import { SubTabs } from '../SubTabs'
 
@@ -43,7 +41,6 @@ const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineC
 const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m.StackedBarChart })))
 
 const STATUS_MARK = { covered: '✓', drawing: '↓', short: '!' } as const
-const SCENARIOS = ['prudent', 'neutral', 'bold'] as const
 
 // What the last card tap wrote into the profile, kept so the line under the cards can say it
 // happened — a card looks like a view toggle, but it IS a profile edit — and take it back.
@@ -55,89 +52,6 @@ interface AppliedChange {
   rrq: number
   oas: number
   both: boolean
-}
-
-function StrategyCards({
-  view,
-  pressed,
-  copy,
-  onPick,
-  horizonAge,
-  who,
-  matrix,
-}: {
-  view: BridgeView
-  pressed: readonly StrategyKey[]
-  copy: BridgeCopy
-  onPick: (key: StrategyKey) => void
-  horizonAge: number
-  /** The person `horizonAge` is counted for, named in a couple; null for a person alone. */
-  who: string | null
-  /** Each strategy under each scenario; null while the worker is still at it. */
-  matrix: BridgeMatrix | null
-}) {
-  const t = useT()
-  const { lang } = useLang()
-  const standard = view.strategies.find((s) => s.key === 'standard')!
-  // When the person's own start ages ARE the standard, one card says so instead of two identical ones (and « Mon plan » is never compared with itself).
-  const mine = view.strategies.find((s) => s.key === 'mine')!
-  const mineIsStandard = mine.levers.rrqStartAge === standard.levers.rrqStartAge && mine.levers.oasStartAge === standard.levers.oasStartAge
-  const money = (n: number | null) => (n === null ? copy.noWorth : formatMoney(n, lang))
-  const best = sturdiest(view.strategies, matrix)
-  // « Standard » and « Mon plan » can be one card: the badge goes to the card that is on the screen.
-  const bestKey = best !== null && best.key === 'mine' && mineIsStandard ? 'standard' : (best?.key ?? null)
-  const card = (s: StrategyCard) => {
-    const v = verdictOf(s.levers, s.summary, standard.summary, horizonAge)
-    const extra = s.extraDrawn6070
-    return (
-      <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short')}>
-        {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
-        <Chip radio selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
-          {s.key === 'standard' && mineIsStandard ? copy.standardIsMine : strategyLabel(copy, s.key, s.levers.retirementAge)}
-        </Chip>
-        <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>
-        <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v, who)}</p>
-        <dl className="bridge-card__facts">
-          <div>
-            <dt>{copy.lifetime}</dt>
-            <dd className="mono">{formatMoney(s.summary.lifetimeAfterTax, lang)}</dd>
-          </div>
-          <div>
-            <dt>{copy.worth95}</dt>
-            <dd className="mono">{money(s.summary.netWorth95)}</dd>
-          </div>
-          <div>
-            <dt>{copy.lowestNestLabel}</dt>
-            <dd className="mono">{s.summary.lowestNest ? `${formatMoney(s.summary.lowestNest.amount, lang)} · ${copy.age(s.summary.lowestNest.age)}` : copy.noWorth}</dd>
-          </div>
-        </dl>
-        <p className="field-row__hint">
-          {s.key === 'standard' ? copy.breakEvenSelf : extra > 50 ? copy.extraDrawn(formatMoney(extra, lang)) : extra < -50 ? copy.lessDrawn(formatMoney(-extra, lang)) : copy.sameDrawn}
-          {s.key !== 'standard' && ' · ' + (s.breakEven === null || s.breakEvenKind === null ? copy.breakEvenNone : s.breakEvenKind === 'later' ? copy.breakEvenLater(s.breakEven) : copy.breakEvenEarlier(s.breakEven))}
-        </p>
-        {/* The same way of starting under the three scenarios: one mark each, on the card it qualifies. */}
-        <p className="bridge-card__marks" aria-label={copy.marksTitle}>
-          {SCENARIOS.map((k) => {
-            const cell = matrix?.[s.key][k]
-            return (
-              <span key={k} className={'bridge-mark' + (cell === undefined ? '' : cell.ok ? ' bridge-mark--ok' : ' bridge-mark--short')}>
-                <span aria-hidden="true">{cell === undefined ? '' : cell.ok ? '✓ ' : '! '}</span>
-                {t.assumptions.presets[k]} : {cell === undefined ? copy.marksPending : cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}
-              </span>
-            )
-          })}
-        </p>
-      </li>
-    )
-  }
-  return (
-    <div role="radiogroup" aria-label={copy.strategyTitle}>
-      {best !== null && (
-        <p className="bridge-sturdiest">{copy.sturdiest(best.key === 'mine' && mineIsStandard ? copy.strategyName.standard : strategyLabel(copy, best.key, view.strategies.find((c) => c.key === best.key)!.levers.retirementAge), best.holds, best.next)}</p>
-      )}
-      <ul className="bridge-cards">{view.strategies.filter((s) => !(s.key === 'mine' && mineIsStandard)).map(card)}</ul>
-    </div>
-  )
 }
 
 function BridgeCharts({ view, span, household, params, copy }: { view: BridgeView; span: BridgeWindow; household: Household; params: BridgeParams; copy: BridgeCopy }) {
@@ -282,8 +196,6 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
   )
 }
 
-// « Mon plan » always says the age it stands for: the retirement age the person's own start ages go with.
-const strategyLabel = (copy: BridgeCopy, key: StrategyKey, retirementAge: number) => (key === 'mine' ? `${copy.strategyName.mine} (${copy.age(retirementAge)})` : copy.strategyName[key])
 
 export function BridgePanel({ household, assumptions, names }: { household: Household; assumptions: Assumptions; names: readonly string[] }) {
   const { lang } = useLang()
@@ -311,6 +223,15 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const change = (patch: Partial<Pick<BridgeLevers, 'both'>>, win?: BridgeWindow) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household)
     write({ levers: { ...cur.levers, ...patch }, window: win ?? cur.window })
+  }
+  // `bt=cards|table`: how the ways of starting are compared. Absent: the screen's width chooses (StrategyViews).
+  const askedLayout = params.get('bt')
+  const layout: StrategyLayout | null = askedLayout === 'cards' || askedLayout === 'table' ? askedLayout : null
+  const setLayout = (next: StrategyLayout | null) => {
+    const base = new URLSearchParams(window.location.search)
+    if (next === null) base.delete('bt')
+    else base.set('bt', next)
+    setParams(base, { replace: true })
   }
   const [applied, setApplied] = useState<AppliedChange | null>(null)
   const pickPerson = (id: PersonId) => {
@@ -374,9 +295,23 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             {copy.verdict(verdict, who)}
           </p>
 
+          <div className="bridge__window">
+            <SubTabs
+              size="mini"
+              ariaLabel={copy.windowLabel}
+              value={windowShown}
+              onSelect={(w) => change({}, w)}
+              options={[
+                { key: 'bridge', label: copy.windowBridge },
+                { key: 'plan', label: copy.windowPlan },
+              ]}
+            />
+          </div>
+
+          <BridgeCharts view={view} span={windowShown} household={household} params={{ levers: shown, window: windowShown }} copy={copy} />
           <h3 className="bridge__heading">{copy.strategyTitle}</h3>
           {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
-          <StrategyCards view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} matrix={matrix} />
+          <StrategyViews view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} matrix={matrix} layout={layout} onLayout={setLayout} />
           <p className="field-row__hint">{copy.marksHint(ownerName)}</p>
           {applied !== null && (
             <Cluster className="bridge__applied">
@@ -395,20 +330,6 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
           )}
           <p className="field-row__hint">{copy.todayNote}</p>
 
-          <div className="bridge__window">
-            <SubTabs
-              size="mini"
-              ariaLabel={copy.windowLabel}
-              value={windowShown}
-              onSelect={(w) => change({}, w)}
-              options={[
-                { key: 'bridge', label: copy.windowBridge },
-                { key: 'plan', label: copy.windowPlan },
-              ]}
-            />
-          </div>
-
-          <BridgeCharts view={view} span={windowShown} household={household} params={{ levers: shown, window: windowShown }} copy={copy} />
           <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
           <p className="field-row__hint">{copy.householdNote}</p>
 
