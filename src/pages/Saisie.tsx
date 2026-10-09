@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, type ReactNode, lazy, Suspense } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import type { Person } from '../engine/types'
 import { AboutSection } from '../components/profile/AboutSection'
@@ -18,7 +18,8 @@ import { useLang, useT } from '../i18n'
 import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { useTicks } from '../lib/documentsTicks'
 import { ENTRY_COPY } from '../lib/entryCopy'
-import { ENTRY_STEPS, lastStep, rememberStep, stepById, stepFactIds, stepProgress, type Step } from '../lib/entrySteps'
+import { lastStep, rememberStep, stepById, stepFactIds, stepProgress, stepsFor, type Step } from '../lib/entrySteps'
+import { applies, useYes } from '../lib/situation'
 import { GUIDE_COPY } from '../lib/guideCopy'
 import { mapPerson, setFacts } from '../lib/profileEdit'
 import { updateProfile, useProfile } from '../lib/store'
@@ -48,13 +49,19 @@ function Persons({ render }: { render: (person: Person, edit: PersonEditor['edit
   )
 }
 
+// The household's first step is where « Ma situation » is answered: what it says decides which documents the next steps are about.
 function StepBody({ step }: { step: Step }) {
+  const profile = useProfile()
+  const yes = useYes()
   switch (step.id) {
     case 'you':
       return (
         <>
-          <FamilySection />
-          <Persons render={(person, edit) => <AboutSection person={person} edit={edit} withoutSalary />} />
+          <FamilySection withKids={applies(profile, yes, 'kids')} />
+          <Suspense fallback={null}>
+            <SituationCard />
+          </Suspense>
+          <Persons render={(person, edit) => <AboutSection person={person} edit={edit} withoutSalary withoutPartTime={!applies(profile, yes, 'partTime', person.id)} />} />
         </>
       )
     case 'rrq':
@@ -70,9 +77,11 @@ function StepBody({ step }: { step: Step }) {
     case 'budget':
       return <BudgetSection />
     case 'residence':
-      return <Persons render={(person, edit) => <OasSection person={person} edit={edit} />} />
+      return <Persons render={(person, edit) => <OasSection person={person} edit={edit} withoutResidence={!applies(profile, yes, 'abroad', person.id)} />} />
   }
 }
+
+const SituationCard = lazy(() => import('../components/profile/SituationCard'))
 
 export function Saisie() {
   const t = useT()
@@ -85,8 +94,10 @@ export function Saisie() {
   const [params, setParams] = useSearchParams()
   const asked = params.get('etape')
   const step = stepById(asked)
-  const at = ENTRY_STEPS.indexOf(step)
-  const total = ENTRY_STEPS.length
+  const yes = useYes()
+  const steps = stepsFor(profile, yes, step.id)
+  const at = steps.findIndex((s) => s.id === step.id)
+  const total = steps.length
   const nameOf = (s: Step): string => (s.doc === null ? c.youTitle : guide.docs[s.doc].name)
   const doc = step.doc === null ? null : guide.docs[step.doc]
   const infoUrl = doc?.link ? (t.info[doc.link].url ?? null) || null : null
@@ -124,7 +135,7 @@ export function Saisie() {
       )}
       <nav className="saisie__steps" aria-label={c.nav}>
         <Cluster>
-          {ENTRY_STEPS.map((s, i) => {
+          {steps.map((s, i) => {
             const p = stepProgress(s, profile)
             const done = p.total > 0 && p.confirmed === p.total
             return (
@@ -170,11 +181,11 @@ export function Saisie() {
       )}
 
       <Cluster className="saisie__nav" justify="between">
-        <Chip disabled={at === 0} onClick={() => go(ENTRY_STEPS[Math.max(0, at - 1)].id)}>
+        <Chip disabled={at === 0} onClick={() => go(steps[Math.max(0, at - 1)].id)}>
           {c.prev}
         </Chip>
         {at < total - 1 ? (
-          <Chip onClick={() => go(ENTRY_STEPS[at + 1].id)}>{c.next}</Chip>
+          <Chip onClick={() => go(steps[at + 1].id)}>{c.next}</Chip>
         ) : (
           <button type="button" className="btn btn--primary" onClick={() => navigate('/resultats')}>
             {c.finish}

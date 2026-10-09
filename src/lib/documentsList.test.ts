@@ -77,3 +77,13 @@ describe('documentsText', () => {
     expect(text).toContain(GUIDE_COPY.fr.docs.home.how)
   })
 })
+
+describe('the checklist keeps what matters to the household', () => {
+  it('drops the documents a household said it has no use for, per person, and keeps everything by default', () => {
+    const all = documentItems(couple, GUIDE_COPY.fr, urlOf)
+    const some = documentItems(couple, GUIDE_COPY.fr, urlOf, (doc, owner) => !(doc === 'employer' && owner === couple[1].id) && doc !== 'home')
+    expect(all.length - some.length).toBe(2) // the home, and the second person's employer statement
+    expect(some.some((i) => i.doc === 'home')).toBe(false)
+    expect(some.filter((i) => i.doc === 'employer').map((i) => i.owner)).toEqual([couple[0].id])
+  })
+})

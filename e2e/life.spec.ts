@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { EXAMPLE, savedProfile, seedProfile, type SeedProfile } from './seed'
+import { EXAMPLE, savedProfile, seedProfile, showAllSections, type SeedProfile } from './seed'
 
 // A life beyond the budget (schema v16): what a child costs until they leave, work kept after retirement, dated events and income, and
 // spending that slows with age. The unit tests pin the engine; this pins that a PERSON can drive each one and that it reaches the answer.
@@ -7,7 +7,10 @@ import { EXAMPLE, savedProfile, seedProfile, type SeedProfile } from './seed'
 const box = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })
 
 test.describe('on Profil', () => {
-  test.beforeEach(async ({ page }) => seedProfile(page))
+  test.beforeEach(async ({ page }) => {
+    await seedProfile(page)
+    await showAllSections(page) // « Ma situation »: these tests drive sections that are shown once the question is answered « oui »
+  })
 
   test('what a child costs: typed, saved, and said in a line', async ({ page }) => {
     await page.goto('/?form=1')

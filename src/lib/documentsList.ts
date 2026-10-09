@@ -27,13 +27,13 @@ export interface DocItem {
   weight: DocWeight
 }
 
-export function documentItems(persons: readonly { id: PersonId; name: string }[], guide: GuideCopy, urlOf: (doc: DocId) => string | null): DocItem[] {
+export function documentItems(persons: readonly { id: PersonId; name: string }[], guide: GuideCopy, urlOf: (doc: DocId) => string | null, keep: (doc: DocId, owner: PersonId | undefined) => boolean = () => true): DocItem[] {
   const out: DocItem[] = []
   const couple = persons.length > 1
   const base = (doc: DocId) => ({ doc, name: guide.docs[doc].name, what: guide.docs[doc].what, how: guide.docs[doc].how, figures: docFigures(doc).kinds.map((k) => guide.kind[k]), url: urlOf(doc), weight: DOC_WEIGHT[doc] })
   // The household's own (the budget, the home), then each person's documents — the way Profil groups its inputs; within a group, most important first.
-  for (const doc of DOC_IDS) if (docFigures(doc).owner === 'household') out.push({ ...base(doc), id: `${doc}:household`, owner: 'household', who: null })
-  for (const p of persons) for (const doc of DOC_IDS) if (docFigures(doc).owner === 'person') out.push({ ...base(doc), id: `${doc}:${p.id}`, owner: p.id, who: couple ? p.name : null })
+  for (const doc of DOC_IDS) if (docFigures(doc).owner === 'household' && keep(doc, undefined)) out.push({ ...base(doc), id: `${doc}:household`, owner: 'household', who: null })
+  for (const p of persons) for (const doc of DOC_IDS) if (docFigures(doc).owner === 'person' && keep(doc, p.id)) out.push({ ...base(doc), id: `${doc}:${p.id}`, owner: p.id, who: couple ? p.name : null })
   return out
 }
 

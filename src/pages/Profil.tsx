@@ -25,11 +25,13 @@ import { GUIDE_COPY } from '../lib/guideCopy'
 import { scrollBehavior } from '../lib/motion'
 import { hasSpouse, mapPerson } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
+import { applies, useYes } from '../lib/situation'
 import { updateProfile, useProfile } from '../lib/store'
 
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
 const Onboarding = lazy(() => import('../components/Onboarding'))
 const LevelPicker = lazy(() => import('../components/profile/LevelPicker'))
+const SituationCard = lazy(() => import('../components/profile/SituationCard'))
 
 // The profile: the household's facts (who is in it, what it spends, the home), then EVERY person's fields on the page —
 // side by side on a wide screen, one after the other on a phone — then « Rendre mon profil exact », the documents that
@@ -42,6 +44,7 @@ export function Profil() {
   const profile = useProfile()
   const [params, setParams] = useSearchParams()
   const spouse = hasSpouse(profile)
+  const yes = useYes()
   const gaps = profileGaps(profile)
   const acc = useMemo(() => accuracyOf(profile), [profile])
   const g = GUIDE_COPY[lang].panel
@@ -136,14 +139,18 @@ export function Profil() {
           )}
         </div>
       )}
-      <FamilySection />
+      <FamilySection withKids={applies(profile, yes, 'kids')} />
+      {/* « Ma situation »: a few yes / no questions that decide which sections below are shown. */}
+      <Suspense fallback={null}>
+        <SituationCard />
+      </Suspense>
       {/* « Je ne connais pas mes chiffres »: a level fills what is blank; loaded on its own (it carries the official tables). */}
       <Suspense fallback={null}>
         <LevelPicker />
       </Suspense>
       <BudgetSection />
-      <HomeSection />
-      <LifeSection />
+      {applies(profile, yes, 'home') && <HomeSection />}
+      {applies(profile, yes, 'events') && <LifeSection />}
       <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
         {profile.household.persons.map((p, i) => {
           const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
@@ -184,14 +191,15 @@ export function Profil() {
 function PersonFields({ id }: { id: PersonId }) {
   const profile = useProfile()
   const person = profile.household.persons.find((x) => x.id === id)!
+  const yes = useYes()
   const edit = (change: Parameters<typeof mapPerson>[2]) => updateProfile((p) => mapPerson(p, id, change))
   return (
     <>
-      <AboutSection person={person} edit={edit} />
+      <AboutSection person={person} edit={edit} withoutPartTime={!applies(profile, yes, 'partTime', id)} />
       <RrqSection person={person} edit={edit} />
-      <OasSection person={person} edit={edit} />
+      <OasSection person={person} edit={edit} withoutResidence={!applies(profile, yes, 'abroad', id)} />
       <AccountsSection person={person} edit={edit} />
-      <PensionPlans person={person} edit={edit} />
+      {applies(profile, yes, 'pension', id) && <PensionPlans person={person} edit={edit} />}
     </>
   )
 }

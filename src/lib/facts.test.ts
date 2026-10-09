@@ -18,11 +18,19 @@ describe('the facts a household has', () => {
   it('a person alone: the figures every person has, and none that need something they do not have', () => {
     const p = defaultProfile(TODAY) // no salary, no pension, no home, nothing in the non-registered account
     const kinds = factsOf(p).map((f) => f.kind)
-    expect(kinds).toEqual(['earnings', 'residence', 'rrspBalance', 'rrspRoom', 'tfsaBalance', 'tfsaRoom', 'nonRegBalance', 'spendingWorking', 'spendingRetired'])
+    expect(kinds).toEqual(['earnings', 'rrspBalance', 'rrspRoom', 'tfsaBalance', 'tfsaRoom', 'nonRegBalance', 'spendingWorking', 'spendingRetired'])
     expect(kinds).not.toContain('salary')
     expect(kinds).not.toContain('nonRegAcb')
     expect(kinds).not.toContain('pension')
     expect(kinds).not.toContain('mortgage')
+    expect(kinds).not.toContain('residence') // lived here since 18: the OAS counts from there, nothing to read
+  })
+
+  it('the residence is a figure only for someone whose residence began after their 18th birthday', () => {
+    const p = defaultProfile(TODAY)
+    const me = p.household.persons[0]
+    const later = { ...p, household: { ...p.household, persons: [{ ...me, oas: { ...me.oas, residentSince: me.birth.year + 25 } }] } }
+    expect(factsOf(later).map((f) => f.kind)).toContain('residence')
   })
 
   it('a figure appears when the thing it describes does: a salary, a cost base, a plan, a home, a loan', () => {
@@ -50,7 +58,9 @@ describe('the facts a household has', () => {
   it('every fact belongs to a document, and every document holds at least one', () => {
     const everything = golden()
     const withHome = updateHome(addHome(everything), (h) => ({ ...h, mortgage: { ...h.mortgage, balance: 1 } }))
-    const docs = new Set(factsOf(withHome).map((f) => f.doc))
+    // … and someone who arrived after 18, so the proof of residence is asked for too
+    const arrived = { ...withHome, household: { ...withHome.household, persons: withHome.household.persons.map((x, i) => (i === 0 ? { ...x, oas: { ...x.oas, residentSince: x.birth.year + 25 } } : x)) } }
+    const docs = new Set(factsOf(arrived).map((f) => f.doc))
     for (const d of DOC_IDS) expect(docs.has(d), d).toBe(true)
   })
 })

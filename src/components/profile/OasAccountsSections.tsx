@@ -14,11 +14,12 @@ import { LevelSlot } from './LevelSlot'
 // Old Age Security (when it starts, and the residence that decides how much), then the three kinds of savings
 // account. Grouped in one file because each is a short list of the same FieldRow + NumberField pair.
 
-export function OasSection({ person, edit }: PersonEditor) {
+export function OasSection({ person, edit, withoutResidence = false }: PersonEditor & { /** The years of residence are asked only of someone who lived abroad after 18 (« Ma situation »). */ withoutResidence?: boolean }) {
   const t = useT()
   const o = t.profile.oas
   return (
     <Section title={o.title} icon="identification-card-bold">
+      {!withoutResidence && (<>
       <FieldRow label={o.residentSince} infoId="oasResidence" hint={o.residentHint} fact={factId(person.id, 'residence')}>
         {(w) => (
           <NumberField kind="year" min={1900} max={2100} value={person.oas.residentSince} onChange={(residentSince) => edit((x) => ({ ...x, oas: { ...x.oas, residentSince } }))} id={w.id} ariaDescribedBy={w.describedBy} />
@@ -28,6 +29,7 @@ export function OasSection({ person, edit }: PersonEditor) {
       <Chip selected={person.oas.residentSince <= person.birth.year} onClick={() => edit((x) => ({ ...x, oas: { ...x.oas, residentSince: x.birth.year } }))}>
         {o.sinceBirth}
       </Chip>
+      </>)}
       <FieldRow label={o.startAge} infoId="oasStartAge" hint={o.startHint}>
         {(w) => (
           <NumberField kind="int" min={65} max={70} unit={t.fields.years} value={person.oas.startAge} onChange={(startAge) => edit((x) => ({ ...x, oas: { ...x.oas, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />

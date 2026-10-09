@@ -9,6 +9,7 @@ import { documentItems, documentsText } from '../lib/documentsList'
 import { clearTicks, toggleTick, useTicks } from '../lib/documentsTicks'
 import { saveAsFile } from '../lib/download'
 import { GUIDE_COPY } from '../lib/guideCopy'
+import { docApplies, useYes } from '../lib/situation'
 import { useProfile } from '../lib/store'
 import { useNotice } from '../lib/toast'
 import type { DocId } from '../lib/facts'
@@ -29,7 +30,9 @@ export function Documents() {
     const link = guide.docs[doc].link
     return link === null ? null : (t.info[link].url ?? null) || null
   }
-  const items = documentItems(people, guide, urlOf)
+  const yes = useYes()
+  // Only the documents this household has use for: the home's papers, the employer's statement and the proof of residence need a « yes » in « Ma situation » (or the figures already there).
+  const items = documentItems(people, guide, urlOf, (doc, owner) => docApplies(profile, yes, doc, owner))
   const done = items.filter((it) => ticked.has(it.id)).length
   const download = () => {
     saveAsFile(documentsText(items, ticked, { title: c.fileTitle, intro: c.fileIntro, readOff: c.readOff, where: c.where, official: c.official, importance: c.importance, weights: c.weights, household: c.household, you: c.you }), c.file, 'text/plain;charset=utf-8')

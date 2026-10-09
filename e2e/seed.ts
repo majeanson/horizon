@@ -60,6 +60,16 @@ export async function seedProfile(page: Page, profile: SeedProfile = EXAMPLE): P
   )
 }
 
+/**
+ * « Ma situation » decides which sections of the profile form show. A spec that exercises one of them (the employer plan, years abroad, children,
+ * dated events, work kept after retiring) answers « oui » to every question first — the same note to oneself the page keeps on this device.
+ */
+export async function showAllSections(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('horizon-situation') === null) localStorage.setItem('horizon-situation', JSON.stringify(['kids', 'events', 'pension:self', 'pension:spouse', 'abroad:self', 'abroad:spouse', 'partTime:self', 'partTime:spouse']))
+  })
+}
+
 /** The profile as the app has saved it right now. */
 export async function savedProfile(page: Page): Promise<any> {
   return page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? 'null'), PROFILE_KEY)

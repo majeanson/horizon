@@ -1,24 +1,25 @@
 import { expect, test } from '@playwright/test'
-import { savedProfile, seedProfile } from './seed'
+import { savedProfile, seedProfile, showAllSections } from './seed'
 
 // « Saisie par document »: the profile typed one document at a time. Same fields, same store — gathered in the order the papers are held.
 
 test.beforeEach(async ({ page }) => seedProfile(page))
 
-test('eight steps, the first about the household, and the step is in the address', async ({ page }) => {
+test('seven steps, the first about the household, and the step is in the address', async ({ page }) => {
+  await showAllSections(page) // every « oui » to « Ma situation »: the employer's statement and the proof of residence are steps for those who have them
   await page.goto('/saisie')
   await expect(page.getByRole('heading', { name: 'Saisie par document', level: 1 })).toBeVisible()
   const nav = page.getByRole('navigation', { name: 'Les étapes de la saisie' })
-  await expect(nav.getByRole('button')).toHaveCount(8)
-  await expect(page.getByText('Étape 1 sur 8')).toBeVisible()
+  await expect(nav.getByRole('button')).toHaveCount(7) // the example owns no home
+  await expect(page.getByText('Étape 1 sur 7')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Vous et votre ménage', level: 2 })).toBeVisible()
   await page.getByRole('button', { name: 'Suivant' }).click()
   // the documents come most important first: the spending budget, then the tax notice…
   await expect(page).toHaveURL(/etape=budget/)
-  await expect(page.getByText('Étape 2 sur 8')).toBeVisible()
+  await expect(page.getByText('Étape 2 sur 7')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Vos dépenses des 12 derniers mois', level: 2 })).toBeVisible()
   await page.getByRole('button', { name: 'Précédent' }).click()
-  await expect(page.getByText('Étape 1 sur 8')).toBeVisible()
+  await expect(page.getByText('Étape 1 sur 7')).toBeVisible()
 })
 
 test('walking the steps reaches exactly the figures the full profile asks for — none missed, none twice', async ({ page }) => {
@@ -31,7 +32,8 @@ test('walking the steps reaches exactly the figures the full profile asks for �
   for (const id of ['you', 'rrq', 'tax', 'bank', 'employer', 'home', 'budget', 'residence']) {
     await page.goto(`/saisie?etape=${id}`)
     await expect(page.getByRole('heading', { level: 2 }).first()).toBeVisible()
-    if (id !== 'you' && id !== 'home') await expect(page.locator('[data-fact]').first()).toBeVisible()
+    // (the employer's and the residence's steps hold a figure only for someone with a plan, or years abroad)
+    if (!['you', 'home', 'employer', 'residence'].includes(id)) await expect(page.locator('[data-fact]').first()).toBeVisible()
     seen.push(...(await factsOnPage()))
   }
   expect([...new Set(seen)].sort()).toEqual(full)

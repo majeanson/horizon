@@ -55,7 +55,8 @@ const person = (p: Profile, owner: FactOwner) => p.household.persons.find((x) =>
 const FACTS: readonly FactDef[] = [
   { kind: 'salary', doc: 'tax', owner: 'person', info: 'salary', applies: (p, o) => (person(p, o)?.salaryToday ?? 0) > 0 },
   { kind: 'earnings', doc: 'rrq', owner: 'person', info: 'earnings', applies: () => true },
-  { kind: 'residence', doc: 'residence', owner: 'person', info: 'oasResidence', applies: () => true },
+  // Only for someone who lived elsewhere after 18 (a residence that began later): for everyone else the OAS counts the years from 18, and nothing is asked.
+  { kind: 'residence', doc: 'residence', owner: 'person', info: 'oasResidence', applies: (p, o) => { const x = person(p, o); return x !== undefined && x.oas.residentSince > x.birth.year + 18 } },
   { kind: 'rrspBalance', doc: 'bank', owner: 'person', info: 'rrspBalance', applies: () => true },
   { kind: 'rrspRoom', doc: 'tax', owner: 'person', info: 'rrspRoom', applies: () => true },
   // Only for someone who has a locked-in part: nothing is asked of anyone else.

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
-import { EXAMPLE, blankSeed, savedProfile, seedProfile } from './seed'
+import { EXAMPLE, blankSeed, savedProfile, seedProfile, showAllSections } from './seed'
 
 // The profile, end to end in a real browser: what is typed is what is saved, what is saved is what comes back, and
 // every number has its ⓘ. The unit tests pin the logic; this pins that a PERSON can drive it.
@@ -126,6 +126,7 @@ test.describe('a blank profile', () => {
   })
 
   test('children are birth years: added, shown as removable chips, validated', async ({ page }) => {
+    await showAllSections(page) // the children's box shows once « Ma situation » says there are some
     await page.goto('/?form=1')
     const year = page.getByRole('textbox', { name: 'Année de naissance de l’enfant' })
     await year.fill('2015')
@@ -140,6 +141,7 @@ test.describe('a blank profile', () => {
   })
 
   test('an employer plan starts from the RREGOP preset, carries its cited rules, and is removable', async ({ page }) => {
+    await showAllSections(page) // the plan's section shows once « Ma situation » says there is one
     await page.goto('/?form=1')
     await page.getByRole('button', { name: 'Ajouter le RREGOP' }).click()
     const saved = async () => (await savedProfile(page)).household.persons[0].pensions

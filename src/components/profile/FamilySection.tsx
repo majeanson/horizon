@@ -19,7 +19,7 @@ import { Section } from './shared'
 // The household: whether there is a spouse (their own tab, their own numbers), and the children — their birth years, and
 // what a child costs inside the budget until they leave home (the plan then drops that part of the working-years spending).
 
-export function FamilySection() {
+export function FamilySection({ withKids = true }: { /** The children and what each costs: asked only of someone who said there are some (« Ma situation »). */ withKids?: boolean }) {
   const t = useT()
   const { lang } = useLang()
   const lc = LIFE_COPY[lang].children
@@ -82,7 +82,7 @@ export function FamilySection() {
         </div>
       )}
 
-      <div className="family__children">
+      {withKids && (<div className="family__children">
         <p className="field-row__hint">{f.childrenHint}</p>
         {(profile.household.children ?? []).length === 0 ? (
           <p className="field-row__hint">{f.none}</p>
@@ -110,9 +110,9 @@ export function FamilySection() {
           placeholder={f.childYear}
         />
         {bad && <StatusMessage tone="error">{t.fields.range('1950', '2100')}</StatusMessage>}
-      </div>
+      </div>)}
 
-      {children.length > 0 && (
+      {withKids && children.length > 0 && (
         <div className="family__cost">
           <FieldRow label={lc.cost} hint={lc.costHint}>
             {(w) => (

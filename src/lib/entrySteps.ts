@@ -1,5 +1,6 @@
 import { DOC_IDS, factsOf, type DocId } from './facts.ts'
 import type { Profile } from './schema.ts'
+import { docApplies } from './situation.ts'
 
 // « SAISIE PAR DOCUMENT » — the order a person types a full profile in when they hold the documents: first who they are, then ONE DOCUMENT AT A TIME,
 // each step showing only the figures that document holds. The steps are the profile's own documents (facts.ts), so a step can never ask for a figure the
@@ -15,6 +16,16 @@ export interface Step {
 
 /** The first step, then the documents in the order a person is likely to have them to hand (the checklist's own order). */
 export const ENTRY_STEPS: readonly Step[] = [{ id: 'you', doc: null }, ...DOC_IDS.map((doc): Step => ({ id: doc, doc }))]
+
+/** The steps this household walks: the first, then the documents it has use for (the one it stands on is always kept, so a link never strands it). */
+export function stepsFor(profile: Profile, yes: ReadonlySet<string>, current?: StepId): Step[] {
+  const people = profile.household.persons
+  return ENTRY_STEPS.filter((s) => {
+    if (s.doc === null || s.id === current) return true
+    const doc = s.doc
+    return doc === 'home' || doc === 'budget' ? docApplies(profile, yes, doc) : people.some((p) => docApplies(profile, yes, doc, p.id))
+  })
+}
 
 export const stepById = (id: string | null): Step => ENTRY_STEPS.find((s) => s.id === id) ?? ENTRY_STEPS[0]
 

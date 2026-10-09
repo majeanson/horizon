@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile } from './seed'
+import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile, showAllSections } from './seed'
 
 // The results page keeps its three views and the map pinned under the top bar while it scrolls, and the chart's
 // « Détail » view shows the whole picture (sources, accounts, the three sets of hypotheses), not only the net worth.
@@ -110,6 +110,7 @@ test('« Mon plan » always says its age', async ({ page }) => {
 // Two people, one format: the same sections begin on the same line in both columns, each card wears its person's colour down
 // the left edge, and no amount is ever cut off by a box that is too narrow.
 test('two people on the Profil: sections start at the same height, the colour follows down, every input shows in full', async ({ page }) => {
+  await showAllSections(page) // every section a person can have, so the two columns have the same five
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/')
   const columns = page.locator('.persons--aligned > .person')
@@ -130,6 +131,7 @@ test('two people on the Profil: sections start at the same height, the colour fo
 })
 
 test('« Depuis la naissance » sets the year of residence to the year of birth, and reads as chosen', async ({ page }) => {
+  await showAllSections(page) // the residence year is asked of someone who said « oui » to years abroad
   await page.goto('/')
   const person = (await savedProfile(page)).household.persons[0]
   const chip = page.getByRole('button', { name: 'Depuis la naissance' }).first()
@@ -162,8 +164,9 @@ test('the estimate shows the pay as it was — about the salary last year — an
 
 test('the home: owning one, its mortgage says when the payment stops, and it is saved with the profile', async ({ page }) => {
   await page.goto('/')
-  const section = page.locator('.profile-section', { hasText: 'Résidence principale' })
-  await section.getByRole('button', { name: 'Je possède ma résidence principale' }).click()
+  // « Ma situation »: the home's section opens on a « oui » to owning one
+  await page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Oui' }).click()
+  const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })
   await section.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' }).fill('520000')
   await section.getByRole('textbox', { name: 'Solde de l’hypothèque' }).fill('150000')
   await section.getByRole('textbox', { name: 'Solde de l’hypothèque' }).blur() // a box commits when left: the rate and payment fields appear once there is a balance
@@ -187,5 +190,7 @@ test('the home: owning one, its mortgage says when the payment stops, and it is 
   await section.getByRole('button', { name: 'Retirer la résidence' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Retirer' }).click()
   await expect.poll(async () => (await savedProfile(page)).household.home).toBeNull()
-  await expect(section.getByRole('button', { name: 'Je possède ma résidence principale' })).toBeVisible()
+  // … and the section goes with it: no home, no section (the question says « non » again)
+  await expect(section).toHaveCount(0)
+  await expect(page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Non' })).toBeChecked()
 })

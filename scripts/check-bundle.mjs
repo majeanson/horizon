@@ -53,7 +53,7 @@ const LAZY_CAPS = [
 
 // The door.
 const CLOSURE_CHUNK_CAP = 6
-const CLOSURE_BUDGET = 337 * KB // 336 → 337 on 2026-10-09: the entry's own 1 KB (see its cap). 334 → 336 on 2026-10-09: the entry's own 2 KB (see its cap). 330 → 334 on 2026-10-08: the entry's own 2 KB (see its cap)
+const CLOSURE_BUDGET = 338 * KB // 337 → 338 on 2026-10-09: a few hundred bytes in the modules the first screen reads (the year of birth that carries a lifelong residence, the residence rule of the facts); the picker, the card and the tables ride lazy chunks. 336 → 337 on 2026-10-09: the entry's own 1 KB (see its cap). 334 → 336 on 2026-10-09: the entry's own 2 KB (see its cap). 330 → 334 on 2026-10-08: the entry's own 2 KB (see its cap)
 // Any closure member that is not react / the dictionary / the entry is something that leaked
 // into boot.
 const EAGER_MEMBER_CAP = 32 * KB
