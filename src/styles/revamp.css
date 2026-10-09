@@ -1465,3 +1465,70 @@
   color: var(--terracotta-ink);
   font-weight: 600;
 }
+
+/* ── Documents à rassembler: a checklist that prints — a box to tick, the document, what is read off it, where it comes from ───────────────── */
+.docs-page__intro {
+  margin: 0;
+  color: var(--ink-soft);
+}
+.docs-page__progress {
+  margin: 0;
+  font-weight: 600;
+}
+.docs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.docs-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  padding: 0.9rem 1.1rem;
+}
+.docs-item.is-done {
+  opacity: 0.75;
+}
+.docs-item__check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  min-height: 2.75rem;
+}
+.docs-item__check input {
+  width: 1.4rem;
+  height: 1.4rem;
+  accent-color: var(--accent);
+}
+.docs-item__body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.docs-item__body p {
+  margin: 0;
+}
+.docs-item__name {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.docs-item__who {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .docs-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media print {
+  .docs-item {
+    break-inside: avoid;
+  }
+  .docs-item.is-done {
+    opacity: 1;
+  }
+}

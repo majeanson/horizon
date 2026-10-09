@@ -65,6 +65,12 @@ const FACTS: readonly FactDef[] = [
   { kind: 'mortgage', doc: 'home', owner: 'household', info: null, applies: (p) => (p.household.home?.mortgage.balance ?? 0) > 0 },
 ]
 
+/** What a document holds: the figures (kinds) that name it, and whether each person has their own or the household has one. */
+export function docFigures(doc: DocId): { kinds: FactKind[]; owner: 'person' | 'household' } {
+  const own = FACTS.filter((f) => f.doc === doc)
+  return { kinds: own.map((f) => f.kind), owner: own[0]?.owner ?? 'household' }
+}
+
 export const factId = (owner: FactOwner, kind: FactKind): string => `${owner}:${kind}`
 /** What the saved profile may hold in `confirmed`: an owner and a kind, nothing else. */
 export const FACT_ID_PATTERN = /^(self|spouse|household):[a-zA-Z]{3,20}$/

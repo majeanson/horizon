@@ -5,6 +5,7 @@ import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { formatMoney } from '../lib/money'
+import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { ONBOARD_COPY } from '../lib/onboardCopy'
 import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, removeSpouse, setSpending, updateHome, updatePension } from '../lib/profileEdit'
 import { profileGaps, type ProfileGap } from '../lib/profileGaps'
@@ -389,6 +390,9 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
       <Cluster className="onboard__aside">
         <Link className="btn btn--sm btn--ghost" to="/donnees">
           {c.example}
+        </Link>
+        <Link className="btn btn--sm btn--ghost" to="/documents">
+          {DOCUMENTS_COPY[lang].link}
         </Link>
         {step !== 'done' && (
           <button type="button" className="btn btn--sm btn--ghost" onClick={onSkip}>

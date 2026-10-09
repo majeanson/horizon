@@ -61,6 +61,7 @@ const PAGES = [
   ['the results', '/resultats', '.page-head__title'],
   ['the data page', '/donnees', '.page-head__title'],
   ['the glossary', '/glossaire', '.page-head__title'],
+  ['the documents to gather', '/documents', '.page-head__title'],
   ['the component gallery', '/dev/kit', '.devkit'],
 ] as const
 

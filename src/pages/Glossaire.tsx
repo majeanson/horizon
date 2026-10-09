@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useLang } from '../i18n'
 import { GLOSSARY_COPY } from '../lib/glossaryCopy'
+import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { glossaryAnchor } from '../lib/glossIndex'
 import { scrollToSection } from '../lib/motion'
+import { Chip } from '../components/Chip'
 import { Icon } from '../components/Icon'
 import { PageHead } from '../components/PageHead'
 import { SectionNav } from '../components/SectionNav'
@@ -84,6 +86,9 @@ export function Glossaire() {
             </li>
           ))}
         </ul>
+        <Chip to="/documents" icon="identification-card-bold">
+          {DOCUMENTS_COPY[lang].link}
+        </Chip>
       </Section>
       <Section id={groupId(g.help.id)} title={g.help.title} subtitle={g.help.hint}>
         <ul className="glossary-docs">
