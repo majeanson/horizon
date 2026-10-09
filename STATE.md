@@ -146,7 +146,7 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] The answer explains itself: each lever in money too (`endGain`), the sturdiest way to start, the unconfirmed figures ranked by how far the answer moves (`engine/factImpact.ts`, « Le trouver » → `/?fact=`), « Mes plans, côte à côte », « Votre réponse » live on Profil and Hypothèses, the figures’ vintage and the new-year warning, the full printed plan, « Copier le résumé », the address keys as a contract (`addressKeys.test.ts`)
 - [x] **Schema v16**: children move into the household; `childSpending`, dated `flows`, `partTime`, `retiredSpendingDrift` (`engine/lifeEvents.ts`, `LifeSection`, `PartTimeFields`); a household that states none projects exactly as before (the golden snapshots did not move)
-- [ ] ❓ Left out on purpose, ask before reopening: a first-run tour and a re-split of the Réponse view (both against the same-day « answer first, fewer views » rule). Not built: a tenth example that uses the new fields (EXAMPLES.md is nine by design), dated events in the CSV, an RRSP-shaped windfall, REEE and child benefits
+- [x] **Four views, asked by Marc the same day**: Réponse · Ajuster · Stratégies · Vérifier (`?v=adjust` holds the levers, « Combien épargner ? » and « Et si je dépensais moins ? »); the chart now comes before « Préciser le calcul »; « Comment lire cette page ? » is one closed chip under the answer; the map of sections WRAPS (every chip whole); the backup notice speaks after an HOUR of unsaved typing, and Profil says when the last copy was made. Not built: a tenth example that uses the new fields (EXAMPLES.md is nine by design), dated events in the CSV, an RRSP-shaped windfall, REEE and child benefits
 
 ## 5. Lessons carried over from Babillard
 

@@ -1,13 +1,13 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
-import { scrollBehavior, scrollToSection } from '../lib/motion'
+import { Fragment, useEffect, useState } from 'react'
+import { scrollToSection } from '../lib/motion'
 import { Chip } from './Chip'
-import { Rail } from './Layout'
+import { Cluster } from './Layout'
 
 // The map of a long page: one chip per section, in reading order, in a sticky Rail under the top
 // bar. A tap scrolls to the section (the page keeps its address — nothing to bookmark here, the
 // sections are always on the page); the chip of the section in view is marked `aria-current` (a
-// location, not a toggle). Mouse, touch and keyboard all work: the chips are buttons, and the
-// Rail scrolls sideways on a phone — following the reader, so the mark is never past its edge.
+// location, not a toggle). Mouse, touch and keyboard all work: the chips are buttons, and the row WRAPS on a narrow screen — every
+// chip is shown whole (a rail that scrolled sideways cut the last one to « Ajus… » and hid how many there were).
 
 export interface SectionLink {
   id: string
@@ -18,7 +18,6 @@ export interface SectionLink {
 
 export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]; ariaLabel: string }) {
   const [inView, setInView] = useState<string | null>(null)
-  const navRef = useRef<HTMLElement>(null)
   const ids = links.map((l) => l.id).join('|')
 
   useEffect(() => {
@@ -39,24 +38,9 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
     return () => observer.disconnect()
   }, [ids])
 
-  // On a phone the rail shows a few chips: as the reader scrolls the PAGE, keep the marked chip
-  // inside the rail ('nearest': it only moves when the mark actually left the visible run).
-  useEffect(() => {
-    if (inView === null) return
-    // Sideways inside the rail ONLY. `scrollIntoView` also scrolls every ancestor, and while a tapped chip's smooth scroll is
-    // still running it cancelled the page's own scroll half-way (the map is now pinned, so the chip is always « in view »
-    // vertically and the browser had nothing to do but fight the page).
-    const rail = navRef.current?.querySelector<HTMLElement>('.rail')
-    const chip = navRef.current?.querySelector<HTMLElement>('[aria-current="true"]')
-    if (!rail || !chip) return
-    const c = chip.getBoundingClientRect()
-    const box = rail.getBoundingClientRect()
-    if (c.left < box.left || c.right > box.right) rail.scrollTo({ left: Math.max(0, rail.scrollLeft + (c.left - box.left) - (box.width - c.width) / 2), behavior: scrollBehavior() })
-  }, [inView])
-
   return (
-    <nav ref={navRef} className="section-nav" aria-label={ariaLabel}>
-      <Rail>
+    <nav className="section-nav" aria-label={ariaLabel}>
+      <Cluster>
         {links.map((l) => (
           <Fragment key={l.id}>
             {l.arc != null && (
@@ -68,7 +52,7 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
             </Chip>
           </Fragment>
         ))}
-      </Rail>
+      </Cluster>
     </nav>
   )
 }

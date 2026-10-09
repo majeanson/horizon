@@ -105,7 +105,8 @@ function save(): void {
 const UNBACKED_KEY = 'horizon-unbacked-since'
 // « Plus tard » on the notice: it comes back after a week, not at the next reload — a nudge a person cannot put off is a nag.
 const SNOOZED_KEY = 'horizon-backup-snoozed-until'
-const BACKUP_AFTER_MS = 30 * 24 * 3600 * 1000
+const BACKUP_AFTER_MS = 3600 * 1000 // an hour of typing is the first thing worth keeping
+const LAST_EXPORT_KEY = 'horizon-last-export'
 const SNOOZE_MS = 7 * 24 * 3600 * 1000
 let persistAsked = false
 
@@ -125,11 +126,23 @@ function noteUnbackedEdit(): void {
 export function markExported(): void {
   try {
     localStorage.removeItem(UNBACKED_KEY)
+    localStorage.setItem(LAST_EXPORT_KEY, String(Date.now()))
   } catch {
     /* see noteUnbackedEdit */
   }
   notify()
 }
+
+/** The moment a copy last left this device, or null when none ever did. */
+export function lastExported(): number | null {
+  try {
+    const n = Number(localStorage.getItem(LAST_EXPORT_KEY))
+    return n > 0 ? n : null
+  } catch {
+    return null
+  }
+}
+export const useLastExport = (): number | null => useSyncExternalStore(subscribe, lastExported, lastExported)
 
 /** « Plus tard » on the backup notice: silence it for a week. */
 export function snoozeBackup(): void {

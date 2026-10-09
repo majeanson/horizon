@@ -64,8 +64,8 @@ test('the verdict says what the age can fund each month, beside what is planned'
   await expect(page.getByText(/peut financer jusqu’à .* par mois \(après impôt\) — vous prévoyez/)).toBeVisible()
 })
 
-test('the verdict ranks what moves the answer most, each lever with its age', async ({ page }) => {
-  await page.goto('/resultats')
+test('« Ajuster » ranks what moves the answer most, each lever with its age', async ({ page }) => {
+  await page.goto('/resultats?v=adjust')
   await expect(page.getByText('Ce qui change le plus')).toBeVisible()
   const items = page.locator('.levers__item')
   await expect(items).toHaveCount(4)

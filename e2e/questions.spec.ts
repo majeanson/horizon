@@ -9,10 +9,14 @@ test.beforeEach(async ({ page }) => {
   await seedProfile(page, EXAMPLE)
 })
 
-test('the three answers share the page: the verdict first, then saving and stopping as sections', async ({ page }) => {
+test('the three answers: the verdict and stopping on the first view, saving and spending on « Ajuster »', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
+  await expect(page.locator('#epargner')).toHaveCount(0)
+  await page.goto('/resultats?v=adjust')
   await expect(page.locator('#epargner')).toContainText('Combien épargner ?')
+  await expect(page.locator('#depenser')).toBeVisible()
+  await page.goto('/resultats')
   await expect(page.locator('#arreter')).toContainText('En dates')
   await expect(page.getByText(/Camille\s: en 20\d\d/)).toBeVisible()
 })
@@ -35,17 +39,17 @@ test('« Quand arrêter de travailler ? » gives each person a year, and says wh
 })
 
 test('« Combien épargner ? » says nothing more at an age that already works, an amount before it, and « ne tient pas » far too early', async ({ page }) => {
-  await page.goto('/resultats?age=59')
+  await page.goto('/resultats?v=adjust&age=59')
   await expect(page.getByText('Rien de plus : à 59 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
-  await page.goto('/resultats?age=58')
+  await page.goto('/resultats?v=adjust&age=58')
   await expect(page.getByText(/de plus par année/)).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText(/Soit environ .* par mois/)).toBeVisible()
-  await page.goto('/resultats?age=50')
+  await page.goto('/resultats?v=adjust&age=50')
   await expect(page.getByText('À 50 ans, l’argent ne dure pas.')).toBeVisible({ timeout: 30_000 })
 })
 
 test('typing an age in « Combien épargner ? » recomputes the answer and keeps it in the address', async ({ page }) => {
-  await page.goto('/resultats?age=59')
+  await page.goto('/resultats?v=adjust&age=59')
   await expect(page.getByText('Rien de plus : à 59 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
   const box = page.getByRole('textbox', { name: 'Partir à (âge)' })
   await box.fill('58')
@@ -70,7 +74,7 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses. Glissez pour voir l’âge à un autre montant.')
   await expect(page.locator('#depenser')).not.toContainText('dès 59 ans')
   // A lower amount from the address: an earlier age, said against the profile's own.
-  await page.goto('/resultats?spend=70000')
+  await page.goto('/resultats?v=adjust&spend=70000')
   await expect(page.locator('#depenser')).toContainText('À 70 000 $ par année : dès 56 ans.', { timeout: 30_000 })
   await expect(page.locator('#depenser')).toContainText('3 ans plus tôt qu’avec les 90 000 $ de vos hypothèses.')
   // The slider's step button is one exact step, kept in the address.
@@ -82,7 +86,9 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   // Keeping the amount writes it to the profile: the verdict follows, the address forgets the what-if.
   await page.getByRole('button', { name: 'Garder ce montant dans mes hypothèses' }).click()
   await expect(page).not.toHaveURL(/spend=/)
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 56 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('#depenser')).toContainText('Soit 5 792 $ par mois', { timeout: 30_000 })
   await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses.', { timeout: 30_000 })
+  // The kept amount IS the profile's now: the answer, one view over, says so.
+  await page.getByRole('tab', { name: 'Réponse' }).click()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 56 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
 })

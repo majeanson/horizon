@@ -41,7 +41,7 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['de
     await page.locator('#root').evaluate((el) => el.scrollTo({ top: 1500 }))
     const pinBox = (await pin.boundingBox())!
     await expect.poll(async () => ((await nav.boundingBox())!.y >= pinBox.y + pinBox.height - 1)).toBe(mapPinned)
-    // Back at the top, tap « Ajuster » in the map: the section stops under the pinned chrome, fully clear of it.
+    // Back at the top, tap « Comparer » in the map: the section stops under the pinned chrome, fully clear of it.
     await page.locator('#root').evaluate((el) => el.scrollTo({ top: 0 }))
     await expect.poll(() => page.locator('#root').evaluate((el) => el.scrollTop)).toBe(0) // the page may scroll smoothly: tap only once it is back
     // …and only once the page has stopped growing: a smooth scroll aims at where the section WAS when it began.
@@ -54,8 +54,8 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['de
         return same
       }, { intervals: [600] })
       .toBe(true)
-    await nav.getByRole('button', { name: 'Ajuster' }).click()
-    const target = page.locator('#ajuster')
+    await nav.getByRole('button', { name: 'Comparer' }).click()
+    const target = page.locator('#comparer')
     // The page settles (a smooth scroll, the worker's answers replacing skeletons) before it is measured: poll the landing
     // spot until it holds, instead of guessing how long that takes.
     await expect

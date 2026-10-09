@@ -498,7 +498,7 @@ export const FR = {
       conflict: 'Un autre onglet a enregistré pendant votre saisie : sa version a été reprise, et votre dernière modification n’a pas été conservée.',
     },
     backup: {
-      due: 'Dernière copie de sauvegarde : il y a plus d’un mois. Vos chiffres ne vivent que sur cet appareil.',
+      due: 'Vous avez saisi des chiffres depuis plus d’une heure sans en garder de copie. Ils ne vivent que sur cet appareil.',
       button: 'Sauvegarder une copie',
       later: 'Plus tard',
     },

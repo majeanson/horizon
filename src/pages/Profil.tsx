@@ -8,6 +8,7 @@ import { FamilySection } from '../components/profile/FamilySection'
 import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
+import { BackupLine } from '../components/profile/BackupLine'
 import { Chip } from '../components/Chip'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { Loading } from '../components/Loading'
@@ -112,6 +113,7 @@ export function Profil() {
     <section className="page-body">
       <LiveAnswer />
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
+      <BackupLine />
       {/* One line: how much of the profile stands on documents, and the door to the section that makes it exact. */}
       {acc.total > 0 && (
         <div className="accuracy-line">

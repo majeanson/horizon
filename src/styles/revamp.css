@@ -846,7 +846,8 @@
 }
 
 /* ── Profil: the one-line meter above the form; the full panel sits after it ───────────────────────────────────── */
-.accuracy-line {
+.accuracy-line,
+.backup-line {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1113,4 +1114,19 @@
   display: grid;
   gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+/* « Comment lire cette page ? » — a small chip under the answer; opened, six short lines. */
+.how-to-read {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+.how-to-read__list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
 }

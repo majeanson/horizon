@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { LAST_KNOWN_YEAR } from '../engine/params/index.ts'
-import { RESULTS_COPY, longDate } from './resultsCopy.ts'
+import { longDate } from './months.ts'
+import { RESULTS_COPY } from './resultsCopy.ts'
 import { paramsVintage } from './vintage.ts'
 
 describe('what the figures stand on', () => {

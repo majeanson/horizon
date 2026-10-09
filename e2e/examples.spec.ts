@@ -82,9 +82,10 @@ test('heir: young and rich — « dès maintenant » rather than a first age tri
   await loadExample(page, 'Une personne, grand héritage')
   await expect(page.locator('.verdict__line')).toHaveText('Vous pouvez déjà prendre votre retraite.')
   // the spending lever says it too, whatever the amount that still works
-  await page.goto('/resultats?spend=60000')
+  await page.goto('/resultats?v=adjust&spend=60000')
   await expect(page.locator('#depenser')).toContainText(/dès maintenant.|C’est le montant de vos hypothèses./, { timeout: 30_000 })
   // the comparison starts at the age already reached, and nobody is shown an age in the past
+  await page.goto('/resultats')
   await expect(page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: /^27 ans/ })).toBeVisible()
 })
 

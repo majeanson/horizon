@@ -24,7 +24,7 @@ const KEY = /\b(?:params|search|next)\.(?:get|set|delete|has)\(\s*'([A-Za-z]+)'|
 
 /** key → who owns it, and what a value nobody knows does. */
 const KEYS: Record<string, string> = {
-  v: 'Résultats: the open view (answer · strategies · verify). Anything else lands on the answer and the key is dropped from the address.',
+  v: 'Résultats: the open view (answer · adjust · strategies · verify). Anything else lands on the answer and the key is dropped from the address.',
   ages: 'Résultats: the departure ages being compared (a number, or a split « 58-64 »). Unreadable parts are ignored; none left falls back to the default chips.',
   metric: 'Résultats: the chart (netWorth · income · detail). Unknown falls back to netWorth.',
   dollars: 'Résultats: today’s or nominal dollars. Unknown falls back to today’s.',

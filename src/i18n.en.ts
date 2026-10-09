@@ -479,7 +479,7 @@ export const EN: typeof FR = {
       conflict: 'Another tab saved while you were typing: its version was taken, and your last change was not kept.',
     },
     backup: {
-      due: 'Last saved copy: over a month ago. Your figures live only on this device.',
+      due: 'You have been typing figures for over an hour without keeping a copy. They live only on this device.',
       button: 'Save a copy',
       later: 'Later',
     },

@@ -8,14 +8,25 @@
 // (Prudent · Neutre · Audacieux, named in the dictionary); an age being compared is a « départ »; the sentence at the top
 // is « la réponse », never a verdict; the money « dure jusqu’à » an age or a year, it does not « tenir » or « manquer ».
 
+import { MONTHS_EN, MONTHS_FR } from './months.ts'
+
 /** Where the age sits inside the headline sentence: the page draws that part large. */
 export const AGE_TOKEN = '\u0000'
 
-const MONTHS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
-const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
 const FR_RESULTS = {
-  tabs: { label: 'Vues des résultats', answer: 'Réponse', strategies: 'Stratégies', verify: 'Vérifier' },
+  /** « Comment lire cette page ? » — a small chip under the answer that unfolds six one-line explanations; closed by default. */
+  howto: {
+    open: 'Comment lire cette page ?',
+    items: [
+      ['La réponse', 'le plus tôt où l’argent dure jusqu’à la fin du plan, avec vos chiffres et vos hypothèses.'],
+      ['Solidité', 'le même plan sous trois scénarios et sous un marché difficile. Si l’âge bouge beaucoup, la réponse est fragile.'],
+      ['Comparer', 'choisissez des âges de départ pour voir l’argent année par année.'],
+      ['Préciser', 'les chiffres que vous n’avez pas encore confirmés avec un document, classés par effet sur la réponse.'],
+      ['Ajuster', 'ce que vous pourriez changer (dépenses, épargne) pour partir plus tôt.'],
+      ['Le nid', 'ce que vous avez dans vos REER, CELI et comptes non enregistrés.'],
+    ] as readonly (readonly [string, string])[],
+  },
+  tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Ajuster', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
     title: 'Dans quel ordre puiser ?',
     hint: (age: number) => `Votre plan, retraite à ${age} ans, refait avec chacun des six ordres de retrait des comptes. Les retraits sont recalculés année par année avec l’impôt, la RRQ, la PSV et le SRG.`,
@@ -86,7 +97,10 @@ const FR_RESULTS = {
     solidite: 'Solidité',
     comparer: 'Comparer',
     rentes: 'Rentes',
-    ajuster: 'Ajuster',
+    ajuster: 'Ce qui change',
+    preciser: 'Préciser',
+    epargner: 'Épargner',
+    depenser: 'Dépenser',
     chiffres: 'Mes chiffres',
     ordre: 'Ordre de retrait',
     tableau: 'Année par année',
@@ -184,7 +198,18 @@ const FR_RESULTS = {
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
-  tabs: { label: 'Results views', answer: 'Answer', strategies: 'Strategies', verify: 'Check' },
+  howto: {
+    open: 'How to read this page',
+    items: [
+      ['The answer', 'the earliest age at which the money lasts to the end of the plan, with your figures and your assumptions.'],
+      ['How firm', 'the same plan under three scenarios and under a hard market. If the age moves a lot, the answer is fragile.'],
+      ['Compare', 'pick departure ages to see the money year by year.'],
+      ['Refine', 'the figures you have not yet confirmed with a document, ranked by how much they move the answer.'],
+      ['Adjust', 'what you could change (spending, saving) to leave earlier.'],
+      ['The nest', 'what you hold in your RRSP, TFSA and non-registered accounts.'],
+    ] as readonly (readonly [string, string])[],
+  },
+  tabs: { label: 'Results views', answer: 'Answer', adjust: 'Adjust', strategies: 'Strategies', verify: 'Check' },
   orders: {
     title: 'In which order should I draw?',
     hint: (age: number) => `Your plan, retiring at ${age}, rerun with each of the six orders of drawing the accounts. Withdrawals are recomputed year by year with tax, QPP, OAS and GIS.`,
@@ -248,7 +273,10 @@ const EN_RESULTS: typeof FR_RESULTS = {
     solidite: 'How firm',
     comparer: 'Compare',
     rentes: 'Pensions',
-    ajuster: 'Adjust',
+    ajuster: 'What changes',
+    preciser: 'Refine',
+    epargner: 'Save',
+    depenser: 'Spend',
     chiffres: 'My figures',
     ordre: 'Withdrawal order',
     tableau: 'Year by year',
@@ -339,9 +367,3 @@ const EN_RESULTS: typeof FR_RESULTS = {
 }
 
 export const RESULTS_COPY = { fr: FR_RESULTS, en: EN_RESULTS }
-
-/** « 2026-10-07 » as a reader of `lang` says it: « 7 octobre 2026 » · « October 7, 2026 ». */
-export function longDate(iso: string, lang: 'fr' | 'en'): string {
-  const [y, m, d] = iso.split('-').map(Number)
-  return lang === 'fr' ? `${d === 1 ? '1er' : d} ${MONTHS_FR[m - 1]} ${y}` : `${MONTHS_EN[m - 1]} ${d}, ${y}`
-}

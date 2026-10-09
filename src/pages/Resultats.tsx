@@ -7,6 +7,7 @@ import { NumberField } from '../components/NumberField'
 import { PageHead } from '../components/PageHead'
 import { BridgePanel } from '../components/results/BridgePanel'
 import { ChartPanel } from '../components/results/ChartPanel'
+import { HowToRead } from '../components/results/HowToRead'
 import { EarliestEachPanel } from '../components/results/EarliestEachPanel'
 import { PlansCompare } from '../components/results/PlansCompare'
 import { LedgerPanel } from '../components/results/LedgerPanel'
@@ -28,7 +29,8 @@ import type { ChartMetric, Dollars } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { presetOf } from '../engine/assumptionPresets'
 import { formatPct, formatYearAge } from '../lib/format'
-import { AGE_TOKEN, RESULTS_COPY, longDate } from '../lib/resultsCopy'
+import { longDate } from '../lib/months'
+import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
 import { paramsVintage } from '../lib/vintage'
 import { prudentDiffers } from '../lib/headline'
 import { NO_HEADLINE } from '../lib/answer'
@@ -63,7 +65,7 @@ import { today } from '../lib/today'
 // enough to mean something (profileGaps). Every choice lives in the address (`?v=&ages=&metric=…`), so a view can be
 // bookmarked.
 
-type View = 'answer' | 'strategies' | 'verify'
+type View = 'answer' | 'adjust' | 'strategies' | 'verify'
 
 const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
@@ -151,7 +153,7 @@ export function Resultats() {
   const runsPending = gaps.length === 0 && runsAnswer.value === null
 
   // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
-  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : 'answer'
+  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' ? 'adjust' : 'answer'
   // A view this page does not have (a typo, an old link) lands on the answer — and the ADDRESS follows, as the router's catch-all
   // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
   const rawView = params.get('v')
@@ -182,6 +184,7 @@ export function Resultats() {
   useEffect(() => {
     if (legacyQ !== 'save' && legacyQ !== 'stop') return
     setParam('q', null)
+    if (legacyQ === 'save') setParam('v', 'adjust')
     const go = () => document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
     go()
     // The sections above stream in (workers, lazy charts) and would push the target off screen:
@@ -317,7 +320,9 @@ export function Resultats() {
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse }, ...(retiredNow ? [] : [{ id: 'solidite', label: rc.nav.solidite }]), { id: 'comparer', label: rc.nav.comparer }, { id: 'ajuster', label: rc.nav.ajuster }]
+      ? [{ id: 'verdict', label: rc.nav.reponse }, ...(retiredNow ? [] : [{ id: 'solidite', label: rc.nav.solidite }]), { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : [])]
+      : view === 'adjust'
+        ? [...(retiredNow ? [] : [{ id: 'ajuster', label: rc.nav.ajuster }]), { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }])]
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
         : [
@@ -381,6 +386,7 @@ export function Resultats() {
           onSelect={(v) => setParam('v', v === 'answer' ? null : v)}
           options={[
             { key: 'answer' as const, label: rc.tabs.answer },
+            { key: 'adjust' as const, label: rc.tabs.adjust },
             { key: 'strategies' as const, label: rc.tabs.strategies },
             { key: 'verify' as const, label: rc.tabs.verify },
           ]}
@@ -424,7 +430,7 @@ export function Resultats() {
                   {/* The WORST answer must be the most actionable one: the nudge carries its doors, and each door opens. */}
                   <p className="verdict__note">{rc.headline.tryThis}</p>
                   <Cluster>
-                    <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
+                    <Chip icon="caret-down-bold" onClick={() => goTo('adjust', 'depenser')}>{rc.headline.trySpend}</Chip>
                     <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
                     <Chip onClick={() => goTo('verify', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
                   </Cluster>
@@ -450,7 +456,7 @@ export function Resultats() {
                   )}
                   {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
                   <Cluster>
-                    <Chip icon="caret-down-bold" onClick={() => scrollTo('depenser')}>{rc.headline.trySpend}</Chip>
+                    <Chip icon="caret-down-bold" onClick={() => goTo('adjust', 'depenser')}>{rc.headline.trySpend}</Chip>
                   </Cluster>
                 </>
               )}
@@ -466,6 +472,8 @@ export function Resultats() {
             <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
             <p className="verdict__note">{rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang))}{year > vintage.year ? ' ' + rc.out.vintageProjected(vintage.year, year) : ''}</p>
           </div>
+
+          {!answerPending && gaps.length === 0 && <HowToRead />}
 
           {/* How firm the answer is: the same plan under the three scenarios and a hard market side by side, then what would move it. Rows from the first paint. */}
           {!retiredNow && (
@@ -509,36 +517,6 @@ export function Resultats() {
                 </p>
               </div>
                 </div>
-            </div>
-          )}
-
-          {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
-          {(refine.length > 0 || accuracy.total > 0) && (
-            <div className="surface results-section refine" aria-label={rc.refine.title}>
-              <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
-              {confidenceLine}
-              {movers.length > 0 && (
-                <div className="refine__moves">
-                  <p className="verdict__range-title">{rc.refine.moves}</p>
-                  <ul className="refine__list">
-                    {movers.map((f) => (
-                      <li key={f.id}>
-                        <span>{factName(f.id)}</span> <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span> <Chip to={`/?fact=${encodeURIComponent(f.id)}`}>{rc.refine.find}</Chip>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="verdict__note">{rc.refine.movesHint}</p>
-                </div>
-              )}
-              {refine.length > 0 && (
-                <ul className="refine__list">
-                  {refine.map((k) => (
-                    <li key={k}>
-                      {rc.refine[k]} <Chip to="/">{rc.refine.toProfile}</Chip>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
           )}
 
@@ -624,6 +602,42 @@ export function Resultats() {
             )}
           </section>
 
+          {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
+          {(refine.length > 0 || accuracy.total > 0) && (
+            <div id="preciser" className="surface results-section refine" aria-label={rc.refine.title}>
+              <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
+              {confidenceLine}
+              {movers.length > 0 && (
+                <div className="refine__moves">
+                  <p className="verdict__range-title">{rc.refine.moves}</p>
+                  <ul className="refine__list">
+                    {movers.map((f) => (
+                      <li key={f.id}>
+                        <span>{factName(f.id)}</span> <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span> <Chip to={`/?fact=${encodeURIComponent(f.id)}`}>{rc.refine.find}</Chip>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="verdict__note">{rc.refine.movesHint}</p>
+                </div>
+              )}
+              {refine.length > 0 && (
+                <ul className="refine__list">
+                  {refine.map((k) => (
+                    <li key={k}>
+                      {rc.refine[k]} <Chip to="/">{rc.refine.toProfile}</Chip>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+        </section>
+      )}
+
+      {/* 2 — what to change: the changes ranked, the saving an age needs, the spending that moves it. Inputs of the plan, not of the future (those live on Hypothèses). */}
+      {view === 'adjust' && (
+        <section className="arc" aria-label={rc.tabs.adjust}>
           {/* What the household could DO about it — three ways of changing the plan, none of them an assumption (those live on Hypothèses): the changes ranked by the years they gain, the saving needed for an age, and the spending that moves it. */}
           <section id="ajuster" className="results-section ajuster" aria-label={rc.headline.adjustTitle}>
             <SectionHeader title={rc.headline.adjustTitle} />
@@ -659,7 +673,8 @@ export function Resultats() {
                 </div>
               </div>
             )}
-            {/* The two other questions, answered in the same arc: views over the same profile and assumptions. */}
+          </section>
+
             <section id="epargner" className="results-section" aria-label={rc.questions.tabs.save}>
               <SectionHeader title={rc.questions.tabs.save} />
               <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />
@@ -670,7 +685,6 @@ export function Resultats() {
                 <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
               </section>
             )}
-          </section>
         </section>
       )}
 

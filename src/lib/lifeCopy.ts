@@ -53,6 +53,12 @@ export interface LifeCopy {
     /** « 2043 (63 / 60 ans) » arrives already built; the line says what the flow does in that year. */
     line: (kind: FlowKindName, amount: string, from: string, to: string | null) => string
   }
+  /** The one line on Profil that says when a copy of the profile last left this device. */
+  backup: {
+    never: string
+    last: (date: string) => string
+    now: string
+  }
   drift: {
     title: string
     hint: string
@@ -121,6 +127,11 @@ const FR: LifeCopy = {
             ? `${amount} reçus en ${from}`
             : `${amount} par année de ${from} à ${to}`,
   },
+  backup: {
+    never: 'Dernière copie de sauvegarde : jamais. Vos chiffres ne vivent que sur cet appareil.',
+    last: (date) => `Dernière copie de sauvegarde : ${date}.`,
+    now: 'Sauvegarder maintenant',
+  },
   drift: {
     title: 'Les dépenses à la retraite avec l’âge',
     hint: 'Beaucoup de gens dépensent un peu moins chaque année en vieillissant (moins de voyages, d’activités). Si vous le pensez aussi, choisissez un rythme : il s’applique à vos dépenses de retraite à partir de 70 ans, en dollars d’aujourd’hui. C’est un choix, pas un chiffre officiel.',
@@ -188,6 +199,11 @@ const EN: LifeCopy = {
           : to === null
             ? `${amount} received in ${from}`
             : `${amount} a year from ${from} to ${to}`,
+  },
+  backup: {
+    never: 'Last saved copy: never. Your figures live only on this device.',
+    last: (date) => `Last saved copy: ${date}.`,
+    now: 'Save a copy now',
   },
   drift: {
     title: 'Retirement spending with age',
