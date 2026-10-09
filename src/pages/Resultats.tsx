@@ -27,7 +27,8 @@ import type { ChartMetric, Dollars } from '../lib/chartData'
 import { LEDGER_COPY } from '../lib/ledgerCopy'
 import { presetOf } from '../engine/assumptionPresets'
 import { formatPct, formatYearAge } from '../lib/format'
-import { AGE_TOKEN, RESULTS_COPY } from '../lib/resultsCopy'
+import { AGE_TOKEN, RESULTS_COPY, longDate } from '../lib/resultsCopy'
+import { paramsVintage } from '../lib/vintage'
 import { prudentDiffers } from '../lib/headline'
 import { NO_HEADLINE } from '../lib/answer'
 import { useAnswer } from '../lib/useAnswer'
@@ -73,6 +74,7 @@ function milestoneAges(earliest: number | null, selections: readonly Selection[]
 export function Resultats() {
   const pinned = usePinOffset()
   const printing = usePrinting()
+  const vintage = useMemo(paramsVintage, [])
   const t = useT()
   const { lang } = useLang()
   const r = t.results
@@ -433,6 +435,7 @@ export function Resultats() {
             {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
                 be present, not compete with the answer. */}
             <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
+            <p className="verdict__note">{rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang))}{year > vintage.year ? ' ' + rc.out.vintageProjected(vintage.year, year) : ''}</p>
           </div>
 
           {/* How firm the answer is: the same plan under the three scenarios and a hard market side by side, then what would move it. Rows from the first paint. */}

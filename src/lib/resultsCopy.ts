@@ -11,6 +11,9 @@
 /** Where the age sits inside the headline sentence: the page draws that part large. */
 export const AGE_TOKEN = '\u0000'
 
+const MONTHS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
 const FR_RESULTS = {
   tabs: { label: 'Vues des résultats', answer: 'Réponse', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
@@ -40,8 +43,11 @@ const FR_RESULTS = {
   out: {
     print: 'Imprimer le plan',
     /** The head and foot of the printed plan: what it is, when it was made, and what it is not. */
+    /** What the government figures stand on, said under the answer: the tax year, the day the newest was read — and, once the calendar has moved on, that this year's are projected. */
+    vintage: (year: number, read: string) => `Barèmes et rentes de ${year}, lus sur les pages officielles jusqu’au ${read}.`,
+    vintageProjected: (known: number, now: number) => `Les barèmes de ${now} ne sont pas encore dans Horizon : ceux de ${known} sont projetés avec l’inflation. Vérifiez vos relevés de ${now} dès qu’ils sortent.`,
     printTitle: 'Horizon — mon plan de retraite',
-    printedOn: (month: number, year: number) => `Imprimé en ${['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'][month - 1]} ${year}`,
+    printedOn: (month: number, year: number) => `Imprimé en ${MONTHS_FR[month - 1]} ${year}`,
     printFoot: 'Une estimation selon vos hypothèses, pas un conseil financier. Chaque chiffre du gouvernement est cité, avec sa page officielle, sous « Paramètres utilisés ».',
     csv: 'Télécharger en tableur (CSV)',
     csvDone: 'Tableau exporté',
@@ -198,8 +204,10 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   out: {
     print: 'Print the plan',
+    vintage: (year: number, read: string) => `${year} tax and pension figures, read on the official pages up to ${read}.`,
+    vintageProjected: (known: number, now: number) => `The ${now} figures are not in Horizon yet: the ${known} ones are projected with inflation. Check your ${now} statements as soon as they are out.`,
     printTitle: 'Horizon — my retirement plan',
-    printedOn: (month: number, year: number) => `Printed in ${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]} ${year}`,
+    printedOn: (month: number, year: number) => `Printed in ${MONTHS_EN[month - 1]} ${year}`,
     printFoot: 'An estimate based on your assumptions, not financial advice. Every government figure is cited, with its official page, under “Parameters used”.',
     csv: 'Download as a spreadsheet (CSV)',
     csvDone: 'Table exported',
@@ -320,3 +328,9 @@ const EN_RESULTS: typeof FR_RESULTS = {
 }
 
 export const RESULTS_COPY = { fr: FR_RESULTS, en: EN_RESULTS }
+
+/** « 2026-10-07 » as a reader of `lang` says it: « 7 octobre 2026 » · « October 7, 2026 ». */
+export function longDate(iso: string, lang: 'fr' | 'en'): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return lang === 'fr' ? `${d === 1 ? '1er' : d} ${MONTHS_FR[m - 1]} ${y}` : `${MONTHS_EN[m - 1]} ${d}, ${y}`
+}
