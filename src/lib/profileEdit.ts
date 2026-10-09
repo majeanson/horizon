@@ -1,8 +1,8 @@
 import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPresets.ts'
 import { CUSTOM_PATH_YEARS, MARKET_PATHS } from '../engine/marketPaths.ts'
 import { rregopPension } from '../engine/presets.ts'
-import type { AccountKind, DbPension, Flow, Home, Person, PersonId } from '../engine/types.ts'
-import { blankPerson, MAX_FLOWS, MAX_PLAN_NAME, MAX_PLANS, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
+import type { AccountKind, DbPension, Home, Person, PersonId } from '../engine/types.ts'
+import { blankPerson, MAX_PLAN_NAME, MAX_PLANS, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
 
 // Every way the pages change a profile, as a pure function from profile to profile. A page never builds a new
 // profile by hand: it calls one of these, which is why each can be tested without a browser and why the pages
@@ -275,39 +275,4 @@ export function updatePension(person: Person, index: number, change: (p: DbPensi
 export function removePension(person: Person, index: number): Person {
   if (index < 0 || index >= person.pensions.length) return person
   return { ...person, pensions: person.pensions.filter((_, i) => i !== index) }
-}
-
-// ── A life beyond the budget (schema v16) ───────────────────────────────────────────────────────────
-
-/** What a child costs inside the budget until they leave home (null: it is not counted). */
-export function setChildSpending(p: Profile, value: { perChild: number; untilAge: number } | null): Profile {
-  const same = (p.household.childSpending ?? null) === value || (value !== null && p.household.childSpending?.perChild === value.perChild && p.household.childSpending?.untilAge === value.untilAge)
-  return same ? p : { ...p, household: { ...p.household, childSpending: value } }
-}
-
-/** A flow as the page may hold it: a windfall is once and tax-free, an expense is not income, and an owner is someone who is in the household. */
-function normalFlow(p: Profile, f: Flow): Flow {
-  const fromYear = Math.min(2150, Math.max(2000, Math.round(f.fromYear)))
-  const toYear = f.kind === 'windfall' ? fromYear : Math.min(2150, Math.max(fromYear, Math.round(f.toYear)))
-  const owner = f.owner === 'spouse' && p.household.persons.length < 2 ? 'self' : f.owner
-  return { ...f, fromYear, toYear, owner, taxable: f.kind === 'income' ? f.taxable : false }
-}
-
-export function addFlow(p: Profile, flow: Flow): Profile {
-  const flows = p.household.flows ?? []
-  if (flows.length >= MAX_FLOWS) return p
-  return { ...p, household: { ...p.household, flows: [...flows, normalFlow(p, flow)] } }
-}
-
-export function updateFlow(p: Profile, index: number, change: (f: Flow) => Flow): Profile {
-  const flows = p.household.flows ?? []
-  if (index < 0 || index >= flows.length) return p
-  const next = normalFlow(p, change(flows[index]))
-  return { ...p, household: { ...p.household, flows: flows.map((f, i) => (i === index ? next : f)) } }
-}
-
-export function removeFlow(p: Profile, index: number): Profile {
-  const flows = p.household.flows ?? []
-  if (index < 0 || index >= flows.length) return p
-  return { ...p, household: { ...p.household, flows: flows.filter((_, i) => i !== index) } }
 }
