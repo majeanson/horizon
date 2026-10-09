@@ -183,7 +183,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
         <Suspense fallback={<Loading />}>
           <StackedBarChart
             data={bars}
-            series={SEGMENTS.map((id) => ({ id, label: copy.segment[id], colour: SEGMENT_COLOUR[id] }))}
+            series={SEGMENTS.map((id) => ({ id, label: id === 'work' && rows.some((r) => r.dated > 0) ? copy.segment.workOther : copy.segment[id], colour: SEGMENT_COLOUR[id] }))}
             line={{ id: 'need', label: copy.needLine }}
             yFormat={(y) => formatCompactMoney(y, lang)}
             yDetail={(y) => formatMoney(y, lang)}
@@ -235,7 +235,7 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
           <tr>
             <th scope="col">{copy.colAge}</th>
             <th scope="col">{copy.colNeed}</th>
-            {showWork && <th scope="col">{copy.colWork}</th>}
+            {showWork && <th scope="col">{rows.some((r) => r.dated > 0) ? copy.colWorkOther : copy.colWork}</th>}
             {showDb && <th scope="col">{copy.colDb}</th>}
             {showRrq && <th scope="col">{copy.colRrq}</th>}
             {showOas && <th scope="col">{copy.colOas}</th>}

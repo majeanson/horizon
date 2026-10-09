@@ -54,6 +54,8 @@ export interface BridgeYear {
   /** What the household needed to spend. */
   spending: number
   employment: number
+  /** The dated income (rent…) inside `employment`: 0 for most households; the « work » bar and column say so when it is not. */
+  dated: number
   /** The defined-benefit pensions (both people). */
   db: number
   rrq: number
@@ -195,7 +197,8 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
     // The person's age in the year — from their birth year, so the rows after their death (they leave the rows at their horizon age) still read in order.
     age: r.year - birthYear,
     spending: r.household.spending / d,
-    employment: pick((p) => p.employment),
+    employment: pick((p) => p.employment + (p.otherIncome ?? 0)),
+    dated: pick((p) => p.otherIncome ?? 0),
     db: pick((p) => p.db),
     rrq: pick((p) => p.rrq),
     oas: pick((p) => p.oas),

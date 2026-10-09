@@ -9,6 +9,7 @@ import {
   balanceBars,
   chartSeries,
   retirementMarkers,
+  hasDatedIncome,
   sourceBars,
   type ChartMetric,
   type Dollars,
@@ -187,7 +188,7 @@ function DetailView({
         <Suspense fallback={<Loading />}>
           <StackedBarChart
             data={sources}
-            series={SOURCE_SEGMENTS.map((id) => ({ id, label: c.source[id], colour: SOURCE_COLOUR[id] }))}
+            series={SOURCE_SEGMENTS.map((id) => ({ id, label: id === 'work' && hasDatedIncome(rows) ? c.source.workOther : c.source[id], colour: SOURCE_COLOUR[id] }))}
             line={personId === null ? { id: 'need', label: c.need } : undefined}
             yFormat={yFormat}
             yDetail={yDetail}

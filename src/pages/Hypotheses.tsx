@@ -22,6 +22,7 @@ import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
 import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
+import { LIFE_COPY } from '../lib/lifeCopy'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { useNotice } from '../lib/toast'
 
@@ -194,6 +195,21 @@ export function Hypotheses() {
             )}
           </FieldRow>
         )}
+      </Section>
+
+      <Section title={LIFE_COPY[lang].drift.title} subtitle={LIFE_COPY[lang].drift.hint} icon="chart-line-up-bold">
+        <Cluster role="radiogroup" aria-label={LIFE_COPY[lang].drift.title}>
+          {[0, -0.01, -0.02].map((v) => (
+            <Chip key={v} radio selected={(assumptions.retiredSpendingDrift ?? 0) === v} onClick={() => updateProfile((p) => setAssumptions(p, { retiredSpendingDrift: v }))}>
+              {v === 0 ? LIFE_COPY[lang].drift.level : LIFE_COPY[lang].drift.slows(formatPct(-v, lang, 0))}
+            </Chip>
+          ))}
+          {![0, -0.01, -0.02].includes(assumptions.retiredSpendingDrift ?? 0) && (
+            <Chip radio selected onClick={() => undefined}>
+              {LIFE_COPY[lang].drift.slows(formatPct(-(assumptions.retiredSpendingDrift ?? 0), lang, 1))}
+            </Chip>
+          )}
+        </Cluster>
       </Section>
 
       <Section title={a.options.title} icon="lock-bold">

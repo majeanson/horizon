@@ -134,9 +134,9 @@ test.describe('a blank profile', () => {
     await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
     // The refusal names the permitted range, like every NumberField — not a mute « Valeur invalide ».
     await expect(page.getByRole('alert')).toContainText('Entre 1950 et 2100')
-    await expect.poll(async () => (await savedProfile(page)).children).toEqual([2015])
+    await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([2015])
     await page.getByRole('button', { name: 'Retirer l’enfant né en 2015' }).click()
-    await expect.poll(async () => (await savedProfile(page)).children).toEqual([])
+    await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([])
   })
 
   test('an employer plan starts from the RREGOP preset, carries its cited rules, and is removable', async ({ page }) => {

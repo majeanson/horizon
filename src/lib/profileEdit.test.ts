@@ -257,3 +257,23 @@ describe('« Personnalisé » is kept while a ready-made scenario is on', () => 
     expect(read.ok && read.profile.customScenario).toBeNull()
   })
 })
+
+describe('removing the spouse', () => {
+  it('takes their dated income with them and hands what belongs to the household to the first person, so the profile still validates', () => {
+    let p = addSpouse(defaultProfile(TODAY), TODAY)
+    p = {
+      ...p,
+      household: {
+        ...p.household,
+        flows: [
+          { label: 'Loyer', kind: 'income', amount: 9000, fromYear: 2040, toYear: 2050, owner: 'spouse', taxable: true },
+          { label: 'Héritage', kind: 'windfall', amount: 50000, fromYear: 2035, toYear: 2035, owner: 'spouse', taxable: false },
+          { label: 'Toit', kind: 'expense', amount: 20000, fromYear: 2031, toYear: 2031, owner: 'self', taxable: false },
+        ],
+      },
+    }
+    const after = removeSpouse(p)
+    expect((after.household.flows ?? []).map((f) => [f.label, f.owner])).toEqual([['Héritage', 'self'], ['Toit', 'self']])
+    valid(after)
+  })
+})

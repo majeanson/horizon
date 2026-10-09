@@ -1,27 +1,37 @@
 import { useState } from 'react'
-import { useT } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
+import { LIFE_COPY } from '../../lib/lifeCopy'
+import { formatMoney } from '../../lib/money'
 import { scrollBehavior } from '../../lib/motion'
-import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
+import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse, setChildSpending, setLivesAlone } from '../../lib/profileEdit'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip, ChipGroup } from '../Chip'
 import { EditField } from '../EditField'
+import { FieldRow } from '../FieldRow'
+import { NumberField } from '../NumberField'
 import { Cluster } from '../Layout'
 import { StatusMessage } from '../StatusMessage'
 import { Section } from './shared'
 
-// The household: whether there is a spouse (their own tab, their own numbers), and the children — birth years
-// only, noted for the record because this version computes no child benefits.
+// The household: whether there is a spouse (their own tab, their own numbers), and the children — their birth years, and
+// what a child costs inside the budget until they leave home (the plan then drops that part of the working-years spending).
 
 export function FamilySection() {
   const t = useT()
+  const { lang } = useLang()
+  const lc = LIFE_COPY[lang].children
   const f = t.profile.family
   const profile = useProfile()
   const confirm = useConfirm()
   const spouse = hasSpouse(profile)
   const [year, setYear] = useState('')
   const [bad, setBad] = useState(false)
+  const children = profile.household.children ?? []
+  const cost = profile.household.childSpending ?? null
+  // The years the children who are still at home today will leave: what the plan drops, and from when.
+  const leaving = cost === null ? [] : children.filter((born) => today().year - born < cost.untilAge).map((born) => born + cost.untilAge)
 
   const submitChild = () => {
     // A four-digit year typed as text: digits only, then the same range sentence every NumberField
@@ -100,6 +110,33 @@ export function FamilySection() {
         />
         {bad && <StatusMessage tone="error">{t.fields.range('1950', '2100')}</StatusMessage>}
       </div>
+
+      {children.length > 0 && (
+        <div className="family__cost">
+          <FieldRow label={lc.cost} hint={lc.costHint}>
+            {(w) => (
+              <NumberField
+                kind="money"
+                max={1e6}
+                value={cost?.perChild ?? 0}
+                onChange={(perChild) => updateProfile((p) => setChildSpending(p, perChild > 0 ? { perChild, untilAge: cost?.untilAge ?? 23 } : null))}
+                id={w.id}
+                ariaDescribedBy={w.describedBy}
+              />
+            )}
+          </FieldRow>
+          {cost && (
+            <>
+              <FieldRow label={lc.leaves} hint={lc.leavesHint}>
+                {(w) => (
+                  <NumberField kind="int" min={16} max={35} unit={t.fields.years} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => setChildSpending(p, { perChild: cost.perChild, untilAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
+                )}
+              </FieldRow>
+              <p className="field-row__hint">{leaving.length === 0 ? lc.none : lc.effect(formatMoney(cost.perChild, lang), leaving.length, String(Math.min(...leaving)))}</p>
+            </>
+          )}
+        </div>
+      )}
     </Section>
   )
 }

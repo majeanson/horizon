@@ -1084,3 +1084,33 @@
     max-width: 66rem;
   }
 }
+
+/* « Événements et revenus datés » and the work kept after retirement: a list of small stacked forms, each a bordered block. */
+.flows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+.flow {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+.flow__line {
+  margin: 0;
+}
+.part-time {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.family__cost {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}

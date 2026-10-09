@@ -16,7 +16,7 @@ export const SERIES_COLOURS: readonly SeriesColour[] = ['accent', 'sky', 'sage',
 export function metricValue(row: YearRow, metric: Metric): number {
   if (metric === 'netWorth') return row.household.netWorthEnd
   let sum = 0
-  for (const p of Object.values(row.persons)) sum += p.employment + p.db + p.rrq + p.oas + p.allowance + p.gis
+  for (const p of Object.values(row.persons)) sum += p.employment + (p.otherIncome ?? 0) + p.db + p.rrq + p.oas + p.allowance + p.gis
   return sum
 }
 
@@ -78,13 +78,17 @@ interface Scale {
 const scaleOf = (row: YearRow, s: Scale): number => (s.dollars === 'today' ? deflator(row.year, s.todayYear, s.inflation) : 1)
 const peopleOf = (row: YearRow, who: string | null) => Object.entries(row.persons).filter(([id]) => who === null || id === who).map(([, p]) => p)
 
+/** Does any year of these rows carry dated income (a rent, a part of the household's plan that is neither work nor pension)? The work bar then says so. */
+export const hasDatedIncome = (rows: readonly YearRow[]): boolean => rows.some((r) => Object.values(r.persons).some((p) => (p.otherIncome ?? 0) > 0))
+
 /** One bar per year: the sources of the year's money, for the household (`who` null) or one person. `need` (spending + tax) is the household's only. */
 export function sourceBars(rows: readonly YearRow[], who: string | null, s: Scale): ({ x: number; need: number } & Record<SourceSegment, number>)[] {
   return rows.map((row) => {
     const k = scaleOf(row, s)
     let work = 0, db = 0, rrq = 0, oas = 0, nest = 0
     for (const p of peopleOf(row, who)) {
-      work += p.employment
+      // Dated income (a rent…) rides in the work bar, which says so in its label when there is some (hasDatedIncome).
+      work += p.employment + (p.otherIncome ?? 0)
       db += p.db
       rrq += p.rrq
       oas += p.oas + p.allowance + p.gis

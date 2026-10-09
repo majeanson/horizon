@@ -3,6 +3,7 @@ import { factId } from '../../lib/facts'
 import { EditField } from '../EditField'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { PartTimeFields } from './PartTimeFields'
 import { Section, type PersonEditor } from './shared'
 
 // Who this person is, and when their work income stops. Everything else in the form hangs off these.
@@ -34,6 +35,7 @@ export function AboutSection({ person, edit }: PersonEditor) {
       <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint} fact={factId(person.id, 'salary')}>
         {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
+      <PartTimeFields person={person} edit={edit} />
     </Section>
   )
 }
