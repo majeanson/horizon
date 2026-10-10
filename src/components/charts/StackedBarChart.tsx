@@ -17,6 +17,8 @@ const COLOUR: Record<SeriesColour, string> = {
   berry: 'var(--berry-deep)',
   ink: 'var(--ink-faint)',
   clay: 'var(--terracotta-deep)',
+  sun: 'var(--marigold)',
+  coral: 'var(--terracotta)',
 }
 
 export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300 }: StackedBarChartProps) {

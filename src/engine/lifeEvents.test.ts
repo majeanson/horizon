@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from './golden/household.fixture.ts'
-import { childAdd, childStage, childStepDown, costBandOf, DEPENDENT_AGE, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
+import { childAdd, childStage, childStepDown, costBandOf, DEPENDENT_AGE, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor, workingBudget } from './lifeEvents.ts'
 import { project } from './projection.ts'
 import type { Flow, Household, YearRow } from './types.ts'
 
@@ -117,13 +117,27 @@ describe('the projection — dated flows', () => {
 })
 
 describe('the projection — children who leave, spending that slows', () => {
+  // A household whose retirement budget is well under its working one, so the children's step-down has room to show.
+  const LOW_RETIRED = { ...H, spending: { ...H.spending, retiredToday: H.spending.workingToday - 30_000 } }
+  const BASE_LOW = project(LOW_RETIRED, A, {})
+
   it('the working-years budget drops as each child reaches the leaving age, and the retired budget is untouched', () => {
-    const rows = project({ ...H, children: [2012, 2015], childSpending: { perChild: 6000, untilAge: 22 } }, A, {})
+    const rows = project({ ...LOW_RETIRED, children: [2012, 2015], childSpending: { perChild: 6000, untilAge: 22 } }, A, {})
     // Both retire by 2043 (Alex): 2034 and 2037 are working years.
-    expect(row(rows, 2033).household.spending).toBeCloseTo(row(BASE, 2033).household.spending, 2)
-    expect(row(BASE, 2034).household.spending - row(rows, 2034).household.spending).toBeCloseTo(6000 * inflate(2034), 1)
-    expect(row(BASE, 2037).household.spending - row(rows, 2037).household.spending).toBeCloseTo(12000 * inflate(2037), 1)
-    expect(row(rows, 2050).household.spending).toBeCloseTo(row(BASE, 2050).household.spending, 2)
+    expect(row(rows, 2033).household.spending).toBeCloseTo(row(BASE_LOW, 2033).household.spending, 2)
+    expect(row(BASE_LOW, 2034).household.spending - row(rows, 2034).household.spending).toBeCloseTo(6000 * inflate(2034), 1)
+    expect(row(BASE_LOW, 2037).household.spending - row(rows, 2037).household.spending).toBeCloseTo(12000 * inflate(2037), 1)
+    expect(row(rows, 2050).household.spending).toBeCloseTo(row(BASE_LOW, 2050).household.spending, 2)
+  })
+
+  it('the step-down stops at the retirement budget: two children at 19 300 $ against a budget that holds them cannot leave two adults 6 400 $', () => {
+    const w = H.spending.workingToday
+    const house = { ...H, spending: { workingToday: w, retiredToday: w }, children: [2012, 2015], childSpending: { perChild: w * 0.43, untilAge: 22 } }
+    const rows = project(house, A, {})
+    // 2037: both gone — the unfloored budget would be 0.14 × w; it stays at the retirement budget instead
+    expect(row(rows, 2037).household.spending).toBeCloseTo(row(project({ ...house, children: [] }, A, {}), 2037).household.spending, 2)
+    expect(workingBudget(house, A, 2037)).toBe(w)
+    expect(workingBudget({ ...house, spending: { workingToday: w, retiredToday: w - 5_000 } }, A, 2037)).toBe(w - 5_000)
   })
 
   it('a working budget never drops below nothing', () => {

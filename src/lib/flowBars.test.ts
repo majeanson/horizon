@@ -10,6 +10,8 @@ import { EXPENSE_COLOUR, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, expenseBars, sourceB
 const IDS = Object.keys(EXAMPLES) as ExampleId[]
 const rowsOf = (id: ExampleId) => project(EXAMPLES[id].household, EXAMPLES[id].assumptions)
 const nominal = (id: ExampleId, per?: 'year' | 'month') => ({ dollars: 'nominal' as const, todayYear: EXAMPLES[id].assumptions.today.year, inflation: EXAMPLES[id].assumptions.inflation, per })
+const OUT = ['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved'] as const
+const NEED = ['living', 'children', 'events', 'mortgage', 'tax', 'unmet'] as const
 const sum = (o: Record<string, number>, keys: readonly string[]) => keys.reduce((s, k) => s + o[k], 0)
 
 // Eleven households, each a full projection: a slow CI runner needs more than the default five seconds.
@@ -22,7 +24,7 @@ describe('what comes in is what goes out', { timeout: 120_000 }, () => {
       const spent = expenseBars(rows, s)
       expect(sources.length).toBe(spent.length)
       sources.forEach((src, i) => {
-        const out = sum(spent[i], ['living', 'mortgage', 'tax', 'deductions', 'saved'])
+        const out = sum(spent[i], OUT)
         expect(sum(src, SOURCE_SEGMENTS), `${id} ${src.x}`).toBeCloseTo(out, 1)
       })
     }
@@ -34,13 +36,33 @@ describe('what comes in is what goes out', { timeout: 120_000 }, () => {
       const s = nominal(id)
       const sources = sourceBars(rows, null, s)
       const spent = expenseBars(rows, s)
-      sources.forEach((src, i) => expect(src.need, `${id} ${src.x}`).toBeCloseTo(sum(spent[i], ['living', 'mortgage', 'tax', 'unmet']), 1))
+      sources.forEach((src, i) => expect(src.need, `${id} ${src.x}`).toBeCloseTo(sum(spent[i], NEED), 1))
     }
   })
 
   it('no segment is ever negative, and the mortgage never counts for more than was paid', () => {
     for (const id of IDS) {
       for (const bar of expenseBars(rowsOf(id), nominal(id))) for (const seg of EXPENSE_SEGMENTS) expect(bar[seg], `${id} ${bar.x} ${seg}`).toBeGreaterThanOrEqual(-1e-6)
+    }
+  })
+})
+
+describe('the children and the dated expenses are drawn apart', { timeout: 120_000 }, () => {
+  it('the family example shows its children while they are at home, none once they have left, and the care it plans for', () => {
+    const rows = rowsOf('family')
+    const spent = expenseBars(rows, nominal('family'))
+    expect(spent.some((b) => b.children > 1_000)).toBe(true)
+    expect(spent[spent.length - 1].children).toBe(0)
+    // the parts never exceed the budget they ride in, and the living costs are what is left — never negative
+    for (const b of spent) expect(b.living).toBeGreaterThanOrEqual(-1e-6)
+  })
+
+  it('a household that states none of them has no such segment', () => {
+    for (const id of IDS) {
+      const h = EXAMPLES[id].household
+      if ((h.children ?? []).length > 0 || (h.flows ?? []).some((x) => x.kind === 'expense')) continue
+      const spent = expenseBars(rowsOf(id), nominal(id))
+      for (const b of spent) expect(b.children + b.events).toBe(0)
     }
   })
 })
@@ -59,8 +81,8 @@ describe('a plan that runs out says so in the chart', { timeout: 120_000 }, () =
     const bars = expenseBars(rows, s)
     const sources = sourceBars(rows, null, s)
     const bad = bars.findIndex((b) => b.unmet > 0.5)
-    expect(sum(sources[bad], SOURCE_SEGMENTS)).toBeCloseTo(sum(bars[bad], ['living', 'mortgage', 'tax', 'deductions', 'saved']), 1)
-    expect(sum(bars[bad], ['living', 'mortgage', 'tax', 'unmet'])).toBeCloseTo(sources[bad].need, 1)
+    expect(sum(sources[bad], SOURCE_SEGMENTS)).toBeCloseTo(sum(bars[bad], OUT), 1)
+    expect(sum(bars[bad], NEED)).toBeCloseTo(sources[bad].need, 1)
   })
 })
 

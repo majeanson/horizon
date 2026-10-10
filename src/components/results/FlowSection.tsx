@@ -59,7 +59,7 @@ export function FlowSection({
 
   const comesIn = SOURCE_SEGMENTS.filter((id) => src[id] > 0.5).sort((a, b) => src[b] - src[a])
   const comesInTotal = SOURCE_SEGMENTS.reduce((s, id) => s + src[id], 0)
-  const goesOut = (['living', 'mortgage', 'tax', 'deductions', 'saved'] as const).filter((id) => out[id] > 0.5).sort((a, b) => out[b] - out[a])
+  const goesOut = (['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved'] as const).filter((id) => out[id] > 0.5).sort((a, b) => out[b] - out[a])
   const goesOutTotal = goesOut.reduce((s, id) => s + out[id], 0)
 
   return (

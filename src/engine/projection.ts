@@ -4,7 +4,7 @@ import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAll
 import { homeYear, initialHome, type HomeState } from './home.ts'
 import { childBenefitsFor } from './childBenefits.ts'
 import { leaveBenefit, leaveOf, leaveRulesOf } from './parentalLeave.ts'
-import { childAdd, childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
+import { childAdd, childCost, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor, workingBudget } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
 import { pathReturn, resolvePath } from './marketPaths.ts'
 import { payrollContribution } from './payroll.ts'
@@ -378,7 +378,10 @@ function simulateYear(
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
   // What the household must pay: its living costs, plus the mortgage (which ENDS) and a replacement home's extra cost in a sale year.
-  const budget = retiredAll ? h.spending.retiredToday * retiredDriftFactor(a, Math.max(...people.map((r) => year - r.p.birth.year))) : Math.max(0, h.spending.workingToday - childStepDown(h, a, year))
+  const budget = retiredAll ? h.spending.retiredToday * retiredDriftFactor(a, Math.max(...people.map((r) => year - r.p.birth.year))) : workingBudget(h, a, year)
+  // Where the budget's money goes, for the pictures: the children's share and the dated expenses (both already inside `spending`).
+  const kidsCost = childCost(h, a, year, retiredAll) * inflate
+  const eventsCost = flowExpenses(h, year) * inflate
   const spending = roundTo(budget * inflate * (survivorOf ? (a.survivorSpending ?? 1) : 1) + housing.payment + housing.extraNeed + (flowExpenses(h, year) + childAdd(h, a, year)) * inflate, 0.01)
 
   // ── withdrawals are the unknown: one amount per person per account, solved below ──────────────
@@ -732,6 +735,8 @@ function simulateYear(
       netWorthEnd: roundTo(sum(next.map((s) => s.rrsp + s.tfsa + s.nonReg.balance)), 0.01),
       mortgagePayment: roundTo(housing.payment, 0.01),
       ...(kidsBenefit > 0 ? { childBenefit: roundTo(kidsBenefit, 0.01) } : {}),
+      ...(kidsCost > 0.005 ? { childCost: roundTo(kidsCost, 0.01) } : {}),
+      ...(eventsCost > 0.005 ? { eventCost: roundTo(eventsCost, 0.01) } : {}),
       homeValueEnd: roundTo(housing.valueEnd, 0.01),
       mortgageBalanceEnd: roundTo(housing.balanceEnd, 0.01),
     },

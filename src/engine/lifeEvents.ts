@@ -41,6 +41,31 @@ export function childStepDown(h: Household, a: Assumptions, year: number): numbe
 }
 
 /**
+ * The working-years budget in `year`, in today's dollars: what the household states, less what the children who have left home cost — but never less than
+ * what it says it lives on in retirement. The step-down assumes the stated budget held those children; when it did not (two children at 19 300 $ each against a
+ * 45 000 $ budget would leave two adults 6 400 $), taking it all out would price the parents' last working years below their own retirement.
+ */
+export function workingBudget(h: Household, a: Assumptions, year: number): number {
+  const stated = h.spending.workingToday
+  const floor = Math.min(stated, h.spending.retiredToday)
+  return Math.max(floor, stated - childStepDown(h, a, year))
+}
+
+/**
+ * What the children cost in `year`, in today's dollars, for the picture of where the money goes: the children of today's budget still at home — their `perChild`
+ * each, out of the working budget they ride in (never more than that budget: a share cannot exceed its whole) — plus what the children still to come add
+ * (`childAdd`). The retirement budget is the adults' own, so a retired household has only the added part. It is an attribution, not a new cost: the projection's
+ * spending already holds every dollar of it.
+ */
+export function childCost(h: Household, a: Assumptions, year: number, retired: boolean): number {
+  const c = h.childSpending
+  if (!c || c.perChild <= 0) return childAdd(h, a, year)
+  const atHome = inTheBudget(h, a.today.year, c.untilAge).filter((born) => year - born < c.untilAge).length
+  const inBudget = retired ? 0 : Math.min(atHome * c.perChild, workingBudget(h, a, year))
+  return inBudget + childAdd(h, a, year)
+}
+
+/**
  * What the children still to come ADD to the budget in `year`, in today's dollars: from its birth until it reaches the leaving age, each costs the amount of its
  * age band (`byAge`) when the household gave one, else the flat `perChild`. A child already at home is in the budget and a child already gone costs
  * nothing, so they add nothing. It applies in the working years AND in retirement: a child still at home when the parents stop working still costs. 0 when

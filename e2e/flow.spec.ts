@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { EXAMPLE, seedProfile } from './seed'
+import { EXAMPLE, PROFILE_KEY, seedProfile } from './seed'
 
 // « OÙ VIENT L'ARGENT » AND « OÙ VA-T-IL », by the year and by the month: the Détail view draws the sources, then where the money goes, and reads ONE year in words under both
 // (a bar is hard to read where there is no hover). What comes in and what goes out are the same figure, to the cent; a month is a twelfth of a year.
@@ -101,4 +101,18 @@ test('on a phone the two columns stack and nothing runs off the screen', async (
   const [a, b] = await cols.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()))
   expect(b.top, 'stacked: the second column starts below the first').toBeGreaterThan(a.bottom - 1)
   for (const r of [a, b]) expect(r.right, 'inside the screen').toBeLessThanOrEqual(360.5)
+})
+
+test('the children and the care a plan states are drawn apart in « Où va l’argent » — and read in the year in words', async ({ page }) => {
+  const family = JSON.parse(JSON.stringify(EXAMPLE))
+  family.household.children = [2022, 2024]
+  family.household.childSpending = { perChild: 19_300, untilAge: 23 }
+  family.household.spending = { workingToday: 70_000, retiredToday: 55_000 }
+  family.household.flows = [{ label: 'Des soins plus tard', kind: 'expense', amount: 26_906, fromYear: 2040, toYear: 2045, owner: 'self', taxable: false }]
+  await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const) // after the file's own seed: the last write wins
+  await page.goto('/resultats?metric=detail')
+  const legend = page.locator('.chart-detail .chart__legend')
+  await expect(legend.getByText('Enfants', { exact: true })).toBeVisible({ timeout: 30_000 })
+  await expect(legend.getByText('Soins et événements', { exact: true })).toBeVisible()
+  await expect(page.locator('.flow-readout__col[aria-label="Ce qui sort"]')).toBeVisible()
 })

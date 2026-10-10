@@ -28,11 +28,13 @@ export interface FlowWords {
 
 const FR: FlowWords = {
   title: 'Où va l’argent, année par année',
-  hint: 'Chaque barre est une année : ce que coûte la vie (enfants, soins et événements compris), l’hypothèque, l’impôt, les retenues sur la paie, et ce qui est mis de côté. Ce qui entre et ce qui sort s’égalent, au cent près.',
+  hint: 'Chaque barre est une année : ce que coûte la vie courante, ce que coûtent les enfants, les soins et les événements datés, l’hypothèque, l’impôt, les retenues sur la paie, et ce qui est mis de côté. Ce qui entre et ce qui sort s’égalent, au cent près.',
   personNote: 'Les dépenses sont celles du ménage : ce graphique reste celui des deux, même quand une seule personne est choisie plus haut.',
   perMonthHint: 'Par mois : les mêmes montants, divisés par douze.',
   segment: {
     living: 'Dépenses courantes',
+    children: 'Enfants',
+    events: 'Soins et événements',
     mortgage: 'Hypothèque',
     tax: 'Impôt',
     deductions: 'Retenues sur la paie',
@@ -55,11 +57,13 @@ const FR: FlowWords = {
 
 const EN: FlowWords = {
   title: 'Where the money goes, year by year',
-  hint: 'Each bar is a year: what living costs (children, care and events included), the mortgage, tax, what comes off the pay, and what is put aside. What comes in and what goes out are equal, to the cent.',
+  hint: 'Each bar is a year: everyday living costs, what the children cost, care and dated events, the mortgage, tax, what comes off the pay, and what is put aside. What comes in and what goes out are equal, to the cent.',
   personNote: 'Spending is the household’s: this chart stays the whole household’s, even when one person is picked above.',
   perMonthHint: 'Per month: the same amounts, divided by twelve.',
   segment: {
     living: 'Living costs',
+    children: 'Children',
+    events: 'Care and events',
     mortgage: 'Mortgage',
     tax: 'Tax',
     deductions: 'Deductions from pay',

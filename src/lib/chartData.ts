@@ -105,13 +105,13 @@ export function sourceBars(rows: readonly YearRow[], who: string | null, s: Scal
   })
 }
 
-export const EXPENSE_SEGMENTS = ['living', 'mortgage', 'tax', 'deductions', 'saved', 'unmet'] as const
+export const EXPENSE_SEGMENTS = ['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved', 'unmet'] as const
 export type ExpenseSegment = (typeof EXPENSE_SEGMENTS)[number]
 /** `unmet`: what the plan needed and could not pay — drawn only in a plan that runs out. */
-export const EXPENSE_COLOUR: Record<ExpenseSegment, SeriesColour> = { living: 'sky', mortgage: 'berry', tax: 'ink', deductions: 'sage', saved: 'accent', unmet: 'clay' }
+export const EXPENSE_COLOUR: Record<ExpenseSegment, SeriesColour> = { living: 'sky', children: 'sun', events: 'coral', mortgage: 'berry', tax: 'ink', deductions: 'sage', saved: 'accent', unmet: 'clay' }
 
 /**
- * One bar per year: where the household's money goes. `living` is the budget (the children, the dated expenses and the care ride in it) less the mortgage, `mortgage` the
+ * One bar per year: where the household's money goes. `living` is the budget less the mortgage, the children and the dated expenses (care, a roof…), which are drawn apart so they can be seen, `mortgage` the
  * payments, `tax` the income tax and the OAS recovery, `deductions` what comes off the pay (QPP, EI, QPIP, a plan's own contributions), `saved` what is put into the
  * accounts, `unmet` the part of the budget the plan could not pay. The household's: the budget is not a person's. Together the first five are exactly what the sources
  * bars bring in (the engine's cash identity), which is the test that the two charts agree.
@@ -128,7 +128,10 @@ export function expenseBars(rows: readonly YearRow[], s: Scale): ({ x: number } 
     const unmet = row.household.shortfall
     const paid = row.household.spending - unmet
     const mortgage = Math.min(row.household.mortgagePayment, paid)
-    return { x: row.year, living: (paid - mortgage) / k, mortgage: mortgage / k, tax: row.household.tax / k, deductions: deductions / k, saved: saved / k, unmet: unmet / k }
+    // The children and the dated expenses ride inside the budget: drawn apart, never more than what is left of it.
+    const children = Math.min(row.household.childCost ?? 0, paid - mortgage)
+    const events = Math.min(row.household.eventCost ?? 0, paid - mortgage - children)
+    return { x: row.year, living: (paid - mortgage - children - events) / k, children: children / k, events: events / k, mortgage: mortgage / k, tax: row.household.tax / k, deductions: deductions / k, saved: saved / k, unmet: unmet / k }
   })
 }
 
