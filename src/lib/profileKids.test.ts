@@ -36,3 +36,22 @@ describe('patchChildSpending', () => {
     expect(setChildSpending(a, a.household.childSpending ?? null)).toBe(a)
   })
 })
+
+describe('patchKidsEffects and addChildCounted', () => {
+  it('counts one part at a time; nothing counted is null', async () => {
+    const { patchKidsEffects } = await import('./profileLife.ts')
+    const a = patchKidsEffects(p0, { benefits: true })
+    expect(a.household.kidsEffects).toEqual({ benefits: true, qppExclusion: false, leave: null })
+    const b = patchKidsEffects(a, { qppExclusion: true })
+    expect(b.household.kidsEffects).toEqual({ benefits: true, qppExclusion: true, leave: null })
+    expect(patchKidsEffects(patchKidsEffects(b, { benefits: false }), { qppExclusion: false }).household.kidsEffects ?? null).toBeNull()
+    expect(patchKidsEffects(a, { benefits: true })).toBe(a)
+  })
+
+  it('a first child counts the benefits; a household that already chose keeps its choice', async () => {
+    const { addChildCounted, patchKidsEffects } = await import('./profileLife.ts')
+    expect(addChildCounted(p0, 2028).household.kidsEffects).toEqual({ benefits: true, qppExclusion: false, leave: null })
+    const off = patchKidsEffects(patchKidsEffects(p0, { qppExclusion: true }), { benefits: false })
+    expect(addChildCounted(off, 2028).household.kidsEffects).toEqual({ benefits: false, qppExclusion: true, leave: null })
+  })
+})

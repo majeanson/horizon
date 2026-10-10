@@ -6,7 +6,8 @@ import { useLang } from '../../i18n'
 import { DEFAULT_LEAVE_AGE, suggestChildCost } from '../../lib/kidsCost'
 import { KIDS_COPY } from '../../lib/kidsCopy'
 import { formatMoney } from '../../lib/money'
-import { patchChildSpending } from '../../lib/profileLife'
+import { kidsSummary } from '../../lib/kidsSummary'
+import { patchChildSpending, patchKidsEffects } from '../../lib/profileLife'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
@@ -35,6 +36,9 @@ export function KidsCosts() {
   if (s === null || (!hasFuture && !hasHome)) return null
   const money = (n: number) => formatMoney(n, lang)
   const byAge = cost?.byAge ?? null
+  const summary = kidsSummary(profile, now.year)
+  const counted = profile.household.kidsEffects?.benefits ?? false
+  const b = k.benefits
 
   return (
     <div className="kids-cost">
@@ -71,6 +75,22 @@ export function KidsCosts() {
             </FieldRow>
           ))}
           <Chip onClick={() => updateProfile((p) => patchChildSpending(p, { byAge: null }))}>{c.byAgeClear}</Chip>
+        </div>
+      )}
+
+      {summary && (
+        <div className="kids-benefits">
+          <p className="kids-cost__title">
+            <strong>{b.title}</strong> <span className="mono">({c.estimated})</span>
+          </p>
+          {summary.atHome && <p>{b.atHome(summary.atHome.children, money(Math.round(summary.atHome.cost)), money(Math.round(summary.atHome.benefit)), money(Math.round(summary.atHome.net)))}</p>}
+          {summary.planned && (
+            <p>{b.planned(String(summary.planned.born), money(Math.round(summary.planned.cost)), money(Math.round(summary.planned.benefit)), money(Math.round(summary.planned.net)), money(Math.round(summary.planned.lifetime)))}</p>
+          )}
+          <p className="field-row__hint">{b.note}</p>
+          <Chip selected={counted} onClick={() => updateProfile((p) => patchKidsEffects(p, { benefits: !counted }))}>
+            {b.toggle}
+          </Chip>
         </div>
       )}
 

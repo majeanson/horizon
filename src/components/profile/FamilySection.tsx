@@ -4,10 +4,10 @@ import { useConfirm } from '../../lib/confirm'
 import { LIFE_COPY } from '../../lib/lifeCopy'
 import { formatMoney } from '../../lib/money'
 import { scrollBehavior } from '../../lib/motion'
-import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
+import { addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
 import { childStage } from '../../engine/lifeEvents'
 import { KIDS_COPY } from '../../lib/kidsCopy'
-import { patchChildSpending } from '../../lib/profileLife'
+import { addChildCounted, patchChildSpending } from '../../lib/profileLife'
 import { KidsCosts } from './KidsCosts'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -47,7 +47,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
     const n = /^\d{4}$/.test(year.trim()) ? Number(year.trim()) : NaN
     if (!Number.isInteger(n) || n < 1950 || n > 2100) return setBad(true)
     setBad(false)
-    updateProfile((p) => addChild(p, n))
+    updateProfile((p) => addChildCounted(p, n))
     setYear('')
   }
 
@@ -118,7 +118,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
         />
         {bad && <StatusMessage tone="error">{t.fields.range('1950', '2100')}</StatusMessage>}
         <Cluster>
-          <Chip onClick={() => updateProfile((p) => addChild(p, today().year + 1))}>{kc.planned.add}</Chip>
+          <Chip onClick={() => updateProfile((p) => addChildCounted(p, today().year + 1))}>{kc.planned.add}</Chip>
         </Cluster>
         <p className="field-row__hint">{kc.planned.hint}</p>
       </div>)}

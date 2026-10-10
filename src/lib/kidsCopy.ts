@@ -26,6 +26,13 @@ interface KidsCopy {
     nowHint: (amount: string) => string
   }
   how: { open: string; lines: string[]; sources: string }
+  benefits: {
+    title: string
+    toggle: string
+    note: string
+    atHome: (children: number, cost: string, benefit: string, net: string) => string
+    planned: (born: string, cost: string, benefit: string, net: string, lifetime: string) => string
+  }
 }
 
 const FR: KidsCopy = {
@@ -62,6 +69,13 @@ const FR: KidsCopy = {
     ],
     sources: 'Sources',
   },
+  benefits: {
+    title: 'Ce que l’État verse pour eux',
+    toggle: 'Tenir compte des allocations dans le plan (estimation)',
+    note: 'L’Allocation canadienne pour enfants et l’Allocation famille du Québec dépendent du revenu familial : plus il est élevé, moins elles rapportent. Ici, au revenu d’aujourd’hui.',
+    atHome: (children, cost, benefit, net) => `${children === 1 ? 'Un enfant à la maison' : `${children} enfants à la maison`} : environ ${cost} par année, dont ${benefit} d’allocations, soit ${net} net.`,
+    planned: (born, cost, benefit, net, lifetime) => `Un enfant prévu en ${born} : environ ${cost} sa première année, moins ${benefit} d’allocations, soit ${net} net. Toutes ses années à la maison : environ ${lifetime} (avant allocations).`,
+  },
 }
 
 const EN: KidsCopy = {
@@ -97,6 +111,13 @@ const EN: KidsCopy = {
       'In Québec child care cost less than in the rest of the country ($9.65 a day in subsidised care in 2026), so these amounts may run a little high for you. Take them as an order of magnitude, to replace with your own.',
     ],
     sources: 'Sources',
+  },
+  benefits: {
+    title: 'What the state pays for them',
+    toggle: 'Count the benefits in the plan (estimate)',
+    note: 'The Canada Child Benefit and Québec’s Family Allowance depend on family income: the higher it is, the less they bring in. Shown here at today’s income.',
+    atHome: (children, cost, benefit, net) => `${children === 1 ? 'One child at home' : `${children} children at home`}: about ${cost} a year, of which ${benefit} in benefits, so ${net} net.`,
+    planned: (born, cost, benefit, net, lifetime) => `A child planned for ${born}: about ${cost} in its first year, less ${benefit} in benefits, so ${net} net. All its years at home: about ${lifetime} (before benefits).`,
   },
 }
 

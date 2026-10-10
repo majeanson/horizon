@@ -2,6 +2,7 @@ import { ageAtJan1, firstRrifYear, grow, lockedAvailable, maxWithdraw, nonRegCon
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, survivorAllowanceMonthly, type GisCategoryName, type OasPerson } from './oas.ts'
 import { homeYear, initialHome, type HomeState } from './home.ts'
+import { childBenefitsFor } from './childBenefits.ts'
 import { childAdd, childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
 import { pathReturn, resolvePath } from './marketPaths.ts'
@@ -177,6 +178,8 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
   // The living. A couple's first death hands the deceased's accounts to the survivor (see the header) and the survivor's rules take over.
   let alive = people
   let survivorOf: Survivorship | null = null
+  // The family's net income of the year before: the benefits for a child follow the last return filed. The first year reads today's earnings.
+  let lastIncome = h.persons.reduce((sum, p) => sum + p.salaryToday, 0)
   for (let year = a.today.year; year <= endYear; year++) {
     if (alive.length === 2) {
       const gone = alive.findIndex((r) => year > r.deathYear)
@@ -201,9 +204,11 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
     // A windfall (an inheritance, a gift): tax-free money into the first person alive's non-registered account before the year's tax and withdrawals.
     const lump = flowWindfalls(h, year) * (1 + a.inflation) ** (year - a.today.year)
     if (lump > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + lump, acb: s.nonReg.acb + lump } } : s))
-    const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, indexation, housing, returnsOf(year), rrqRules, survivorOf)
+    const kidsBenefit = childBenefitsFor(h, year, lastIncome, alive.length === 1, paramsOf(year).childBenefits)
+    const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, indexation, housing, returnsOf(year), rrqRules, survivorOf, kidsBenefit)
     rows.push(out.row)
     states = out.next
+    lastIncome = Object.values(out.row.persons).reduce((sum, t) => sum + t.netIncome, 0)
   }
   return rows
 }
@@ -269,6 +274,7 @@ function simulateYear(
   returns: Record<AccountKind, number>,
   rrqRules: RrqRules,
   survivorOf: Survivorship | null,
+  kidsBenefit = 0,
 ): { row: YearRow; next: PersonState[] } {
   const P = paramsOf(year)
   const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, livesAlone: h.livesAlone }
@@ -337,7 +343,7 @@ function simulateYear(
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate, otherFree: dated[i].free * inflate }
+    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate, otherFree: dated[i].free * inflate + (i === 0 ? kidsBenefit : 0) }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -695,6 +701,7 @@ function simulateYear(
       shortfall,
       netWorthEnd: roundTo(sum(next.map((s) => s.rrsp + s.tfsa + s.nonReg.balance)), 0.01),
       mortgagePayment: roundTo(housing.payment, 0.01),
+      ...(kidsBenefit > 0 ? { childBenefit: roundTo(kidsBenefit, 0.01) } : {}),
       homeValueEnd: roundTo(housing.valueEnd, 0.01),
       mortgageBalanceEnd: roundTo(housing.balanceEnd, 0.01),
     },

@@ -88,6 +88,26 @@ test('a planned child makes the answer later: its cost is added to the budget', 
   expect(b).toBeGreaterThan(a)
 })
 
+test('what the state pays is said beside what a child costs; adding a child counts it in the plan, and a switch takes it out', async ({ page }) => {
+  await seedProfile(page, couple())
+  await showAllSections(page)
+  await page.goto('/?form=1')
+  await page.getByRole('button', { name: 'Un enfant prévu' }).click()
+  // a first child counts the benefits (a visible switch), and the card says what they come to at this income
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects).toEqual({ benefits: true, qppExclusion: false, leave: null })
+  await expect(page.getByText('Ce que l’État verse pour eux')).toBeVisible()
+  await expect(page.getByText(/Un enfant prévu en \d{4}.+environ .+ sa première année, moins .+ d’allocations, soit .+ net/)).toBeVisible()
+  const toggle = page.getByRole('button', { name: 'Tenir compte des allocations dans le plan (estimation)' })
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await toggle.click()
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects ?? null).toBeNull()
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  // a household that already chose keeps its choice when it adds another child
+  await box(page, 'Année de naissance de l’enfant').fill(String(THIS_YEAR + 3))
+  await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([THIS_YEAR + 1, THIS_YEAR + 3])
+})
+
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, couple())

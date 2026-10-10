@@ -28,6 +28,9 @@ const OAS_SURVIVOR = 'https://www.canada.ca/en/services/benefits/publicpensions/
 const OGP = 'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f27707ed0'
 const ESDC_2023Q1 = 'https://www.canada.ca/fr/emploi-developpement-social/programmes/pensions/pension/statistiques/rapport-trimestriel/2023-trimestriel-janvier-mars.html'
 const CRA = 'https://www.canada.ca/en/revenue-agency/services/tax/individuals'
+const CCB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html'
+const FAMILY_ALLOWANCE = `${RQ}/en/citizens/children/family-allowance`
+const FAMILY_ALLOWANCE_TABLE = `${RQ}/en/citizens/children/amounts-family-allowance-payments-based-family-income`
 const LINES = `${CRA}/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses`
 const QC_PDF = 'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf'
 const QC_2020 = 'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/documents/Depenses_fiscales_2020_Description_mesures.pdf'
@@ -163,6 +166,24 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'payroll.eiMaxInsurable': [68_900, 'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html'],
   'payroll.qpipRate': [0.0043, 'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations'],
   'payroll.qpipMaxInsurable': [103_000, 'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable'],
+  // What the state pays for a child: the CRA's table for July 2026 to June 2027, and Retraite Québec's 2026 amounts.
+  'childBenefits.ccb.maxUnder6': [8_157, CCB],
+  'childBenefits.ccb.max6to17': [6_883, CCB],
+  'childBenefits.ccb.threshold1': [38_237, CCB],
+  'childBenefits.ccb.threshold2': [82_847, CCB],
+  'childBenefits.ccb.midRate': [[0.07, 0.135, 0.19, 0.23], CCB],
+  'childBenefits.ccb.topRate': [[0.032, 0.057, 0.08, 0.095], CCB],
+  'childBenefits.ccb.topFixedOne': [3_123, CCB],
+  'childBenefits.ccb.topFixedTwo': [6_022, CCB],
+  'childBenefits.ccb.topFixedThree': [8_476, CCB],
+  'childBenefits.ccb.topFixedFourPlus': [10_260, CCB],
+  'childBenefits.familyAllowance.max': [3_068, FAMILY_ALLOWANCE],
+  'childBenefits.familyAllowance.min': [1_221, FAMILY_ALLOWANCE],
+  'childBenefits.familyAllowance.supplementMax': [1_077, FAMILY_ALLOWANCE],
+  'childBenefits.familyAllowance.supplementMin': [430, FAMILY_ALLOWANCE],
+  'childBenefits.familyAllowance.reductionRate': [0.04, FAMILY_ALLOWANCE_TABLE],
+  'childBenefits.familyAllowance.thresholdCouple': [60_000, FAMILY_ALLOWANCE],
+  'childBenefits.familyAllowance.thresholdSingle': [44_000, FAMILY_ALLOWANCE],
 
   // ── Registered accounts ─────────────────────────────────────────────────────────────────────
   'accounts.rrspLimit': [33_810, 'https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html'],

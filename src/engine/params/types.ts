@@ -193,6 +193,39 @@ export interface YearParams {
     qpipMaxInsurable: Cited
   }
 
+  /**
+   * What the state pays for a child (engine/childBenefits.ts): the Canada Child Benefit — Canada Revenue Agency — and Québec's Allocation famille — Retraite Québec.
+   * The year is the one the payments START in (the CCB's July 2026 to June 2027 period is « 2026 »).
+   */
+  childBenefits: {
+    ccb: {
+      /** The most a year brings for a child under 6, and for a child aged 6 to 17. */
+      maxUnder6: Cited
+      max6to17: Cited
+      /** The adjusted family net income up to which nothing is taken off, and the one beyond which the steeper reduction applies. */
+      threshold1: Cited
+      threshold2: Cited
+      /** By number of children (1, 2, 3, 4 or more): the share of income over `threshold1` taken off in between, and above `threshold2` a fixed amount plus a share. */
+      midRate: Cited<readonly number[]>
+      topRate: Cited<readonly number[]>
+      topFixedOne: Cited
+      topFixedTwo: Cited
+      topFixedThree: Cited
+      topFixedFourPlus: Cited
+    }
+    familyAllowance: {
+      max: Cited
+      min: Cited
+      /** A single-parent family's addition, paid once whatever the number of children: at the maximum and at the minimum. */
+      supplementMax: Cited
+      supplementMin: Cited
+      reductionRate: Cited
+      /** The family income up to which the maximum is paid, for two parents and for one. */
+      thresholdCouple: Cited
+      thresholdSingle: Cited
+    }
+  }
+
   /** Registered accounts — Canada Revenue Agency. */
   accounts: {
     rrspLimit: Cited

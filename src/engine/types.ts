@@ -341,6 +341,8 @@ export interface YearRow {
     netWorthEnd: number
     /** Paid on the mortgage this year (0 with no home or once paid off); it is part of `spending`. */
     mortgagePayment: number
+    /** What the family was paid this year for its children (Canada Child Benefit and Allocation famille), tax-free; present only when the household counts it and it is more than 0. */
+    childBenefit?: number
     /** What the home is worth at the end of the year (0 with no home): wealth the net worth does not count. */
     homeValueEnd: number
     /** Still owed on the mortgage at the end of the year. */

@@ -103,6 +103,32 @@ const CRA_EI = src(
   { note: 'Table for employees in Québec, row 2026: « $68,900 | 1.30 | $895.70 | $1,253.98 » (maximum insurable earnings, employee rate, maximum employee premium, employer maximum).' },
 )
 
+// ── What the state pays for a child (read 2026-10-09) ───────────────────────────────────────────────
+const CRA_CCB = src(
+  'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html',
+  'How much you can get - Canada child benefit (CCB) - Canada.ca',
+  {
+    retrieved: '2026-10-09',
+    note: 'Payments July 2026 to June 2027, from the 2025 adjusted family net income: 8 157 $ a year under 6, 6 883 $ aged 6 to 17; nothing taken off up to 38 237 $; from there to 82 847 $, 7 % of the income over 38 237 $ (one child), 13,5 % (two), 19 % (three), 23 % (four or more); above 82 847 $, 3 123 $ + 3,2 % (one), 6 022 $ + 5,7 % (two), 8 476 $ + 8 % (three), 10 260 $ + 9,5 % (four or more) of the income over 82 847 $. The page\'s eight worked examples are held to the cent in childBenefits.test.ts.',
+  },
+)
+const RQ_FAMILY_ALLOWANCE = src(
+  'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/family-allowance',
+  'Family Allowance - Retraite Québec',
+  {
+    retrieved: '2026-10-09',
+    note: '2026: maximum 3 068 $ and minimum 1 221 $ per child; a single-parent family adds 1 077 $ (at the maximum) and 430 $ (at the minimum); indexed 2,05 % on 2026-01-01. « Two-parent family: 60 000 $ or less 3 068 $, 107 000 $ or more 1 221 $ — single-parent family: 44 000 $ or less 4 145 $, 107 000 $ or more 1 651 $ » (the page prints the thresholds to the nearest 1 000 $). Family income is the one of the return filed for the previous year.',
+  },
+)
+const RQ_FAMILY_ALLOWANCE_TABLE = src(
+  'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/amounts-family-allowance-payments-based-family-income',
+  'Amounts of Family Allowance payments based on family income - Retraite Québec',
+  {
+    retrieved: '2026-10-09',
+    note: 'The table of payments by family income (the 2025 amounts). Every row is the maximum less 4 % of the family income over the threshold, never under the minimum, with the single-parent supplement paid once: 1 child, two parents, 100 000 $: 3 006 − 4 % × (100 000 − 59 369) = 1 381 $; 2 children, one parent, 80 000 $: 7 067 − 4 % × (80 000 − 43 280) = 5 598 $; 2 children, two parents, 150 000 $: the floor, 2 × 1 196 = 2 392 $.',
+  },
+)
+
 // ── Revenu Québec / Finances Québec ──────────────────────────────────────────────────────────────
 const QC_QPIP_RATES = src(
   'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations',
@@ -322,6 +348,30 @@ export const P2026 = {
     eiMaxInsurable: c(68_900, 'wage', CRA_EI, 100),
     qpipRate: c(0.0043, 'fixed', QC_QPIP_RATES),
     qpipMaxInsurable: c(103_000, 'wage', QC_QPIP_MAX, 1_000),
+  },
+
+  childBenefits: {
+    ccb: {
+      maxUnder6: c(8_157, 'cpi', CRA_CCB, 1),
+      max6to17: c(6_883, 'cpi', CRA_CCB, 1),
+      threshold1: c(38_237, 'cpi', CRA_CCB, 1),
+      threshold2: c(82_847, 'cpi', CRA_CCB, 1),
+      midRate: c([0.07, 0.135, 0.19, 0.23], 'fixed', CRA_CCB),
+      topRate: c([0.032, 0.057, 0.08, 0.095], 'fixed', CRA_CCB),
+      topFixedOne: c(3_123, 'cpi', CRA_CCB, 1),
+      topFixedTwo: c(6_022, 'cpi', CRA_CCB, 1),
+      topFixedThree: c(8_476, 'cpi', CRA_CCB, 1),
+      topFixedFourPlus: c(10_260, 'cpi', CRA_CCB, 1),
+    },
+    familyAllowance: {
+      max: c(3_068, 'cpi', RQ_FAMILY_ALLOWANCE, 1),
+      min: c(1_221, 'cpi', RQ_FAMILY_ALLOWANCE, 1),
+      supplementMax: c(1_077, 'cpi', RQ_FAMILY_ALLOWANCE, 1),
+      supplementMin: c(430, 'cpi', RQ_FAMILY_ALLOWANCE, 1),
+      reductionRate: c(0.04, 'fixed', RQ_FAMILY_ALLOWANCE_TABLE),
+      thresholdCouple: c(60_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Two-parent family: $60 000 or less » — the maximum is paid up to this family income (the page prints it to the nearest 1 000 $; the exact figure, a few hundred dollars higher, moves a payment by under 16 $ a year).' }, 100),
+      thresholdSingle: c(44_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Single-parent family: $44 000 or less » — the maximum plus the supplement is paid up to this family income (printed to the nearest 1 000 $).' }, 100),
+    },
   },
 
   accounts: {

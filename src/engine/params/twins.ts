@@ -30,6 +30,9 @@ export interface PageEntry {
 }
 
 export const TWINS: Readonly<Record<string, PageEntry>> = {
+  'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html': { lang: 'en', twin: { url: 'https://www.canada.ca/fr/agence-revenu/services/prestations-enfants-familles/allocation-canadienne-enfants/combien-recevoir.html', title: 'Combien vous pourriez recevoir – Allocation canadienne pour enfants (ACE) - Canada.ca' } },
+  'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/family-allowance': { lang: 'en', twin: { url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/allocation-famille', title: 'L’Allocation famille - Retraite Québec' } },
+  'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/amounts-family-allowance-payments-based-family-income': { lang: 'en', twin: { url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/montants-allocation-famille-selon-revenu-familial', title: 'Montants de l’Allocation famille selon le revenu familial - Retraite Québec' } },
   'https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2023007-eng.htm': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2023007-fra.htm', title: 'Estimer les dépenses liées aux enfants effectuées par les familles au Canada, 2014 à 2017' } },
   'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000501': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1810000501', title: 'Indice des prix à la consommation, moyenne annuelle, non désaisonnalisé' } },
   'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110001601': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1110001601', title: 'Actifs et dettes détenus selon le type de famille économique, par groupe d’âge, Canada, provinces et certaines régions métropolitaines de recensement, enquête sur la sécurité financière' } },

@@ -1,4 +1,5 @@
-import type { Flow } from '../engine/types.ts'
+import type { Flow, KidsEffects } from '../engine/types.ts'
+import { addChild } from './profileEdit.ts'
 import { MAX_FLOWS, type Profile } from './schema.ts'
 
 // THE EDITS OF A LIFE BEYOND THE BUDGET (schema v16): what a child costs, and the dated flows. Pure functions from profile to profile like
@@ -26,6 +27,27 @@ export function patchChildSpending(p: Profile, patch: { perChild?: number; until
   const byAge = patch.byAge === undefined ? cur.byAge : patch.byAge
   if (byAge) next.byAge = byAge
   return setChildSpending(p, next.perChild <= 0 && !next.byAge ? null : next)
+}
+
+/**
+ * Change ONE part of what the household counts about its children (the benefits, the QPP exclusion, a parental leave), leaving the rest. Nothing counted at all is
+ * null: a household that never says so projects as before.
+ */
+export function patchKidsEffects(p: Profile, patch: Partial<KidsEffects>): Profile {
+  const cur: KidsEffects = p.household.kidsEffects ?? { benefits: false, qppExclusion: false, leave: null }
+  const next: KidsEffects = { ...cur, ...patch }
+  const value = !next.benefits && !next.qppExclusion && next.leave === null ? null : next
+  const same = (p.household.kidsEffects ?? null) === value || (value !== null && p.household.kidsEffects != null && JSON.stringify(p.household.kidsEffects) === JSON.stringify(value))
+  return same ? p : { ...p, household: { ...p.household, kidsEffects: value } }
+}
+
+/**
+ * A child added through the family card: the child, and — if the household had not said anything yet about counting the benefits — the benefits counted (a visible
+ * switch beside the children turns them off). A household that already chose, either way, keeps its choice.
+ */
+export function addChildCounted(p: Profile, born: number): Profile {
+  const added = addChild(p, born)
+  return added === p || added.household.kidsEffects != null ? added : patchKidsEffects(added, { benefits: true })
 }
 
 /** A flow as the page may hold it: a windfall is once and tax-free, an expense is not income, and an owner is someone who is in the household. */
