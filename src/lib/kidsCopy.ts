@@ -26,6 +26,7 @@ interface KidsCopy {
     nowHint: (amount: string) => string
   }
   how: { open: string; lines: string[]; sources: string }
+  qpp: { toggle: string; note: string }
   leave: {
     title: string
     toggle: string
@@ -78,6 +79,10 @@ const FR: KidsCopy = {
     ],
     sources: 'Sources',
   },
+  qpp: {
+    toggle: 'Exclure du calcul de la rente du RRQ les années avec un enfant de moins de 7 ans',
+    note: 'Selon la loi (art. 101), un mois où vous touchez une allocation pour un enfant de moins de 7 ans sort du calcul de votre rente du RRQ, mais seulement dans une année où vos gains ne dépassent pas 3 500 $. Sans effet si vous travaillez toute l’année. L’allocation est comptée au parent dont le revenu est le plus bas.',
+  },
   leave: {
     title: 'Congé parental',
     toggle: 'Tenir compte d’un congé parental (RQAP)',
@@ -129,6 +134,10 @@ const EN: KidsCopy = {
       'In Québec child care cost less than in the rest of the country ($9.65 a day in subsidised care in 2026), so these amounts may run a little high for you. Take them as an order of magnitude, to replace with your own.',
     ],
     sources: 'Sources',
+  },
+  qpp: {
+    toggle: 'Leave out of the QPP pension’s calculation the years with a child under 7',
+    note: 'By the Act (art. 101), a month in which you are paid a family benefit for a child under 7 is taken out of the calculation of your QPP pension, but only in a year in which your earnings do not exceed $3,500. It changes nothing if you work all year. The benefit is counted to the parent with the lower income.',
   },
   leave: {
     title: 'Parental leave',

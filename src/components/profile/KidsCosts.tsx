@@ -100,6 +100,13 @@ export function KidsCosts() {
         </div>
       )}
 
+      <div className="kids-benefits">
+        <Chip selected={profile.household.kidsEffects?.qppExclusion ?? false} onClick={() => updateProfile((p) => patchKidsEffects(p, { qppExclusion: !(p.household.kidsEffects?.qppExclusion ?? false) }))}>
+          {k.qpp.toggle}
+        </Chip>
+        <p className="field-row__hint">{k.qpp.note}</p>
+      </div>
+
       {hasFuture && (
         <div className="kids-leave">
           <Chip selected={leave !== null} onClick={() => updateProfile((p) => patchKidsEffects(p, { leave: leave ? null : { birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 } }))}>

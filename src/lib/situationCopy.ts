@@ -21,7 +21,7 @@ const FR: SituationCopy = {
   yes: 'Oui',
   no: 'Non',
   q: {
-    kids: 'Des enfants à la maison?',
+    kids: 'Des enfants à la maison, ou un enfant prévu?',
     home: 'Propriétaire de votre résidence principale?',
     events: 'Un événement prévu : héritage, grosse dépense, revenu de location?',
     pension: 'Un régime de retraite d’employeur qui verse une rente (comme le RREGOP)?',
@@ -29,7 +29,7 @@ const FR: SituationCopy = {
     partTime: 'Du travail après votre retraite, à temps partiel?',
   },
   hint: {
-    kids: 'Pour que vos dépenses baissent quand ils quittent la maison.',
+    kids: 'Ce que coûte un enfant, ce que l’État verse et un congé parental : et vos dépenses baissent quand ils quittent la maison.',
     home: 'Sa valeur, l’hypothèque et une vente éventuelle.',
     events: 'Des sommes datées, en plus du budget courant.',
     pension: 'Pas un REER collectif ni un CELI : seulement un régime où la rente dépend de vos années de service et de votre salaire.',
@@ -54,7 +54,7 @@ const EN: SituationCopy = {
   yes: 'Yes',
   no: 'No',
   q: {
-    kids: 'Children at home?',
+    kids: 'Children at home, or a planned child?',
     home: 'Do you own your main residence?',
     events: 'A planned event: inheritance, big expense, rental income?',
     pension: 'An employer pension plan that pays an annuity (like RREGOP)?',
@@ -62,7 +62,7 @@ const EN: SituationCopy = {
     partTime: 'Part-time work after you retire?',
   },
   hint: {
-    kids: 'So your spending drops when they leave home.',
+    kids: 'What a child costs, what the state pays and a parental leave; and your spending drops when they leave home.',
     home: 'Its value, the mortgage and a possible sale.',
     events: 'Dated sums, on top of the regular budget.',
     pension: 'Not a group RRSP or a TFSA: only a plan whose annuity depends on your years of service and your salary.',

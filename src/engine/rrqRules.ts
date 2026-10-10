@@ -37,6 +37,7 @@ export function makeRrqRules(indexation: Indexation): RrqRules {
     yampe,
     baseRate: k.baseReplacement,
     excludedShare: k.excludedShare,
+    exemption: knownYear(LAST_KNOWN_YEAR).rrq.exemption,
     firstRate: k.firstReplacement,
     secondRate: k.secondReplacement,
     firstFrom: k.firstFrom,

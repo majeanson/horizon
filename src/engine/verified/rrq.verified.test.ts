@@ -20,6 +20,7 @@ const RULES: RrqRules = {
   yampe: (y) => RRQ_YAMPE_HISTORY.value[y] ?? null,
   baseRate: 0.25,
   excludedShare: 0.15,
+  exemption: 3_500, // « Basic exemption $3500 » (Retraite Québec, 2026 Benefit Amounts and Key Data)
   firstRate: 0.0833,
   secondRate: 0.3333,
   firstFrom: 2019,

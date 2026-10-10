@@ -26,7 +26,7 @@ export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest',
 export interface ExampleHousehold {
   id: ExampleId
   household: Household
-  /** Birth years of the children (they change nothing in the projection). */
+  /** Birth years of the children (with no cost stated and nothing counted they change nothing in the projection). */
   children: number[]
   assumptions: Assumptions
 }

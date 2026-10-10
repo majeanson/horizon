@@ -48,6 +48,11 @@ export interface RrqRules {
   baseRate: number
   /** 0.15 — the share of the lowest-earning months dropped from the base calculation. */
   excludedShare: number
+  /**
+   * 3 500 $ — the basic exemption. Art. 101 of the Act takes a month out of the base period only in a year whose earnings do not exceed it (see
+   * `childRearingMonths`). Absent: 0, so only a year with no earnings at all qualifies.
+   */
+  exemption?: number
   /** 0.0833 — the first additional component's replacement rate. */
   firstRate: number
   /** 0.3333 — the second additional component's replacement rate. */
@@ -84,6 +89,12 @@ export interface RrqPensionInput {
   earnings: Readonly<Record<number, number>>
   /** Whole years, 60 to 72: the pension starts the month AFTER the birthday month of this age. */
   startAge: number
+  /**
+   * Months, by calendar year, in which the person is paid a family benefit for a child under 7 (Act, art. 1 v and 101, third paragraph, c). Such a month is out of
+   * the base contributory period — before the 15 % drop-out is counted — but ONLY in a year whose base earnings do not exceed the basic exemption: a parent who
+   * works through those years loses nothing and gains nothing. Absent: none (the pension is what it always was).
+   */
+  childRearingMonths?: Readonly<Record<number, number>>
 }
 
 export interface RrqPension {
@@ -177,16 +188,22 @@ function basePension(input: RrqPensionInput, rules: RrqRules, startIdx: number, 
   if (careerEnd < careerStart) return { pension: 0, months: 0, excluded: 0, adjustedTotal: 0, excludedTotal: 0 }
 
   const years = monthsByYear(careerStart, careerEnd)
-  const totalMonths = years.reduce((s, y) => s + y.months, 0)
 
   // Each year contributes `months` months worth `adjusted / months` each. The ceiling of a PARTIAL
   // year is pro-rated by its months, exactly as the leaflet does: $71 300 × 11 ÷ 12 = $65 358.
-  const blocks = years.map(({ year, months }) => {
-    const mga = rules.mga(year)
-    const capped = Math.min(input.earnings[year] ?? 0, (mga * months) / 12)
-    const adjusted = (capped * ampe) / mga
-    return { perMonth: adjusted / months, months, adjusted }
-  })
+  // A month with a family benefit for a child under 7, in a year whose earnings are at or under the exemption, is not in the period at all (art. 101).
+  const blocks = years
+    .map(({ year, months }) => {
+      const mga = rules.mga(year)
+      const earned = input.earnings[year] ?? 0
+      const out = earned <= (rules.exemption ?? 0) ? Math.min(months, input.childRearingMonths?.[year] ?? 0) : 0
+      const kept = months - out
+      const capped = Math.min(earned, (mga * months) / 12)
+      const adjusted = (capped * ampe) / mga
+      return { perMonth: kept > 0 ? adjusted / kept : 0, months: kept, adjusted }
+    })
+    .filter((b) => b.months > 0)
+  const totalMonths = blocks.reduce((s, b) => s + b.months, 0)
 
   // s. 116.4 of the QPP Act: 15 % of the months « counting any fraction of a month as a whole month » — rounded UP
   // (84.6 → 85, 66.6 → 67 in the leaflets). (Its other limit, the months over 120, cannot bind: the period is 504 months at 60.)

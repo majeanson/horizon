@@ -8,7 +8,7 @@ import type { Assumptions, Household, Person } from '../types.ts'
 //
 //   · Self, born March 1978 (48): a public-sector employee in RREGOP, 85 000 $, 12 years of service so far.
 //   · Spouse, born September 1981 (45): a private-sector employee, 65 000 $, no employer pension.
-//   · Two children (born 2012 and 2015) are in the profile but change nothing in v1 (no child benefits).
+//   · Two children (born 2012 and 2015) are in the profile but change nothing: no cost is stated for them and no child benefit is counted (`kidsEffects` is null).
 //
 // The earnings history is a plain ramp so the fixture does not carry 55 literals: it starts the year a person turns
 // 21 and grows 4 % a year, never above that year's ceiling — the MGA, and from 2024 the additional ceiling (YAMPE),

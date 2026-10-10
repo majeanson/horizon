@@ -50,7 +50,7 @@ describe('patchKidsEffects and addChildCounted', () => {
 
   it('a first child counts the benefits; a household that already chose keeps its choice', async () => {
     const { addChildCounted, patchKidsEffects } = await import('./profileLife.ts')
-    expect(addChildCounted(p0, 2028).household.kidsEffects).toEqual({ benefits: true, qppExclusion: false, leave: null })
+    expect(addChildCounted(p0, 2028).household.kidsEffects).toEqual({ benefits: true, qppExclusion: true, leave: null })
     const off = patchKidsEffects(patchKidsEffects(p0, { qppExclusion: true }), { benefits: false })
     expect(addChildCounted(off, 2028).household.kidsEffects).toEqual({ benefits: false, qppExclusion: true, leave: null })
   })

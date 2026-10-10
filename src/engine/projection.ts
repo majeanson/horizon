@@ -83,6 +83,25 @@ function workFraction(r: ResolvedPerson, year: number): number {
   return 0
 }
 
+/**
+ * The months, by calendar year, a parent is paid a family benefit for a child under 7 — when the household counts the exclusion (`kidsEffects.qppExclusion`). The
+ * benefit goes to ONE parent: the lower earner of a couple (a lone parent is that parent). A child is taken to be born in the middle of its year: the benefit starts
+ * the month AFTER the birth month (August) and lasts until the 7th birthday (June of the year it turns 7) — 71 months, over seven calendar years.
+ */
+export function childRearingMonths(p: Person, h: Household | undefined): Record<number, number> | undefined {
+  if (!h?.kidsEffects?.qppExclusion || (h.children ?? []).length === 0) return undefined
+  const lower = h.persons.length === 1 ? h.persons[0] : h.persons[1].salaryToday < h.persons[0].salaryToday ? h.persons[1] : h.persons[0]
+  if (lower.id !== p.id) return undefined
+  const out: Record<number, number> = {}
+  const add = (year: number, months: number) => (out[year] = Math.min(12, (out[year] ?? 0) + months))
+  for (const born of h.children ?? []) {
+    add(born, 5)
+    for (let y = born + 1; y <= born + 5; y++) add(y, 12)
+    add(born + 6, 6)
+  }
+  return out
+}
+
 export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRules, h?: Household): ResolvedPerson {
   const retirementAge = s.retirementAge?.[p.id] ?? p.retirementAge
   const rrqStartAge = s.rrqStartAge?.[p.id] ?? p.rrq.startAge
@@ -102,7 +121,7 @@ export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRul
   }
   r.earnings = earnings
 
-  r.rrq = rrqPension({ birth: p.birth, earnings, startAge: rrqStartAge }, rrqRules)
+  r.rrq = rrqPension({ birth: p.birth, earnings, startAge: rrqStartAge, childRearingMonths: childRearingMonths(p, h) }, rrqRules)
   r.oas = { birth: p.birth, startAge: oasStartAge, residentSince: p.oas.residentSince }
   r.db = p.pensions.map((pension) => ({
     pension,

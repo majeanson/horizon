@@ -42,12 +42,12 @@ export function patchKidsEffects(p: Profile, patch: Partial<KidsEffects>): Profi
 }
 
 /**
- * A child added through the family card: the child, and — if the household had not said anything yet about counting the benefits — the benefits counted (a visible
- * switch beside the children turns them off). A household that already chose, either way, keeps its choice.
+ * A child added through the family card: the child, and — if the household had not said anything yet — the benefits and the QPP exclusion counted (visible
+ * switches beside the children turn them off). A household that already chose, either way, keeps its choice.
  */
 export function addChildCounted(p: Profile, born: number): Profile {
   const added = addChild(p, born)
-  return added === p || added.household.kidsEffects != null ? added : patchKidsEffects(added, { benefits: true })
+  return added === p || added.household.kidsEffects != null ? added : patchKidsEffects(added, { benefits: true, qppExclusion: true })
 }
 
 /** A flow as the page may hold it: a windfall is once and tax-free, an expense is not income, and an owner is someone who is in the household. */

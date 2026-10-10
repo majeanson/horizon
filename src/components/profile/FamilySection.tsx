@@ -144,7 +144,8 @@ export function FamilySection({ withKids = true }: { /** The children and what e
                   <NumberField kind="int" min={16} max={35} unit={t.fields.years} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => patchChildSpending(p, { untilAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
                 )}
               </FieldRow>
-              <p className="field-row__hint">{leaving.length === 0 ? lc.none : lc.effect(formatMoney(cost.perChild, lang), leaving.length, String(Math.min(...leaving)))}</p>
+              {/* what leaving home takes out of the budget: only said when a flat amount per child at home is stated (the amounts by age are for a child still to come) */}
+              {cost.perChild > 0 && <p className="field-row__hint">{leaving.length === 0 ? lc.none : lc.effect(formatMoney(cost.perChild, lang), leaving.length, String(Math.min(...leaving)))}</p>}
               {coming.map((born) => (
                 <p key={born} className="field-row__hint">
                   {cost.byAge ? kc.planned.effectBands(String(born), String(born + cost.untilAge)) : kc.planned.effect(String(born), formatMoney(cost.perChild, lang), String(born + cost.untilAge))}
