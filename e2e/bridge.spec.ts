@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
-import { EXAMPLE, savedProfile, seedProfile } from './seed'
+import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile } from './seed'
 
 // « Mes années 60 à 70 » in a real browser: the strategy view sits on the results page, always visible, computed
 // off the page's thread, keeps every choice in the address, and shows each year of the bridge as text beside the
@@ -154,4 +154,22 @@ test('on a phone the view fits the screen: the table scrolls inside its own regi
   await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   await expectNoHorizontalOverflow(page, page.locator('.bridge'))
   await expect(page.locator('.bridge__table')).toHaveAttribute('role', 'region')
+})
+
+test('« Le nid » has a net-value twin when there is a home: the nest alone says how the accounts hold, the net value what the household owns', async ({ page }) => {
+  const owner = JSON.parse(JSON.stringify(EXAMPLE))
+  owner.household.home = { value: 520_000, mortgage: { balance: 150_000, rate: 0.049, monthlyPayment: 1_150 }, sale: null }
+  await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(owner)] as const) // after the file's own seed: the last write wins
+  await page.goto('/resultats?v=strategies&bt=cards')
+  await expect(page.getByRole('heading', { name: 'Le nid, selon la façon de commencer' })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { name: 'La valeur nette, selon la façon de commencer' })).toBeVisible()
+  await expect(page.getByRole('img', { name: /Valeur nette \(nid plus avoir foncier\)/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Nid en fin d’année selon/ })).toBeVisible()
+})
+
+test('…and without a home there is one picture: the net value would be the same lines', async ({ page }) => {
+  // (the seeded example owns no home)
+  await page.goto('/resultats?v=strategies&bt=cards')
+  await expect(page.getByRole('heading', { name: 'Le nid, selon la façon de commencer' })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { name: 'La valeur nette, selon la façon de commencer' })).toHaveCount(0)
 })

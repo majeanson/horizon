@@ -65,7 +65,8 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
   const first = rows[0]?.age ?? 0
   const last = rows[rows.length - 1]?.age ?? 0
   const inWindow = (age: number) => age >= first && age <= last
-  const nestSeries = [
+  // The same four lines twice: the nest (the accounts drawn on), and the household's net value (the nest plus the home's equity).
+  const lines = (of: 'total' | 'worth') => [
     { id: 'selected', label: copy.selectedName, colour: 'accent' as const, key: null },
     { id: 'asap', label: copy.strategyName.asap, colour: 'sky' as const, key: 'asap' as const },
     { id: 'standard', label: copy.strategyName.standard, colour: 'sage' as const, key: 'standard' as const },
@@ -74,10 +75,13 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
     id: s.id,
     label: s.label,
     colour: s.colour,
-    points: (s.key === null ? view.selected.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total })) : view.strategies.find((c) => c.key === s.key)!.nest)
+    points: (s.key === null ? view.selected.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total, worth: r.nest.total + r.homeEquity })) : view.strategies.find((c) => c.key === s.key)!.nest)
       .filter((p) => inWindow(p.age))
-      .map((p) => ({ x: p.year, y: p.total })),
+      .map((p) => ({ x: p.year, y: p[of] })),
   }))
+  const nestSeries = lines('total')
+  // Without a home, net value IS the nest: a second picture of the same lines would say nothing.
+  const hasHome = rows.some((r) => r.homeEquity > 0.5)
   // One marker per start age; when both pensions start the same year they share one line and one label.
   const starts = (at: (age: number) => number) => {
     const { rrqStartAge: q, oasStartAge: o } = params.levers
@@ -125,6 +129,25 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
           />
         </Suspense>
       </div>
+      {hasHome && (
+        <>
+          <h3 className="bridge__heading">{copy.worthTitle}</h3>
+          <p className="field-row__hint">{copy.worthHint}</p>
+          <div className="chart-slot">
+            <Suspense fallback={<Loading />}>
+              <LineChart
+                series={lines('worth')}
+                markers={markers}
+                yFormat={(y) => formatCompactMoney(y, lang)}
+                yDetail={(y) => formatMoney(y, lang)}
+                xTitle={(year) => copy.tooltip(year - person.birth.year, year)}
+                xTick={yearTick}
+                ariaLabel={copy.worthFigure(first, last)}
+              />
+            </Suspense>
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -210,3 +210,23 @@ describe('the strategies side by side', () => {
     }
   })
 })
+
+describe('net value: the nest plus the home’s equity', () => {
+  const lev = profileLevers(H, 'self')
+  it('is the nest alone for a household with no home — and the home’s value less its mortgage, in today’s dollars, for one with a home', () => {
+    const none = bridgeView(H, A, lev)
+    for (const r of none.selected.rows) expect(r.homeEquity).toBe(0)
+    for (const s of none.strategies) for (const p of s.nest) expect(p.worth).toBeCloseTo(p.total, 6)
+
+    const owner = structuredClone(H)
+    owner.home = { value: 500_000, mortgage: { balance: 200_000, rate: 0.05, monthlyPayment: 1_500 }, sale: null }
+    const view = bridgeView(owner, A, lev)
+    const first = view.selected.rows[0]
+    expect(first.homeEquity).toBeGreaterThan(200_000)
+    expect(first.homeEquity).toBeLessThan(500_000)
+    // the mortgage is paid down while the home keeps pace with prices: the equity never falls, in today's dollars, as the loan ends
+    const last = view.selected.rows.at(-1)!
+    expect(last.homeEquity).toBeGreaterThan(first.homeEquity - 1)
+    for (const s of view.strategies) s.nest.forEach((p, i) => expect(p.worth).toBeCloseTo(p.total + view.selected.rows[i]!.homeEquity, 6))
+  })
+})

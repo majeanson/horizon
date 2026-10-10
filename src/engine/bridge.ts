@@ -84,6 +84,8 @@ export interface BridgeYear {
   shortfall: number
   /** What the accounts hold at the end of the year. */
   nest: Record<AccountKind, number> & { total: number }
+  /** What the home is worth less what is still owed on it, at the end of the year (0 with no home, or one that is underwater): the part of the household's wealth the nest does not hold. */
+  homeEquity: number
   status: YearStatus
 }
 
@@ -118,8 +120,8 @@ export interface StrategyCard {
   key: StrategyKey
   levers: BridgeLevers
   summary: BridgeSummary
-  /** The nest at the end of each year (today's dollars), for the chart. */
-  nest: { year: number; age: number; total: number }[]
+  /** The nest at the end of each year (today's dollars), for the chart; `worth` is the nest plus the home's equity — the household's net value. */
+  nest: { year: number; age: number; total: number; worth: number }[]
   /** Against starting the QPP and OAS at 65 (the `standard` card): how much MORE was drawn from the nest while 60 to 69. */
   extraDrawn6070: number
   /** The age (reached in the year) at which the pensions of this strategy have paid back what waiting cost, or the age at which waiting until 65 overtakes; null when it never happens in the plan or the strategy is the baseline. */
@@ -218,6 +220,7 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
     saved: pick((p) => p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa),
     shortfall,
     nest: { ...nestParts, total: sum(KINDS.map((k) => nestParts[k])) },
+    homeEquity: Math.max(0, r.household.homeValueEnd - r.household.mortgageBalanceEnd) / d,
     // The verdict's own rule (retireAt, deferral, runScenario): ANY shortfall in the year, in the year's own dollars — so a figure here is never a plan that works there.
     status: r.household.shortfall > 0 ? 'short' : drawn > 1 ? 'drawing' : 'covered',
   }
@@ -330,7 +333,7 @@ export function bridgeView(h: Household, a: Assumptions, levers: BridgeLevers, w
       key,
       levers: l,
       summary: run.summary,
-      nest: run.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total })),
+      nest: run.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total, worth: r.nest.total + r.homeEquity })),
       extraDrawn6070: run.summary.drawn6070 - base.run.summary.drawn6070,
       breakEven: broke?.age ?? null,
       breakEvenKind: broke?.kind ?? null,
