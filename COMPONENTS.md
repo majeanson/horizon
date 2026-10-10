@@ -99,7 +99,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 Pages compose the primitives above and own data and routing; a specimen of a page is a
 screenshot, and the e2e suite takes those. They are listed so nobody looks for them here:
 `src/pages/Profil.tsx`, `Hypotheses.tsx`, `Resultats.tsx`, `Donnees.tsx` (the four destinations; their sections are
-`src/components/profile/*`; Résultats' panels are `src/components/results/*` — `BridgePanel`, `ChartPanel`,
+`src/components/profile/*`; Résultats' state is `lib/useResultsPage.ts`, its five views `src/components/results/views/*` and its panels `src/components/results/*` — `BridgePanel`, `ChartPanel`,
 `SensitivityPanel`, `EarliestEachPanel`, `SaveView`, `SpendView`, `FutureView`, `CareView`, `AccuracyNote`, `LedgerPanel`, `OrderPanel`, `YearTables`, `ParamsPanel`) `src/pages/Fiche.tsx` (the character sheet; its two skins and their pieces are `src/components/sheet/*` — `SheetSerious`, `SheetRpg`, `StatBar`, `ModeSwitch`, all drawing the one view of `lib/sheetView.ts`) and `src/pages/DevKit.tsx` (the gallery itself).
 
 ## CSS design system (condensed)
