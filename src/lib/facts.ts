@@ -63,7 +63,8 @@ const FACTS: readonly FactDef[] = [
   { kind: 'rrspLocked', doc: 'bank', owner: 'person', info: 'rrspLocked', applies: (p, o) => (person(p, o)?.accounts.rrsp.lockedIn ?? 0) > 0 },
   { kind: 'tfsaBalance', doc: 'bank', owner: 'person', info: 'tfsaBalance', applies: () => true },
   { kind: 'tfsaRoom', doc: 'tax', owner: 'person', info: 'tfsaRoom', applies: () => true },
-  { kind: 'nonRegBalance', doc: 'bank', owner: 'person', info: 'nonRegBalance', applies: () => true },
+  // Only for someone who holds money outside the REER and the CELI (« Ma situation »): nothing is asked of anyone else.
+  { kind: 'nonRegBalance', doc: 'bank', owner: 'person', info: 'nonRegBalance', applies: (p, o) => { const a = person(p, o)?.accounts.nonReg; return a !== undefined && (a.balance > 0 || a.acb > 0 || a.annualContribution > 0) } },
   { kind: 'nonRegAcb', doc: 'bank', owner: 'person', info: 'nonRegAcb', applies: (p, o) => (person(p, o)?.accounts.nonReg.balance ?? 0) > 0 },
   { kind: 'pension', doc: 'employer', owner: 'person', info: 'dbService', applies: (p, o) => (person(p, o)?.pensions.length ?? 0) > 0 },
   { kind: 'spendingWorking', doc: 'budget', owner: 'household', info: 'spendingWorking', applies: () => true },

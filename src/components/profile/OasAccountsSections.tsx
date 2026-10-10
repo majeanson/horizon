@@ -106,7 +106,7 @@ function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & 
   )
 }
 
-export function AccountsSection({ person, edit, withoutRoom = false }: PersonEditor & { /** The room left comes from the tax notice: the stepper asks for it there. */ withoutRoom?: boolean }) {
+export function AccountsSection({ person, edit, withoutRoom = false, withNonReg = true }: PersonEditor & { /** The room left comes from the tax notice: the stepper asks for it there. */ withoutRoom?: boolean; /** Money outside the REER and the CELI: its group shows only when « Ma situation » says there is some (or there already is). */ withNonReg?: boolean }) {
   const t = useT()
   const a = t.profile.accounts
   const nonReg = person.accounts.nonReg
@@ -115,6 +115,7 @@ export function AccountsSection({ person, edit, withoutRoom = false }: PersonEdi
     <Section title={a.title} icon="piggy-bank-bold">
       <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} withRoom={!withoutRoom} />
       <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} withRoom={!withoutRoom} />
+      {withNonReg && (
       <Group title={a.nonReg}>
         <FieldRow label={a.balance} infoId="nonRegBalance" fact={factId(person.id, 'nonRegBalance')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
@@ -127,6 +128,7 @@ export function AccountsSection({ person, edit, withoutRoom = false }: PersonEdi
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.annualContribution} onChange={(annualContribution) => setNonReg({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
       </Group>
+      )}
     </Section>
   )
 }

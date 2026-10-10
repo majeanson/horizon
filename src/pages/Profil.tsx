@@ -199,7 +199,7 @@ function PersonFields({ id }: { id: PersonId }) {
       <AboutSection person={person} edit={edit} withoutPartTime={!applies(profile, yes, 'partTime', id)} />
       <RrqSection person={person} edit={edit} />
       <OasSection person={person} edit={edit} withoutResidence={!applies(profile, yes, 'abroad', id)} />
-      <AccountsSection person={person} edit={edit} />
+      <AccountsSection person={person} edit={edit} withNonReg={applies(profile, yes, 'nonReg', id)} />
       {applies(profile, yes, 'pension', id) && <PensionPlans person={person} edit={edit} />}
     </>
   )

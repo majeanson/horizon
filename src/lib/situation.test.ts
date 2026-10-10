@@ -45,6 +45,14 @@ describe('what is already in the profile shows without an answer', () => {
     expect(hasData(later, 'partTime', 'self')).toBe(true)
   })
 
+  it('money outside the REER and the CELI: a balance, a cost base or a yearly addition each show the topic, and nothing at all does not', () => {
+    const blank = defaultProfile({ year: 2026 })
+    const me = blank.household.persons[0]
+    const holding = (patch: Partial<typeof me.accounts.nonReg>) => ({ ...blank, household: { ...blank.household, persons: [{ ...me, accounts: { ...me.accounts, nonReg: { ...me.accounts.nonReg, ...patch } } }] } })
+    expect(hasData(blank, 'nonReg', 'self')).toBe(false)
+    for (const patch of [{ balance: 1 }, { acb: 1 }, { annualContribution: 1 }]) expect(hasData(holding(patch), 'nonReg', 'self'), JSON.stringify(patch)).toBe(true)
+  })
+
   it('the committed household: whatever it holds shows, and nothing it lacks does', () => {
     const g = golden()
     for (const person of g.household.persons) expect(hasData(g, 'pension', person.id), person.id).toBe(person.pensions.length > 0)
@@ -63,6 +71,17 @@ describe('a « no » over typed figures', () => {
     const home = addHome(blank)
     expect(lostBy(home, 'home')).toBe(1)
     expect(clearTopic(home, 'home').household.home ?? null).toBeNull()
+  })
+
+  it('a « no » to the non-registered question empties that account — the balance, what it cost, the yearly addition — and nothing else', () => {
+    const blank = defaultProfile({ year: 2026 })
+    const me = blank.household.persons[0]
+    const rich = { ...blank, household: { ...blank.household, persons: [{ ...me, accounts: { ...me.accounts, rrsp: { ...me.accounts.rrsp, balance: 50_000 }, nonReg: { balance: 80_000, acb: 60_000, annualContribution: 3_000 } } }] } }
+    expect(lostBy(rich, 'nonReg', 'self')).toBe(1)
+    const cleared = clearTopic(rich, 'nonReg', 'self').household.persons[0].accounts
+    expect(cleared.nonReg).toEqual({ balance: 0, acb: 0, annualContribution: 0 })
+    expect(cleared.rrsp.balance).toBe(50_000) // the registered accounts are not touched
+    expect(clearTopic(blank, 'nonReg', 'self')).toBe(blank) // nothing to erase: the same profile back, nothing to ask
   })
 
   it('a lifelong residence is restored, not just blanked: the arrival year goes and the OAS counts from 18 again', () => {

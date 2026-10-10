@@ -10,11 +10,11 @@ import type { Profile } from './schema.ts'
 // never carries the answer: « yes » with nothing typed yet is a note to oneself, like the ticks of the documents list, kept under its own key.
 // A « no » over data asks first, and says what is lost.
 
-export type Topic = 'kids' | 'home' | 'events' | 'pension' | 'abroad' | 'partTime'
+export type Topic = 'kids' | 'home' | 'events' | 'pension' | 'nonReg' | 'abroad' | 'partTime'
 
 /** The topics asked once for the household, and the ones asked for each person. */
 export const HOUSEHOLD_TOPICS: readonly Topic[] = ['kids', 'home', 'events']
-export const PERSON_TOPICS: readonly Topic[] = ['pension', 'abroad', 'partTime']
+export const PERSON_TOPICS: readonly Topic[] = ['pension', 'nonReg', 'abroad', 'partTime']
 
 const person = (p: Profile, owner: PersonId | undefined) => p.household.persons.find((x) => x.id === owner)
 
@@ -30,6 +30,11 @@ export function hasData(p: Profile, topic: Topic, owner?: PersonId): boolean {
       return (h.flows ?? []).length > 0
     case 'pension':
       return (person(p, owner)?.pensions.length ?? 0) > 0
+    case 'nonReg': {
+      // Money held outside the REER and the CELI: a balance, what it cost, or what the person adds to it each year.
+      const a = person(p, owner)?.accounts.nonReg
+      return a !== undefined && (a.balance > 0 || a.acb > 0 || a.annualContribution > 0)
+    }
     case 'abroad': {
       // Residence counts from the later of the year of birth + 18 and the year it began: a later one is a life partly lived elsewhere.
       const x = person(p, owner)
@@ -59,6 +64,8 @@ export function lostBy(p: Profile, topic: Topic, owner?: PersonId): number {
       return (h.flows ?? []).length
     case 'pension':
       return person(p, owner)?.pensions.length ?? 0
+    case 'nonReg':
+      return hasData(p, 'nonReg', owner) ? 1 : 0
     case 'abroad':
       return hasData(p, 'abroad', owner) ? 1 : 0
     case 'partTime':
@@ -66,7 +73,7 @@ export function lostBy(p: Profile, topic: Topic, owner?: PersonId): number {
   }
 }
 
-/** The profile with this topic emptied: no children, no home, no dated flows, no plan, a lifelong residence, no work kept after retiring. */
+/** The profile with this topic emptied: no children, no home, no dated flows, no plan, no money outside the REER and the CELI, a lifelong residence, no work kept after retiring. */
 export function clearTopic(p: Profile, topic: Topic, owner?: PersonId): Profile {
   if (lostBy(p, topic, owner) === 0) return p
   const h = p.household
@@ -80,6 +87,8 @@ export function clearTopic(p: Profile, topic: Topic, owner?: PersonId): Profile 
       return { ...p, household: { ...h, flows: [] } }
     case 'pension':
       return mapOwner((x) => ({ ...x, pensions: [] }))
+    case 'nonReg':
+      return mapOwner((x) => ({ ...x, accounts: { ...x.accounts, nonReg: { balance: 0, acb: 0, annualContribution: 0 } } }))
     case 'abroad':
       return mapOwner((x) => ({ ...x, oas: { ...x.oas, residentSince: x.birth.year + 18 } }))
     case 'partTime':

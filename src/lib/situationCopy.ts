@@ -7,10 +7,10 @@ interface SituationCopy {
   lead: string
   yes: string
   no: string
-  q: { kids: string; home: string; events: string; pension: string; abroad: string; partTime: string }
-  hint: { kids: string; home: string; events: string; pension: string; abroad: string; partTime: string }
+  q: { kids: string; home: string; events: string; pension: string; nonReg: string; abroad: string; partTime: string }
+  hint: { kids: string; home: string; events: string; pension: string; nonReg: string; abroad: string; partTime: string }
   /** What a « no » over typed figures would erase — said before it does. */
-  lose: { kids: string; home: string; events: (n: number) => string; pension: (n: number) => string; abroad: string; partTime: string }
+  lose: { kids: string; home: string; events: (n: number) => string; pension: (n: number) => string; nonReg: string; abroad: string; partTime: string }
   hidden: string
   confirmNo: string
 }
@@ -25,6 +25,7 @@ const FR: SituationCopy = {
     home: 'Propriétaire de votre résidence principale?',
     events: 'Un événement prévu : héritage, grosse dépense, revenu de location?',
     pension: 'Un régime de retraite d’employeur qui verse une rente (comme le RREGOP)?',
+    nonReg: 'Des placements hors REER et CELI (un compte de courtage, un compte non enregistré)?',
     abroad: 'Des années hors du Canada depuis vos 18 ans?',
     partTime: 'Du travail après votre retraite, à temps partiel?',
   },
@@ -33,6 +34,7 @@ const FR: SituationCopy = {
     home: 'Sa valeur, l’hypothèque et une vente éventuelle.',
     events: 'Des sommes datées, en plus du budget courant.',
     pension: 'Pas un REER collectif ni un CELI : seulement un régime où la rente dépend de vos années de service et de votre salaire.',
+    nonReg: 'Actions, fonds ou obligations dans un compte ordinaire : leur valeur, ce qu’ils ont coûté et ce que vous y ajoutez chaque année.',
     abroad: 'La Sécurité de la vieillesse compte les années passées ici après 18 ans. Sans « oui », on suppose que vous avez toujours vécu au Canada.',
     partTime: 'Une part de votre salaire, jusqu’à l’âge que vous choisissez.',
   },
@@ -41,6 +43,7 @@ const FR: SituationCopy = {
     home: 'La maison, son hypothèque et sa vente éventuelle seront effacées.',
     events: (n) => (n === 1 ? '1 événement daté sera effacé.' : `${n} événements datés seront effacés.`),
     pension: (n) => (n === 1 ? 'Ce régime de retraite et ses règles seront effacés.' : `${n} régimes de retraite et leurs règles seront effacés.`),
+    nonReg: 'Le solde de ce compte non enregistré, son coût d’achat et vos ajouts annuels seront effacés.',
     abroad: 'Votre année d’arrivée au Canada sera effacée : on supposera que vous avez toujours vécu ici.',
     partTime: 'Le travail gardé après la retraite sera effacé.',
   },
@@ -58,6 +61,7 @@ const EN: SituationCopy = {
     home: 'Do you own your main residence?',
     events: 'A planned event: inheritance, big expense, rental income?',
     pension: 'An employer pension plan that pays an annuity (like RREGOP)?',
+    nonReg: 'Investments outside the RRSP and the TFSA (a brokerage or other non-registered account)?',
     abroad: 'Years outside Canada since you turned 18?',
     partTime: 'Part-time work after you retire?',
   },
@@ -66,6 +70,7 @@ const EN: SituationCopy = {
     home: 'Its value, the mortgage and a possible sale.',
     events: 'Dated sums, on top of the regular budget.',
     pension: 'Not a group RRSP or a TFSA: only a plan whose annuity depends on your years of service and your salary.',
+    nonReg: 'Stocks, funds or bonds in an ordinary account: their value, what they cost and what you add each year.',
     abroad: 'Old Age Security counts the years spent here after 18. Without a “yes”, you are assumed to have lived in Canada all along.',
     partTime: 'A share of your salary, up to the age you choose.',
   },
@@ -74,6 +79,7 @@ const EN: SituationCopy = {
     home: 'The home, its mortgage and a possible sale will be erased.',
     events: (n) => (n === 1 ? '1 dated event will be erased.' : `${n} dated events will be erased.`),
     pension: (n) => (n === 1 ? 'This pension plan and its rules will be erased.' : `${n} pension plans and their rules will be erased.`),
+    nonReg: 'The balance of this non-registered account, its cost base and your yearly additions will be erased.',
     abroad: 'Your year of arrival in Canada will be erased: you will be assumed to have lived here all along.',
     partTime: 'The work kept after retirement will be erased.',
   },

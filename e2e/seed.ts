@@ -66,7 +66,7 @@ export async function seedProfile(page: Page, profile: SeedProfile = EXAMPLE): P
  */
 export async function showAllSections(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    if (localStorage.getItem('horizon-situation') === null) localStorage.setItem('horizon-situation', JSON.stringify(['kids', 'events', 'pension:self', 'pension:spouse', 'abroad:self', 'abroad:spouse', 'partTime:self', 'partTime:spouse']))
+    if (localStorage.getItem('horizon-situation') === null) localStorage.setItem('horizon-situation', JSON.stringify(['kids', 'events', 'pension:self', 'pension:spouse', 'nonReg:self', 'nonReg:spouse', 'abroad:self', 'abroad:spouse', 'partTime:self', 'partTime:spouse']))
   })
 }
 

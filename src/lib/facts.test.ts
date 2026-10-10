@@ -18,12 +18,21 @@ describe('the facts a household has', () => {
   it('a person alone: the figures every person has, and none that need something they do not have', () => {
     const p = defaultProfile(TODAY) // no salary, no pension, no home, nothing in the non-registered account
     const kinds = factsOf(p).map((f) => f.kind)
-    expect(kinds).toEqual(['earnings', 'rrspBalance', 'rrspRoom', 'tfsaBalance', 'tfsaRoom', 'nonRegBalance', 'spendingWorking', 'spendingRetired'])
+    expect(kinds).toEqual(['earnings', 'rrspBalance', 'rrspRoom', 'tfsaBalance', 'tfsaRoom', 'spendingWorking', 'spendingRetired'])
     expect(kinds).not.toContain('salary')
+    expect(kinds).not.toContain('nonRegBalance') // nothing held outside the REER and the CELI: nothing to read
     expect(kinds).not.toContain('nonRegAcb')
     expect(kinds).not.toContain('pension')
     expect(kinds).not.toContain('mortgage')
     expect(kinds).not.toContain('residence') // lived here since 18: the OAS counts from there, nothing to read
+  })
+
+  it('the non-registered balance is a figure only for someone who holds money outside the REER and the CELI', () => {
+    const p = defaultProfile(TODAY)
+    const me = p.household.persons[0]
+    const holding = (patch: Partial<typeof me.accounts.nonReg>) => ({ ...p, household: { ...p.household, persons: [{ ...me, accounts: { ...me.accounts, nonReg: { ...me.accounts.nonReg, ...patch } } }] } })
+    for (const patch of [{ balance: 10_000 }, { annualContribution: 2_000 }, { acb: 5_000 }]) expect(factsOf(holding(patch)).map((f) => f.kind), JSON.stringify(patch)).toContain('nonRegBalance')
+    expect(factsOf(holding({})).map((f) => f.kind)).not.toContain('nonRegBalance')
   })
 
   it('the residence is a figure only for someone whose residence began after their 18th birthday', () => {

@@ -141,3 +141,33 @@ test('« Ma situation » is one of the first things on the page: right after who
   const top = await page.locator('#situation').evaluate((el) => el.getBoundingClientRect().top + (document.getElementById('root')?.scrollTop ?? 0))
   expect(top, 'the card starts within the first two screens').toBeLessThan(844 * 2)
 })
+
+test('money outside the REER and the CELI: no question answered, no fields; a « oui » opens them; a « non » over a balance says what is erased first', async ({ page }) => {
+  await seedProfile(page, simple())
+  await page.goto('/profil?form=1')
+  const ask = question(page, /Des placements hors REER et CELI/)
+  await expect(ask.getByRole('radio', { name: 'Non' })).toBeChecked()
+  // the registered accounts stay; the non-registered group (balance, cost base, yearly addition) is not offered
+  await expect(page.locator('[data-fact="self:rrspBalance"]')).toBeVisible()
+  await expect(page.locator('[data-fact="self:nonRegBalance"]')).toHaveCount(0)
+  await expect(page.locator('[data-fact="self:nonRegAcb"]')).toHaveCount(0)
+  // a « oui » opens it, and what is typed in it is the household's from then on
+  await ask.getByRole('radio', { name: 'Oui' }).click()
+  const balance = page.locator('[data-fact="self:nonRegBalance"]').getByRole('textbox')
+  await expect(balance).toBeVisible()
+  await balance.fill('40000')
+  await balance.press('Enter')
+  await page.waitForFunction(() => (localStorage.getItem('horizon-profile') ?? '').includes('"nonReg":{"balance":40000'))
+  // the question now reads « oui » by itself (there is a balance), and a « non » asks first
+  await expect(ask.getByRole('radio', { name: 'Oui' })).toBeChecked()
+  await ask.getByRole('radio', { name: 'Non' }).click()
+  await expect(page.getByRole('alertdialog')).toContainText('Le solde de ce compte non enregistré')
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Annuler' }).click()
+  await expect(page.locator('[data-fact="self:nonRegBalance"]')).toBeVisible() // a refusal keeps everything
+  await ask.getByRole('radio', { name: 'Non' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Effacer' }).click()
+  await expect(page.locator('[data-fact="self:nonRegBalance"]')).toHaveCount(0)
+  // the profile is written a beat after the tap: wait for it before reading it
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem('horizon-profile')!).household.persons[0].accounts.nonReg.balance === 0)
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('horizon-profile')!).household.persons[0].accounts.nonReg)).toEqual({ balance: 0, acb: 0, annualContribution: 0 })
+})

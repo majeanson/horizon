@@ -69,7 +69,7 @@ function StepBody({ step }: { step: Step }) {
     case 'tax':
       return <Persons render={(person, edit) => <TaxFields person={person} edit={edit} />} />
     case 'bank':
-      return <Persons render={(person, edit) => <AccountsSection person={person} edit={edit} withoutRoom />} />
+      return <Persons render={(person, edit) => <AccountsSection person={person} edit={edit} withoutRoom withNonReg={applies(profile, yes, 'nonReg', person.id)} />} />
     case 'employer':
       return <Persons render={(person, edit) => <PensionPlans person={person} edit={edit} />} />
     case 'home':
