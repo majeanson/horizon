@@ -57,11 +57,11 @@ test('the list downloads as a text file that carries the ticks, and prints witho
 
 test('a first-time user finds it on the first screen, and everyone finds it on Profil and in the glossary', async ({ page }) => {
   await seedProfile(page, blankSeed())
-  await page.goto('/')
+  await page.goto('/profil')
   await page.getByRole('link', { name: 'Documents à rassembler' }).click()
   await expect(page).toHaveURL(/\/documents$/)
   await expect(page.locator('.docs-item')).toHaveCount(4) // one person alone, with nothing to say: the budget, the tax notice, the accounts and the QPP statement
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByRole('link', { name: 'Documents à rassembler' })).toBeVisible()
   await page.goto('/glossaire')
   await expect(page.getByRole('link', { name: 'Documents à rassembler' })).toBeVisible()

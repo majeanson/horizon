@@ -11,7 +11,7 @@ const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'short desktop', width: 1280, height: 500 },
 ]
-const ROUTES = ['/', '/hypotheses', '/resultats', '/donnees']
+const ROUTES = ['/', '/profil', '/hypotheses', '/resultats', '/donnees']
 
 for (const vp of VIEWPORTS) {
   test(`chrome holds still while the page scrolls — ${vp.name}`, async ({ page }) => {

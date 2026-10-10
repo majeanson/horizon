@@ -6,7 +6,7 @@ import { EXAMPLE, savedProfile, seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('a pasted table fills the years, says what it understood first, and marks the earnings confirmed', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const section = page.locator('.persons .profile-section', { hasText: 'Revenus de travail admissibles par année' }).first()
   await section.getByRole('button', { name: 'Coller mon relevé' }).click()
   const box = section.getByRole('textbox', { name: 'Tableau copié du relevé de participation' })
@@ -22,7 +22,7 @@ test('a pasted table fills the years, says what it understood first, and marks t
 })
 
 test('text with no year and amount reads nothing and offers nothing to import', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const section = page.locator('.persons .profile-section', { hasText: 'Revenus de travail admissibles par année' }).first()
   await section.getByRole('button', { name: 'Coller mon relevé' }).click()
   await section.getByRole('textbox', { name: 'Tableau copié du relevé de participation' }).fill('Bonjour\nrien ici')

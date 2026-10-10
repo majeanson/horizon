@@ -43,7 +43,7 @@ test.describe('with the keyboard alone', () => {
   test.beforeEach(async ({ page }) => seedProfile(page, blankSeed()))
 
   test('a field is reached, typed into, committed with Enter, and explained with Space — and the note opens in place', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.locator('.page-head__title').waitFor()
     // The label line carries the field's tools: its estimé / confirmé mark, then its ⓘ, then the box itself.
     await tabTo(page, /^Où trouver ce chiffre\s: Revenu de travail par année$/)
@@ -63,7 +63,7 @@ test.describe('with the keyboard alone', () => {
   })
 
   test('the earnings grid sits on the page: its ⓘ, the fill action, the paste action and the first year are the next stops', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.locator('.page-head__title').waitFor()
     await tabTo(page, /Où trouver ce chiffre\s: Revenus de travail admissibles par année/)
     await page.keyboard.press('Tab')
@@ -85,7 +85,7 @@ test.describe('with the keyboard alone', () => {
   })
 
   test('a confirmation traps focus, closes on Escape, and gives focus back to the button that opened it', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.getByRole('button', { name: 'Ajouter mon ou ma partenaire' }).click()
     const remove = page.getByRole('button', { name: 'Retirer mon ou ma partenaire' })
     await remove.focus()
@@ -106,7 +106,7 @@ test.describe('with the keyboard alone', () => {
 test.describe('on every page', () => {
   test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
-  for (const path of ['/', '/hypotheses', '/resultats', '/donnees', '/glossaire']) {
+  for (const path of ['/', '/profil', '/hypotheses', '/resultats', '/donnees', '/glossaire']) {
     test(`${path}: focus moves in reading order, always shows where it is, and no tabindex fights the order`, async ({ page }) => {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()

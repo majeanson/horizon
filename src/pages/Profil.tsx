@@ -170,7 +170,7 @@ export function Profil() {
         <AccuracyGuide />
       </Suspense>
       {/* The one next thing: the answer. Hypothèses is optional (the defaults are the Neutre scenario) and reachable from the answer. */}
-      <NextStep to={gaps.length === 0 ? '/resultats' : '/'} label={gaps.length === 0 ? t.next.toResults : t.next.toProfile}>
+      <NextStep to={gaps.length === 0 ? '/resultats' : '/profil'} label={gaps.length === 0 ? t.next.toResults : t.next.toProfile}>
         {gaps.length === 0 ? (
           <p>{t.next.profileReady}</p>
         ) : (

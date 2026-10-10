@@ -6,6 +6,7 @@ import { Loading } from './components/Loading'
 // Every page is lazy: the shell stays small, and the heavy ones (the chart library rides with Résultats) never
 // load until their route is opened. The service worker precaches every one of these chunks except /dev/kit, so
 // the app opens every route offline (scripts/check-bundle.mjs holds both sides of that).
+const Accueil = lazy(() => import('./pages/Accueil').then((m) => ({ default: m.Accueil })))
 const Profil = lazy(() => import('./pages/Profil').then((m) => ({ default: m.Profil })))
 const Hypotheses = lazy(() => import('./pages/Hypotheses').then((m) => ({ default: m.Hypotheses })))
 const Resultats = lazy(() => import('./pages/Resultats').then((m) => ({ default: m.Resultats })))
@@ -20,7 +21,8 @@ export function AppRoutes() {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route element={<AppShell />}>
-          <Route index element={<Profil />} />
+          <Route index element={<Accueil />} />
+          <Route path="profil" element={<Profil />} />
           <Route path="hypotheses" element={<Hypotheses />} />
           <Route path="resultats" element={<Resultats />} />
           <Route path="documents" element={<Documents />} />

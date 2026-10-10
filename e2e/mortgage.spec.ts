@@ -12,7 +12,7 @@ const box = (page: import('@playwright/test').Page, name: string) => page.getByR
 
 test('a payment every two weeks is typed as the statement says it, and kept as its monthly equivalent', async ({ page }) => {
   await seedProfile(page, withHome())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })
   await section.getByRole('radio', { name: 'Aux 2 semaines' }).click()
   await expect(section.getByRole('radio', { name: 'Aux 2 semaines' })).toBeChecked()
@@ -31,7 +31,7 @@ test('a payment every two weeks is typed as the statement says it, and kept as i
 
 test('a renewal is said in words: the payment that keeps the date, or the date that keeps the payment', async ({ page }) => {
   await seedProfile(page, withHome())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })
   await section.getByRole('button', { name: 'Le taux sera renégocié à l’échéance du terme' }).click()
   await box(page, 'Nouveau taux (annuel)').fill('5,5')
@@ -52,14 +52,14 @@ test('a renewal is said in words: the payment that keeps the date, or the date t
 
 test('the card reminds what owning costs and where to put it', async ({ page }) => {
   await seedProfile(page, withHome())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByText('Les taxes foncières, l’assurance habitation et l’entretien ne sont pas comptés ici', { exact: false })).toBeVisible()
 })
 
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, withHome())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('radio', { name: 'Every 2 weeks' }).click()
   await expect(box(page, 'Payment every 2 weeks')).toBeVisible()
   await expect(page.getByRole('button', { name: 'The rate will be renegotiated when the term ends' })).toBeVisible()

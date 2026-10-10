@@ -21,7 +21,7 @@ const box = (page: import('@playwright/test').Page, name: string) => page.getByR
 test('a planned child is added with one tap, shown as « prévu », and its cost is suggested from Statistics Canada', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await expect(page.getByText(`${THIS_YEAR + 1} · prévu`)).toBeVisible()
   await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([THIS_YEAR + 1])
@@ -42,7 +42,7 @@ test('a planned child is added with one tap, shown as « prévu », and its cost
 test('the amounts by age can be typed over, and taken away; a typed figure is never replaced by the suggestion', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await page.getByRole('button', { name: 'Utiliser ces montants pour un enfant prévu' }).click()
   const first = box(page, 'de 0 à 5 ans')
@@ -60,7 +60,7 @@ test('past, current and planned children sit in one list, each with where it sta
   p.household.children = [THIS_YEAR - 30, THIS_YEAR - 4]
   await seedProfile(page, p as unknown as SeedProfile)
   await showAllSections(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByText(`${THIS_YEAR - 30} · parti`)).toBeVisible()
   await expect(page.getByText(`${THIS_YEAR - 4} · à la maison`)).toBeVisible()
   await box(page, 'Année de naissance de l’enfant').fill(String(THIS_YEAR + 2))
@@ -91,7 +91,7 @@ test('a planned child makes the answer later: its cost is added to the budget', 
 test('what the state pays is said beside what a child costs; adding a child counts it in the plan, and a switch takes it out', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   // a first child counts the benefits (a visible switch), and the card says what they come to at this income
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects).toEqual({ benefits: true, qppExclusion: true, leave: null })
@@ -115,7 +115,7 @@ test('what the state pays is said beside what a child costs; adding a child coun
 test('a parental leave for a child to come: who gives birth, the weeks each takes, and what it does to the pay', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await page.getByRole('button', { name: 'Tenir compte d’un congé parental (RQAP)' }).click()
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave).toEqual({ birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 })
@@ -145,7 +145,7 @@ test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('button', { name: 'A planned child' }).click()
   await expect(page.getByText(`${THIS_YEAR + 1} · planned`)).toBeVisible()
   await expect(page.getByText('What a child costs, according to Statistics Canada')).toBeVisible()

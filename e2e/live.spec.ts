@@ -6,7 +6,7 @@ import { blankSeed, seedProfile } from './seed'
 test.describe('the live answer', () => {
   test('follows an edit: it shows the answer on arrival, then how far a typed figure moved it', async ({ page }) => {
     await seedProfile(page)
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const strip = page.getByRole('status').filter({ hasText: 'Votre réponse' })
     await expect(strip).toContainText('59 ans', { timeout: 30_000 })
     await expect(strip).not.toContainText('qu’à votre arrivée')
@@ -29,7 +29,7 @@ test.describe('the live answer', () => {
 
   test('says nothing while the profile has gaps', async ({ page }) => {
     await seedProfile(page, blankSeed())
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await expect(page.getByRole('heading', { name: 'Profil', level: 1 })).toBeVisible()
     await page.waitForTimeout(1500)
     await expect(page.getByText('Votre réponse', { exact: true })).toHaveCount(0)

@@ -13,7 +13,7 @@ test.describe('on Profil', () => {
   })
 
   test('what a child costs: typed, saved, and said in a line', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const cost = box(page, 'Ce que coûte chaque enfant, par année')
     await cost.fill('6000')
     await cost.press('Enter')
@@ -26,7 +26,7 @@ test.describe('on Profil', () => {
   })
 
   test('work kept after retirement: off by default, on with two figures, saved per person', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const first = page.locator('#person-self')
     await expect(first.getByRole('radio', { name: 'Je m’arrête complètement' })).toBeChecked()
     await first.getByRole('radio', { name: 'Je continue de travailler' }).click()
@@ -41,7 +41,7 @@ test.describe('on Profil', () => {
   })
 
   test('a dated event: added from a starting point, edited, saved, and removed with a confirmation that says what is lost', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.getByRole('button', { name: 'Ajouter · Un héritage' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.flows.length).toBe(1)
     const amount = box(page, 'Montant')
@@ -56,7 +56,7 @@ test.describe('on Profil', () => {
   })
 
   test('an income can be taxed or not, and is the first person’s or the partner’s', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.getByRole('button', { name: 'Ajouter · Un loyer reçu' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.flows[0]?.kind).toBe('income')
     const flow = page.locator('.flow').first()

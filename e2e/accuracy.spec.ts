@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 const panel = (page: import('@playwright/test').Page) => page.locator('.profile-section', { hasText: 'Rendre mon profil exact' })
 
 test('a figure is estimated until the person says it is real; the mark, the meter and the saved profile agree, and a reload keeps it', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const meter = panel(page).getByRole('progressbar')
   await expect(meter).toHaveAttribute('aria-valuenow', '0')
   const total = Number(await meter.getAttribute('aria-valuemax'))
@@ -35,7 +35,7 @@ test('a figure is estimated until the person says it is real; the mark, the mete
 })
 
 test('the checklist names the documents, what each confirms, and its official page; a figure in it leads to its field', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const docs = panel(page).locator('.doc')
   // the documents come most important first: the spending budget leads
   await expect(docs.first()).toContainText('Vos dépenses des 12 derniers mois')
@@ -53,7 +53,7 @@ test('the checklist names the documents, what each confirms, and its official pa
 })
 
 test('the guide walks the form: it lights the field, says where the figure is, confirms on a tap, and ends with the count', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await panel(page).locator('.doc', { hasText: 'Relevés de vos comptes' }).getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await expect(bar).toBeVisible()
@@ -78,7 +78,7 @@ test('the guide walks the form: it lights the field, says where the figure is, c
 })
 
 test('the guide finishes: after the last figure it says how many are confirmed', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   // the budget document has two figures: confirm both
   await panel(page).locator('.doc', { hasText: 'Vos dépenses des 12 derniers mois' }).getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
@@ -94,7 +94,7 @@ test('the guide finishes: after the last figure it says how many are confirmed',
 
 test('on a phone the guide sits above the bottom navigation, inside the window, and nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/')
+  await page.goto('/profil')
   await panel(page).locator('.doc', { hasText: 'Relevés de vos comptes' }).getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await expect(bar).toBeVisible()
@@ -113,7 +113,7 @@ test('the quick way: « Estimer ce qui manque » fills blank earnings years and 
   me.earningsHistory = { '2020': 55_000 }
   me.accounts.tfsa.balance = 40_000
   me.accounts.tfsa.room = 0
-  await page.goto('/')
+  await page.goto('/profil')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
   const quick = panel(page)
@@ -142,7 +142,7 @@ test('the results say how much of the answer stands on confirmed figures, and po
   const note = page.locator('.refine').getByText(/chiffres confirmés/)
   await expect(note).toContainText(/Votre profil\s: 0 sur \d+ chiffres confirmés\s; le reste est estimé\./)
   await note.getByRole('link', { name: 'Rendre mon profil exact' }).click()
-  await expect(page).toHaveURL(/\/$/)
+  await expect(page).toHaveURL(/\/profil$/)
   await page.locator('[data-fact="self:rrspBalance"]').getByRole('button', { name: /^Estimé/ }).click()
   await page.getByRole('link', { name: 'Résultats' }).first().click()
   await expect(page.locator('.refine')).toContainText(/Votre profil\s: 1 sur \d+ chiffres confirmés/)

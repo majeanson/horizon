@@ -154,7 +154,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
         return (
           <section key={l.id} className={`ledger__person person who who--${Math.min(i, 1)}`} aria-label={c.person(name)}>
             <h3 className="year-table__title">{c.person(name)}</h3>
-            <Chip to={`/?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
+            <Chip to={`/profil?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
             <div className="ledger__row">
               {ageSlider(l.id, 'retirement', c.retireLabel, p.retirementAge, l.retirement.done)}
               <p className="ledger__calc">{c.retireCalc(monthYear(l.retirement.leaving))}</p>

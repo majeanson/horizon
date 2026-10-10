@@ -24,7 +24,7 @@ test('seven steps, the first about the household, and the step is in the address
 
 test('walking the steps reaches exactly the figures the full profile asks for — none missed, none twice', async ({ page }) => {
   const factsOnPage = () => page.locator('[data-fact]').evaluateAll((els) => els.map((e) => e.getAttribute('data-fact')!))
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.locator('[data-fact]').first()).toBeVisible()
   const full = [...new Set(await factsOnPage())].sort()
   expect(full.length).toBeGreaterThan(15)

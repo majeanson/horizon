@@ -19,7 +19,7 @@ import { StatusMessage } from './StatusMessage'
 // settings are a fourth page (« Sauvegarde et réglages ») behind the gear in the top bar: used a few times a year,
 // it does not earn a quarter of the thumb bar.
 const TABS = [
-  { to: '/', key: 'profile', icon: 'user-bold' },
+  { to: '/profil', key: 'profile', icon: 'user-bold' },
   { to: '/resultats', key: 'results', icon: 'chart-line-up-bold' },
   { to: '/hypotheses', key: 'assumptions', icon: 'sliders-horizontal-bold' },
 ] as const satisfies ReadonlyArray<{ to: string; key: string; icon: IconName }>
@@ -96,7 +96,7 @@ export function AppShell() {
       </a>
       <RouteChange />
       <header className="shell__bar">
-        <NavLink to="/" className="shell__brand">
+        <NavLink to="/" end className="shell__brand">
           {t.appName}
         </NavLink>
         <div className="shell__actions">

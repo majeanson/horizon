@@ -16,7 +16,7 @@ import { describe, expect, it } from 'vitest'
 
 const srcDir = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-const COPY_FILES = ['i18n.ts', 'i18n.en.ts', 'lib/resultsCopy.ts', 'lib/onboardCopy.ts', 'lib/guideCopy.ts', 'lib/levelsCopy.ts', 'lib/kidsCopy.ts', 'lib/homeCopy.ts', 'lib/situationCopy.ts', 'lib/bridgeCopy.ts', 'lib/ledgerCopy.ts', 'lib/marketCopy.ts', 'lib/exampleCopy.ts', 'lib/leversCopy.ts', 'lib/paramLabels.ts', 'lib/lifeCopy.ts', 'lib/liveCopy.ts', 'lib/plansCopy.ts', 'lib/glossaryCopy.ts', 'lib/documentsCopy.ts', 'lib/entryCopy.ts']
+const COPY_FILES = ['i18n.ts', 'i18n.en.ts', 'lib/resultsCopy.ts', 'lib/onboardCopy.ts', 'lib/guideCopy.ts', 'lib/levelsCopy.ts', 'lib/kidsCopy.ts', 'lib/homeCopy.ts', 'lib/situationCopy.ts', 'lib/bridgeCopy.ts', 'lib/ledgerCopy.ts', 'lib/marketCopy.ts', 'lib/exampleCopy.ts', 'lib/leversCopy.ts', 'lib/paramLabels.ts', 'lib/lifeCopy.ts', 'lib/liveCopy.ts', 'lib/welcomeCopy.ts', 'lib/plansCopy.ts', 'lib/glossaryCopy.ts', 'lib/documentsCopy.ts', 'lib/entryCopy.ts']
 
 /** A plain space before a sign that French binds to the word, or a plain space inside « … ». (An English « $500 » puts
  *  the sign BEFORE the number: a « $ » followed by a digit is not the French trailing sign.) */

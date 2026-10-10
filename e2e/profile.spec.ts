@@ -28,7 +28,7 @@ test.describe('a blank profile', () => {
 
   test('opens on the profile, prints nothing to the console, and asks for the missing numbers on the results page', async ({ page }) => {
     const problems = watchConsole(page)
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await expect(page.getByRole('heading', { name: 'Profil', level: 1 })).toBeVisible()
     await page.getByRole('link', { name: 'Résultats', exact: true }).click()
     await expect(page.getByText('Il manque des chiffres pour un résultat fiable')).toBeVisible()
@@ -38,7 +38,7 @@ test.describe('a blank profile', () => {
   })
 
   test('a typed salary is saved, survives a reload, and drops the « no income » gap', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const salary = box(page, 'Revenu de travail par année')
     await salary.fill('85 000')
     await salary.press('Enter')
@@ -48,7 +48,7 @@ test.describe('a blank profile', () => {
   })
 
   test('a comma decimal is read the Québécois way: « 85 000,50 » is eighty-five thousand dollars and fifty cents', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const field = box(page, 'Revenu de travail par année')
     await field.fill('85 000,50')
     await field.blur()
@@ -56,7 +56,7 @@ test.describe('a blank profile', () => {
   })
 
   test('an out-of-range text is refused with its reason, kept on screen, and not saved', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const age = box(page, 'Âge de retraite visé')
     await age.fill('12')
     await age.blur()
@@ -70,7 +70,7 @@ test.describe('a blank profile', () => {
   })
 
   test('« où trouver ce chiffre » opens in place, names the document’s own wording, and links to an official page', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const toggle = page.getByRole('button', { name: /Où trouver ce chiffre : Droits de cotisation inutilisés/ }).first()
     await expect(toggle).toHaveAttribute('aria-expanded', 'false')
     await toggle.click()
@@ -86,7 +86,7 @@ test.describe('a blank profile', () => {
   })
 
   test('adding a spouse gives a second column with its own numbers; removing asks first, in words that say what is lost', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.getByRole('button', { name: 'Ajouter mon ou ma partenaire' }).click()
     // Both people are on the page at once, each column named: no tab hides the other person.
     await expect(page.locator('#person-self').getByRole('heading', { name: 'Moi' })).toBeVisible()
@@ -109,7 +109,7 @@ test.describe('a blank profile', () => {
   })
 
   test('« Je vis seul ou seule » is on for one adult, can be unticked (and says why), and is gone — and false — for a couple', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const alone = page.getByRole('button', { name: 'Je vis seul ou seule' })
     await expect(alone).toHaveAttribute('aria-pressed', 'true')
     await expect(page.getByText('Seul ou seule dans un logement à vous, toute l’année')).toBeVisible()
@@ -127,7 +127,7 @@ test.describe('a blank profile', () => {
 
   test('children are birth years: added, shown as removable chips, validated', async ({ page }) => {
     await showAllSections(page) // the children's box shows once « Ma situation » says there are some
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const year = page.getByRole('textbox', { name: 'Année de naissance de l’enfant' })
     await year.fill('2015')
     await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
@@ -142,7 +142,7 @@ test.describe('a blank profile', () => {
 
   test('an employer plan starts from the RREGOP preset, carries its cited rules, and is removable', async ({ page }) => {
     await showAllSections(page) // the plan's section shows once « Ma situation » says there is one
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     await page.getByRole('button', { name: 'Ajouter le RREGOP' }).click()
     const saved = async () => (await savedProfile(page)).household.persons[0].pensions
     await expect.poll(async () => (await saved()).length).toBe(1)
@@ -159,7 +159,7 @@ test.describe('a blank profile', () => {
   })
 
   test('the earnings years can be estimated from the salary — and a typed year is never overwritten', async ({ page }) => {
-    await page.goto('/?form=1')
+    await page.goto('/profil?form=1')
     const salary = box(page, 'Revenu de travail par année')
     await salary.fill('80000')
     await salary.press('Enter')
@@ -184,7 +184,7 @@ test.describe('first visit', () => {
 
   test('every page names the tab, so history and bookmarks are not all « Horizon »', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
-    for (const [path, title] of [['/', 'Profil · Horizon'], ['/hypotheses', 'Hypothèses · Horizon'], ['/resultats', 'Résultats · Horizon'], ['/donnees', 'Sauvegarde et réglages · Horizon']] as const) {
+    for (const [path, title] of [['/profil', 'Profil · Horizon'], ['/hypotheses', 'Hypothèses · Horizon'], ['/resultats', 'Résultats · Horizon'], ['/donnees', 'Sauvegarde et réglages · Horizon']] as const) {
       await page.goto(path)
       await expect(page).toHaveTitle(title)
     }
@@ -241,7 +241,7 @@ test.describe('the example household', () => {
   })
 
   test('the profile page loads the golden couple’s numbers into the fields, one column each', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/profil')
     await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/85\D000/)
     await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/65\D000/)
     await page.goto('/hypotheses')
@@ -330,7 +330,7 @@ test.describe('data stays on this device', () => {
       const u = new URL(r.url())
       if (u.protocol.startsWith('http') && u.origin !== 'http://127.0.0.1:5173') foreign.push(r.url())
     })
-    for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
+    for (const path of ['/profil', '/hypotheses', '/resultats', '/donnees']) {
       await page.goto(path)
       await page.waitForLoadState('networkidle')
     }
@@ -347,7 +347,7 @@ test.describe('an unreadable stored profile', () => {
       sessionStorage.setItem('e2e-seeded', '1')
       localStorage.setItem('horizon-profile', text)
     }, BROKEN)
-    await page.goto('/')
+    await page.goto('/profil')
     // On the Profil page — not only on Données — a person who finds a blank profile is told why.
     const banner = page.getByRole('status').filter({ hasText: 'était illisible' })
     await expect(banner).toBeVisible()
@@ -375,7 +375,7 @@ for (const width of [360, 390]) {
     await seedProfile(page, EXAMPLE)
     await page.addInitScript(() => localStorage.setItem('horizon-text-scale', 'x-large'))
     await page.setViewportSize({ width, height: 800 })
-    for (const path of ['/', '/hypotheses', '/resultats']) {
+    for (const path of ['/profil', '/hypotheses', '/resultats']) {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
       expect(await page.evaluate(() => document.documentElement.getAttribute('data-text-scale')), 'the large step really applied').toBe('x-large')
@@ -401,7 +401,7 @@ for (const width of [360, 390]) {
   test(`every control a thumb must hit is at least 44 px tall at ${width}px: chips, small buttons, disclosures, ⓘ`, async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width, height: 800 })
-    for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
+    for (const path of ['/profil', '/hypotheses', '/resultats', '/donnees']) {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
       const small = await page.locator('.chip, .btn--sm, .info-btn').evaluateAll((els) =>
@@ -419,7 +419,7 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
   test(`no page runs past the right edge at ${name} width (${width}px), with the example loaded and every ⓘ open`, async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width, height: 800 })
-    for (const path of ['/', '/hypotheses', '/resultats', '/donnees']) {
+    for (const path of ['/profil', '/hypotheses', '/resultats', '/donnees']) {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
       for (const t of await page.locator('.info-btn').all()) await t.click()

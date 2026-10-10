@@ -56,7 +56,8 @@ async function violations(page: Page): Promise<string[]> {
 // because the colours that matter most (a note on its tinted ground, a table row marked short) only
 // exist once something is opened. Nothing else hides: the pages show everything by themselves.
 const PAGES = [
-  ['the profile', '/', '.page-head__title'],
+  ['the front door', '/', '.page-head__title'],
+  ['the profile', '/profil', '.page-head__title'],
   ['the assumptions', '/hypotheses', '.page-head__title'],
   ['the results', '/resultats', '.page-head__title'],
   ['the data page', '/donnees', '.page-head__title'],
@@ -88,7 +89,7 @@ test('the gallery stays accessible with its dialog open', async ({ page }) => {
 
 test('the whole shell is reachable by keyboard, in a sensible order', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
-  await page.goto('/')
+  await page.goto('/profil')
   const order: string[] = []
   for (let i = 0; i < 10; i++) {
     await page.keyboard.press('Tab')

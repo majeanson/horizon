@@ -12,7 +12,7 @@ const reer = (page: Page) => page.locator('#person-self .account-group', { hasTe
 const box = (page: Page, name: string) => page.locator('#person-self').getByRole('textbox', { name, exact: true })
 
 test('for someone with nothing locked the form is as it was: three boxes and one folded line, no extra field', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const group = reer(page)
   await expect(group.getByRole('button', { name: TOGGLE })).toHaveAttribute('aria-expanded', 'false')
   await expect(box(page, 'Dont immobilisé')).toHaveCount(0)
@@ -22,7 +22,7 @@ test('for someone with nothing locked the form is as it was: three boxes and one
 })
 
 test('opening it asks two things; both are saved; folding keeps them and says so; a value above the balance is refused', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const group = reer(page)
   await group.getByRole('button', { name: TOGGLE }).click()
   await expect(group.getByRole('button', { name: TOGGLE })).toHaveAttribute('aria-expanded', 'true')
@@ -47,7 +47,7 @@ test('opening it asks two things; both are saved; folding keeps them and says so
 })
 
 test('lowering the REER balance lowers the locked part with it', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   const group = reer(page)
   await group.getByRole('button', { name: TOGGLE }).click()
   const locked = box(page, 'Dont immobilisé')
@@ -61,7 +61,7 @@ test('lowering the REER balance lowers the locked part with it', async ({ page }
 })
 
 test('« où trouver ce chiffre »: the statement’s « immobilisé » part, with the official page', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await reer(page).getByRole('button', { name: TOGGLE }).click()
   const row = page.locator('#person-self [data-fact="self:rrspLocked"]')
   await row.getByRole('button', { name: /Où trouver ce chiffre/ }).click()
@@ -76,7 +76,7 @@ test('the example with an RVER shows it opened, and the results carry the locked
   await page.goto('/donnees')
   await page.getByRole('button', { name: 'Couple, revenus moyens', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   // Luc (the second person) has an RVER: his line is already open, with its values
   const luc = page.locator('#person-spouse')
   await expect(luc.getByRole('button', { name: TOGGLE })).toHaveAttribute('aria-expanded', 'true')

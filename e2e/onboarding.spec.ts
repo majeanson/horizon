@@ -17,7 +17,7 @@ const fill = async (page: Page, name: string, value: string) => {
   await f.press('Enter')
 }
 test('the first landing is ONE question, not the form: who the calculation is for, with its promise, and nothing else on the page', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pour commencer')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Pour qui faisons-nous le calcul ?')
   // the promise: how many questions, and what comes out
@@ -33,7 +33,7 @@ test('the first landing is ONE question, not the form: who the calculation is fo
 })
 
 test('the year of birth is typed, never pre-filled: the box is empty, « Suivant » waits for it, and the box has focus', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await next(page)
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelle est votre année de naissance ?')
   const year = box(page, 'Année de naissance')
@@ -49,7 +49,7 @@ test('the year of birth is typed, never pre-filled: the box is empty, « Suivant
 })
 
 test('walking through for one person: each answer is saved as typed, and the answer answers', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await next(page) // who: Juste moi (the default)
   await fill(page, 'Année de naissance', '1985')
   await fill(page, 'Revenu de travail par année', '90000')
@@ -96,7 +96,7 @@ test('walking through for one person: each answer is saved as typed, and the ans
 })
 
 test('a couple adds a person’s questions in the same order, and the progress counts them', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await expect(progress(page)).toHaveText('Question 1 sur 12')
   await next(page)
@@ -124,7 +124,7 @@ test('a couple adds a person’s questions in the same order, and the progress c
 })
 
 test('going back to « Juste moi » after typing for the partner asks first, in words that say what is lost', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await next(page)
   await fill(page, 'Année de naissance', '1980')
@@ -145,7 +145,7 @@ test('going back to « Juste moi » after typing for the partner asks first, in 
 })
 
 test('going back keeps what was typed; a home asks for its balance and, if there is one, the payment', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await next(page)
   await fill(page, 'Année de naissance', '1990')
   await back(page)
@@ -166,7 +166,7 @@ test('going back keeps what was typed; a home asks for its balance and, if there
 })
 
 test('the last screen says what is still missing, takes the reader back to that question, and holds the answer back until it is there', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await next(page)
   await fill(page, 'Année de naissance', '1985')
   for (let i = 0; i < 6; i++) await next(page)
@@ -181,19 +181,19 @@ test('the last screen says what is still missing, takes the reader back to that 
 })
 
 test('leaving for the full form: the form is there, with what was typed, and a link can carry the choice', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await next(page)
   await fill(page, 'Année de naissance', '1975')
   await page.getByRole('button', { name: 'Passer au formulaire complet' }).click()
   await expect(page).toHaveURL(/form=1/)
   await expect(page.locator('#person-self')).toBeVisible()
   await expect(page.locator('#person-self').getByRole('textbox', { name: 'Année de naissance' })).toHaveValue('1975')
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.locator('#person-self')).toBeVisible()
 })
 
 test('a returning visitor — someone with a profile — never sees the path', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(EXAMPLE)])
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Profil')
@@ -203,7 +203,7 @@ test('a returning visitor — someone with a profile — never sees the path', a
 
 test('on a phone each question fits the screen: no sideways scroll, the buttons are thumb-sized', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
-  await page.goto('/')
+  await page.goto('/profil')
   const check = async () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     for (const b of await page.locator('.onboard button.btn:not(.btn--sm)').all()) expect((await b.boundingBox())!.height).toBeGreaterThanOrEqual(43)

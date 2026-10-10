@@ -17,7 +17,7 @@ const question = (page: Page, text: string | RegExp) => page.getByRole('radiogro
 
 test('a simple household sees only what concerns it — and the card says how to open the rest', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(section(page, 'Ma situation')).toBeVisible()
   // no children, home, employer plan, years abroad or dated events: none of their sections, none of their fields
   await expect(section(page, 'Régimes de retraite de l’employeur')).toHaveCount(0)
@@ -33,7 +33,7 @@ test('a simple household sees only what concerns it — and the card says how to
 
 test('a yes opens its section; the answer is kept on this device; a no closes it again', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await expect(section(page, 'Régimes de retraite de l’employeur')).toBeVisible()
   await question(page, /Des années hors du Canada/).getByRole('radio', { name: 'Oui' }).click()
@@ -53,7 +53,7 @@ test('a no over typed figures asks first, says what is lost, and keeps everythin
   const withHome = structuredClone(EXAMPLE) as unknown as { household: { home: { value: number; mortgage: { balance: number; rate: number; monthlyPayment: number }; sale: null } | null } }
   withHome.household.home = { value: 450_000, mortgage: { balance: 120_000, rate: 0.05, monthlyPayment: 1_000 }, sale: null }
   await seedProfile(page, withHome as unknown as SeedProfile)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   // this household has a home: it shows without any answer, and the question reads « oui »
   await expect(section(page, 'Résidence principale')).toBeVisible()
   const home = question(page, /Propriétaire de votre résidence/)
@@ -70,7 +70,7 @@ test('a no over typed figures asks first, says what is lost, and keeps everythin
 
 test('a couple is asked once per person, by name', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   for (const name of ['Camille', 'Alex']) await expect(page.getByRole('group', { name })).toContainText('Un régime de retraite d’employeur')
 })
 
@@ -84,7 +84,7 @@ test('the documents list and the entry by document keep only what the household 
   await page.goto('/saisie')
   await expect(page.getByText(/Étape 1 sur 5/)).toBeVisible()
   // answering yes brings the documents back
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await page.goto('/documents')
   await expect(page.locator('.docs-item')).toHaveCount(5)
@@ -93,7 +93,7 @@ test('the documents list and the entry by document keep only what the household 
 
 test('the proof of residence is asked only of someone who lived abroad', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.locator('[data-fact="self:residence"]')).toHaveCount(0)
   await page.getByText(/chiffres confirmés/).first().waitFor()
   const abroad = structuredClone(simple()) as unknown as Seed
@@ -106,7 +106,7 @@ test('the proof of residence is asked only of someone who lived abroad', async (
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, simple())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(section(page, 'My situation')).toBeVisible()
   await page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' }).click()
   await expect(page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' })).toBeChecked()

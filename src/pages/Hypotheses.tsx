@@ -250,7 +250,7 @@ export function Hypotheses() {
           <p>{t.next.assumptionsReady}</p>
         </NextStep>
       ) : (
-        <NextStep to="/" label={t.next.toProfile}>
+        <NextStep to="/profil" label={t.next.toProfile}>
           <p>{t.results.gaps.lead}</p>
           <ul className="next__gaps">
             {gaps.map((g) => (

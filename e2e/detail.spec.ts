@@ -112,7 +112,7 @@ test('« Mon plan » always says its age', async ({ page }) => {
 test('two people on the Profil: sections start at the same height, the colour follows down, every input shows in full', async ({ page }) => {
   await showAllSections(page) // every section a person can have, so the two columns have the same five
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/')
+  await page.goto('/profil')
   const columns = page.locator('.persons--aligned > .person')
   await expect(columns).toHaveCount(2)
   const tops = async (col: number) => columns.nth(col).locator(':scope > .profile-section').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top + (document.getElementById('root')?.scrollTop ?? 0))))
@@ -132,7 +132,7 @@ test('two people on the Profil: sections start at the same height, the colour fo
 
 test('« Depuis la naissance » sets the year of residence to the year of birth, and reads as chosen', async ({ page }) => {
   await showAllSections(page) // the residence year is asked of someone who said « oui » to years abroad
-  await page.goto('/')
+  await page.goto('/profil')
   const person = (await savedProfile(page)).household.persons[0]
   const chip = page.getByRole('button', { name: 'Depuis la naissance' }).first()
   await expect(chip).toHaveAttribute('aria-pressed', 'false')
@@ -147,7 +147,7 @@ test('the estimate shows the pay as it was — about the salary last year — an
   seed.household.persons[0].salaryToday = 120_000
   seed.household.persons[0].earningsHistory = {}
   // (beforeEach already seeded the example, and a second seed is ignored — once per tab: replace what is stored, then reload.)
-  await page.goto('/')
+  await page.goto('/profil')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
   const section = page.locator('.persons .profile-section', { hasText: 'Revenus de travail admissibles par année' }).first()
@@ -163,7 +163,7 @@ test('the estimate shows the pay as it was — about the salary last year — an
 })
 
 test('the home: owning one, its mortgage says when the payment stops, and it is saved with the profile', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   // « Ma situation »: the home's section opens on a « oui » to owning one
   await page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Oui' }).click()
   const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })

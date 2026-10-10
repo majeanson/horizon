@@ -7,7 +7,7 @@ import { EXAMPLE, seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('a sigle in a hint opens its glossary entry, scrolled to and marked', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await page.locator('.page-head__title').waitFor()
   // The ⓘ notes are closed: take a hint that is on screen.
   const link = page.locator('main a.gloss:visible').first()
@@ -37,7 +37,7 @@ test('the glossary page: every group, the documents list and official links that
 })
 
 test('the glossary follows the language and the top-bar book leads to it', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/profil')
   await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
   await page.getByRole('link', { name: 'Glossary: abbreviations explained' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Glossary' })).toBeVisible()

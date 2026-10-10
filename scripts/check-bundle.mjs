@@ -59,6 +59,7 @@ const CLOSURE_BUDGET = 340 * KB // 338 → 340 on 2026-10-09: the entry's own gr
 const EAGER_MEMBER_CAP = 32 * KB
 // Modules that must have a chunk of their own and be reachable only through lazy().
 const LAZY_BY_NAME = [
+  'src/pages/Accueil.tsx',
   'src/pages/Profil.tsx',
   'src/pages/Hypotheses.tsx',
   'src/pages/Resultats.tsx',

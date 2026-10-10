@@ -108,7 +108,7 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   await expect(page.locator('.verdict__line')).toContainText('58 ans')
   await expect(page.locator('.scenario').first()).toContainText('L’argent dure jusqu’à')
   // the profile says it: a home, a mortgage, a planned sale
-  await page.goto('/')
+  await page.goto('/profil')
   const home = page.locator('.profile-section', { hasText: 'Résidence principale' })
   await expect(home.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' })).toHaveValue(/880\s?000/)
   await expect(home.getByRole('textbox', { name: 'Âge de la vente (première personne)' })).toHaveValue('58')

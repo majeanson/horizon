@@ -16,7 +16,7 @@ const tfsa = (page: import('@playwright/test').Page) => page.locator('[data-fact
 
 test('a level fills every blank figure at once, says it is an estimate, and one tap takes it back', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByRole('heading', { name: 'Je ne connais pas mes chiffres' })).toBeVisible()
   await expect(rrsp(page)).toHaveValue(/^0?$/)
   await page.getByRole('radio', { name: 'Moyen', exact: true }).click()
@@ -39,7 +39,7 @@ test('a level fills every blank figure at once, says it is an estimate, and one 
 
 test('a later visit says which level the estimated figures stand at', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('radio', { name: 'Moyen', exact: true }).click()
   await expect(rrsp(page)).toHaveValue(/48.?000/)
   // the profile is written a beat after the tap: reload only once it is on the device
@@ -51,7 +51,7 @@ test('a later visit says which level the estimated figures stand at', async ({ p
 
 test('a figure the person typed is never replaced, and the level can be changed', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await rrsp(page).fill('61234')
   await rrsp(page).blur()
   await page.getByRole('radio', { name: 'Aisé', exact: true }).click()
@@ -61,7 +61,7 @@ test('a figure the person typed is never replaced, and the level can be changed'
 
 test('« Je ne sais pas » under one figure fills that figure only, and goes away once the person types', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   const helper = page.locator('fieldset.account-group').first().locator('.level-helper')
   await helper.getByRole('button', { name: 'Je ne sais pas' }).click()
   await helper.getByRole('radio', { name: /^Modeste · / }).click()
@@ -74,7 +74,7 @@ test('« Je ne sais pas » under one figure fills that figure only, and goes awa
 
 test('the where-from line names the official tables, in the reader\'s language', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await page.getByRole('button', { name: 'D’où viennent ces chiffres?' }).click()
   await expect(page.getByRole('link', { name: /Actifs et dettes détenus selon le type de famille économique/ })).toHaveAttribute('href', /statcan\.gc\.ca\/t1\/tbl1\/fr\/tv\.action\?pid=1110001601/)
   await expect(page.getByRole('link', { name: /Dépenses des ménages selon le type de ménage/ })).toBeVisible()
@@ -97,7 +97,7 @@ test('the answer is shown at each level while a figure is open — and not at al
 
 test('a household with every figure entered sees neither the picker nor the range', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByRole('heading', { name: 'Famille' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Je ne connais pas mes chiffres' })).toHaveCount(0)
   await page.goto('/resultats')
@@ -108,7 +108,7 @@ test('a household with every figure entered sees neither the picker nor the rang
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByRole('heading', { name: 'I do not know my numbers' })).toBeVisible()
   await page.getByRole('radio', { name: 'Comfortable', exact: true }).click()
   await expect(page.getByText(/figures filled with this level/)).toBeVisible()
@@ -116,7 +116,7 @@ test('English', async ({ page }) => {
 
 test('the retirement budget can be set as observed or cautiously, and the screen says why', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   const retired = page.locator('[data-fact="household:spendingRetired"] input')
   const amount = async () => Number((await retired.inputValue()).replace(/\D/g, ''))
   await page.getByRole('radio', { name: 'Moyen', exact: true }).click()

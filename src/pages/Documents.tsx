@@ -112,7 +112,7 @@ export function Documents() {
         <p>{c.next}</p>
         <p>{c.entryHint}</p>
         <p>
-          <Link to="/">{c.nextGo}</Link>
+          <Link to="/profil">{c.nextGo}</Link>
         </p>
       </NextStep>
     </section>

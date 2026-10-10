@@ -1593,3 +1593,12 @@
 .kids-cost__sources { list-style: none; padding-left: 0 !important; }
 .kids-benefits { display: grid; gap: var(--space-2, 0.5rem); }
 .kids-leave { display: grid; gap: var(--space-2, 0.5rem); }
+
+/* « Accueil »: the front door — a lead, one or two buttons, then short cards that stack on a phone and sit side by side when there is room. */
+.welcome { display: grid; gap: var(--space-4, 1rem); }
+.welcome__go { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.welcome__title { margin: 0 0 var(--space-2, 0.5rem); font-size: var(--text-lg, 1.2rem); }
+.welcome__cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3, 0.75rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.welcome__card { display: grid; gap: 0.4rem; align-content: start; padding: 1rem 1.1rem; }
+.welcome__card p { margin: 0; color: var(--ink-soft); }
+.welcome__card-title { margin: 0; font-size: var(--text-md, 1rem); }

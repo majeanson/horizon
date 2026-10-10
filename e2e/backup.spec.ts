@@ -36,7 +36,7 @@ test.describe('the notice', () => {
 
 test('Profil says when the last copy was made — « jamais » first, today after one tap', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/?form=1')
+  await page.goto('/profil?form=1')
   await expect(page.getByText(/Dernière copie de sauvegarde\s: jamais/)).toBeVisible()
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Sauvegarder maintenant' }).click()

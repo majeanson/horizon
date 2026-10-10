@@ -298,7 +298,7 @@ export function Resultats() {
               <li key={g}>{r.gaps[g]}</li>
             ))}
           </ul>
-          <Link className="btn btn--primary btn--sm" to="/">
+          <Link className="btn btn--primary btn--sm" to="/profil">
             {r.gaps.toProfile}
           </Link>
         </div>
@@ -365,7 +365,7 @@ export function Resultats() {
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
       {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
-      <Link className="info-note__link" to="/">
+      <Link className="info-note__link" to="/profil">
         {rc.headline.confidenceLink}
       </Link>
     </p>
@@ -617,7 +617,7 @@ export function Resultats() {
                   <ul className="refine__list">
                     {movers.map((f) => (
                       <li key={f.id}>
-                        <span>{factName(f.id)}</span> <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span> <Chip to={`/?fact=${encodeURIComponent(f.id)}`}>{rc.refine.find}</Chip>
+                        <span>{factName(f.id)}</span> <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span> <Chip to={`/profil?fact=${encodeURIComponent(f.id)}`}>{rc.refine.find}</Chip>
                       </li>
                     ))}
                   </ul>
@@ -628,7 +628,7 @@ export function Resultats() {
                 <ul className="refine__list">
                   {refine.map((k) => (
                     <li key={k}>
-                      {rc.refine[k]} <Chip to="/">{rc.refine.toProfile}</Chip>
+                      {rc.refine[k]} <Chip to="/profil">{rc.refine.toProfile}</Chip>
                     </li>
                   ))}
                 </ul>
