@@ -111,3 +111,33 @@ test('English', async ({ page }) => {
   await page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' }).click()
   await expect(page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' })).toBeChecked()
 })
+
+test('« Ma situation » is one of the first things on the page: right after who is in the household, before the housekeeping and before every section it decides', async ({ page }) => {
+  await seedProfile(page, simple())
+  await page.goto('/profil?form=1')
+  await expect(section(page, 'Ma situation')).toBeVisible()
+  // document order of the page's landmarks: who → what applies → the housekeeping (backup, doors, accuracy) → the sections the answers decide
+  const order = await page.evaluate(() => {
+    const at = (el: Element | null) => (el === null ? -1 : [...document.querySelectorAll('*')].indexOf(el))
+    const heading = (text: string) => [...document.querySelectorAll('h2, h3')].find((h) => h.textContent?.trim() === text) ?? null
+    return {
+      family: at(heading('Famille')),
+      situation: at(document.getElementById('situation')),
+      doors: at(document.querySelector('.rail')),
+      accuracy: at(document.querySelector('.accuracy-line')),
+      budget: at(heading('Budget')),
+      person: at(document.getElementById('person-self')),
+    }
+  })
+  for (const [name, v] of Object.entries(order)) expect(v, name).toBeGreaterThan(-1)
+  expect(order.family).toBeLessThan(order.situation)
+  expect(order.situation).toBeLessThan(order.doors)
+  expect(order.situation).toBeLessThan(order.accuracy)
+  expect(order.situation).toBeLessThan(order.budget)
+  expect(order.situation).toBeLessThan(order.person)
+  // …and on a phone it is on the first screen's neighbour, not three screens down
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.locator('#situation').scrollIntoViewIfNeeded()
+  const top = await page.locator('#situation').evaluate((el) => el.getBoundingClientRect().top + (document.getElementById('root')?.scrollTop ?? 0))
+  expect(top, 'the card starts within the first two screens').toBeLessThan(844 * 2)
+})

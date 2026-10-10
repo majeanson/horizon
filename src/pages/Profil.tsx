@@ -119,6 +119,12 @@ export function Profil() {
     <section className="page-body">
       <LiveAnswer />
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
+      {/* First the household (who), then « Ma situation » (what applies to it): the questions answered here decide which sections of everything below are shown, so they come before it. */}
+      <FamilySection withKids={applies(profile, yes, 'kids')} />
+      {/* « Ma situation »: a few yes / no questions that decide which sections below are shown. */}
+      <Suspense fallback={null}>
+        <SituationCard />
+      </Suspense>
       <BackupLine />
       <Rail>
         <Chip to="/documents" icon="identification-card-bold">
@@ -139,11 +145,6 @@ export function Profil() {
           )}
         </div>
       )}
-      <FamilySection withKids={applies(profile, yes, 'kids')} />
-      {/* « Ma situation »: a few yes / no questions that decide which sections below are shown. */}
-      <Suspense fallback={null}>
-        <SituationCard />
-      </Suspense>
       {/* « Je ne connais pas mes chiffres »: a level fills what is blank; loaded on its own (it carries the official tables). */}
       <Suspense fallback={null}>
         <LevelPicker />
