@@ -56,6 +56,7 @@ export const EN: typeof FR = {
     results: 'Results',
     data: 'Backup and settings',
     glossary: 'Glossary: abbreviations explained',
+    sheet: 'My sheet: your situation in five measures',
   },
 
   fields: {

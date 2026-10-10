@@ -18,6 +18,8 @@
   }
   try {
     if (localStorage.getItem('horizon-contrast') === 'high') root.setAttribute('data-contrast', 'high')
+    // The display mode (« Sérieux » or « Aventure »): read only by the pages that ask for it (the character sheet). Absence means serious.
+    if (localStorage.getItem('horizon-mode') === 'adventure') root.setAttribute('data-mode', 'adventure')
     // Matched against the known set rather than tested for one value: an unrecognised or
     // stale key must fall back to the base size, never paint at a size no CSS rule defines.
     var ts = localStorage.getItem('horizon-text-scale')

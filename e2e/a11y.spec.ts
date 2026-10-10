@@ -82,6 +82,22 @@ for (const s of STATES) {
   }
 }
 
+// The character sheet in BOTH of its display modes, in every display state: « Aventure » is a different drawing of the same sheet (frames, gauges, icons,
+// tiles), so the contrast of every pair in it is judged here, day and night, with high contrast and with the largest text.
+for (const s of STATES) {
+  for (const mode of ['serious', 'adventure'] as const) {
+    test(`the character sheet (${mode}) has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
+      await setState(page, s)
+      await page.addInitScript((m) => localStorage.setItem('horizon-mode', m), mode)
+      await seedProfile(page, EXAMPLE)
+      await page.goto('/fiche')
+      await page.locator(mode === 'serious' ? '.sheet--serious' : '.sheet--rpg').waitFor({ timeout: 30_000 })
+      await page.waitForFunction(() => !(document.querySelector('.sheet')?.textContent ?? '').match(/Calcul en cours|Le sort est en train/), null, { timeout: 30_000 })
+      expect(await violations(page)).toEqual([])
+    })
+  }
+}
+
 test('the gallery stays accessible with its dialog open', async ({ page }) => {
   await page.goto('/dev/kit')
   await page.getByRole('button', { name: 'Ouvrir le dialogue' }).click()
@@ -93,13 +109,13 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
   await seedProfile(page, EXAMPLE)
   await page.goto('/profil')
   const order: string[] = []
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 11; i++) {
     await page.keyboard.press('Tab')
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
-  // The skip link first — the whole point of one — then the top bar (name, language, theme, the glossary, the settings gear), then the three destinations.
-  expect(order.slice(0, 6)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', '', ''])
-  expect(order.slice(6, 9)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
+  // The skip link first — the whole point of one — then the top bar (name, language, theme, the sheet, the glossary, the settings gear), then the three destinations.
+  expect(order.slice(0, 7)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', '', '', ''])
+  expect(order.slice(7, 10)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
 })
 
 // The page's outline is part of its accessibility tree (heading navigation in a screen reader, and the

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
+import { ModeSwitch } from '../components/sheet/ModeSwitch'
 import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
@@ -16,6 +17,7 @@ import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
 import { clearProfile, exportFileName, exportProfileJson, getProfile, markExported, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
+import { MODE_COPY } from '../lib/sheetCopy'
 import { getTheme, setTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 
@@ -208,6 +210,7 @@ export function Donnees() {
 // (the cascade does the rest) and persist to this device; local state only mirrors them so the control shows what is in force.
 function DisplaySection() {
   const t = useT()
+  const { lang } = useLang()
   const d = t.data.display
   const [theme, setThemeShown] = useState<Theme>(getTheme)
   const [contrast, setContrastShown] = useState<Contrast>(getContrast)
@@ -258,6 +261,11 @@ function DisplaySection() {
           }}
           options={TEXT_SCALES.map((s) => ({ key: s, label: d.textSizes[s] }))}
         />
+      </div>
+      <div className="field-row">
+        <p className="field-row__label">{MODE_COPY[lang].label}</p>
+        <ModeSwitch />
+        <p className="field-row__hint">{MODE_COPY[lang].hint}</p>
       </div>
     </Section>
   )

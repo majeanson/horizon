@@ -1,0 +1,352 @@
+/* ── The character sheet (/fiche): one model, two skins ───────────────────────────────────────────────────────────────────────
+   The serious skin is cards and bars on the app's own surfaces; « Aventure » is the same sheet drawn as a role-playing character sheet — a framed banner,
+   gauges with an icon each, tiles for the equipment, a scroll of quests, badges for the feats. Both read only the app's colour tokens (so day, night, high
+   contrast and the larger text sizes all follow), keep every figure as text beside its bar, and stack on a phone before they spread on a wider screen. */
+
+.sheet__mode {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+  margin-bottom: var(--gap);
+}
+.sheet {
+  display: grid;
+  gap: 1.25rem;
+}
+.sheet__empty {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+.sheet__section {
+  display: grid;
+  gap: 0.75rem;
+}
+.sheet__heroes,
+.sheet__stats,
+.sheet__slots,
+.sheet__quests,
+.sheet__feats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.sheet__heroes {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+.sheet__stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+.sheet__slots,
+.sheet__feats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+.sheet__hero,
+.sheet__stat,
+.sheet__slot,
+.sheet__feat {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+}
+.sheet__hero p,
+.sheet__stat p,
+.sheet__slot p,
+.sheet__feat p {
+  margin: 0;
+}
+.sheet__hero-name {
+  font-family: var(--display);
+  font-size: var(--text-lg);
+}
+.sheet__hero-class {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+.sheet__level-value {
+  font-family: var(--display);
+  font-size: var(--text-xl);
+}
+.sheet__stat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+.sheet__stat-name {
+  font-weight: 700;
+}
+.sheet__stat-value {
+  font-size: var(--text-lg);
+}
+.sheet__stat-detail {
+  font-size: var(--text-sm);
+}
+.sheet__slot-title,
+.sheet__feat-name {
+  font-weight: 700;
+}
+.sheet__slot-amount {
+  font-size: var(--text-lg);
+}
+.sheet__feat-status {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.sheet__feat.is-earned {
+  border-color: var(--sage-deep);
+}
+.sheet__quests {
+  gap: 0.5rem;
+}
+
+/* A bar is the picture of a figure that is also written beside it: the track, and the fill on the stated scale. */
+.sheet-bar {
+  height: 0.8rem;
+  margin: 0.4rem 0;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.sheet-bar--empty {
+  background: transparent;
+  border: 1px dashed var(--line-strong);
+}
+.sheet-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sage-deep);
+  transition: width var(--dur-base, 200ms) var(--ease-out, ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-bar__fill {
+    transition: none;
+  }
+}
+
+/* ── « Aventure » ─────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+.sheet-rpg__banner,
+.sheet-rpg__panel {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-md);
+  background: var(--paper-deep);
+  box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5px var(--line-strong), var(--shadow-sm);
+}
+.sheet-rpg__banner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  padding: 1.1rem;
+}
+.sheet-rpg__crest {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--marigold);
+  color: var(--accent-ink);
+  border: 2px solid var(--ink);
+}
+.sheet-rpg__banner-text {
+  display: grid;
+  gap: 0.2rem;
+}
+.sheet-rpg__banner-text p {
+  margin: 0;
+}
+.sheet-rpg__title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--text-xl);
+  letter-spacing: 0.04em;
+}
+.sheet-rpg__party {
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.sheet-rpg__level {
+  grid-column: 1 / -1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--marigold-deep);
+  background: var(--marigold-wash);
+  color: var(--marigold-ink);
+  font-weight: 700;
+}
+.sheet-rpg__level-value {
+  font-family: var(--display);
+  font-size: var(--text-lg);
+}
+@media (min-width: 640px) {
+  .sheet-rpg__banner {
+    grid-template-columns: auto 1fr auto;
+  }
+  .sheet-rpg__level {
+    grid-column: auto;
+    justify-self: end;
+  }
+}
+.sheet-rpg__heroes,
+.sheet-rpg__stats,
+.sheet-rpg__slots,
+.sheet-rpg__feats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.sheet-rpg__heroes {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+.sheet-rpg__stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+.sheet-rpg__slots,
+.sheet-rpg__feats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+.sheet-rpg__hero,
+.sheet-rpg__slot,
+.sheet-rpg__feat {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+  padding: 0.85rem;
+  border: 2px solid var(--line-strong);
+  border-left: 6px solid var(--marigold-deep);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+}
+.sheet-rpg__hero p,
+.sheet-rpg__slot p,
+.sheet-rpg__feat p {
+  margin: 0;
+}
+.sheet-rpg__hero-name {
+  font-family: var(--display);
+  font-size: var(--text-lg);
+}
+.sheet-rpg__hero-class {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.sheet-rpg__stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+}
+.sheet-rpg__stat-icon,
+.sheet-rpg__slot-icon,
+.sheet-rpg__feat-mark {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--sky-wash);
+  color: var(--sky-ink);
+  border: 2px solid var(--sky-deep);
+}
+.sheet-rpg__slot-icon,
+.sheet-rpg__feat-mark {
+  width: 2rem;
+  height: 2rem;
+}
+.sheet-rpg__stat-body {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.sheet-rpg__stat-body p {
+  margin: 0;
+}
+.sheet-rpg__stat-name {
+  font-family: var(--display);
+  font-size: var(--text-md);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sheet-rpg .sheet-bar {
+  position: relative;
+  height: 1rem;
+  border: 2px solid var(--ink);
+  background: var(--paper-deep);
+}
+.sheet-rpg .sheet-bar--empty {
+  border-style: dashed;
+  background: transparent;
+}
+/* The gauge's ten notches, drawn over the fill. */
+.sheet-rpg .sheet-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), var(--ink) calc(10% - 2px) 10%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.sheet-rpg .sheet-bar__fill {
+  background: var(--marigold-deep);
+}
+.sheet-rpg__panel {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.1rem;
+}
+.sheet-rpg__panel p {
+  margin: 0;
+}
+.sheet-rpg__panel-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--text-md);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.sheet-rpg__slot-title,
+.sheet-rpg__feat-name {
+  font-weight: 700;
+}
+.sheet-rpg__feat {
+  border-left-color: var(--line-strong);
+}
+.sheet-rpg__feat.is-earned {
+  border-left-color: var(--sage-deep);
+  border-color: var(--sage-deep);
+}
+.sheet-rpg__feat-mark {
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.sheet-rpg__feat.is-earned .sheet-rpg__feat-mark {
+  background: var(--sage-wash);
+  color: var(--sage-ink);
+  border-color: var(--sage-deep);
+}
+
+@media print {
+  /* A sheet on paper: day ink, no frames to ink in, the bars as their figures say. */
+  .sheet-rpg__banner,
+  .sheet-rpg__panel {
+    box-shadow: none;
+  }
+}

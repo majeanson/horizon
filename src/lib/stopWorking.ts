@@ -34,7 +34,7 @@ export const pensionsAfterTax = (r: YearRow): number => pensionsOf(r) - r.househ
 const shareOf = (r: YearRow): number => (r.household.spending > 0 ? Math.max(0, pensionsAfterTax(r)) / r.household.spending : 0)
 
 /** The year the LAST pension of the household begins: each person's QPP, OAS and plan pensions (one already in pay began in the past). */
-function lastPensionStart(household: Household): number {
+export function lastPensionStart(household: Household): number {
   return Math.max(...household.persons.map((p) => p.birth.year + Math.max(p.rrq.startAge, p.oas.startAge, ...p.pensions.filter((d) => !d.inPay).map((d) => d.startAge))))
 }
 

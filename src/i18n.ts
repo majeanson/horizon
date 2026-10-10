@@ -72,6 +72,7 @@ export const FR = {
     results: 'Résultats',
     data: 'Sauvegarde et réglages',
     glossary: 'Glossaire : les sigles expliqués',
+    sheet: 'Ma fiche : la situation en cinq mesures',
   },
 
   fields: {
