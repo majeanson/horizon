@@ -350,3 +350,11 @@
     box-shadow: none;
   }
 }
+
+/* The header's button to the sheet makes five: on the narrowest phones (with the larger text sizes) they would run off the edge, so below 380 px the sheet is
+   reached from the settings page instead (a link under the display mode) — never both a button and an overflow. */
+@media (max-width: 379px) {
+  .shell__actions .shell__sheet {
+    display: none;
+  }
+}

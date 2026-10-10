@@ -132,3 +132,15 @@ test('the quests lead somewhere: the last one is the plan’s own « this year �
   await expect(quests.last()).toHaveAttribute('href', '/resultats?v=future')
   await expect(page.locator('.sheet__quest', { hasText: 'Confirmer' })).toBeVisible()
 })
+
+test('on the narrowest phones the header leaves the sheet button out, and the settings page still leads there', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 })
+  await page.goto('/profil')
+  await expect(page.locator('.shell__sheet')).toBeHidden()
+  await page.goto('/donnees')
+  await page.getByRole('link', { name: 'Ouvrir ma fiche' }).click()
+  await expect(page).toHaveURL(/\/fiche$/)
+  // wide enough for it: the button is there
+  await page.setViewportSize({ width: 390, height: 800 })
+  await expect(page.locator('.shell__sheet')).toBeVisible()
+})

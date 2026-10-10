@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { ModeSwitch } from '../components/sheet/ModeSwitch'
@@ -266,6 +267,9 @@ function DisplaySection() {
         <p className="field-row__label">{MODE_COPY[lang].label}</p>
         <ModeSwitch />
         <p className="field-row__hint">{MODE_COPY[lang].hint}</p>
+        <Chip to="/fiche" icon="identification-card-bold">
+          {MODE_COPY[lang].open}
+        </Chip>
       </div>
     </Section>
   )

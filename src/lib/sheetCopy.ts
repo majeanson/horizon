@@ -44,6 +44,8 @@ export interface SheetWords {
 
 export interface ModeWords {
   label: string
+  /** The link to the sheet, on the settings page (the header has it too, where the screen is wide enough). */
+  open: string
   hint: string
   serious: string
   adventure: string
@@ -51,8 +53,8 @@ export interface ModeWords {
 
 /** The names of the two modes — the same in the sheet's own switch and on the settings page, whichever skin is in force. */
 export const MODE_COPY: Record<Lang, ModeWords> = {
-  fr: { label: 'Affichage de la fiche', hint: 'Les mêmes chiffres, présentés autrement. Seule la fiche en profite pour l’instant.', serious: 'Sérieux', adventure: 'Aventure' },
-  en: { label: 'How the sheet is shown', hint: 'The same figures, shown another way. Only the sheet uses it for now.', serious: 'Serious', adventure: 'Adventure' },
+  fr: { label: 'Affichage de la fiche', open: 'Ouvrir ma fiche', hint: 'Les mêmes chiffres, présentés autrement. Seule la fiche en profite pour l’instant.', serious: 'Sérieux', adventure: 'Aventure' },
+  en: { label: 'How the sheet is shown', open: 'Open my sheet', hint: 'The same figures, shown another way. Only the sheet uses it for now.', serious: 'Serious', adventure: 'Adventure' },
 }
 
 const FR: SheetWords = {
