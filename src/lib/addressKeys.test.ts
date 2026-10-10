@@ -24,12 +24,13 @@ const KEY = /\b(?:params|search|next)\.(?:get|set|delete|has)\(\s*'([A-Za-z]+)'|
 
 /** key → who owns it, and what a value nobody knows does. */
 const KEYS: Record<string, string> = {
-  v: 'Résultats: the open view (answer · adjust · strategies · verify). Anything else lands on the answer and the key is dropped from the address.',
+  v: 'Résultats: the open view (answer · adjust · strategies · future · verify). Anything else lands on the answer and the key is dropped from the address.',
   ages: 'Résultats: the departure ages being compared (a number, or a split « 58-64 »). Unreadable parts are ignored; none left falls back to the default chips.',
   metric: 'Résultats: the chart (netWorth · income · detail). Unknown falls back to netWorth.',
   dollars: 'Résultats: today’s or nominal dollars. Unknown falls back to today’s.',
   age: 'Résultats: the « Combien épargner ? » age. Unreadable is ignored and the profile’s own is used.',
   spend: 'Résultats: the « Et si je dépensais moins ? » what-if amount. Unreadable is ignored: the slider sits on the profile’s own spending.',
+  care: 'Résultats › Avenir: the late-life care what-if, « amount,age,years ». A part left out takes the starting figure; anything unreadable is ignored and the sliders sit on the starting figures.',
   bp: 'Résultats › Stratégies: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Stratégies: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
   bt: 'Résultats › Stratégies: how the ways of starting are compared (cards · table). Anything else, or no key: the screen’s width chooses — a table from 860 px, cards below.',

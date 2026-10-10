@@ -55,6 +55,9 @@ import { accuracyOf, factsOf } from '../lib/facts'
 import { GUIDE_COPY } from '../lib/guideCopy'
 import { useFactImpact } from '../lib/useFactImpact'
 import { parseSpend } from '../lib/spendModel'
+import type { LeverId } from '../engine/levers'
+import { CARE_START, formatCare, parseCare } from '../lib/careModel'
+import { FutureView } from '../components/results/FutureView'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
@@ -67,7 +70,7 @@ import { today } from '../lib/today'
 // enough to mean something (profileGaps). Every choice lives in the address (`?v=&ages=&metric=…`), so a view can be
 // bookmarked.
 
-type View = 'answer' | 'adjust' | 'strategies' | 'verify'
+type View = 'answer' | 'adjust' | 'strategies' | 'future' | 'verify'
 
 const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
@@ -155,7 +158,7 @@ export function Resultats() {
   const runsPending = gaps.length === 0 && runsAnswer.value === null
 
   // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
-  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' ? 'adjust' : 'answer'
+  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' ? 'adjust' : params.get('v') === 'future' ? 'future' : 'answer'
   // A view this page does not have (a typo, an old link) lands on the answer — and the ADDRESS follows, as the router's catch-all
   // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
   const rawView = params.get('v')
@@ -239,6 +242,8 @@ export function Resultats() {
   }
   const movers = impact === undefined ? [] : unconfirmed.filter((f) => (impact.swings[f.id]?.years ?? 0) > 0).sort((x, y) => impact.swings[y.id].years - impact.swings[x.id].years).slice(0, 4)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
+  // The change that brings the age forward most (« À faire cette année »): undefined while the levers are worked out, null when none does.
+  const bestLever = levers === undefined ? undefined : (levers.levers.filter((l) => l.earliest !== null && (l.yearsGained ?? 0) > 0).sort((x, y) => (y.yearsGained ?? 0) - (x.yearsGained ?? 0))[0] as { id: LeverId; yearsGained: number; earliest: number } | undefined) ?? null
   const prudentGap = prudentDiffers(range?.prudent, headline.age)
   // What the answer's age can fund each month (engine/maxSpending.ts, after tax, today's dollars), and the age put in dates.
   const comfort = got?.comfort
@@ -311,6 +316,8 @@ export function Resultats() {
   const saveAge = Number.isFinite(wantedSaveAge) && wantedSaveAge >= firstAge && wantedSaveAge <= MAX_AGE ? Math.round(wantedSaveAge) : Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
   // « Et si je dépensais moins ? » keeps its what-if amount in the address (`?spend=`) too; absent, the slider sits on the profile's own.
   const spend = parseSpend(params.get('spend')) ?? profile.household.spending.retiredToday
+  // « Et si les dernières années coûtaient plus cher ? » too (`?care=amount,age,years`); absent, the sliders sit on the starting figures.
+  const care = parseCare(params.get('care')) ?? CARE_START
 
   // What would make the answer more precise — detectable absences only, never a guess about what the household owns.
   const refine = [
@@ -327,6 +334,8 @@ export function Resultats() {
         ? [...(retiredNow ? [] : [{ id: 'ajuster', label: rc.nav.ajuster }]), { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }])]
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
+        : view === 'future'
+          ? [{ id: 'soins', label: rc.nav.soins }, { id: 'annee', label: rc.nav.annee }]
         : [
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
@@ -390,6 +399,7 @@ export function Resultats() {
             { key: 'answer' as const, label: rc.tabs.answer },
             { key: 'adjust' as const, label: rc.tabs.adjust },
             { key: 'strategies' as const, label: rc.tabs.strategies },
+            { key: 'future' as const, label: rc.tabs.future },
             { key: 'verify' as const, label: rc.tabs.verify },
           ]}
         />
@@ -707,6 +717,25 @@ export function Resultats() {
             <OrderPanel household={profile.household} assumptions={assumptions} age={earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))} firstAge={firstAge} />
           </section>
         </section>
+      )}
+
+      {/* 4 — the future: a late-life care cost tried on the plan, and what the plan points at for this year. */}
+      {view === 'future' && (
+        <FutureView
+          household={profile.household}
+          assumptions={assumptions}
+          care={care}
+          onCare={(c) => setParam('care', c === null ? null : formatCare(c))}
+          earliest={earliest}
+          age={earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))}
+          maxAge={MAX_AGE}
+          retiredNow={retiredNow}
+          lever={bestLever}
+          movers={movers.map((m) => ({ id: m.id, name: factName(m.id), years: impact!.swings[m.id].years }))}
+          moversPending={impact === undefined}
+          pensionsOpen={state.pensionsOpen}
+          onGo={goTo}
+        />
       )}
 
       {view === 'verify' && (

@@ -46,13 +46,8 @@ official page, and any guard it added has been **planted against its own bug** a
 
 ## 4. The backlog, in build order
 
-### Phase 0 — scaffold and CI
-
-- [x] CI green on GitHub (`ci.yml`), first deploy to Cloudflare (local `wrangler deploy`), `e2e/smoke.spec.ts`, `a11y.spec.ts` and the service-worker harness green in CI
-
 ### Phase 1 — parameters for 2026, with their sources
 
-- [x] The parameter machinery: `Cited` / `Plain`, `params/2026.ts` (every leaf from its official page), the literal tests, `cited.test.ts`, `crosscheck.test.ts`, `enginePurity` — each planted red
 - [x] `scripts/gen-sources.ts` + `SOURCES.md` + `lib/sourcesMd.test.ts`; `npm run sources:check` verifies every cited URL resolves
 - [x] No figure carries a `verify` reason any more: the Québec brackets, the line-361 age rule and the worker-deduction rate (browser screenshot + `docs/TP-1.G(2025-12).pdf`), the four GIS divisors (OAS Benefits Estimator, ≤ 1 $/month apart), the TFSA total (the CRA's limits table + a real room history); ratchet 11 → 0 on 2026-10-06
 - [ ] **Needs a human with a browser** (revenuquebec.ca refuses every automated client; legisquebec.gouv.qc.ca opens in the in-app Browser pane, which settled the QPP Act's 15 % drop-out on 2026-10-07: rounded UP, s. 116.4 « counting any fraction of a month as a whole month », `verified/rrqDropOut.verified.test.ts`, engine fixed; the 72nd-birthday-month boundary was confirmed on the calculation page on 2026-10-06): (the CRA's T5008 page read 2026-10-07: « The amount in box 20 may or may not reflect your adjusted cost base (ACB) » — what the ⓘ already says); (the OAS estimator's residence wording was read on 2026-10-06: step 4 asks « Since the age of 18, have you only lived in Canada? » Yes/No; answering No asks for the years lived when the pension STARTED (a partner not yet on it: the years so far) — read 2026-10-07, and 35 years gave the engine's 35/40 exactly)
@@ -123,7 +118,7 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] Deployed to https://horizon.marc-jeanson.workers.dev with `npm run deploy` (local `wrangler login`)
 - [x] Language: `SOURCES.md` and `SOURCES.en.md` are both generated (`npm run sources`), the English one linking each page's English edition; `index.html` ships a FR + EN description / link preview and `lib/documentLang.ts` narrows them, `<html lang>` and the install manifest (`manifest.webmanifest` / `manifest.en.webmanifest`, both precached) to the reader's language
 - [ ] Language, what is still one-language: a link-preview crawler reads the FR + EN sentence, never one language (it runs no script); the `<link rel=manifest>` swap is read by the browser at install time, so an app installed in one language keeps that language's name until reinstalled; a note in `SOURCES.en.md` is the official page's own wording, so a few are French; 7 cited pages exist in one language only (`twins.ts` says which and why)
-- [ ] **Deploy on push**: add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets (Settings ▸ Secrets and variables ▸ Actions). Until then CI skips the deploy job cleanly and a deploy is `npm run deploy` from a logged-in machine
+- [x] **Deploy on push** works: the two repository secrets are set and a push to `main` deploys once CI is green (tested by Marc, 2026-10-09)
 
 ### Phase 10 — clarity, questions
 
@@ -148,6 +143,11 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] **Schema v16**: children move into the household; `childSpending`, dated `flows`, `partTime`, `retiredSpendingDrift` (`engine/lifeEvents.ts`, `LifeSection`, `PartTimeFields`); a household that states none projects exactly as before (the golden snapshots did not move)
 - [x] **Four views, asked by Marc the same day**: Réponse · Ajuster · Stratégies · Vérifier (`?v=adjust` holds the levers, « Combien épargner ? » and « Et si je dépensais moins ? »); the chart now comes before « Préciser le calcul »; « Comment lire cette page ? » is one closed chip under the answer; the map of sections WRAPS (every chip whole); the backup notice speaks after an HOUR of unsaved typing, and Profil says when the last copy was made. Not built: a tenth example that uses the new fields (EXAMPLES.md is nine by design), dated events in the CSV, an RRSP-shaped windfall, REEE
 - [x] **Kids (2026-10-09, asked by Marc: « if we add kids… »)**: schema v18; what a child costs from Statistics Canada's 11F0019M paper (tables 1–3, held to the paper's own printed totals, moved to today by the CPI) as an ESTIMATE that never overwrites a typed figure; children past / current / to come (`childAdd`: a child to come ADDS its cost, flat or by age band — it used to be treated as already in the budget); the Canada Child Benefit (the CRA's eight worked examples to the cent — the page rounds the reduction DOWN) and Allocation famille (official table rows and the 2026 page's amounts); a parental leave from the Act (A-29.011); the QPP child-rearing exclusion as the STATUTE reads (art. 101: only in a year with earnings ≤ 3 500 $ — Retraite Québec's page omits that, and applied plainly it would raise every working parent's pension; five tests plant it). All of it OFF unless the household counts it (`kidsEffects`); a lone parent keeps Québec's living-alone amount (Revenu Québec line 361: alone or only with minors). Not built: REEE, the Québec childcare credit, the single-parent add-on (it needs an adult student child), an employer's parental top-up
+
+### Phase 13 — preparing the future (2026-10-09, « a section to plan the future »)
+
+- [x] **« Avenir »**, the fifth Résultats view (`?v=future`): « Et si les dernières années coûtaient plus cher ? » — a late-life care what-if (amount · age of the oldest · years, `?care=`) on a copy of the household as a dated expense flow, answered in a worker (`lib/careModel.ts`, `CareView`): the earliest age with it, what is left at the horizon, and « L’ajouter à mes événements » (the same flow the Profil chip makes; no schema change). No cost is cited: the RAMQ page for the CHSLD contribution refuses automated clients — ❓ needs a human with a browser. « À faire cette année » says the lever that gains most and the figure to confirm first, and links to the order of the accounts and the pensions (they keep their one home on Stratégies)
+- [ ] Planned the same night: the character sheet (one model, a serious skin and an RPG skin behind a site-wide mode, only the sheet reading it at first), the yearly figure-diff job (design note only), the complexity / separation cleanup, then bundle and knip
 
 ## 5. Lessons carried over from Babillard
 

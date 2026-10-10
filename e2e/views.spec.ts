@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test'
 import { seedProfile } from './seed'
 
-// Résultats is four views of one plan — Réponse · Ajuster · Stratégies · Vérifier — and its map of sections shows every chip whole.
+// Résultats is five views of one plan — Réponse · Ajuster · Stratégies · Avenir · Vérifier — and its map of sections shows every chip whole.
 
 test.beforeEach(async ({ page }) => seedProfile(page))
 
-test('four views; « Ajuster » holds the levers, the saving and the spending, and keeps its place in the address', async ({ page }) => {
+test('five views; « Ajuster » holds the levers, the saving and the spending, and keeps its place in the address', async ({ page }) => {
   await page.goto('/resultats')
   const tabs = page.getByRole('tablist', { name: 'Vues des résultats' })
-  await expect(tabs.getByRole('tab')).toHaveText(['Réponse', 'Ajuster', 'Stratégies', 'Vérifier'])
+  await expect(tabs.getByRole('tab')).toHaveText(['Réponse', 'Ajuster', 'Stratégies', 'Avenir', 'Vérifier'])
   await expect(page.locator('#ajuster')).toHaveCount(0)
   await tabs.getByRole('tab', { name: 'Ajuster' }).click()
   await expect(page).toHaveURL(/v=adjust/)
