@@ -9,18 +9,29 @@ import { LEVEL_MAX, SCALE, sheetModel, type SheetStat } from './sheetModel.ts'
 
 const TODAY = { year: 2026, month: 10 }
 const profileOf = (id: ExampleId): Profile => exampleProfile(id)
+// The search and the model are pure and slow (a dozen projections each), and a slow CI runner is several times slower than this machine: each is worked out once.
+const earliestCache = new Map<ExampleId, number | null>()
 const earliestOf = (id: ExampleId): number | null => {
-  const p = profileOf(id)
-  return retireAt(p.household, assumptionsOf(p, TODAY), { stopAtFirstOk: true }).earliestOk
+  if (!earliestCache.has(id)) {
+    const p = profileOf(id)
+    earliestCache.set(id, retireAt(p.household, assumptionsOf(p, TODAY), { stopAtFirstOk: true }).earliestOk)
+  }
+  return earliestCache.get(id)!
 }
+const sheetCache = new Map<string, ReturnType<typeof sheetModel>>()
 // `...asked` so that an explicit `undefined` (« still being worked out ») is not replaced by the default.
 const sheet = (id: ExampleId, ...asked: [(number | null | undefined)?]) => {
-  const p = profileOf(id)
-  return sheetModel(p, assumptionsOf(p, TODAY), asked.length > 0 ? asked[0] : earliestOf(id))
+  const earliest = asked.length > 0 ? asked[0] : earliestOf(id)
+  const key = `${id}|${String(earliest)}`
+  if (!sheetCache.has(key)) {
+    const p = profileOf(id)
+    sheetCache.set(key, sheetModel(p, assumptionsOf(p, TODAY), earliest))
+  }
+  return sheetCache.get(key)!
 }
 const stat = (m: ReturnType<typeof sheet>, id: SheetStat['id']): SheetStat => m.stats.find((s) => s.id === id)!
 
-describe('the sheet of a household', () => {
+describe('the sheet of a household', { timeout: 120_000 }, () => {
   it('has the five stats in a fixed order, and every ready one has a figure and a bar inside its scale', () => {
     for (const id of Object.keys(EXAMPLES) as ExampleId[]) {
       const m = sheet(id)

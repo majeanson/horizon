@@ -105,7 +105,8 @@ const viewOf = (id: ExampleId, lang: Lang, words: SheetWords): SheetView => {
   return sheetView(model, lang, words, p.household.persons.map((x) => x.birth.year), p.household.persons.map((x, i) => x.name || String(i)))
 }
 
-describe('the two skins show the same figures', () => {
+// Each model is a search and four projections: a slow CI runner needs more than the default five seconds for the first of each household.
+describe('the two skins show the same figures', { timeout: 120_000 }, () => {
   it('on every example household, in both languages: the same digits in the same order, the same bars, the same figures behind them', () => {
     for (const id of Object.keys(EXAMPLES) as ExampleId[]) {
       for (const lang of LANGS) {
