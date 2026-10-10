@@ -17,8 +17,10 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
       persons: structuredClone(e.household.persons).map((p) => ({ ...p, accounts: { ...p.accounts, rrsp: { lockedIn: 0, employerContribution: 0, ...p.accounts.rrsp } } })),
       home: structuredClone(e.household.home ?? null),
       children: [...e.children],
-      childSpending: null,
-      flows: [],
+      // The life events the example states (a child to come, its benefits and leave, dated flows); the nine other examples state none.
+      childSpending: structuredClone(e.household.childSpending ?? null),
+      kidsEffects: structuredClone(e.household.kidsEffects ?? null),
+      flows: structuredClone([...(e.household.flows ?? [])]),
     },
     assumptions: { surplusToRrsp: false, retiredSpendingDrift: 0, marketPath: { preset: 'smooth', custom: [] }, ...structuredClone(assumptions) },
     customScenario: null,

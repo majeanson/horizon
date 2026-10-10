@@ -4,7 +4,7 @@ import { slowCpu } from './seed'
 // The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
 test.beforeEach(({ page }) => slowCpu(page))
 
-// EVERY EXAMPLE, THROUGH THE REAL PAGES. The nine example households (src/engine/golden/examples.ts) are loaded the way a person
+// EVERY EXAMPLE, THROUGH THE REAL PAGES. The ten example households (src/engine/golden/examples.ts) are loaded the way a person
 // loads them — the data page — and each one must read as its own story on the results page: the headline, the cards, the ledger,
 // and which panels are offered at all. The arithmetic behind each is printed in EXAMPLES.md and pinned by engine/golden/examples.test.ts.
 
@@ -21,9 +21,9 @@ const openLedger = async (page: Page) => {
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
-test('the data page offers all nine examples, each with its story', async ({ page }) => {
+test('the data page offers all ten examples, each with its story', async ({ page }) => {
   await page.goto('/donnees')
-  await expect(page.locator('.example-list li')).toHaveCount(9)
+  await expect(page.locator('.example-list li')).toHaveCount(10)
   await expect(page.locator('.example-list')).toContainText('Julien, 52 ans')
 })
 
@@ -115,4 +115,16 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   // and the year table carries the home's columns
   await page.goto('/resultats?v=verify')
   await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible({ timeout: 30_000 })
+})
+
+test('planner: a life to plan — the profile carries its events, the answer moves with them, and the Avenir view knows the care is already there', async ({ page }) => {
+  await loadExample(page, 'Couple, une vie à planifier')
+  await expect(page.locator('.verdict__line')).toContainText('56 ans')
+  // the profile says it: a child to come, a part-time work, an inheritance and a care cost among the dated events
+  await page.goto('/profil')
+  await expect(page.locator('.flow__line', { hasText: 'Un héritage' })).toBeVisible()
+  await expect(page.locator('.flow__line', { hasText: 'Des soins plus tard' })).toBeVisible()
+  // the care what-if sits on top of the care the household already counts, and says so
+  await page.goto('/resultats?v=future')
+  await expect(page.locator('#soins')).toContainText('déjà dans vos événements', { timeout: 30_000 })
 })

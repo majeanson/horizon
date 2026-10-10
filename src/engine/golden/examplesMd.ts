@@ -25,6 +25,7 @@ const NAMES: Record<string, string> = {
   newcomer: 'Arrivée au Canada à 30 ans',
   heir: 'Une personne, grand héritage',
   downsizer: 'Couple, vendre la maison',
+  planner: 'Couple, une vie à planifier',
 }
 
 function personTable(p: Person): string[] {
@@ -53,6 +54,15 @@ function section(e: ExampleHousehold): string[] {
     const sale = h.home.sale ? `vendue à ${h.home.sale.age} ans (logement de remplacement : ${$(h.home.sale.replacementCost)})` : 'gardée à vie'
     out.push(`Résidence principale : valeur ${$(h.home.value)}, hypothèque ${$(m.balance)} à ${pct(m.rate)} (${$(m.monthlyPayment)} par mois, ${payoff}), ${sale}. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.`, '')
   }
+
+  const life: string[] = []
+  const kids = h.kidsEffects
+  if (h.childSpending) life.push(`enfants à venir ou à la maison (${(h.children ?? []).join(', ')}) : ${h.childSpending.byAge ? `coût par tranche d’âge ${h.childSpending.byAge.map($).join(' · ')} par année` : `${$(h.childSpending.perChild)} par enfant et par année`} jusqu’à ${h.childSpending.untilAge} ans`)
+  if (kids) life.push(`${kids.benefits ? 'allocations pour enfants comptées' : 'allocations non comptées'}${kids.qppExclusion ? ', exclusion des mois avec un enfant de moins de 7 ans dans la moyenne du RRQ' : ''}${kids.leave ? `, congé parental (${kids.leave.birthParentWeeks} + ${kids.leave.otherParentWeeks} semaines partagées)` : ''}`)
+  for (const p of h.persons) if (p.partTime) life.push(`${p.name} garde ${pct(p.partTime.share, 0)} de son salaire jusqu’à ${p.partTime.untilAge} ans`)
+  for (const f of h.flows ?? []) life.push(`${f.label} : ${f.kind === 'windfall' ? `${$(f.amount)} reçus en ${f.fromYear}` : f.kind === 'expense' ? `${$(f.amount)} par année de ${f.fromYear} à ${f.toYear}` : `${$(f.amount)} par année de ${f.fromYear} à ${f.toYear} (revenu)`}`)
+  if (a.retiredSpendingDrift) life.push(`les dépenses à la retraite changent de ${pct(a.retiredSpendingDrift)} par année (en termes réels) à partir de 70 ans`)
+  if (life.length > 0) out.push(`Événements de vie : ${life.join(' ; ')}.`, '')
 
   out.push('### Ce qui sort', '')
   out.push(`- Le plan tel que décrit : ${g.ok ? `tient jusqu’à l’horizon, valeur nette à la fin ${$(g.netWorthEnd)} (dollars d’aujourd’hui)` : `manque d’argent en ${g.firstShortfallYear}`}.`)

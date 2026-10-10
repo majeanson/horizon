@@ -104,7 +104,14 @@ function violations(h: Household, children: readonly number[] = []): string[] {
 
   const oldestParent = Math.min(...h.persons.map((p) => p.birth.year))
   for (const c of children) {
-    if (c > TODAY.year) add('child', 'household', `born in ${c}, in the future`)
+    if (c > TODAY.year) {
+      // A child still TO COME is a stated plan, not a mistake — when the household says what it costs, is due within ten years, and the younger parent is
+      // not past 45 by then. Without a stated cost it is a birth year nobody accounted for.
+      const youngest = Math.max(...h.persons.map((p) => p.birth.year))
+      if (!h.childSpending) add('child', 'household', `born in ${c}, in the future, with no cost stated`)
+      else if (c > TODAY.year + 10) add('child', 'household', `born in ${c}, more than ten years ahead`)
+      else if (c - youngest > 45) add('child', 'household', `born in ${c}, when the younger parent would be ${c - youngest}`)
+    }
     if (c < oldestParent + 14) add('child', 'household', `born in ${c}, before the oldest parent turned 14`)
   }
   return out
@@ -187,6 +194,18 @@ describe('the detector is pinned: a household built to break every rule is caugh
     'nonreg-acb', 'db-service', 'db-start', 'spending-vs-income', 'retired-spending', 'child',
   ])('rule « %s » fires', (rule) => {
     expect(found.has(rule), `${rule} did not fire on the broken household`).toBe(true)
+  })
+
+  it('a child still to come is allowed only as a plan: a stated cost, within ten years, a parent who can still have one', () => {
+    const withCost = (h: Household) => ({ ...h, childSpending: { perChild: 9_000, untilAge: 23 } })
+    // Two people born in 1990: a birth three years from now is within what a 36-year-old can plan.
+    const g: Household = { ...GOLDEN_HOUSEHOLD, persons: GOLDEN_HOUSEHOLD.persons.map((p) => ({ ...p, birth: { year: 1990, month: 1 } })) }
+    const youngest = 1990
+    const rule = (h: Household, kids: number[]) => violations(h, kids).filter((v) => v.startsWith('child'))
+    expect(rule(withCost(g), [TODAY.year + 2])).toEqual([])
+    expect(rule(g, [TODAY.year + 2]).join()).toMatch(/no cost stated/)
+    expect(rule(withCost(g), [TODAY.year + 11]).join()).toMatch(/more than ten years ahead/)
+    expect(rule(withCost(g), [youngest + 46]).join()).toMatch(/younger parent/)
   })
 
   it('the old golden couple (a retired budget 14 % above the working one) would have been caught', () => {

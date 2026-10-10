@@ -2,7 +2,7 @@ import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './household.fixture.ts'
 
-// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Nine different lives, so that
+// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Ten different lives, so that
 // every table and every result can be looked at, and checked by hand, for more than one kind of person:
 //
 //   golden    a couple, one in the public sector (RREGOP), the other private — the household the golden snapshots pin
@@ -16,12 +16,15 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //             without the sale the money runs out and the earliest age that works is later
 //   heir      one person, 27, who inherited a large sum: the very-early-retirement case — the answer is « dès maintenant »,
 //             and the plan has to last seventy years
+//   planner   a young couple whose life is not in the budget yet: a child still to come (its cost, the state's benefits, a parental
+//             leave), part-time work after the first retires, an inheritance, a spending that slows with age, and a care cost in the
+//             last years — each one moves the earliest age, and the household says by how much
 //
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
 
-export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer'
-export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer']
+export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner'
+export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner']
 
 export interface ExampleHousehold {
   id: ExampleId
@@ -211,6 +214,54 @@ const downsizer: Household = {
   spending: { workingToday: 92_000, retiredToday: 80_000 },
 }
 
+/** The planner's life events, each one switchable so the test (and a reader) can see what it is worth. */
+export interface PlannerEvents {
+  child: boolean
+  care: boolean
+  heritage: boolean
+  partTime: boolean
+}
+
+export function plannerHousehold(events: PlannerEvents = { child: true, care: true, heritage: true, partTime: true }): Household {
+  return {
+    livesAlone: false,
+    persons: [
+      person({
+        id: 'self', name: 'Élise', birth: { year: 1989, month: 3 }, retirementAge: 58, salaryToday: 88_000, earningsHistory: history(1989, 42_000),
+        // After she stops full-time she keeps 30 % of her pay until 64.
+        partTime: events.partTime ? { untilAge: 64, share: 0.3 } : null,
+        accounts: {
+          rrsp: { balance: 45_000, room: 22_000, annualContribution: 7_000 },
+          tfsa: { balance: 22_000, room: 28_000, annualContribution: 6_000 },
+          nonReg: none,
+        },
+        pensions: [],
+      }),
+      person({
+        id: 'spouse', name: 'Thomas', birth: { year: 1987, month: 9 }, retirementAge: 58, salaryToday: 74_000, earningsHistory: history(1987, 33_000),
+        accounts: {
+          rrsp: { balance: 30_000, room: 18_000, annualContribution: 5_000 },
+          tfsa: { balance: 18_000, room: 30_000, annualContribution: 6_000 },
+          nonReg: { balance: 12_000, acb: 10_000, annualContribution: 0 },
+        },
+        pensions: [],
+      }),
+    ],
+    home: { value: 470_000, mortgage: { balance: 215_000, rate: 0.049, monthlyPayment: 1_550 }, sale: null },
+    // A first child is due in 2028: its cost is ADDED to the budget from its birth to 23, the Canada Child Benefit and Allocation famille are counted, the
+    // months with a child under 7 are left out of the QPP average, and Élise takes 20 of the 32 shared parental weeks, Thomas the other 12.
+    children: events.child ? [2028] : [],
+    childSpending: events.child ? { perChild: 9_000, untilAge: 23, byAge: [11_000, 9_500, 11_500, 6_000] } : null,
+    kidsEffects: events.child ? { benefits: true, qppExclusion: true, leave: { birthParent: 'self', birthParentWeeks: 20, otherParentWeeks: 12 } } : null,
+    flows: [
+      ...(events.heritage ? [{ label: 'Un héritage', kind: 'windfall' as const, amount: 60_000, fromYear: 2038, toYear: 2038, owner: 'self' as const, taxable: false }] : []),
+      // Ten years of care from Thomas's 85th year (he is the older): 45 000 $ a year on top of the budget.
+      ...(events.care ? [{ label: 'Des soins plus tard', kind: 'expense' as const, amount: 45_000, fromYear: 1987 + 85, toYear: 1987 + 94, owner: 'self' as const, taxable: false }] : []),
+    ],
+    spending: { workingToday: 78_000, retiredToday: 72_000 },
+  }
+}
+
 const base = (): Assumptions => ({ ...GOLDEN_ASSUMPTIONS, today: GOLDEN_TODAY, ...ASSUMPTION_PRESETS.neutral })
 
 export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
@@ -223,4 +274,6 @@ export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
   newcomer: { id: 'newcomer', household: newcomer, children: [], assumptions: base() },
   heir: { id: 'heir', household: heir, children: [], assumptions: base() },
   downsizer: { id: 'downsizer', household: downsizer, children: [2005], assumptions: base() },
+  // Spending slows 1 % a year in real terms from 70 (a choice, not an official figure): the other life event of this household.
+  planner: { id: 'planner', household: plannerHousehold(), children: [2028], assumptions: { ...base(), retiredSpendingDrift: -0.01 } },
 }
