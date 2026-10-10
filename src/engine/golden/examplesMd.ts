@@ -26,6 +26,7 @@ const NAMES: Record<string, string> = {
   heir: 'Une personne, grand héritage',
   downsizer: 'Couple, vendre la maison',
   planner: 'Couple, une vie à planifier',
+  family: 'Couple, une famille qui grandit',
 }
 
 function personTable(p: Person): string[] {

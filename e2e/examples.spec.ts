@@ -4,7 +4,7 @@ import { slowCpu } from './seed'
 // The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
 test.beforeEach(({ page }) => slowCpu(page))
 
-// EVERY EXAMPLE, THROUGH THE REAL PAGES. The ten example households (src/engine/golden/examples.ts) are loaded the way a person
+// EVERY EXAMPLE, THROUGH THE REAL PAGES. The eleven example households (src/engine/golden/examples.ts) are loaded the way a person
 // loads them — the data page — and each one must read as its own story on the results page: the headline, the cards, the ledger,
 // and which panels are offered at all. The arithmetic behind each is printed in EXAMPLES.md and pinned by engine/golden/examples.test.ts.
 
@@ -21,9 +21,9 @@ const openLedger = async (page: Page) => {
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
-test('the data page offers all ten examples, each with its story', async ({ page }) => {
+test('the data page offers all eleven examples, each with its story', async ({ page }) => {
   await page.goto('/donnees')
-  await expect(page.locator('.example-list li')).toHaveCount(10)
+  await expect(page.locator('.example-list li')).toHaveCount(11)
   await expect(page.locator('.example-list')).toContainText('Julien, 52 ans')
 })
 
@@ -127,4 +127,17 @@ test('planner: a life to plan — the profile carries its events, the answer mov
   // the care what-if sits on top of the care the household already counts, and says so
   await page.goto('/resultats?v=future')
   await expect(page.locator('#soins')).toContainText('déjà dans vos événements', { timeout: 30_000 })
+})
+
+test('family: one big pay and one small, two children — the profile carries them, and the answer is the one the story says', async ({ page }) => {
+  await loadExample(page, 'Couple, une famille qui grandit')
+  await expect(page.locator('.verdict__line')).toContainText('59 ans')
+  await expect(page.locator('.verdict__line')).toContainText('tous les deux')
+  // the profile says it: two children and what the household counts about them
+  await page.goto('/profil')
+  await expect(page.getByText('Olivier').first()).toBeVisible()
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('horizon-profile')!).household)
+  expect(saved.children).toEqual([2024, 2028])
+  expect(saved.kidsEffects).toMatchObject({ benefits: true, qppExclusion: true })
+  expect(saved.persons[1].salaryToday).toBe(24000)
 })

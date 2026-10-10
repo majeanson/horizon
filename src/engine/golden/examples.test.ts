@@ -5,7 +5,7 @@ import { agesLedger, planGlance } from '../ledger.ts'
 import { project } from '../projection.ts'
 import { retireAt, worksNow } from '../retireAt.ts'
 import type { YearRow } from '../types.ts'
-import { EXAMPLE_IDS, EXAMPLES, plannerHousehold } from './examples.ts'
+import { EXAMPLE_IDS, EXAMPLES, familyHousehold, plannerHousehold } from './examples.ts'
 
 // EACH EXAMPLE HOUSEHOLD MUST DO WHAT ITS STORY SAYS. They exist so that every table and every result can be looked at, and
 // checked by hand, for more than one kind of life; a household that tells the wrong story (a « poor » one that is rich, a
@@ -178,6 +178,35 @@ describe('each story', () => {
     expect(household.flows?.map((f) => f.kind).sort()).toEqual(['expense', 'windfall'])
     expect(household.persons[0].partTime).toEqual({ untilAge: 64, share: 0.3 })
     expect(assumptions.retiredSpendingDrift).toBe(-0.01)
+  })
+
+  it('family: one big pay and one small — two children cost two years, the benefits give one back, and the home-with-a-baby year is left out of the QPP average', () => {
+    const { household, assumptions } = EXAMPLES.family
+    expect(household.persons[0].salaryToday).toBeGreaterThan(4 * household.persons[1].salaryToday)
+    expect(household.children).toEqual([2024, 2028])
+    expect(household.persons[1].earningsHistory[2024]).toBe(0) // the year at home: no earnings on the relevé
+    expect(planGlance(household, assumptions).ok).toBe(true)
+    expect(Math.max(...household.persons.map((p) => p.retirementAge))).toBe(62)
+    const earliest = (events: Partial<Parameters<typeof familyHousehold>[0]>) =>
+      retireAt(familyHousehold({ kids: true, benefits: true, exclusion: true, ...events }), assumptions, { stopAtFirstOk: true }).earliestOk!
+    const all = earliest({})
+    expect(all).toBe(59)
+    // two children: the cost of raising them, net of what the state pays — without them, two years sooner
+    expect(earliest({ kids: false, benefits: false, exclusion: false })).toBe(57)
+    // the Canada Child Benefit and Allocation famille: without them, a year later
+    expect(earliest({ benefits: false })).toBe(60)
+    const worth = (events: Partial<Parameters<typeof familyHousehold>[0]>) => planGlance(familyHousehold({ kids: true, benefits: true, exclusion: true, ...events }), assumptions).netWorthEnd
+    expect(worth({})).toBeGreaterThan(worth({ benefits: false }) + 100_000)
+    // the year at home with a child under 7 and no earnings is not counted against her: a higher QPP than with it counted
+    const qppAt66 = (events: Partial<Parameters<typeof familyHousehold>[0]>) => {
+      const h = familyHousehold({ kids: true, benefits: true, exclusion: true, ...events })
+      const row = project(h, assumptions).find((r) => r.persons.spouse?.age === 66)!
+      return row.persons.spouse!.rrq / (1 + assumptions.inflation) ** (row.year - assumptions.today.year)
+    }
+    expect(qppAt66({})).toBeGreaterThan(qppAt66({ exclusion: false }))
+    // and her QPP is a fraction of his: the plan leans on one pay
+    const [olivier, lea] = agesLedger(household, assumptions)
+    expect(lea.rrq.monthly).toBeLessThan(0.6 * olivier.rrq.monthly)
   })
 
   it('« dès maintenant » is only said when today is the floor AND works: a household whose first working age is later is not told « now »', () => {

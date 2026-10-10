@@ -498,3 +498,59 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Élise | 64 | 0 $ | 0 $ | 0 $ | 0 $ | 41 689 $ | 44 607 $ | 3 291 $ | 3 092 $ | 0 $ |
 | Thomas | 66 | 0 $ | 0 $ | 23 764 $ | 9 150 $ | 8 338 $ | 38 334 $ | 1 348 $ | 2 713 $ | 0 $ |
 
+## family — Couple, une famille qui grandit
+
+### Ce qui entre
+
+| Personne | Naissance | Retraite | Revenu | Rentes publiques |
+| --- | --- | --- | --- | --- |
+| Olivier | né·e en 1988-06 | retraite à 62 ans | salaire 135 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2006) |
+| ↳ comptes | REER 95 000 $ (+9 000 $/an) | CELI 48 000 $ (+7 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+| Léa | né·e en 1990-02 | retraite à 62 ans | salaire 24 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2008) |
+| ↳ comptes | REER 22 000 $ (+1 000 $/an) | CELI 26 000 $ (+2 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+
+Dépenses : 80 000 $ par année en travaillant, 66 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+Résidence principale : valeur 590 000 $, hypothèque 410 000 $ à 4,9 % (2 350 $ par mois, payée en 2051), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
+
+Événements de vie : enfants à venir ou à la maison (2024, 2028) : coût par tranche d’âge 11 000 $ · 9 500 $ · 11 500 $ · 6 000 $ par année jusqu’à 23 ans ; allocations pour enfants comptées, exclusion des mois avec un enfant de moins de 7 ans dans la moyenne du RRQ, congé parental (24 + 8 semaines partagées) ; les dépenses à la retraite changent de -1,0 % par année (en termes réels) à partir de 70 ans.
+
+### Ce qui sort
+
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 394 354 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
+
+### Le calcul des rentes
+
+| Personne | RRQ | PSV |
+| --- | --- | --- |
+| Olivier | première rente 07/2053 : (base 3 337,08 $ + 1ʳᵉ supp. 818,76 $ + 2ᵉ supp. 395,17 $) × ajustement 100,0 % = 4 551,01 $/mois, soit 2 597 $ d’aujourd’hui | première pension 07/2053 : 1 336,40 $ × résidence 100 % × report 0,0 % = 1 336,40 $/mois, soit 763 $ d’aujourd’hui |
+| Léa | première rente 03/2055 : (base 1 711,83 $ + 1ʳᵉ supp. 326,50 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 2 038,33 $/mois, soit 1 116 $ d’aujourd’hui | première pension 03/2055 : 1 393,11 $ × résidence 100 % × report 0,0 % = 1 393,11 $/mois, soit 762 $ d’aujourd’hui |
+
+### Année par année — Olivier (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
+
+| Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 38 | 108 200 $ | 162 818 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 406 $ | 211 117 $ | couvert |
+| 40 | 118 052 $ | 161 561 $ | 0 $ | 0 $ | 0 $ | 0 $ | 1 548 $ | 37 917 $ | 233 315 $ | tire du nid |
+| 45 | 115 382 $ | 177 635 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 40 098 $ | 306 157 $ | couvert |
+| 50 | 111 476 $ | 184 398 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 43 773 $ | 437 646 $ | couvert |
+| 55 | 111 307 $ | 189 825 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 47 632 $ | 606 303 $ | couvert |
+| 60 | 94 852 $ | 197 025 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 51 680 $ | 839 472 $ | couvert |
+| 65 | 66 000 $ | 0 $ | 0 $ | 15 580 $ | 4 575 $ | 0 $ | 61 451 $ | 10 141 $ | 765 782 $ | tire du nid |
+| 70 | 66 000 $ | 0 $ | 0 $ | 44 415 $ | 18 300 $ | 0 $ | 9 680 $ | 5 717 $ | 776 903 $ | tire du nid |
+| 75 | 62 765 $ | 0 $ | 0 $ | 44 415 $ | 18 757 $ | 0 $ | 12 721 $ | 6 744 $ | 831 397 $ | tire du nid |
+| 80 | 59 689 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 12 254 $ | 7 025 $ | 914 413 $ | tire du nid |
+| 85 | 56 764 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 11 783 $ | 6 907 $ | 1 025 128 $ | tire du nid |
+| 90 | 53 982 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 11 312 $ | 6 787 $ | 1 165 337 $ | tire du nid |
+| 95 | 51 336 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 10 771 $ | 6 645 $ | 1 337 993 $ | tire du nid |
+
+### Année témoin pour un calculateur d’impôt : 2053, en dollars d’aujourd’hui
+
+Montants de l’année divisés par l’inflation : les barèmes sont indexés sur les prix, donc un calculateur 2026 doit donner presque la même chose (à 1 % près, les arrondis des barèmes). Le revenu net compte aussi le fractionnement du revenu de pension et les gains en capital réalisés : ce n’est pas la somme des colonnes.
+
+| Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Olivier | 65 | 0 $ | 0 $ | 15 580 $ | 4 575 $ | 60 981 $ | 50 645 $ | 2 861 $ | 3 902 $ | 0 $ |
+| Léa | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 471 $ | 30 961 $ | 1 696 $ | 1 681 $ | 0 $ |
+
