@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster, Rail } from '../components/Layout'
@@ -57,7 +57,7 @@ import { useFactImpact } from '../lib/useFactImpact'
 import { parseSpend } from '../lib/spendModel'
 import type { LeverId } from '../engine/levers'
 import { CARE_START, formatCare, parseCare } from '../lib/careModel'
-import { FutureView } from '../components/results/FutureView'
+import { ACCURACY_COPY } from '../lib/accuracyCopy'
 import { useEarliestEach } from '../lib/useEarliestEach'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
@@ -69,6 +69,11 @@ import { today } from '../lib/today'
 // calculation, the year-by-year table, the sensitivity, the parameters). Nothing is shown until the profile holds
 // enough to mean something (profileGaps). Every choice lives in the address (`?v=&ages=&metric=…`), so a view can be
 // bookmarked.
+
+// The two views that arrive on demand: « Avenir » and the accuracy note on « Vérifier ». Their words, the care model and its worker ride their own chunks, so
+// the results page that every visit opens does not carry them (scripts/check-bundle.mjs holds the page's own size).
+const FutureView = lazy(() => import('../components/results/FutureView').then((m) => ({ default: m.FutureView })))
+const AccuracyNote = lazy(() => import('../components/results/AccuracyNote').then((m) => ({ default: m.AccuracyNote })))
 
 type View = 'answer' | 'adjust' | 'strategies' | 'future' | 'verify'
 
@@ -337,6 +342,7 @@ export function Resultats() {
         : view === 'future'
           ? [{ id: 'soins', label: rc.nav.soins }, { id: 'annee', label: rc.nav.annee }]
         : [
+            { id: 'precision', label: rc.nav.precision },
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
             { id: 'sensibilite', label: rc.nav.sensibilite },
@@ -721,6 +727,7 @@ export function Resultats() {
 
       {/* 4 — the future: a late-life care cost tried on the plan, and what the plan points at for this year. */}
       {view === 'future' && (
+        <Suspense fallback={<Skeleton count={4} />}>
         <FutureView
           household={profile.household}
           assumptions={assumptions}
@@ -736,10 +743,19 @@ export function Resultats() {
           pensionsOpen={state.pensionsOpen}
           onGo={goTo}
         />
+        </Suspense>
       )}
 
       {view === 'verify' && (
         <section className="arc" aria-label={rc.tabs.verify}>
+          {/* What the calculation was checked against and what it simplifies: the frame for everything below it. */}
+          <section id="precision" className="results-section" aria-label={ACCURACY_COPY[lang].title}>
+            <SectionHeader title={ACCURACY_COPY[lang].title} />
+            <Suspense fallback={<Skeleton count={4} />}>
+              <AccuracyNote onSeeFigures={() => scrollTo('parametres')} />
+            </Suspense>
+          </section>
+
           {/* The ages and figures that set the answer, with their calculation and a slider each. */}
           <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
             <SectionHeader title={LEDGER_COPY[lang].title} />

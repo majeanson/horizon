@@ -44,8 +44,8 @@ test('on a phone the map of sections wraps: every chip is whole and inside the s
   await page.setViewportSize({ width: 360, height: 800 })
   await page.goto('/resultats?v=verify')
   const chips = page.locator('.section-nav .chip')
-  await expect(chips).toHaveCount(4)
-  for (let i = 0; i < 4; i++) {
+  await expect(chips).toHaveCount(5)
+  for (let i = 0; i < 5; i++) {
     const box = (await chips.nth(i).boundingBox())!
     expect(box.x, `chip ${i} left`).toBeGreaterThanOrEqual(0)
     expect(box.x + box.width, `chip ${i} right`).toBeLessThanOrEqual(360)

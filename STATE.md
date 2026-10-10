@@ -52,10 +52,6 @@ official page, and any guard it added has been **planted against its own bug** a
 - [x] No figure carries a `verify` reason any more: the Québec brackets, the line-361 age rule and the worker-deduction rate (browser screenshot + `docs/TP-1.G(2025-12).pdf`), the four GIS divisors (OAS Benefits Estimator, ≤ 1 $/month apart), the TFSA total (the CRA's limits table + a real room history); ratchet 11 → 0 on 2026-10-06
 - [ ] **Needs a human with a browser** (revenuquebec.ca refuses every automated client; legisquebec.gouv.qc.ca opens in the in-app Browser pane, which settled the QPP Act's 15 % drop-out on 2026-10-07: rounded UP, s. 116.4 « counting any fraction of a month as a whole month », `verified/rrqDropOut.verified.test.ts`, engine fixed; the 72nd-birthday-month boundary was confirmed on the calculation page on 2026-10-06): (the CRA's T5008 page read 2026-10-07: « The amount in box 20 may or may not reflect your adjusted cost base (ACB) » — what the ⓘ already says); (the OAS estimator's residence wording was read on 2026-10-06: step 4 asks « Since the age of 18, have you only lived in Canada? » Yes/No; answering No asks for the years lived when the pension STARTED (a partner not yet on it: the years so far) — read 2026-10-07, and 35 years gave the engine's 35/40 exactly)
 
-### Phase 2 — RRQ
-
-- [x] RRQ: contributions, the 15 % drop-out and base 25 %, the two additional components, the early / late adjustment, property tests — the leaflet’s worked example and the published 2026 maximums to the cent (ENGINE.md)
-
 ### Phase 3 — OAS and GIS
 
 - [x] Residence proration, deferral (+36 % at 70), the 75-and-over increase — against the « when to start » table
@@ -147,7 +143,8 @@ official page, and any guard it added has been **planted against its own bug** a
 ### Phase 13 — preparing the future (2026-10-09, « a section to plan the future »)
 
 - [x] **« Avenir »**, the fifth Résultats view (`?v=future`): « Et si les dernières années coûtaient plus cher ? » — a late-life care what-if (amount · age of the oldest · years, `?care=`) on a copy of the household as a dated expense flow, answered in a worker (`lib/careModel.ts`, `CareView`): the earliest age with it, what is left at the horizon, and « L’ajouter à mes événements » (the same flow the Profil chip makes; no schema change). Three reference chips set the amount from the public CHSLD ceilings (`longTermCare.*`, cited to a Santé Québec institution’s fees page — « Taux valides du 1er janvier au 31 décembre 2026 » — with its English twin; a CEILING, the RAMQ sets the real contribution from income; the RAMQ’s own page answers 403 to bots, so ❓ a human could confirm it there). Private residences have no cited figure. « À faire cette année » says the lever that gains most and the figure to confirm first, and links to the order of the accounts and the pensions (they keep their one home on Stratégies)
-- [ ] Planned the same night: the character sheet (one model, a serious skin and an RPG skin behind a site-wide mode, only the sheet reading it at first), the yearly figure-diff job (design note only: `docs/figure-diff-job.md`), the complexity / separation cleanup, then bundle and knip
+- [x] **Also shipped the same night**: a tenth example, « planner » (a child to come, part-time work, an inheritance, a spending drift, a care cost — the earliest age 56, 54 without the child, 54 without the care; the plausibility guard now accepts a child to come as a stated plan), the « À quel point est-ce précis ? » note first on **Vérifier** (`lib/accuracyCopy.ts`; its claims are held to ENGINE.md / STATE.md by a test), axe on the Avenir and Vérifier views, and the weekly figure-diff job as a design note (`docs/figure-diff-job.md`)
+- [ ] Still to build: the character sheet (one model, a serious and an RPG skin behind a site-wide mode, only the sheet reading it at first), the complexity / separation cleanup (`Resultats.tsx` is the outlier), then bundle and knip
 
 ## 5. Lessons carried over from Babillard
 
