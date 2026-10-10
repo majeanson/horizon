@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { InstallCard } from '../components/install/InstallHint'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
 import { useLang } from '../i18n'
@@ -25,6 +26,7 @@ export function Accueil() {
           {ready ? c.editProfile : c.example}
         </Link>
       </div>
+      <InstallCard />
       <section aria-labelledby="welcome-steps">
         <h2 id="welcome-steps" className="welcome__title">
           {c.stepsTitle}

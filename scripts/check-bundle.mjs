@@ -53,7 +53,7 @@ const LAZY_CAPS = [
 
 // The door.
 const CLOSURE_CHUNK_CAP = 6
-const CLOSURE_BUDGET = 340 * KB // 338 → 340 on 2026-10-09: the entry's own growth for schema v18 (see its cap) and the child-stage helpers the plan shares. 337 → 338 on 2026-10-09: a few hundred bytes in the modules the first screen reads (the year of birth that carries a lifelong residence, the residence rule of the facts); the picker, the card and the tables ride lazy chunks. 336 → 337 on 2026-10-09: the entry's own 1 KB (see its cap). 334 → 336 on 2026-10-09: the entry's own 2 KB (see its cap). 330 → 334 on 2026-10-08: the entry's own 2 KB (see its cap)
+const CLOSURE_BUDGET = 341 * KB // 340 → 341 on 2026-10-10 (measured 340,4 KB): the installed app's bottom-tab handler in the shell (the transition itself is a chunk of its own, lib/pageTransition.ts, loaded only when an installed app is tapped). 338 → 340 on 2026-10-09: the entry's own growth for schema v18 (see its cap) and the child-stage helpers the plan shares. 337 → 338 on 2026-10-09: a few hundred bytes in the modules the first screen reads (the year of birth that carries a lifelong residence, the residence rule of the facts); the picker, the card and the tables ride lazy chunks. 336 → 337 on 2026-10-09: the entry's own 1 KB (see its cap). 334 → 336 on 2026-10-09: the entry's own 2 KB (see its cap). 330 → 334 on 2026-10-08: the entry's own 2 KB (see its cap)
 // Any closure member that is not react / the dictionary / the entry is something that leaked
 // into boot.
 const EAGER_MEMBER_CAP = 32 * KB

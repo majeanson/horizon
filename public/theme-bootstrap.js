@@ -29,4 +29,21 @@
   } catch (e) {
     /* no saved profile — the base presentation shows */
   }
+  // Installed (home screen, own window) or in a tab? The same three display modes lib/standalone.ts reads, plus iOS's navigator.standalone: stamped before
+  // first paint so styles/phone.css can dress the app without waiting for a script.
+  try {
+    var installed = navigator.standalone === true
+    var modes = ['standalone', 'fullscreen', 'minimal-ui']
+    for (var i = 0; i < modes.length && !installed; i++) installed = !!(window.matchMedia && window.matchMedia('(display-mode: ' + modes[i] + ')').matches)
+    if (installed) root.setAttribute('data-standalone', '')
+  } catch (e) {
+    /* no matchMedia: a tab, as far as we can tell */
+  }
+  // The browser's « you could install me » event fires once, and may fire before the app has started: catch it here and park it where lib/install.ts reads it.
+  // preventDefault turns the browser's own mini-infobar off — the app makes one quiet offer of its own (components/install/InstallHint.tsx).
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault()
+    window.horizonInstall = e
+    window.dispatchEvent(new Event('horizon:install-ready'))
+  })
 })()

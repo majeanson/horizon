@@ -40,3 +40,69 @@
     border: 0;
   }
 }
+
+/* ── An app under a thumb ─────────────────────────────────────────────────────────────────────────────────────────────────────
+   `touch-action: manipulation` removes the double-tap-to-zoom wait on every control while pinch-zoom stays (this app never blocks zoom: it is read by people
+   who may need large type). The grey flash a browser paints on a tap is not wanted on a control that already shows its pressed state. */
+html {
+  touch-action: manipulation;
+}
+a,
+button,
+[role='button'],
+[role='tab'],
+[role='radio'],
+label,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+/* Installed, the bars and the controls are chrome, not text: a long press must not select them or open the iOS callout. The content stays selectable on
+   purpose — a planner is a place people copy a figure from — and so do the fields. */
+[data-standalone] .shell__bar,
+[data-standalone] .shell__nav,
+[data-standalone] .btn,
+[data-standalone] .chip,
+[data-standalone] .subtabs,
+[data-standalone] .section-nav {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* The one-time install card on the front door: a card gives its text room, and its two buttons sit side by side. */
+.install-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem 1.2rem;
+}
+.install-card p {
+  margin: 0;
+}
+.install-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+/* ── Changing page, as an app does ───────────────────────────────────────────────────────────────────────────────────────────
+   Only when the app is installed (the tabs ask the browser for a view transition then; in a tab they do not): the page cross-fades in about a tenth of a
+   second while the two bars hold still, so the chrome never blinks. Reduced motion: no animation at all, the page just changes. */
+[data-standalone] .shell__bar {
+  view-transition-name: shell-bar;
+}
+[data-standalone] .shell__nav {
+  view-transition-name: shell-nav;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 140ms;
+  animation-timing-function: ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

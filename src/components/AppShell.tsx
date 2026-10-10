@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
 import { saveAsFile } from '../lib/download'
@@ -57,6 +57,15 @@ function RouteChange() {
 
 export function AppShell() {
   const t = useT()
+  const navigate = useNavigate()
+  // An installed app changes page with a short cross-fade (lib/pageTransition.ts, a chunk of its own that a tab in a browser never loads). A plain tap only:
+  // a modified click keeps the ordinary navigation, and so does a chunk that fails to load.
+  const changePage = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
+    // « Installed » is what public/theme-bootstrap.js stamped on <html> before first paint (the same answer as lib/standalone.ts): no hook to carry in the shell.
+    if (!document.documentElement.hasAttribute('data-standalone') || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+    e.preventDefault()
+    void import('../lib/pageTransition').then((m) => m.changePage(to, navigate), () => navigate(to))
+  }
   const { lang, setLang } = useLang()
   const { pathname } = useLocation()
   const notice = useNotice()
@@ -125,7 +134,8 @@ export function AppShell() {
       </header>
       <nav className="shell__nav" aria-label={t.nav.label}>
         {TABS.map((tab) => (
-          <NavLink key={tab.to} to={tab.to} end className={({ isActive }) => 'shell__tab' + (isActive ? ' is-on' : '')}>
+          // Installed: a short cross-fade between pages, the bars holding still (changePage above, styles/phone.css); in a tab the page just changes.
+          <NavLink key={tab.to} to={tab.to} end onClick={(e) => changePage(e, tab.to)} className={({ isActive }) => 'shell__tab' + (isActive ? ' is-on' : '')}>
             <Icon name={tab.icon} size={22} />
             <span>{t.nav[tab.key]}</span>
           </NavLink>

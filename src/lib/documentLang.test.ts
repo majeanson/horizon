@@ -98,9 +98,12 @@ describe('the two install manifests', () => {
   })
 
   it('are ONE app: same identity, scope, start page, icons and colours — only the words differ', () => {
-    const words = new Set(['name', 'description', 'lang'])
+    // The home-screen shortcuts carry words (their names) AND addresses: the words differ, the addresses must not (src/lib/pwa.test.ts holds them).
+    const words = new Set(['name', 'description', 'lang', 'shortcuts'])
     expect(Object.keys(en).sort()).toEqual(Object.keys(fr).sort())
     for (const key of Object.keys(fr)) if (!words.has(key)) expect(en[key], key).toEqual(fr[key])
+    const urls = (m: Record<string, unknown>) => (m.shortcuts as { url: string }[]).map((s) => s.url)
+    expect(urls(en)).toEqual(urls(fr))
     expect(fr.id).toBe('/')
   })
 })

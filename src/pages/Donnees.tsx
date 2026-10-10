@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
+import { InstallLine } from '../components/install/InstallHint'
 import { ModeSwitch } from '../components/sheet/ModeSwitch'
 import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
@@ -173,6 +174,8 @@ export function Donnees() {
       </Section>
 
       <DisplaySection />
+
+      <InstallLine />
 
       <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold">
         <Cluster>
