@@ -12,7 +12,10 @@ import { Section } from './shared'
 // « Ma situation » — the plain yes / no questions that decide what the rest of the form shows (lib/situation.ts). « Oui » opens the matching
 // section (or starts the home); « Non » closes it, and over typed figures says first what would be lost. Nothing here is a profile figure: a
 // « yes » with nothing typed yet is a note to oneself on this device.
-export default function SituationCard() {
+//
+// The questions themselves (`SituationQuestions`) are one component in two places: the card on the profile form, and — for the first visit — an early
+// screen of the one-question-at-a-time path, which asks a few of them up front so that a « no » skips the screens that would have followed.
+export function SituationQuestions({ householdTopics = HOUSEHOLD_TOPICS, personTopics = PERSON_TOPICS }: { householdTopics?: readonly Topic[]; personTopics?: readonly Topic[] }) {
   const t = useT()
   const { lang } = useLang()
   const c = SITUATION_COPY[lang]
@@ -67,17 +70,27 @@ export default function SituationCard() {
   }
 
   return (
-    <Section id="situation" title={c.title} subtitle={c.lead} icon="users-three-bold">
-      {HOUSEHOLD_TOPICS.map((topic) => row(topic))}
+    <>
+      {householdTopics.map((topic) => row(topic))}
       {people.map((p, i) => {
         const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
         return (
           <div key={p.id} role="group" aria-label={name} className="situation__person">
             {people.length > 1 && <h3 className="situation__who">{name}</h3>}
-            {PERSON_TOPICS.map((topic) => row(topic, p.id))}
+            {personTopics.map((topic) => row(topic, p.id))}
           </div>
         )
       })}
+    </>
+  )
+}
+
+export default function SituationCard() {
+  const { lang } = useLang()
+  const c = SITUATION_COPY[lang]
+  return (
+    <Section id="situation" title={c.title} subtitle={c.lead} icon="users-three-bold">
+      <SituationQuestions />
       <p className="field-row__hint">{c.hidden}</p>
     </Section>
   )

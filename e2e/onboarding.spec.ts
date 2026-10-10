@@ -21,8 +21,8 @@ test('the first landing is ONE question, not the form: who the calculation is fo
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pour commencer')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Pour qui faisons-nous le calcul ?')
   // the promise: how many questions, and what comes out
-  await expect(page.locator('.onboard__lead')).toContainText('8 questions, et vous saurez à quel âge l’argent suffit.')
-  await expect(progress(page)).toHaveText('Question 1 sur 8')
+  await expect(page.locator('.onboard__lead')).toContainText('7 questions, et vous saurez à quel âge l’argent suffit.')
+  await expect(progress(page)).toHaveText('Question 1 sur 7')
   await expect(page.locator('.onboard__why')).toContainText('Un couple se calcule ensemble')
   // the whole form is NOT on the page: no person column, no sections of numbers — and no keyboard: the landing screen has no box
   await expect(page.locator('#person-self')).toHaveCount(0)
@@ -43,7 +43,9 @@ test('the year of birth is typed, never pre-filled: the box is empty, « Suivant
   // the month is not asked here: the form has it, and it only moves a first payment by a few months
   await expect(page.getByRole('textbox', { name: /Mois de naissance/ })).toHaveCount(0)
   await fill(page, 'Année de naissance', '1985')
-  // Enter in the box moved on by itself
+  // Enter in the box moved on by itself — to « Ma situation », the first screen that decides the rest
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelques oui ou non sur votre situation')
+  await next(page)
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien gagnez-vous par année ?')
   await expect(box(page, 'Revenu de travail par année')).toBeFocused()
 })
@@ -52,6 +54,9 @@ test('walking through for one person: each answer is saved as typed, and the ans
   await page.goto('/profil')
   await next(page) // who: Juste moi (the default)
   await fill(page, 'Année de naissance', '1985')
+  // « Ma situation »: an employer plan, yes (so its screen comes later); a home, no (so its screen never does)
+  await page.getByRole('radiogroup', { name: /régime de retraite d’employeur/ }).getByRole('radio', { name: 'Oui' }).click()
+  await next(page)
   await fill(page, 'Revenu de travail par année', '90000')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Que contiennent vos comptes d’épargne ?')
   await box(page, 'REER (épargne-retraite)').fill('85000')
@@ -67,8 +72,6 @@ test('walking through for one person: each answer is saved as typed, and the ans
   await page.getByRole('button', { name: 'Estimer : 60 % du revenu brut' }).click()
   await expect(page.locator('.onboard__body')).toContainText('Estimation : 54 000 $')
   await next(page)
-  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Êtes-vous propriétaire de votre résidence ?')
-  await next(page) // Non, locataire (the default)
   // the last screen: what was said, and the way on
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('C’est assez pour une première réponse')
   await expect(page.locator('.onboard__summary')).toContainText('Année de naissance : 1985')
@@ -98,19 +101,17 @@ test('walking through for one person: each answer is saved as typed, and the ans
 test('a couple adds a person’s questions in the same order, and the progress counts them', async ({ page }) => {
   await page.goto('/profil')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
-  await expect(progress(page)).toHaveText('Question 1 sur 12')
+  await expect(progress(page)).toHaveText('Question 1 sur 10')
   await next(page)
   await fill(page, 'Année de naissance', '1980')
+  await next(page) // « Ma situation »: every answer « non »
   await fill(page, 'Revenu de travail par année', '100000')
   await next(page) // savings
-  await next(page) // pension
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelle est l’année de naissance de votre partenaire ?')
   await fill(page, 'Année de naissance', '1982')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien gagne votre partenaire par année ?')
   await fill(page, 'Revenu de travail par année', '60000')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Et les comptes de votre partenaire ?')
-  await next(page)
-  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Et votre partenaire, un régime de retraite d’employeur ?')
   await next(page)
   // the retirement ages: one box each
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('À quel âge pensez-vous arrêter de travailler ?')
@@ -128,8 +129,8 @@ test('going back to « Juste moi » after typing for the partner asks first, in 
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await next(page)
   await fill(page, 'Année de naissance', '1980')
+  await next(page) // « Ma situation »: every answer « non »
   await fill(page, 'Revenu de travail par année', '100000')
-  await next(page)
   await next(page)
   await fill(page, 'Année de naissance', '1982')
   for (let i = 0; i < 6; i++) await back(page)
@@ -148,6 +149,8 @@ test('going back keeps what was typed; a home asks for its balance and, if there
   await page.goto('/profil')
   await next(page)
   await fill(page, 'Année de naissance', '1990')
+  // « Ma situation »: a home, yes — which is why its screen comes later
+  await page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Oui' }).click()
   await back(page)
   await expect(box(page, 'Année de naissance')).toHaveValue('1990')
   // jump to the home question: the typed year lets « Suivant » through, then one tap per question
@@ -169,7 +172,7 @@ test('the last screen says what is still missing, takes the reader back to that 
   await page.goto('/profil')
   await next(page)
   await fill(page, 'Année de naissance', '1985')
-  for (let i = 0; i < 6; i++) await next(page)
+  for (let i = 0; i < 5; i++) await next(page)
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Il manque une réponse')
   const gaps = page.locator('.onboard__gaps li')
   await expect(gaps).toHaveCount(2)
@@ -215,4 +218,96 @@ test('on a phone each question fits the screen: no sideways scroll, the buttons 
   await check()
   await next(page)
   await check()
+})
+
+// « Ma situation » is the third thing the first visit asks, right after who and when: its answers decide which of the later screens a person is asked at all.
+const situation = (page: Page) => page.getByRole('heading', { level: 2, name: 'Quelques oui ou non sur votre situation' })
+const ask = (page: Page, text: string | RegExp) => page.getByRole('radiogroup', { name: text })
+const toSituation = async (page: Page, birth = '1985') => {
+  await page.goto('/profil')
+  await next(page) // who: Juste moi
+  await fill(page, 'Année de naissance', birth)
+  await expect(situation(page)).toBeVisible()
+}
+
+test('« Ma situation » comes third, with the questions that gate the rest — every answer « non » until a « oui »', async ({ page }) => {
+  await toSituation(page)
+  await expect(progress(page)).toHaveText('Question 3 sur 7')
+  await expect(page.getByRole('radiogroup')).toHaveCount(6)
+  for (const q of [/Des enfants à la maison/, /Propriétaire de votre résidence/, /régime de retraite d’employeur/, /Des placements hors REER et CELI/, /Des années hors du Canada/, /Du travail après votre retraite/]) {
+    await expect(ask(page, q).getByRole('radio', { name: 'Non' })).toBeChecked()
+  }
+})
+
+test('every answer « non »: no non-registered box, no plan screen, no home screen — the path is shorter, and the last screen follows spending', async ({ page }) => {
+  await toSituation(page)
+  await next(page)
+  await fill(page, 'Revenu de travail par année', '80000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Que contiennent vos comptes d’épargne ?')
+  await expect(box(page, 'REER (épargne-retraite)')).toBeVisible()
+  await expect(box(page, 'CELI (épargne libre d’impôt)')).toBeVisible()
+  await expect(box(page, 'Autres placements, hors REER et CELI')).toHaveCount(0)
+  await next(page)
+  // no « Avez-vous un régime de retraite d’employeur ? » here: straight to the retirement age
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('À quel âge pensez-vous arrêter de travailler ?')
+  await fill(page, 'Vous', '62')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien dépensez-vous par année ?')
+  await fill(page, 'Dépenses par année', '60000')
+  // no home screen either: the last one
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('C’est assez pour une première réponse')
+})
+
+test('a « oui » keeps the screen it would have skipped: the plan, the non-registered box and the home each come back, and the count grows', async ({ page }) => {
+  await toSituation(page)
+  await ask(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
+  await expect(progress(page)).toHaveText('Question 3 sur 8')
+  await ask(page, /Propriétaire de votre résidence/).getByRole('radio', { name: 'Oui' }).click()
+  await expect(progress(page)).toHaveText('Question 3 sur 9')
+  await ask(page, /Des placements hors REER et CELI/).getByRole('radio', { name: 'Oui' }).click()
+  await expect(progress(page)).toHaveText('Question 3 sur 9') // a box on a screen that was there, not a new screen
+  await next(page)
+  await fill(page, 'Revenu de travail par année', '80000')
+  await expect(box(page, 'Autres placements, hors REER et CELI')).toBeVisible()
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Avez-vous un régime de retraite d’employeur ?')
+  await next(page)
+  await fill(page, 'Vous', '62')
+  await fill(page, 'Dépenses par année', '60000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Êtes-vous propriétaire de votre résidence ?')
+})
+
+test('a couple is asked for each person: the plan screen of the partner comes only with the partner’s « oui »', async ({ page }) => {
+  await page.goto('/profil')
+  await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
+  await next(page)
+  await fill(page, 'Année de naissance', '1980')
+  await expect(situation(page)).toBeVisible()
+  // one group of questions each, named
+  await expect(page.getByRole('group', { name: 'Moi' })).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Partenaire' })).toBeVisible()
+  await expect(page.getByRole('radiogroup')).toHaveCount(2 + 4 * 2)
+  // the partner has a plan, I do not
+  await page.getByRole('group', { name: 'Partenaire' }).getByRole('radiogroup', { name: /régime de retraite d’employeur/ }).getByRole('radio', { name: 'Oui' }).click()
+  await next(page)
+  await fill(page, 'Revenu de travail par année', '90000')
+  await next(page) // savings
+  // no plan screen for me
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelle est l’année de naissance de votre partenaire ?')
+  await fill(page, 'Année de naissance', '1982')
+  await fill(page, 'Revenu de travail par année', '60000')
+  await next(page) // the partner's savings
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Et votre partenaire, un régime de retraite d’employeur ?')
+})
+
+test('what is answered here is what the full form shows: the same questions, the same answers, the sections they open', async ({ page }) => {
+  await toSituation(page, '1975')
+  await ask(page, /Des années hors du Canada/).getByRole('radio', { name: 'Oui' }).click()
+  await ask(page, /Des enfants à la maison/).getByRole('radio', { name: 'Oui' }).click()
+  await page.getByRole('button', { name: 'Passer au formulaire complet' }).click()
+  await expect(page).toHaveURL(/form=1/)
+  await expect(page.locator('#situation')).toBeVisible()
+  await expect(page.locator('#situation').getByRole('radiogroup', { name: /Des années hors du Canada/ }).getByRole('radio', { name: 'Oui' })).toBeChecked()
+  await expect(page.locator('#situation').getByRole('radiogroup', { name: /Des enfants à la maison/ }).getByRole('radio', { name: 'Oui' })).toBeChecked()
+  await expect(page.locator('#situation').getByRole('radiogroup', { name: /régime de retraite d’employeur/ }).getByRole('radio', { name: 'Non' })).toBeChecked()
+  await expect(page.getByText('Au Canada depuis (année)')).toBeVisible()
 })

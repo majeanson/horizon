@@ -15,6 +15,7 @@ export interface OnboardCopy {
   who: { q: string; why: string; alone: string; couple: string; dropSpouse: string; dropSpouseLabel: string }
   birth: { q: string; why: string; year: string; placeholder: string }
   spouseBirth: { q: string; why: string }
+  situation: { q: string; why: string }
   income: { q: string; why: string; label: string }
   spouseIncome: { q: string; why: string }
   savings: { q: string; why: string; rrsp: string; tfsa: string; nonReg: string }
@@ -64,6 +65,7 @@ const FR: OnboardCopy = {
   },
   birth: { q: 'Quelle est votre année de naissance ?', why: 'Elle fixe vos âges, donc le moment de chaque rente.', year: 'Année de naissance', placeholder: 'ex. 1975' },
   spouseBirth: { q: 'Quelle est l’année de naissance de votre partenaire ?', why: 'Chaque personne a ses propres âges et ses propres rentes.' },
+  situation: { q: 'Quelques oui ou non sur votre situation', why: 'Vos réponses décident des questions suivantes : un « non » les saute, et le formulaire complet ne garde que ce qui vous concerne. Vous pouvez changer d’avis.' },
   income: { q: 'Combien gagnez-vous par année ?', why: 'Votre revenu de travail avant impôt, en dollars d’aujourd’hui. Écrivez 0 si vous ne travaillez plus.', label: 'Revenu de travail par année' },
   spouseIncome: { q: 'Combien gagne votre partenaire par année ?', why: 'Avant impôt, en dollars d’aujourd’hui. 0 si cette personne ne travaille pas.' },
   savings: {
@@ -140,6 +142,7 @@ const EN: OnboardCopy = {
   },
   birth: { q: 'What year were you born?', why: 'It sets your ages, so when each pension starts.', year: 'Year of birth', placeholder: 'e.g. 1975' },
   spouseBirth: { q: 'What year was your partner born?', why: 'Each person has their own ages and their own pensions.' },
+  situation: { q: 'A few yes or no questions about your situation', why: 'Your answers decide the questions that follow: a “no” skips them, and the full form keeps only what concerns you. You can change your mind.' },
   income: { q: 'How much do you earn a year?', why: 'Your work income before tax, in today’s dollars. Write 0 if you no longer work.', label: 'Work income per year' },
   spouseIncome: { q: 'How much does your partner earn a year?', why: 'Before tax, in today’s dollars. 0 if they do not work.' },
   savings: {

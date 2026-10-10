@@ -9,10 +9,12 @@ import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { ONBOARD_COPY } from '../lib/onboardCopy'
 import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, setBirthYear, removeSpouse, setSpending, updateHome, updatePension } from '../lib/profileEdit'
 import { profileGaps, type ProfileGap } from '../lib/profileGaps'
+import { applies, PERSON_TOPICS, useYes } from '../lib/situation'
 import { updateProfile, useProfile } from '../lib/store'
 import { today } from '../lib/today'
 import { Chip } from './Chip'
 import { Cluster } from './Layout'
+import { SituationQuestions } from './profile/SituationCard'
 import { FieldRow } from './FieldRow'
 import { NumberField } from './NumberField'
 
@@ -25,18 +27,21 @@ import { NumberField } from './NumberField'
 // What a screen asks is a QUESTION, so: the box it reveals takes focus (the « Suivant » tap asked for it), Enter in the last box
 // moves on, and a year of birth is typed, never pre-filled — a summary that stated « Né en 1981 » about a default was a lie.
 
-type StepId = 'who' | 'birth' | 'income' | 'savings' | 'pension' | 'spouseBirth' | 'spouseIncome' | 'spouseSavings' | 'spousePension' | 'retire' | 'spending' | 'home' | 'done'
+type StepId = 'who' | 'birth' | 'situation' | 'income' | 'savings' | 'pension' | 'spouseBirth' | 'spouseIncome' | 'spouseSavings' | 'spousePension' | 'retire' | 'spending' | 'home' | 'done'
 
-const stepsOf = (couple: boolean): StepId[] => [
+// « Ma situation » comes right after who and when: what it says decides which of the later screens a person is asked at all — an employer plan, a home — so a « non » to
+// either skips its screen (and the form that follows shows only what applies). A « oui » keeps the screen, which asks for the details.
+const stepsOf = (couple: boolean, has: { pension: boolean; spousePension: boolean; home: boolean }): StepId[] => [
   'who',
   'birth',
+  'situation',
   'income',
   'savings',
-  'pension',
-  ...(couple ? (['spouseBirth', 'spouseIncome', 'spouseSavings', 'spousePension'] as const) : []),
+  ...(has.pension ? (['pension'] as const) : []),
+  ...(couple ? (['spouseBirth', 'spouseIncome', 'spouseSavings', ...(has.spousePension ? (['spousePension'] as const) : [])] as const) : []),
   'retire',
   'spending',
-  'home',
+  ...(has.home ? (['home'] as const) : []),
   'done',
 ]
 
@@ -51,7 +56,8 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
   const confirm = useConfirm()
   const profile = useProfile()
   const couple = hasSpouse(profile)
-  const steps = stepsOf(couple)
+  const yes = useYes()
+  const steps = stepsOf(couple, { pension: applies(profile, yes, 'pension', 'self'), spousePension: couple && applies(profile, yes, 'pension', 'spouse'), home: applies(profile, yes, 'home') })
   const [at, setAt] = useState(0)
   const step = steps[Math.min(at, steps.length - 1)]
   const last = steps.length - 1
@@ -75,7 +81,9 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
 
   // The three account totals of one person: one box each (the form splits room, cost base and contributions).
   const savingsFields = (id: PersonId): ReactNode =>
-    (['rrsp', 'tfsa', 'nonReg'] as const).map((kind, i) => {
+    (['rrsp', 'tfsa', 'nonReg'] as const)
+      .filter((kind) => kind !== 'nonReg' || applies(profile, yes, 'nonReg', id))
+      .map((kind, i) => {
       const person = personOf(id)
       return (
         <FieldRow key={kind} label={c.savings[kind]} infoId={kind === 'rrsp' ? 'rrspBalance' : kind === 'tfsa' ? 'tfsaBalance' : 'nonRegBalance'}>
@@ -195,6 +203,11 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
       question = c.spouseBirth.q
       why = c.spouseBirth.why
       body = birthField('spouse')
+      break
+    case 'situation':
+      question = c.situation.q
+      why = c.situation.why
+      body = <SituationQuestions householdTopics={['kids', 'home']} personTopics={PERSON_TOPICS} />
       break
     case 'income':
       question = c.income.q
