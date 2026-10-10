@@ -26,6 +26,15 @@ interface KidsCopy {
     nowHint: (amount: string) => string
   }
   how: { open: string; lines: string[]; sources: string }
+  leave: {
+    title: string
+    toggle: string
+    birthParent: string
+    weeksOf: (name: string) => string
+    hint: string
+    line: (name: string, weeks: number, lost: string, paid: string) => string
+    none: string
+  }
   benefits: {
     title: string
     toggle: string
@@ -69,6 +78,15 @@ const FR: KidsCopy = {
     ],
     sources: 'Sources',
   },
+  leave: {
+    title: 'Congé parental',
+    toggle: 'Tenir compte d’un congé parental (RQAP)',
+    birthParent: 'Qui accouche',
+    weeksOf: (name) => `Semaines parentales à partager prises par ${name}`,
+    hint: 'Régime de base de la Loi sur l’assurance parentale : 18 semaines de maternité et 5 de paternité, plus 32 semaines parentales à se partager, payées à 70 % pour les 7 premières et à 55 % ensuite. Le congé ne compte pas pour la rente du RRQ, et un complément de l’employeur n’est pas compté.',
+    line: (name, weeks, lost, paid) => `${name} : ${weeks} semaines de congé. Le salaire de ces semaines (environ ${lost}) n’est pas versé ; l’assurance parentale paie environ ${paid}, imposables.`,
+    none: 'Aucune semaine de congé pour ce choix.',
+  },
   benefits: {
     title: 'Ce que l’État verse pour eux',
     toggle: 'Tenir compte des allocations dans le plan (estimation)',
@@ -111,6 +129,15 @@ const EN: KidsCopy = {
       'In Québec child care cost less than in the rest of the country ($9.65 a day in subsidised care in 2026), so these amounts may run a little high for you. Take them as an order of magnitude, to replace with your own.',
     ],
     sources: 'Sources',
+  },
+  leave: {
+    title: 'Parental leave',
+    toggle: 'Count a parental leave (QPIP)',
+    birthParent: 'Who gives birth',
+    weeksOf: (name) => `Shared parental weeks taken by ${name}`,
+    hint: 'The basic plan of the Act respecting parental insurance: 18 weeks of maternity and 5 of paternity, plus 32 parental weeks to share, paid at 70% for the first 7 and 55% after. The leave does not count for the QPP pension, and an employer top-up is not counted.',
+    line: (name, weeks, lost, paid) => `${name}: ${weeks} weeks of leave. The pay of those weeks (about ${lost}) is not paid; the parental insurance pays about ${paid}, taxable.`,
+    none: 'No weeks of leave for this choice.',
   },
   benefits: {
     title: 'What the state pays for them',

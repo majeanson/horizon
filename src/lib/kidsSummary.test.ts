@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { kidsSummary } from './kidsSummary.ts'
+import { kidsSummary, leaveSummary } from './kidsSummary.ts'
 import { suggestChildCost } from './kidsCost.ts'
 import { defaultProfile, type Profile } from './schema.ts'
 
@@ -54,5 +54,34 @@ describe('the summary', () => {
     expect(two.children).toBe(2)
     expect(two.benefit).toBeGreaterThan(one.benefit)
     expect(two.cost).toBeGreaterThan(one.cost)
+  })
+})
+
+describe('the leave summary', () => {
+  const withLeave = (leave: { birthParent: 'self' | 'spouse'; birthParentWeeks: number; otherParentWeeks: number } | null): Profile => ({
+    ...family([120_000, 35_000], [TODAY + 2]),
+    household: { ...family([120_000, 35_000], [TODAY + 2]).household, kidsEffects: leave ? { benefits: false, qppExclusion: false, leave } : null },
+  })
+
+  it('says nothing without a leave, or without a child still to come', () => {
+    expect(leaveSummary(withLeave(null), TODAY)).toBeNull()
+    expect(leaveSummary({ ...withLeave({ birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 }), household: { ...withLeave(null).household, children: [TODAY - 2], kidsEffects: { benefits: false, qppExclusion: false, leave: { birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 } } } }, TODAY)).toBeNull()
+  })
+
+  it('the birth parent: 18 + 32 weeks, the pay of those weeks lost, and 70 % then 55 % of the weekly earnings (capped at 103 000 $) paid instead', () => {
+    const lines = leaveSummary(withLeave({ birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 }), TODAY)!
+    const self = lines.find((l) => l.person === 'self')!
+    const spouse = lines.find((l) => l.person === 'spouse')!
+    expect(self.weeks).toBe(50)
+    expect(self.lostPay).toBeCloseTo((120_000 * 50) / 52, 6)
+    // 25 weeks at 70 % (18 maternity + the first 7 shared) and 25 at 55 %, on 103 000 $ / 52
+    expect(self.benefit).toBeCloseTo((25 * 0.7 + 25 * 0.55) * (103_000 / 52), 6)
+    // the other parent: 5 weeks of paternity at 70 % of their own 35 000 $
+    expect(spouse.weeks).toBe(5)
+    expect(spouse.benefit).toBeCloseTo(5 * 0.7 * (35_000 / 52), 6)
+  })
+
+  it('never pays back more than the pay lost', () => {
+    for (const l of leaveSummary(withLeave({ birthParent: 'spouse', birthParentWeeks: 20, otherParentWeeks: 12 }), TODAY)!) expect(l.benefit).toBeLessThanOrEqual(l.lostPay)
   })
 })

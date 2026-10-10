@@ -108,6 +108,35 @@ test('what the state pays is said beside what a child costs; adding a child coun
   await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([THIS_YEAR + 1, THIS_YEAR + 3])
 })
 
+test('a parental leave for a child to come: who gives birth, the weeks each takes, and what it does to the pay', async ({ page }) => {
+  await seedProfile(page, couple())
+  await showAllSections(page)
+  await page.goto('/?form=1')
+  await page.getByRole('button', { name: 'Un enfant prévu' }).click()
+  await page.getByRole('button', { name: 'Tenir compte d’un congé parental (RQAP)' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave).toEqual({ birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 })
+  // the birth parent has 18 + 32 = 50 weeks, the other 5 of paternity
+  await expect(page.getByText(/50 semaines de congé/)).toBeVisible()
+  await expect(page.getByText(/5 semaines de congé/)).toBeVisible()
+  // shared weeks can be split; together they never pass 32
+  const other = box(page, 'Semaines parentales à partager prises par Partenaire')
+  await other.fill('12')
+  await other.blur()
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave).toMatchObject({ birthParentWeeks: 32, otherParentWeeks: 0 })
+  const mine = box(page, 'Semaines parentales à partager prises par Moi')
+  await mine.fill('20')
+  await mine.blur()
+  await other.fill('12')
+  await other.blur()
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave).toMatchObject({ birthParentWeeks: 20, otherParentWeeks: 12 })
+  await expect(page.getByText(/17 semaines de congé/)).toBeVisible() // 5 of paternity + 12 shared
+  // the other parent can be the one who gives birth
+  await page.getByRole('radio', { name: /Qui accouche.+Partenaire/ }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave?.birthParent).toBe('spouse')
+  await page.getByRole('button', { name: 'Tenir compte d’un congé parental (RQAP)' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave ?? null).toBeNull()
+})
+
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, couple())

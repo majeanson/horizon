@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { CHILD_COSTS, CPI_ANNUAL } from '../../engine/params/childCosts'
 import { pageFor } from '../../engine/params/twins'
 import { childStage } from '../../engine/lifeEvents'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { DEFAULT_LEAVE_AGE, suggestChildCost } from '../../lib/kidsCost'
 import { KIDS_COPY } from '../../lib/kidsCopy'
 import { formatMoney } from '../../lib/money'
-import { kidsSummary } from '../../lib/kidsSummary'
+import { kidsSummary, leaveSummary } from '../../lib/kidsSummary'
 import { patchChildSpending, patchKidsEffects } from '../../lib/profileLife'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -22,6 +22,7 @@ const SOURCES = [CHILD_COSTS, CPI_ANNUAL].map((x) => x.source)
 
 export function KidsCosts() {
   const { lang } = useLang()
+  const t = useT()
   const k = KIDS_COPY[lang]
   const c = k.cost
   const profile = useProfile()
@@ -38,6 +39,11 @@ export function KidsCosts() {
   const byAge = cost?.byAge ?? null
   const summary = kidsSummary(profile, now.year)
   const counted = profile.household.kidsEffects?.benefits ?? false
+  const leave = profile.household.kidsEffects?.leave ?? null
+  const lines = leaveSummary(profile, now.year)
+  const people = profile.household.persons
+  const nameOf = (id: 'self' | 'spouse') => profile.household.persons.find((x) => x.id === id)?.name.trim() || (id === 'self' ? t.profile.self : t.profile.spouse)
+  const otherOf = (id: 'self' | 'spouse') => (id === 'self' ? 'spouse' : 'self')
   const b = k.benefits
 
   return (
@@ -91,6 +97,41 @@ export function KidsCosts() {
           <Chip selected={counted} onClick={() => updateProfile((p) => patchKidsEffects(p, { benefits: !counted }))}>
             {b.toggle}
           </Chip>
+        </div>
+      )}
+
+      {hasFuture && (
+        <div className="kids-leave">
+          <Chip selected={leave !== null} onClick={() => updateProfile((p) => patchKidsEffects(p, { leave: leave ? null : { birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 } }))}>
+            {k.leave.toggle}
+          </Chip>
+          {leave && (
+            <>
+              {people.length > 1 && (
+                <Cluster role="radiogroup" aria-label={k.leave.birthParent}>
+                  {people.map((x) => (
+                    <Chip key={x.id} radio selected={leave.birthParent === x.id} onClick={() => updateProfile((p) => patchKidsEffects(p, { leave: { ...leave, birthParent: x.id } }))}>
+                      {k.leave.birthParent} : {nameOf(x.id)}
+                    </Chip>
+                  ))}
+                </Cluster>
+              )}
+              <FieldRow label={k.leave.weeksOf(nameOf(leave.birthParent))}>
+                {(w) => (
+                  <NumberField kind="int" min={0} max={32 - (people.length > 1 ? leave.otherParentWeeks : 0)} value={leave.birthParentWeeks} onChange={(birthParentWeeks) => updateProfile((p) => patchKidsEffects(p, { leave: { ...leave, birthParentWeeks } }))} id={w.id} />
+                )}
+              </FieldRow>
+              {people.length > 1 && (
+                <FieldRow label={k.leave.weeksOf(nameOf(otherOf(leave.birthParent)))}>
+                  {(w) => (
+                    <NumberField kind="int" min={0} max={32 - leave.birthParentWeeks} value={leave.otherParentWeeks} onChange={(otherParentWeeks) => updateProfile((p) => patchKidsEffects(p, { leave: { ...leave, otherParentWeeks } }))} id={w.id} />
+                  )}
+                </FieldRow>
+              )}
+              {lines?.map((l) => (l.weeks > 0 ? <p key={l.person}>{k.leave.line(nameOf(l.person), l.weeks, money(Math.round(l.lostPay)), money(Math.round(l.benefit)))}</p> : null))}
+              <p className="field-row__hint">{k.leave.hint}</p>
+            </>
+          )}
         </div>
       )}
 

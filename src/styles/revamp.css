@@ -1592,3 +1592,4 @@
 .kids-cost__how ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
 .kids-cost__sources { list-style: none; padding-left: 0 !important; }
 .kids-benefits { display: grid; gap: var(--space-2, 0.5rem); }
+.kids-leave { display: grid; gap: var(--space-2, 0.5rem); }

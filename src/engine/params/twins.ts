@@ -30,6 +30,7 @@ export interface PageEntry {
 }
 
 export const TWINS: Readonly<Record<string, PageEntry>> = {
+  'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf': { lang: 'fr', twin: { url: 'https://www.legisquebec.gouv.qc.ca/en/pdf/cs/A-29.011.pdf', title: 'Act respecting parental insurance (chapter A-29.011)' } },
   'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html': { lang: 'en', twin: { url: 'https://www.canada.ca/fr/agence-revenu/services/prestations-enfants-familles/allocation-canadienne-enfants/combien-recevoir.html', title: 'Combien vous pourriez recevoir – Allocation canadienne pour enfants (ACE) - Canada.ca' } },
   'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/family-allowance': { lang: 'en', twin: { url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/allocation-famille', title: 'L’Allocation famille - Retraite Québec' } },
   'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/amounts-family-allowance-payments-based-family-income': { lang: 'en', twin: { url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/montants-allocation-famille-selon-revenu-familial', title: 'Montants de l’Allocation famille selon le revenu familial - Retraite Québec' } },

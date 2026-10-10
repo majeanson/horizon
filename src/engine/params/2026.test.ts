@@ -166,6 +166,13 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'payroll.eiMaxInsurable': [68_900, 'https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html'],
   'payroll.qpipRate': [0.0043, 'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/taux-cotisations'],
   'payroll.qpipMaxInsurable': [103_000, 'https://www.quebec.ca/entreprises-et-travailleurs-autonomes/administrer-gerer/embauche-gestion-personnel/assurance-parentale/revenu-maximal-assurable'],
+  // The Québec Parental Insurance Plan's basic plan, from the Act (arts. 7, 9, 10 and 18).
+  'parentalLeave.maternityWeeks': [18, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
+  'parentalLeave.paternityWeeks': [5, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
+  'parentalLeave.sharedWeeks': [32, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
+  'parentalLeave.sharedFirstWeeks': [7, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
+  'parentalLeave.rateHigh': [0.7, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
+  'parentalLeave.rateLow': [0.55, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
   // What the state pays for a child: the CRA's table for July 2026 to June 2027, and Retraite Québec's 2026 amounts.
   'childBenefits.ccb.maxUnder6': [8_157, CCB],
   'childBenefits.ccb.max6to17': [6_883, CCB],

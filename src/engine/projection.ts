@@ -3,6 +3,7 @@ import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from '.
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, survivorAllowanceMonthly, type GisCategoryName, type OasPerson } from './oas.ts'
 import { homeYear, initialHome, type HomeState } from './home.ts'
 import { childBenefitsFor } from './childBenefits.ts'
+import { leaveBenefit, leaveOf, leaveRulesOf } from './parentalLeave.ts'
 import { childAdd, childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
 import { pathReturn, resolvePath } from './marketPaths.ts'
@@ -82,7 +83,7 @@ function workFraction(r: ResolvedPerson, year: number): number {
   return 0
 }
 
-export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRules): ResolvedPerson {
+export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRules, h?: Household): ResolvedPerson {
   const retirementAge = s.retirementAge?.[p.id] ?? p.retirementAge
   const rrqStartAge = s.rrqStartAge?.[p.id] ?? p.rrq.startAge
   const oasStartAge = s.oasStartAge?.[p.id] ?? p.oas.startAge
@@ -92,7 +93,13 @@ export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRul
 
   // Pensionable earnings: the statement's past years, then the salary until the retirement date.
   const earnings: Record<number, number> = { ...p.earningsHistory }
-  for (let y = a.today.year; y <= leaving.year; y++) earnings[y] = salaryAt(p, y, a) * workFraction(r, y)
+  // A parental leave takes weeks of pay off the years it falls in, and the benefit it pays is not pensionable: only the pay that was earned counts.
+  const leaveRules = h?.kidsEffects?.leave ? leaveRulesOf(paramsFor(a.today.year, { inflation: a.inflation, wageGrowth: a.wageGrowth }).parentalLeave) : null
+  for (let y = a.today.year; y <= leaving.year; y++) {
+    const worked = workFraction(r, y)
+    const off = h && leaveRules ? Math.min(worked, leaveOf(h, p.id, a.today.year, y, leaveRules).weeksOff / 52) : 0
+    earnings[y] = salaryAt(p, y, a) * (worked - off)
+  }
   r.earnings = earnings
 
   r.rrq = rrqPension({ birth: p.birth, earnings, startAge: rrqStartAge }, rrqRules)
@@ -145,7 +152,7 @@ interface FixedIncome {
 export function project(h: Household, a: Assumptions, scenario: Scenario = {}): YearRow[] {
   const indexation: Indexation = { inflation: a.inflation, wageGrowth: a.wageGrowth }
   const rrqRules = makeRrqRules(indexation)
-  const people = h.persons.map((p) => resolve(p, a, scenario, rrqRules))
+  const people = h.persons.map((p) => resolve(p, a, scenario, rrqRules, h))
   const endYear = Math.max(...people.map((r) => r.deathYear))
 
   const yearParams = new Map<number, PlainYear>()
@@ -287,7 +294,11 @@ function simulateYear(
   const fixed: FixedIncome[] = people.map((r, i) => {
     const age = year - r.p.birth.year
     const worked = workFraction(r, year)
-    const employment = salaryAt(r.p, year, a) * worked + partTimePay(r.p.partTime, salaryAt(r.p, year, a), worked, year - r.p.birth.year)
+    // A parental leave (children still to come): the weeks off are unpaid by the employer — their pay is lost — and the plan pays a taxable benefit instead.
+    const leaveY = h.kidsEffects?.leave && worked > 0 ? leaveOf(h, r.p.id, a.today.year, year, leaveRulesOf(P.parentalLeave)) : null
+    const offShare = leaveY ? Math.min(worked, leaveY.weeksOff / 52) : 0
+    const leavePay = leaveY && leaveY.weeksOff > 0 ? leaveBenefit(leaveY, salaryAt(r.p, year, a), P.payroll.qpipMaxInsurable) * ((offShare * 52) / leaveY.weeksOff) : 0
+    const employment = salaryAt(r.p, year, a) * (worked - offShare) + partTimePay(r.p.partTime, salaryAt(r.p, year, a), worked, year - r.p.birth.year)
     // Pay of any kind brings the payroll premiums and the QPP contribution; only FULL-TIME work (before the retirement date) is the work the
     // person's chosen savings and employer-plan contributions were set for.
     const paid = employment > 0
@@ -343,7 +354,7 @@ function simulateYear(
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate, otherFree: dated[i].free * inflate + (i === 0 ? kidsBenefit : 0) }
+    return { age, employment, rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate + leavePay, otherFree: dated[i].free * inflate + (i === 0 ? kidsBenefit : 0) }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)

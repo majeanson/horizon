@@ -103,6 +103,12 @@ const CRA_EI = src(
   { note: 'Table for employees in Québec, row 2026: « $68,900 | 1.30 | $895.70 | $1,253.98 » (maximum insurable earnings, employee rate, maximum employee premium, employer maximum).' },
 )
 
+// ── The Québec Parental Insurance Plan (read 2026-10-09) ─────────────────────────────────────────
+const RQAP_ACT = src('https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf', 'Loi sur l’assurance parentale (chapitre A-29.011)', {
+  retrieved: '2026-10-09',
+  note: 'The statute, in French, up to date on 12 August 2026 (the English edition is its twin), cited by its PDF edition like the QPP Act. The basic plan: art. 7, 18 weeks of maternity; art. 9, 5 weeks of paternity; art. 10, 32 weeks of parental benefits to share; art. 18, 70 % of the average weekly income for the maternity and paternity weeks and the first 7 shared weeks, 55 % for the other shared weeks. The weekly income is capped at the maximum insurable earnings (payroll.qpipMaxInsurable).',
+})
+
 // ── What the state pays for a child (read 2026-10-09) ───────────────────────────────────────────────
 const CRA_CCB = src(
   'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html',
@@ -348,6 +354,15 @@ export const P2026 = {
     eiMaxInsurable: c(68_900, 'wage', CRA_EI, 100),
     qpipRate: c(0.0043, 'fixed', QC_QPIP_RATES),
     qpipMaxInsurable: c(103_000, 'wage', QC_QPIP_MAX, 1_000),
+  },
+
+  parentalLeave: {
+    maternityWeeks: c(18, 'fixed', { ...RQAP_ACT, note: '« Le nombre maximal de semaines de prestations de maternité … est de 18 » (art. 7, régime de base).' }),
+    paternityWeeks: c(5, 'fixed', { ...RQAP_ACT, note: '« Le nombre maximal de semaines de prestations de paternité … est de cinq » (art. 9, régime de base).' }),
+    sharedWeeks: c(32, 'fixed', { ...RQAP_ACT, note: '« Le nombre de semaines de prestations parentales partageables dont peuvent bénéficier les parents est de 32 » (art. 10, régime de base).' }),
+    sharedFirstWeeks: c(7, 'fixed', { ...RQAP_ACT, note: '« 70 % pour … les sept premières semaines de prestations parentales partageables » (art. 18, 1°).' }),
+    rateHigh: c(0.7, 'fixed', { ...RQAP_ACT, note: '« 70 % pour les semaines de prestations de maternité … de paternité … les sept premières semaines de prestations parentales partageables » (art. 18, 1°).' }),
+    rateLow: c(0.55, 'fixed', { ...RQAP_ACT, note: '« 55 % pour les autres semaines de prestations parentales … partageables » (art. 18, 6°).' }),
   },
 
   childBenefits: {

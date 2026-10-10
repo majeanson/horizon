@@ -193,6 +193,18 @@ export interface YearParams {
     qpipMaxInsurable: Cited
   }
 
+  /** The Québec Parental Insurance Plan's basic plan (engine/parentalLeave.ts): the weeks and the shares of the weekly insurable earnings the Act sets. */
+  parentalLeave: {
+    maternityWeeks: Cited
+    paternityWeeks: Cited
+    /** The parental weeks the two parents share. */
+    sharedWeeks: Cited
+    /** The first of them paid at the higher rate. */
+    sharedFirstWeeks: Cited
+    rateHigh: Cited
+    rateLow: Cited
+  }
+
   /**
    * What the state pays for a child (engine/childBenefits.ts): the Canada Child Benefit — Canada Revenue Agency — and Québec's Allocation famille — Retraite Québec.
    * The year is the one the payments START in (the CCB's July 2026 to June 2027 period is « 2026 »).

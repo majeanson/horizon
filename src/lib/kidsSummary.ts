@@ -1,7 +1,8 @@
 import { childBenefitsFor } from '../engine/childBenefits.ts'
+import { leaveBenefit, leaveOf, leaveRulesOf } from '../engine/parentalLeave.ts'
 import { childStage, costBandOf } from '../engine/lifeEvents.ts'
 import { paramsFor } from '../engine/params/index.ts'
-import type { Household } from '../engine/types.ts'
+import type { Household, PersonId } from '../engine/types.ts'
 import { DEFAULT_LEAVE_AGE, householdIncome, suggestChildCost } from './kidsCost.ts'
 import type { Profile } from './schema.ts'
 
@@ -64,4 +65,34 @@ export function kidsSummary(p: Profile, todayYear: number): KidsSummary | null {
     planned = { born: first, cost, benefit, net: cost - benefit, lifetime }
   }
   return { atHome, planned }
+}
+
+export interface LeaveLine {
+  person: PersonId
+  /** Weeks off, in all, for the first child still to come. */
+  weeks: number
+  /** The pay those weeks lose, and what the Québec Parental Insurance Plan pays instead (taxable), in today's dollars. */
+  lostPay: number
+  benefit: number
+}
+
+/** What a parental leave does to each parent's pay, for the first child still to come; null with no leave stated or no such child. */
+export function leaveSummary(p: Profile, todayYear: number): LeaveLine[] | null {
+  const h = p.household
+  if (!h.kidsEffects?.leave) return null
+  const first = (h.children ?? []).filter((y) => y > todayYear).sort((a, b) => a - b)[0]
+  if (first === undefined) return null
+  const P = paramsFor(todayYear, { inflation: p.assumptions.inflation, wageGrowth: p.assumptions.wageGrowth })
+  const rules = leaveRulesOf(P.parentalLeave)
+  const one: Household = { ...h, children: [first] }
+  return h.persons.map((x) => {
+    let weeks = 0
+    let benefit = 0
+    for (let year = first; year <= first + 2; year++) {
+      const y = leaveOf(one, x.id, todayYear, year, rules)
+      weeks += y.weeksOff
+      benefit += leaveBenefit(y, x.salaryToday, P.payroll.qpipMaxInsurable)
+    }
+    return { person: x.id, weeks, lostPay: (x.salaryToday * weeks) / 52, benefit }
+  })
 }
