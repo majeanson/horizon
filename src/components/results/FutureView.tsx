@@ -67,7 +67,7 @@ export function FutureView({
 
       <section id="annee" className="results-section" aria-label={f.year.title}>
         <SectionHeader title={f.year.title} subtitle={f.year.hint} />
-        <div className="surface">
+        <div className="surface future-year">
           {!retiredNow && (
             <div className="verdict__range">
               <p className="verdict__range-title">{f.year.leverTitle}</p>

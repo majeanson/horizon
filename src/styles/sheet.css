@@ -43,6 +43,14 @@
 .sheet__feats {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 }
+/* A `.surface` carries no padding of its own: each card of the sheet gives its text room. */
+.sheet__hero,
+.sheet__stat,
+.sheet__slot,
+.sheet__feat,
+.sheet__empty {
+  padding: 1rem 1.15rem;
+}
 .sheet__hero,
 .sheet__stat,
 .sheet__slot,

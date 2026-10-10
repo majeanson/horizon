@@ -49,6 +49,11 @@
   background: var(--paper);
   border-bottom: 1px solid var(--line);
 }
+/* The map is one scrolling line: room above and below inside it for a chip's focus ring (a scroll container clips what sticks out of it). */
+.section-nav .rail {
+  padding-block: 3px;
+  margin-block: -3px;
+}
 .results-section {
   display: flex;
   flex-direction: column;
@@ -60,6 +65,13 @@
 /* A section that IS a card (Solidité, Préciser le calcul) breathes like the answer card above it: the surface carries no padding
    of its own, and without this the title and the tiles sat on the card's edge. */
 .results-section.surface {
+  padding: 1rem 1.2rem;
+}
+/* The two info cards of the Avenir and Vérifier views (« À faire cette année », « À quel point est-ce précis ? »): the same room as the cards above. */
+.accuracy,
+.future-year {
+  display: grid;
+  gap: 0.9rem;
   padding: 1rem 1.2rem;
 }
 /* A group label inside the sticky map: reading order only, never a control. */
