@@ -3,7 +3,7 @@
 // library behind it (chartBoundary.test.ts) — so the library can be replaced by editing one folder.
 
 /** The four series colours, as the design tokens they resolve to (never a hex literal: night mode would not follow). */
-export type SeriesColour = 'accent' | 'sky' | 'sage' | 'berry' | 'ink'
+export type SeriesColour = 'accent' | 'sky' | 'sage' | 'berry' | 'ink' | 'clay'
 
 export interface ChartPoint {
   x: number

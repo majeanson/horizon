@@ -13,6 +13,7 @@ import {
   sourceBars,
   type ChartMetric,
   type Dollars,
+  type Per,
 } from '../../lib/chartData'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import type { Selection } from '../../lib/resultsModel'
@@ -30,6 +31,8 @@ import { SubTabs } from '../SubTabs'
 
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
 const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m.StackedBarChart })))
+// « Où va l'argent » and the year-by-year reading: their own chunk, with their words — the first screen never needs them.
+const FlowSection = lazy(() => import('./FlowSection').then((m) => ({ default: m.FlowSection })))
 
 export function ChartPanel({
   runs,
@@ -148,10 +151,13 @@ function DetailView({
   const who = household.persons.some((p) => p.id === pickedWho) ? pickedWho : 'all'
   const whoIndex = household.persons.findIndex((p) => p.id === who)
   const scale = useMemo(() => ({ dollars, todayYear, inflation }), [dollars, todayYear, inflation])
+  // « Par année » or « Par mois »: the flows (what comes in, what goes out) are said either way; what the accounts hold at year end never is.
+  const [per, setPer] = useState<Per>('year')
+  const flowScale = useMemo(() => ({ dollars, todayYear, inflation, per }), [dollars, todayYear, inflation, per])
   const rows = run.result.rows
   const personId = who === 'all' ? null : who
 
-  const sources = useMemo(() => sourceBars(rows, personId, scale), [rows, personId, scale])
+  const sources = useMemo(() => sourceBars(rows, personId, flowScale), [rows, personId, flowScale])
   const balances = useMemo(() => balanceBars(rows, personId, scale), [rows, personId, scale])
   // The house's equity is a segment of the household's bars when the plan has a home.
   const balanceSegments: BalanceBarSegment[] = ['rrsp', 'tfsa', 'nonReg']
@@ -167,6 +173,7 @@ function DetailView({
   return (
     <div className="chart-detail">
       <p className="field-row__hint">{c.detailHint}</p>
+      <SubTabs size="mini" ariaLabel={c.per} value={per} onSelect={setPer} options={[{ key: 'year', label: c.perYear }, { key: 'month', label: c.perMonth }]} />
       {runs.length > 1 && (
         <SubTabs size="mini" ariaLabel={c.scenarioPick} value={String(Math.min(pickedRun, runs.length - 1))} onSelect={(k) => setPickedRun(Number(k))} options={runs.map((r, i) => ({ key: String(i), label: label(r.selection) }))} />
       )}
@@ -199,6 +206,10 @@ function DetailView({
           />
         </Suspense>
       </div>
+
+      <Suspense fallback={<Loading />}>
+        <FlowSection rows={rows} sources={sources} personId={personId} births={household.persons.map((p) => p.birth.year)} scale={flowScale} agesByYear={agesByYear} />
+      </Suspense>
 
       <h4 className="chart-detail__heading">{c.balancesTitle}</h4>
       <p className="field-row__hint">{c.balancesHint}</p>

@@ -18,11 +18,12 @@ test('the views and the section map stay pinned while the page scrolls', async (
   await expect(pin.getByRole('tab').first()).toBeInViewport()
 })
 
-test('« Détail » shows where the money comes from and what the accounts hold — and nothing the answer card already says', async ({ page }) => {
+test('« Détail » shows where the money comes from, where it goes and what the accounts hold — and nothing the answer card already says', async ({ page }) => {
   await page.goto('/resultats?metric=detail')
   const chart = page.locator('.chart-panel')
-  await expect(chart.getByRole('img')).toHaveCount(2, { timeout: 30_000 })
+  await expect(chart.getByRole('img')).toHaveCount(3, { timeout: 30_000 })
   await expect(chart.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toBeVisible()
+  await expect(chart.getByRole('heading', { name: 'Où va l’argent, année par année' })).toBeVisible() // e2e/flow.spec.ts holds it
   await expect(chart.getByRole('heading', { name: 'Ce que contiennent les comptes' })).toBeVisible()
   // The three scenarios are said ONCE, on the answer card (and marked on the strategy cards): no third chart of them here.
   await expect(chart.getByRole('heading', { name: /hypothèses/ })).toHaveCount(0)

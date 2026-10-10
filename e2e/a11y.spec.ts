@@ -67,6 +67,7 @@ const PAGES = [
   ['the component gallery', '/dev/kit', '.devkit'],
   ['the future view of the results', '/resultats?v=future', '.page-head__title'],
   ['the check view of the results', '/resultats?v=verify', '.page-head__title'],
+  ['the detail chart of the results', '/resultats?metric=detail', '.page-head__title'],
 ] as const
 
 for (const s of STATES) {

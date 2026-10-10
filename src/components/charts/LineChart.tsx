@@ -15,6 +15,7 @@ const COLOUR: Record<SeriesColour, string> = {
   sage: 'var(--sage-deep)',
   berry: 'var(--berry-deep)',
   ink: 'var(--ink-faint)',
+  clay: 'var(--terracotta-deep)',
 }
 
 // One dash pattern per series position (undefined = solid, for the first).
