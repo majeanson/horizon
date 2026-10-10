@@ -2,7 +2,7 @@ import { ageAtJan1, firstRrifYear, grow, lockedAvailable, maxWithdraw, nonRegCon
 import { dbStart, dbYear, leavingDate, pensionAdjustment, type DbStart } from './dbPension.ts'
 import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAllowanceSpouseMonthly, oasStart, oasYear, residenceFraction, survivorAllowanceMonthly, type GisCategoryName, type OasPerson } from './oas.ts'
 import { homeYear, initialHome, type HomeState } from './home.ts'
-import { childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
+import { childAdd, childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
 import { pathReturn, resolvePath } from './marketPaths.ts'
 import { payrollContribution } from './payroll.ts'
@@ -343,7 +343,7 @@ function simulateYear(
   const retiredAll = people.every((r) => year >= r.leaving.year)
   // What the household must pay: its living costs, plus the mortgage (which ENDS) and a replacement home's extra cost in a sale year.
   const budget = retiredAll ? h.spending.retiredToday * retiredDriftFactor(a, Math.max(...people.map((r) => year - r.p.birth.year))) : Math.max(0, h.spending.workingToday - childStepDown(h, a, year))
-  const spending = roundTo(budget * inflate * (survivorOf ? (a.survivorSpending ?? 1) : 1) + housing.payment + housing.extraNeed + flowExpenses(h, year) * inflate, 0.01)
+  const spending = roundTo(budget * inflate * (survivorOf ? (a.survivorSpending ?? 1) : 1) + housing.payment + housing.extraNeed + (flowExpenses(h, year) + childAdd(h, a, year)) * inflate, 0.01)
 
   // ── withdrawals are the unknown: one amount per person per account, solved below ──────────────
   const draw: Record<AccountKind, number[]> = { nonReg: people.map(() => 0), rrsp: people.map(() => 0), tfsa: people.map(() => 0) }

@@ -117,6 +117,12 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     const mortgage = { ...((home.mortgage ?? {}) as Raw), frequency: 'monthly', renewal: null }
     return { ...profile, household: { ...household, home: { ...home, mortgage } } }
   },
+  // v17 → v18: a child can cost something that CHANGES with their age (four bands, for a child still to come), and the household may say it counts the child
+  // benefits, the QPP exclusion and a parental leave. Every older file meant exactly that: none of it (`kidsEffects: null`, no `byAge`).
+  (profile) => {
+    const household = (profile.household ?? {}) as Raw
+    return { ...profile, household: { ...household, kidsEffects: null } }
+  },
 ]
 
 export type ReadResult =

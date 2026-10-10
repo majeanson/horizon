@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from './golden/household.fixture.ts'
-import { childStepDown, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
+import { childAdd, childStage, childStepDown, costBandOf, DEPENDENT_AGE, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor } from './lifeEvents.ts'
 import { project } from './projection.ts'
 import type { Flow, Household, YearRow } from './types.ts'
 
@@ -178,5 +178,62 @@ describe('the projection — work kept after the retirement age', () => {
     const rows = project(withPartTime(), A, { retirementAge: { self: 55 } })
     expect(row(rows, 2034).persons.self!.employment).toBeGreaterThan(0) // age 56
     expect(row(rows, 2041).persons.self!.employment).toBe(0)
+  })
+})
+
+describe('children: past, current and still to come', () => {
+  const THIS_YEAR = A.today.year
+  const kids = (children: number[], childSpending: Household['childSpending']): Household => ({ ...H, children, childSpending })
+
+  it('a child is still to come, at home, or already gone — from the year of birth, this year and the age they leave', () => {
+    expect([THIS_YEAR + 2, THIS_YEAR, THIS_YEAR - 10, THIS_YEAR - 22, THIS_YEAR - 40].map((born) => childStage(born, THIS_YEAR, 22))).toEqual(['future', 'home', 'home', 'gone', 'gone'])
+    // the year of birth that IS this year is already in the budget; the leaving age is the household's own, the dependent age a different question
+    expect(childStage(THIS_YEAR - 22, THIS_YEAR, 23)).toBe('home')
+    expect(DEPENDENT_AGE).toBe(18)
+  })
+
+  it('the four cost bands change at 6, 13 and 19', () => {
+    expect([0, 5, 6, 12, 13, 18, 19, 30].map(costBandOf)).toEqual([0, 0, 1, 1, 2, 2, 3, 3])
+  })
+
+  it('a child still to come ADDS its cost from the year of birth until it leaves — flat, or by age band', () => {
+    const born = THIS_YEAR + 2
+    const flat = kids([born], { perChild: 9000, untilAge: 22 })
+    expect([born - 1, born, born + 21, born + 22].map((y) => childAdd(flat, A, y))).toEqual([0, 9000, 9000, 0])
+    const banded = kids([born], { perChild: 9000, untilAge: 22, byAge: [20000, 22000, 24000, 15000] })
+    expect([born, born + 5, born + 6, born + 12, born + 13, born + 18, born + 19, born + 21].map((y) => childAdd(banded, A, y))).toEqual([20000, 20000, 22000, 22000, 24000, 24000, 15000, 15000])
+  })
+
+  it('two children to come add up; one at home or already gone adds nothing, and nothing is added without a stated cost', () => {
+    const h = kids([THIS_YEAR + 1, THIS_YEAR + 3, THIS_YEAR - 5, THIS_YEAR - 40], { perChild: 1000, untilAge: 22 })
+    expect(childAdd(h, A, THIS_YEAR + 4)).toBe(2000)
+    expect(childAdd(h, A, THIS_YEAR)).toBe(0)
+    expect(childAdd({ ...h, childSpending: null }, A, THIS_YEAR + 4)).toBe(0)
+    expect(childAdd({ ...h, childSpending: { perChild: 0, untilAge: 22 } }, A, THIS_YEAR + 4)).toBe(0)
+    expect(childAdd(H, A, THIS_YEAR + 4)).toBe(0)
+  })
+
+  it('a child at home still drops when it leaves, and a child to come is not dropped when it leaves — it was never in the budget', () => {
+    const h = kids([THIS_YEAR - 10, THIS_YEAR + 2], { perChild: 7000, untilAge: 22 })
+    expect(childStepDown(h, A, THIS_YEAR + 12)).toBe(7000) // the one at home leaves in THIS_YEAR + 12
+    expect(childStepDown(h, A, THIS_YEAR + 24)).toBe(7000) // the one to come is not counted: only the first one ever drops
+  })
+
+  it('in the projection the new child costs exactly its amount, in the right years, working or retired — and nothing else moves', () => {
+    const born = THIS_YEAR + 3
+    const h = kids([born], { perChild: 8000, untilAge: 20 })
+    const rows = project(h, A, {})
+    for (const y of [THIS_YEAR, born - 1, born + 20, born + 25]) expect(row(rows, y).household.spending, String(y)).toBeCloseTo(row(BASE, y).household.spending, 2)
+    for (const y of [born, born + 5, born + 19]) expect(row(rows, y).household.spending - row(BASE, y).household.spending, String(y)).toBeCloseTo(8000 * inflate(y), 0)
+  })
+
+  it('the cost of a child to come is not shrunk by the survivor share: a death does not make a child cheaper', () => {
+    const born = THIS_YEAR + 1
+    const h: Household = { ...kids([born], { perChild: 10000, untilAge: 25 }), persons: H.persons.map((x, i) => (i === 0 ? { ...x, horizonAge: x.birth.year ? THIS_YEAR + 3 - x.birth.year : null } : x)) }
+    const rows = project(h, A, {})
+    const base = project({ ...h, children: [], childSpending: null }, A, {})
+    // after the first death the household spends 70 % of its budget, but the child's 10 000 $ is added in full
+    const y = THIS_YEAR + 6
+    expect(row(rows, y).household.spending - row(base, y).household.spending).toBeCloseTo(10000 * inflate(y), 0)
   })
 })

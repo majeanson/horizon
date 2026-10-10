@@ -5,7 +5,10 @@ import { LIFE_COPY } from '../../lib/lifeCopy'
 import { formatMoney } from '../../lib/money'
 import { scrollBehavior } from '../../lib/motion'
 import { addChild, addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
-import { setChildSpending } from '../../lib/profileLife'
+import { childStage } from '../../engine/lifeEvents'
+import { KIDS_COPY } from '../../lib/kidsCopy'
+import { patchChildSpending } from '../../lib/profileLife'
+import { KidsCosts } from './KidsCosts'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip, ChipGroup } from '../Chip'
@@ -32,7 +35,11 @@ export function FamilySection({ withKids = true }: { /** The children and what e
   const children = profile.household.children ?? []
   const cost = profile.household.childSpending ?? null
   // The years the children who are still at home today will leave: what the plan drops, and from when.
-  const leaving = cost === null ? [] : children.filter((born) => today().year - born < cost.untilAge).map((born) => born + cost.untilAge)
+  // The years the children who are AT HOME today will leave (a child still to come is not in today's budget, a grown one is gone): what the plan drops, and from when.
+  const kc = KIDS_COPY[lang]
+  const stageOf = (born: number) => childStage(born, today().year, cost?.untilAge ?? 23)
+  const leaving = cost === null ? [] : children.filter((born) => stageOf(born) === 'home').map((born) => born + cost.untilAge)
+  const coming = cost === null ? [] : children.filter((born) => stageOf(born) === 'future')
 
   const submitChild = () => {
     // A four-digit year typed as text: digits only, then the same range sentence every NumberField
@@ -90,7 +97,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
           <ChipGroup label={f.children}>
             {(profile.household.children ?? []).map((y, i) => (
               <Chip key={`${y}-${i}`} onRemove={() => updateProfile((p) => removeChild(p, i))} removeLabel={f.removeChild(y)}>
-                {y}
+                {y} · {kc.stage[stageOf(y)]}
               </Chip>
             ))}
           </ChipGroup>
@@ -110,6 +117,10 @@ export function FamilySection({ withKids = true }: { /** The children and what e
           placeholder={f.childYear}
         />
         {bad && <StatusMessage tone="error">{t.fields.range('1950', '2100')}</StatusMessage>}
+        <Cluster>
+          <Chip onClick={() => updateProfile((p) => addChild(p, today().year + 1))}>{kc.planned.add}</Chip>
+        </Cluster>
+        <p className="field-row__hint">{kc.planned.hint}</p>
       </div>)}
 
       {withKids && children.length > 0 && (
@@ -120,7 +131,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
                 kind="money"
                 max={1e6}
                 value={cost?.perChild ?? 0}
-                onChange={(perChild) => updateProfile((p) => setChildSpending(p, perChild > 0 ? { perChild, untilAge: cost?.untilAge ?? 23 } : null))}
+                onChange={(perChild) => updateProfile((p) => patchChildSpending(p, { perChild }))}
                 id={w.id}
                 ariaDescribedBy={w.describedBy}
               />
@@ -130,12 +141,18 @@ export function FamilySection({ withKids = true }: { /** The children and what e
             <>
               <FieldRow label={lc.leaves} hint={lc.leavesHint}>
                 {(w) => (
-                  <NumberField kind="int" min={16} max={35} unit={t.fields.years} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => setChildSpending(p, { perChild: cost.perChild, untilAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
+                  <NumberField kind="int" min={16} max={35} unit={t.fields.years} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => patchChildSpending(p, { untilAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
                 )}
               </FieldRow>
               <p className="field-row__hint">{leaving.length === 0 ? lc.none : lc.effect(formatMoney(cost.perChild, lang), leaving.length, String(Math.min(...leaving)))}</p>
+              {coming.map((born) => (
+                <p key={born} className="field-row__hint">
+                  {cost.byAge ? kc.planned.effectBands(String(born), String(born + cost.untilAge)) : kc.planned.effect(String(born), formatMoney(cost.perChild, lang), String(born + cost.untilAge))}
+                </p>
+              ))}
             </>
           )}
+          <KidsCosts />
         </div>
       )}
     </Section>

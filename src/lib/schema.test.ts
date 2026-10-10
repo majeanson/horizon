@@ -344,3 +344,49 @@ describe('schema v17 — a mortgage that says how its payment is counted, and wh
     if (result.ok) expect(result.profile.household.home ?? null).toBe(((raw.household as { home?: unknown }).home ?? null) as null)
   })
 })
+
+describe('schema v18 — the cost of a child by age, and what the household counts about its children', () => {
+  const v18 = (household: Record<string, unknown>) => {
+    const p = JSON.parse(JSON.stringify(oldFixture(18))) as { household: Record<string, unknown> }
+    p.household = { ...p.household, ...household }
+    return p
+  }
+  const leave = { birthParent: 'self', birthParentWeeks: 20, otherParentWeeks: 12 }
+
+  it('an older file arrives with nothing counted: no kidsEffects, no amounts by age', () => {
+    const result = migrateProfile(oldFixture(17))
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.profile.household.kidsEffects).toBeNull()
+      expect(result.profile.household.childSpending ?? null).toBeNull()
+    }
+  })
+
+  it('amounts by age, benefits, the exclusion and a leave survive a round trip', () => {
+    const raw = v18({ children: [2028], childSpending: { perChild: 0, untilAge: 23, byAge: [24_600, 26_000, 28_600, 28_400] }, kidsEffects: { benefits: true, qppExclusion: true, leave } })
+    const result = migrateProfile(raw)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.profile.household.childSpending).toEqual({ perChild: 0, untilAge: 23, byAge: [24_600, 26_000, 28_600, 28_400] })
+      expect(result.profile.household.kidsEffects).toEqual({ benefits: true, qppExclusion: true, leave })
+    }
+  })
+
+  it('a malformed one is refused: bands that are not four non-negative amounts, a leave of more than 32 shared weeks, a parent who is not in the household', () => {
+    const bad: Record<string, unknown>[] = [
+      { childSpending: { perChild: 1000, untilAge: 23, byAge: [1, 2, 3] } },
+      { childSpending: { perChild: 1000, untilAge: 23, byAge: [1, 2, 3, -4] } },
+      { kidsEffects: { benefits: true, qppExclusion: false, leave: { birthParent: 'self', birthParentWeeks: 20, otherParentWeeks: 20 } } },
+      { kidsEffects: { benefits: true, qppExclusion: false, leave: { birthParent: 'nobody', birthParentWeeks: 1, otherParentWeeks: 1 } } },
+      { kidsEffects: { benefits: 'yes', qppExclusion: false, leave: null } },
+    ]
+    for (const b of bad) expect(migrateProfile(v18(b)).ok, JSON.stringify(b)).toBe(false)
+  })
+
+  it('a household that states nothing is the same file as before, version apart', () => {
+    const result = migrateProfile(oldFixture(17))
+    const raw = oldFixture(18)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(JSON.parse(JSON.stringify(result.profile))).toEqual({ ...raw })
+  })
+})

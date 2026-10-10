@@ -5,10 +5,27 @@ import { MAX_FLOWS, type Profile } from './schema.ts'
 // every edit in profileEdit.ts, kept in their own module because only the profile page ever calls them — the store (and so every page) reads
 // profileEdit.ts, and these would ride in the shell for nothing.
 
+type ChildSpending = NonNullable<Profile['household']['childSpending']>
+
+const sameBands = (a: ChildSpending['byAge'], b: ChildSpending['byAge']) => (a ?? null) === (b ?? null) || (!!a && !!b && a.every((x, i) => x === b[i]))
+
 /** What a child costs inside the budget until they leave home (null: it is not counted). */
-export function setChildSpending(p: Profile, value: { perChild: number; untilAge: number } | null): Profile {
-  const same = (p.household.childSpending ?? null) === value || (value !== null && p.household.childSpending?.perChild === value.perChild && p.household.childSpending?.untilAge === value.untilAge)
+export function setChildSpending(p: Profile, value: ChildSpending | null): Profile {
+  const cur = p.household.childSpending ?? null
+  const same = cur === value || (value !== null && cur !== null && cur.perChild === value.perChild && cur.untilAge === value.untilAge && sameBands(cur.byAge, value.byAge))
   return same ? p : { ...p, household: { ...p.household, childSpending: value } }
+}
+
+/**
+ * Change ONE part of what a child costs, leaving the rest as it is: the flat amount, the age they leave, the amounts by age band. What is left with no cost at
+ * all (a flat 0 and no bands) is not counted (null). A part given as `null` is taken away (the bands).
+ */
+export function patchChildSpending(p: Profile, patch: { perChild?: number; untilAge?: number; byAge?: ChildSpending['byAge'] }): Profile {
+  const cur: ChildSpending = p.household.childSpending ?? { perChild: 0, untilAge: 23 }
+  const next: ChildSpending = { perChild: patch.perChild ?? cur.perChild, untilAge: patch.untilAge ?? cur.untilAge }
+  const byAge = patch.byAge === undefined ? cur.byAge : patch.byAge
+  if (byAge) next.byAge = byAge
+  return setChildSpending(p, next.perChild <= 0 && !next.byAge ? null : next)
 }
 
 /** A flow as the page may hold it: a windfall is once and tax-free, an expense is not income, and an owner is someone who is in the household. */

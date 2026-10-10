@@ -3,6 +3,7 @@ import { PLAN_RREGOP } from './plans.ts'
 import { resolveYear, type Indexation } from './project.ts'
 import { P2026 } from './2026.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
+import { CHILD_COSTS, CHILD_COST_INCOME_LEVELS, CPI_ANNUAL } from './childCosts.ts'
 import { TFSA_LIMIT_HISTORY } from './tfsaHistory.ts'
 import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME } from './typical.ts'
 import type { YearParams } from './types.ts'
@@ -26,6 +27,10 @@ export const SERIES: ReadonlyArray<{ name: string; cited: Cited<unknown> }> = [
   { name: 'typical.spendingByHousehold', cited: TYPICAL_SPENDING_BY_HOUSEHOLD },
   { name: 'typical.spendingByIncome', cited: TYPICAL_SPENDING_BY_INCOME },
   { name: 'typical.spendingByAge', cited: TYPICAL_SPENDING_BY_AGE },
+  // What a child costs (Statistics Canada), and the price index that moves it to today's dollars.
+  { name: 'kids.costs', cited: CHILD_COSTS },
+  { name: 'kids.incomeLevels', cited: CHILD_COST_INCOME_LEVELS },
+  { name: 'kids.cpi', cited: CPI_ANNUAL },
   // The rules of the pension plans the app can pre-fill (not a tax year's figures: they change by legislation).
   ...citedLeaves(PLAN_RREGOP, 'plan.rregop').map((l) => ({ name: l.path, cited: l.cited as Cited<unknown> })),
 ]

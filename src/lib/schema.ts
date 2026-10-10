@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 17
+export const SCHEMA_VERSION = 18
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -78,7 +78,7 @@ export const blankPerson = (id: PersonId, today: { year: number }): Person => ({
 export const defaultProfile = (today: { year: number }): Profile => ({
   app: 'horizon',
   version: SCHEMA_VERSION,
-  household: { livesAlone: true, persons: [blankPerson('self', today)], children: [], childSpending: null, flows: [], spending: { workingToday: 0, retiredToday: 0 }, home: null },
+  household: { livesAlone: true, persons: [blankPerson('self', today)], children: [], childSpending: null, kidsEffects: null, flows: [], spending: { workingToday: 0, retiredToday: 0 }, home: null },
   // The Neutre scenario, exactly (engine/assumptionPresets.ts): a first visit lands on a named, documented scenario, not
   // on « Personnalisé » for figures nobody typed (the defaults used to be 2 / 3 / 5 / 5 / 4 %, matching no scenario).
   assumptions: {
@@ -243,6 +243,32 @@ function readRenewal(r: Reader, v: unknown): NonNullable<Home['mortgage']['renew
   }
 }
 
+// The cost of a child still to come, by age band (v18): four non-negative amounts, or none.
+function readByAge(r: Reader, v: unknown): [number, number, number, number] | null {
+  if (v === undefined || v === null) return null
+  const a = r.arr(v, 'household.childSpending.byAge') ?? []
+  if (a.length !== 4) {
+    r.count('household.childSpending.byAge')
+    return null
+  }
+  return [0, 1, 2, 3].map((i) => r.num(a[i], `household.childSpending.byAge[${i}]`, 0, 1e6)) as [number, number, number, number]
+}
+
+// What the household counts about its children (v18): benefits, the QPP exclusion, a parental leave — all off unless stated.
+function readKidsEffects(r: Reader, v: unknown): Household['kidsEffects'] {
+  if (v === undefined || v === null) return null
+  const o = r.obj(v, 'household.kidsEffects') ?? {}
+  let leave: NonNullable<Household['kidsEffects']>['leave'] = null
+  if (o.leave !== undefined && o.leave !== null) {
+    const l = r.obj(o.leave, 'household.kidsEffects.leave') ?? {}
+    const birthParentWeeks = r.num(l.birthParentWeeks, 'household.kidsEffects.leave.birthParentWeeks', 0, 32, true)
+    const otherParentWeeks = r.num(l.otherParentWeeks, 'household.kidsEffects.leave.otherParentWeeks', 0, 32, true)
+    if (birthParentWeeks + otherParentWeeks > 32) r.count('household.kidsEffects.leave')
+    leave = { birthParent: r.oneOf(l.birthParent, 'household.kidsEffects.leave.birthParent', ['self', 'spouse'] as const), birthParentWeeks, otherParentWeeks }
+  }
+  return { benefits: r.bool(o.benefits, 'household.kidsEffects.benefits'), qppExclusion: r.bool(o.qppExclusion, 'household.kidsEffects.qppExclusion'), leave }
+}
+
 function readFlows(r: Reader, v: unknown, persons: number): Flow[] {
   if (v === undefined || v === null) return []
   const raw = r.arr(v, 'household.flows') ?? []
@@ -373,8 +399,10 @@ export function validateProfile(raw: unknown): ProfileResult {
   let childSpending: Household['childSpending'] = null
   if (household.childSpending !== undefined && household.childSpending !== null) {
     const cs = r.obj(household.childSpending, 'household.childSpending') ?? {}
-    childSpending = { perChild: r.num(cs.perChild, 'household.childSpending.perChild', 0, 1e6), untilAge: r.num(cs.untilAge, 'household.childSpending.untilAge', 16, 35, true) }
+    const byAge = readByAge(r, cs.byAge)
+    childSpending = { perChild: r.num(cs.perChild, 'household.childSpending.perChild', 0, 1e6), untilAge: r.num(cs.untilAge, 'household.childSpending.untilAge', 16, 35, true), ...(byAge === null ? {} : { byAge }) }
   }
+  const kidsEffects = readKidsEffects(r, household.kidsEffects)
   const flows = readFlows(r, household.flows, persons.length)
 
   const a = r.obj(root.assumptions, 'assumptions') ?? {}
@@ -449,5 +477,5 @@ export function validateProfile(raw: unknown): ProfileResult {
   })
 
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, children, childSpending, flows, spending: spendingNow, home }, assumptions, customScenario, confirmed, plans } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, children, childSpending, kidsEffects, flows, spending: spendingNow, home }, assumptions, customScenario, confirmed, plans } }
 }

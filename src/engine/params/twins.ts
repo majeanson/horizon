@@ -30,6 +30,8 @@ export interface PageEntry {
 }
 
 export const TWINS: Readonly<Record<string, PageEntry>> = {
+  'https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2023007-eng.htm': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2023007-fra.htm', title: 'Estimer les dépenses liées aux enfants effectuées par les familles au Canada, 2014 à 2017' } },
+  'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000501': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1810000501', title: 'Indice des prix à la consommation, moyenne annuelle, non désaisonnalisé' } },
   'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110001601': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1110001601', title: 'Actifs et dettes détenus selon le type de famille économique, par groupe d’âge, Canada, provinces et certaines régions métropolitaines de recensement, enquête sur la sécurité financière' } },
   'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110004901': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1110004901', title: 'Actifs et dettes selon les quintiles d’avoir net, Canada, provinces et certaines régions métropolitaines de recensement, enquête sur la sécurité financière' } },
   'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110022301': { lang: 'en', twin: { url: 'https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1110022301', title: 'Dépenses des ménages selon le quintile de revenu du ménage, Canada, régions et provinces' } },

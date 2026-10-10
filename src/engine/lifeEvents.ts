@@ -8,8 +8,26 @@ import type { Assumptions, Household, PersonId } from './types.ts'
 /** The oldest age the retired spending is held level to; after it, `retiredSpendingDrift` a year. */
 export const DRIFT_FROM_AGE = 70
 
-/** The children who count as part of today's budget: the ones still under the leaving age now. */
-const inTheBudget = (h: Household, today: number, untilAge: number): number[] => (h.children ?? []).filter((born) => today - born < untilAge)
+/**
+ * The age under which a child is a dependant of the family benefits (the Canada Child Benefit and Québec's Allocation famille stop at 18) and of the
+ * household-spending survey's own « children » (Statistics Canada's table of household types). It is NOT the age a child leaves home: that is the
+ * household's own `childSpending.untilAge`, which can be anything from 16 to 35 — two different questions, kept apart on purpose.
+ */
+export const DEPENDENT_AGE = 18
+
+/** Where a child stands: still to come (born after this year), at home (born, under the leaving age), or already gone (at or past it). */
+export type ChildStage = 'future' | 'home' | 'gone'
+
+export function childStage(born: number, todayYear: number, untilAge: number): ChildStage {
+  if (born > todayYear) return 'future'
+  return todayYear - born < untilAge ? 'home' : 'gone'
+}
+
+/** The children who count as part of today's budget: the ones at home now. A child still to come is NOT in it (its cost is added: `childAdd`). */
+const inTheBudget = (h: Household, today: number, untilAge: number): number[] => (h.children ?? []).filter((born) => childStage(born, today, untilAge) === 'home')
+
+/** Which of the four age bands (0–5, 6–12, 13–18, 19 and over) a child's age falls in. */
+export const costBandOf = (age: number): 0 | 1 | 2 | 3 => (age < 6 ? 0 : age < 13 ? 1 : age < 19 ? 2 : 3)
 
 /**
  * What the working-years budget drops by in `year`, once children have left home: `perChild` for each child who is in the budget today and has
@@ -20,6 +38,25 @@ export function childStepDown(h: Household, a: Assumptions, year: number): numbe
   if (!c || c.perChild <= 0) return 0
   const gone = inTheBudget(h, a.today.year, c.untilAge).filter((born) => year - born >= c.untilAge).length
   return gone * c.perChild
+}
+
+/**
+ * What the children still to come ADD to the budget in `year`, in today's dollars: from its birth until it reaches the leaving age, each costs the amount of its
+ * age band (`byAge`) when the household gave one, else the flat `perChild`. A child already at home is in the budget and a child already gone costs
+ * nothing, so they add nothing. It applies in the working years AND in retirement: a child still at home when the parents stop working still costs. 0 when
+ * the household states no such cost or has no child to come.
+ */
+export function childAdd(h: Household, a: Assumptions, year: number): number {
+  const c = h.childSpending
+  if (!c) return 0
+  let sum = 0
+  for (const born of h.children ?? []) {
+    if (childStage(born, a.today.year, c.untilAge) !== 'future') continue
+    const age = year - born
+    if (age < 0 || age >= c.untilAge) continue
+    sum += c.byAge ? c.byAge[costBandOf(age)] : c.perChild
+  }
+  return sum
 }
 
 /** The factor on the retired budget in a year when the oldest person alive is `oldestAge`: 1 until 70, then `(1 + drift)` for every year past it. */

@@ -17,9 +17,9 @@ const official = (url: string): boolean => {
   return OFFICIAL.some((h) => host === h || host.endsWith('.' + h))
 }
 
-// What an address says about its language: /fr/ and /fra/ (and the Finances Québec AUTFR edition) are French; /en/ and /eng/
-// (and AUTEN) are English. An address with none of these (a fiche, a quebec.ca page) says nothing, and is not judged by it.
-const says = (url: string, lang: PageLang): boolean => (lang === 'fr' ? /\/(fr|fra)\/|AUTFR/.test(url) : /\/(en|eng)\/|AUTEN/.test(url))
+// What an address says about its language: /fr/ and /fra/ (and the Finances Québec AUTFR edition, and a Statistics Canada publication's -fra.htm) are French; /en/ and /eng/
+// (and AUTEN, and -eng.htm) are English. An address with none of these (a fiche, a quebec.ca page) says nothing, and is not judged by it.
+const says = (url: string, lang: PageLang): boolean => (lang === 'fr' ? /\/(fr|fra)\/|AUTFR|-fra\.htm$/.test(url) : /\/(en|eng)\/|AUTEN|-eng\.htm$/.test(url))
 
 function citedUrls(): Set<string> {
   const out = new Set<string>()
@@ -37,6 +37,8 @@ describe('every cited page is readable in both languages, or says why not', () =
     expect(says('https://laws-lois.justice.gc.ca/eng/acts/o-9/FullText.html', 'en')).toBe(true)
     expect(says('https://cdn-contenu.quebec.ca/x/AUTFR_RegimeImpot2026.pdf', 'fr')).toBe(true)
     expect(says('https://cdn-contenu.quebec.ca/x/AUTEN_IncomeTax2026.pdf', 'en')).toBe(true)
+    expect(says('https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2023007-fra.htm', 'fr')).toBe(true)
+    expect(says('https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2023007-eng.htm', 'fr')).toBe(false)
     expect(says('https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/fiches/fiche-110111.asp', 'fr')).toBe(false) // says nothing
   })
 

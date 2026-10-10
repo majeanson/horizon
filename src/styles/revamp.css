@@ -1583,3 +1583,11 @@
 .levels-table th[scope='row'], .levels-table thead th:first-child { text-align: left; font-weight: 500; }
 .level-helper { display: grid; gap: 0.25rem; margin: -0.25rem 0 var(--space-2, 0.5rem); }
 .level-range { display: grid; gap: var(--space-2, 0.5rem); }
+
+/* « Ce que coûte un enfant »: Statistics Canada's suggestion under the children, and the amounts by age of a child still to come. */
+.kids-cost { display: grid; gap: var(--space-2, 0.5rem); margin-top: var(--space-3, 0.75rem); padding-top: var(--space-3, 0.75rem); border-top: 1px solid var(--line, rgba(0, 0, 0, 0.12)); }
+.kids-cost__bands { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+.kids-cost__edit { display: grid; gap: var(--space-2, 0.5rem); }
+.kids-cost__how { display: grid; gap: var(--space-2, 0.5rem); }
+.kids-cost__how ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.kids-cost__sources { list-style: none; padding-left: 0 !important; }

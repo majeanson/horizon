@@ -19,7 +19,7 @@ export const PROFILE_KEY = 'horizon-profile'
 
 export type SeedProfile = Record<string, unknown>
 
-export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v17.json', 'utf8'))
+export const EXAMPLE: SeedProfile = JSON.parse(readFileSync('src/lib/fixtures/profile.v18.json', 'utf8'))
 
 /** A blank single person with the defaults the app itself would start from. */
 export function blankSeed(): SeedProfile {

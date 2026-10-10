@@ -186,6 +186,29 @@ export interface Flow {
   taxable: boolean
 }
 
+/**
+ * Parental leave taken for every child still to be born: who gives birth, and how many of the 32 shareable parental weeks each parent takes (the Québec
+ * Parental Insurance Plan's basic plan: 18 weeks of maternity and 5 of paternity are the parents' own, on top). A lone parent takes both. Null: no leave is modelled.
+ */
+export interface ParentalLeave {
+  birthParent: PersonId
+  /** Shareable parental weeks (0 to 32) the birth parent takes. */
+  birthParentWeeks: number
+  /** Shareable parental weeks (0 to 32) the other parent takes; together with the birth parent's, at most 32. */
+  otherParentWeeks: number
+}
+
+/**
+ * What the household chose to count about its children beyond their cost — all optional, none on by itself: a profile that never says so projects
+ * exactly as it did before. `benefits`: the Canada Child Benefit and Québec's Allocation famille, estimated from the family's income. `qppExclusion`: the
+ * months of a year with no earnings spent with a child under 7 do not count in the QPP pension's average (Act, art. 101). `leave`: see ParentalLeave.
+ */
+export interface KidsEffects {
+  benefits: boolean
+  qppExclusion: boolean
+  leave: ParentalLeave | null
+}
+
 export interface Household {
   /**
    * Whether the household is ONE adult who lives alone — the condition for Québec's living-alone amount. Ignored for a
@@ -196,13 +219,20 @@ export interface Household {
   persons: Person[]
   /** The principal residence. Absent or null: the household owns none (or does not want it counted). */
   home?: Home | null
-  /** Birth years of the children (the profile's own list: it is the engine's too, since v16). */
+  /**
+   * Birth years of the children (the profile's own list: it is the engine's too, since v16): PAST (already left home), CURRENT (at home) or FUTURE (a year after
+   * today's: a child still to come). The stage is never stored; it is worked out from the year, today and `untilAge` (engine/lifeEvents.ts `childStage`).
+   */
   children?: readonly number[]
   /**
    * What each child costs inside the budget, until they leave: once a child reaches `untilAge` (they leave home), `perChild` (today's dollars a year,
-   * already part of `spending.workingToday`) drops out of the working-years budget. Absent or null: the budget does not change as children leave.
+   * already part of `spending.workingToday`) drops out of the working-years budget. A child STILL TO COME is not in today's budget: its cost is ADDED from
+   * its birth until `untilAge` — `byAge` (today's dollars a year at ages 0–5, 6–12, 13–18, 19 and over) when given, else the flat `perChild`.
+   * Absent or null: the budget does not change with the children.
    */
-  childSpending?: { perChild: number; untilAge: number } | null
+  childSpending?: { perChild: number; untilAge: number; byAge?: readonly [number, number, number, number] | null } | null
+  /** What else the household counts about its children (benefits, the QPP exclusion, a parental leave). Absent or null: none of it. */
+  kidsEffects?: KidsEffects | null
   /** The dated flows (see Flow). Absent: none. */
   flows?: readonly Flow[]
   spending: {
