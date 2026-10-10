@@ -35,7 +35,7 @@ export const costBandOf = (age: number): 0 | 1 | 2 | 3 => (age < 6 ? 0 : age < 1
  */
 export function childStepDown(h: Household, a: Assumptions, year: number): number {
   const c = h.childSpending
-  if (!c || c.perChild <= 0) return 0
+  if (!c || c.perChild <= 0 || c.onTop) return 0 // a cost on top was never in the budget: nothing to take out
   const gone = inTheBudget(h, a.today.year, c.untilAge).filter((born) => year - born >= c.untilAge).length
   return gone * c.perChild
 }
@@ -61,7 +61,7 @@ export function childCost(h: Household, a: Assumptions, year: number, retired: b
   const c = h.childSpending
   if (!c || c.perChild <= 0) return childAdd(h, a, year)
   const atHome = inTheBudget(h, a.today.year, c.untilAge).filter((born) => year - born < c.untilAge).length
-  const inBudget = retired ? 0 : Math.min(atHome * c.perChild, workingBudget(h, a, year))
+  const inBudget = retired || c.onTop ? 0 : Math.min(atHome * c.perChild, workingBudget(h, a, year))
   return inBudget + childAdd(h, a, year)
 }
 
@@ -76,7 +76,9 @@ export function childAdd(h: Household, a: Assumptions, year: number): number {
   if (!c) return 0
   let sum = 0
   for (const born of h.children ?? []) {
-    if (childStage(born, a.today.year, c.untilAge) !== 'future') continue
+    // A child at home is in the budget unless the household said the cost is on top of it; one already gone costs nothing.
+    const stage = childStage(born, a.today.year, c.untilAge)
+    if (stage === 'gone' || (stage === 'home' && !c.onTop)) continue
     const age = year - born
     if (age < 0 || age >= c.untilAge) continue
     sum += c.byAge ? c.byAge[costBandOf(age)] : c.perChild

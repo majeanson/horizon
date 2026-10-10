@@ -385,8 +385,35 @@ describe('schema v18 — the cost of a child by age, and what the household coun
 
   it('a household that states nothing is the same file as before, version apart', () => {
     const result = migrateProfile(oldFixture(17))
-    const raw = oldFixture(18)
+    const raw = oldFixture(19)
     expect(result.ok).toBe(true)
     if (result.ok) expect(JSON.parse(JSON.stringify(result.profile))).toEqual({ ...raw })
+  })
+})
+
+describe('schema v19 — a child’s cost on top of the annual budget', () => {
+  const v19 = (childSpending: unknown) => {
+    const p = clone(oldFixture(19)) as { household: Record<string, unknown> }
+    p.household.children = [2022, 2024]
+    p.household.childSpending = childSpending
+    return p
+  }
+  it('keeps `onTop` when true, and an older file (the field absent) means the budget holds the children', () => {
+    const on = validateProfile(v19({ perChild: 6000, untilAge: 23, onTop: true }))
+    expect(on.ok && on.profile.household.childSpending).toEqual({ perChild: 6000, untilAge: 23, onTop: true })
+    const inside = validateProfile(v19({ perChild: 6000, untilAge: 23 }))
+    expect(inside.ok && inside.profile.household.childSpending).toEqual({ perChild: 6000, untilAge: 23 })
+    const off = validateProfile(v19({ perChild: 6000, untilAge: 23, onTop: false }))
+    expect(off.ok && off.profile.household.childSpending).toEqual({ perChild: 6000, untilAge: 23 })
+  })
+  it('refuses an `onTop` that is not a yes or a no', () => {
+    expect(validateProfile(v19({ perChild: 6000, untilAge: 23, onTop: 'maybe' })).ok).toBe(false)
+  })
+  it('a v18 file with a child cost arrives as the same cost, inside the budget', () => {
+    const old = clone(oldFixture(18)) as { household: Record<string, unknown> }
+    old.household.children = [2022]
+    old.household.childSpending = { perChild: 5000, untilAge: 23 }
+    const r = migrateProfile(old)
+    expect(r.ok && r.profile.household.childSpending).toEqual({ perChild: 5000, untilAge: 23 })
   })
 })

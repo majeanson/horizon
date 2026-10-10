@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLang, useT } from '../../i18n'
 import { useConfirm } from '../../lib/confirm'
 import { LIFE_COPY } from '../../lib/lifeCopy'
+import { formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { scrollBehavior } from '../../lib/motion'
 import { addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
@@ -40,6 +41,11 @@ export function FamilySection({ withKids = true }: { /** The children and what e
   const stageOf = (born: number) => childStage(born, today().year, cost?.untilAge ?? 23)
   const leaving = cost === null ? [] : children.filter((born) => stageOf(born) === 'home').map((born) => born + cost.untilAge)
   const coming = cost === null ? [] : children.filter((born) => stageOf(born) === 'future')
+  // The cost per child is an average until the person says what they pay. Against a budget they typed from their own accounts it can take most of it: say so, and offer a quarter.
+  const budget = profile.household.spending.workingToday
+  const kidsTotal = cost === null ? 0 : leaving.length * cost.perChild
+  const heavy = cost !== null && !cost.onTop && budget > 0 && leaving.length > 0 && kidsTotal >= budget * 0.5
+  const quarter = leaving.length === 0 ? 0 : Math.round((budget * 0.25) / leaving.length / 100) * 100
 
   const submitChild = () => {
     // A four-digit year typed as text: digits only, then the same range sentence every NumberField
@@ -125,6 +131,22 @@ export function FamilySection({ withKids = true }: { /** The children and what e
 
       {withKids && children.length > 0 && (
         <div className="family__cost">
+          {cost && (
+            <div className="situation__q">
+              <p id="child-where" className="situation__question">
+                {lc.where}
+              </p>
+              <Cluster role="radiogroup" aria-labelledby="child-where">
+                <Chip radio selected={!cost.onTop} onClick={() => updateProfile((p) => patchChildSpending(p, { onTop: false }))}>
+                  {lc.inside}
+                </Chip>
+                <Chip radio selected={!!cost.onTop} onClick={() => updateProfile((p) => patchChildSpending(p, { onTop: true }))}>
+                  {lc.onTop}
+                </Chip>
+              </Cluster>
+              <p className="field-row__hint">{cost.onTop ? lc.onTopHint : lc.insideHint}</p>
+            </div>
+          )}
           <FieldRow label={lc.cost} hint={lc.costHint}>
             {(w) => (
               <NumberField
@@ -145,7 +167,15 @@ export function FamilySection({ withKids = true }: { /** The children and what e
                 )}
               </FieldRow>
               {/* what leaving home takes out of the budget: only said when a flat amount per child at home is stated (the amounts by age are for a child still to come) */}
-              {cost.perChild > 0 && <p className="field-row__hint">{leaving.length === 0 ? lc.none : lc.effect(formatMoney(cost.perChild, lang), leaving.length, String(Math.min(...leaving)))}</p>}
+              {heavy && (
+                <>
+                  <StatusMessage tone="info">{lc.heavy(leaving.length, formatMoney(kidsTotal, lang), formatPct(kidsTotal / budget, lang, 0), formatMoney(budget, lang), formatMoney(Math.max(0, budget - kidsTotal), lang))}</StatusMessage>
+                  <Cluster>
+                    <Chip onClick={() => updateProfile((p) => patchChildSpending(p, { perChild: quarter }))}>{lc.heavyFix(formatMoney(quarter, lang))}</Chip>
+                  </Cluster>
+                </>
+              )}
+              {cost.perChild > 0 && !cost.onTop && <p className="field-row__hint">{leaving.length === 0 ? lc.none : lc.effect(formatMoney(cost.perChild, lang), leaving.length, String(Math.min(...leaving)))}</p>}
               {coming.map((born) => (
                 <p key={born} className="field-row__hint">
                   {cost.byAge ? kc.planned.effectBands(String(born), String(born + cost.untilAge)) : kc.planned.effect(String(born), formatMoney(cost.perChild, lang), String(born + cost.untilAge))}

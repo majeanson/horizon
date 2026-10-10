@@ -13,7 +13,7 @@ const sameBands = (a: ChildSpending['byAge'], b: ChildSpending['byAge']) => (a ?
 /** What a child costs inside the budget until they leave home (null: it is not counted). */
 export function setChildSpending(p: Profile, value: ChildSpending | null): Profile {
   const cur = p.household.childSpending ?? null
-  const same = cur === value || (value !== null && cur !== null && cur.perChild === value.perChild && cur.untilAge === value.untilAge && sameBands(cur.byAge, value.byAge))
+  const same = cur === value || (value !== null && cur !== null && cur.perChild === value.perChild && cur.untilAge === value.untilAge && (cur.onTop ?? false) === (value.onTop ?? false) && sameBands(cur.byAge, value.byAge))
   return same ? p : { ...p, household: { ...p.household, childSpending: value } }
 }
 
@@ -21,11 +21,13 @@ export function setChildSpending(p: Profile, value: ChildSpending | null): Profi
  * Change ONE part of what a child costs, leaving the rest as it is: the flat amount, the age they leave, the amounts by age band. What is left with no cost at
  * all (a flat 0 and no bands) is not counted (null). A part given as `null` is taken away (the bands).
  */
-export function patchChildSpending(p: Profile, patch: { perChild?: number; untilAge?: number; byAge?: ChildSpending['byAge'] }): Profile {
+export function patchChildSpending(p: Profile, patch: { perChild?: number; untilAge?: number; byAge?: ChildSpending['byAge']; onTop?: boolean }): Profile {
   const cur: ChildSpending = p.household.childSpending ?? { perChild: 0, untilAge: 23 }
   const next: ChildSpending = { perChild: patch.perChild ?? cur.perChild, untilAge: patch.untilAge ?? cur.untilAge }
   const byAge = patch.byAge === undefined ? cur.byAge : patch.byAge
   if (byAge) next.byAge = byAge
+  const onTop = patch.onTop === undefined ? cur.onTop : patch.onTop
+  if (onTop) next.onTop = true
   return setChildSpending(p, next.perChild <= 0 && !next.byAge ? null : next)
 }
 

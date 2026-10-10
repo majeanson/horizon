@@ -116,3 +116,37 @@ test('the children and the care a plan states are drawn apart in « Où va l’a
   await expect(legend.getByText('Soins et événements', { exact: true })).toBeVisible()
   await expect(page.locator('.flow-readout__col[aria-label="Ce qui sort"]')).toBeVisible()
 })
+
+test('children that take most of a typed budget are said so on the profile, with one tap to a quarter of it', async ({ page }) => {
+  const family = JSON.parse(JSON.stringify(EXAMPLE))
+  family.household.children = [2022, 2024]
+  family.household.childSpending = { perChild: 19_300, untilAge: 23 }
+  family.household.spending = { workingToday: 45_000, retiredToday: 45_000 }
+  await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const)
+  await page.goto('/profil?form=1')
+  const note = page.getByText(/Ces 2 enfants représentent/)
+  await expect(note).toBeVisible({ timeout: 30_000 })
+  await expect(note).toContainText('86 %')
+  await page.getByRole('button', { name: /Mettre 5\s?600\s?\$ par enfant/ }).click()
+  await expect(note).toHaveCount(0)
+  await expect.poll(async () => (await page.evaluate((k) => JSON.parse(localStorage.getItem(k)!), PROFILE_KEY)).household.childSpending.perChild).toBe(5_600)
+})
+
+test('the profile says where the children are: inside the annual budget, or on top of it — and the choice moves the plan', async ({ page }) => {
+  const family = JSON.parse(JSON.stringify(EXAMPLE))
+  family.household.children = [2022, 2024]
+  family.household.childSpending = { perChild: 6_000, untilAge: 23 }
+  family.household.spending = { workingToday: 45_000, retiredToday: 45_000 }
+  await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const)
+  await page.goto('/profil?form=1')
+  const where = page.getByRole('radiogroup', { name: 'Où sont les enfants dans vos dépenses ?' })
+  await expect(where.getByRole('radio', { name: 'Déjà dans mon budget annuel' })).toBeChecked({ timeout: 30_000 })
+  await expect(page.getByText(/sa part en sort/)).toBeVisible()
+  await where.getByRole('radio', { name: 'En plus, ajoutés ici' }).click()
+  await expect(page.getByText(/s’y ajoute, jusqu’à son départ/)).toBeVisible()
+  await expect(page.getByText(/sa part en sort/)).toHaveCount(0)
+  await expect.poll(async () => (await page.evaluate((k) => JSON.parse(localStorage.getItem(k)!), PROFILE_KEY)).household.childSpending.onTop).toBe(true)
+  // the second chart draws the added cost as the children
+  await page.goto('/resultats?metric=detail')
+  await expect(page.locator('.chart-detail .chart__legend').getByText('Enfants', { exact: true })).toBeVisible({ timeout: 30_000 })
+})

@@ -14,6 +14,15 @@ export interface LifeCopy {
     leavesHint: string
     effect: (perChild: string, count: number, firstYear: string) => string
     none: string
+    /** The children at this cost take most of a stated budget: what is left for the adults, and a way to say it is less. */
+    heavy: (count: number, total: string, share: string, budget: string, left: string) => string
+    heavyFix: (perChild: string) => string
+    /** Where the children are: inside the annual budget already, or added on top of it by the cost below. */
+    where: string
+    inside: string
+    insideHint: string
+    onTop: string
+    onTopHint: string
   }
   partTime: {
     title: string
@@ -71,11 +80,18 @@ export interface LifeCopy {
 const FR: LifeCopy = {
   children: {
     cost: 'Ce que coûte chaque enfant, par année',
-    costHint: 'La part de votre budget qui sert un enfant (nourriture, activités, vêtements). Quand il quitte la maison, cette somme sort de vos dépenses. Laissez 0 si vous ne voulez pas en tenir compte.',
+    costHint: 'Ce que coûte un enfant à la maison (nourriture, activités, vêtements). Laissez 0 si vous ne voulez pas en tenir compte.',
     leaves: 'Quitte la maison à (âge)',
     leavesHint: 'Souvent 22 à 25 ans.',
     effect: (perChild, count, firstYear) => `${count === 1 ? 'Votre enfant' : `Vos ${count} enfants`} ${count === 1 ? 'quitte' : 'quittent'} la maison à partir de ${firstYear} : ${perChild} de moins par année et par enfant dans vos dépenses de travail.`,
     none: 'Aucun enfant ne quitte plus la maison dans le plan.',
+    heavy: (count, total, share, budget, left) => `${count === 1 ? 'Cet enfant' : `Ces ${count} enfants`} représente${count === 1 ? '' : 'nt'} ${total} par année, soit ${share} de votre budget de ${budget} : il en reste ${left} pour le reste de la maison. Si ce budget vient de vos dépenses réelles, c’est sans doute plus que ce que vous payez vraiment pour eux.`,
+    heavyFix: (perChild) => `Mettre ${perChild} par enfant`,
+    where: 'Où sont les enfants dans vos dépenses ?',
+    inside: 'Déjà dans mon budget annuel',
+    insideHint: 'Votre budget de dépenses compte déjà ce que coûtent les enfants : quand l’un d’eux quitte la maison, sa part en sort.',
+    onTop: 'En plus, ajoutés ici',
+    onTopHint: 'Votre budget de dépenses est celui des adultes : le coût de chaque enfant à la maison s’y ajoute, jusqu’à son départ.',
   },
   partTime: {
     title: 'Travail après la retraite',
@@ -144,11 +160,18 @@ const FR: LifeCopy = {
 const EN: LifeCopy = {
   children: {
     cost: 'What each child costs, a year',
-    costHint: 'The part of your budget that serves a child (food, activities, clothes). When they leave home, that amount comes out of your spending. Leave 0 to ignore it.',
+    costHint: 'What a child at home costs (food, activities, clothes). Leave 0 if you do not want to count it.',
     leaves: 'Leaves home at (age)',
     leavesHint: 'Often 22 to 25.',
     effect: (perChild, count, firstYear) => `${count === 1 ? 'Your child leaves' : `Your ${count} children leave`} home from ${firstYear}: ${perChild} less a year per child in your working-years spending.`,
     none: 'No child leaves home any more within the plan.',
+    heavy: (count, total, share, budget, left) => `${count === 1 ? 'This child' : `These ${count} children`} account${count === 1 ? 's' : ''} for ${total} a year, ${share} of your ${budget} budget — ${left} is left for the rest of the household. If that budget comes from what you actually spend, this is probably more than you really pay for them.`,
+    heavyFix: (perChild) => `Use ${perChild} per child`,
+    where: 'Where are the children in your spending?',
+    inside: 'Already in my annual budget',
+    insideHint: 'Your spending budget already counts what the children cost: when one leaves home, their share comes out.',
+    onTop: 'On top, added here',
+    onTopHint: 'Your spending budget is the adults’: each child at home costs this much more, until they leave.',
   },
   partTime: {
     title: 'Work after retirement',

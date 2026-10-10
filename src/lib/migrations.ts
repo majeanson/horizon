@@ -123,6 +123,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
     const household = (profile.household ?? {}) as Raw
     return { ...profile, household: { ...household, kidsEffects: null } }
   },
+  // v18 → v19: what a child costs can say it is ON TOP of the annual budget (`childSpending.onTop`) instead of inside it. Every older file meant inside: the field is
+  // absent, which reads as exactly that.
+  (profile) => profile,
 ]
 
 export type ReadResult =

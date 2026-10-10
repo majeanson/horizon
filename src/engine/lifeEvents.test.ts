@@ -140,6 +140,21 @@ describe('the projection — children who leave, spending that slows', () => {
     expect(workingBudget({ ...house, spending: { workingToday: w, retiredToday: w - 5_000 } }, A, 2037)).toBe(w - 5_000)
   })
 
+  it('a cost ON TOP of the budget is added for the children at home, taken out of nothing, and ends when they leave', () => {
+    const w = H.spending.workingToday
+    const house = { ...H, spending: { workingToday: w, retiredToday: w }, children: [2012, 2015], childSpending: { perChild: 6000, untilAge: 22, onTop: true } }
+    const rows = project(house, A, {})
+    const none = project({ ...house, childSpending: null }, A, {})
+    // nothing drops out when a child leaves — the budget never held them
+    expect(workingBudget(house, A, 2037)).toBe(w)
+    expect(childStepDown(house, A, 2037)).toBe(0)
+    // today both are at home (the year is the example's own): their cost rides on top, then ends year by year
+    const first = row(rows, 2026).household.spending - row(none, 2026).household.spending
+    expect(first).toBeGreaterThan(0)
+    expect(row(rows, 2040).household.spending).toBeCloseTo(row(none, 2040).household.spending, 2) // both have left by 2037
+    expect(row(rows, 2026).household.childCost ?? 0).toBeCloseTo(first, 1)
+  })
+
   it('a working budget never drops below nothing', () => {
     const rows = project({ ...H, children: [2012], childSpending: { perChild: 10_000_000, untilAge: 22 } }, A, {})
     expect(row(rows, 2040).household.spending).toBeGreaterThanOrEqual(0)

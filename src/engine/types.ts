@@ -228,9 +228,11 @@ export interface Household {
    * What each child costs inside the budget, until they leave: once a child reaches `untilAge` (they leave home), `perChild` (today's dollars a year,
    * already part of `spending.workingToday`) drops out of the working-years budget. A child STILL TO COME is not in today's budget: its cost is ADDED from
    * its birth until `untilAge` — `byAge` (today's dollars a year at ages 0–5, 6–12, 13–18, 19 and over) when given, else the flat `perChild`.
+   * `onTop`: the budget does NOT hold the children — it is the adults' own, and each child at home ADDS their cost on top of it (from now until `untilAge`, as a child
+   * still to come does), so nothing drops out when they leave. Absent: the budget holds them (every file before schema v19 meant that).
    * Absent or null: the budget does not change with the children.
    */
-  childSpending?: { perChild: number; untilAge: number; byAge?: readonly [number, number, number, number] | null } | null
+  childSpending?: { perChild: number; untilAge: number; byAge?: readonly [number, number, number, number] | null; onTop?: boolean } | null
   /** What else the household counts about its children (benefits, the QPP exclusion, a parental leave). Absent or null: none of it. */
   kidsEffects?: KidsEffects | null
   /** The dated flows (see Flow). Absent: none. */
