@@ -31,6 +31,14 @@ export interface FutureCopy {
     starts: (yearAge: string) => string
     /** A care already sits among the dated events: this trial adds to it. */
     already: string
+    /** The reference chips under the amount: a public CHSLD's ceiling. */
+    refTitle: string
+    refs: { privateRoom: string; semiPrivate: string; ward: string }
+    /** The name of the room and what it costs a year, already formatted. */
+    refChip: (name: string, perYear: string) => string
+    /** The ceiling is the government's, for the year it was read: what it says and what it leaves out (the figures arrive already formatted). */
+    refNote: (year: number, monthlyPrivate: string) => string
+    refSource: string
     caveat: string
   }
   year: {
@@ -51,7 +59,7 @@ const FR: FutureCopy = {
   title: 'Préparer l’avenir',
   care: {
     title: 'Et si les dernières années coûtaient plus cher ?',
-    hint: 'Une résidence avec soins, de l’aide à la maison : un coût de plus chaque année, à partir d’un âge. Glissez : le plan est refait avec ce coût. L’âge est celui de la personne la plus âgée. Le montant est le vôtre, aucun chiffre officiel n’est utilisé : il dépend du lieu et des soins. Rien n’est enregistré tant que vous ne l’ajoutez pas.',
+    hint: 'Une résidence avec soins, de l’aide à la maison : un coût de plus chaque année, à partir d’un âge. Glissez : le plan est refait avec ce coût. L’âge est celui de la personne la plus âgée. Le montant est le vôtre : il dépend du lieu et des soins. Rien n’est enregistré tant que vous ne l’ajoutez pas.',
     amount: 'Coût par année',
     fromAge: 'À partir de l’âge de',
     years: 'Pendant',
@@ -70,6 +78,11 @@ const FR: FutureCopy = {
     full: (max) => `Les ${max} événements sont utilisés : retirez-en un sur Profil pour en ajouter.`,
     starts: (yearAge) => `Le coût commencerait en ${yearAge}.`,
     already: 'Un coût de soins est déjà dans vos événements : cet essai s’y ajoute.',
+    refTitle: 'Repère : un CHSLD public',
+    refs: { privateRoom: 'Chambre privée', semiPrivate: 'Chambre semi-privée', ward: 'Salle' },
+    refChip: (name, perYear) => `${name} : ${perYear} par année`,
+    refNote: (year, monthlyPrivate) => `C’est le plafond fixé par le gouvernement pour ${year} (${monthlyPrivate} par mois en chambre privée) : la RAMQ établit ce que la personne paie d’après son revenu, souvent moins. Il ne couvre ni une résidence privée ni l’aide à domicile.`,
+    refSource: 'Source :',
     caveat: 'Un essai, pas une prévision : les soins en CHSLD public se paient selon le revenu, le privé coûte plus et varie beaucoup d’un endroit à l’autre. Le coût suit les prix (dollars d’aujourd’hui).',
   },
   year: {
@@ -90,7 +103,7 @@ const EN: FutureCopy = {
   title: 'Prepare for the future',
   care: {
     title: 'What if the last years cost more?',
-    hint: 'A residence with care, help at home: one more cost every year, from an age. Drag: the plan is rerun with that cost. The age is the oldest person’s. The amount is yours, no official figure is used: it depends on the place and the care. Nothing is saved until you add it.',
+    hint: 'A residence with care, help at home: one more cost every year, from an age. Drag: the plan is rerun with that cost. The age is the oldest person’s. The amount is yours: it depends on the place and the care. Nothing is saved until you add it.',
     amount: 'Cost per year',
     fromAge: 'From age',
     years: 'For',
@@ -109,6 +122,11 @@ const EN: FutureCopy = {
     full: (max) => `All ${max} events are used: remove one on Profile to add this.`,
     starts: (yearAge) => `The cost would start in ${yearAge}.`,
     already: 'A care cost is already among your events: this trial adds to it.',
+    refTitle: 'Reference: a public CHSLD',
+    refs: { privateRoom: 'Private room', semiPrivate: 'Semi-private room', ward: 'Ward' },
+    refChip: (name, perYear) => `${name}: ${perYear} a year`,
+    refNote: (year, monthlyPrivate) => `This is the ceiling the government sets for ${year} (${monthlyPrivate} a month for a private room): the RAMQ sets what a person pays from their income, often less. It covers neither a private residence nor help at home.`,
+    refSource: 'Source:',
     caveat: 'A trial, not a forecast: care in a public CHSLD is paid by income, a private one costs more and varies a lot from place to place. The cost follows prices (today’s dollars).',
   },
   year: {

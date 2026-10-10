@@ -64,3 +64,30 @@ test('« À faire cette année » names the change that gains most and the figur
   await expect(year.getByText('Le changement qui avance le plus', { exact: true })).toBeVisible()
   await expect(year.getByText('Le chiffre à confirmer d’abord', { exact: true })).toBeVisible()
 })
+
+test('the CHSLD ceilings are three reference chips that set the amount exactly, with the official page beside them', async ({ page }) => {
+  await page.goto('/resultats?v=future')
+  const soins = page.locator('#soins')
+  await expect(soins.getByRole('radio', { name: /Chambre privée/ })).toBeVisible()
+  await expect(soins.getByRole('radio', { name: /Chambre semi-privée/ })).toBeVisible()
+  await expect(soins.getByRole('radio', { name: /Salle/ })).toBeVisible()
+  // 12 x 2 242,20 $ a month, whole dollars, in the address: not rounded to the slider's step.
+  await soins.getByRole('radio', { name: /Chambre privée/ }).click()
+  await expect(page).toHaveURL(/care=26906%2C/)
+  await expect(soins.getByRole('radio', { name: /Chambre privée/ })).toBeChecked()
+  // A ceiling, said as one, with the page it was read on (the French edition for a French reader).
+  await expect(soins).toContainText('plafond fixé par le gouvernement')
+  await expect(soins.getByRole('link', { name: 'Frais d’hébergement longue durée' })).toHaveAttribute('href', /ciusss-ouestmtl\.gouv\.qc\.ca\/usagers-et-visiteurs\//)
+  // The shared ward is cheaper than the private room, and the answer follows the amount.
+  await soins.getByRole('radio', { name: /Salle/ }).click()
+  await expect(page).toHaveURL(/care=16744%2C/)
+})
+
+test('in English the chips and the note speak English and the link goes to the English edition', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
+  await page.goto('/resultats?v=future')
+  const soins = page.locator('#soins')
+  await expect(soins.getByRole('radio', { name: /Private room/ })).toBeVisible()
+  await expect(soins).toContainText('ceiling the government sets')
+  await expect(soins.getByRole('link', { name: 'Long-Term Residential Care Fees' })).toHaveAttribute('href', /\/en\/users-and-visitors\//)
+})

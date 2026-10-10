@@ -173,6 +173,10 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'parentalLeave.sharedFirstWeeks': [7, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
   'parentalLeave.rateHigh': [0.7, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
   'parentalLeave.rateLow': [0.55, 'https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'],
+  // A public CHSLD, per month: the ceiling the government sets (a health-network institution's fees page).
+  'longTermCare.chsldPrivateRoom': [2_242.2, 'https://www.ciusss-ouestmtl.gouv.qc.ca/usagers-et-visiteurs/frais-et-paiement/frais-dhebergement-longue-duree'],
+  'longTermCare.chsldSemiPrivateRoom': [1_872.9, 'https://www.ciusss-ouestmtl.gouv.qc.ca/usagers-et-visiteurs/frais-et-paiement/frais-dhebergement-longue-duree'],
+  'longTermCare.chsldWard': [1_395.3, 'https://www.ciusss-ouestmtl.gouv.qc.ca/usagers-et-visiteurs/frais-et-paiement/frais-dhebergement-longue-duree'],
   // What the state pays for a child: the CRA's table for July 2026 to June 2027, and Retraite Québec's 2026 amounts.
   'childBenefits.ccb.maxUnder6': [8_157, CCB],
   'childBenefits.ccb.max6to17': [6_883, CCB],

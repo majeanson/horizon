@@ -1,6 +1,7 @@
 import type { Assumptions, Household } from '../../engine/types'
 import { useLang } from '../../i18n'
-import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, CARE_AMOUNT_STEP, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, CARE_YEARS_MIN, careFlow, oldestBirthYear, sameCare, type Care } from '../../lib/careModel'
+import { pageFor } from '../../engine/params/twins'
+import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_AMOUNT_STEP, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, CARE_YEARS_MIN, careFlow, oldestBirthYear, sameCare, type Care } from '../../lib/careModel'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { formatYearAge } from '../../lib/format'
 import { FUTURE_COPY } from '../../lib/futureCopy'
@@ -63,6 +64,9 @@ export function CareView({
     notice(c.kept)
   }
 
+  const refs = chsldReferences(assumptions)
+  const refSource = chsldSource()
+  const refPage = pageFor(refSource, lang)
   const earliestLine =
     a === null
       ? null
@@ -78,6 +82,19 @@ export function CareView({
   return (
     <div className="surface answer" aria-live={busy ? 'off' : 'polite'} aria-busy={busy}>
       <Slider label={c.amount} value={care.amount} min={Math.min(CARE_AMOUNT_MIN, care.amount)} max={Math.max(CARE_AMOUNT_MAX, care.amount)} step={CARE_AMOUNT_STEP} valueText={money} onCommit={(v) => change({ amount: v })} />
+      <Cluster role="group" aria-label={c.refTitle}>
+        {refs.map((r) => (
+          <Chip key={r.key} radio selected={care.amount === r.yearly} onClick={() => change({ amount: r.yearly })}>
+            {c.refChip(c.refs[r.key], money(r.yearly))}
+          </Chip>
+        ))}
+      </Cluster>
+      <p className="field-row__hint">
+        {c.refNote(refSource.year, money(refs[0].monthly))} {c.refSource}{' '}
+        <a className="info-note__link" href={refPage.url} target="_blank" rel="noopener noreferrer">
+          {refPage.title}
+        </a>
+      </p>
       <Slider label={c.fromAge} value={care.fromAge} min={CARE_FROM_MIN} max={CARE_FROM_MAX} valueText={c.age} onCommit={(v) => change({ fromAge: v })} />
       <Slider label={c.years} value={care.years} min={CARE_YEARS_MIN} max={CARE_YEARS_MAX} valueText={c.yearsOf} onCommit={(v) => change({ years: v })} />
       <p className="field-row__hint">{c.hint}</p>

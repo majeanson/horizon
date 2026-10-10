@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { FUTURE_COPY, type FutureCopy } from './futureCopy.ts'
 
@@ -25,6 +28,9 @@ function texts(c: FutureCopy): [string, string][] {
     ['care.holds', c.care.holds(59)],
     ['care.full', c.care.full(20)],
     ['care.starts', c.care.starts('2051 (85)')],
+    ['care.refChip', c.care.refChip(c.care.refs.privateRoom, '26 906 $')],
+    ['care.refNote', c.care.refNote(2026, '2 242 $')],
+    ...Object.entries(c.care.refs).map(([k, v]): [string, string] => [`care.refs.${k}`, v]),
   )
   for (const [k, v] of Object.entries(c.year)) out.push([`year.${k}`, v])
   return out
@@ -50,6 +56,24 @@ describe('the « Préparer l’avenir » copy, in both languages', () => {
     expect(en.care.later(en.care.yearsOf(1), 60, 59)).toContain('1 year later')
     expect(fr.care.none(95)).toContain('95')
     expect(fr.care.short(59, '2051')).toContain('2051')
+  })
+})
+
+describe('the CHSLD reference note', () => {
+  it('prints the figures it is given, and never types a rate of its own', () => {
+    expect(fr.care.refNote(2026, '2 242 $')).toContain('2 242 $')
+    expect(fr.care.refNote(2026, '2 242 $')).toContain('2026')
+    expect(en.care.refNote(2026, '$2,242')).toContain('$2,242')
+    // A figure retyped in the copy would drift from the cited params without a test noticing.
+    const source = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'futureCopy.ts'), 'utf8')
+    expect(source).not.toMatch(/2[   ,]?242|1[   ,]?872|1[   ,]?395|26[   ,]?906/)
+  })
+
+  it('says it is a ceiling and what it leaves out, in both languages', () => {
+    expect(fr.care.refNote(2026, 'x')).toMatch(/plafond/)
+    expect(fr.care.refNote(2026, 'x')).toMatch(/résidence privée/)
+    expect(en.care.refNote(2026, 'x')).toMatch(/ceiling/)
+    expect(en.care.refNote(2026, 'x')).toMatch(/private residence/)
   })
 })
 

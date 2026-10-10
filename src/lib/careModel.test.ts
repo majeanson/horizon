@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
 import { retireAt } from '../engine/retireAt.ts'
-import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, careAnswer, careFlow, formatCare, oldestBirthYear, parseCare, sameCare, withCare, type Care } from './careModel.ts'
+import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, careAnswer, careFlow, formatCare, oldestBirthYear, parseCare, sameCare, withCare, type Care } from './careModel.ts'
 
 const H = GOLDEN_HOUSEHOLD
 const A = GOLDEN_ASSUMPTIONS
@@ -49,10 +49,35 @@ describe('« and if the last years cost more? »', () => {
   })
 })
 
+describe('the CHSLD references', () => {
+  it('are the three cited ceilings of a month, and the same over twelve months', () => {
+    const refs = chsldReferences(A)
+    expect(refs.map((r) => r.key)).toEqual(['privateRoom', 'semiPrivate', 'ward'])
+    for (const r of refs) expect(r.yearly).toBe(Math.round(r.monthly * 12))
+    expect(refs[0].monthly).toBeGreaterThan(refs[1].monthly)
+    expect(refs[1].monthly).toBeGreaterThan(refs[2].monthly)
+    // 2026 is the year the golden assumptions read: the page's own figures, to the cent.
+    expect(A.today.year).toBe(2026)
+    expect(refs[0].monthly).toBeCloseTo(2_242.2, 2)
+    expect(refs[1].monthly).toBeCloseTo(1_872.9, 2)
+    expect(refs[2].monthly).toBeCloseTo(1_395.3, 2)
+  })
+
+  it('fit the sliders, so choosing one is never clamped', () => {
+    for (const r of chsldReferences(A)) expect(parseCare(formatCare({ amount: r.yearly, fromAge: 85, years: 10 }))?.amount).toBe(r.yearly)
+  })
+
+  it('name an official page', () => {
+    const s = chsldSource()
+    expect(s.url).toMatch(/^https:\/\/[^/]*gouv\.qc\.ca\//)
+    expect(s.title.length).toBeGreaterThan(0)
+  })
+})
+
 describe('the address', () => {
-  it('reads « amount,age,years » rounded to each slider’s step and inside its reach', () => {
+  it('reads « amount,age,years » in whole dollars and years, inside each slider’s reach', () => {
     expect(parseCare('30000,85,10')).toEqual({ amount: 30_000, fromAge: 85, years: 10 })
-    expect(parseCare('30499,85.4,10.2')).toEqual({ amount: 30_000, fromAge: 85, years: 10 })
+    expect(parseCare('30499.4,85.4,10.2')).toEqual({ amount: 30_499, fromAge: 85, years: 10 })
     expect(parseCare('1,1,0')).toEqual({ amount: CARE_AMOUNT_MIN, fromAge: CARE_FROM_MIN, years: 1 })
     expect(parseCare('9999999,200,99')).toEqual({ amount: CARE_AMOUNT_MAX, fromAge: CARE_FROM_MAX, years: CARE_YEARS_MAX })
   })

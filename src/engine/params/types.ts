@@ -206,6 +206,17 @@ export interface YearParams {
   }
 
   /**
+   * What a place in a public CHSLD (long-term residential care) costs a Québec resident, a MONTH: the most the person pays for a private room, a
+   * semi-private room and a ward (« salle »). A CEILING: the RAMQ sets the contribution from the person's income and it can be lower. Read by the care
+   * what-if (lib/careModel.ts) as a reference figure; the projection itself never reads it.
+   */
+  longTermCare: {
+    chsldPrivateRoom: Cited
+    chsldSemiPrivateRoom: Cited
+    chsldWard: Cited
+  }
+
+  /**
    * What the state pays for a child (engine/childBenefits.ts): the Canada Child Benefit — Canada Revenue Agency — and Québec's Allocation famille — Retraite Québec.
    * The year is the one the payments START in (the CCB's July 2026 to June 2027 period is « 2026 »).
    */

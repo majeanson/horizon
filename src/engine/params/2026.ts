@@ -109,6 +109,13 @@ const RQAP_ACT = src('https://www.legisquebec.gouv.qc.ca/fr/pdf/cs/A-29.011.pdf'
   note: 'The statute, in French, up to date on 12 August 2026 (the English edition is its twin), cited by its PDF edition like the QPP Act. The basic plan: art. 7, 18 weeks of maternity; art. 9, 5 weeks of paternity; art. 10, 32 weeks of parental benefits to share; art. 18, 70 % of the average weekly income for the maternity and paternity weeks and the first 7 shared weeks, 55 % for the other shared weeks. The weekly income is capped at the maximum insurable earnings (payroll.qpipMaxInsurable).',
 })
 
+// ── Long-term residential care (read 2026-10-09) ─────────────────────────────────────────────────────
+// Published by a health-network institution of the Québec government, not by the RAMQ itself (its page answers 403 to every automated client).
+const CHSLD_RATES = src('https://www.ciusss-ouestmtl.gouv.qc.ca/usagers-et-visiteurs/frais-et-paiement/frais-dhebergement-longue-duree', 'Frais d’hébergement longue durée', {
+  retrieved: '2026-10-09',
+  note: 'Santé Québec Ouest-de-l’Île-de-Montréal – Universitaire. Table « Tarifs pour l’hébergement », « Résidents du Québec avec une carte d’assurance maladie valide », « Taux valides du 1er janvier au 31 décembre 2026 », lines « Centre hospitalier · CHSLD ». These are the amounts the government sets for every establishment; they are a CEILING — the RAMQ sets what a person pays from their income and savings, so it can be lower. Reset every 1 January.',
+})
+
 // ── What the state pays for a child (read 2026-10-09) ───────────────────────────────────────────────
 const CRA_CCB = src(
   'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html',
@@ -363,6 +370,12 @@ export const P2026 = {
     sharedFirstWeeks: c(7, 'fixed', { ...RQAP_ACT, note: '« 70 % pour … les sept premières semaines de prestations parentales partageables » (art. 18, 1°).' }),
     rateHigh: c(0.7, 'fixed', { ...RQAP_ACT, note: '« 70 % pour les semaines de prestations de maternité … de paternité … les sept premières semaines de prestations parentales partageables » (art. 18, 1°).' }),
     rateLow: c(0.55, 'fixed', { ...RQAP_ACT, note: '« 55 % pour les autres semaines de prestations parentales … partageables » (art. 18, 6°).' }),
+  },
+
+  longTermCare: {
+    chsldPrivateRoom: c(2_242.2, 'cpi', { ...CHSLD_RATES, note: CHSLD_RATES.note + ' « Chambre privée 2 242,20 $/mois ».' }, 0.1),
+    chsldSemiPrivateRoom: c(1_872.9, 'cpi', { ...CHSLD_RATES, note: CHSLD_RATES.note + ' « Chambre semi-privée 1 872,90 $/mois ».' }, 0.1),
+    chsldWard: c(1_395.3, 'cpi', { ...CHSLD_RATES, note: CHSLD_RATES.note + ' « Salle 1 395,30 $/mois ».' }, 0.1),
   },
 
   childBenefits: {

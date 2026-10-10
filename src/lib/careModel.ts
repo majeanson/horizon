@@ -1,3 +1,4 @@
+import { KNOWN, paramsFor } from '../engine/params/index.ts'
 import { everyoneAt, retireAt, runScenario, worksNow } from '../engine/retireAt.ts'
 import type { Assumptions, Flow, Household } from '../engine/types.ts'
 
@@ -69,11 +70,34 @@ export function careAnswer(household: Household, assumptions: Assumptions, care:
   return { earliest, now: worksNow(h, assumptions, earliest), age, ok: withCareRun.ok, firstShortfallYear: withCareRun.firstShortfallYear, worthWith: withCareRun.worth, worthWithout: without.worth }
 }
 
+export type CareReferenceKey = 'privateRoom' | 'semiPrivate' | 'ward'
+
+/** A public CHSLD's ceiling, as a reference for the sliders: what the government sets a MONTH, and the same over a year (today's dollars). */
+export interface CareReference {
+  key: CareReferenceKey
+  monthly: number
+  yearly: number
+}
+
+/** The three CHSLD ceilings of the plan's year (cited in engine/params: longTermCare). A ceiling: the RAMQ sets what a person pays from their income. */
+export function chsldReferences(a: Assumptions): CareReference[] {
+  const L = paramsFor(a.today.year, { inflation: a.inflation, wageGrowth: a.wageGrowth }).longTermCare
+  const row = (key: CareReferenceKey, monthly: number): CareReference => ({ key, monthly, yearly: Math.round(monthly * 12) })
+  return [row('privateRoom', L.chsldPrivateRoom), row('semiPrivate', L.chsldSemiPrivateRoom), row('ward', L.chsldWard)]
+}
+
+/** The page the ceilings were read on (the latest known year's citation), for the link under them. */
+export function chsldSource(): { url: string; title: string; year: number } {
+  const year = Math.max(...Object.keys(KNOWN).map(Number))
+  const { url, title } = KNOWN[year].longTermCare.chsldPrivateRoom.source
+  return { url, title, year }
+}
+
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))
 
 /**
- * `?care=amount,fromAge,years` → a care the sliders can hold (each part rounded to its step, inside its reach), or null for anything
- * unreadable. A part left out takes the starting figure.
+ * `?care=amount,fromAge,years` → a care the sliders can hold (whole dollars, whole years, each inside its reach: a reference figure such as a
+ * CHSLD's ceiling is kept exactly, not rounded to the slider's step), or null for anything unreadable. A part left out takes the starting figure.
  */
 export function parseCare(text: string | null): Care | null {
   if (text === null || text === '') return null
@@ -83,7 +107,7 @@ export function parseCare(text: string | null): Care | null {
   if (nums.some((n) => n !== null && !Number.isFinite(n))) return null
   const [amount, fromAge, years] = nums
   return {
-    amount: clamp(Math.round((amount ?? CARE_START.amount) / CARE_AMOUNT_STEP) * CARE_AMOUNT_STEP, CARE_AMOUNT_MIN, CARE_AMOUNT_MAX),
+    amount: clamp(Math.round(amount ?? CARE_START.amount), CARE_AMOUNT_MIN, CARE_AMOUNT_MAX),
     fromAge: clamp(Math.round(fromAge ?? CARE_START.fromAge), CARE_FROM_MIN, CARE_FROM_MAX),
     years: clamp(Math.round(years ?? CARE_START.years), CARE_YEARS_MIN, CARE_YEARS_MAX),
   }
