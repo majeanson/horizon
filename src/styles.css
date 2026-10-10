@@ -16,5 +16,7 @@
 @import './styles/print.css';
 /* The character sheet (/fiche): one model, two skins (serious and « Aventure »). */
 @import './styles/sheet.css';
+/* The phone: hit areas a thumb can find, and height not spent twice. */
+@import './styles/phone.css';
 /* The dev-only component gallery (/dev/kit) is NOT imported here: pages/DevKit.tsx imports
    its own stylesheet as a side effect, so the shell never pays for it. */

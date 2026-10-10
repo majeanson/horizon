@@ -12,7 +12,7 @@ import { BackupLine } from '../components/profile/BackupLine'
 import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { Chip } from '../components/Chip'
 import { LiveAnswer } from '../components/LiveAnswer'
-import { Cluster } from '../components/Layout'
+import { Rail } from '../components/Layout'
 import { Loading } from '../components/Loading'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
@@ -120,14 +120,14 @@ export function Profil() {
       <LiveAnswer />
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
       <BackupLine />
-      <Cluster>
+      <Rail>
         <Chip to="/documents" icon="identification-card-bold">
           {DOCUMENTS_COPY[lang].link}
         </Chip>
         <Chip to="/saisie" icon="pencil-simple-bold">
           {DOCUMENTS_COPY[lang].entry}
         </Chip>
-      </Cluster>
+      </Rail>
       {/* One line: how much of the profile stands on documents, and the door to the section that makes it exact. */}
       {acc.total > 0 && (
         <div className="accuracy-line">
