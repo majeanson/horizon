@@ -7,7 +7,9 @@ import { useConfirm } from '../lib/confirm'
 import { formatMoney } from '../lib/money'
 import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { ONBOARD_COPY } from '../lib/onboardCopy'
-import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, setBirthYear, removeSpouse, setSpending, updateHome, updatePension } from '../lib/profileEdit'
+import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, setBirthYear, removeSpouse, setFacts, setSpending, updateHome, updatePension } from '../lib/profileEdit'
+import { factId } from '../lib/facts'
+import type { Profile } from '../lib/schema'
 import { profileGaps, type ProfileGap } from '../lib/profileGaps'
 import { applies, PERSON_TOPICS, useYes } from '../lib/situation'
 import { updateProfile, useProfile } from '../lib/store'
@@ -65,6 +67,9 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
   const self = profile.household.persons[0]
   const spouse = profile.household.persons[1]
   const edit = (id: PersonId, change: Parameters<typeof mapPerson>[2]) => updateProfile((p) => mapPerson(p, id, change))
+  // A figure the person TYPES here is one they chose to write down: it is called confirmed (the first-visit path asks for what they know). An estimate
+  // — the « Estimer » button — never is, and typing over it confirms it.
+  const typed = (change: (p: Profile) => Profile, ...facts: string[]) => updateProfile((p) => setFacts(change(p), facts, true))
   const personOf = (id: PersonId) => profile.household.persons.find((x) => x.id === id)!
   // Which years of birth were TYPED: the stored profile always holds one (a default), and a default is not an answer.
   const [birthTyped, setBirthTyped] = useState<Partial<Record<PersonId, true>>>({})
@@ -87,7 +92,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
       const person = personOf(id)
       return (
         <FieldRow key={kind} label={c.savings[kind]} infoId={kind === 'rrsp' ? 'rrspBalance' : kind === 'tfsa' ? 'tfsaBalance' : 'nonRegBalance'}>
-          {(w) => <NumberField kind="money" max={1e9} value={person.accounts[kind].balance} onChange={(balance) => edit(id, (x) => ({ ...x, accounts: { ...x.accounts, [kind]: { ...x.accounts[kind], balance } } }))} id={w.id} ariaDescribedBy={w.describedBy} autoFocus={focus && i === 0} />}
+          {(w) => <NumberField kind="money" max={1e9} value={person.accounts[kind].balance} onChange={(balance) => typed((p) => mapPerson(p, id, (x) => ({ ...x, accounts: { ...x.accounts, [kind]: { ...x.accounts[kind], balance } } })), factId(id, kind === 'rrsp' ? 'rrspBalance' : kind === 'tfsa' ? 'tfsaBalance' : 'nonRegBalance'))} id={w.id} ariaDescribedBy={w.describedBy} autoFocus={focus && i === 0} />}
         </FieldRow>
       )
     })
@@ -119,7 +124,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
     const person = personOf(id)
     return (
       <FieldRow label={label} infoId="salary">
-        {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit(id, (x) => ({ ...x, salaryToday }))} id={w.id} autoFocus={focus} />}
+        {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => typed((p) => mapPerson(p, id, (x) => ({ ...x, salaryToday })), factId(id, 'salary'))} id={w.id} autoFocus={focus} />}
       </FieldRow>
     )
   }
@@ -150,7 +155,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
         </Cluster>
         {choice === 'rregop' && (
           <FieldRow label={c.pension.service} infoId="dbService">
-            {(w) => <NumberField kind="decimal" min={0} max={60} unit={t.fields.years} value={person.pensions[rregop].serviceYearsToDate} onChange={(serviceYearsToDate) => edit(id, (x) => updatePension(x, rregop, (p) => ({ ...p, serviceYearsToDate })))} id={w.id} />}
+            {(w) => <NumberField kind="decimal" min={0} max={60} unit={t.fields.years} value={person.pensions[rregop].serviceYearsToDate} onChange={(serviceYearsToDate) => typed((p) => mapPerson(p, id, (x) => updatePension(x, rregop, (q) => ({ ...q, serviceYearsToDate }))), factId(id, 'pension'))} id={w.id} />}
           </FieldRow>
         )}
         {choice === 'other' && <p className="field-row__hint">{c.pension.otherNote}</p>}
@@ -265,7 +270,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
                 value={profile.household.spending.retiredToday}
                 onChange={(v) => {
                   setEstimate(null)
-                  updateProfile((p) => setSpending(p, { workingToday: v, retiredToday: v }))
+                  typed((p) => setSpending(p, { workingToday: v, retiredToday: v }), factId('household', 'spendingWorking'), factId('household', 'spendingRetired'))
                 }}
                 id={w.id}
                 autoFocus={focus}
@@ -278,7 +283,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
                 onClick={() => {
                   const v = Math.round((grossIncome * 0.6) / 1000) * 1000
                   setEstimate(v)
-                  updateProfile((p) => setSpending(p, { workingToday: v, retiredToday: v }))
+                  updateProfile((p) => setFacts(setSpending(p, { workingToday: v, retiredToday: v }), [factId('household', 'spendingWorking'), factId('household', 'spendingRetired')], false))
                 }}
               >
                 {c.spending.estimate}
@@ -305,10 +310,10 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
           {home !== null && (
             <>
               <FieldRow label={c.home.value}>
-                {(w) => <NumberField kind="money" max={1e8} value={home.value} onChange={(value) => updateProfile((p) => updateHome(p, (x) => ({ ...x, value })))} id={w.id} />}
+                {(w) => <NumberField kind="money" max={1e8} value={home.value} onChange={(value) => typed((p) => updateHome(p, (x) => ({ ...x, value })), factId('household', 'homeValue'))} id={w.id} />}
               </FieldRow>
               <FieldRow label={c.home.balance}>
-                {(w) => <NumberField kind="money" max={1e8} value={home.mortgage.balance} onChange={(balance) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, balance } })))} id={w.id} />}
+                {(w) => <NumberField kind="money" max={1e8} value={home.mortgage.balance} onChange={(balance) => typed((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, balance } })), factId('household', 'mortgage'))} id={w.id} />}
               </FieldRow>
               {home.mortgage.balance > 0 && (
                 <FieldRow label={c.home.payment}>

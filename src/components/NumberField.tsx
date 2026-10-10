@@ -16,6 +16,9 @@ import { StatusMessage } from './StatusMessage'
 //   int      a whole number (an age)                     unit from the `unit` prop
 //
 // `min` / `max` are in the STORED unit (a fraction for percent).
+//
+// Focus makes typing easy: the box's text is selected whole, so the first digit REPLACES it — a plain 0 (the default of every optional
+// amount) never ends up as « 0150 ». (Emptying a zero on focus was tried: the clear ✕ appears with the first digit and shifts the tab order.)
 
 const DEFAULT_UNIT: Record<NumberKind, string> = { money: '$', percent: '%', decimal: '', year: '', int: '' }
 
@@ -107,6 +110,7 @@ export function NumberField(props: NumberFieldProps) {
         }}
         onSubmit={commit}
         onBlur={commit}
+        selectOnFocus
         allowEmpty
         submitIcon={null}
         id={id}

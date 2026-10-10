@@ -106,7 +106,7 @@ const FR: OnboardCopy = {
   done: {
     q: 'C’est assez pour une première réponse',
     qMissing: 'Il manque une réponse',
-    why: 'Ces chiffres sont des estimations tant que vous ne les confirmez pas : le profil vous guidera, document par document.',
+    why: 'Les chiffres que vous avez écrits sont notés confirmés, et une estimation reste une estimation. Le profil vous guidera, document par document, pour les vérifier.',
     see: 'Voir ma réponse',
     refine: 'Préciser mon profil',
     missing: 'Il manque encore :',
@@ -183,7 +183,7 @@ const EN: OnboardCopy = {
   done: {
     q: 'That is enough for a first answer',
     qMissing: 'One answer is missing',
-    why: 'These figures are estimates until you confirm them: the profile will guide you, document by document.',
+    why: 'The figures you typed are marked confirmed, and an estimate stays an estimate. The profile will guide you, document by document, to check them.',
     see: 'See my answer',
     refine: 'Make my profile exact',
     missing: 'Still missing:',

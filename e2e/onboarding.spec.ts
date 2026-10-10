@@ -77,7 +77,7 @@ test('walking through for one person: each answer is saved as typed, and the ans
   await expect(page.locator('.onboard__summary')).toContainText('Année de naissance : 1985')
   await expect(page.locator('.onboard__summary')).toContainText('Régime d’employeur : RREGOP')
   await expect(page.locator('.onboard__summary')).toContainText('Retraite visée à 62 ans')
-  await expect(page.locator('.onboard__why')).toContainText('estimations tant que vous ne les confirmez pas')
+  await expect(page.locator('.onboard__why')).toContainText('une estimation reste une estimation')
   // everything was written to the stored profile, as typed (the store saves a beat after the last answer)
   await expect.poll(async () => (await savedProfile(page)).household.spending.retiredToday).toBe(54_000)
   const p = await savedProfile(page)
@@ -90,7 +90,8 @@ test('walking through for one person: each answer is saved as typed, and the ans
   expect(p.household.persons[0].retirementAge).toBe(62)
   expect(p.household.spending).toEqual({ workingToday: 54_000, retiredToday: 54_000 })
   expect(p.household.home).toBeNull()
-  expect(p.confirmed).toEqual([]) // an estimate, a guess, a typed number: none is called real until the person says so
+  // what was TYPED is confirmed (a birth year and a retirement age are not facts); the « Estimer » spending is an estimate until typed over
+  expect([...p.confirmed].sort()).toEqual(['self:pension', 'self:rrspBalance', 'self:salary', 'self:tfsaBalance'])
   await page.getByRole('button', { name: 'Voir ma réponse' }).click()
   await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)/)).toBeVisible()
   // …and the answer opens ON the answer: nothing scrolled it out of sight
@@ -310,4 +311,18 @@ test('what is answered here is what the full form shows: the same questions, the
   await expect(page.locator('#situation').getByRole('radiogroup', { name: /Des enfants à la maison/ }).getByRole('radio', { name: 'Oui' })).toBeChecked()
   await expect(page.locator('#situation').getByRole('radiogroup', { name: /régime de retraite d’employeur/ }).getByRole('radio', { name: 'Non' })).toBeChecked()
   await expect(page.getByText('Au Canada depuis (année)')).toBeVisible()
+})
+
+test('a figure typed on the path is confirmed; the « Estimer » figure is an estimate until typed over', async ({ page }) => {
+  await toSituation(page)
+  await next(page)
+  await fill(page, 'Revenu de travail par année', '90000')
+  await next(page) // savings, left as they are
+  await fill(page, 'Vous', '62')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien dépensez-vous par année ?')
+  await page.getByRole('button', { name: 'Estimer : 60 % du revenu brut' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.spending.retiredToday).toBe(54_000)
+  expect((await savedProfile(page)).confirmed).toEqual(['self:salary'])
+  await fill(page, 'Dépenses par année', '48000')
+  await expect.poll(async () => (await savedProfile(page)).confirmed.sort()).toEqual(['household:spendingRetired', 'household:spendingWorking', 'self:salary'])
 })

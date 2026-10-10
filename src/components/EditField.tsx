@@ -27,6 +27,10 @@ export interface EditFieldProps {
   commitOnBlur?: boolean
   /** Plain focus-out notification, for a host that parses the text itself. */
   onBlur?: () => void
+  /** Focus-in notification. */
+  onFocus?: () => void
+  /** Select the whole text on focus, so the first keystroke REPLACES it instead of landing beside it (a number box). */
+  selectOnFocus?: boolean
   /** Renders a compact ✕ cancel at the row end. */
   onCancel?: () => void
   /** Inline ✕ inside the box while the value is non-empty. Default true. */
@@ -71,6 +75,8 @@ export function EditField({
   submitIcon = 'check-bold',
   commitOnBlur = false,
   onBlur,
+  onFocus,
+  selectOnFocus = false,
   onCancel,
   clearable = true,
   leadingIcon,
@@ -98,6 +104,7 @@ export function EditField({
   // is not; `block: 'nearest'` means an already-visible field never moves.
   useEffect(() => (autoFocus ? revealOnOpen(inputRef.current) : undefined), [autoFocus])
   const isForm = as === 'form'
+  const justFocused = useRef(false)
 
   const commit = () => {
     if (!onSubmit || disabled) return
@@ -128,6 +135,7 @@ export function EditField({
   // hops to the cancel button in the SAME field (which would commit-then-cancel).
   const handleBlur = (e: React.FocusEvent) => {
     onBlur?.()
+    justFocused.current = false
     if (!commitOnBlur || !value.trim()) return
     const next = e.relatedTarget as Node | null
     if (next && e.currentTarget.closest('.edit-field')?.contains(next)) return
@@ -152,6 +160,18 @@ export function EditField({
     value,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(e.target.value),
     onBlur: handleBlur,
+    onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      onFocus?.()
+      if (selectOnFocus) {
+        e.currentTarget.select()
+        justFocused.current = true
+      }
+    },
+    // The mouse-up of the click that focused the box would drop the caret and undo the selection: swallow that one.
+    onMouseUp: (e: React.MouseEvent) => {
+      if (justFocused.current) e.preventDefault()
+      justFocused.current = false
+    },
     placeholder,
     // The placeholder names the box only when nothing else can: a box with an `id` has a <label for> pointing at it,
     // and an aria-label would silence that label (« Année de naissance » read as « ex. 1975 » to a screen reader).
