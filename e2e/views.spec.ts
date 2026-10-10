@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { seedProfile } from './seed'
 
-// Résultats is five views of one plan — Réponse · Ajuster · Stratégies · Avenir · Vérifier — and its map of sections shows every chip whole.
+// Résultats is five views of one plan — Réponse · Ajuster · Stratégies · Avenir · Vérifier — and its map of sections is one line that scrolls (e2e/map-line.spec.ts).
 
 test.beforeEach(async ({ page }) => seedProfile(page))
 
@@ -40,16 +40,3 @@ test('« Comment lire cette page ? » is closed until it is asked for, then says
   await expect(page.getByText('le plus tôt où l’argent dure jusqu’à la fin du plan')).toHaveCount(0)
 })
 
-test('on a phone the map of sections wraps: every chip is whole and inside the screen', async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/resultats?v=verify')
-  const chips = page.locator('.section-nav .chip')
-  await expect(chips).toHaveCount(5)
-  for (let i = 0; i < 5; i++) {
-    const box = (await chips.nth(i).boundingBox())!
-    expect(box.x, `chip ${i} left`).toBeGreaterThanOrEqual(0)
-    expect(box.x + box.width, `chip ${i} right`).toBeLessThanOrEqual(360)
-    // not clipped: the text is not wider than the chip that holds it
-    expect(await chips.nth(i).evaluate((el) => el.scrollWidth <= el.clientWidth + 1), `chip ${i} text fits`).toBe(true)
-  }
-})
