@@ -409,7 +409,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
         <Link className="btn btn--sm btn--ghost" to="/donnees">
           {c.example}
         </Link>
-        <Link className="btn btn--sm btn--ghost" to="/documents">
+        <Link className="btn btn--sm btn--ghost" to="/profil?form=1&par=document&etape=gather">
           {DOCUMENTS_COPY[lang].link}
         </Link>
         {step !== 'done' && (

@@ -86,7 +86,7 @@ export function Glossaire() {
             </li>
           ))}
         </ul>
-        <Chip to="/documents" icon="identification-card-bold">
+        <Chip to="/profil?form=1&par=document&etape=gather" icon="identification-card-bold">
           {DOCUMENTS_COPY[lang].link}
         </Chip>
       </Section>

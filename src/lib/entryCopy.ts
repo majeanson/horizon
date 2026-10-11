@@ -1,11 +1,15 @@
 import type { Lang } from '../i18n.ts'
 
-// THE WORDS OF « SAISIE PAR DOCUMENT ». The documents' own names, what each is for and where to find it are the profile guide's (lib/guideCopy.ts).
+// THE WORDS OF « PAR DOCUMENT » (the second way to fill Profil). The documents' own names, what each is for and where to find it are the profile guide's (lib/guideCopy.ts).
 
 export interface EntryCopy {
   title: string
   subtitle: string
   intro: string
+  /** The first step of « Par document »: the list of what to gather (it was the Documents page). */
+  gatherTitle: string
+  /** The switch on Profil: the two ways to fill the same profile. */
+  modes: { label: string; topic: string; doc: string }
   youTitle: string
   youHint: string
   stepOf: (n: number, total: number) => string
@@ -31,6 +35,8 @@ const FR: EntryCopy = {
   title: 'Saisie par document',
   subtitle: 'Un document à la fois : ouvrez-le, tapez ce qu’il contient, confirmez, passez au suivant.',
   intro: 'Chaque étape ne montre que les chiffres du document en main, pour vous et votre partenaire côte à côte. Tout s’enregistre à mesure, sur cet appareil ; vous pouvez partir et revenir.',
+  gatherTitle: 'Rassembler',
+  modes: { label: 'Façon de remplir le profil', topic: 'Par sujet', doc: 'Par document' },
   youTitle: 'Vous et votre ménage',
   youHint: 'Qui est dans le ménage, la naissance de chacun et l’âge de retraite visé : rien à lire sur un document.',
   stepOf: (n, total) => `Étape ${n} sur ${total}`,
@@ -56,6 +62,8 @@ const EN: EntryCopy = {
   title: 'Entry by document',
   subtitle: 'One document at a time: open it, type what it holds, confirm, move on.',
   intro: 'Each step shows only the figures of the document in hand, for you and your partner side by side. Everything is saved as you go, on this device; you can leave and come back.',
+  gatherTitle: 'Gather',
+  modes: { label: 'Way to fill the profile', topic: 'By topic', doc: 'By document' },
   youTitle: 'You and your household',
   youHint: 'Who is in the household, everyone’s birth and the retirement age you aim for: nothing to read off a document.',
   stepOf: (n, total) => `Step ${n} of ${total}`,

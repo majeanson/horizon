@@ -23,13 +23,14 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
   const nav = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    // The marked chip is the topmost section currently on screen — watched, not computed on scroll.
+    // The marked chip is the LAST section (in reading order) that touches the reading band — watched, not computed on scroll. A tall section still
+    // crossing the band from above must not outrank the one the reader just scrolled to or tapped.
     const seen = new Map<string, boolean>()
     const order = ids.split('|')
     const observer = new IntersectionObserver(
       (entries) => {
         for (const e of entries) seen.set(e.target.id, e.isIntersecting)
-        setInView(order.find((id) => seen.get(id)) ?? null)
+        setInView([...order].reverse().find((id) => seen.get(id)) ?? null)
       },
       { rootMargin: '-15% 0px -60% 0px' },
     )

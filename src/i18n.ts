@@ -90,6 +90,8 @@ export const FR = {
     title: 'Profil',
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
     welcome: { title: 'Pour commencer' },
+    /** The page's map: one short noun per block of the form (the people's chips carry their own names). */
+    nav: { label: 'Sections du profil', family: 'Famille', situation: 'Situation', budget: 'Budget', home: 'Maison', events: 'Événements', exact: 'Précision' },
     self: 'Moi',
     spouse: 'Partenaire',
     budget: {

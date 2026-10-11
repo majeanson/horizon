@@ -49,8 +49,8 @@ test('with a bad start chosen, the results page still answers', async ({ page })
   await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)|ne tient pas|Aucun âge/)).toBeVisible()
 })
 
-test('the verdict shows the earliest age under a hard market, beside « Lisse »', async ({ page }) => {
-  await page.goto('/resultats')
+test('« Vérifier » shows the earliest age under a hard market, beside « Lisse »', async ({ page }) => {
+  await page.goto('/resultats?v=verify')
   await expect(page.getByText('Si les marchés tournent mal')).toBeVisible()
   const smooth = page.locator('.verdict__range-item', { hasText: 'Lisse' })
   const bad = page.locator('.verdict__range-item', { hasText: 'Mauvais départ' })
@@ -64,7 +64,7 @@ test('the verdict says what the age can fund each month, beside what is planned'
   await expect(page.getByText(/peut financer jusqu’à .* par mois \(après impôt\) — vous prévoyez/)).toBeVisible()
 })
 
-test('« Ajuster » ranks what moves the answer most, each lever with its age', async ({ page }) => {
+test('« Essayer » ranks what moves the answer most, each lever with its age', async ({ page }) => {
   await page.goto('/resultats?v=adjust')
   await expect(page.getByText('Ce qui change le plus')).toBeVisible()
   const items = page.locator('.levers__item')

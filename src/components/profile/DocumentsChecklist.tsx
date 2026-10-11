@@ -1,23 +1,22 @@
 import { Link } from 'react-router-dom'
-import { Chip } from '../components/Chip'
-import { Cluster } from '../components/Layout'
-import { NextStep } from '../components/NextStep'
-import { PageHead } from '../components/PageHead'
-import { useLang, useT } from '../i18n'
-import { DOCUMENTS_COPY } from '../lib/documentsCopy'
-import { documentItems, documentsText } from '../lib/documentsList'
-import { clearTicks, toggleTick, useTicks } from '../lib/documentsTicks'
-import { saveAsFile } from '../lib/download'
-import { GUIDE_COPY } from '../lib/guideCopy'
-import { docApplies, useYes } from '../lib/situation'
-import { useProfile } from '../lib/store'
-import { useNotice } from '../lib/toast'
-import type { DocId } from '../lib/facts'
+import { Chip } from '../Chip'
+import { Cluster } from '../Layout'
+import { useLang, useT } from '../../i18n'
+import { DOCUMENTS_COPY } from '../../lib/documentsCopy'
+import { ENTRY_COPY } from '../../lib/entryCopy'
+import { documentItems, documentsText } from '../../lib/documentsList'
+import { clearTicks, toggleTick, useTicks } from '../../lib/documentsTicks'
+import { saveAsFile } from '../../lib/download'
+import { GUIDE_COPY } from '../../lib/guideCopy'
+import { docApplies, useYes } from '../../lib/situation'
+import { useProfile } from '../../lib/store'
+import { useNotice } from '../../lib/toast'
+import type { DocId } from '../../lib/facts'
 
-// « Documents à rassembler » — what a full profile is typed from, as a list to work through BEFORE typing: tick what is in hand, print it or download it
+// « Rassembler » — the first step of « Par document »: what a full profile is typed from, as a list to work through BEFORE typing: tick what is in hand, print it or download it
 // as a text file, go and find the rest, come back later (offline too: the page is part of the installed app, and a tick is kept on this device).
 // Each document says who it is for, what is read off it (the figures Profil will ask for), where it comes from, and the official page when there is one.
-export function Documents() {
+export function DocumentsChecklist({ onNext }: { onNext: () => void }) {
   const t = useT()
   const { lang } = useLang()
   const c = DOCUMENTS_COPY[lang]
@@ -73,8 +72,8 @@ export function Documents() {
           )
         }
   return (
-    <section className="page-body docs-page">
-      <PageHead title={c.title} subtitle={c.subtitle} />
+    <section className="docs-page" aria-label={c.title}>
+      <h2 className="saisie__title">{c.title}</h2>
       <p className="docs-page__intro">{c.intro}</p>
       <p className="docs-page__intro">{c.rankNote}</p>
       <Cluster className="no-print">
@@ -108,13 +107,9 @@ export function Documents() {
       <p className="field-row__hint no-print">
         {c.glossaryNote} <Link to="/glossaire#documents">{c.glossaryLink}</Link>.
       </p>
-      <NextStep to="/saisie" label={c.entry}>
-        <p>{c.next}</p>
-        <p>{c.entryHint}</p>
-        <p>
-          <Link to="/profil">{c.nextGo}</Link>
-        </p>
-      </NextStep>
+      <Cluster className="saisie__nav" justify="end">
+        <Chip onClick={onNext}>{ENTRY_COPY[lang].next}</Chip>
+      </Cluster>
     </section>
   )
 }

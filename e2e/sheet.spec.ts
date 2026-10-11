@@ -129,7 +129,7 @@ test('the quests lead somewhere: the last one is the plan’s own « this year �
   await page.goto('/fiche')
   await settled(page)
   const quests = page.locator('.sheet__quest a')
-  await expect(quests.last()).toHaveAttribute('href', '/resultats?v=future')
+  await expect(quests.last()).toHaveAttribute('href', '/resultats')
   await expect(page.locator('.sheet__quest', { hasText: 'Confirmer' })).toBeVisible()
 })
 

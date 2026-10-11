@@ -88,7 +88,7 @@ test('the documents list and the entry by document keep only what the household 
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await page.goto('/documents')
   await expect(page.locator('.docs-item')).toHaveCount(5)
-  await expect(page.getByText('Relevé de votre régime de retraite')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Relevé de votre régime de retraite' })).toBeVisible()
 })
 
 test('the proof of residence is asked only of someone who lived abroad', async ({ page }) => {
@@ -116,14 +116,13 @@ test('« Ma situation » is one of the first things on the page: right after who
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
   await expect(section(page, 'Ma situation')).toBeVisible()
-  // document order of the page's landmarks: who → what applies → the housekeeping (backup, doors, accuracy) → the sections the answers decide
+  // document order of the page's landmarks: who → what applies → the housekeeping (backup, accuracy) → the sections the answers decide
   const order = await page.evaluate(() => {
     const at = (el: Element | null) => (el === null ? -1 : [...document.querySelectorAll('*')].indexOf(el))
     const heading = (text: string) => [...document.querySelectorAll('h2, h3')].find((h) => h.textContent?.trim() === text) ?? null
     return {
       family: at(heading('Famille')),
       situation: at(document.getElementById('situation')),
-      doors: at(document.querySelector('.rail')),
       accuracy: at(document.querySelector('.accuracy-line')),
       budget: at(heading('Budget')),
       person: at(document.getElementById('person-self')),
@@ -131,7 +130,6 @@ test('« Ma situation » is one of the first things on the page: right after who
   })
   for (const [name, v] of Object.entries(order)) expect(v, name).toBeGreaterThan(-1)
   expect(order.family).toBeLessThan(order.situation)
-  expect(order.situation).toBeLessThan(order.doors)
   expect(order.situation).toBeLessThan(order.accuracy)
   expect(order.situation).toBeLessThan(order.budget)
   expect(order.situation).toBeLessThan(order.person)

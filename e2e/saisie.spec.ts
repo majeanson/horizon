@@ -1,16 +1,17 @@
 import { expect, test } from '@playwright/test'
 import { savedProfile, seedProfile, showAllSections } from './seed'
 
-// « Saisie par document »: the profile typed one document at a time. Same fields, same store — gathered in the order the papers are held.
+// « Par document » (the second way to fill Profil; it was the Saisie page): the profile typed one document at a time. Same fields, same store — gathered in the order the papers are held.
 
 test.beforeEach(async ({ page }) => seedProfile(page))
 
 test('seven steps, the first about the household, and the step is in the address', async ({ page }) => {
   await showAllSections(page) // every « oui » to « Ma situation »: the employer's statement and the proof of residence are steps for those who have them
   await page.goto('/saisie')
-  await expect(page.getByRole('heading', { name: 'Saisie par document', level: 1 })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Par document' })).toHaveAttribute('aria-selected', 'true') // the old /saisie address lands here
+  await expect(page).toHaveURL(/par=document/)
   const nav = page.getByRole('navigation', { name: 'Les étapes de la saisie' })
-  await expect(nav.getByRole('button')).toHaveCount(7) // the example owns no home
+  await expect(nav.getByRole('button')).toHaveCount(8) // « Rassembler » + seven steps (the example owns no home)
   await expect(page.getByText('Étape 1 sur 7')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Vous et votre ménage', level: 2 })).toBeVisible()
   await page.getByRole('button', { name: 'Suivant' }).click()
@@ -84,11 +85,12 @@ test('a document never ticked in the checklist says so; a ticked one does not', 
   await expect(page.getByText('Vous n’avez pas coché ce document dans la liste')).toHaveCount(0)
 })
 
-test('the last step leads to the result, and the checklist leads here', async ({ page }) => {
+test('the last step leads to the result, and the checklist leads to the first step', async ({ page }) => {
   await page.goto('/saisie?etape=residence')
   await page.getByRole('button', { name: 'Terminer et voir le résultat' }).click()
   await expect(page).toHaveURL(/\/resultats/)
   await page.goto('/documents')
-  await page.getByRole('link', { name: 'Saisie par document' }).first().click()
-  await expect(page).toHaveURL(/\/saisie/)
+  await expect(page.getByRole('heading', { name: 'Documents à rassembler', level: 2 })).toBeVisible()
+  await page.getByRole('button', { name: 'Suivant' }).click()
+  await expect(page.getByText(/Étape 1 sur/)).toBeVisible()
 })

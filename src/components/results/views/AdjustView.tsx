@@ -1,3 +1,5 @@
+import { lazy, Suspense } from 'react'
+import { Skeleton } from '../../Skeleton'
 import { SaveView } from '../SaveView'
 import { SpendView } from '../SpendView'
 import { SectionHeader } from '../../SectionHeader'
@@ -5,7 +7,9 @@ import { formatCompactMoney } from '../../../lib/money'
 import { MAX_AGE } from '../../../lib/resultsModel'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 
-// The « adjust » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
+const CareSection = lazy(() => import('./CareSection').then((m) => ({ default: m.CareSection })))
+
+// The « adjust » view (« Essayer ») of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AdjustView({ m }: { m: ResultsModel }) {
   const { lang, rc, profile, retiredNow, assumptions, setParam, firstAge, earliest, nowOk, lc, levers, saveAge, spend } = m
   return (
@@ -58,6 +62,10 @@ export function AdjustView({ m }: { m: ResultsModel }) {
                 <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />
               </section>
             )}
+            {/* The one what-if about LIFE rather than the plan: the last years costing more (a care). It was the « Avenir » view; it is a thing to try, so it sits with the others. */}
+            <Suspense fallback={<Skeleton count={3} />}>
+              <CareSection m={m} />
+            </Suspense>
         </section>
     </>
   )

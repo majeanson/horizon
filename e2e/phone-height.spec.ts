@@ -66,10 +66,10 @@ test('a wide screen keeps the title of Résultats where it was', async ({ page }
   expect((await page.locator('.results-page > .page-head').boundingBox())!.height).toBeGreaterThan(20)
 })
 
-test('Profil: the two door links under the title are one line that scrolls, not two stacked pills', async ({ page }) => {
+test('Profil: the two ways to fill it are ONE switch under the title, on one line, not two stacked pills', async ({ page }) => {
   await page.goto('/profil')
-  const chips = page.locator('.rail .chip', { hasText: /Documents à rassembler|Saisie par document/ })
-  await expect(chips).toHaveCount(2)
-  const tops = await chips.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)))
+  const tabs = page.getByRole('tablist', { name: 'Façon de remplir le profil' }).getByRole('tab')
+  await expect(tabs).toHaveText(['Par sujet', 'Par document'])
+  const tops = await tabs.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)))
   expect(Math.abs(tops[0] - tops[1])).toBeLessThanOrEqual(2)
 })

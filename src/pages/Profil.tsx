@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { BudgetSection } from '../components/profile/BudgetSection'
@@ -9,13 +9,14 @@ import { AccountsSection, OasSection } from '../components/profile/OasAccountsSe
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
 import { BackupLine } from '../components/profile/BackupLine'
-import { DOCUMENTS_COPY } from '../lib/documentsCopy'
+import { ProfileMap } from '../components/profile/ProfileMap'
+import { ENTRY_COPY } from '../lib/entryCopy'
 import { Chip } from '../components/Chip'
 import { LiveAnswer } from '../components/LiveAnswer'
-import { Rail } from '../components/Layout'
 import { Loading } from '../components/Loading'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
+import { SubTabs } from '../components/SubTabs'
 import { SectionLevel } from '../components/SectionHeader'
 import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
@@ -28,6 +29,7 @@ import { profileGaps } from '../lib/profileGaps'
 import { applies, useYes } from '../lib/situation'
 import { updateProfile, useProfile } from '../lib/store'
 
+const EntryByDocument = lazy(() => import('../components/profile/EntryByDocument'))
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
 const Onboarding = lazy(() => import('../components/Onboarding'))
 const LevelPicker = lazy(() => import('../components/profile/LevelPicker'))
@@ -52,6 +54,21 @@ export function Profil() {
   // committing the last number (Enter or blur — possibly in a field inside the card) swaps its
   // content to « c'est assez » instead of yanking the card, and the focus with it, out of the page.
   const [welcome] = useState(gaps.length > 0)
+  const page = useRef<HTMLElement>(null)
+  // Two ways to fill the SAME profile: by topic (the form below) or by document (one paper at a time, the first step being the list of what to gather). The address keeps it.
+  const byDoc = params.get('par') === 'document'
+  const entry = ENTRY_COPY[lang]
+  const setMode = (mode: 'topic' | 'doc') =>
+    setParams(
+      () => {
+        const next = new URLSearchParams(window.location.search)
+        next.delete('etape')
+        if (mode === 'doc') next.set('par', 'document')
+        else next.delete('par')
+        return next
+      },
+      { replace: false },
+    )
 
   // Old deep links named one person (`?person=spouse`); both are on the page now, so the link
   // becomes a scroll to that column, and the key is dropped from the address.
@@ -116,23 +133,38 @@ export function Profil() {
   }
 
   return (
-    <section className="page-body">
+    <section className="page-body" ref={page}>
       <LiveAnswer />
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
+      <SubTabs
+        ariaLabel={entry.modes.label}
+        value={byDoc ? 'doc' : 'topic'}
+        onSelect={setMode}
+        options={[
+          { key: 'topic' as const, label: entry.modes.topic },
+          { key: 'doc' as const, label: entry.modes.doc },
+        ]}
+      />
+      {byDoc ? (
+        <Suspense fallback={<Loading />}>
+          <EntryByDocument />
+        </Suspense>
+      ) : (
+        <>
+      {/* A couple's profile is twenty screens on a phone: the map says where each block is, and which one the reader is in. */}
+      <ProfileMap
+        page={page}
+        people={profile.household.persons.map((p, i) => ({ id: p.id, name: p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse) }))}
+        withHome={applies(profile, yes, 'home')}
+        withEvents={applies(profile, yes, 'events')}
+        withExact={acc.total > 0}
+      />
       {/* First the household (who), then « Ma situation » (what applies to it): the questions answered here decide which sections of everything below are shown, so they come before it. */}
       <FamilySection withKids={applies(profile, yes, 'kids')} />
       {/* « Ma situation »: a few yes / no questions that decide which sections below are shown. */}
       <Suspense fallback={null}>
         <SituationCard />
       </Suspense>
-      <Rail>
-        <Chip to="/documents" icon="identification-card-bold">
-          {DOCUMENTS_COPY[lang].link}
-        </Chip>
-        <Chip to="/saisie" icon="pencil-simple-bold">
-          {DOCUMENTS_COPY[lang].entry}
-        </Chip>
-      </Rail>
       {/* One line: how much of the profile stands on documents, and the door to the section that makes it exact. */}
       {acc.total > 0 && (
         <div className="accuracy-line">
@@ -186,6 +218,8 @@ export function Profil() {
           </>
         )}
       </NextStep>
+        </>
+      )}
     </section>
   )
 }

@@ -150,6 +150,11 @@ export function Donnees() {
 
       <PlansSection onReplace={setPrevious} />
 
+      {/* The settings a person comes here for sit above the long list of examples (a try-out, used once). */}
+      <DisplaySection />
+
+      <InstallLine />
+
       <Section title={d.example.title} subtitle={d.example.hint} icon="user-bold">
         <ul className="example-list">
           {EXAMPLE_IDS.map((id: ExampleId) => (
@@ -172,10 +177,6 @@ export function Donnees() {
           ))}
         </ul>
       </Section>
-
-      <DisplaySection />
-
-      <InstallLine />
 
       <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold">
         <Cluster>

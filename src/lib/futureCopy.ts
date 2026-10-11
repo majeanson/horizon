@@ -50,9 +50,6 @@ export interface FutureCopy {
     leverTitle: string
     leverNone: string
     leverPending: string
-    confirmTitle: string
-    confirmNone: string
-    confirmPending: string
     moreTitle: string
     pensions: string
   }
@@ -96,9 +93,6 @@ const FR: FutureCopy = {
     leverTitle: 'Le changement qui avance le plus',
     leverNone: 'Aucun des changements essayés n’avance l’âge de votre réponse.',
     leverPending: 'Calcul en cours…',
-    confirmTitle: 'Le chiffre à confirmer d’abord',
-    confirmNone: 'Aucun chiffre non confirmé ne déplace la réponse.',
-    confirmPending: 'Calcul en cours…',
     moreTitle: 'Deux décisions à regarder',
     pensions: 'Quand commencer la RRQ et la PSV ?',
   },
@@ -138,13 +132,10 @@ const EN: FutureCopy = {
   },
   year: {
     title: 'To do this year',
-    hint: 'Two things your plan points at, not advice: the change that brings the age forward most, and the figure to confirm first.',
+    hint: 'What your plan points at, not advice: the change that brings the age forward most, and the two decisions that have their own page.',
     leverTitle: 'The change that brings the age forward most',
     leverNone: 'None of the changes tried brings your answer’s age forward.',
     leverPending: 'Working it out…',
-    confirmTitle: 'The figure to confirm first',
-    confirmNone: 'No unconfirmed figure moves the answer.',
-    confirmPending: 'Working it out…',
     moreTitle: 'Two decisions to look at',
     pensions: 'When should I start the QPP and the OAS?',
   },

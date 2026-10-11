@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip } from '../../Chip'
 import { Cluster, Rail } from '../../Layout'
@@ -9,17 +10,20 @@ import { TimelineStrip } from '../TimelineStrip'
 import { EarliestEachPanel } from '../EarliestEachPanel'
 import { PlansCompare } from '../PlansCompare'
 import { SectionHeader } from '../../SectionHeader'
+
 import { Skeleton } from '../../Skeleton'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
-import { STRESS_PRESETS } from '../../../lib/marketRange'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 
+// « À faire cette année » rides with the care copy, outside the page's own chunk.
+const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m.YearSection })))
+
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AnswerView({ m }: { m: ResultsModel }) {
-  const { vintage, t, lang, r, rc, profile, slow, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, range, stress, mc, firstSearchesIn, impact, factName, movers, pathName, prudentGap, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
+  const { vintage, t, lang, r, rc, profile, slow, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
       {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
@@ -110,51 +114,6 @@ export function AnswerView({ m }: { m: ResultsModel }) {
           {!answerPending && gaps.length === 0 && <TimelineStrip household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />}
           {!answerPending && gaps.length === 0 && <HowToRead />}
           {!answerPending && gaps.length === 0 && !retiredNow && <LevelRange profile={slow} enabled={answered && firstSearchesIn} />}
-
-          {/* How firm the answer is: the same plan under the three scenarios and a hard market side by side, then what would move it. Rows from the first paint. */}
-          {!retiredNow && (
-            <div id="solidite" className="surface results-section firm" aria-label={rc.headline.firmTitle}>
-              <SectionHeader title={rc.headline.firmTitle} />
-              <div className="firm__pair">
-                <div className="verdict__range">
-                <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
-                <dl className="verdict__range-list">
-                  {(['prudent', 'neutral', 'bold'] as const).map((k) => (
-                    <div key={k} className={'verdict__range-item' + (activePreset === k ? ' is-on' : '')}>
-                      <dt>{t.assumptions.presets[k]}</dt>
-                      <dd className="mono">{range === undefined ? '…' : range[k] === null ? rc.headline.rangeNone(MAX_AGE) : rc.headline.rangeAge(range[k]!)}</dd>
-                    </div>
-                  ))}
-                </dl>
-                {range !== undefined && prudentGap && (
-                  <Cluster className="verdict__gap">
-                    <p className="verdict__note">{rc.headline.rangeGap}</p>
-                    <Chip onClick={() => goTo('verify', 'sensibilite')}>{rc.headline.trySensitivity}</Chip>
-                  </Cluster>
-                )}
-              </div>
-              {/* The same plan under a hard stretch of markets: the order of the years, said where the answer is read. */}
-              <div className="verdict__range">
-                <p className="verdict__range-title">{mc.stress.title}</p>
-                <dl className="verdict__range-list">
-                  {(['smooth', ...STRESS_PRESETS] as const).map((k) => (
-                    <div key={k} className={'verdict__range-item' + (pathName === k ? ' is-on' : '')}>
-                      <dt>{mc.path.names[k]}</dt>
-                      <dd className="mono">{stress === undefined ? '…' : stress[k] === null ? mc.stress.none(MAX_AGE) : mc.stress.age(stress[k]!)}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="verdict__note">
-                  {pathName !== 'smooth' && <>{mc.stress.active(mc.path.names[pathName])} </>}
-                  {mc.stress.hint}{' '}
-                  <Link className="info-note__link" to="/hypotheses">
-                    {mc.stress.link}
-                  </Link>
-                </p>
-              </div>
-                </div>
-            </div>
-          )}
 
           {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
               is ONE section: the same runs, seen as cards, as a picture, and per person. */}
@@ -268,6 +227,9 @@ export function AnswerView({ m }: { m: ResultsModel }) {
             </div>
           )}
 
+          <Suspense fallback={null}>
+            <YearSection m={m} />
+          </Suspense>
         </section>
     </>
   )

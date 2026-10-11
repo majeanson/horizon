@@ -117,7 +117,7 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible({ timeout: 30_000 })
 })
 
-test('planner: a life to plan — the profile carries its events, the answer moves with them, and the Avenir view knows the care is already there', async ({ page }) => {
+test('planner: a life to plan — the profile carries its events, the answer moves with them, and the Essayer view knows the care is already there', async ({ page }) => {
   await loadExample(page, 'Couple, une vie à planifier')
   await expect(page.locator('.verdict__line')).toContainText('56 ans')
   // the profile says it: a child to come, a part-time work, an inheritance and a care cost among the dated events
@@ -125,7 +125,7 @@ test('planner: a life to plan — the profile carries its events, the answer mov
   await expect(page.locator('.flow__line', { hasText: 'Un héritage' })).toBeVisible()
   await expect(page.locator('.flow__line', { hasText: 'Des soins plus tard' })).toBeVisible()
   // the care what-if sits on top of the care the household already counts, and says so
-  await page.goto('/resultats?v=future')
+  await page.goto('/resultats?v=adjust')
   await expect(page.locator('#soins')).toContainText('déjà dans vos événements', { timeout: 30_000 })
 })
 

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { FirmSection } from './FirmSection'
 import { LedgerPanel } from '../LedgerPanel'
 import { ParamsPanel } from '../ParamsPanel'
 import { SectionHeader } from '../../SectionHeader'
@@ -24,6 +25,9 @@ export function VerifyView({ m }: { m: ResultsModel }) {
               <AccuracyNote onSeeFigures={() => scrollTo('parametres')} />
             </Suspense>
           </section>
+
+          {/* How firm the answer is: the same plan under the three scenarios and a hard market — a check, so it lives here. */}
+          <FirmSection m={m} />
 
           {/* The ages and figures that set the answer, with their calculation and a slider each. */}
           <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>

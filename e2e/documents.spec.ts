@@ -8,7 +8,7 @@ test('the list names every document, per person where each has their own, and a 
   await seedProfile(page)
   await showAllSections(page) // every « oui » to « Ma situation »: the employer's statement and the proof of residence are for those who have them
   await page.goto('/documents')
-  await expect(page.getByRole('heading', { name: 'Documents à rassembler', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Documents à rassembler', level: 2 })).toBeVisible()
   const items = page.locator('.docs-item')
   await expect(items).toHaveCount(11) // the example is a couple: five documents each + the budget (it owns no home)
   await expect(page.getByText('0 sur 11 rassemblés')).toBeVisible()
@@ -55,14 +55,19 @@ test('the list downloads as a text file that carries the ticks, and prints witho
   await expect(page.locator('.docs-item').first()).toBeVisible()
 })
 
-test('a first-time user finds it on the first screen, and everyone finds it on Profil and in the glossary', async ({ page }) => {
+test('a first-time user finds it on the first screen, everyone finds it as the first step of « Par document », and in the glossary', async ({ page }) => {
   await seedProfile(page, blankSeed())
   await page.goto('/profil')
   await page.getByRole('link', { name: 'Documents à rassembler' }).click()
-  await expect(page).toHaveURL(/\/documents$/)
+  await expect(page).toHaveURL(/par=document&etape=gather/)
   await expect(page.locator('.docs-item')).toHaveCount(4) // one person alone, with nothing to say: the budget, the tax notice, the accounts and the QPP statement
   await page.goto('/profil?form=1')
-  await expect(page.getByRole('link', { name: 'Documents à rassembler' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Par document' }).click()
+  await page.getByRole('button', { name: 'Rassembler' }).click()
+  await expect(page.getByRole('heading', { name: 'Documents à rassembler', level: 2 })).toBeVisible()
+  // the old address still works, and lands on the same step
+  await page.goto('/documents')
+  await expect(page).toHaveURL(/par=document&etape=gather/)
   await page.goto('/glossaire')
   await expect(page.getByRole('link', { name: 'Documents à rassembler' })).toBeVisible()
 })
@@ -71,6 +76,6 @@ test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page)
   await page.goto('/documents')
-  await expect(page.getByRole('heading', { name: 'Documents to gather', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Documents to gather', level: 2 })).toBeVisible()
   await expect(page.getByText('0 of 8 gathered')).toBeVisible()
 })

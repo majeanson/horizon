@@ -114,8 +114,8 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9)
   // …and the verdict's own range line reads prudent ≥ neutre ≥ audacieux (a more prudent future never retires earlier)
   // — the ONE place the three scenarios' ages are written; the grids detail it.
-  await page.getByRole('tab', { name: 'Réponse' }).click()
-  const range = page.locator('.verdict__range').first()
+  // (« Solidité » sits above the grids in the same view.)
+  const range = page.locator('#solidite .verdict__range').first()
   await expect(range).toContainText('Selon le scénario')
   for (const name of ['Prudent', 'Neutre', 'Audacieux']) await expect(range.locator('dt', { hasText: name })).toBeVisible()
   // The three boxes are on the card from the first paint and FILL (no late paragraph growing the card).

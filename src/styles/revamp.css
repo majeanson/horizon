@@ -1668,3 +1668,17 @@
   font-size: var(--text-sm);
   color: var(--warn);
 }
+
+/* ── Profil: a pinned map of the form ─────────────────────────────────────────────────────────────────────────── */
+/* The map sticks under « Votre réponse » (ProfileMap measures that strip into --live-h); a tapped block stops below both. */
+/* The wrapper must not box the map: a sticky child only travels inside its parent. */
+.profile-map {
+  display: contents;
+}
+.profile-map .section-nav {
+  top: calc(var(--bar-h) + var(--live-h, 0px));
+}
+.page-body:has(.profile-map) .profile-section[id],
+.page-body:has(.profile-map) .person[id] {
+  scroll-margin-top: calc(var(--bar-h) + var(--live-h, 0px) + var(--map-h, 3rem) + 0.75rem);
+}

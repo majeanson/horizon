@@ -142,7 +142,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
       text = words.quests.room(words.quests.account[q.room!.kind], money(q.room!.amount)) + who
     } else {
       text = words.quests.plan
-      to = '/resultats?v=future'
+      to = '/resultats'
     }
     return { key: `${q.id}-${i}`, text, to }
   })

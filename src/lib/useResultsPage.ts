@@ -38,7 +38,7 @@ import { today } from './today'
 // the comparisons the person has chosen, and the values the views read. It holds no JSX: the page (pages/Resultats.tsx) is the shell and each
 // view (components/results/views/*) draws from the one object this returns, so a view has no state of its own to keep in step.
 
-export type View = 'answer' | 'adjust' | 'strategies' | 'future' | 'verify'
+export type View = 'answer' | 'adjust' | 'strategies' | 'verify'
 
 export const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
@@ -125,13 +125,15 @@ export function useResultsPage() {
   const runs = gaps.length > 0 ? [] : (runsAnswer.value ?? [])
   const runsPending = gaps.length === 0 && runsAnswer.value === null
 
-  // Three jobs, one at a time (the address keeps it: `?v=strategies|verify`): get the answer · choose how to carry it out · check it.
-  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' ? 'adjust' : params.get('v') === 'future' ? 'future' : 'answer'
+  // Three jobs, one at a time (the address keeps it: `?v=adjust|strategies|verify`): get the answer · try changes · choose how to carry it out · check it.
+  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' || params.get('v') === 'future' ? 'adjust' : 'answer'
   // A view this page does not have (a typo, an old link) lands on the answer — and the ADDRESS follows, as the router's catch-all
   // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
   const rawView = params.get('v')
   useEffect(() => {
-    if (rawView !== null && rawView !== view) setParam('v', null)
+    // « Avenir » (`?v=future`) is gone: its care what-if is part of « Essayer », and the address follows.
+    if (rawView === 'future') setParam('v', 'adjust')
+    else if (rawView !== null && rawView !== view) setParam('v', null)
   }, [rawView, view, setParam])
 
   // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
@@ -279,15 +281,14 @@ export function useResultsPage() {
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse }, ...(retiredNow ? [] : [{ id: 'solidite', label: rc.nav.solidite }]), { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : [])]
+      ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : []), { id: 'annee', label: rc.nav.annee }]
       : view === 'adjust'
-        ? [...(retiredNow ? [] : [{ id: 'ajuster', label: rc.nav.ajuster }]), { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }])]
+        ? [...(retiredNow ? [] : [{ id: 'ajuster', label: rc.nav.ajuster }]), { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }]), { id: 'soins', label: rc.nav.soins }]
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
-        : view === 'future'
-          ? [{ id: 'soins', label: rc.nav.soins }, { id: 'annee', label: rc.nav.annee }]
         : [
             { id: 'precision', label: rc.nav.precision },
+            ...(retiredNow ? [] : [{ id: 'solidite', label: rc.nav.solidite }]),
             { id: 'sensibilite', label: rc.nav.sensibilite },
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },

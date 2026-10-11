@@ -6,6 +6,9 @@ import { docApplies } from './situation.ts'
 // each step showing only the figures that document holds. The steps are the profile's own documents (facts.ts), so a step can never ask for a figure the
 // profile does not use, and a figure the profile uses is always in some step (e2e/saisie.spec.ts walks them all against the full form).
 
+/** The step of « Par document » that is not a document: the list of what to gather, before typing (the address says `etape=gather`). */
+export const GATHER = 'gather'
+
 export type StepId = 'you' | DocId
 
 export interface Step {

@@ -1,31 +1,30 @@
 import { useEffect, type ReactNode, lazy, Suspense } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import type { Person } from '../engine/types'
-import { AboutSection } from '../components/profile/AboutSection'
-import { BudgetSection } from '../components/profile/BudgetSection'
-import { FamilySection } from '../components/profile/FamilySection'
-import { HomeSection } from '../components/profile/HomeSection'
-import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
-import { PensionPlans } from '../components/profile/PensionPlans'
-import { RrqSection } from '../components/profile/RrqSection'
-import { TaxFields } from '../components/profile/TaxFields'
-import type { PersonEditor } from '../components/profile/shared'
-import { Chip } from '../components/Chip'
-import { Cluster } from '../components/Layout'
-import { PageHead } from '../components/PageHead'
-import { StatusMessage } from '../components/StatusMessage'
-import { useLang, useT } from '../i18n'
-import { DOCUMENTS_COPY } from '../lib/documentsCopy'
-import { useTicks } from '../lib/documentsTicks'
-import { ENTRY_COPY } from '../lib/entryCopy'
-import { lastStep, rememberStep, stepById, stepFactIds, stepProgress, stepsFor, type Step } from '../lib/entrySteps'
-import { applies, useYes } from '../lib/situation'
-import { GUIDE_COPY } from '../lib/guideCopy'
-import { mapPerson, setFacts } from '../lib/profileEdit'
-import { updateProfile, useProfile } from '../lib/store'
-import type { DocId } from '../lib/facts'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import type { Person } from '../../engine/types'
+import { AboutSection } from './AboutSection'
+import { BudgetSection } from './BudgetSection'
+import { FamilySection } from './FamilySection'
+import { HomeSection } from './HomeSection'
+import { AccountsSection, OasSection } from './OasAccountsSections'
+import { PensionPlans } from './PensionPlans'
+import { RrqSection } from './RrqSection'
+import { TaxFields } from './TaxFields'
+import type { PersonEditor } from './shared'
+import { Chip } from '../Chip'
+import { Cluster, Rail } from '../Layout'
+import { DocumentsChecklist } from './DocumentsChecklist'
+import { StatusMessage } from '../StatusMessage'
+import { useLang, useT } from '../../i18n'
+import { useTicks } from '../../lib/documentsTicks'
+import { ENTRY_COPY } from '../../lib/entryCopy'
+import { GATHER, lastStep, rememberStep, stepById, stepFactIds, stepProgress, stepsFor, type Step } from '../../lib/entrySteps'
+import { applies, useYes } from '../../lib/situation'
+import { GUIDE_COPY } from '../../lib/guideCopy'
+import { mapPerson, setFacts } from '../../lib/profileEdit'
+import { updateProfile, useProfile } from '../../lib/store'
+import type { DocId } from '../../lib/facts'
 
-// « Saisie par document » — typing a full profile when the documents are in hand: ONE DOCUMENT AT A TIME, the step showing only the figures that
+// « Par document » — the second way to fill Profil (the first is by topic): typing a full profile when the documents are in hand: ONE DOCUMENT AT A TIME, the step showing only the figures that
 // document holds, for each person side by side, with a single tap to confirm them all. The fields are the profile's own (the same sections, the same
 // store, the same confirmation marks): this page only gathers them in the order a person holds the papers. The step lives in the address (`?etape=`) and
 // is remembered on this device, so a person can leave and come back.
@@ -81,9 +80,9 @@ function StepBody({ step }: { step: Step }) {
   }
 }
 
-const SituationCard = lazy(() => import('../components/profile/SituationCard'))
+const SituationCard = lazy(() => import('./SituationCard'))
 
-export function Saisie() {
+export default function EntryByDocument() {
   const t = useT()
   const { lang } = useLang()
   const c = ENTRY_COPY[lang]
@@ -93,6 +92,7 @@ export function Saisie() {
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const asked = params.get('etape')
+  const gather = asked === GATHER
   const step = stepById(asked)
   const yes = useYes()
   const steps = stepsFor(profile, yes, step.id)
@@ -124,8 +124,7 @@ export function Saisie() {
     )
 
   return (
-    <section className="page-body saisie">
-      <PageHead title={c.title} subtitle={c.subtitle} />
+    <section className="saisie" aria-label={c.title}>
       <p className="docs-page__intro">{c.intro}</p>
       {asked === null && saved !== null && saved !== 'you' && (
         <Cluster>
@@ -134,20 +133,27 @@ export function Saisie() {
         </Cluster>
       )}
       <nav className="saisie__steps" aria-label={c.nav}>
-        <Cluster>
+        <Rail>
+          <Chip current={gather} onClick={() => go(GATHER)}>
+            {c.gatherTitle}
+          </Chip>
           {steps.map((s, i) => {
             const p = stepProgress(s, profile)
             const done = p.total > 0 && p.confirmed === p.total
             return (
-              <Chip key={s.id} current={s.id === step.id} onClick={() => go(s.id)} ariaLabel={`${i + 1}. ${nameOf(s)}${done ? ' ✓' : ''}`}>
+              <Chip key={s.id} current={!gather && s.id === step.id} onClick={() => go(s.id)} ariaLabel={`${i + 1}. ${nameOf(s)}${done ? ' ✓' : ''}`}>
                 {i + 1}. {nameOf(s)}
                 {done ? ' ✓' : ''}
               </Chip>
             )
           })}
-        </Cluster>
+        </Rail>
       </nav>
 
+      {gather ? (
+        <DocumentsChecklist onNext={() => go(steps[0].id)} />
+      ) : (
+        <>
       <header className="saisie__head">
         <p className="field-row__hint">{c.stepOf(at + 1, total)}</p>
         <h2 className="saisie__title">{nameOf(step)}</h2>
@@ -181,7 +187,7 @@ export function Saisie() {
       )}
 
       <Cluster className="saisie__nav" justify="between">
-        <Chip disabled={at === 0} onClick={() => go(steps[Math.max(0, at - 1)].id)}>
+        <Chip onClick={() => go(at === 0 ? GATHER : steps[at - 1].id)}>
           {c.prev}
         </Chip>
         {at < total - 1 ? (
@@ -192,9 +198,8 @@ export function Saisie() {
           </button>
         )}
       </Cluster>
-      <p className="field-row__hint no-print">
-        <Link to="/documents">{DOCUMENTS_COPY[lang].link}</Link>
-      </p>
+        </>
+      )}
     </section>
   )
 }

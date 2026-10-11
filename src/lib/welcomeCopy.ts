@@ -34,7 +34,7 @@ const FR: WelcomeCopy = {
   facts: [
     { title: 'Tout reste sur cet appareil', text: 'Aucun compte, aucun serveur : vos chiffres ne quittent jamais votre appareil. Gardez une copie de sauvegarde.', link: 'Sauvegarde et réglages', to: '/donnees' },
     { title: 'Chaque chiffre a sa source', text: 'Les montants du gouvernement viennent d’une page officielle, citée, que n’importe qui peut vérifier.', link: 'Glossaire des sigles', to: '/glossaire' },
-    { title: 'Mieux vaut des documents en main', text: 'Le relevé de Retraite Québec et vos avis de cotisation rendent les chiffres exacts.', link: 'Documents à rassembler', to: '/documents' },
+    { title: 'Mieux vaut des documents en main', text: 'Le relevé de Retraite Québec et vos avis de cotisation rendent les chiffres exacts.', link: 'Documents à rassembler', to: '/profil?form=1&par=document&etape=gather' },
   ],
 }
 
@@ -55,7 +55,7 @@ const EN: WelcomeCopy = {
   facts: [
     { title: 'Everything stays on this device', text: 'No account, no server: your figures never leave your device. Keep a backup copy.', link: 'Backup and settings', to: '/donnees' },
     { title: 'Every figure has a source', text: 'Government amounts come from a cited official page that anyone can check.', link: 'Glossary of acronyms', to: '/glossaire' },
-    { title: 'Documents in hand help', text: 'The Retraite Québec statement and your notices of assessment make the figures exact.', link: 'Documents to gather', to: '/documents' },
+    { title: 'Documents in hand help', text: 'The Retraite Québec statement and your notices of assessment make the figures exact.', link: 'Documents to gather', to: '/profil?form=1&par=document&etape=gather' },
   ],
 }
 

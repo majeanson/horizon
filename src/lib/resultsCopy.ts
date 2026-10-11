@@ -43,7 +43,7 @@ const FR_RESULTS = {
   shortage: {
     from: (yearAge: string, column: string) => `L’argent manque dès ${yearAge} : les lignes en rouge sont les années où les dépenses ne sont pas couvertes (colonne « ${column} »).`,
   },
-  tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Ajuster', strategies: 'Stratégies', future: 'Avenir', verify: 'Vérifier' },
+  tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Essayer', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
     title: 'Dans quel ordre puiser ?',
     hint: (age: number) => `Votre plan, retraite à ${age} ans, refait avec chacun des six ordres de retrait des comptes. Les retraits sont recalculés année par année avec l’impôt, la RRQ, la PSV et le SRG.`,
@@ -244,7 +244,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   shortage: {
     from: (yearAge: string, column: string) => `The money runs out from ${yearAge}: the red rows are the years when spending is not covered (column “${column}”).`,
   },
-  tabs: { label: 'Results views', answer: 'Answer', adjust: 'Adjust', strategies: 'Strategies', future: 'Future', verify: 'Check' },
+  tabs: { label: 'Results views', answer: 'Answer', adjust: 'Try', strategies: 'Strategies', verify: 'Check' },
   orders: {
     title: 'In which order should I draw?',
     hint: (age: number) => `Your plan, retiring at ${age}, rerun with each of the six orders of drawing the accounts. Withdrawals are recomputed year by year with tax, QPP, OAS and GIS.`,

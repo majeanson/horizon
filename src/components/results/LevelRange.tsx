@@ -58,7 +58,7 @@ export function LevelRange({ profile, enabled }: { profile: Profile; enabled: bo
       )}
       {typeof first === 'number' && typeof last === 'number' && last !== first && <p className="verdict__note">{c.range.yearsOf(Math.min(first, last), Math.max(first, last))}</p>}
       <p className="verdict__note">{c.range.note}</p>
-      <Chip to="/documents" icon="identification-card-bold">
+      <Chip to="/profil?form=1&par=document&etape=gather" icon="identification-card-bold">
         {c.range.fix}
       </Chip>
     </div>

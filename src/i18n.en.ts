@@ -74,6 +74,7 @@ export const EN: typeof FR = {
     title: 'Profile',
     subtitle: 'Your numbers, typed by hand. They stay on this device.',
     welcome: { title: 'To begin' },
+    nav: { label: 'Profile sections', family: 'Family', situation: 'Situation', budget: 'Budget', home: 'Home', events: 'Events', exact: 'Accuracy' },
     self: 'Me',
     spouse: 'Partner',
     budget: {

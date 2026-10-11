@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
   await seedProfile(page, EXAMPLE)
 })
 
-test('the three answers: the verdict and stopping on the first view, saving and spending on « Ajuster »', async ({ page }) => {
+test('the three answers: the verdict and stopping on the first view, saving and spending on « Essayer »', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
   await expect(page.locator('#epargner')).toHaveCount(0)

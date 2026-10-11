@@ -4,6 +4,7 @@ import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { ParamsPanel } from '../components/results/ParamsPanel'
+import { FirmSection } from '../components/results/views/FirmSection'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
@@ -12,7 +13,6 @@ import { StatusMessage } from '../components/StatusMessage'
 import { AnswerView } from '../components/results/views/AnswerView'
 import { AdjustView } from '../components/results/views/AdjustView'
 import { StrategiesView } from '../components/results/views/StrategiesView'
-import { FutureSection } from '../components/results/views/FutureSection'
 import { VerifyView } from '../components/results/views/VerifyView'
 import { useResultsPage } from '../lib/useResultsPage'
 
@@ -65,7 +65,6 @@ export function Resultats() {
             { key: 'answer' as const, label: rc.tabs.answer },
             { key: 'adjust' as const, label: rc.tabs.adjust },
             { key: 'strategies' as const, label: rc.tabs.strategies },
-            { key: 'future' as const, label: rc.tabs.future },
             { key: 'verify' as const, label: rc.tabs.verify },
           ]}
         />
@@ -73,23 +72,22 @@ export function Resultats() {
       <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
 
 
-      {/* 1 — what you asked: the answer, then the same answer compared, costed and dated. */}
+      {/* 1 — what you asked: the answer, compared and dated, what would sharpen it, and what the plan points at. */}
       {view === 'answer' && <AnswerView m={m} />}
 
-      {/* 2 — what to change: the changes ranked, the saving an age needs, the spending that moves it. Inputs of the plan, not of the future (those live on Hypothèses). */}
+      {/* 2 — « Essayer »: what to try — the changes ranked, the saving an age needs, the spending that moves it, a late-life care. Inputs of the plan, not of the future (those live on Hypothèses). */}
       {view === 'adjust' && <AdjustView m={m} />}
 
-      {/* 2 — two decisions: when to start the QPP and the OAS, and in which order to draw the accounts. Once every start is behind the household, nothing to choose. */}
+      {/* 3 — two decisions: when to start the QPP and the OAS, and in which order to draw the accounts. Once every start is behind the household, nothing to choose. */}
       {view === 'strategies' && <StrategiesView m={m} />}
 
-      {/* 4 — the future: a late-life care cost tried on the plan, and what the plan points at for this year. */}
-      {view === 'future' && <FutureSection m={m} />}
-
+      {/* 4 — « Vérifier »: how firm the answer is, how it was checked, and every figure behind it. */}
       {view === 'verify' && <VerifyView m={m} />}
 
       {/* On paper the plan is the open view AND what a reader checks it against, whichever view that is: the year by year and the cited figures. */}
       {printing && view !== 'verify' && (
         <section className="arc print-appendix" aria-label={rc.tabs.verify}>
+          <FirmSection m={m} />
           <section className="results-section" aria-label={r.table.title}>
             <SectionHeader title={r.table.title} />
             <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
