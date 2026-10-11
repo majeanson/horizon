@@ -281,7 +281,7 @@ test.describe('data stays on this device', () => {
     await infl.fill('4')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.04)
-    await page.goto('/donnees')
+    await page.goto('/donnees?copie=restore')
     await page.locator('input[type=file]').setInputFiles(path)
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText('sera remplacé par celui du fichier')
@@ -290,7 +290,7 @@ test.describe('data stays on this device', () => {
   })
 
   test('a file that is not a profile is refused, field by field, and nothing changes', async ({ page }) => {
-    await page.goto('/donnees')
+    await page.goto('/donnees?copie=restore')
     const before = await savedProfile(page)
     await page.locator('input[type=file]').setInputFiles({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ app: 'horizon', version: 1, household: { persons: [] } })) })
     await expect(page.getByRole('alert').first()).toContainText('Ce fichier semble incomplet ou modifié')
@@ -318,7 +318,7 @@ test.describe('data stays on this device', () => {
 
   test('the example loads over a blank profile, after a confirmation', async ({ page }) => {
     await seedProfile(page, blankSeed())
-    await page.goto('/donnees')
+    await page.goto('/donnees?autres=examples')
     await page.getByRole('button', { name: 'Couple, un en fonction publique' }).click()
     await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.persons.length).toBe(2)
@@ -471,4 +471,50 @@ test('the scenario picker sets the economy, follows a hand edit, and the desktop
   const nav = await page.locator('.shell__nav').boundingBox()
   expect(main!.x, 'the content hugs the sidebar with the empty space all on the right').toBeGreaterThanOrEqual(nav!.x + nav!.width)
   await expectNoHorizontalOverflow(page)
+})
+
+test.describe('the settings page: two families, each one section with a switch', () => {
+  test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
+
+  test('the copies of the profile: saving first, restoring one tap away, the choice in the address', async ({ page }) => {
+    await page.goto('/donnees')
+    const copies = page.getByRole('tablist', { name: 'Les copies de votre profil' })
+    await expect(copies.getByRole('tab')).toHaveText(['Sauvegarder', 'Restaurer'])
+    await expect(page.getByRole('button', { name: 'Télécharger mon profil' })).toBeVisible()
+    await expect(page.locator('input[type=file]')).toHaveCount(0)
+    await copies.getByRole('tab', { name: 'Restaurer' }).click()
+    await expect(page).toHaveURL(/copie=restore/)
+    await expect(page.locator('input[type=file]')).toHaveCount(1)
+    await expect(page.getByRole('button', { name: 'Télécharger mon profil' })).toHaveCount(0)
+  })
+
+  test('the other plans to look at: the plans kept under a name first, the examples one tap away', async ({ page }) => {
+    await page.goto('/donnees')
+    const others = page.getByRole('tablist', { name: 'D’autres plans à regarder' })
+    await expect(others.getByRole('tab')).toHaveText(['Mes plans', 'Exemples'])
+    await expect(page.getByRole('heading', { name: 'Mes plans' })).toBeVisible()
+    await expect(page.locator('.example-list li')).toHaveCount(0)
+    await others.getByRole('tab', { name: 'Exemples' }).click()
+    await expect(page).toHaveURL(/autres=examples/)
+    await expect(page.locator('.example-list li')).toHaveCount(11)
+  })
+
+  test('a copy the device could not read is the first thing shown, and still reachable beside saving and restoring', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('horizon-profile-unreadable', '{ "broken": '))
+    await page.goto('/donnees')
+    const copies = page.getByRole('tablist', { name: 'Les copies de votre profil' })
+    await expect(copies.getByRole('tab')).toHaveText(['Sauvegarder', 'Restaurer', 'Copie illisible'])
+    await expect(copies.getByRole('tab', { name: 'Copie illisible' })).toHaveAttribute('aria-selected', 'true')
+    await expect(page.getByRole('button', { name: 'Télécharger la copie illisible' })).toBeVisible()
+  })
+
+  test('on a phone the two switches fit the screen, in both languages', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 })
+    for (const lang of ['fr', 'en']) {
+      await page.addInitScript((l) => localStorage.setItem('horizon-lang', l), lang)
+      await page.goto('/donnees')
+      await expect(page.getByRole('tablist').first()).toBeVisible()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    }
+  })
 })

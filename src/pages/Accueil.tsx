@@ -22,7 +22,7 @@ export function Accueil() {
         <Link className="btn btn--primary" to={ready ? '/resultats' : '/profil'}>
           {ready ? c.seeAnswer : c.begin}
         </Link>
-        <Link className="btn btn--ghost" to={ready ? '/profil' : '/donnees'}>
+        <Link className="btn btn--ghost" to={ready ? '/profil' : '/donnees?autres=examples'}>
           {ready ? c.editProfile : c.example}
         </Link>
       </div>

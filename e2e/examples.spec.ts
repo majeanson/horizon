@@ -9,7 +9,7 @@ test.beforeEach(({ page }) => slowCpu(page))
 // and which panels are offered at all. The arithmetic behind each is printed in EXAMPLES.md and pinned by engine/golden/examples.test.ts.
 
 async function loadExample(page: Page, name: string) {
-  await page.goto('/donnees')
+  await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name, exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
   await page.goto('/resultats')
@@ -22,7 +22,7 @@ const openLedger = async (page: Page) => {
 }
 
 test('the data page offers all eleven examples, each with its story', async ({ page }) => {
-  await page.goto('/donnees')
+  await page.goto('/donnees?autres=examples')
   await expect(page.locator('.example-list li')).toHaveCount(11)
   await expect(page.locator('.example-list')).toContainText('Julien, 52 ans')
 })

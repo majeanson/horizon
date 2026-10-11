@@ -1,8 +1,8 @@
 import { NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
-import { saveAsFile } from '../lib/download'
-import { exportFileName, exportProfileJson, getProfile, markExported, snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
+import { saveCopy } from '../lib/saveCopy'
+import { snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import { Icon, type IconName } from './Icon'
@@ -85,8 +85,7 @@ export function AppShell() {
   // points at. (It used to send the reader to that page to press a second button, and could not be dismissed.)
   const backupDue = useBackupDue() && pathname !== '/donnees'
   const exportNow = () => {
-    saveAsFile(exportProfileJson(getProfile()), exportFileName())
-    markExported()
+    saveCopy()
     notice(t.data.export.done)
   }
   const themeLabel = theme === 'night' ? t.common.themeToDay : t.common.themeToNight

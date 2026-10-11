@@ -14,14 +14,17 @@ import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type
 import { useConfirm } from '../lib/confirm'
 import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
+import { DATA_COPY } from '../lib/dataCopy'
 import { exampleProfile } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
-import { clearProfile, exportFileName, exportProfileJson, getProfile, markExported, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
+import { saveCopy } from '../lib/saveCopy'
+import { clearProfile, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { MODE_COPY } from '../lib/sheetCopy'
 import { getTheme, setTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
+import { useParamChoice } from '../lib/useParamChoice'
 
 // Where the figures go — which is nowhere — and the device's own settings. Save a copy to keep, restore one, see an
 // example household, set the display, or erase this device's copy. Every action that replaces the profile asks first,
@@ -36,6 +39,11 @@ export function Donnees() {
   // rescue section below reads storage afresh each time. (The banner itself lives in the shell, on every page.)
   useStorageIssue()
   const copies = unreadableCopies()
+  // Two families, each ONE section with a switch (they were five sections): the copies of the profile, and the other plans to look at. The address keeps both (`?copie=`, `?autres=`).
+  const dc = DATA_COPY[lang]
+  const copyKeys = ['save', 'restore', ...(copies.length > 0 ? (['rescue'] as const) : [])] as const
+  const [copyView, setCopyView] = useParamChoice('copie', copyKeys, copies.length > 0 ? 'rescue' : 'save')
+  const [otherView, setOtherView] = useParamChoice('autres', ['plans', 'examples'] as const, 'plans')
   const fileInput = useRef<HTMLInputElement>(null)
   const [failure, setFailure] = useState<Extract<ReadResult, { ok: false }> | null>(null)
   // The profile as it was before the last replace or clear, held in memory for this visit: the confirm
@@ -50,8 +58,7 @@ export function Donnees() {
   }
 
   const download = () => {
-    saveAsFile(exportProfileJson(getProfile()), exportFileName())
-    markExported()
+    saveCopy()
     notice(d.export.done)
   }
 
@@ -93,90 +100,106 @@ export function Donnees() {
         </Cluster>
       )}
 
-      <div className="data-pair">
+      <SubTabs
+        ariaLabel={dc.copies.label}
+        value={copyView}
+        onSelect={setCopyView}
+        options={copyKeys.map((key) => ({ key, label: dc.copies[key] }))}
+      />
       {/* The copy is the whole reason this page exists: its button is the one filled button here. */}
-      <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
-        <Cluster>
-          <button type="button" className="btn btn--primary" onClick={download}>
-            {d.export.button}
-          </button>
-        </Cluster>
-      </Section>
-
-      {copies.length > 0 && (
-        <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
+      {copyView === 'save' && (
+        <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
           <Cluster>
-            {copies.map((text, i) => (
-              <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
-                {i === 0 ? d.rescue.button : d.rescue.older}
-              </button>
-            ))}
+            <button type="button" className="btn btn--primary" onClick={download}>
+              {d.export.button}
+            </button>
           </Cluster>
         </Section>
       )}
+      {copyView === 'rescue' && copies.length > 0 && (
+          <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
+            <Cluster>
+              {copies.map((text, i) => (
+                <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
+                  {i === 0 ? d.rescue.button : d.rescue.older}
+                </button>
+              ))}
+            </Cluster>
+          </Section>
+      )}
+      {copyView === 'restore' && (
+        <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">
+          <Cluster>
+            <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
+              {d.import.button}
+            </button>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="application/json,.json"
+              className="sr-only"
+              tabIndex={-1}
+              aria-label={d.import.button}
+              onChange={(e) => void onFile(e.target.files?.[0])}
+            />
+          </Cluster>
+          {failure && (
+            <div role="alert" className="import-errors">
+              <StatusMessage tone="error">{failure.reason === 'json' ? d.import.notJson : failure.reason === 'newer' ? d.import.newer : d.import.problems}</StatusMessage>
+              {failure.problems.length > 0 && failure.reason !== 'newer' && (
+                <ul className="import-errors__list mono">
+                  {failure.problems.slice(0, 12).map((p) => (
+                    <li key={p.path + p.problem}>
+                      {p.path} — {d.import.problem[p.problem]}
+                    </li>
+                  ))}
+                  {failure.problems.length > 12 && <li>…</li>}
+                </ul>
+              )}
+            </div>
+          )}
+        </Section>
+      )}
 
-      <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">
-        <Cluster>
-          <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
-            {d.import.button}
-          </button>
-          <input
-            ref={fileInput}
-            type="file"
-            accept="application/json,.json"
-            className="sr-only"
-            tabIndex={-1}
-            aria-label={d.import.button}
-            onChange={(e) => void onFile(e.target.files?.[0])}
-          />
-        </Cluster>
-        {failure && (
-          <div role="alert" className="import-errors">
-            <StatusMessage tone="error">{failure.reason === 'json' ? d.import.notJson : failure.reason === 'newer' ? d.import.newer : d.import.problems}</StatusMessage>
-            {failure.problems.length > 0 && failure.reason !== 'newer' && (
-              <ul className="import-errors__list mono">
-                {failure.problems.slice(0, 12).map((p) => (
-                  <li key={p.path + p.problem}>
-                    {p.path} — {d.import.problem[p.problem]}
-                  </li>
-                ))}
-                {failure.problems.length > 12 && <li>…</li>}
-              </ul>
-            )}
-          </div>
-        )}
-      </Section>
-      </div>
-
-      <PlansSection onReplace={setPrevious} />
+      <SubTabs
+        ariaLabel={dc.others.label}
+        value={otherView}
+        onSelect={setOtherView}
+        options={[
+          { key: 'plans' as const, label: dc.others.plans },
+          { key: 'examples' as const, label: dc.others.examples },
+        ]}
+      />
+      {otherView === 'plans' && <PlansSection onReplace={setPrevious} />}
+      {otherView === 'examples' && (
+        <Section title={d.example.title} subtitle={d.example.hint} icon="user-bold">
+          <ul className="example-list">
+            {EXAMPLE_IDS.map((id: ExampleId) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  className="btn btn--ghost btn--sm"
+                  onClick={async () => {
+                    if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
+                      setPrevious(getProfile())
+                      replaceProfile(exampleProfile(id))
+                      notice(d.example.done)
+                    }
+                  }}
+                >
+                  {EXAMPLE_COPY[lang][id].name}
+                </button>
+                <span className="field-row__hint">{EXAMPLE_COPY[lang][id].story}</span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       {/* The settings a person comes here for sit above the long list of examples (a try-out, used once). */}
       <DisplaySection />
 
       <InstallLine />
-
-      <Section title={d.example.title} subtitle={d.example.hint} icon="user-bold">
-        <ul className="example-list">
-          {EXAMPLE_IDS.map((id: ExampleId) => (
-            <li key={id}>
-              <button
-                type="button"
-                className="btn btn--ghost btn--sm"
-                onClick={async () => {
-                  if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
-                    setPrevious(getProfile())
-                    replaceProfile(exampleProfile(id))
-                    notice(d.example.done)
-                  }
-                }}
-              >
-                {EXAMPLE_COPY[lang][id].name}
-              </button>
-              <span className="field-row__hint">{EXAMPLE_COPY[lang][id].story}</span>
-            </li>
-          ))}
-        </ul>
-      </Section>
 
       <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold">
         <Cluster>

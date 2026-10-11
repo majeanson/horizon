@@ -70,7 +70,7 @@ test('with one person picked the sources are theirs and the spending stays the h
 })
 
 test('a plan that runs out says what is missing, in the year it is missing', async ({ page }) => {
-  await page.goto('/donnees')
+  await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name: 'Une personne, en retard', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
   await open(page)

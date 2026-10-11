@@ -73,7 +73,7 @@ test('« où trouver ce chiffre »: the statement’s « immobilisé » part, wi
 })
 
 test('the example with an RVER shows it opened, and the results carry the locked part in the table and the chart', async ({ page }) => {
-  await page.goto('/donnees')
+  await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name: 'Couple, revenus moyens', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
   await page.goto('/profil?form=1')

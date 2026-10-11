@@ -107,7 +107,7 @@ test('in English both skins speak English, with the same figures', async ({ page
 })
 
 test('a household already retired has no runway to draw, and a blank profile is asked to start', async ({ page }) => {
-  await page.goto('/donnees')
+  await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name: 'Couple à la retraite', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
   await page.goto('/fiche')

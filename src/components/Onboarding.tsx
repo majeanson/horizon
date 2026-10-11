@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { rregopPension } from '../engine/presets'
 import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
+import { saveCopy } from '../lib/saveCopy'
+import { useNotice } from '../lib/toast'
 import { useConfirm } from '../lib/confirm'
 import { formatMoney } from '../lib/money'
 import { DOCUMENTS_COPY } from '../lib/documentsCopy'
@@ -53,6 +55,7 @@ const STEP_OF_GAP: Record<ProfileGap, StepId> = { income: 'income', spending: 's
 export default function Onboarding({ onSkip }: { onSkip: () => void }) {
   const t = useT()
   const { lang } = useLang()
+  const notice = useNotice()
   const c = ONBOARD_COPY[lang]
   const navigate = useNavigate()
   const confirm = useConfirm()
@@ -406,12 +409,25 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
         )}
       </div>
       <Cluster className="onboard__aside">
-        <Link className="btn btn--sm btn--ghost" to="/donnees">
+        <Link className="btn btn--sm btn--ghost" to="/donnees?autres=examples">
           {c.example}
         </Link>
         <Link className="btn btn--sm btn--ghost" to="/profil?form=1&par=document&etape=gather">
           {DOCUMENTS_COPY[lang].link}
         </Link>
+        {/* The moment the work is freshest is the one to keep it: the figures live on this device alone, and a copy is one tap. */}
+        {step === 'done' && (
+          <button
+            type="button"
+            className="btn btn--sm btn--ghost"
+            onClick={() => {
+              saveCopy()
+              notice(t.data.export.done)
+            }}
+          >
+            {t.data.backup.button}
+          </button>
+        )}
         {step !== 'done' && (
           <button type="button" className="btn btn--sm btn--ghost" onClick={onSkip}>
             {c.skip}

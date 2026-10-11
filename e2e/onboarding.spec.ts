@@ -28,7 +28,7 @@ test('the first landing is ONE question, not the form: who the calculation is fo
   await expect(page.locator('#person-self')).toHaveCount(0)
   await expect(page.getByRole('textbox')).toHaveCount(0)
   // the way out is plain: an example, or the full form
-  await expect(page.getByRole('link', { name: 'Voir un exemple' })).toHaveAttribute('href', '/donnees')
+  await expect(page.getByRole('link', { name: 'Voir un exemple' })).toHaveAttribute('href', '/donnees?autres=examples')
   await expect(page.getByRole('button', { name: 'Passer au formulaire complet' })).toBeVisible()
 })
 
@@ -78,6 +78,11 @@ test('walking through for one person: each answer is saved as typed, and the ans
   await expect(page.locator('.onboard__summary')).toContainText('Régime d’employeur : RREGOP')
   await expect(page.locator('.onboard__summary')).toContainText('Retraite visée à 62 ans')
   await expect(page.locator('.onboard__why')).toContainText('une estimation reste une estimation')
+  // the work is freshest here: one tap keeps a copy off this device, and the backup stamps say so
+  const copy = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Sauvegarder une copie' }).click()
+  expect((await copy).suggestedFilename()).toMatch(/^horizon-\d{4}-\d{2}-\d{2}\.json$/)
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('horizon-last-export') !== null)).toBe(true)
   // everything was written to the stored profile, as typed (the store saves a beat after the last answer)
   await expect.poll(async () => (await savedProfile(page)).household.spending.retiredToday).toBe(54_000)
   const p = await savedProfile(page)

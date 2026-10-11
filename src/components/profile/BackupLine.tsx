@@ -1,8 +1,8 @@
 import { useLang, useT } from '../../i18n'
-import { saveAsFile } from '../../lib/download'
+import { saveCopy } from '../../lib/saveCopy'
 import { LIFE_COPY } from '../../lib/lifeCopy'
 import { longDate } from '../../lib/months'
-import { exportFileName, exportProfileJson, getProfile, markExported, useLastExport } from '../../lib/store'
+import { useLastExport } from '../../lib/store'
 import { useNotice } from '../../lib/toast'
 import { Chip } from '../Chip'
 
@@ -23,8 +23,7 @@ export function BackupLine() {
       <span>{last === null ? c.never : c.last(day(last))}</span>
       <Chip
         onClick={() => {
-          saveAsFile(exportProfileJson(getProfile()), exportFileName())
-          markExported()
+          saveCopy()
           notice(t.data.export.done)
         }}
       >
