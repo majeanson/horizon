@@ -48,6 +48,8 @@ const FR_RESULTS = {
   tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Essayer', strategies: 'Stratégies', verify: 'Vérifier' },
   /** « Essayer » shows one thing at a time. */
   try: { label: 'Un essai à la fois' },
+  /** « Comparer des âges de départ » has three ways of comparing; one on screen at a time. */
+  compareViews: { label: 'Façons de comparer', ages: 'Âges de départ', each: 'Chacun de son côté', plans: 'Mes plans' },
   /** « Solidité de la réponse » at two depths. */
   firm: { label: 'Deux façons de voir la solidité', brief: 'En bref', grids: 'Si l’avenir est moins bon' },
   orders: {
@@ -252,6 +254,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   idle: (name: string, from: string, to: string) => `From ${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', adjust: 'Try', strategies: 'Strategies', verify: 'Check' },
   try: { label: 'One try at a time' },
+  compareViews: { label: 'Ways to compare', ages: 'Departure ages', each: 'Each of us', plans: 'My plans' },
   firm: { label: 'Two ways to see how firm it is', brief: 'In brief', grids: 'If the future is worse' },
   orders: {
     title: 'In which order should I draw?',

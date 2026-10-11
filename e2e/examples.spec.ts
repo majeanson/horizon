@@ -38,7 +38,7 @@ test('modest single: one person, no couple widgets, and the GIS is in the year t
   await expect(page.locator('.verdict__line')).toContainText('64 ans.')
   await expect(page.locator('.verdict__line')).not.toContainText('tous les deux')
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=strategies&bv=years')
   await expect(page.locator('#rentes')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Pour les deux' })).toHaveCount(0)
   await expect(page.locator('.bridge__table')).toContainText('SRG')

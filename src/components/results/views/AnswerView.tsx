@@ -10,6 +10,8 @@ import { TimelineStrip } from '../TimelineStrip'
 import { EarliestEachPanel } from '../EarliestEachPanel'
 import { PlansCompare } from '../PlansCompare'
 import { SectionHeader } from '../../SectionHeader'
+import { SubTabs } from '../../SubTabs'
+import { useParamChoice } from '../../../lib/useParamChoice'
 
 import { Skeleton } from '../../Skeleton'
 import { formatYearAge } from '../../../lib/format'
@@ -24,6 +26,10 @@ const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AnswerView({ m }: { m: ResultsModel }) {
   const { vintage, t, lang, r, rc, profile, slow, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
+  // Three ways of comparing, one on screen at a time: departure ages (the chips, the cards, the chart), each person's own earliest age (a couple) and the saved plans (when there are some).
+  // The address keeps it (`?cv=`); the last two are offered only when they exist.
+  const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
+  const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
       {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
@@ -119,6 +125,18 @@ export function AnswerView({ m }: { m: ResultsModel }) {
               is ONE section: the same runs, seen as cards, as a picture, and per person. */}
           <section id="comparer" className="results-section" aria-label={r.compare.label}>
             <SectionHeader title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} />
+            {compareKeys.length > 1 && (
+              <SubTabs
+                size="mini"
+                ariaLabel={rc.compareViews.label}
+                value={compareView}
+                onSelect={setCompareView}
+                options={compareKeys.map((key) => ({ key, label: rc.compareViews[key] }))}
+              />
+            )}
+
+            {compareView === 'ages' && (
+              <>
             {!retiredNow && (
               <div className="compare" ref={compareRef}>
                 <Rail role="group" aria-label={r.compare.label}>
@@ -184,13 +202,26 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 label={label}
               />
             )}
+              </>
+            )}
 
-            {isCouple && !retiredNow && (
+            {compareView === 'each' && isCouple && !retiredNow && (
               <div className="surface">
-                <EarliestEachPanel household={profile.household} names={names} answer={earliestEachAnswer} maxAge={MAX_AGE} onCompare={addSplit} compareDisabled={selections.length >= MAX_SELECTIONS} />
+                {/* « Comparer » adds the pair to the departure-age comparison: show it there. */}
+                <EarliestEachPanel
+                  household={profile.household}
+                  names={names}
+                  answer={earliestEachAnswer}
+                  maxAge={MAX_AGE}
+                  onCompare={(a, b) => {
+                    addSplit(a, b)
+                    setCompareView('ages')
+                  }}
+                  compareDisabled={selections.length >= MAX_SELECTIONS}
+                />
               </div>
             )}
-            {!retiredNow && profile.plans.length > 0 && (
+            {compareView === 'plans' && !retiredNow && profile.plans.length > 0 && (
               <div className="surface">
                 <PlansCompare profile={slow} enabled={answered && firstSearchesIn} />
               </div>

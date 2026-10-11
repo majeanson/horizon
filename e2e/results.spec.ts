@@ -185,6 +185,10 @@ test('no chart or table runs past the right edge on a phone', async ({ page }) =
 test('a couple gets each person\'s own earliest age, worked out off the page\'s thread, and can send the pair to the comparison', async ({ page }) => {
   const problems = watchConsole(page)
   await page.goto('/resultats')
+  // a couple's comparison has two ways: the departure ages, and each person's own earliest age
+  await expect(page.getByRole('tablist', { name: 'Façons de comparer' }).getByRole('tab')).toHaveText(['Âges de départ', 'Chacun de son côté'])
+  await page.getByRole('tab', { name: 'Chacun de son côté' }).click()
+  await expect(page).toHaveURL(/cv=each/)
   const panel = page.getByRole('heading', { name: 'Chacun de son côté' })
   await expect(panel).toBeVisible()
   // One line per person, each naming who the other is held at; then the placeholder is gone.
@@ -194,6 +198,9 @@ test('a couple gets each person\'s own earliest age, worked out off the page\'s 
   const compare = lines.first().getByRole('button', { name: /^Comparer .* à \d+ ans et .* à \d+ ans$/ })
   await compare.click()
   await expect(page).toHaveURL(/ages=plan(%2C|,)65(%2C|,)\d+-\d+/)
+  // the pair was added to the departure-age comparison: that is where it is shown
+  await expect(page.getByRole('tab', { name: 'Âges de départ' })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.locator('.scenarios .scenario')).toHaveCount(3, { timeout: 60_000 })
   expect(problems).toEqual([])
 })
 

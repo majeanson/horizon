@@ -93,3 +93,19 @@ test('« Vérifier » › « Solidité »: the scenarios and a hard market in br
   await expect(page.locator('.sensitivity')).toBeVisible()
   await expect(page.getByRole('tab', { name: 'Si l’avenir est moins bon' })).toHaveAttribute('aria-selected', 'true')
 })
+
+test('« Comparer »: the departure ages are the first way, and a way that the household does not have is not offered', async ({ page }) => {
+  // the golden couple has no kept plan: two ways, the ages and each of us
+  await page.goto('/resultats')
+  const ways = page.getByRole('tablist', { name: 'Façons de comparer' })
+  await expect(ways.getByRole('tab')).toHaveText(['Âges de départ', 'Chacun de son côté'])
+  await expect(page.locator('.scenarios')).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('.verdict__each')).toHaveCount(0)
+  await ways.getByRole('tab', { name: 'Chacun de son côté' }).click()
+  await expect(page.locator('.verdict__each')).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('.scenarios')).toHaveCount(0)
+  await expect(page.locator('.chart-panel')).toHaveCount(0)
+  // an address that names a way opens it
+  await page.goto('/resultats?cv=each')
+  await expect(page.locator('.verdict__each')).toBeVisible({ timeout: 60_000 })
+})

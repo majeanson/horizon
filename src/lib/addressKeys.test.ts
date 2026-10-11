@@ -31,6 +31,7 @@ const KEYS: Record<string, string> = {
   age: 'Résultats: the « Combien épargner ? » age. Unreadable is ignored and the profile’s own is used.',
   spend: 'Résultats: the « Et si je dépensais moins ? » what-if amount. Unreadable is ignored: the slider sits on the profile’s own spending.',
   care: 'Résultats › Essayer: the late-life care what-if, « amount,age,years ». A part left out takes the starting figure; anything unreadable is ignored and the sliders sit on the starting figures.',
+  cv: 'Résultats › Réponse › Comparer: the way of comparing on screen (ages · each · plans). Unknown, or one the household does not have, is the departure ages.',
   bv: 'Résultats › Stratégies: the view of the pensions on screen (ways · years · death · why). Unknown is the ways of starting.',
   bp: 'Résultats › Stratégies: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Stratégies: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
