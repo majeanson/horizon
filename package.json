@@ -17,6 +17,7 @@
     "e2e:slow": "playwright test -c playwright.slow.config.ts",
     "e2e:sw": "playwright test -c e2e/sw.config.ts",
     "check:bundle": "node scripts/check-bundle.mjs",
+    "verify": "npm run typecheck && npm test && npm run build && npm run check:bundle",
     "sources": "node scripts/gen-sources.ts",
     "examples": "node scripts/gen-examples.ts",
     "sources:check": "node scripts/check-sources.ts",
