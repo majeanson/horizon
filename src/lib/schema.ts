@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 20
+export const SCHEMA_VERSION = 21
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -89,6 +89,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
     survivorSpending: 0.7,
     withdrawalOrder: ['nonReg', 'rrsp', 'tfsa'],
     pensionSplitting: true,
+    drawTogether: false,
     surplusToRrsp: false,
     retiredSpendingDrift: 0,
     marketPath: { preset: 'smooth', custom: [] },
@@ -441,6 +442,8 @@ export function validateProfile(raw: unknown): ProfileResult {
     survivorSpending: r.num(a.survivorSpending, 'assumptions.survivorSpending', 0.3, 1),
     withdrawalOrder: order,
     pensionSplitting: r.bool(a.pensionSplitting, 'assumptions.pensionSplitting'),
+    // Draw each account across both spouses (v21). An older file drew on whoever had the lower taxable income: false.
+    drawTogether: a.drawTogether === undefined ? false : r.bool(a.drawTogether, 'assumptions.drawTogether'),
     surplusToRrsp: r.bool(a.surplusToRrsp, 'assumptions.surplusToRrsp'),
     // How the retired budget slows with age, real a year from 70 (v16). An older file's budget stayed level: 0.
     retiredSpendingDrift: a.retiredSpendingDrift === undefined ? 0 : r.num(a.retiredSpendingDrift, 'assumptions.retiredSpendingDrift', -0.05, 0.03),

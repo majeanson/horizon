@@ -268,6 +268,7 @@ export function Hypotheses() {
       <Section title={a.options.title} icon="lock-bold">
         {/* The splitting switch only when there is someone to split with. */}
         {hasSpouse(profile) && <Switch checked={assumptions.pensionSplitting} onChange={(pensionSplitting) => updateProfile((p) => setAssumptions(p, { pensionSplitting }))} label={a.splitting.on} hint={a.splitting.hint} />}
+        {hasSpouse(profile) && <Switch checked={assumptions.drawTogether === true} onChange={(drawTogether) => updateProfile((p) => setAssumptions(p, { drawTogether }))} label={m.together.on} hint={m.together.hint} />}
         <Switch checked={assumptions.surplusToRrsp === true} onChange={(surplusToRrsp) => updateProfile((p) => setAssumptions(p, { surplusToRrsp }))} label={m.surplus.on} hint={m.surplus.hint} />
       </Section>
       )}

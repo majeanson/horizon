@@ -385,7 +385,7 @@ describe('schema v18 — the cost of a child by age, and what the household coun
 
   it('a household that states nothing is the same file as before, version apart', () => {
     const result = migrateProfile(oldFixture(17))
-    const raw = oldFixture(20)
+    const raw = oldFixture(21)
     expect(result.ok).toBe(true)
     if (result.ok) expect(JSON.parse(JSON.stringify(result.profile))).toEqual({ ...raw })
   })

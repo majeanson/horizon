@@ -5,6 +5,7 @@ import type { Lang } from '../i18n.ts'
 
 export interface MarketCopy {
   surplus: { title: string; on: string; hint: string }
+  together: { on: string; hint: string }
   income: { line: (age: number, perMonth: string, planned: string) => string; none: (age: number) => string; note: string }
   stress: { title: string; active: (name: string) => string; none: (max: number) => string; age: (n: number) => string; hint: string; link: string }
   path: {
@@ -24,6 +25,10 @@ const FR: MarketCopy = {
     title: 'L’argent qui reste',
     on: 'Placer d’abord le surplus dans le REER',
     hint: 'L’argent qui reste à la fin d’une année de travail va d’abord au REER (la déduction baisse l’impôt), puis au CELI, puis au compte non enregistré. Désactivé : au CELI d’abord.',
+  },
+  together: {
+    on: 'Retirer ensemble : puiser chez les deux',
+    hint: 'Chaque retrait est partagé entre vous deux, en proportion de ce que chacun a au total, et chacun puise dans ses propres comptes selon l’ordre choisi : les deux s’épuisent au même rythme et les deux barres de « D’où vient l’argent » se remplissent. Désactivé : chaque compte est puisé à tour de rôle chez la personne dont le revenu imposable est le plus bas, et l’autre attend.',
   },
   income: {
     line: (age, perMonth, planned) => `À ${age} ans, le plan peut financer jusqu’à ${perMonth} par mois (après impôt) — vous prévoyez ${planned}.`,
@@ -61,6 +66,10 @@ const EN: MarketCopy = {
     title: 'The money left over',
     on: 'Put the surplus in the RRSP first',
     hint: 'The money left at the end of a working year goes to the RRSP first (the deduction lowers the tax), then the TFSA, then the non-registered account. Off: the TFSA first.',
+  },
+  together: {
+    on: 'Draw together: from both of you',
+    hint: 'Each withdrawal is shared between the two of you in proportion to everything each holds, and each person draws from their own accounts in the order you chose: both run down at the same pace and both people’s bars in “Where the money comes from” fill in. Off: each account in turn is drawn from whoever has the lower taxable income, and the other person waits.',
   },
   income: {
     line: (age, perMonth, planned) => `At ${age}, the plan can fund up to ${perMonth} a month (after tax) — you plan ${planned}.`,

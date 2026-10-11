@@ -559,17 +559,35 @@ function simulateYear(
   // ── 3–4. draw on the accounts, in order, until the need is met ────────────────────────────────
   let need = spending - evaluate(fixedSplit()).cash
   if (need > 0.005) {
-    for (const kind of a.withdrawalOrder) {
+    // A stage is one account at a time (the order, whoever's it is) — or, drawing TOGETHER, every account at once.
+    const together = a.drawTogether === true && people.length > 1
+    const stages: AccountKind[][] = together ? [[...a.withdrawalOrder]] : a.withdrawalOrder.map((k) => [k])
+    for (const stage of stages) {
       if (need <= 0.005) break
-      const room = people.map((_, i) =>
-        kind === 'rrsp' ? fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, returns.tfsa) : maxWithdraw(states[i].nonReg.balance, returns.nonReg),
-      )
-      const available = sum(room.map((x) => Math.max(0, x)))
+      const roomOf = (kind: AccountKind, i: number) =>
+        Math.max(0, kind === 'rrsp' ? fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin : kind === 'tfsa' ? maxWithdraw(states[i].tfsa, returns.tfsa) : maxWithdraw(states[i].nonReg.balance, returns.nonReg))
+      const rooms = stage.map((kind) => people.map((_, i) => roomOf(kind, i)))
+      const available = sum(rooms.map(sum))
       if (available <= 0.005) continue
+      const kind = stage[0]
+      const room = rooms[0]
 
       // Allocate `x` among the persons: in chunks, to whoever currently has the LOWER taxable income and money left.
       const allocate = (x: number) => {
-        for (let i = 0; i < people.length; i++) draw[kind][i] = 0
+        for (const k of stage) for (let i = 0; i < people.length; i++) draw[k][i] = 0
+        if (together) {
+          // Each person gives in proportion to all they hold, taking it from their own accounts in the chosen order: both run down at the same pace.
+          for (let i = 0; i < people.length; i++) {
+            const mine = sum(rooms.map((r) => r[i]))
+            let left = Math.min(mine, (x * mine) / available)
+            stage.forEach((k, s) => {
+              const take = Math.min(left, rooms[s][i])
+              draw[k][i] = take
+              left -= take
+            })
+          }
+          return
+        }
         if (people.length === 1) {
           draw[kind][0] = Math.min(x, Math.max(0, room[0]))
           return

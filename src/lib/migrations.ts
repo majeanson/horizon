@@ -128,6 +128,8 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   (profile) => profile,
   // v19 → v20: a couple can enter the budget SPLIT by account (`household.spendingSplit`: joint account, each person's own spending). Every older file entered one figure: the field is absent.
   (profile) => profile,
+  // v20 → v21: the accounts can be drawn TOGETHER across both spouses (`assumptions.drawTogether`). Every older file drew on whoever had the lower taxable income: the field reads as false.
+  (profile) => profile,
 ]
 
 export type ReadResult =

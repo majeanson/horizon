@@ -274,6 +274,11 @@ export interface Assumptions {
   /** Try every 5 % allocation of pension income between the spouses and keep the cheapest. */
   pensionSplitting: boolean
   /**
+   * In a couple, the draw is shared between the two in proportion to ALL each holds, each taking from their own accounts in `withdrawalOrder`,
+   * so both run down together. Absent / false: each account in turn goes to whoever has the lower taxable income, and the other person's waits.
+   */
+  drawTogether?: boolean
+  /**
    * When a working year ends with cash left over and RRSP room is open, put the surplus in the RRSP first (the deduction is worth
    * more than the TFSA's tax-free growth for most earners), the rest going to the TFSA and then the non-registered account as ever.
    * Absent / false: the surplus goes to the TFSA, then non-registered, and the RRSP only gets what the person entered.
