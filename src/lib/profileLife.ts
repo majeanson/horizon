@@ -78,3 +78,33 @@ export function removeFlow(p: Profile, index: number): Profile {
   if (index < 0 || index >= flows.length) return p
   return { ...p, household: { ...p.household, flows: flows.filter((_, i) => i !== index) } }
 }
+
+// ── The budget entered by account (schema v20) ──────────────────────────────────────────────────────
+
+type Split = NonNullable<Profile['household']['spendingSplit']>
+const cents = (n: number) => Math.round(n * 100) / 100
+const columnSum = (s: Split, k: 'working' | 'retired') => cents(s.rows.reduce((a, r) => a + r[k], 0))
+
+/** A couple starts entering the budget by account: the joint account holds today's figures, each person's own spending starts at 0 — the total does not move. */
+export function startSplit(p: Profile): Profile {
+  if (p.household.spendingSplit || p.household.persons.length < 2) return p
+  const { workingToday: working, retiredToday: retired } = p.household.spending
+  const rows: Split['rows'] = [{ id: 'joint', working, retired }, ...p.household.persons.map((x) => ({ id: x.id, working: 0, retired: 0 }))]
+  return { ...p, household: { ...p.household, spendingSplit: { rows } } }
+}
+
+/** Back to one figure: the total stays as it is, the parts are forgotten. */
+export function stopSplit(p: Profile): Profile {
+  if (!p.household.spendingSplit) return p
+  const { spendingSplit: _gone, ...household } = p.household
+  return { ...p, household }
+}
+
+/** One part of the split (the joint account, or a person's own spending), in either column; the two totals follow. */
+export function setSplitRow(p: Profile, id: Split['rows'][number]['id'], patch: { working?: number; retired?: number }): Profile {
+  const split = p.household.spendingSplit
+  if (!split || !split.rows.some((r) => r.id === id)) return p
+  const rows = split.rows.map((r) => (r.id === id ? { ...r, ...patch } : r))
+  return { ...p, household: { ...p.household, spendingSplit: { rows }, spending: { workingToday: columnSum({ rows }, 'working'), retiredToday: columnSum({ rows }, 'retired') } } }
+}
+

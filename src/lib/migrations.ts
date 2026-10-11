@@ -126,6 +126,8 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v18 → v19: what a child costs can say it is ON TOP of the annual budget (`childSpending.onTop`) instead of inside it. Every older file meant inside: the field is
   // absent, which reads as exactly that.
   (profile) => profile,
+  // v19 → v20: a couple can enter the budget SPLIT by account (`household.spendingSplit`: joint account, each person's own spending). Every older file entered one figure: the field is absent.
+  (profile) => profile,
 ]
 
 export type ReadResult =

@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 19
+export const SCHEMA_VERSION = 20
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -368,6 +368,22 @@ export function validateProfile(raw: unknown): ProfileResult {
     retiredToday: r.num(spending.retiredToday, 'household.spending.retiredToday', 0, 1e8),
   }
   const livesAlone = r.bool(household.livesAlone, 'household.livesAlone')
+  // The budget split by account (a couple's joint account and each person's own spending): the split wins over the two totals, which are always its sum.
+  let spendingSplit: Household['spendingSplit'] = null
+  if (household.spendingSplit != null) {
+    const rawRows = r.arr((r.obj(household.spendingSplit, 'household.spendingSplit') ?? {}).rows, 'household.spendingSplit.rows') ?? []
+    if (rawRows.length < 1 || rawRows.length > 3) r.count('household.spendingSplit.rows')
+    const ids = persons.length > 1 ? (['joint', 'self', 'spouse'] as const) : (['joint', 'self'] as const)
+    const rows = rawRows.slice(0, 3).map((x, i) => {
+      const o = r.obj(x, `household.spendingSplit.rows[${i}]`) ?? {}
+      return { id: r.oneOf(o.id, `household.spendingSplit.rows[${i}].id`, ids), working: r.num(o.working, `household.spendingSplit.rows[${i}].working`, 0, 1e8), retired: r.num(o.retired, `household.spendingSplit.rows[${i}].retired`, 0, 1e8) }
+    })
+    if (new Set(rows.map((x) => x.id)).size !== rows.length) r.count('household.spendingSplit.rows')
+    spendingSplit = { rows }
+    const total = (k: 'working' | 'retired') => Math.round(rows.reduce((s, x) => s + x[k], 0) * 100) / 100
+    spendingNow.workingToday = total('working')
+    spendingNow.retiredToday = total('retired')
+  }
 
   // The principal residence: null (none), or what it is worth, what is owed on it, and when it is sold (null: never).
   let home: Home | null = null
@@ -477,5 +493,5 @@ export function validateProfile(raw: unknown): ProfileResult {
   })
 
   if (r.problems.length > 0) return { ok: false, problems: r.problems }
-  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, children, childSpending, kidsEffects, flows, spending: spendingNow, home }, assumptions, customScenario, confirmed, plans } }
+  return { ok: true, profile: { app: 'horizon', version, household: { livesAlone, persons, children, childSpending, kidsEffects, flows, spending: spendingNow, ...(spendingSplit ? { spendingSplit } : {}), home }, assumptions, customScenario, confirmed, plans } }
 }

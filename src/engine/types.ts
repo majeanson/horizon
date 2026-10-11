@@ -237,6 +237,11 @@ export interface Household {
   kidsEffects?: KidsEffects | null
   /** The dated flows (see Flow). Absent: none. */
   flows?: readonly Flow[]
+  /**
+   * The budget as the household entered it SPLIT by account: a couple's joint account (the family's, outside the mortgage) and each person's own spending, in two
+   * columns (working years, retirement). `spending` below is always their sum — the engine reads that and nothing here. Absent or null: one figure.
+   */
+  spendingSplit?: { rows: readonly { id: 'joint' | PersonId; working: number; retired: number }[] } | null
   spending: {
     /** Household spending while anyone still works, in today's dollars. */
     workingToday: number

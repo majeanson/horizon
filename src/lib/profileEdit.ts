@@ -19,8 +19,30 @@ export function mapPerson(p: Profile, id: PersonId, change: (person: Person) => 
   return touched ? { ...p, household: { ...p.household, persons } } : p
 }
 
+type Split = NonNullable<Profile['household']['spendingSplit']>
+const cents = (n: number) => Math.round(n * 100) / 100
+const columnSum = (s: Split, k: 'working' | 'retired') => cents(s.rows.reduce((a, r) => a + r[k], 0))
+
+/**
+ * The household's budget. With the budget split by account, a total written from elsewhere (the results page's slider, the ledger, a level) is shared out
+ * among the parts in proportion — all to the joint account when they were all 0 — so the parts always add up to the two figures the plan reads.
+ */
 export function setSpending(p: Profile, patch: Partial<Profile['household']['spending']>): Profile {
-  return { ...p, household: { ...p.household, spending: { ...p.household.spending, ...patch } } }
+  const next = { ...p.household.spending, ...patch }
+  const split = p.household.spendingSplit
+  if (!split) return { ...p, household: { ...p.household, spending: next } }
+  const share = (k: 'working' | 'retired', to: number): number[] => {
+    const old = columnSum(split, k)
+    const parts = split.rows.map((r) => (old > 0 ? cents((r[k] * to) / old) : r.id === 'joint' ? to : 0))
+    const drift = cents(to - parts.reduce((a, b) => a + b, 0))
+    const at = Math.max(0, split.rows.findIndex((r) => r.id === 'joint'))
+    parts[at] = cents(parts[at] + drift)
+    return parts
+  }
+  const working = share('working', next.workingToday)
+  const retired = share('retired', next.retiredToday)
+  const rows = split.rows.map((r, i) => ({ ...r, working: working[i], retired: retired[i] }))
+  return { ...p, household: { ...p.household, spendingSplit: { rows }, spending: { workingToday: columnSum({ rows }, 'working'), retiredToday: columnSum({ rows }, 'retired') } } }
 }
 
 export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): Profile {
@@ -193,7 +215,9 @@ export function removeSpouse(p: Profile): Profile {
   // What was confirmed about the spouse goes with them (a returning spouse starts again from estimates).
   // The spouse's own dated income goes with them; what the household spends or receives once (a roof, an inheritance) stays, as the first person's.
   const flows = (p.household.flows ?? []).filter((f) => !(f.kind === 'income' && f.owner === 'spouse')).map((f) => (f.owner === 'spouse' ? { ...f, owner: 'self' as const } : f))
-  return { ...p, household: { ...p.household, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse'), flows }, confirmed: p.confirmed.filter((id) => !id.startsWith('spouse:')) }
+  // The budget split by account has no second person to split between: the total stays, as one figure.
+  const { spendingSplit: _split, ...rest } = p.household
+  return { ...p, household: { ...rest, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse'), flows }, confirmed: p.confirmed.filter((id) => !id.startsWith('spouse:')) }
 }
 
 /** Whether a one-adult household lives alone (Québec's living-alone amount). A couple is unaffected. */
