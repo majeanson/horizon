@@ -89,7 +89,7 @@ const FR: FutureCopy = {
   },
   year: {
     title: 'À faire cette année',
-    hint: 'Deux choses que votre plan désigne, pas des conseils : le changement qui avance le plus l’âge, et le chiffre à confirmer d’abord.',
+    hint: 'Ce que votre plan désigne, pas des conseils : le changement qui avance le plus l’âge, et les deux décisions qui ont leur propre page.',
     leverTitle: 'Le changement qui avance le plus',
     leverNone: 'Aucun des changements essayés n’avance l’âge de votre réponse.',
     leverPending: 'Calcul en cours…',
