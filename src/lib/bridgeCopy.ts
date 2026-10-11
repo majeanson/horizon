@@ -10,6 +10,8 @@ import type { Verdict } from './bridgeModel.ts'
 
 export interface BridgeCopy {
   hint: string
+  /** « Quand commencer mes rentes ? » shows one of four views at a time. */
+  views: { label: string; ways: string; years: string; death: string; why: string }
   /** Shown while a new answer is being worked out and the old one is still on screen. */
   updating: string
   person: string
@@ -136,6 +138,7 @@ export interface BridgeCopy {
 
 export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
   fr: {
+    views: { label: 'Quatre façons de regarder vos rentes', ways: 'Façons de commencer', years: 'Année par année', death: 'Si l’un décède', why: 'Pourquoi et limites' },
     hint: 'Chaque année entre 60 et 70 ans : ce que le ménage dépense, ce que les rentes garanties paient, ce que le nid (vos REER, CELI et placements) doit couvrir, et ce qu’il en reste. Choisissez une façon de commencer vos rentes pour voir si l’argent dure. Tout est en dollars d’aujourd’hui.',
     updating: 'Mise à jour du calcul…',
     person: 'Pour',
@@ -274,6 +277,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     matrixFails: (age) => `jusqu’à ${age} ans`,
   },
   en: {
+    views: { label: 'Four ways to look at your pensions', ways: 'Ways to start', years: 'Year by year', death: 'If one of us dies', why: 'Why, and limits' },
     hint: 'Every year from 60 to 70: what the household spends, what the guaranteed pensions pay, what the nest egg (your RRSPs, TFSAs and investments) has to cover, and what is left. Pick a way of starting your pensions to see whether the money lasts. Everything is in today’s dollars.',
     updating: 'Updating the calculation…',
     person: 'For',

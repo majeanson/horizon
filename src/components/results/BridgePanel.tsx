@@ -22,6 +22,7 @@ import { mapPerson } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
 import { useDeathSweep } from '../../lib/useDeathSweep'
+import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
@@ -225,8 +226,11 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const { value: view, busy } = useBridge(household, assumptions, levers)
   // The three scenarios per strategy: fifteen more projections, started once the page is idle, marked on the cards as they land.
   const { value: matrix } = useBridgeMatrix(household, assumptions, levers)
-  // « Et si l'un de nous décède plus tôt ? »: thirty projections, started once the cards' scenarios are in.
-  const sweep = useDeathSweep(household, assumptions, levers, matrix !== null)
+  // Four views of the one question « when do I start my pensions? », one on screen at a time (they were four blocks stacked: the charts, the ways, a short life, the reasons). The address keeps it (`?bv=`).
+  const VIEWS = ['ways', 'years', 'death', 'why'] as const
+  const [bridgeView, setBridgeView] = useParamChoice('bv', VIEWS, 'ways')
+  // « Et si l'un de nous décède plus tôt ? »: thirty projections — asked only when that view is open, and after the cards' scenarios are in.
+  const sweep = useDeathSweep(household, assumptions, levers, matrix !== null && bridgeView === 'death')
   const ownerName = names[Math.max(0, household.persons.findIndex((p) => p.id === levers.id))] ?? ''
   // The ages under « dure jusqu'à » are this person's; in a couple that is not the youngest, so the verdict names them.
   const who = household.persons.length > 1 ? ownerName : null
@@ -319,69 +323,95 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             {copy.verdict(verdict, who)}
           </p>
 
-          <div className="bridge__window">
-            <SubTabs
-              size="mini"
-              ariaLabel={copy.windowLabel}
-              value={windowShown}
-              onSelect={(w) => change({}, w)}
-              options={[
-                { key: 'bridge', label: copy.windowBridge },
-                { key: 'plan', label: copy.windowPlan },
-              ]}
-            />
-          </div>
-
-          <BridgeCharts view={view} span={windowShown} household={household} params={{ levers: shown, window: windowShown }} copy={copy} />
-          <h3 className="bridge__heading">{copy.strategyTitle}</h3>
-          {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
-          <StrategyViews view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} matrix={matrix} layout={layout} onLayout={setLayout} />
-          <p className="field-row__hint">{copy.marksHint(ownerName)}</p>
-          {applied !== null && (
-            <Cluster className="bridge__applied">
-              <StatusMessage tone="success">
-                {copy.applied({
-                  name: household.persons.length > 1 ? (names[Math.max(0, household.persons.findIndex((p) => p.id === applied.id))] ?? null) : null,
-                  rrq: copy.age(applied.rrq),
-                  oas: copy.age(applied.oas),
-                  prevRrq: copy.age(applied.prevRrq),
-                  prevOas: copy.age(applied.prevOas),
-                  both: applied.both,
-                })}
-              </StatusMessage>
-              <Chip onClick={undoApply}>{copy.appliedUndo}</Chip>
-            </Cluster>
-          )}
-          <p className="field-row__hint">{copy.todayNote}</p>
-
-          <DeathSweepPanel
-            sweep={sweep}
-            copy={copy}
-            who={who}
-            couple={household.persons.length > 1}
-            hideMine={mineIsStandard}
-            label={(k) => (k === 'standard' && mineIsStandard ? copy.standardIsMine : k === 'mine' ? `${copy.strategyName.mine} (${copy.age(levers.retirementAge)})` : copy.strategyName[k])}
+          <SubTabs
+            size="mini"
+            ariaLabel={copy.views.label}
+            value={bridgeView}
+            onSelect={setBridgeView}
+            options={[
+              { key: 'ways' as const, label: copy.views.ways },
+              { key: 'years' as const, label: copy.views.years },
+              { key: 'death' as const, label: copy.views.death },
+              { key: 'why' as const, label: copy.views.why },
+            ]}
           />
 
-          <h3 className="bridge__heading">{copy.whyTitle}</h3>
-          <ul className="bridge__list">
-            <li>{standard && view.selected.summary.drawn6070 - standard.summary.drawn6070 > 50 ? copy.whyCost(money(view.selected.summary.drawn6070 - standard.summary.drawn6070)) : copy.whyCostNone}</li>
-            <li>{copy.whyGis(money(view.selected.summary.gisTotal), money(view.selected.summary.oasRecoveryTotal))}</li>
-            {copy.why({ rrqPerMonth: formatPct(view.facts.rrqPerMonth, lang, 1), rrqMax: formatPct(view.facts.rrqLateMax, lang, 1), oasPerMonth: formatPct(view.facts.oasPerMonth, lang, 1), oasMax: formatPct(view.facts.oasLateMax, lang, 0) }).map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
+          {bridgeView === 'ways' && (
+            <>
+              <h3 className="bridge__heading">{copy.strategyTitle}</h3>
+              {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
+              <StrategyViews view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} matrix={matrix} layout={layout} onLayout={setLayout} />
+              <p className="field-row__hint">{copy.marksHint(ownerName)}</p>
+              {applied !== null && (
+                <Cluster className="bridge__applied">
+                  <StatusMessage tone="success">
+                    {copy.applied({
+                      name: household.persons.length > 1 ? (names[Math.max(0, household.persons.findIndex((p) => p.id === applied.id))] ?? null) : null,
+                      rrq: copy.age(applied.rrq),
+                      oas: copy.age(applied.oas),
+                      prevRrq: copy.age(applied.prevRrq),
+                      prevOas: copy.age(applied.prevOas),
+                      both: applied.both,
+                    })}
+                  </StatusMessage>
+                  <Chip onClick={undoApply}>{copy.appliedUndo}</Chip>
+                </Cluster>
+              )}
+              <p className="field-row__hint">{copy.todayNote}</p>
+            </>
+          )}
 
-          <h3 className="bridge__heading">{copy.caveatTitle}</h3>
-          <ul className="bridge__list">
-            {copy.caveats.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
+          {bridgeView === 'years' && (
+            <>
+              <div className="bridge__window">
+                <SubTabs
+                  size="mini"
+                  ariaLabel={copy.windowLabel}
+                  value={windowShown}
+                  onSelect={(w) => change({}, w)}
+                  options={[
+                    { key: 'bridge', label: copy.windowBridge },
+                    { key: 'plan', label: copy.windowPlan },
+                  ]}
+                />
+              </div>
+              <BridgeCharts view={view} span={windowShown} household={household} params={{ levers: shown, window: windowShown }} copy={copy} />
+              {/* The reference at the end: the year-by-year table. */}
+              <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
+              <p className="field-row__hint">{copy.householdNote}</p>
+            </>
+          )}
 
-          {/* The reference at the end: the year-by-year table, once the choice and its reasons have been read. */}
-          <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
-          <p className="field-row__hint">{copy.householdNote}</p>
+          {bridgeView === 'death' && (
+            <DeathSweepPanel
+              sweep={sweep}
+              copy={copy}
+              who={who}
+              couple={household.persons.length > 1}
+              hideMine={mineIsStandard}
+              label={(k) => (k === 'standard' && mineIsStandard ? copy.standardIsMine : k === 'mine' ? `${copy.strategyName.mine} (${copy.age(levers.retirementAge)})` : copy.strategyName[k])}
+            />
+          )}
+
+          {bridgeView === 'why' && (
+            <>
+              <h3 className="bridge__heading">{copy.whyTitle}</h3>
+              <ul className="bridge__list">
+                <li>{standard && view.selected.summary.drawn6070 - standard.summary.drawn6070 > 50 ? copy.whyCost(money(view.selected.summary.drawn6070 - standard.summary.drawn6070)) : copy.whyCostNone}</li>
+                <li>{copy.whyGis(money(view.selected.summary.gisTotal), money(view.selected.summary.oasRecoveryTotal))}</li>
+                {copy.why({ rrqPerMonth: formatPct(view.facts.rrqPerMonth, lang, 1), rrqMax: formatPct(view.facts.rrqLateMax, lang, 1), oasPerMonth: formatPct(view.facts.oasPerMonth, lang, 1), oasMax: formatPct(view.facts.oasLateMax, lang, 0) }).map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+
+              <h3 className="bridge__heading">{copy.caveatTitle}</h3>
+              <ul className="bridge__list">
+                {copy.caveats.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </>
       )}
     </div>

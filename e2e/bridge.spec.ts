@@ -36,6 +36,9 @@ test('the strategy view sits on the page: each year from 60 to 70, five strategi
     }
     await expect(page.locator('.bridge-card')).toHaveCount(5)
     await expect(page.getByRole('radiogroup', { name: 'Façons de commencer vos rentes' })).toBeVisible()
+    // the year by year and the three pictures are the second view of the same panel
+    await page.getByRole('tab', { name: 'Année par année' }).click()
+    await expect(page).toHaveURL(/bv=years/)
     // each year of the bridge, as text: ages 60 to 70, with the start of the pensions tagged
     const rows = page.locator('.bridge__table tbody tr')
     await expect(rows).toHaveCount(11)
@@ -113,7 +116,7 @@ test('a couple has one tab per person, each with their own ages from the profile
 })
 
 test('« jusqu’à l’horizon » shows every year of the plan, and the bridge shows only 60 to 70', async ({ page }) => {
-  await page.goto('/resultats?v=strategies&bt=cards')
+  await page.goto('/resultats?v=strategies&bt=cards&bv=years')
   await expect(page.locator('.bridge__table tbody tr')).toHaveCount(11)
   await page.getByRole('tab', { name: 'Jusqu’à la fin du plan' }).click()
   await expect(page).toHaveURL(/bw=plan/)
@@ -146,21 +149,65 @@ test('English: the view speaks English and keeps the same choices', async ({ pag
   await page.locator('.bridge-card').getByRole('radio', { name: 'Bridge to 70', exact: true }).click()
   await expect(page.locator('.bridge__verdict')).toContainText(/You can defer|Deferring uses up/)
   await expect(page.locator('.bridge')).toContainText('Your ages: retire at age 60, QPP at age 70, OAS at age 70')
+  await expect(page.getByRole('tab', { name: 'Year by year' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Year by year' }).click()
   await expect(page.locator('.bridge__table thead')).toContainText('Nest egg at year end')
 })
 
 test('on a phone the view fits the screen: the table scrolls inside its own region, nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
-  await page.goto('/resultats?v=strategies&bt=cards')
+  await page.goto('/resultats?v=strategies&bt=cards&bv=years')
   await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 30_000 }) // worked out in a worker: slow under a loaded machine
   await expectNoHorizontalOverflow(page, page.locator('.bridge'))
   await expect(page.locator('.bridge__table')).toHaveAttribute('role', 'region')
 })
 
 test('under « Le nid », a second picture shows what the pensions pay each year: waiting buys a higher step, for life', async ({ page }) => {
-  await page.goto('/resultats?v=strategies&bt=cards')
+  await page.goto('/resultats?v=strategies&bt=cards&bv=years')
   await expect(page.getByRole('heading', { name: 'Le nid, selon la façon de commencer' })).toBeVisible({ timeout: 30_000 })
   await expect(page.getByRole('heading', { name: 'Ce que paient les rentes, selon la façon de commencer' })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Rentes garanties par année selon la façon de commencer/ })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Nid en fin d’année selon/ })).toBeVisible()
+})
+
+test('« Quand commencer mes rentes ? » is one panel with four views — the ways, year by year, a short life, the reasons — the verdict always above, the choice in the address', async ({ page }) => {
+  await page.goto('/resultats?v=strategies&bt=cards')
+  const views = page.getByRole('tablist', { name: 'Quatre façons de regarder vos rentes' })
+  await expect(views.getByRole('tab')).toHaveText(['Façons de commencer', 'Année par année', 'Si l’un décède', 'Pourquoi et limites'])
+  await expect(views.getByRole('tab', { name: 'Façons de commencer' })).toHaveAttribute('aria-selected', 'true')
+  // the verdict stays above whichever view is open
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('.bridge-card').first()).toBeVisible()
+  await expect(page.locator('.bridge__table')).toHaveCount(0)
+  await expect(page.locator('.sweep')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Pourquoi' })).toHaveCount(0)
+  for (const [tab, key, shown] of [
+    ['Année par année', 'years', '.bridge__table'],
+    ['Si l’un décède', 'death', '.sweep'],
+    ['Pourquoi et limites', 'why', '.bridge__list'],
+  ] as const) {
+    await views.getByRole('tab', { name: tab }).click()
+    await expect(page).toHaveURL(new RegExp('bv=' + key))
+    await expect(page.locator(shown).first()).toBeVisible({ timeout: 90_000 })
+    await expect(page.locator('.bridge-card')).toHaveCount(0)
+    await expect(page.locator('.bridge__verdict')).toBeVisible()
+  }
+  // an address that names a view opens it; an unknown one falls back to the ways
+  await page.goto('/resultats?v=strategies&bv=why')
+  await expect(page.getByRole('tab', { name: 'Pourquoi et limites' })).toHaveAttribute('aria-selected', 'true')
+  await page.goto('/resultats?v=strategies&bv=nope&bt=cards')
+  await expect(page.locator('.bridge-card').first()).toBeVisible({ timeout: 60_000 })
+})
+
+test('the thirty projections of « Si l’un décède » are not run until that view is opened', async ({ page }) => {
+  const workers: string[] = []
+  page.on('worker', (w) => workers.push(w.url()))
+  await page.goto('/resultats?v=strategies&bt=cards')
+  await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('.dots__dot.is-pending')).toHaveCount(0, { timeout: 60_000 }) // the cards' scenarios are in: the sweep used to start now
+  await page.waitForTimeout(3_000)
+  expect(workers.some((u) => u.includes('deathSweep')), 'no death sweep before its view').toBe(false)
+  await page.getByRole('tab', { name: 'Si l’un décède' }).click()
+  await expect.poll(() => workers.some((u) => u.includes('deathSweep')), { timeout: 30_000 }).toBe(true)
+  await expect(page.locator('.sweep table')).toBeVisible({ timeout: 90_000 })
 })

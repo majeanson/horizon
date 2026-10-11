@@ -1614,3 +1614,9 @@
   margin: 0.25rem 0 0;
   font-size: var(--text-md);
 }
+
+/* « Quand commencer mes rentes ? »: the panel is a grid, whose children default to min-width: auto — a row of four tabs wider than the screen would stretch the whole column.
+   Let each child shrink, so the row scrolls sideways inside its own box (SubTabs) instead. */
+.bridge > * {
+  min-width: 0;
+}

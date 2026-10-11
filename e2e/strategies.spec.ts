@@ -52,13 +52,14 @@ test('the reader chooses, on either screen, and the choice is in the address', a
   await expect(page.locator('.bridge-card').first()).toBeVisible()
 })
 
-test('the chart comes before the comparison', async ({ page }) => {
+test('the comparison is the first view of the pensions; the chart is one switch away', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/resultats?v=strategies')
-  const heading = page.getByRole('heading', { name: 'Façons de commencer vos rentes' })
-  await expect(heading).toBeVisible({ timeout: 60_000 })
-  const chart = (await page.getByRole('heading', { name: 'D’où vient l’argent, année par année' }).boundingBox())!
-  expect(chart.y).toBeLessThan((await heading.boundingBox())!.y)
+  await expect(page.getByRole('heading', { name: 'Façons de commencer vos rentes' })).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toHaveCount(0)
+  await page.getByRole('tab', { name: 'Année par année' }).click()
+  await expect(page.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Façons de commencer vos rentes' })).toHaveCount(0)
 })
 
 test('« Votre plan en une ligne »: one bar per person, with the dates ahead, in text as well as in colour', async ({ page }) => {
@@ -75,7 +76,7 @@ test('« Votre plan en une ligne »: one bar per person, with the dates ahead, i
 
 test('« Et si Camille décédait plus tôt ? » compares every way of starting at five death ages, and the best of a column is marked', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=strategies&bv=death')
   const panel = page.locator('.sweep')
   await expect(panel.getByRole('heading', { name: /Et si Camille décédait plus tôt/ })).toBeVisible({ timeout: 60_000 })
   const table = panel.locator('table')
@@ -98,7 +99,7 @@ test('« Et si Camille décédait plus tôt ? » compares every way of starting 
 
 test('a phone gets the compact table: ages as bare numbers, amounts in k and M', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=strategies&bv=death')
   const panel = page.locator('.sweep')
   await expect(panel.locator('table')).toBeVisible({ timeout: 90_000 })
   await expect(panel.getByText('Colonnes : l’âge au décès.', { exact: false })).toBeVisible()

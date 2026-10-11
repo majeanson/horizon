@@ -20,7 +20,7 @@ import { blankComments, sourceFiles } from './buildGuardScan'
 
 const srcDir = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-const KEY = /\b(?:params|search|next)\.(?:get|set|delete|has)\(\s*'([A-Za-z]+)'|\bsetParam\(\s*'([A-Za-z]+)'/g
+const KEY = /\b(?:params|search|next)\.(?:get|set|delete|has)\(\s*'([A-Za-z]+)'|\bsetParam\(\s*'([A-Za-z]+)'|\buseParamChoice\(\s*'([A-Za-z]+)'/g
 
 /** key → who owns it, and what a value nobody knows does. */
 const KEYS: Record<string, string> = {
@@ -31,6 +31,7 @@ const KEYS: Record<string, string> = {
   age: 'Résultats: the « Combien épargner ? » age. Unreadable is ignored and the profile’s own is used.',
   spend: 'Résultats: the « Et si je dépensais moins ? » what-if amount. Unreadable is ignored: the slider sits on the profile’s own spending.',
   care: 'Résultats › Essayer: the late-life care what-if, « amount,age,years ». A part left out takes the starting figure; anything unreadable is ignored and the sliders sit on the starting figures.',
+  bv: 'Résultats › Stratégies: the view of the pensions on screen (ways · years · death · why). Unknown is the ways of starting.',
   bp: 'Résultats › Stratégies: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Stratégies: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
   bt: 'Résultats › Stratégies: how the ways of starting are compared (cards · table). Anything else, or no key: the screen’s width chooses — a table from 860 px, cards below.',
@@ -42,6 +43,8 @@ const KEYS: Record<string, string> = {
   solidite: 'Résultats › Vérifier › Solidité: « grids » opens the 3 × 3 grids; no key is the scenarios and a hard market in brief.',
   par: 'Profil: « document » opens the second way to fill it (by document); no key is by topic. The old /saisie and /documents addresses redirect here.',
   etape: 'Profil › Par document: the step open (gather · you · rrq · tax · bank · employer · home · budget · residence). Anything else lands on the first step.',
+  table: 'Résultats › Vérifier › Détail année par année: which retirement age’s table is shown (the compared ages). Unknown falls back to the first.',
+  horizon: 'Résultats › Vérifier › Solidité › Grilles: which plan horizon’s 3 × 3 grid is shown. Unknown falls back to the plan’s own.',
   fact: 'Profil: one figure’s id (« self:rrspBalance »): scroll to its field and light it once, then drop the key from the address. An unknown id scrolls nowhere.',
 }
 
@@ -55,7 +58,7 @@ function scan(): Map<string, string[]> {
     if (!/\.(ts|tsx)$/.test(f) || /\.test\.|[\\/]engine[\\/]/.test(f)) continue
     const src = blankComments(readFileSync(f, 'utf8'))
     for (const m of src.matchAll(KEY)) {
-      const key = m[1] ?? m[2]
+      const key = m[1] ?? m[2] ?? m[3]
       const where = `${relative(srcDir, f).split(sep).join('/')}:${lineOf(src, m.index ?? 0)}`
       out.set(key, [...(out.get(key) ?? []), where])
     }
@@ -71,11 +74,12 @@ describe('the address is a contract', () => {
       `next.set('ages', x)`, // 2 ←
       `next.delete("fact")`, // double quotes: not this codebase's style, named as a hole
       `setParam('spend', null)`, // 4 ←
+      `useParamChoice('bv', ['a'], 'a')`, // a pick among a few values ←
       `params.get(key)`, // variable
       `other.get('v')`, // not an address object
       `localStorage.getItem('v')`,
     ].join('\n')
-    expect([...fixture.matchAll(KEY)].map((m) => m[1] ?? m[2])).toEqual(['v', 'ages', 'spend'])
+    expect([...fixture.matchAll(KEY)].map((m) => m[1] ?? m[2] ?? m[3])).toEqual(['v', 'ages', 'spend', 'bv'])
   })
 
   const found = scan()
