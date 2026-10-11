@@ -4,13 +4,14 @@ import { setSpending } from '../../lib/profileEdit'
 import { updateProfile, useProfile } from '../../lib/store'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { ChildCosts } from './FamilySection'
 import { LevelSlot } from './LevelSlot'
 import { Section } from './shared'
 
 // What the household spends: a FACT about it (the bank statements confirm it), not a guess about the future — so it sits
 // here with the other facts, not on Hypothèses. It is the household's, not one person's, so it sits above the two columns.
 // (The results page's « Et si je dépensais moins ? » slider and the ledger write the same two figures.)
-export function BudgetSection() {
+export function BudgetSection({ withKids = false }: { /** The children’s cost and where it sits (inside this budget or on top of it): asked only of someone who said there are children. */ withKids?: boolean }) {
   const t = useT()
   const b = t.profile.budget
   const { household } = useProfile()
@@ -24,6 +25,7 @@ export function BudgetSection() {
         {(w) => <NumberField kind="money" max={1e8} value={household.spending.retiredToday} onChange={(retiredToday) => updateProfile((p) => setSpending(p, { retiredToday }))} id={w.id} />}
       </FieldRow>
       <LevelSlot kind="spendingRetired" owner="household" />
+      <ChildCosts withKids={withKids} />
     </Section>
   )
 }

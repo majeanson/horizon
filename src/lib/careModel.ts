@@ -52,13 +52,16 @@ export interface CareAnswer {
   /** The household's net worth at the horizon, today's dollars, with the care and without it (the RRSP counted before its tax, as everywhere). */
   worthWith: number
   worthWithout: number
+  /** With the care, at `age`: the spending the plan could not pay, summed over the years it falls short, today's dollars (0 when it holds). It moves with every dollar of the care, unlike an age. */
+  unmet: number
 }
 
 /** Net worth at the horizon in today's dollars. */
-function worthToday(h: Household, a: Assumptions, age: number): { ok: boolean; firstShortfallYear: number | null; worth: number } {
+function worthToday(h: Household, a: Assumptions, age: number): { ok: boolean; firstShortfallYear: number | null; worth: number; unmet: number } {
   const run = runScenario(h, a, everyoneAt(h, age), age)
   const last = run.rows[run.rows.length - 1]
-  return { ok: run.ok, firstShortfallYear: run.firstShortfallYear, worth: run.netWorthAtHorizon / Math.pow(1 + a.inflation, last.year - a.today.year) }
+  const unmet = run.rows.reduce((s, r) => s + r.household.shortfall / Math.pow(1 + a.inflation, r.year - a.today.year), 0)
+  return { ok: run.ok, firstShortfallYear: run.firstShortfallYear, worth: run.netWorthAtHorizon / Math.pow(1 + a.inflation, last.year - a.today.year), unmet }
 }
 
 /** The plan with the care: the earliest age that works, and — at `age`, the one the verdict reads — what is left at the horizon, with and without it. */
@@ -67,7 +70,7 @@ export function careAnswer(household: Household, assumptions: Assumptions, care:
   const earliest = retireAt(h, assumptions, { stopAtFirstOk: true }).earliestOk
   const withCareRun = worthToday(h, assumptions, age)
   const without = worthToday(household, assumptions, age)
-  return { earliest, now: worksNow(h, assumptions, earliest), age, ok: withCareRun.ok, firstShortfallYear: withCareRun.firstShortfallYear, worthWith: withCareRun.worth, worthWithout: without.worth }
+  return { earliest, now: worksNow(h, assumptions, earliest), age, ok: withCareRun.ok, firstShortfallYear: withCareRun.firstShortfallYear, worthWith: withCareRun.worth, worthWithout: without.worth, unmet: withCareRun.unmet }
 }
 
 export type CareReferenceKey = 'privateRoom' | 'semiPrivate' | 'ward'

@@ -95,3 +95,16 @@ describe('the address', () => {
     expect(sameCare(c, { ...c, years: 8 })).toBe(false)
   })
 })
+
+describe('what a change of the care moves, in dollars and not only in whole years', () => {
+  it('the part the plan cannot pay grows with the cost, and is nothing while the plan holds', () => {
+    const holds = careAnswer(H, A, { amount: 5_000, fromAge: 90, years: 1 }, 70)
+    expect(holds.ok).toBe(true)
+    expect(holds.unmet).toBe(0)
+    // an age too early for the money: the plan falls short, and every dollar of the care shows in the unmet total
+    const small = careAnswer(H, A, { amount: 40_000, fromAge: 70, years: 10 }, 52)
+    const big = careAnswer(H, A, { amount: 80_000, fromAge: 70, years: 10 }, 52)
+    expect(big.unmet).toBeGreaterThan(small.unmet)
+    expect(big.unmet - small.unmet).toBeGreaterThan(0)
+  })
+})

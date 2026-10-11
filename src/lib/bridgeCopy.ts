@@ -79,9 +79,9 @@ export interface BridgeCopy {
   nestTitle: string
   nestHint: (rrq: number, oas: number) => string
   nestFigure: (from: number, to: number) => string
-  worthTitle: string
-  worthHint: string
-  worthFigure: (from: number, to: number) => string
+  incomeTitle: string
+  incomeHint: string
+  incomeFigure: (from: number, to: number) => string
   markerRrq: string
   markerOas: string
   tooltip: (age: number, year: number) => string
@@ -212,9 +212,9 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     nestTitle: 'Le nid, selon la façon de commencer',
     nestHint: (rrq, oas) => `Traits pointillés : début du RRQ (${rrq} ans) et de la PSV (${oas} ans) de votre choix. Reporter creuse le nid d’abord, puis le fait remonter.`,
     nestFigure: (from, to) => `Nid en fin d’année selon la façon de commencer les rentes, de ${from} à ${to} ans`,
-    worthTitle: 'La valeur nette, selon la façon de commencer',
-    worthHint: 'Le nid plus la valeur de la maison moins ce qui reste dû dessus : tout ce que le ménage possède, en dollars d’aujourd’hui. Le nid, plus haut, ne compte que les comptes dans lesquels vous puisez.',
-    worthFigure: (from, to) => `Valeur nette (nid plus avoir foncier) en fin d’année selon la façon de commencer les rentes, de ${from} à ${to} ans`,
+    incomeTitle: 'Ce que paient les rentes, selon la façon de commencer',
+    incomeHint: 'Ce que le RRQ, la PSV et les rentes d’employeur paient chaque année, sans puiser dans le nid, en dollars d’aujourd’hui. Commencer plus tard donne une marche plus haute, pour toute la vie : c’est ce que l’attente achète.',
+    incomeFigure: (from, to) => `Rentes garanties par année selon la façon de commencer, de ${from} à ${to} ans`,
     markerRrq: 'RRQ',
     markerOas: 'PSV',
     tooltip: (age, year) => `${age} ans · ${year}`,
@@ -348,9 +348,9 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     nestTitle: 'The nest egg, by way of starting',
     nestHint: (rrq, oas) => `Dashed lines: your chosen QPP start (${rrq}) and OAS start (${oas}). Deferring digs into the nest egg first, then lets it recover.`,
     nestFigure: (from, to) => `Nest egg at year end by way of starting the pensions, ages ${from} to ${to}`,
-    worthTitle: 'Net value, by way of starting',
-    worthHint: 'The nest plus what the home is worth less what is still owed on it — what the household owns, in today’s dollars. The nest above is only the accounts you draw on.',
-    worthFigure: (from, to) => `Net value (nest egg plus home equity) at year end by way of starting the pensions, ages ${from} to ${to}`,
+    incomeTitle: 'What the pensions pay, by way of starting',
+    incomeHint: 'What the QPP, the OAS and employer pensions pay each year without drawing on the nest, in today’s dollars. Starting later gives a higher step for life: that is what waiting buys.',
+    incomeFigure: (from, to) => `Guaranteed pension income per year by way of starting, ages ${from} to ${to}`,
     markerRrq: 'QPP',
     markerOas: 'OAS',
     tooltip: (age, year) => `Age ${age} · ${year}`,

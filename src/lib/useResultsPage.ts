@@ -288,9 +288,9 @@ export function useResultsPage() {
           ? [{ id: 'soins', label: rc.nav.soins }, { id: 'annee', label: rc.nav.annee }]
         : [
             { id: 'precision', label: rc.nav.precision },
+            { id: 'sensibilite', label: rc.nav.sensibilite },
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
-            { id: 'sensibilite', label: rc.nav.sensibilite },
             { id: 'parametres', label: rc.nav.parametres },
           ]
 

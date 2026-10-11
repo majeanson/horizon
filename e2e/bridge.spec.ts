@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
-import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile } from './seed'
+import { EXAMPLE, savedProfile, seedProfile } from './seed'
 
 // « Mes années 60 à 70 » in a real browser: the strategy view sits on the results page, always visible, computed
 // off the page's thread, keeps every choice in the address, and shows each year of the bridge as text beside the
@@ -22,7 +22,7 @@ async function openDetails(page: Page): Promise<void> {
   for (const b of await page.locator('.bridge-card').getByRole('button', { name: /^Détails/ }).all()) await b.click()
 }
 
-test('the strategy view sits on the page: each year from 60 to 70, five strategies and two pictures', async ({ page }) => {
+test('the strategy view sits on the page: each year from 60 to 70, five strategies and three pictures', async ({ page }) => {
     const problems = watchConsole(page)
     await page.goto('/resultats?v=strategies&bt=cards')
 
@@ -42,11 +42,12 @@ test('the strategy view sits on the page: each year from 60 to 70, five strategi
     await expect(rows.first().locator('th')).toContainText('60')
     await expect(rows.last().locator('th')).toContainText('70')
     await expect(page.locator('.bridge__table .bridge__tag').first()).toBeVisible()
-    // two pictures, each named
+    // three pictures, each named
     const figures = page.locator('.bridge figure.chart')
-    await expect(figures).toHaveCount(2)
+    await expect(figures).toHaveCount(3)
     await expect(figures.first()).toHaveAttribute('aria-label', /Sources de revenus année par année, de 60 à 70 ans/)
-    await expect(figures.last()).toHaveAttribute('aria-label', /Nid en fin d’année/)
+    await expect(figures.nth(1)).toHaveAttribute('aria-label', /Nid en fin d’année/)
+    await expect(figures.last()).toHaveAttribute('aria-label', /Rentes garanties par année/)
     await expect(figures.first().locator('.recharts-bar-rectangle').first()).toBeVisible()
     expect(await figures.first().locator('.chart__plot').boundingBox().then((b) => b!.height)).toBeGreaterThan(200)
     expect(problems).toEqual([])
@@ -156,20 +157,10 @@ test('on a phone the view fits the screen: the table scrolls inside its own regi
   await expect(page.locator('.bridge__table')).toHaveAttribute('role', 'region')
 })
 
-test('« Le nid » has a net-value twin when there is a home: the nest alone says how the accounts hold, the net value what the household owns', async ({ page }) => {
-  const owner = JSON.parse(JSON.stringify(EXAMPLE))
-  owner.household.home = { value: 520_000, mortgage: { balance: 150_000, rate: 0.049, monthlyPayment: 1_150 }, sale: null }
-  await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(owner)] as const) // after the file's own seed: the last write wins
+test('under « Le nid », a second picture shows what the pensions pay each year: waiting buys a higher step, for life', async ({ page }) => {
   await page.goto('/resultats?v=strategies&bt=cards')
   await expect(page.getByRole('heading', { name: 'Le nid, selon la façon de commencer' })).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByRole('heading', { name: 'La valeur nette, selon la façon de commencer' })).toBeVisible()
-  await expect(page.getByRole('img', { name: /Valeur nette \(nid plus avoir foncier\)/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ce que paient les rentes, selon la façon de commencer' })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Rentes garanties par année selon la façon de commencer/ })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Nid en fin d’année selon/ })).toBeVisible()
-})
-
-test('…and without a home there is one picture: the net value would be the same lines', async ({ page }) => {
-  // (the seeded example owns no home)
-  await page.goto('/resultats?v=strategies&bt=cards')
-  await expect(page.getByRole('heading', { name: 'Le nid, selon la façon de commencer' })).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByRole('heading', { name: 'La valeur nette, selon la façon de commencer' })).toHaveCount(0)
 })

@@ -28,16 +28,17 @@ export function AboutSection({ person, edit, withoutSalary = false, withoutPartT
           <NumberField kind="int" min={1} max={12} value={person.birth.month} onChange={(month) => edit((x) => ({ ...x, birth: { ...x.birth, month } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
-      <FieldRow label={a.retirementAge} hint={a.retirementHint}>
-        {(w) => (
-          <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
-        )}
-      </FieldRow>
+      {/* Income, then the age it stops: the order the first visit asks in. */}
       {!withoutSalary && (
       <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint} fact={factId(person.id, 'salary')}>
         {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       )}
+      <FieldRow label={a.retirementAge} hint={a.retirementHint}>
+        {(w) => (
+          <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
+        )}
+      </FieldRow>
       {!withoutPartTime && <PartTimeFields person={person} edit={edit} />}
     </Section>
   )

@@ -91,3 +91,10 @@ test('in English the chips and the note speak English and the link goes to the E
   await expect(soins).toContainText('ceiling the government sets')
   await expect(soins.getByRole('link', { name: 'Long-Term Residential Care Fees' })).toHaveAttribute('href', /\/en\/users-and-visitors\//)
 })
+
+test('a change of the care moves a figure in dollars at once: the total it costs follows the sliders', async ({ page }) => {
+  await page.goto('/resultats?v=future&care=60000%2C75%2C10')
+  await expect(page.getByText(/Ces soins coûtent 600\s?000\s?\$ en tout sur 10 ans/)).toBeVisible({ timeout: 30_000 })
+  await page.goto('/resultats?v=future&care=20000%2C85%2C5')
+  await expect(page.getByText(/Ces soins coûtent 100\s?000\s?\$ en tout sur 5 ans/)).toBeVisible({ timeout: 30_000 })
+})

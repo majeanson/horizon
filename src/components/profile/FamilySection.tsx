@@ -26,26 +26,15 @@ import { Section } from './shared'
 export function FamilySection({ withKids = true }: { /** The children and what each costs: asked only of someone who said there are some (« Ma situation »). */ withKids?: boolean }) {
   const t = useT()
   const { lang } = useLang()
-  const lc = LIFE_COPY[lang].children
   const f = t.profile.family
   const profile = useProfile()
   const confirm = useConfirm()
   const spouse = hasSpouse(profile)
   const [year, setYear] = useState('')
   const [bad, setBad] = useState(false)
-  const children = profile.household.children ?? []
   const cost = profile.household.childSpending ?? null
-  // The years the children who are still at home today will leave: what the plan drops, and from when.
-  // The years the children who are AT HOME today will leave (a child still to come is not in today's budget, a grown one is gone): what the plan drops, and from when.
   const kc = KIDS_COPY[lang]
   const stageOf = (born: number) => childStage(born, today().year, cost?.untilAge ?? 23)
-  const leaving = cost === null ? [] : children.filter((born) => stageOf(born) === 'home').map((born) => born + cost.untilAge)
-  const coming = cost === null ? [] : children.filter((born) => stageOf(born) === 'future')
-  // The cost per child is an average until the person says what they pay. Against a budget they typed from their own accounts it can take most of it: say so, and offer a quarter.
-  const budget = profile.household.spending.workingToday
-  const kidsTotal = cost === null ? 0 : leaving.length * cost.perChild
-  const heavy = cost !== null && !cost.onTop && budget > 0 && leaving.length > 0 && kidsTotal >= budget * 0.5
-  const quarter = leaving.length === 0 ? 0 : Math.round((budget * 0.25) / leaving.length / 100) * 100
 
   const submitChild = () => {
     // A four-digit year typed as text: digits only, then the same range sentence every NumberField
@@ -129,6 +118,34 @@ export function FamilySection({ withKids = true }: { /** The children and what e
         <p className="field-row__hint">{kc.planned.hint}</p>
       </div>)}
 
+    </Section>
+  )
+}
+
+// What a child costs, and WHERE it sits: inside the annual budget already, or on top of it. A spending question, so it rides inside the Budget card (BudgetSection),
+// right after the two budgets it qualifies — asked only of someone who said there are children (« Ma situation »).
+export function ChildCosts({ withKids = true }: { withKids?: boolean }) {
+  const t = useT()
+  const { lang } = useLang()
+  const lc = LIFE_COPY[lang].children
+  const kc = KIDS_COPY[lang]
+  const profile = useProfile()
+  const children = profile.household.children ?? []
+  const cost = profile.household.childSpending ?? null
+  const stageOf = (born: number) => childStage(born, today().year, cost?.untilAge ?? 23)
+  // The years the children who are still at home today will leave: what the plan drops, and from when.
+  // The years the children who are AT HOME today will leave (a child still to come is not in today's budget, a grown one is gone): what the plan drops, and from when.
+  const leaving = cost === null ? [] : children.filter((born) => stageOf(born) === 'home').map((born) => born + cost.untilAge)
+  const coming = cost === null ? [] : children.filter((born) => stageOf(born) === 'future')
+  // The cost per child is an average until the person says what they pay. Against a budget they typed from their own accounts it can take most of it: say so, and offer a quarter.
+  const budget = profile.household.spending.workingToday
+  const kidsTotal = cost === null ? 0 : leaving.length * cost.perChild
+  const heavy = cost !== null && !cost.onTop && budget > 0 && leaving.length > 0 && kidsTotal >= budget * 0.5
+  const quarter = leaving.length === 0 ? 0 : Math.round((budget * 0.25) / leaving.length / 100) * 100
+
+
+  return (
+    <>
       {withKids && children.length > 0 && (
         <div className="family__cost">
           {cost && (
@@ -186,6 +203,6 @@ export function FamilySection({ withKids = true }: { /** The children and what e
           <KidsCosts />
         </div>
       )}
-    </Section>
+    </>
   )
 }

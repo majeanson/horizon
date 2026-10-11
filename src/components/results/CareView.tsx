@@ -99,6 +99,7 @@ export function CareView({
       <Slider label={c.years} value={care.years} min={CARE_YEARS_MIN} max={CARE_YEARS_MAX} valueText={c.yearsOf} onCommit={(v) => change({ years: v })} />
       <p className="field-row__hint">{c.hint}</p>
       <p className="answer__note">{c.starts(formatYearAge(oldestBirthYear(household) + care.fromAge, births, lang))}</p>
+      <p className="answer__note">{c.total(money(care.amount * care.years), care.years)}</p>
       {busy && a !== null && (
         <p className="bridge__updating" role="status">
           {c.updating}
@@ -110,7 +111,9 @@ export function CareView({
         <>
           <p className="answer__big">{earliestLine}</p>
           {a.ok ? <p className="answer__note">{c.holds(a.age)}</p> : <p className="answer__note">{c.short(a.age, a.firstShortfallYear === null ? '' : formatYearAge(a.firstShortfallYear, births, lang))}</p>}
-          {worthGap >= 1000 && <p className="answer__note">{c.leaves(formatCompactMoney(Math.max(0, a.worthWith), lang), formatCompactMoney(a.worthWithout, lang))}</p>}
+          {!a.ok && a.unmet >= 1 && <p className="answer__note">{c.unmet(formatCompactMoney(a.unmet, lang))}</p>}
+          {/* What is left at the horizon says something only while the plan holds; once it runs out it floors near nothing whatever the care costs. */}
+          {a.ok && worthGap >= 1000 && <p className="answer__note">{c.leaves(formatCompactMoney(Math.max(0, a.worthWith), lang), formatCompactMoney(a.worthWithout, lang))}</p>}
         </>
       )}
       {alreadyThere && <p className="answer__note">{c.already}</p>}

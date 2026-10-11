@@ -159,6 +159,33 @@ export function Hypotheses() {
 
       {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
           first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
+      <Section title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
+        <SubTabs
+          ariaLabel={m.path.title}
+          value={assumptions.marketPath.preset}
+          onSelect={(k) => updateProfile((p) => setMarketPreset(p, k))}
+          options={([...MARKET_PRESETS, 'custom'] as const).map((k) => ({ key: k, label: m.path.names[k] }))}
+        />
+        <p className="field-row__hint">
+          {m.path.about[assumptions.marketPath.preset]}
+          {assumptions.marketPath.preset !== 'smooth' && assumptions.marketPath.preset !== 'custom' ? ` ${MARKET_PATHS[assumptions.marketPath.preset].map((r) => formatPct(r, lang, 0)).join(' · ')}` : ''}
+        </p>
+        {assumptions.marketPath.preset === 'custom' && (
+          <>
+            {assumptions.marketPath.custom.map((v, i) => (
+              <FieldRow key={i} label={m.path.year(i + 1)}>
+                {(w) => <NumberField kind="percent" min={-0.6} max={0.6} value={v ?? averageReturn} onChange={(x) => updateProfile((p) => setMarketYear(p, i, x))} id={w.id} />}
+              </FieldRow>
+            ))}
+            <Cluster>
+              <Chip icon="plus-bold" onClick={() => updateProfile((p) => resizeMarketPath(p, 1, (p.assumptions.returns.rrsp + p.assumptions.returns.tfsa + p.assumptions.returns.nonReg) / 3))}>{m.path.add}</Chip>
+              <Chip icon="minus-bold" onClick={() => updateProfile((p) => resizeMarketPath(p, -1, 0))}>{m.path.remove}</Chip>
+            </Cluster>
+            <p className="field-row__hint">{m.path.countsFrom}</p>
+          </>
+        )}
+      </Section>
+
       <Section title={a.horizon.title} subtitle={a.horizon.hint} icon="calendar-blank-bold">
         {profile.household.persons.map((person, i) => {
           const own = person.horizonAge ?? null
@@ -216,33 +243,6 @@ export function Hypotheses() {
         {/* The splitting switch only when there is someone to split with. */}
         {hasSpouse(profile) && <Switch checked={assumptions.pensionSplitting} onChange={(pensionSplitting) => updateProfile((p) => setAssumptions(p, { pensionSplitting }))} label={a.splitting.on} hint={a.splitting.hint} />}
         <Switch checked={assumptions.surplusToRrsp === true} onChange={(surplusToRrsp) => updateProfile((p) => setAssumptions(p, { surplusToRrsp }))} label={m.surplus.on} hint={m.surplus.hint} />
-      </Section>
-
-      <Section title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
-        <SubTabs
-          ariaLabel={m.path.title}
-          value={assumptions.marketPath.preset}
-          onSelect={(k) => updateProfile((p) => setMarketPreset(p, k))}
-          options={([...MARKET_PRESETS, 'custom'] as const).map((k) => ({ key: k, label: m.path.names[k] }))}
-        />
-        <p className="field-row__hint">
-          {m.path.about[assumptions.marketPath.preset]}
-          {assumptions.marketPath.preset !== 'smooth' && assumptions.marketPath.preset !== 'custom' ? ` ${MARKET_PATHS[assumptions.marketPath.preset].map((r) => formatPct(r, lang, 0)).join(' · ')}` : ''}
-        </p>
-        {assumptions.marketPath.preset === 'custom' && (
-          <>
-            {assumptions.marketPath.custom.map((v, i) => (
-              <FieldRow key={i} label={m.path.year(i + 1)}>
-                {(w) => <NumberField kind="percent" min={-0.6} max={0.6} value={v ?? averageReturn} onChange={(x) => updateProfile((p) => setMarketYear(p, i, x))} id={w.id} />}
-              </FieldRow>
-            ))}
-            <Cluster>
-              <Chip icon="plus-bold" onClick={() => updateProfile((p) => resizeMarketPath(p, 1, (p.assumptions.returns.rrsp + p.assumptions.returns.tfsa + p.assumptions.returns.nonReg) / 3))}>{m.path.add}</Chip>
-              <Chip icon="minus-bold" onClick={() => updateProfile((p) => resizeMarketPath(p, -1, 0))}>{m.path.remove}</Chip>
-            </Cluster>
-            <p className="field-row__hint">{m.path.countsFrom}</p>
-          </>
-        )}
       </Section>
 
       {gaps.length === 0 ? (

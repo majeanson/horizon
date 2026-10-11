@@ -125,7 +125,6 @@ export function Profil() {
       <Suspense fallback={null}>
         <SituationCard />
       </Suspense>
-      <BackupLine />
       <Rail>
         <Chip to="/documents" icon="identification-card-bold">
           {DOCUMENTS_COPY[lang].link}
@@ -149,9 +148,6 @@ export function Profil() {
       <Suspense fallback={null}>
         <LevelPicker />
       </Suspense>
-      <BudgetSection />
-      {applies(profile, yes, 'home') && <HomeSection />}
-      {applies(profile, yes, 'events') && <LifeSection />}
       <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
         {profile.household.persons.map((p, i) => {
           const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
@@ -166,6 +162,11 @@ export function Profil() {
           )
         })}
       </div>
+      {/* The household’s own costs come after the people, as on the first visit: the retirement ages are known by the time a budget is asked. */}
+      <BudgetSection withKids={applies(profile, yes, 'kids')} />
+      {applies(profile, yes, 'home') && <HomeSection />}
+      {applies(profile, yes, 'events') && <LifeSection />}
+      <BackupLine />
       {/* « Rendre mon profil exact »: the meter, the documents and the guide — after the form, loaded on its own, the form never waits for it. */}
       <Suspense fallback={null}>
         <AccuracyGuide />
@@ -197,10 +198,11 @@ function PersonFields({ id }: { id: PersonId }) {
   return (
     <>
       <AboutSection person={person} edit={edit} withoutPartTime={!applies(profile, yes, 'partTime', id)} />
-      <RrqSection person={person} edit={edit} />
-      <OasSection person={person} edit={edit} withoutResidence={!applies(profile, yes, 'abroad', id)} />
+      {/* What the person holds, then what they will be paid: accounts, an employer plan, then the QPP and the OAS. */}
       <AccountsSection person={person} edit={edit} withNonReg={applies(profile, yes, 'nonReg', id)} />
       {applies(profile, yes, 'pension', id) && <PensionPlans person={person} edit={edit} />}
+      <RrqSection person={person} edit={edit} />
+      <OasSection person={person} edit={edit} withoutResidence={!applies(profile, yes, 'abroad', id)} />
     </>
   )
 }

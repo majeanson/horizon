@@ -65,8 +65,8 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
   const first = rows[0]?.age ?? 0
   const last = rows[rows.length - 1]?.age ?? 0
   const inWindow = (age: number) => age >= first && age <= last
-  // The same four lines twice: the nest (the accounts drawn on), and the household's net value (the nest plus the home's equity).
-  const lines = (of: 'total' | 'worth') => [
+  // The same four lines twice: the nest over the window (what the bridge costs), and what the pensions PAY a year over the rest of the plan (what waiting buys).
+  const lines = (of: 'total' | 'guaranteed') => [
     { id: 'selected', label: copy.selectedName, colour: 'accent' as const, key: null },
     { id: 'asap', label: copy.strategyName.asap, colour: 'sky' as const, key: 'asap' as const },
     { id: 'standard', label: copy.strategyName.standard, colour: 'sage' as const, key: 'standard' as const },
@@ -75,13 +75,11 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
     id: s.id,
     label: s.label,
     colour: s.colour,
-    points: (s.key === null ? view.selected.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total, worth: r.nest.total + r.homeEquity })) : view.strategies.find((c) => c.key === s.key)!.nest)
-      .filter((p) => inWindow(p.age))
+    points: (s.key === null ? view.selected.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total, guaranteed: r.guaranteed })) : view.strategies.find((c) => c.key === s.key)!.nest)
+      .filter((p) => (of === 'total' ? inWindow(p.age) : p.age >= first))
       .map((p) => ({ x: p.year, y: p[of] })),
   }))
   const nestSeries = lines('total')
-  // Without a home, net value IS the nest: a second picture of the same lines would say nothing.
-  const hasHome = rows.some((r) => r.homeEquity > 0.5)
   // One marker per start age; when both pensions start the same year they share one line and one label.
   const starts = (at: (age: number) => number) => {
     const { rrqStartAge: q, oasStartAge: o } = params.levers
@@ -129,25 +127,21 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
           />
         </Suspense>
       </div>
-      {hasHome && (
-        <>
-          <h3 className="bridge__heading">{copy.worthTitle}</h3>
-          <p className="field-row__hint">{copy.worthHint}</p>
-          <div className="chart-slot">
-            <Suspense fallback={<Loading />}>
-              <LineChart
-                series={lines('worth')}
-                markers={markers}
-                yFormat={(y) => formatCompactMoney(y, lang)}
-                yDetail={(y) => formatMoney(y, lang)}
-                xTitle={(year) => copy.tooltip(year - person.birth.year, year)}
-                xTick={yearTick}
-                ariaLabel={copy.worthFigure(first, last)}
-              />
-            </Suspense>
-          </div>
-        </>
-      )}
+      <h3 className="bridge__heading">{copy.incomeTitle}</h3>
+      <p className="field-row__hint">{copy.incomeHint}</p>
+      <div className="chart-slot">
+        <Suspense fallback={<Loading />}>
+          <LineChart
+            series={lines('guaranteed')}
+            markers={markers}
+            yFormat={(y) => formatCompactMoney(y, lang)}
+            yDetail={(y) => formatMoney(y, lang)}
+            xTitle={(year) => copy.tooltip(year - person.birth.year, year)}
+            xTick={yearTick}
+            ariaLabel={copy.incomeFigure(first, rows.length > 0 ? Math.max(...view.selected.rows.map((r) => r.age)) : last)}
+          />
+        </Suspense>
+      </div>
     </div>
   )
 }
@@ -369,9 +363,6 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
             label={(k) => (k === 'standard' && mineIsStandard ? copy.standardIsMine : k === 'mine' ? `${copy.strategyName.mine} (${copy.age(levers.retirementAge)})` : copy.strategyName[k])}
           />
 
-          <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
-          <p className="field-row__hint">{copy.householdNote}</p>
-
           <h3 className="bridge__heading">{copy.whyTitle}</h3>
           <ul className="bridge__list">
             <li>{standard && view.selected.summary.drawn6070 - standard.summary.drawn6070 > 50 ? copy.whyCost(money(view.selected.summary.drawn6070 - standard.summary.drawn6070)) : copy.whyCostNone}</li>
@@ -387,6 +378,10 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
               <li key={line}>{line}</li>
             ))}
           </ul>
+
+          {/* The reference at the end: the year-by-year table, once the choice and its reasons have been read. */}
+          <YearTable view={view} span={windowShown} levers={shown} copy={copy} />
+          <p className="field-row__hint">{copy.householdNote}</p>
         </>
       )}
     </div>

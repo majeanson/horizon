@@ -75,7 +75,7 @@ function StepBody({ step }: { step: Step }) {
     case 'home':
       return <HomeSection />
     case 'budget':
-      return <BudgetSection />
+      return <BudgetSection withKids={applies(profile, yes, 'kids')} />
     case 'residence':
       return <Persons render={(person, edit) => <OasSection person={person} edit={edit} withoutResidence={!applies(profile, yes, 'abroad', person.id)} />} />
   }

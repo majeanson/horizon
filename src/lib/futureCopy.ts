@@ -24,6 +24,9 @@ export interface FutureCopy {
     /** At the answer's own age the plan falls short in this year (already « 2051 (85 ans) »). */
     short: (age: number, yearAge: string) => string
     holds: (age: number) => string
+    /** What the care costs in all, and — when the plan falls short at the answer's age — how much it could not pay: both move with every dollar of the sliders. */
+    total: (amount: string, years: number) => string
+    unmet: (amount: string) => string
     keep: string
     kept: string
     full: (max: number) => string
@@ -73,6 +76,8 @@ const FR: FutureCopy = {
     leaves: (withCare, without) => `À l’horizon du plan, il resterait ${withCare} au lieu de ${without} (dollars d’aujourd’hui, REER avant impôt).`,
     short: (age, yearAge) => `Si vous arrêtez à ${age} ans, l’argent manquerait dès ${yearAge}.`,
     holds: (age) => `Si vous arrêtez à ${age} ans, l’argent dure jusqu’au bout.`,
+    total: (amount, years) => `Ces soins coûtent ${amount} en tout sur ${years} ${years === 1 ? 'an' : 'ans'} (dollars d’aujourd’hui).`,
+    unmet: (amount) => `Il manquerait ${amount} en tout (dollars d’aujourd’hui).`,
     keep: 'L’ajouter à mes événements',
     kept: 'Ajouté à vos événements datés, sur Profil.',
     full: (max) => `Les ${max} événements sont utilisés : retirez-en un sur Profil pour en ajouter.`,
@@ -117,6 +122,8 @@ const EN: FutureCopy = {
     leaves: (withCare, without) => `At the plan’s horizon there would be ${withCare} left instead of ${without} (today’s dollars, RRSP before tax).`,
     short: (age, yearAge) => `If you stop at ${age}, the money would run short from ${yearAge}.`,
     holds: (age) => `If you stop at ${age}, the money lasts to the end.`,
+    total: (amount, years) => `This care costs ${amount} in all over ${years} ${years === 1 ? 'year' : 'years'} (today’s dollars).`,
+    unmet: (amount) => `${amount} would be missing in all (today’s dollars).`,
     keep: 'Add it to my events',
     kept: 'Added to your dated events, on Profile.',
     full: (max) => `All ${max} events are used: remove one on Profile to add this.`,

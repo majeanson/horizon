@@ -26,6 +26,11 @@ export function VerifyView({ m }: { m: ResultsModel }) {
           </section>
 
           {/* The ages and figures that set the answer, with their calculation and a slider each. */}
+          <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
+            <SectionHeader title={r.sensitivity.title} subtitle={rc.headline.sensitivityDetail} />
+            <SensitivityPanel household={profile.household} assumptions={assumptions} />
+          </section>
+
           <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
             <SectionHeader title={LEDGER_COPY[lang].title} />
             <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
@@ -35,11 +40,6 @@ export function VerifyView({ m }: { m: ResultsModel }) {
             <SectionHeader title={r.table.title} />
             {runsPending && <Skeleton count={6} />}
             <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
-          </section>
-
-          <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
-            <SectionHeader title={r.sensitivity.title} subtitle={rc.headline.sensitivityDetail} />
-            <SensitivityPanel household={profile.household} assumptions={assumptions} />
           </section>
 
           <section id="parametres" className="results-section" aria-label={r.params.title}>
