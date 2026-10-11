@@ -18,8 +18,14 @@ concurrency:
 
 jobs:
   e2e:
-    name: E2E (Playwright)
+    name: E2E (Playwright) ${{ matrix.shard }}
     runs-on: ubuntu-latest
+    # The suite is split in four parallel runners (Playwright's own --shard): the same shape in each — one worker, no retries — so a flake still FAILS and still names the test,
+    # but the wall time is a quarter of the whole. A shard that fails does not cancel the others: every failure is reported in one pass.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/4', '2/4', '3/4', '4/4']
     # On the workflow_run path, only proceed if CI actually passed. (A manual workflow_dispatch
     # has no upstream conclusion, so let that through.)
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
@@ -40,12 +46,12 @@ jobs:
       # CI's authoritative shape: one worker, no retries — a flake FAILS, and which test flaked
       # is the whole signal. Playwright boots the Vite dev server itself (webServer config);
       # there is no backend to stub.
-      - run: npm run e2e:ci
+      - run: npm run e2e:ci -- --shard=${{ matrix.shard }}
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-${{ strategy.job-index }}
           path: e2e/report
           retention-days: 7
 

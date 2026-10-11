@@ -129,7 +129,7 @@ Run one file or one test: `npx vitest run src/engine/rrq.props.test.ts` · `npx 
 
 CI (`.github/workflows/ci.yml`) runs typecheck → test → build → check:bundle → knip on every
 push; on `main` it then deploys. E2E (`e2e.yml`) chains off a green CI and never blocks the
-deploy. **Node 26.** A local e2e run is *weaker* than CI (4 workers, 1 retry) — a flake fails
+deploy; it runs as four parallel shards (`--shard=n/4`, one worker and no retries each), so a red run names every failing test in about a quarter of the time. **Node 26.** A local e2e run is *weaker* than CI (4 workers, 1 retry) — a flake fails
 the local run, and **which test flaked is the whole signal**; never dismiss one unread.
 
 > **Workflow: push straight to `main`.** No PR branches — commit and `git push origin main`.

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
@@ -12,9 +13,12 @@ import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
 import { AnswerView } from '../components/results/views/AnswerView'
 import { AdjustView } from '../components/results/views/AdjustView'
-import { StrategiesView } from '../components/results/views/StrategiesView'
-import { VerifyView } from '../components/results/views/VerifyView'
+import { Skeleton } from '../components/Skeleton'
 import { useResultsPage } from '../lib/useResultsPage'
+
+// The two heaviest views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
+const StrategiesView = lazy(() => import('../components/results/views/StrategiesView').then((m) => ({ default: m.StrategiesView })))
+const VerifyView = lazy(() => import('../components/results/views/VerifyView').then((m) => ({ default: m.VerifyView })))
 
 // The answer. It comes FIRST on the page — one sentence, the age drawn large, in dates — then what the same answer looks
 // like under the three scenarios and a hard market, what would move it most, what would make it more precise, and the
@@ -79,10 +83,18 @@ export function Resultats() {
       {view === 'adjust' && <AdjustView m={m} />}
 
       {/* 3 — two decisions: when to start the QPP and the OAS, and in which order to draw the accounts. Once every start is behind the household, nothing to choose. */}
-      {view === 'strategies' && <StrategiesView m={m} />}
+      {view === 'strategies' && (
+        <Suspense fallback={<Skeleton count={4} />}>
+          <StrategiesView m={m} />
+        </Suspense>
+      )}
 
       {/* 4 — « Vérifier »: how firm the answer is, how it was checked, and every figure behind it. */}
-      {view === 'verify' && <VerifyView m={m} />}
+      {view === 'verify' && (
+        <Suspense fallback={<Skeleton count={4} />}>
+          <VerifyView m={m} />
+        </Suspense>
+      )}
 
       {/* On paper the plan is the open view AND what a reader checks it against, whichever view that is: the year by year and the cited figures. */}
       {printing && view !== 'verify' && (
