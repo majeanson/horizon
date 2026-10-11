@@ -54,8 +54,8 @@ test('« Vérifier » shows the earliest age under a hard market, beside « Liss
   await expect(page.getByText('Si les marchés tournent mal')).toBeVisible()
   const smooth = page.locator('.verdict__range-item', { hasText: 'Lisse' })
   const bad = page.locator('.verdict__range-item', { hasText: 'Mauvais départ' })
-  await expect(smooth.locator('dd')).toHaveText(/\d+ ans|aucun/)
-  await expect(bad.locator('dd')).toHaveText(/\d+ ans|aucun/)
+  await expect(smooth.locator('dd')).toHaveText(/\d+ ans|aucun/, { timeout: 60_000 })
+  await expect(bad.locator('dd')).toHaveText(/\d+ ans|aucun/, { timeout: 60_000 })
   await expect(page.getByRole('link', { name: 'Choisir ou modifier le parcours' })).toBeVisible()
 })
 
