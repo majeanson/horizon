@@ -46,10 +46,10 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // the per-card scenario marks that replaced the strategies' matrix table.
 // 160 → 166 KB raw on 2026-10-08 (measured 164,2 KB): the engine's surviving spouse's pension (survivor.ts), the Allowance for
 // the Survivor and the names of their fourteen figures ride in the results closure with the rest of the engine.
-// 166 → 167 KB raw on 2026-10-11 (measured 166,0 KB): the note that says why one person's bars are empty for years (chartData.idleStretch and its two sentences).
+// 166 → 167 KB raw on 2026-10-11 (measured 166,3 KB): the note that says why one person's bars are empty for years (chartData.idleStretch and its two sentences).
 const LAZY_CAPS = [
   { re: /^charts-[^.]*\.js$/, cap: 372 * KB },
-  { re: /^Resultats-[^.]*\.js$/, cap: 166 * KB },
+  { re: /^Resultats-[^.]*\.js$/, cap: 167 * KB },
 ]
 
 // The door.
