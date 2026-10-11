@@ -1,0 +1,104 @@
+import { useEffect } from 'react'
+import { useLang, useT } from '../../i18n'
+import { accuracyOf, factsOf } from '../../lib/facts'
+import { bringIntoView, setGuided } from '../../lib/guide'
+import { GUIDE_COPY } from '../../lib/guideCopy'
+import { setFacts } from '../../lib/profileEdit'
+import { updateProfile, useProfile } from '../../lib/store'
+import { Chip } from '../Chip'
+import { Icon } from '../Icon'
+
+// THE GUIDE: a card docked at the bottom that walks the real form, one unconfirmed figure at a time — scrolling to it, saying where it is and in which words
+// the document prints it (the ⓘ's own text), and confirming it on a tap. Started from « Rendre mon profil exact » (every figure) and from a step of
+// « Par document » (the figures of that document); it reads the figures' ids it is given and writes only `confirmed`.
+// The card docked at the bottom while the guide runs: one figure at a time, on the real form. Three actions, not four:
+// « C'est confirmé », « Plus tard » and the close — a « Précédent » in a bar already crowded on a phone was the one nobody used.
+export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: number; setAt: (at: number) => void; onClose: () => void }) {
+  const t = useT()
+  const { lang } = useLang()
+  const c = GUIDE_COPY[lang]
+  const profile = useProfile()
+  const facts = factsOf(profile)
+  const finished = at >= ids.length
+  const fact = finished ? null : (facts.find((f) => f.id === ids[at]) ?? null)
+
+  // Light the field and bring it on screen at each step; nothing is lit when the guide ends or closes.
+  useEffect(() => {
+    if (fact === null) {
+      setGuided(null)
+      return
+    }
+    setGuided(fact.id)
+    bringIntoView(fact.id)
+  }, [fact?.id])
+  useEffect(() => () => setGuided(null), [])
+  // A figure that stopped applying while the guide was on it (its account was emptied…) is skipped.
+  useEffect(() => {
+    if (!finished && fact === null) setAt(at + 1)
+  }, [finished, fact, at, setAt])
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  const owner = fact === null ? '' : fact.owner === 'household' ? c.guide.householdOwner : c.guide.owner(profile.household.persons.find((p) => p.id === fact.owner)?.name.trim() || (fact.owner === 'self' ? t.profile.self : t.profile.spouse))
+  const entry = fact?.info ? t.info[fact.info] : null
+  const where = fact === null ? '' : (entry?.where ?? c.where[fact.kind] ?? '')
+  const acc = accuracyOf(profile)
+
+  return (
+    <aside className="guide-bar" role="region" aria-label={c.guide.label} aria-live="polite">
+      {finished || fact === null ? (
+        <>
+          <p className="guide-bar__title">{c.guide.finished}</p>
+          <p className="field-row__hint">{c.guide.finishedNote(acc.confirmed, acc.total)}</p>
+          <div className="guide-bar__actions">
+            <Chip onClick={onClose}>{c.guide.close}</Chip>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="guide-bar__step">
+            {c.guide.step(at + 1, ids.length)} · {owner}
+          </p>
+          <p className="guide-bar__title">{c.kind[fact.kind]}</p>
+          <p className="guide-bar__doc">
+            <strong>{c.guide.document} :</strong> {c.docs[fact.doc].name}
+          </p>
+          <p className="guide-bar__where">
+            <strong>{c.guide.whereIs} :</strong> {where}
+            {entry?.label ? (
+              <>
+                {' '}
+                <strong>{c.guide.wording} :</strong> « {entry.label} »
+              </>
+            ) : null}
+          </p>
+          {entry?.url ? (
+            <a className="info-note__link" href={entry.url} target="_blank" rel="noopener noreferrer">
+              {c.panel.openPage}
+              <Icon name="arrow-up-right-bold" size={14} />
+            </a>
+          ) : null}
+          <div className="guide-bar__actions">
+            <Chip
+              icon="check-bold"
+              selected={fact.confirmed}
+              onClick={() => {
+                updateProfile((p) => setFacts(p, [fact.id], true))
+                setAt(at + 1)
+              }}
+            >
+              {fact.confirmed ? c.guide.confirmed : c.guide.confirm}
+            </Chip>
+            <Chip onClick={() => setAt(at + 1)}>{fact.confirmed ? c.guide.next : c.guide.skip}</Chip>
+            <Chip icon="x-bold" onClick={onClose} ariaLabel={c.guide.close}>
+              {c.guide.close}
+            </Chip>
+          </div>
+        </>
+      )}
+    </aside>
+  )
+}

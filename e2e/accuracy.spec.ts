@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile } from './seed'
 
-// « RENDRE MON PROFIL EXACT »: each figure is confirmed (read off a document) or estimated; the meter counts them; the checklist
-// names the documents; the guide walks the real form one figure at a time.
+// « RENDRE MON PROFIL EXACT »: each figure is confirmed (read off a document) or estimated; the meter counts them; the documents are the steps
+// of « Par document » (one list, not two); the guide walks the real form one figure at a time — every figure, or one document's.
 
 test.beforeEach(async ({ page }) => {
   await seedProfile(page, EXAMPLE)
@@ -34,27 +34,35 @@ test('a figure is estimated until the person says it is real; the mark, the mete
   await expect(page.locator('[data-fact="self:rrspBalance"]').getByRole('button', { name: /^Confirmé/ })).toBeVisible()
 })
 
-test('the checklist names the documents, what each confirms, and its official page; a figure in it leads to its field', async ({ page }) => {
+test('the panel is a door to « Par document », beside the two quick ways, and sits after the form', async ({ page }) => {
   await page.goto('/profil')
-  const docs = panel(page).locator('.doc')
-  // the documents come most important first: the spending budget leads
-  await expect(docs.first()).toContainText('Vos dépenses des 12 derniers mois')
-  await expect(docs.filter({ hasText: 'Relevé de participation au RRQ' })).toHaveCount(1)
-  await expect(panel(page).locator('.doc', { hasText: 'Avis de cotisation' }).getByRole('link', { name: /page officielle/ })).toHaveAttribute('href', /^https:\/\/www\.canada\.ca\//)
   // the two ways are two chips: walk every figure with the guide, or estimate what is still blank
   await expect(panel(page).getByRole('button', { name: 'Tout confirmer pas à pas' })).toBeVisible()
   await expect(panel(page).getByRole('button', { name: 'Estimer ce qui manque' })).toBeVisible()
+  // the documents are NOT listed a second time here: no per-document cards in the panel
+  await expect(panel(page).locator('.doc')).toHaveCount(0)
   // the panel sits AFTER the form, and the one-line meter above the form leads to it
   expect(await page.locator('.accuracy-line').evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(await panel(page).evaluate((el) => el.getBoundingClientRect().top))
-  // a figure of the checklist scrolls to its field and lights it
-  await panel(page).locator('.doc', { hasText: 'Relevés de vos comptes' }).getByRole('button', { name: /Solde du REER, .*Camille/ }).click()
-  await expect(page.locator('[data-fact="self:rrspBalance"]')).toHaveClass(/field-row--guided/)
-  await expect(page.locator('[data-fact="self:rrspBalance"]')).toBeInViewport()
+  await panel(page).getByRole('button', { name: 'Confirmer document par document' }).click()
+  await expect(page).toHaveURL(/par=document/)
+  await expect(page.getByRole('tab', { name: 'Par document' })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('heading', { name: 'Vous et votre ménage', level: 2 })).toBeVisible()
+})
+
+test('a document’s step names it, says what it settles and where to get it, and links its official page', async ({ page }) => {
+  await page.goto('/profil?form=1&par=document&etape=tax')
+  await expect(page.getByRole('heading', { name: 'Avis de cotisation et compte de l’ARC', level: 2 })).toBeVisible()
+  await expect(page.getByRole('link', { name: /page officielle/ })).toHaveAttribute('href', /^https:\/\/www\.canada\.ca\//)
+  await expect(page.locator('.saisie__head').getByText('Où le trouver')).toBeVisible()
+  // the budget leads the order of the steps, as it led the old list
+  const steps = page.getByRole('navigation', { name: 'Les étapes de la saisie' }).getByRole('button')
+  await expect(steps.nth(1)).toContainText('Vous et votre ménage')
+  await expect(steps.nth(2)).toContainText('Vos dépenses des 12 derniers mois')
 })
 
 test('the guide walks the form: it lights the field, says where the figure is, confirms on a tap, and ends with the count', async ({ page }) => {
-  await page.goto('/profil')
-  await panel(page).locator('.doc', { hasText: 'Relevés de vos comptes' }).getByRole('button', { name: 'Me guider' }).click()
+  await page.goto('/profil?form=1&par=document&etape=bank')
+  await page.getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await expect(bar).toBeVisible()
   await expect(bar).toContainText('Chiffre 1 sur')
@@ -78,9 +86,9 @@ test('the guide walks the form: it lights the field, says where the figure is, c
 })
 
 test('the guide finishes: after the last figure it says how many are confirmed', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?form=1&par=document&etape=budget')
   // the budget document has two figures: confirm both
-  await panel(page).locator('.doc', { hasText: 'Vos dépenses des 12 derniers mois' }).getByRole('button', { name: 'Me guider' }).click()
+  await page.getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await bar.getByRole('button', { name: 'C’est confirmé' }).click()
   await bar.getByRole('button', { name: 'C’est confirmé' }).click()
@@ -88,14 +96,14 @@ test('the guide finishes: after the last figure it says how many are confirmed',
   await expect(bar).toContainText(/2 sur \d+ chiffres confirmés/)
   await bar.getByRole('button', { name: 'Fermer le guide' }).click()
   await expect(bar).toHaveCount(0)
-  // the document is done: its row says so and offers no guide
-  await expect(panel(page).locator('.doc', { hasText: 'Vos dépenses des 12 derniers mois' }).getByRole('button', { name: 'Me guider' })).toHaveCount(0)
+  // the document is done: its step offers no guide
+  await expect(page.getByRole('button', { name: 'Me guider' })).toHaveCount(0)
 })
 
 test('on a phone the guide sits above the bottom navigation, inside the window, and nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/profil')
-  await panel(page).locator('.doc', { hasText: 'Relevés de vos comptes' }).getByRole('button', { name: 'Me guider' }).click()
+  await page.goto('/profil?form=1&par=document&etape=bank')
+  await page.getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await expect(bar).toBeVisible()
   const box = (await bar.boundingBox())!

@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode, lazy, Suspense } from 'react'
+import { useEffect, useState, type ReactNode, lazy, Suspense } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import type { Person } from '../../engine/types'
 import { AboutSection } from './AboutSection'
@@ -13,6 +13,7 @@ import type { PersonEditor } from './shared'
 import { Chip } from '../Chip'
 import { Cluster, Rail } from '../Layout'
 import { DocumentsChecklist } from './DocumentsChecklist'
+import { GuideBar } from './GuideBar'
 import { StatusMessage } from '../StatusMessage'
 import { useLang, useT } from '../../i18n'
 import { useTicks } from '../../lib/documentsTicks'
@@ -108,9 +109,13 @@ export default function EntryByDocument() {
   const gathered = (d: DocId) => [...ticks].some((id) => id.startsWith(`${d}:`))
   const anyTicked = ticks.size > 0
   const saved = lastStep()
+  // « Me guider »: the guide of « Rendre mon profil exact », for the figures of THIS document only (fixed when it starts, so confirming one does not reshuffle the rest).
+  const [tour, setTour] = useState<{ ids: string[]; at: number } | null>(null)
+  const todo = ids.filter((id) => !new Set(profile.confirmed).has(id))
 
   useEffect(() => {
     rememberStep(step.id)
+    setTour(null) // a guide belongs to the step it was started on
   }, [step.id])
 
   const go = (id: string) =>
@@ -180,9 +185,16 @@ export default function EntryByDocument() {
       {ids.length > 0 && (
         <div className="saisie__confirm surface">
           <p>{c.confirmedOf(progress.confirmed, ids.length)}</p>
-          <Chip selected={allConfirmed} onClick={() => updateProfile((p) => setFacts(p, ids, !allConfirmed))}>
-            {allConfirmed ? c.unconfirmAll : c.confirmAll}
-          </Chip>
+          <Cluster>
+            <Chip selected={allConfirmed} onClick={() => updateProfile((p) => setFacts(p, ids, !allConfirmed))}>
+              {allConfirmed ? c.unconfirmAll : c.confirmAll}
+            </Chip>
+            {todo.length > 0 && (
+              <Chip icon="arrow-right-bold" onClick={() => setTour({ ids: todo, at: 0 })}>
+                {guide.panel.guideMe}
+              </Chip>
+            )}
+          </Cluster>
         </div>
       )}
 
@@ -200,6 +212,7 @@ export default function EntryByDocument() {
       </Cluster>
         </>
       )}
+      {tour && <GuideBar ids={tour.ids} at={tour.at} setAt={(at) => setTour({ ids: tour.ids, at })} onClose={() => setTour(null)} />}
     </section>
   )
 }

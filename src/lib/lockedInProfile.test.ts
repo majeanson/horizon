@@ -10,7 +10,8 @@ import { migrateProfile } from './migrations.ts'
 import { setRrspBalance } from './profileEdit.ts'
 import { exampleProfile } from './example.ts'
 import { SCHEMA_VERSION, validateProfile, type Profile } from './schema.ts'
-import { lockedOf, yearCsv } from './yearCsv.ts'
+import { yearCsv } from './yearCsv.ts'
+import { lockedOf } from './yearTable.ts'
 
 // THE LOCKED-IN PART OF THE REER, AS A SAVED PROFILE: what is accepted, what is refused, how an older file opens, what is asked of
 // someone who has none (nothing), and how the part shows in the chart and the spreadsheet.

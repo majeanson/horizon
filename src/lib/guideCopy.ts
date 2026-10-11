@@ -35,13 +35,11 @@ export interface GuideCopy {
     allDone: string
     legendConfirmed: string
     legendEstimated: string
-    nothingHere: string
-    figures: (n: number) => string
-    fills: string
     openPage: string
     guideMe: string
     guideAll: string
-    show: string
+    /** The door from « Rendre mon profil exact » to « Par document ». */
+    byDocument: string
     estimatedNote: (estimated: number) => string
     estimate: string
     quickDoes: string
@@ -98,19 +96,16 @@ const FR: GuideCopy = {
   },
   panel: {
     title: 'Rendre mon profil exact',
-    lead: 'Chaque chiffre est soit lu sur un document (confirmé), soit une estimation. Voici les documents qui contiennent les vrais chiffres.',
+    lead: 'Chaque chiffre est soit lu sur un document (confirmé), soit une estimation. Confirmez-les document par document, ou laissez le guide vous mener d’un chiffre à l’autre.',
     count: (c, t) => `${c} sur ${t} chiffres confirmés`,
     none: 'Aucun chiffre n’est encore confirmé : le résultat repose sur des estimations.',
     allDone: 'Tout est confirmé : votre profil repose sur vos documents.',
     legendConfirmed: 'Confirmé',
     legendEstimated: 'Estimé',
-    nothingHere: 'Rien à confirmer ici pour l’instant.',
-    figures: (n) => (n === 1 ? '1 chiffre' : `${n} chiffres`),
-    fills: 'Confirme :',
     openPage: 'Ouvrir la page officielle',
     guideMe: 'Me guider',
     guideAll: 'Tout confirmer pas à pas',
-    show: 'Aller aux champs',
+    byDocument: 'Confirmer document par document',
     estimatedNote: (n) => (n === 1 ? 'Un chiffre du profil est encore une estimation.' : `${n} chiffres du profil sont encore des estimations.`),
     estimate: 'Estimer ce qui manque',
     quickDoes: 'L’estimation remplit votre historique de revenus (à partir de votre salaire) et vos droits de CELI (à partir de votre âge et de votre solde). Il ne touche jamais un chiffre déjà saisi.',
@@ -210,19 +205,16 @@ const EN: GuideCopy = {
   },
   panel: {
     title: 'Make my profile exact',
-    lead: 'Each figure is either read off a document (confirmed) or an estimate. These are the documents that hold the real numbers.',
+    lead: 'Each figure is either read off a document (confirmed) or an estimate. Confirm them document by document, or let the guide take you from one figure to the next.',
     count: (c, t) => `${c} of ${t} figures confirmed`,
     none: 'No figure is confirmed yet: the result rests on estimates.',
     allDone: 'Everything is confirmed: your profile rests on your documents.',
     legendConfirmed: 'Confirmed',
     legendEstimated: 'Estimated',
-    nothingHere: 'Nothing to confirm here for now.',
-    figures: (n) => (n === 1 ? '1 figure' : `${n} figures`),
-    fills: 'Confirms:',
     openPage: 'Open the official page',
     guideMe: 'Guide me',
     guideAll: 'Confirm everything, step by step',
-    show: 'Go to the fields',
+    byDocument: 'Confirm document by document',
     estimatedNote: (n) => (n === 1 ? 'One figure in the profile is still an estimate.' : `${n} figures in the profile are still estimates.`),
     estimate: 'Estimate what is missing',
     quickDoes: 'The estimate fills your earnings history (from your salary) and your TFSA room (from your age and balance). It never touches a figure you already typed.',

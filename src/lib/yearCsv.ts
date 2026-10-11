@@ -1,5 +1,6 @@
 import type { AgeResult } from '../engine/types'
 import type { Lang } from '../i18n'
+import { yearTableModel } from './yearTable'
 
 // The per-year table as a spreadsheet file, for an advisor or a spouse who wants the numbers in a cell, not on a
 // screen. Whole dollars, no thousands separators and no currency sign — a spreadsheet reads a bare integer in any locale
@@ -32,32 +33,27 @@ export interface YearCsvOptions {
   unit?: string
 }
 
-/** The locked-in part of the household's REER at the end of the year (0 for most households). */
-export const lockedOf = (row: AgeResult['rows'][number]): number => Object.values(row.persons).reduce((s, p) => s + p.rrspLockedEnd, 0)
-
 const field = (text: string, sep: string): string => (text.includes(sep) || text.includes('"') ? `"${text.replace(/"/g, '""')}"` : text)
 
 export function yearCsv(result: AgeResult, heads: YearCsvHeads, lang: Lang, options: YearCsvOptions = {}): string {
   const sep = lang === 'fr' ? ';' : ','
   const money = (head: string) => (options.unit ? `${head} (${options.unit})` : head)
-  const withHome = heads.mortgage !== undefined && heads.homeEquity !== undefined && result.rows.some((r) => r.household.homeValueEnd > 0)
-  const withLocked = heads.rrspLocked !== undefined && result.rows.some((r) => lockedOf(r) > 0)
+  const model = yearTableModel(result.rows, options.factor)
+  const withHome = heads.mortgage !== undefined && heads.homeEquity !== undefined && model.hasHome
+  const withLocked = heads.rrspLocked !== undefined && model.hasLocked
   const lines = [[heads.year, heads.ages, money(heads.income), money(heads.tax), money(heads.spending), money(heads.shortfall), money(heads.netWorth), ...(withLocked ? [money(heads.rrspLocked!)] : []), ...(withHome ? [money(heads.mortgage!), money(heads.homeEquity!)] : [])]]
-  for (const row of result.rows) {
-    const h = row.household
-    const whole = (n: number) => String(Math.round(n / (options.factor ? options.factor(row.year) : 1)))
+  const whole = (n: number) => String(Math.round(n))
+  for (const row of model.rows) {
     lines.push([
       String(row.year),
-      Object.values(row.persons)
-        .map((p) => p.age)
-        .join(' / '),
-      whole(h.grossIncome),
-      whole(h.tax),
-      whole(h.spending),
-      whole(h.shortfall),
-      whole(h.netWorthEnd),
-      ...(withLocked ? [whole(lockedOf(row))] : []),
-      ...(withHome ? [whole(h.mortgagePayment), whole(h.homeValueEnd - h.mortgageBalanceEnd)] : []),
+      row.ages.join(' / '),
+      whole(row.income),
+      whole(row.tax),
+      whole(row.spending),
+      whole(row.shortfall),
+      whole(row.netWorth),
+      ...(withLocked ? [whole(row.rrspLocked)] : []),
+      ...(withHome ? [whole(row.mortgage), whole(row.homeEquity)] : []),
     ])
   }
   return '﻿' + lines.map((l) => l.map((c) => field(c, sep)).join(sep)).join('\r\n') + '\r\n'
