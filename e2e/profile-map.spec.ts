@@ -21,3 +21,28 @@ for (const [name, size] of [
     await expect.poll(async () => Math.round((await page.locator('#budget').boundingBox())!.y)).toBeGreaterThanOrEqual(Math.floor(mapBottom))
   })
 }
+
+test('the map slides away while the reader scrolls down, comes back on the first move up, and a tap on a chip never hides it', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/profil')
+  const nav = page.locator('.profile-map .section-nav')
+  await expect(nav).toBeVisible()
+  await expect(nav).not.toHaveAttribute('data-away', '')
+  // a tap on a chip scrolls the page by itself: the map stays
+  await nav.getByRole('button', { name: 'Budget' }).click()
+  await page.waitForTimeout(600)
+  await expect(nav).not.toHaveAttribute('data-away', '')
+  // a hand on the page: down hides it, up brings it back
+  await page.mouse.move(200, 500)
+  await page.mouse.wheel(0, 700)
+  await expect(nav).toHaveAttribute('data-away', '')
+  await page.mouse.wheel(0, -150)
+  await expect(nav).not.toHaveAttribute('data-away', '')
+  // back at the top it is always there
+  await page.mouse.wheel(0, 700)
+  await expect(nav).toHaveAttribute('data-away', '')
+  await page.evaluate(() => document.getElementById('root')!.scrollTo({ top: 0 }))
+  await page.mouse.wheel(0, -20)
+  await expect(nav).not.toHaveAttribute('data-away', '')
+})

@@ -59,28 +59,35 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
         </>
       ) : (
         <>
-          <p className="guide-bar__step">
-            {c.guide.step(at + 1, ids.length)} · {owner}
-          </p>
+          {/* One line says where the guide is and lets it be closed; the figure's name is the heading; the paper and where to read the figure on it are ONE paragraph. The card is a strip at the foot of the screen,
+              not a page: the figure it is asking about stays in view above it (lib/guide.ts). */}
+          <div className="guide-bar__head">
+            <p className="guide-bar__step">
+              {c.guide.step(at + 1, ids.length)} · {owner}
+            </p>
+            <button type="button" className="btn btn--icon btn--ghost guide-bar__close" onClick={onClose} aria-label={c.guide.close} title={c.guide.close}>
+              <Icon name="x-bold" size={18} />
+            </button>
+          </div>
           <p className="guide-bar__title">{c.kind[fact.kind]}</p>
-          <p className="guide-bar__doc">
-            <strong>{c.guide.document} :</strong> {c.docs[fact.doc].name}
-          </p>
           <p className="guide-bar__where">
-            <strong>{c.guide.whereIs} :</strong> {where}
+            <strong>{c.guide.document} :</strong> {c.docs[fact.doc].name}. <strong>{c.guide.whereIs} :</strong> {where}
             {entry?.label ? (
               <>
                 {' '}
-                <strong>{c.guide.wording} :</strong> « {entry.label} »
+                <strong>{c.guide.wording} :</strong> « {entry.label} »
+              </>
+            ) : null}
+            {entry?.url ? (
+              <>
+                {' '}
+                <a className="info-note__link" href={entry.url} target="_blank" rel="noopener noreferrer">
+                  {c.panel.openPage}
+                  <Icon name="arrow-up-right-bold" size={14} />
+                </a>
               </>
             ) : null}
           </p>
-          {entry?.url ? (
-            <a className="info-note__link" href={entry.url} target="_blank" rel="noopener noreferrer">
-              {c.panel.openPage}
-              <Icon name="arrow-up-right-bold" size={14} />
-            </a>
-          ) : null}
           <div className="guide-bar__actions">
             <Chip
               icon="check-bold"
@@ -93,9 +100,6 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
               {fact.confirmed ? c.guide.confirmed : c.guide.confirm}
             </Chip>
             <Chip onClick={() => setAt(at + 1)}>{fact.confirmed ? c.guide.next : c.guide.skip}</Chip>
-            <Chip icon="x-bold" onClick={onClose} ariaLabel={c.guide.close}>
-              {c.guide.close}
-            </Chip>
           </div>
         </>
       )}

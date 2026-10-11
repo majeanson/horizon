@@ -32,6 +32,35 @@ export function ProfileMap({ people, withHome, withEvents, withExact, page }: { 
       mutation.disconnect()
     }
   }, [page])
+  // The map is for FINDING a block, not for reading beside it: pinned, it took a fifth of a phone's height under the answer strip. It slides away while the reader scrolls down
+  // (a hand on the screen, the wheel or a key — never the page's own scroll, so a tap on a chip does not hide it) and comes back at the first move up or at the top.
+  useEffect(() => {
+    const root = document.getElementById('root')
+    const nav = page.current?.querySelector<HTMLElement>('.section-nav')
+    if (!root || !nav) return
+    let last = root.scrollTop
+    let gesture = 0
+    const mark = () => {
+      gesture = Date.now()
+    }
+    const onScroll = () => {
+      const y = root.scrollTop
+      const dy = y - last
+      last = y
+      if (Date.now() - gesture > 250) return
+      if (y < 160 || dy < -6) nav.removeAttribute('data-away')
+      else if (dy > 6) nav.setAttribute('data-away', '')
+    }
+    const gestures = ['wheel', 'touchmove', 'keydown'] as const
+    for (const ev of gestures) root.addEventListener(ev, mark, { passive: true })
+    window.addEventListener('keydown', mark, { passive: true })
+    root.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      for (const ev of gestures) root.removeEventListener(ev, mark)
+      window.removeEventListener('keydown', mark)
+      root.removeEventListener('scroll', onScroll)
+    }
+  }, [page])
   const links: SectionLink[] = [
     { id: 'famille', label: n.family },
     { id: 'situation', label: n.situation },

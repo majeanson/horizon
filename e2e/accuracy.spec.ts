@@ -158,3 +158,59 @@ test('the results say how much of the answer stands on confirmed figures, and po
   await page.getByRole('link', { name: 'Résultats' }).first().click()
   await expect(page.locator('.refine')).toContainText(/Votre profil\s: 1 sur \d+ chiffres confirmés/)
 })
+
+// THE GUIDE MUST NOT COVER WHAT IT IS ASKING ABOUT. On a phone the card was a third of the screen and the figure it named was scrolled to the middle of a window half of which was
+// chrome — under the card. The field now lands in the free band (below what is pinned, above the card), and the card is a strip.
+for (const [name, size, maxShare] of [
+  ['phone', { width: 390, height: 844 }, 0.32],
+  ['large phone', { width: 440, height: 956 }, 0.32],
+  ['desktop', { width: 1280, height: 800 }, 0.4],
+] as const) {
+  test(`the guide never covers the figure it is on, and stays a strip — ${name}`, async ({ page }) => {
+    await page.setViewportSize(size)
+    await page.goto('/profil?form=1&par=document&etape=bank')
+    await page.getByRole('button', { name: 'Me guider' }).click()
+    const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
+    await expect(bar).toBeVisible()
+    for (let step = 0; step < 4; step++) {
+      const field = page.locator('.field-row--guided')
+      await expect(field).toHaveCount(1)
+      // the page scrolls to the figure (smoothly): once it has arrived, the figure's first 120 px sit below everything pinned at the top and above the card
+      await expect
+        .poll(
+          async () => {
+            const f = (await field.boundingBox())!
+            const bb = (await bar.boundingBox())!
+            const pinned = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.shell__bar, .live-answer, .section-nav')].filter((e) => getComputedStyle(e).position === 'sticky' || getComputedStyle(e).position === 'fixed').map((e) => e.getBoundingClientRect()).filter((r) => r.height > 0 && r.top < 240).map((r) => r.bottom)))
+            return f.y >= pinned - 1 && f.y + Math.min(f.height, 120) <= bb.y
+          },
+          { timeout: 8_000, message: 'the guided figure sits in the free band' },
+        )
+        .toBe(true)
+      const b = (await bar.boundingBox())!
+      expect(b.height / size.height, `the card is at most ${maxShare * 100} % of the screen`).toBeLessThanOrEqual(maxShare)
+      await bar.getByRole('button', { name: 'Plus tard' }).click()
+    }
+  })
+}
+
+test('« Estimer ce qui manque » also estimates a REER room left at 0 — from the earnings and the balance — and says so, confirms nothing, and can be taken back', async ({ page }) => {
+  const seed = structuredClone(EXAMPLE) as { household: { persons: { salaryToday: number; earningsHistory: Record<string, number>; pensions: unknown[]; accounts: { rrsp: { balance: number; room: number; lockedIn: number } } }[] } }
+  const alex = seed.household.persons[1] // the example's second person has no employer plan
+  expect(alex.pensions).toHaveLength(0)
+  alex.salaryToday = 100_000
+  alex.earningsHistory = {}
+  alex.accounts.rrsp = { ...alex.accounts.rrsp, balance: 60_000, room: 0, lockedIn: 0 }
+  await page.goto('/profil')
+  await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
+  await page.reload()
+  const quick = page.locator('#niveau')
+  await expect(quick).toContainText('droits de REER')
+  await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
+  await expect(quick.getByRole('status')).toContainText(/droit de REER estimé/)
+  await expect(quick.getByRole('status')).toContainText('Rien n’est confirmé')
+  await expect.poll(async () => (await savedProfile(page)).household.persons[1].accounts.rrsp.room).toBeGreaterThan(20_000)
+  expect((await savedProfile(page)).confirmed).toEqual([]) // an estimate is never called real
+  await quick.getByRole('button', { name: 'Retirer ces estimations' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.persons[1].accounts.rrsp.room).toBe(0)
+})

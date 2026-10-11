@@ -22,10 +22,41 @@ const subscribe = (l: () => void) => {
 }
 export const useGuided = (): string | null => useSyncExternalStore(subscribe, getGuided, getGuided)
 
-/** Bring a figure's field on screen — centred, unless it is a tall block (the earnings list): then its TOP, where its header and its mark are. */
-export function bringIntoView(id: string): void {
+/** Where the page's own pinned chrome ends: the lowest edge of the top bar and of the strips pinned under it (the answer, the map). The scroller is #root. */
+function pinnedBottom(): number {
+  let bottom = 0
+  for (const el of document.querySelectorAll<HTMLElement>('.shell__bar, .live-answer, .section-nav, .results-pin')) {
+    const r = el.getBoundingClientRect()
+    const pos = getComputedStyle(el).position
+    if ((pos === 'sticky' || pos === 'fixed') && r.height > 0 && r.top < 240 && r.bottom > bottom) bottom = r.bottom
+  }
+  return bottom
+}
+
+/**
+ * Bring a figure's field on screen — into the band that is FREE: below whatever is pinned at the top, above the guide's card at the foot. The card used to cover the very
+ * figure it was asking about (the field was « centred » in a window half of which was chrome). Put at the top of the free band, the field reads first and the card, under it,
+ * says what to do. A block taller than the band (the earnings list) goes to the top of the band too, where its header and its mark are.
+ */
+let settling: ReturnType<typeof setTimeout>[] = []
+
+function place(id: string, correcting: boolean): void {
   const el = document.querySelector(`[data-fact="${id}"]`)
-  if (!el) return
-  const tall = el.getBoundingClientRect().height > window.innerHeight * 0.4
-  el.scrollIntoView({ behavior: scrollBehavior(), block: tall ? 'start' : 'center' })
+  const root = document.getElementById('root')
+  if (!el || !root) return
+  const delta = el.getBoundingClientRect().top - (pinnedBottom() + 12)
+  // A correction only moves a figure that has drifted: the answer strip and the map mount a moment AFTER the first scroll (they wait for the worker) and push the page down.
+  if (correcting && Math.abs(delta) < 6) return
+  root.scrollTo({ top: root.scrollTop + delta, behavior: correcting ? 'auto' : scrollBehavior() })
+}
+
+export function bringIntoView(id: string): void {
+  for (const t of settling) clearTimeout(t)
+  place(id, false)
+  // Once the chrome has settled, put the figure back where it belongs — unless the reader has taken the scroll in hand.
+  settling = [900, 2200].map((ms) => setTimeout(() => place(id, true), ms))
+  const release = () => {
+    for (const t of settling) clearTimeout(t)
+  }
+  for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(ev, release, { once: true, passive: true })
 }
