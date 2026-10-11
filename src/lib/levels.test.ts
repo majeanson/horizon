@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { ageBandOf, applyLevel, hasOpenFigures, isOpen, levelFigure, levelOf, LEVELS, needsLevel, retiredShare, say, spendingFigures } from './levels.ts'
+import { ageBandOf, applyLevel, hasOpenFigures, isOpen, levelFigure, levelOf, LEVELS, needsLevel, retiredShare, say, setFigure, spendingFigures } from './levels.ts'
 import { setFact } from './profileEdit.ts'
 import { defaultProfile } from './schema.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
@@ -160,5 +160,22 @@ describe('the retirement budget basis', () => {
     expect(cautious.changes.map((c) => c.kind)).toEqual(['spendingRetired'])
     expect(cautious.profile.household.spending.retiredToday).toBe(spendingFigures(blank().household, 'average', TODAY.year, 'cautious').retired)
     expect(levelOf(cautious.profile, TODAY.year)).toBe('average')
+  })
+})
+
+describe('one figure from a level brings its blank contribution room with it', () => {
+  it('an RRSP balance brings the room the earnings and the balance leave; a CELI balance brings its own', () => {
+    const out = setFigure(blank(), 'rrspBalance', 'self', 'average', TODAY)
+    const me = out.household.persons[0]
+    expect(me.accounts.rrsp.balance).toBeGreaterThan(0)
+    expect(me.accounts.rrsp.room).toBeGreaterThan(0)
+    const tf = setFigure(blank(), 'tfsaBalance', 'self', 'average', TODAY).household.persons[0]
+    expect(tf.accounts.tfsa.room).toBeGreaterThan(0)
+  })
+
+  it('never replaces a room the person typed', () => {
+    const p = blank()
+    const typed: Profile = { ...p, household: { ...p.household, persons: [{ ...p.household.persons[0], accounts: { ...p.household.persons[0].accounts, rrsp: { ...p.household.persons[0].accounts.rrsp, room: 7_777 } } }] } }
+    expect(setFigure(typed, 'rrspBalance', 'self', 'average', TODAY).household.persons[0].accounts.rrsp.room).toBe(7_777)
   })
 })

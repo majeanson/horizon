@@ -19,9 +19,9 @@ export function EstimateView({ done, setDone }: { done: EstimateDone | null; set
   const profile = useProfile()
   const estimate = () => {
     const e = estimateMissing(profile, today())
-    if (e.years === 0 && e.rooms === 0) return setDone({ note: c.panel.estimateNothing, before: null })
+    if (e.years === 0 && e.rooms === 0 && e.rrspRooms === 0) return setDone({ note: c.panel.estimateNothing, before: null })
     updateProfile((p) => estimateMissing(p, today()).profile)
-    setDone({ note: c.panel.estimateDone(e.years, e.rooms), before: profile })
+    setDone({ note: c.panel.estimateDone(e.years, e.rooms, e.rrspRooms), before: profile })
   }
   const undo = () => {
     if (done?.before) replaceProfile(done.before)

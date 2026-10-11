@@ -4,6 +4,7 @@ import { resolveYear, type Indexation } from './project.ts'
 import { P2026 } from './2026.ts'
 import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
 import { CHILD_COSTS, CHILD_COST_INCOME_LEVELS, CPI_ANNUAL } from './childCosts.ts'
+import { RRSP_LIMIT_HISTORY } from './rrspHistory.ts'
 import { TFSA_LIMIT_HISTORY } from './tfsaHistory.ts'
 import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME } from './typical.ts'
 import type { YearParams } from './types.ts'
@@ -21,6 +22,7 @@ export const SERIES: ReadonlyArray<{ name: string; cited: Cited<unknown> }> = [
   { name: 'rrq.mgaHistory', cited: RRQ_MGA_HISTORY },
   { name: 'rrq.yampeHistory', cited: RRQ_YAMPE_HISTORY },
   { name: 'accounts.tfsaLimitHistory', cited: TFSA_LIMIT_HISTORY },
+  { name: 'accounts.rrspLimitHistory', cited: RRSP_LIMIT_HISTORY },
   // What a typical Canadian household holds and spends (Statistics Canada): the start of an estimate for someone who cannot read their own figures.
   { name: 'typical.holdingsByAge', cited: TYPICAL_BY_AGE },
   { name: 'typical.holdingsByWealth', cited: TYPICAL_BY_WEALTH },

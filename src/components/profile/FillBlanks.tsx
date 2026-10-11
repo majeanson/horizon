@@ -25,7 +25,7 @@ export default function FillBlanks() {
   const [estimateDone, setEstimateDone] = useState<EstimateDone | null>(null)
   const [picked, setPicked] = useState<'level' | 'estimate' | null>(null)
   const estimate = estimateMissing(profile, now)
-  const views: ('level' | 'estimate')[] = [...(needsLevel(profile, now.year) || levelDone !== null ? (['level'] as const) : []), ...(estimate.years > 0 || estimate.rooms > 0 || estimateDone !== null ? (['estimate'] as const) : [])]
+  const views: ('level' | 'estimate')[] = [...(needsLevel(profile, now.year) || levelDone !== null ? (['level'] as const) : []), ...(estimate.years > 0 || estimate.rooms > 0 || estimate.rrspRooms > 0 || estimateDone !== null ? (['estimate'] as const) : [])]
   if (views.length === 0) return null
   const view = picked !== null && views.includes(picked) ? picked : views[0]
   return (

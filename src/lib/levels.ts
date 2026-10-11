@@ -1,7 +1,7 @@
 import { plain } from '../engine/params/cited.ts'
 import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME, type AgeBand, type Holdings, type Wealth } from '../engine/params/typical.ts'
 import type { Household, Person } from '../engine/types.ts'
-import { estimateMissing, estimateTfsaRoom } from './estimates.ts'
+import { estimateMissing, estimateRrspRoom, estimateTfsaRoom } from './estimates.ts'
 import { factId, type FactKind, type FactOwner } from './facts.ts'
 import type { Profile } from './schema.ts'
 
@@ -189,18 +189,26 @@ export function levelOf(p: Profile, todayYear: number): Level | null {
 
 /**
  * ONE figure from a level — what the « Je ne sais pas » helper under a field does. Unlike applyLevel it touches nothing else, except that
- * a TFSA balance brings its blank room with it (the room is what is left of the limits since 18, less the balance).
+ * a TFSA or an RRSP balance brings its blank room with it (the TFSA's is what is left of the limits since 18, less the balance; the RRSP's what the years' room added up to, less it).
  */
 export function setFigure(p: Profile, kind: FactKind, owner: FactOwner, level: Level, today: { year: number }, basis: RetiredBasis = 'observed'): Profile {
   if (p.confirmed.includes(factId(owner, kind))) return p
   const to = levelFigure(p, kind, owner, level, today.year, basis)
   if (to === null || to === current(p, kind, owner)) return p
   const out = put(p, kind, owner, to)
-  if (kind !== 'tfsaBalance') return out
   const person = out.household.persons.find((x) => x.id === owner)
-  if (!person || person.accounts.tfsa.room !== 0) return out
-  const room = estimateTfsaRoom(person.birth.year, to, today.year)
-  return put2Room(out, owner, room)
+  if (!person) return out
+  if (kind === 'tfsaBalance' && person.accounts.tfsa.room === 0) return put2Room(out, owner, estimateTfsaRoom(person.birth.year, to, today.year))
+  if (kind === 'rrspBalance' && person.accounts.rrsp.room === 0) {
+    const room = estimateRrspRoom(person, today, out.assumptions.wageGrowth)
+    return room !== null && room > 0 ? putRrspRoom(out, owner, room) : out
+  }
+  return out
+}
+
+function putRrspRoom(p: Profile, owner: FactOwner, room: number): Profile {
+  const persons = p.household.persons.map((x): Person => (x.id === owner ? { ...x, accounts: { ...x.accounts, rrsp: { ...x.accounts.rrsp, room } } } : x))
+  return { ...p, household: { ...p.household, persons } }
 }
 
 function put2Room(p: Profile, owner: FactOwner, room: number): Profile {

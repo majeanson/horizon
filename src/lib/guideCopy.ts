@@ -43,7 +43,7 @@ export interface GuideCopy {
     estimatedNote: (estimated: number) => string
     estimate: string
     quickDoes: string
-    estimateDone: (years: number, rooms: number) => string
+    estimateDone: (years: number, rooms: number, rrspRooms: number) => string
     estimateNothing: string
     estimateUndo: string
   }
@@ -108,8 +108,8 @@ const FR: GuideCopy = {
     byDocument: 'Confirmer document par document',
     estimatedNote: (n) => (n === 1 ? 'Un chiffre du profil est encore une estimation.' : `${n} chiffres du profil sont encore des estimations.`),
     estimate: 'Estimer ce qui manque',
-    quickDoes: 'L’estimation remplit votre historique de revenus (à partir de votre salaire) et vos droits de CELI (à partir de votre âge et de votre solde). Il ne touche jamais un chiffre déjà saisi.',
-    estimateDone: (years, rooms) => `${years === 1 ? '1 année de revenus estimée' : `${years} années de revenus estimées`}, ${rooms === 1 ? '1 droit de CELI estimé' : `${rooms} droits de CELI estimés`}. Rien n’est confirmé : à vérifier sur vos documents.`,
+    quickDoes: 'L’estimation remplit votre historique de revenus (à partir de votre salaire), vos droits de CELI (à partir de votre âge et de votre solde) et vos droits de REER (à partir de vos revenus et de votre solde ; pas pour qui a un régime de retraite d’employeur : le facteur d’équivalence ne se lit que sur l’avis de cotisation). Elle ne touche jamais un chiffre déjà saisi.',
+    estimateDone: (years, rooms, rrspRooms) => [years > 0 ? (years === 1 ? '1 année de revenus estimée' : `${years} années de revenus estimées`) : null, rooms > 0 ? (rooms === 1 ? '1 droit de CELI estimé' : `${rooms} droits de CELI estimés`) : null, rrspRooms > 0 ? (rrspRooms === 1 ? '1 droit de REER estimé' : `${rrspRooms} droits de REER estimés`) : null].filter((x) => x !== null).join(', ') + `. Rien n’est confirmé : à vérifier sur vos documents.`,
     estimateNothing: 'Rien à estimer : tout est déjà rempli.',
     estimateUndo: 'Retirer ces estimations',
   },
@@ -217,8 +217,8 @@ const EN: GuideCopy = {
     byDocument: 'Confirm document by document',
     estimatedNote: (n) => (n === 1 ? 'One figure in the profile is still an estimate.' : `${n} figures in the profile are still estimates.`),
     estimate: 'Estimate what is missing',
-    quickDoes: 'The estimate fills your earnings history (from your salary) and your TFSA room (from your age and balance). It never touches a figure you already typed.',
-    estimateDone: (years, rooms) => `${years === 1 ? '1 year of earnings estimated' : `${years} years of earnings estimated`}, ${rooms === 1 ? '1 TFSA room estimated' : `${rooms} TFSA rooms estimated`}. Nothing is confirmed: check it against your documents.`,
+    quickDoes: 'The estimate fills your earnings history (from your salary), your TFSA room (from your age and balance) and your RRSP room (from your earnings and balance; not for someone in an employer pension plan: the pension adjustment is only on the notice of assessment). It never touches a figure you already typed.',
+    estimateDone: (years, rooms, rrspRooms) => [years > 0 ? (years === 1 ? '1 year of earnings estimated' : `${years} years of earnings estimated`) : null, rooms > 0 ? (rooms === 1 ? '1 TFSA room estimated' : `${rooms} TFSA rooms estimated`) : null, rrspRooms > 0 ? (rrspRooms === 1 ? '1 RRSP room estimated' : `${rrspRooms} RRSP rooms estimated`) : null].filter((x) => x !== null).join(', ') + '. Nothing is confirmed: check it against your documents.',
     estimateNothing: 'Nothing to estimate: everything is already filled in.',
     estimateUndo: 'Remove these estimates',
   },
