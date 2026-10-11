@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { balanceBars, chartSeries, deflator, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
+import { balanceBars, chartSeries, deflator, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
 import { runSelections } from './resultsModel.ts'
 import type { Profile } from './schema.ts'
 
@@ -86,5 +86,22 @@ describe('the detail view says what the rows say', () => {
     const today = balanceBars(rows, null, { ...scale, dollars: 'today' })
     const k = deflator(rows[10].year, 2026, 0.02)
     expect(today[10].rrsp).toBeCloseTo(balanceBars(rows, null, scale)[10].rrsp / k, 6)
+  })
+})
+
+describe('a stretch of years with no bar for one person', () => {
+  const bar = (x: number, nest = 0) => ({ x, work: 0, db: 0, rrq: 0, oas: 0, nest })
+  it('is found between two years that have bars, two years or more', () => {
+    const bars = [bar(2050, 10), bar(2051), bar(2052), bar(2053), bar(2054, 5)]
+    expect(idleStretch(bars)).toEqual({ from: 2051, to: 2053 })
+  })
+  it('is not a gap when it is one year, leads the plan, or runs to the end (after a death)', () => {
+    expect(idleStretch([bar(2050, 1), bar(2051), bar(2052, 1)])).toBeNull()
+    expect(idleStretch([bar(2050), bar(2051), bar(2052, 1)])).toBeNull()
+    expect(idleStretch([bar(2050, 1), bar(2051), bar(2052), bar(2053)])).toBeNull()
+  })
+  it('keeps the longest of several', () => {
+    const bars = [bar(2050, 1), bar(2051), bar(2052), bar(2053, 1), bar(2054), bar(2055), bar(2056), bar(2057, 1)]
+    expect(idleStretch(bars)).toEqual({ from: 2054, to: 2056 })
   })
 })

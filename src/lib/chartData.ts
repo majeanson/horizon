@@ -105,6 +105,27 @@ export function sourceBars(rows: readonly YearRow[], who: string | null, s: Scal
   })
 }
 
+/**
+ * The longest run of years, between two years that DO have a bar, in which one person's sources are all empty — what a reader takes for missing data when the
+ * household is paid by the other person's accounts (a pension deferred to 70, a draw that starts with the spouse's). Two years or more; null when none.
+ */
+export function idleStretch(bars: readonly ({ x: number } & Record<SourceSegment, number>)[]): { from: number; to: number } | null {
+  const empty = (b: (typeof bars)[number]) => SOURCE_SEGMENTS.every((s) => b[s] < 0.5)
+  let best: { from: number; to: number } | null = null
+  let start = -1
+  bars.forEach((b, i) => {
+    if (empty(b)) {
+      if (start < 0 && i > 0 && !empty(bars[i - 1])) start = i
+      return
+    }
+    if (start >= 0) {
+      if (i - start >= 2 && (best === null || i - start > best.to - best.from + 1)) best = { from: bars[start].x, to: bars[i - 1].x }
+      start = -1
+    }
+  })
+  return best
+}
+
 export const EXPENSE_SEGMENTS = ['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved', 'unmet'] as const
 export type ExpenseSegment = (typeof EXPENSE_SEGMENTS)[number]
 /** `unmet`: what the plan needed and could not pay — drawn only in a plan that runs out. */

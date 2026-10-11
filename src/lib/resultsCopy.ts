@@ -43,6 +43,8 @@ const FR_RESULTS = {
   shortage: {
     from: (yearAge: string, column: string) => `L’argent manque dès ${yearAge} : les lignes en rouge sont les années où les dépenses ne sont pas couvertes (colonne « ${column} »).`,
   },
+  /** Under one person's « d'où vient l'argent » bars: a stretch of years with no bar is not missing data — it says who pays then. */
+  idle: (name: string, from: string, to: string) => `Entre ${from} et ${to}, rien ne vient de ${name} : le ménage vit alors des comptes et des revenus de l’autre personne. Des barres vides ici sont normales.`,
   tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Essayer', strategies: 'Stratégies', verify: 'Vérifier' },
   orders: {
     title: 'Dans quel ordre puiser ?',
@@ -244,6 +246,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   shortage: {
     from: (yearAge: string, column: string) => `The money runs out from ${yearAge}: the red rows are the years when spending is not covered (column “${column}”).`,
   },
+  idle: (name: string, from: string, to: string) => `From ${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', adjust: 'Try', strategies: 'Strategies', verify: 'Check' },
   orders: {
     title: 'In which order should I draw?',

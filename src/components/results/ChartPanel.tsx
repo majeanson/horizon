@@ -10,12 +10,15 @@ import {
   chartSeries,
   retirementMarkers,
   hasDatedIncome,
+  idleStretch,
   sourceBars,
   type ChartMetric,
   type Dollars,
   type Per,
 } from '../../lib/chartData'
+import { formatYearAge } from '../../lib/format'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
+import { RESULTS_COPY } from '../../lib/resultsCopy'
 import type { Selection } from '../../lib/resultsModel'
 import { Loading } from '../Loading'
 import { SubTabs } from '../SubTabs'
@@ -169,6 +172,9 @@ function DetailView({
   const xTick = (x: number) => [String(x), agesByYear.get(x) ?? '']
   const yFormat = (y: number) => formatCompactMoney(y, lang)
   const yDetail = (y: number) => formatMoney(y, lang)
+  // One person's bars can be EMPTY for years (a pension that starts at 70 while the other person's accounts pay): say so, so the gap does not read as missing data.
+  const idle = useMemo(() => (personId === null ? null : idleStretch(sources)), [personId, sources])
+  const birth = household.persons[whoIndex]?.birth.year
 
   return (
     <div className="chart-detail">
@@ -191,6 +197,7 @@ function DetailView({
 
       <h4 className="chart-detail__heading">{c.sourcesTitle}</h4>
       <p className="field-row__hint">{personId === null ? `${c.sourcesHint} ${c.needHint}` : c.sourcesHint}</p>
+      {idle !== null && birth !== undefined && <p className="field-row__hint">{RESULTS_COPY[lang].idle(names[whoIndex] ?? '', formatYearAge(idle.from, [birth], lang), formatYearAge(idle.to, [birth], lang))}</p>}
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
           <StackedBarChart
