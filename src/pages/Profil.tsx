@@ -32,7 +32,7 @@ import { updateProfile, useProfile } from '../lib/store'
 const EntryByDocument = lazy(() => import('../components/profile/EntryByDocument'))
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
 const Onboarding = lazy(() => import('../components/Onboarding'))
-const LevelPicker = lazy(() => import('../components/profile/LevelPicker'))
+const FillBlanks = lazy(() => import('../components/profile/FillBlanks'))
 const SituationCard = lazy(() => import('../components/profile/SituationCard'))
 
 // The profile: the household's facts (who is in it, what it spends, the home), then EVERY person's fields on the page —
@@ -176,9 +176,9 @@ export function Profil() {
           )}
         </div>
       )}
-      {/* « Je ne connais pas mes chiffres »: a level fills what is blank; loaded on its own (it carries the official tables). */}
+      {/* « Remplir ce qui manque »: a level of living or an estimate fills what is blank; loaded on its own (it carries the official tables). */}
       <Suspense fallback={null}>
-        <LevelPicker />
+        <FillBlanks />
       </Suspense>
       <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
         {profile.household.persons.map((p, i) => {

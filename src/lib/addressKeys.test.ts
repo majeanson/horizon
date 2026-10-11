@@ -38,6 +38,8 @@ const KEYS: Record<string, string> = {
   q: 'Résultats: an OLD deep link (`?q=save|stop`) turned into a scroll once, then dropped from the address.',
   person: 'Profil: an OLD deep link naming one person, turned into a scroll once, then dropped from the address.',
   form: 'Profil: « 1 » skips the first-visit question path and opens the full form.',
+  essai: 'Résultats › Essayer: the one thing on screen (levers · save · spend · care). No key: the address’s own keys decide (care=, spend=, age=), else the changes ranked.',
+  solidite: 'Résultats › Vérifier › Solidité: « grids » opens the 3 × 3 grids; no key is the scenarios and a hard market in brief.',
   par: 'Profil: « document » opens the second way to fill it (by document); no key is by topic. The old /saisie and /documents addresses redirect here.',
   etape: 'Profil › Par document: the step open (gather · you · rrq · tax · bank · employer · home · budget · residence). Anything else lands on the first step.',
   fact: 'Profil: one figure’s id (« self:rrspBalance »): scroll to its field and light it once, then drop the key from the address. An unknown id scrolls nowhere.',

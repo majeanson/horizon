@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('« Essayer » holds the care what-if, and « À faire cette année » closes the answer with its doors to Stratégies', async ({ page }) => {
-  await page.goto('/resultats?v=adjust')
+  await page.goto('/resultats?v=adjust&essai=care')
   await expect(page.getByRole('tab', { name: 'Essayer' })).toHaveAttribute('aria-selected', 'true')
   await expect(page.locator('#soins')).toContainText('Et si les dernières années coûtaient plus cher ?')
   // The answer to the starting care arrives off the page's thread.
@@ -18,6 +18,7 @@ test('« Essayer » holds the care what-if, and « À faire cette année » clos
   // An old link to the removed « Avenir » view lands on « Essayer ».
   await page.goto('/resultats?v=future')
   await expect(page.getByRole('tab', { name: 'Essayer' })).toHaveAttribute('aria-selected', 'true')
+  await expect(page).toHaveURL(/essai=care/)
   await expect(page.locator('#soins')).toBeVisible()
   // The decisions with their own home are links, not copies.
   await page.goto('/resultats')
@@ -71,7 +72,7 @@ test('« À faire cette année » names the change that gains most once the sear
 })
 
 test('the CHSLD ceilings are three reference chips that set the amount exactly, with the official page beside them', async ({ page }) => {
-  await page.goto('/resultats?v=adjust')
+  await page.goto('/resultats?v=adjust&essai=care')
   const soins = page.locator('#soins')
   await expect(soins.getByRole('radio', { name: /Chambre privée/ })).toBeVisible()
   await expect(soins.getByRole('radio', { name: /Chambre semi-privée/ })).toBeVisible()
@@ -90,7 +91,7 @@ test('the CHSLD ceilings are three reference chips that set the amount exactly, 
 
 test('in English the chips and the note speak English and the link goes to the English edition', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats?v=adjust')
+  await page.goto('/resultats?v=adjust&essai=care')
   const soins = page.locator('#soins')
   await expect(soins.getByRole('radio', { name: /Private room/ })).toBeVisible()
   await expect(soins).toContainText('ceiling the government sets')

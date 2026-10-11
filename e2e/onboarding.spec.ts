@@ -197,9 +197,10 @@ test('leaving for the full form: the form is there, with what was typed, and a l
 })
 
 test('a returning visitor — someone with a profile — never sees the path', async ({ page }) => {
+  // Seeded BEFORE the first load, as a returning visitor's profile is: overwriting storage under a page that has just loaded races the app's own write when the page is hidden (the reload).
+  // (the file's beforeEach already seeded a blank one, once per tab; this init script runs after it and puts a real profile in place.)
+  await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(EXAMPLE)])
   await page.goto('/profil')
-  await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(EXAMPLE)])
-  await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Profil')
   await expect(page.locator('.onboard')).toHaveCount(0)
   await expect(page.locator('#person-self')).toBeVisible()

@@ -13,9 +13,16 @@ test('four views; « Essayer » holds the levers, the saving, the spending and t
   await tabs.getByRole('tab', { name: 'Essayer' }).click()
   await expect(page).toHaveURL(/v=adjust/)
   await expect(page.getByText('Ce qui change le plus')).toBeVisible()
-  await expect(page.locator('#epargner')).toBeVisible()
-  await expect(page.locator('#depenser')).toBeVisible()
-  await expect(page.locator('#soins')).toBeVisible()
+  // one of the four at a time, behind a switch, and the choice is kept in the address
+  const essais = page.getByRole('tablist', { name: 'Un essai à la fois' })
+  await expect(essais.getByRole('tab')).toHaveText(['Ce qui change', 'Épargner', 'Dépenser', 'Soins'])
+  await expect(page.locator('#epargner, #depenser, #soins')).toHaveCount(0)
+  for (const [tab, id, key] of [['Épargner', '#epargner', 'save'], ['Dépenser', '#depenser', 'spend'], ['Soins', '#soins', 'care']] as const) {
+    await essais.getByRole('tab', { name: tab }).click()
+    await expect(page.locator(id)).toBeVisible()
+    await expect(page.locator('#ajuster')).toHaveCount(0)
+    await expect(page).toHaveURL(new RegExp('essai=' + key))
+  }
   await expect(page.locator('#solidite')).toHaveCount(0)
   await tabs.getByRole('tab', { name: 'Vérifier' }).click()
   await expect(page.locator('#solidite')).toBeVisible() // how firm the answer is is a check, so it lives here
@@ -45,3 +52,44 @@ test('« Comment lire cette page ? » is closed until it is asked for, then says
   await expect(page.getByText('le plus tôt où l’argent dure jusqu’à la fin du plan')).toHaveCount(0)
 })
 
+
+test('« Essayer »: a link to one of its parts opens that part by itself, and an address that carries its own key does too', async ({ page }) => {
+  // the door on the answer card (« Et si je dépensais moins ? ») lands on the spending view, not on a page that has no such section
+  await page.goto('/resultats')
+  await page.getByRole('button', { name: 'Et si je dépensais moins ?' }).first().click()
+  await expect(page).toHaveURL(/v=adjust/)
+  await expect(page).toHaveURL(/essai=spend/)
+  await expect(page.locator('#depenser')).toBeInViewport()
+  // from inside « Essayer », a link to another of its parts (the plan's « this year » doors) switches the view in place
+  await page.goto('/resultats?v=adjust&essai=care')
+  await expect(page.locator('#soins')).toBeVisible()
+  // the old keys of the three what-ifs open their own view with no `essai`
+  await page.goto('/resultats?v=adjust&spend=70000')
+  await expect(page.locator('#depenser')).toBeVisible()
+  await page.goto('/resultats?v=adjust&age=58')
+  await expect(page.locator('#epargner')).toBeVisible()
+  await page.goto('/resultats?v=adjust&care=45000,88,6')
+  await expect(page.locator('#soins')).toBeVisible()
+  // an unknown view falls back to the first
+  await page.goto('/resultats?v=adjust&essai=nope')
+  await expect(page.locator('#ajuster')).toBeVisible()
+})
+
+test('« Vérifier » › « Solidité »: the scenarios and a hard market in brief, the 3 × 3 grids one switch away, and the choice is in the address', async ({ page }) => {
+  await page.goto('/resultats?v=verify')
+  const depths = page.getByRole('tablist', { name: 'Deux façons de voir la solidité' })
+  await expect(depths.getByRole('tab')).toHaveText(['En bref', 'Si l’avenir est moins bon'])
+  await expect(depths.getByRole('tab', { name: 'En bref' })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.locator('#solidite').getByText('Selon le scénario')).toBeVisible()
+  await expect(page.locator('.sensitivity')).toHaveCount(0)
+  await depths.getByRole('tab', { name: 'Si l’avenir est moins bon' }).click()
+  await expect(page).toHaveURL(/solidite=grids/)
+  await expect(page.locator('.sensitivity')).toBeVisible()
+  await expect(page.locator('#solidite').getByText('Selon le scénario')).toHaveCount(0)
+  // one section, not two: the old second section is gone from the map and the page
+  await expect(page.locator('#sensibilite')).toHaveCount(0)
+  // an address that names the grids opens them
+  await page.goto('/resultats?v=verify&solidite=grids')
+  await expect(page.locator('.sensitivity')).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Si l’avenir est moins bon' })).toHaveAttribute('aria-selected', 'true')
+})

@@ -14,9 +14,10 @@ const blankWithSalary = (): SeedProfile => {
 const rrsp = (page: import('@playwright/test').Page) => page.locator('[data-fact="self:rrspBalance"] input')
 const tfsa = (page: import('@playwright/test').Page) => page.locator('[data-fact="self:tfsaBalance"] input')
 
-test('a level fills every blank figure at once, says it is an estimate, and one tap takes it back', async ({ page }) => {
+test('« Remplir ce qui manque » › a level fills every blank figure at once, says it is an estimate, and one tap takes it back', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
   await page.goto('/profil?form=1')
+  await expect(page.getByRole('heading', { name: 'Remplir ce qui manque' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Je ne connais pas mes chiffres' })).toBeVisible()
   await expect(rrsp(page)).toHaveValue(/^0?$/)
   await page.getByRole('radio', { name: 'Moyen', exact: true }).click()
@@ -29,12 +30,12 @@ test('a level fills every blank figure at once, says it is an estimate, and one 
   await page.getByRole('button', { name: 'Annuler' }).click()
   await expect(rrsp(page)).toHaveValue(/^0?$/)
   // the three levels are ordered
+  const figure = async () => Number((await rrsp(page).inputValue()).replace(/\D/g, ''))
   await page.getByRole('radio', { name: 'Modeste', exact: true }).click()
-  const modest = Number((await rrsp(page).inputValue()).replace(/\D/g, ''))
+  await expect.poll(figure).toBeGreaterThan(0)
+  const modest = await figure()
   await page.getByRole('radio', { name: 'Aisé', exact: true }).click()
-  const comfortable = Number((await rrsp(page).inputValue()).replace(/\D/g, ''))
-  expect(modest).toBeGreaterThan(0)
-  expect(comfortable).toBeGreaterThan(modest * 3)
+  await expect.poll(figure).toBeGreaterThan(modest * 3) // the figure lands a beat after the tap
 })
 
 test('a later visit says which level the estimated figures stand at', async ({ page }) => {
@@ -100,6 +101,7 @@ test('a household with every figure entered sees neither the picker nor the rang
   await page.goto('/profil?form=1')
   await expect(page.getByRole('heading', { name: 'Famille' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Je ne connais pas mes chiffres' })).toHaveCount(0)
+  await expect(page.locator('#niveau')).toHaveCount(0)
   await page.goto('/resultats')
   await expect(page.getByText(/Vous pouvez prendre votre retraite/)).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText('Selon le niveau de vie')).toHaveCount(0)
@@ -135,4 +137,21 @@ test('the retirement budget can be set as observed or cautiously, and the screen
   await page.waitForFunction(() => localStorage.getItem('horizon-level-basis') === 'cautious')
   await page.reload()
   await expect(page.getByRole('radio', { name: /Prudent : au moins/ })).toBeChecked()
+})
+
+test('« Remplir ce qui manque »: the level of living and the estimate are one section with a switch, each view with its own heading', async ({ page }) => {
+  await seedProfile(page, blankWithSalary())
+  await page.goto('/profil?form=1')
+  const section = page.locator('#niveau')
+  await expect(section.getByRole('tab')).toHaveText(['Par niveau de vie', 'Historique et droits'])
+  await expect(section.getByRole('heading', { name: 'Je ne connais pas mes chiffres' })).toBeVisible()
+  await expect(section.getByRole('heading', { name: 'Estimer ce qui manque' })).toHaveCount(0)
+  await section.getByRole('tab', { name: 'Historique et droits' }).click()
+  await expect(section.getByRole('heading', { name: 'Estimer ce qui manque' })).toBeVisible()
+  await expect(section.getByRole('heading', { name: 'Je ne connais pas mes chiffres' })).toHaveCount(0)
+  await section.getByRole('button', { name: 'Estimer ce qui manque' }).click()
+  await expect(section.getByRole('status')).toContainText(/années de revenus estimées/)
+  // the other view is still one tap away, with its radios
+  await section.getByRole('tab', { name: 'Par niveau de vie' }).click()
+  await expect(section.getByRole('radio', { name: 'Moyen', exact: true })).toBeVisible()
 })

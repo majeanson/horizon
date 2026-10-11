@@ -5,6 +5,8 @@ import type { Level } from './levels'
 // Lazy with the screens that use them, so the first screen's code does not carry them.
 
 interface LevelsCopy {
+  /** « Remplir ce qui manque »: the section that holds the level picker and the estimate, with a switch between them. */
+  fill: { title: string; lead: string; label: string; level: string; estimate: string }
   title: string
   lead: string
   /** The three levels: a name and one line of what it stands for. */
@@ -27,6 +29,7 @@ interface LevelsCopy {
 }
 
 const FR: LevelsCopy = {
+  fill: { title: 'Remplir ce qui manque', lead: 'Sans document sous la main, deux façons de remplir ce qui est vide : tout d’un coup selon un niveau de vie, ou seulement l’historique de revenus et les droits de CELI. Tout reste estimé, et un chiffre que vous avez tapé n’est jamais remplacé.', label: 'Façon de remplir ce qui manque', level: 'Par niveau de vie', estimate: 'Historique et droits' },
   title: 'Je ne connais pas mes chiffres',
   lead: 'Pas de document sous la main? Choisissez un niveau : Horizon remplit ce qui est vide avec ce que détiennent des ménages canadiens de votre âge. Ce sont des estimations, à corriger quand vous aurez lu vos documents.',
   levels: {
@@ -84,6 +87,7 @@ const FR: LevelsCopy = {
 }
 
 const EN: LevelsCopy = {
+  fill: { title: 'Fill what is missing', lead: 'With no document at hand, two ways to fill what is blank: everything at once by a standard of living, or only the income history and the TFSA room. It all stays estimated, and a figure you typed is never replaced.', label: 'Way to fill what is missing', level: 'By standard of living', estimate: 'History and room' },
   title: 'I do not know my numbers',
   lead: 'No documents at hand? Pick a level: Horizon fills what is blank with what Canadian households of your age hold. These are estimates, to correct once you have read your documents.',
   levels: {

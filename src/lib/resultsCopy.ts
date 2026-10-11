@@ -46,6 +46,10 @@ const FR_RESULTS = {
   /** Under one person's « d'où vient l'argent » bars: a stretch of years with no bar is not missing data — it says who pays then. */
   idle: (name: string, from: string, to: string) => `Entre ${from} et ${to}, rien ne vient de ${name} : le ménage vit alors des comptes et des revenus de l’autre personne. Des barres vides ici sont normales.`,
   tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Essayer', strategies: 'Stratégies', verify: 'Vérifier' },
+  /** « Essayer » shows one thing at a time. */
+  try: { label: 'Un essai à la fois' },
+  /** « Solidité de la réponse » at two depths. */
+  firm: { label: 'Deux façons de voir la solidité', brief: 'En bref', grids: 'Si l’avenir est moins bon' },
   orders: {
     title: 'Dans quel ordre puiser ?',
     hint: (age: number) => `Votre plan, retraite à ${age} ans, refait avec chacun des six ordres de retrait des comptes. Les retraits sont recalculés année par année avec l’impôt, la RRQ, la PSV et le SRG.`,
@@ -126,7 +130,6 @@ const FR_RESULTS = {
     precision: 'Précision',
     annee: 'Cette année',
     tableau: 'Année par année',
-    sensibilite: 'Sensibilité',
     parametres: 'Paramètres',
   },
   questions: {
@@ -248,6 +251,8 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   idle: (name: string, from: string, to: string) => `From ${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', adjust: 'Try', strategies: 'Strategies', verify: 'Check' },
+  try: { label: 'One try at a time' },
+  firm: { label: 'Two ways to see how firm it is', brief: 'In brief', grids: 'If the future is worse' },
   orders: {
     title: 'In which order should I draw?',
     hint: (age: number) => `Your plan, retiring at ${age}, rerun with each of the six orders of drawing the accounts. Withdrawals are recomputed year by year with tax, QPP, OAS and GIS.`,
@@ -321,7 +326,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
     precision: 'Accuracy',
     annee: 'This year',
     tableau: 'Year by year',
-    sensibilite: 'Sensitivity',
     parametres: 'Parameters',
   },
   questions: {

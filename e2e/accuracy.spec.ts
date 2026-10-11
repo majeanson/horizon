@@ -34,11 +34,11 @@ test('a figure is estimated until the person says it is real; the mark, the mete
   await expect(page.locator('[data-fact="self:rrspBalance"]').getByRole('button', { name: /^Confirmé/ })).toBeVisible()
 })
 
-test('the panel is a door to « Par document », beside the two quick ways, and sits after the form', async ({ page }) => {
+test('the panel is a door to « Par document », beside the guide for every figure, and sits after the form', async ({ page }) => {
   await page.goto('/profil')
-  // the two ways are two chips: walk every figure with the guide, or estimate what is still blank
+  // the two ways are two chips: walk every figure with the guide, or confirm document by document — filling what is blank is « Remplir ce qui manque », not here
   await expect(panel(page).getByRole('button', { name: 'Tout confirmer pas à pas' })).toBeVisible()
-  await expect(panel(page).getByRole('button', { name: 'Estimer ce qui manque' })).toBeVisible()
+  await expect(panel(page).getByRole('button', { name: 'Estimer ce qui manque' })).toHaveCount(0)
   // the documents are NOT listed a second time here: no per-document cards in the panel
   await expect(panel(page).locator('.doc')).toHaveCount(0)
   // the panel sits AFTER the form, and the one-line meter above the form leads to it
@@ -114,7 +114,7 @@ test('on a phone the guide sits above the bottom navigation, inside the window, 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
-test('the quick way: « Estimer ce qui manque » fills blank earnings years and a TFSA room left at 0, confirms nothing, and never touches what was typed', async ({ page }) => {
+test('« Remplir ce qui manque » › « Estimer ce qui manque » fills blank earnings years and a TFSA room left at 0, confirms nothing, and never touches what was typed', async ({ page }) => {
   const seed = structuredClone(EXAMPLE) as { household: { persons: { salaryToday: number; earningsHistory: Record<string, number>; accounts: { tfsa: { balance: number; room: number } } }[] } }
   const me = seed.household.persons[0]
   me.salaryToday = 120_000
@@ -124,7 +124,10 @@ test('the quick way: « Estimer ce qui manque » fills blank earnings years and 
   await page.goto('/profil')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
-  const quick = panel(page)
+  const quick = page.locator('#niveau')
+  // every balance is typed here, so only the estimate has something to fill: the section shows it without a switch
+  await expect(quick.getByRole('tab')).toHaveCount(0)
+  await expect(quick.getByRole('heading', { name: 'Estimer ce qui manque' })).toBeVisible()
   await expect(quick).toContainText('L’estimation remplit')
   await quick.getByRole('button', { name: 'Estimer ce qui manque' }).click()
   await expect(quick.getByRole('status')).toContainText(/années de revenus estimées/)

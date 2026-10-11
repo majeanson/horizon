@@ -104,6 +104,9 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
   await page.getByRole('tab', { name: 'Revenus hors épargne' }).click()
   await page.getByRole('tab', { name: 'Vérifier' }).click()
+  // « Solidité » is one section at two depths: the grids are the second (the first is the scenarios and a hard market, in brief).
+  await page.getByRole('tab', { name: 'Si l’avenir est moins bon' }).click()
+  await expect(page).toHaveURL(/solidite=grids/)
   // One grid at a time: the horizon is chosen in the table's header (three tabs; the plan's own, 95, is open first).
   const grids = page.locator('.sensitivity__grids .table-wrap')
   const horizons = page.locator('.sensitivity .table-chooser').getByRole('tab')
@@ -114,7 +117,8 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9)
   // …and the verdict's own range line reads prudent ≥ neutre ≥ audacieux (a more prudent future never retires earlier)
   // — the ONE place the three scenarios' ages are written; the grids detail it.
-  // (« Solidité » sits above the grids in the same view.)
+  // (the brief is the other depth of the same section.)
+  await page.getByRole('tab', { name: 'En bref' }).click()
   const range = page.locator('#solidite .verdict__range').first()
   await expect(range).toContainText('Selon le scénario')
   for (const name of ['Prudent', 'Neutre', 'Audacieux']) await expect(range.locator('dt', { hasText: name })).toBeVisible()
@@ -123,7 +127,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   const scenarios = (await range.locator('dd').allTextContents()).map((x) => Number(x.match(/\d+/)![0]))
   expect(scenarios[0]).toBeGreaterThanOrEqual(scenarios[1])
   expect(scenarios[1]).toBeGreaterThanOrEqual(scenarios[2])
-  await page.getByRole('tab', { name: 'Vérifier' }).click()
+  await page.getByRole('tab', { name: 'Si l’avenir est moins bon' }).click()
   // The panel mounts afresh with the view and computes again: wait for all of it.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9, { timeout: 60_000 })
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })

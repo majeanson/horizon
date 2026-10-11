@@ -1608,3 +1608,9 @@
 .page-body:has(.profile-map) .person[id] {
   scroll-margin-top: calc(var(--bar-h) + var(--live-h, 0px) + var(--map-h, 3rem) + 0.75rem);
 }
+
+/* « Remplir ce qui manque »: each view of the section opens with its own small heading. */
+.fill__title {
+  margin: 0.25rem 0 0;
+  font-size: var(--text-md);
+}

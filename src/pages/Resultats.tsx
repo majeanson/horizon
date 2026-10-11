@@ -4,7 +4,7 @@ import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { ParamsPanel } from '../components/results/ParamsPanel'
-import { FirmSection } from '../components/results/views/FirmSection'
+import { FirmPrint } from '../components/results/views/FirmSection'
 import { SectionHeader } from '../components/SectionHeader'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
@@ -69,7 +69,7 @@ export function Resultats() {
           ]}
         />
       </div>
-      <SectionNav links={navLinks} ariaLabel={rc.nav.label} />
+      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} />}
 
 
       {/* 1 — what you asked: the answer, compared and dated, what would sharpen it, and what the plan points at. */}
@@ -87,7 +87,7 @@ export function Resultats() {
       {/* On paper the plan is the open view AND what a reader checks it against, whichever view that is: the year by year and the cited figures. */}
       {printing && view !== 'verify' && (
         <section className="arc print-appendix" aria-label={rc.tabs.verify}>
-          <FirmSection m={m} />
+          <FirmPrint m={m} />
           <section className="results-section" aria-label={r.table.title}>
             <SectionHeader title={r.table.title} />
             <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />

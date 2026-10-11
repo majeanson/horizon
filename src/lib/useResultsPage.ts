@@ -40,6 +40,14 @@ import { today } from './today'
 
 export type View = 'answer' | 'adjust' | 'strategies' | 'verify'
 
+/** The four things « Essayer » lets a person try, one at a time: the changes ranked · the saving · the spending · a late-life care. */
+export type Essai = 'levers' | 'save' | 'spend' | 'care'
+
+/** « Solidité » shows one of two depths: the scenarios and a hard market in brief, or the 3 × 3 grids of what moves the age. */
+export type Firm = 'brief' | 'grids'
+/** Which of them a section id of the page belongs to (the ids stay the page's anchors; a link to one opens its view). */
+const ESSAI_OF: Readonly<Record<string, Essai>> = { ajuster: 'levers', epargner: 'save', depenser: 'spend', soins: 'care' }
+
 export const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
 /** The ages offered as one-tap comparisons: the answer's own, the three milestones, and whatever is already chosen. */
@@ -127,12 +135,31 @@ export function useResultsPage() {
 
   // Three jobs, one at a time (the address keeps it: `?v=adjust|strategies|verify`): get the answer · try changes · choose how to carry it out · check it.
   const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' || params.get('v') === 'future' ? 'adjust' : 'answer'
+  // « Essayer » shows one thing at a time. The address keeps it (`?essai=`); an address that carries one of their own keys (an old link with `?care=`, `?spend=` or `?age=`) opens
+  // the matching one; a household that has stopped working has no change to rank and no spending to try, so it is offered the other two.
+  const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['levers', 'save', 'spend', 'care']
+  const rawEssai = params.get('essai')
+  const inferred: Essai = params.get('care') !== null ? 'care' : params.get('spend') !== null ? 'spend' : params.get('age') !== null ? 'save' : essaiKeys[0]
+  const essai: Essai = essaiKeys.find((k) => k === rawEssai) ?? (essaiKeys.includes(inferred) ? inferred : essaiKeys[0])
+  const setEssai = (next: Essai) => setParam('essai', next)
+  // « Solidité »: a household that has stopped working has no age to range over, so only the grids. The address keeps the choice (`?solidite=`).
+  const firmKeys: Firm[] = retiredNow ? ['grids'] : ['brief', 'grids']
+  const rawFirm = params.get('solidite')
+  const firm: Firm = firmKeys.find((k) => k === rawFirm) ?? firmKeys[0]
+  const setFirm = (next: Firm) => setParam('solidite', next)
+  // A view that came from one of the what-ifs' own keys is written down at once: when that key goes (« L'ajouter à mes événements » clears `?care=`), the reader stays where they are.
+  useEffect(() => {
+    if (view === 'adjust' && rawEssai !== essai && (rawEssai !== null || essai !== essaiKeys[0])) setParam('essai', essai)
+  }, [view, rawEssai, essai, essaiKeys, setParam])
   // A view this page does not have (a typo, an old link) lands on the answer — and the ADDRESS follows, as the router's catch-all
   // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
   const rawView = params.get('v')
   useEffect(() => {
     // « Avenir » (`?v=future`) is gone: its care what-if is part of « Essayer », and the address follows.
-    if (rawView === 'future') setParam('v', 'adjust')
+    if (rawView === 'future') {
+      setParam('v', 'adjust')
+      setParam('essai', 'care')
+    }
     else if (rawView !== null && rawView !== view) setParam('v', null)
   }, [rawView, view, setParam])
 
@@ -140,7 +167,22 @@ export function useResultsPage() {
   // scroll to an id that is not on the page did nothing, on the one screen (« no age works ») where the reader most needs it.
   const pendingScroll = useRef<string | null>(null)
   const scrollTo = (id: string) => scrollToSection(id)
-  const goTo = (target: View, id: string) => {
+  const goTo = (target: View, wantedId: string) => {
+    // The 3 × 3 grids are the second depth of « Solidité »: open them, and land on the section.
+    const toGrids = target === 'verify' && wantedId === 'sensibilite'
+    const id = toGrids ? 'solidite' : wantedId
+    if (toGrids && !(target === view && firm === 'grids')) setParam('solidite', 'grids')
+    // A section of « Essayer » that is not the one on screen: open its view first (the section does not exist until then), and scroll once it does.
+    const wanted = target === 'adjust' ? ESSAI_OF[id] : undefined
+    if (wanted !== undefined && !(target === view && wanted === essai)) {
+      setParam('essai', wanted)
+      if (target === view) requestAnimationFrame(() => requestAnimationFrame(() => scrollTo(id)))
+      else {
+        pendingScroll.current = id
+        setParam('v', target)
+      }
+      return
+    }
     if (target === view) return scrollTo(id)
     pendingScroll.current = id
     setParam('v', target === 'answer' ? null : target)
@@ -159,7 +201,10 @@ export function useResultsPage() {
   useEffect(() => {
     if (legacyQ !== 'save' && legacyQ !== 'stop') return
     setParam('q', null)
-    if (legacyQ === 'save') setParam('v', 'adjust')
+    if (legacyQ === 'save') {
+      setParam('v', 'adjust')
+      setParam('essai', 'save')
+    }
     const go = () => document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
     go()
     // The sections above stream in (workers, lazy charts) and would push the target off screen:
@@ -283,13 +328,12 @@ export function useResultsPage() {
     view === 'answer'
       ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : []), { id: 'annee', label: rc.nav.annee }]
       : view === 'adjust'
-        ? [...(retiredNow ? [] : [{ id: 'ajuster', label: rc.nav.ajuster }]), { id: 'epargner', label: rc.nav.epargner }, ...(retiredNow ? [] : [{ id: 'depenser', label: rc.nav.depenser }]), { id: 'soins', label: rc.nav.soins }]
+        ? [] // « Essayer » has its own switch: a map of chips beside it would say the same thing twice
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
         : [
             { id: 'precision', label: rc.nav.precision },
-            ...(retiredNow ? [] : [{ id: 'solidite', label: rc.nav.solidite }]),
-            { id: 'sensibilite', label: rc.nav.sensibilite },
+            { id: 'solidite', label: rc.nav.solidite },
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
             { id: 'parametres', label: rc.nav.parametres },
@@ -411,6 +455,12 @@ export function useResultsPage() {
     care,
     refine,
     navLinks,
+    essai,
+    essaiKeys,
+    setEssai,
+    firm,
+    firmKeys,
+    setFirm,
     sentence,
     sentenceBefore,
     sentenceAfter,

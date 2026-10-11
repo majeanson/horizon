@@ -55,12 +55,12 @@ test('glossary: a tap on a far chip goes to its section, and the marked chip com
 test('results on a phone: the map is one line too, and a wide screen keeps it on one line without scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
   await page.goto('/resultats?v=verify')
-  const { chips, rail } = await oneLine(page, 6)
+  const { chips, rail } = await oneLine(page, 5)
   await rail.evaluate((el) => el.scrollTo({ left: el.scrollWidth }))
   const last = (await chips.last().boundingBox())!
   expect(last.x + last.width).toBeLessThanOrEqual(360.5)
   await page.setViewportSize({ width: 1280, height: 800 })
-  await oneLine(page, 6)
+  await oneLine(page, 5)
   expect(await rail.evaluate((el) => el.scrollWidth <= el.clientWidth + 1), 'plenty of room: no scrolling needed').toBe(true)
 })
 

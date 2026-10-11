@@ -3,7 +3,6 @@ import { FirmSection } from './FirmSection'
 import { LedgerPanel } from '../LedgerPanel'
 import { ParamsPanel } from '../ParamsPanel'
 import { SectionHeader } from '../../SectionHeader'
-import { SensitivityPanel } from '../SensitivityPanel'
 import { YearTables } from '../YearTables'
 import { Skeleton } from '../../Skeleton'
 import { LEDGER_COPY } from '../../../lib/ledgerCopy'
@@ -26,14 +25,8 @@ export function VerifyView({ m }: { m: ResultsModel }) {
             </Suspense>
           </section>
 
-          {/* How firm the answer is: the same plan under the three scenarios and a hard market — a check, so it lives here. */}
+          {/* How firm the answer is — the three scenarios and a hard market, and the grids of what moves it — one section, two depths. */}
           <FirmSection m={m} />
-
-          {/* The ages and figures that set the answer, with their calculation and a slider each. */}
-          <section id="sensibilite" className="results-section" aria-label={r.sensitivity.title}>
-            <SectionHeader title={r.sensitivity.title} subtitle={rc.headline.sensitivityDetail} />
-            <SensitivityPanel household={profile.household} assumptions={assumptions} />
-          </section>
 
           <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
             <SectionHeader title={LEDGER_COPY[lang].title} />

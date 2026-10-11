@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME } from '../../engine/params/typical'
 import { useLang } from '../../i18n'
 import { pageFor } from '../../engine/params/twins'
-import { applyLevel, levelFigure, levelOf, LEVELS, LEVEL_KINDS, needsLevel, retiredShare, type Level, type RetiredBasis } from '../../lib/levels'
+import { applyLevel, levelFigure, levelOf, LEVELS, LEVEL_KINDS, retiredShare, type Level, type RetiredBasis } from '../../lib/levels'
 import { setBasis, useBasis } from '../../lib/levelBasis'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
 import { formatMoney } from '../../lib/money'
@@ -12,24 +12,24 @@ import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { StatusMessage } from '../StatusMessage'
-import { Section } from './shared'
 
-// « Je ne connais pas mes chiffres » — three chips, one per standard of living, that fill EVERY blank figure at once (balances, the home,
+// « Je ne connais pas mes chiffres » — the first view of « Remplir ce qui manque » (FillBlanks.tsx): three chips, one per standard of living, that fill EVERY blank figure at once (balances, the home,
 // the budget) from what Statistics Canada says households of the same age hold and spend. Everything stays « estimated »; a figure the
 // person typed is never replaced; one tap takes it all back; and the arithmetic behind each figure is one expander away, with the
-// official tables it stands on. Shown only while there is a figure left for a level to fill.
+// official tables it stands on.
 const SOURCES = [TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME, TYPICAL_SPENDING_BY_AGE].map((x) => x.source)
 
-export default function LevelPicker() {
+/** What a level just filled, said once, with the profile as it was so one tap takes it back. */
+export type LevelsDone = { note: string; before: Profile | null }
+
+export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone: (d: LevelsDone | null) => void }) {
   const { lang } = useLang()
   const c = LEVELS_COPY[lang]
   const profile = useProfile()
   const now = today()
-  const [done, setDone] = useState<{ note: string; before: Profile | null } | null>(null)
   const [showHow, setShowHow] = useState(false)
   const current = levelOf(profile, now.year)
   const basis = useBasis()
-  if (!needsLevel(profile, now.year) && done === null) return null
 
   const pick = (level: Level) => {
     const e = applyLevel(profile, level, now, basis)
@@ -55,7 +55,9 @@ export default function LevelPicker() {
   }).filter((r) => r.values.every((v) => v !== null))
 
   return (
-    <Section id="niveau" title={c.title} subtitle={c.lead} icon="piggy-bank-bold">
+    <>
+      <h3 className="fill__title">{c.title}</h3>
+      <p className="field-row__hint">{c.lead}</p>
       <Cluster role="radiogroup" aria-label={c.pick}>
         {LEVELS.map((l) => (
           <Chip key={l} radio selected={current === l} onClick={() => pick(l)}>
@@ -139,6 +141,6 @@ export default function LevelPicker() {
           </ul>
         </div>
       )}
-    </Section>
+    </>
   )
 }
