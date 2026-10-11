@@ -22,9 +22,11 @@ import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
 import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
+import { HYPOTHESES_COPY } from '../lib/hypothesesCopy'
 import { LIFE_COPY } from '../lib/lifeCopy'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { useNotice } from '../lib/toast'
+import { useParamChoice } from '../lib/useParamChoice'
 
 // What the household assumes about the future. These are the person's own numbers: nothing here is an official figure,
 // and the page says so. The scenario comes first — it IS the page for most people (the Neutre set is already in place) —
@@ -64,6 +66,10 @@ export function Hypotheses() {
   const [perAccount, setPerAccount] = useState(!sameReturn)
   const setAllReturns = (v: number) => updateProfile((p) => setAssumptions(p, { returns: { rrsp: v, tfsa: v, nonReg: v } }))
   const averageReturn = (returns.rrsp + returns.tfsa + returns.nonReg) / 3
+
+  // The scenario is always on screen; what it sets is read in three views, one at a time (they were six sections stacked). The address keeps the view (`?hv=`).
+  const [view, setView] = useParamChoice('hv', ['economy', 'life', 'options'] as const, 'economy')
+  const hv = HYPOTHESES_COPY[lang].views
 
   return (
     <section className="page-body">
@@ -121,6 +127,19 @@ export function Hypotheses() {
         </div>
       </Section>
 
+      <SubTabs
+        ariaLabel={hv.label}
+        value={view}
+        onSelect={setView}
+        options={[
+          { key: 'economy' as const, label: hv.economy },
+          { key: 'life' as const, label: hv.life },
+          { key: 'options' as const, label: hv.options },
+        ]}
+      />
+
+      {view === 'economy' && (
+        <>
       <Section title={a.economy.title} icon="chart-line-up-bold">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
@@ -157,8 +176,6 @@ export function Hypotheses() {
         {meter('returns', averageReturn)}
       </Section>
 
-      {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
-          first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
       <Section title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
         <SubTabs
           ariaLabel={m.path.title}
@@ -185,7 +202,13 @@ export function Hypotheses() {
           </>
         )}
       </Section>
+        </>
+      )}
 
+      {view === 'life' && (
+        <>
+      {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
+          first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
       <Section title={a.horizon.title} subtitle={a.horizon.hint} icon="calendar-blank-bold">
         {profile.household.persons.map((person, i) => {
           const own = person.horizonAge ?? null
@@ -238,12 +261,16 @@ export function Hypotheses() {
           )}
         </Cluster>
       </Section>
+        </>
+      )}
 
+      {view === 'options' && (
       <Section title={a.options.title} icon="lock-bold">
         {/* The splitting switch only when there is someone to split with. */}
         {hasSpouse(profile) && <Switch checked={assumptions.pensionSplitting} onChange={(pensionSplitting) => updateProfile((p) => setAssumptions(p, { pensionSplitting }))} label={a.splitting.on} hint={a.splitting.hint} />}
         <Switch checked={assumptions.surplusToRrsp === true} onChange={(surplusToRrsp) => updateProfile((p) => setAssumptions(p, { surplusToRrsp }))} label={m.surplus.on} hint={m.surplus.hint} />
       </Section>
+      )}
 
       {gaps.length === 0 ? (
         <NextStep to="/resultats" label={t.next.toResults}>

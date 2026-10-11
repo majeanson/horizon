@@ -69,7 +69,7 @@ test.describe('on Profil', () => {
 
 test('on Hypothèses: spending that slows with age is a choice of pace, saved', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?hv=life')
   await page.getByRole('radio', { name: '1 % de moins par année' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.retiredSpendingDrift).toBe(-0.01)
   await page.getByRole('radio', { name: 'Au même niveau' }).click()
@@ -93,7 +93,7 @@ test.describe('it reaches the answer', () => {
 
   test('the printed year-by-year and the charts name the dated income in the work bar', async ({ page }) => {
     await seedProfile(page, withFlows([{ label: 'Loyer', kind: 'income', amount: 15000, fromYear: 2040, toYear: 2060, owner: 'self', taxable: true }]))
-    await page.goto('/resultats?v=strategies')
+    await page.goto('/resultats?v=strategies&bv=years')
     await expect(page.getByText('Travail et autres revenus').first()).toBeVisible({ timeout: 60_000 })
   })
 })
