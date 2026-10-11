@@ -11,6 +11,7 @@ import {
   retirementMarkers,
   hasDatedIncome,
   idleStretch,
+  survivorJump,
   sourceBars,
   type ChartMetric,
   type Dollars,
@@ -43,6 +44,7 @@ export function ChartPanel({
   names,
   todayYear,
   inflation,
+  horizonAge,
   metric,
   dollars,
   onMetric,
@@ -54,6 +56,8 @@ export function ChartPanel({
   names: readonly string[]
   todayYear: number
   inflation: number
+  /** The age the plan runs to unless a person set their own: where one person's bars end and the other's jump. */
+  horizonAge: number
   metric: ChartMetric
   dollars: Dollars
   onMetric: (m: ChartMetric) => void
@@ -94,7 +98,7 @@ export function ChartPanel({
         />
       </div>
       {detail ? (
-        runs.length > 0 && <DetailView runs={runs} household={household} names={names} todayYear={todayYear} inflation={inflation} dollars={dollars} label={label} agesByYear={agesByYear} />
+        runs.length > 0 && <DetailView runs={runs} household={household} names={names} todayYear={todayYear} inflation={inflation} horizonAge={horizonAge} dollars={dollars} label={label} agesByYear={agesByYear} />
       ) : (
         <>
           <p className="field-row__hint">
@@ -132,6 +136,7 @@ function DetailView({
   names,
   todayYear,
   inflation,
+  horizonAge,
   dollars,
   label,
   agesByYear,
@@ -141,6 +146,7 @@ function DetailView({
   names: readonly string[]
   todayYear: number
   inflation: number
+  horizonAge: number
   dollars: Dollars
   label: (s: Selection) => string
   agesByYear: ReadonlyMap<number, string>
@@ -175,6 +181,10 @@ function DetailView({
   // One person's bars can be EMPTY for years (a pension that starts at 70 while the other person's accounts pay): say so, so the gap does not read as missing data.
   const idle = useMemo(() => (personId === null ? null : idleStretch(sources)), [personId, sources])
   const birth = household.persons[whoIndex]?.birth.year
+  // When two lives end in different years, the first one's bars stop and the other's jump (their accounts pass over): said on either person's view, so neither reads as a mistake.
+  const jump = useMemo(() => (personId === null ? null : survivorJump(household, horizonAge)), [household, horizonAge, personId])
+  const goneIndex = jump === null ? -1 : household.persons.findIndex((p) => p.id === jump.goneId)
+  const otherIndex = jump === null ? -1 : household.persons.findIndex((p) => p.id === jump.otherId)
 
   return (
     <div className="chart-detail">
@@ -197,6 +207,9 @@ function DetailView({
 
       <h4 className="chart-detail__heading">{c.sourcesTitle}</h4>
       <p className="field-row__hint">{personId === null ? `${c.sourcesHint} ${c.needHint}` : c.sourcesHint}</p>
+      {jump !== null && goneIndex >= 0 && otherIndex >= 0 && (personId === jump.goneId || personId === jump.otherId) && (
+        <p className="field-row__hint">{RESULTS_COPY[lang].lifeEnd(names[goneIndex] ?? '', formatYearAge(jump.lastYear, [household.persons[goneIndex].birth.year], lang), names[otherIndex] ?? '', personId === jump.goneId)}</p>
+      )}
       {idle !== null && birth !== undefined && <p className="field-row__hint">{RESULTS_COPY[lang].idle(names[whoIndex] ?? '', formatYearAge(idle.from, [birth], lang), formatYearAge(idle.to, [birth], lang))}</p>}
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>

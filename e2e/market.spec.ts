@@ -71,7 +71,7 @@ test('« Essayer » ranks what moves the answer most, each lever with its age', 
   const items = page.locator('.levers__item')
   await expect(items).toHaveCount(4)
   await expect(items.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
-  await expect(items.first()).toContainText(/plus tôt|pas de changement|plus tard|aucun âge|un âge existe/)
+  await expect(items.first()).toContainText(/plus tôt|même âge|plus tard|aucun âge|un âge existe/)
 })
 
 test('Hypothèses: the scenario is always on top; the rest is three views — the economy, the length and spending, the options — one at a time, the choice in the address', async ({ page }) => {

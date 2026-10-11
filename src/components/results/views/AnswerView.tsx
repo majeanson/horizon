@@ -196,6 +196,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 names={names}
                 todayYear={year}
                 inflation={assumptions.inflation}
+                horizonAge={assumptions.horizonAge}
                 metric={metric}
                 dollars={dollars}
                 onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}

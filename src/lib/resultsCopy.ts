@@ -48,6 +48,8 @@ const FR_RESULTS = {
   tabs: { label: 'Vues des résultats', answer: 'Réponse', adjust: 'Essayer', strategies: 'Stratégies', verify: 'Vérifier' },
   /** « Essayer » shows one thing at a time. */
   try: { label: 'Un essai à la fois' },
+  /** Under one person's bars, when the two plans end in different years: why the first one's bars stop and the other's jump. */
+  lifeEnd: (gone: string, yearAge: string, other: string, viewingGone: boolean) => viewingGone ? `Le plan va jusqu’à ${yearAge} pour ${gone} : après cette année, les barres de ${gone} s’arrêtent et son épargne passe à ${other}.` : `Après ${yearAge}, le plan s’arrête pour ${gone} et son épargne s’ajoute à celle de ${other} : le saut dans les barres est voulu, ce n’est pas une erreur.`,
   /** « Comparer des âges de départ » has three ways of comparing; one on screen at a time. */
   compareViews: { label: 'Façons de comparer', ages: 'Âges de départ', each: 'Chacun de son côté', plans: 'Mes plans' },
   /** « Solidité de la réponse » at two depths. */
@@ -254,6 +256,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   idle: (name: string, from: string, to: string) => `From ${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', adjust: 'Try', strategies: 'Strategies', verify: 'Check' },
   try: { label: 'One try at a time' },
+  lifeEnd: (gone: string, yearAge: string, other: string, viewingGone: boolean) => viewingGone ? `The plan runs to ${yearAge} for ${gone}: after that year ${gone}’s bars stop and the savings pass to ${other}.` : `After ${yearAge} the plan ends for ${gone} and the savings are added to ${other}’s: the jump in the bars is intended, not an error.`,
   compareViews: { label: 'Ways to compare', ages: 'Departure ages', each: 'Each of us', plans: 'My plans' },
   firm: { label: 'Two ways to see how firm it is', brief: 'In brief', grids: 'If the future is worse' },
   orders: {

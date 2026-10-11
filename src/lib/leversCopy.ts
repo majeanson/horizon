@@ -8,7 +8,8 @@ export interface LeversCopy {
   hint: string
   names: Record<LeverId, string>
   gain: (years: number, age: number) => string
-  same: string
+  /** A change that does not move the age (a whole-year answer): it says the age it leaves, so « no change » is never a bare word — the money line beside it says what it does gain. */
+  same: (age: number) => string
   /** The same change in money: what it adds to (or takes from) the nest left at the end of the plan, in today's dollars (« +24 k$ »). */
   end: (signedAmount: string) => string
   later: (years: number, age: number) => string
@@ -27,7 +28,7 @@ const FR: LeversCopy = {
     pensions70: 'Commencer la RRQ et la PSV à 70 ans',
   },
   gain: (years, age) => `${years} ${years === 1 ? 'an' : 'ans'} plus tôt — ${age} ans`,
-  same: 'pas de changement',
+  same: (age) => `même âge — ${age} ans`,
   end: (amount) => `${amount} à la fin du plan`,
   later: (years, age) => `${years} ${years === 1 ? 'an' : 'ans'} plus tard — ${age} ans`,
   none: 'aucun âge jusqu’à 70 ans',
@@ -45,7 +46,7 @@ const EN: LeversCopy = {
     pensions70: 'Start the QPP and OAS at 70',
   },
   gain: (years, age) => `${years} ${years === 1 ? 'year' : 'years'} earlier — age ${age}`,
-  same: 'no change',
+  same: (age) => `same age — age ${age}`,
   end: (amount) => `${amount} at the end of the plan`,
   later: (years, age) => `${years} ${years === 1 ? 'year' : 'years'} later — age ${age}`,
   none: 'no age up to 70',

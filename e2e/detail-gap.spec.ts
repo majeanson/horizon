@@ -21,3 +21,15 @@ test('a stretch of years with nothing from one person is explained under their b
   await page.locator('.chart-panel').getByRole('tab', { name: 'Camille' }).click()
   await expect(page.locator('.chart-panel').getByText(/rien ne vient de/)).toHaveCount(0)
 })
+
+test('when the two plans end in different years, each person’s bars say why one stops and the other jumps', async ({ page }) => {
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats?metric=detail')
+  const panel = page.locator('.chart-panel')
+  // the household's view has no discontinuity to explain
+  await expect(panel.getByText(/le saut dans les barres est voulu|les barres de Camille s’arrêtent/)).toHaveCount(0)
+  await panel.getByRole('tab', { name: 'Camille' }).click()
+  await expect(panel.getByText(/Le plan va jusqu’à 2073 \(95 ans\) pour Camille/)).toBeVisible({ timeout: 30_000 })
+  await panel.getByRole('tab', { name: 'Alex' }).click()
+  await expect(panel.getByText(/Après 2073 \(95 ans\), le plan s’arrête pour Camille et son épargne s’ajoute à celle de Alex/)).toBeVisible()
+})

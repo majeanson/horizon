@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { EXAMPLES, EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples.ts'
 import { everyoneAt, runScenario } from '../engine/retireAt.ts'
 import type { AgeResult } from '../engine/types.ts'
-import { SOURCE_SEGMENTS, balanceBars, chartSeries, deflator, expenseBars, idleStretch, metricValue, sourceBars } from './chartData.ts'
+import { SOURCE_SEGMENTS, balanceBars, chartSeries, deflator, expenseBars, idleStretch, metricValue, sourceBars, survivorJump } from './chartData.ts'
 
 // THE PICTURES CAN BE TRUSTED. Every chart of the « Détail » view and the two lines are read from the engine's year rows by lib/chartData.ts; flowBars.test.ts
 // holds the cash identity of the sources against the uses. This file holds everything ELSE a reader relies on, for ALL eleven example households and three
@@ -171,5 +171,42 @@ describe('the plan, as the pictures show it, agrees with its verdict', { timeout
     }
     // Eleven households × three ages × their people: a couple whose second person lives off the first's draw exists among them — the check ran on real data, not on nothing.
     expect(found).toBeGreaterThan(0)
+  })
+})
+
+describe('the note under a person’s bars when the two lives end in different years', { timeout: 120_000 }, () => {
+  it('names the year the engine really stops the first person: nothing is drawn for them after it, and something is drawn up to it', () => {
+    let couples = 0
+    for (const r of runs) {
+      const { household, assumptions } = EXAMPLES[r.id]
+      const jump = survivorJump(household, assumptions.horizonAge)
+      if (jump === null) continue
+      couples++
+      const rows = r.result.rows
+      const s = scale(r.id)
+      const gone = sourceBars(rows, jump.goneId, s)
+      const goneBal = balanceBars(rows, jump.goneId, s)
+      rows.forEach((row, i) => {
+        const drawn = SOURCE_SEGMENTS.some((k) => gone[i][k] > 0.5) || goneBal[i].rrsp + goneBal[i].tfsa + goneBal[i].nonReg > 0.5
+        if (row.year > jump.lastYear) expect(drawn, `${label(r)} ${row.year}: nothing for the first to go after ${jump.lastYear}`).toBe(false)
+      })
+      const upTo = rows.filter((row) => row.year <= jump.lastYear)
+      expect(upTo.some((_, i) => SOURCE_SEGMENTS.some((k) => gone[i][k] > 0.5)), `${label(r)}: something is drawn for them up to ${jump.lastYear}`).toBe(true)
+    }
+    expect(couples, 'the examples hold couples whose plans end in different years').toBeGreaterThan(0)
+  })
+
+  it('is silent for one person, for two plans that end in the same year, and honours each person’s own age', () => {
+    const { household } = EXAMPLES.golden
+    const [a, b] = household.persons
+    expect(survivorJump({ ...household, persons: [a] }, 95)).toBeNull()
+    // born in different years, both to 95: the older one goes first
+    expect(survivorJump(household, 95)).toEqual({ goneId: a.birth.year < b.birth.year ? a.id : b.id, otherId: a.birth.year < b.birth.year ? b.id : a.id, lastYear: Math.min(a.birth.year, b.birth.year) + 95 })
+    // each to the age that ends them in the same calendar year: no jump
+    const same = { ...household, persons: [{ ...a, horizonAge: 90 }, { ...b, horizonAge: 90 + (a.birth.year - b.birth.year) }] }
+    expect(survivorJump(same, 95)).toBeNull()
+    // one person's own, shorter age makes them the first to go
+    const own = { ...household, persons: [{ ...a, horizonAge: 70 }, b] }
+    expect(survivorJump(own, 95)).toEqual({ goneId: a.id, otherId: b.id, lastYear: a.birth.year + 70 })
   })
 })

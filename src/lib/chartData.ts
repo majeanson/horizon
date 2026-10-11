@@ -126,6 +126,20 @@ export function idleStretch(bars: readonly ({ x: number } & Record<SourceSegment
   return best
 }
 
+/**
+ * In a couple whose plans end in different years, who goes first: the person is alive through the year they reach their plan's age (their own « jusqu'à quel âge », else the
+ * scenario's), and then their accounts pass to the other. The per-person bars of the first end there and the other's JUMP the year after — wanted, and said on the page.
+ * Null for one person, or two plans that end in the same year.
+ */
+export function survivorJump(household: Household, defaultHorizon: number): { goneId: string; otherId: string; lastYear: number } | null {
+  if (household.persons.length !== 2) return null
+  const lastYear = (p: Household['persons'][number]) => p.birth.year + (p.horizonAge ?? defaultHorizon)
+  const [a, b] = household.persons
+  if (lastYear(a) === lastYear(b)) return null
+  const [gone, other] = lastYear(a) < lastYear(b) ? [a, b] : [b, a]
+  return { goneId: gone.id, otherId: other.id, lastYear: lastYear(gone) }
+}
+
 export const EXPENSE_SEGMENTS = ['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved', 'unmet'] as const
 export type ExpenseSegment = (typeof EXPENSE_SEGMENTS)[number]
 /** `unmet`: what the plan needed and could not pay — drawn only in a plan that runs out. */

@@ -45,7 +45,7 @@ export function AdjustView({ m }: { m: ResultsModel }) {
                                 : l.yearsGained > 0
                                   ? lc.gain(l.yearsGained, l.earliest)
                                   : l.yearsGained === 0
-                                    ? lc.same
+                                    ? lc.same(l.earliest)
                                     : lc.later(-l.yearsGained, l.earliest)}
                           {levers !== undefined && l.endGain !== null && Math.abs(l.endGain) >= 1000 && (
                             <span className="levers__end">{lc.end((l.endGain > 0 ? '+' : '−') + formatCompactMoney(Math.abs(l.endGain), lang))}</span>
