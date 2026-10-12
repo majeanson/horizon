@@ -32,7 +32,6 @@ const KEYS: Record<string, string> = {
   spend: 'Résultats: the « Et si je dépensais moins ? » what-if amount. Unreadable is ignored: the slider sits on the profile’s own spending.',
   care: 'Résultats › Essayer: the late-life care what-if, « amount,age,years ». A part left out takes the starting figure; anything unreadable is ignored and the sliders sit on the starting figures.',
   cv: 'Résultats › Réponse › Comparer: the way of comparing on screen (ages · each · plans). Unknown, or one the household does not have, is the departure ages.',
-  hv: 'Hypothèses: the view on screen under the scenario (economy · life · options). Unknown is the economy.',
   copie: 'Réglages: the copy view on screen (save · restore · rescue). Unknown is saving — or the unreadable copy when the device holds one.',
   autres: 'Réglages: the other plans to look at (plans · examples). Unknown is the plans kept under a name.',
   bv: 'Résultats › Stratégies: the view of the pensions on screen (ways · years · death · why). Unknown is the ways of starting.',

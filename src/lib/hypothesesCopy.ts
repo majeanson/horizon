@@ -1,13 +1,13 @@
 import type { Lang } from '../i18n.ts'
 
-// THE WORDS OF HYPOTHÈSES' VIEWS. Outside the eager dictionaries on purpose (the first screen never needs them): the scenario comes first, always on screen, and what it
-// sets is read in three views — the economy (prices and wages, returns, the market path), the length of the plan and what it spends, and the options.
+// THE WORDS OF HYPOTHÈSES' MAP. Outside the eager dictionaries on purpose (the first screen never needs them): one short noun per block of the page, in the order they stand — the
+// scenario first, then what it sets.
 
 export interface HypothesesCopy {
-  views: { label: string; economy: string; life: string; options: string }
+  nav: { label: string; scenario: string; prices: string; returns: string; markets: string; age: string; spending: string; options: string }
 }
 
 export const HYPOTHESES_COPY: Record<Lang, HypothesesCopy> = {
-  fr: { views: { label: 'Ce que vous supposez', economy: 'Économie', life: 'Durée et dépenses', options: 'Options' } },
-  en: { views: { label: 'What you assume', economy: 'Economy', life: 'Length and spending', options: 'Options' } },
+  fr: { nav: { label: 'Sections des hypothèses', scenario: 'Scénario', prices: 'Prix', returns: 'Placements', markets: 'Marchés', age: 'Âge de fin', spending: 'Dépenses', options: 'Options' } },
+  en: { nav: { label: 'Assumption sections', scenario: 'Scenario', prices: 'Prices', returns: 'Returns', markets: 'Markets', age: 'End age', spending: 'Spending', options: 'Options' } },
 }

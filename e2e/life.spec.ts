@@ -69,7 +69,7 @@ test.describe('on Profil', () => {
 
 test('on Hypothèses: spending that slows with age is a choice of pace, saved', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/hypotheses?hv=life')
+  await page.goto('/hypotheses')
   await page.getByRole('radio', { name: '1 % de moins par année' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.retiredSpendingDrift).toBe(-0.01)
   await page.getByRole('radio', { name: 'Au même niveau' }).click()

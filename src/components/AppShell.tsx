@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { Suspense, useEffect, useRef, useState } from 'react'
+import { useHeadroom } from '../lib/useHeadroom'
 import { useLang, useT } from '../i18n'
 import { saveCopy } from '../lib/saveCopy'
 import { snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
@@ -89,9 +90,12 @@ export function AppShell() {
     notice(t.data.export.done)
   }
   const themeLabel = theme === 'night' ? t.common.themeToDay : t.common.themeToNight
+  // The pinned chrome slides away while the reader scrolls down and returns on the first move up (lib/useHeadroom.ts; the sliding is styles/revamp.css).
+  const shell = useRef<HTMLDivElement>(null)
+  useHeadroom(shell)
 
   return (
-    <div className="shell">
+    <div className="shell" ref={shell}>
       <a
         className="skip-link"
         href="#main"

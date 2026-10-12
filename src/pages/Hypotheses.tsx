@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { AccountKind } from '../engine/types'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
@@ -10,6 +10,7 @@ import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
+import { PinnedMap } from '../components/PinnedMap'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
@@ -26,7 +27,6 @@ import { HYPOTHESES_COPY } from '../lib/hypothesesCopy'
 import { LIFE_COPY } from '../lib/lifeCopy'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { useNotice } from '../lib/toast'
-import { useParamChoice } from '../lib/useParamChoice'
 
 // What the household assumes about the future. These are the person's own numbers: nothing here is an official figure,
 // and the page says so. The scenario comes first — it IS the page for most people (the Neutre set is already in place) —
@@ -67,16 +67,26 @@ export function Hypotheses() {
   const setAllReturns = (v: number) => updateProfile((p) => setAssumptions(p, { returns: { rrsp: v, tfsa: v, nonReg: v } }))
   const averageReturn = (returns.rrsp + returns.tfsa + returns.nonReg) / 3
 
-  // The scenario is always on screen; what it sets is read in three views, one at a time (they were six sections stacked). The address keeps the view (`?hv=`).
-  const [view, setView] = useParamChoice('hv', ['economy', 'life', 'options'] as const, 'economy')
-  const hv = HYPOTHESES_COPY[lang].views
+  // A long page of inputs: a one-line map of its blocks (the scenario first, then what it sets), as on Profil and Résultats.
+  const page = useRef<HTMLElement>(null)
+  const nav = HYPOTHESES_COPY[lang].nav
+  const links = [
+    { id: 'scenario', label: nav.scenario },
+    { id: 'prix', label: nav.prices },
+    { id: 'placements', label: nav.returns },
+    { id: 'marches', label: nav.markets },
+    { id: 'age', label: nav.age },
+    { id: 'depenses', label: nav.spending },
+    { id: 'options', label: nav.options },
+  ]
 
   return (
-    <section className="page-body">
+    <section className="page-body" ref={page}>
       <LiveAnswer />
       <PageHead title={a.title} subtitle={a.subtitle} />
+      <PinnedMap links={links} ariaLabel={nav.label} page={page} />
 
-      <Section title={a.presets.title} subtitle={a.presets.hint} icon="sliders-horizontal-bold">
+      <Section id="scenario" title={a.presets.title} subtitle={a.presets.hint} icon="sliders-horizontal-bold">
         <SubTabs<PresetKey | 'custom'>
           ariaLabel={a.presets.label}
           value={active ?? 'custom'}
@@ -127,20 +137,7 @@ export function Hypotheses() {
         </div>
       </Section>
 
-      <SubTabs
-        ariaLabel={hv.label}
-        value={view}
-        onSelect={setView}
-        options={[
-          { key: 'economy' as const, label: hv.economy },
-          { key: 'life' as const, label: hv.life },
-          { key: 'options' as const, label: hv.options },
-        ]}
-      />
-
-      {view === 'economy' && (
-        <>
-      <Section title={a.economy.title} icon="chart-line-up-bold">
+      <Section id="prix" title={a.economy.title} icon="chart-line-up-bold">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
@@ -151,7 +148,7 @@ export function Hypotheses() {
         {meter('wageGrowth', assumptions.wageGrowth)}
       </Section>
 
-      <Section title={a.returns.title} subtitle={a.returns.hint} icon="chart-line-up-bold">
+      <Section id="placements" title={a.returns.title} subtitle={a.returns.hint} icon="chart-line-up-bold">
         {perAccount ? (
           (['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
             <FieldRow key={kind} label={accountName[kind]} infoId="returns">
@@ -176,7 +173,7 @@ export function Hypotheses() {
         {meter('returns', averageReturn)}
       </Section>
 
-      <Section title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
+      <Section id="marches" title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
         <SubTabs
           ariaLabel={m.path.title}
           value={assumptions.marketPath.preset}
@@ -202,14 +199,10 @@ export function Hypotheses() {
           </>
         )}
       </Section>
-        </>
-      )}
 
-      {view === 'life' && (
-        <>
       {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
           first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
-      <Section title={a.horizon.title} subtitle={a.horizon.hint} icon="calendar-blank-bold">
+      <Section id="age" title={a.horizon.title} subtitle={a.horizon.hint} icon="calendar-blank-bold">
         {profile.household.persons.map((person, i) => {
           const own = person.horizonAge ?? null
           const name = person.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
@@ -247,7 +240,7 @@ export function Hypotheses() {
         )}
       </Section>
 
-      <Section title={LIFE_COPY[lang].drift.title} subtitle={LIFE_COPY[lang].drift.hint} icon="chart-line-up-bold">
+      <Section id="depenses" title={LIFE_COPY[lang].drift.title} subtitle={LIFE_COPY[lang].drift.hint} icon="chart-line-up-bold">
         <Cluster role="radiogroup" aria-label={LIFE_COPY[lang].drift.title}>
           {[0, -0.01, -0.02].map((v) => (
             <Chip key={v} radio selected={(assumptions.retiredSpendingDrift ?? 0) === v} onClick={() => updateProfile((p) => setAssumptions(p, { retiredSpendingDrift: v }))}>
@@ -261,17 +254,12 @@ export function Hypotheses() {
           )}
         </Cluster>
       </Section>
-        </>
-      )}
-
-      {view === 'options' && (
-      <Section title={a.options.title} icon="lock-bold">
+      <Section id="options" title={a.options.title} icon="lock-bold">
         {/* The splitting switch only when there is someone to split with. */}
         {hasSpouse(profile) && <Switch checked={assumptions.pensionSplitting} onChange={(pensionSplitting) => updateProfile((p) => setAssumptions(p, { pensionSplitting }))} label={a.splitting.on} hint={a.splitting.hint} />}
         {hasSpouse(profile) && <Switch checked={assumptions.drawTogether === true} onChange={(drawTogether) => updateProfile((p) => setAssumptions(p, { drawTogether }))} label={m.together.on} hint={m.together.hint} />}
         <Switch checked={assumptions.surplusToRrsp === true} onChange={(surplusToRrsp) => updateProfile((p) => setAssumptions(p, { surplusToRrsp }))} label={m.surplus.on} hint={m.surplus.hint} />
       </Section>
-      )}
 
       {gaps.length === 0 ? (
         <NextStep to="/resultats" label={t.next.toResults}>

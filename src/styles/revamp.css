@@ -1598,16 +1598,17 @@
 }
 
 /* ── Profil: a pinned map of the form ─────────────────────────────────────────────────────────────────────────── */
-/* The map sticks under « Votre réponse » (ProfileMap measures that strip into --live-h); a tapped block stops below both. */
+/* The map sticks under « Votre réponse » (PinnedMap measures that strip into --live-h); a tapped block stops below both. */
 /* The wrapper must not box the map: a sticky child only travels inside its parent. */
-.profile-map {
+.pinned-map {
   display: contents;
 }
-.profile-map .section-nav {
+.pinned-map .section-nav {
   top: calc(var(--bar-h) + var(--live-h, 0px));
 }
-.page-body:has(.profile-map) .profile-section[id],
-.page-body:has(.profile-map) .person[id] {
+.page-body:has(.pinned-map) .profile-section[id],
+.page-body:has(.pinned-map) .person[id],
+.page-body:has(.pinned-map) .profile-section[id] {
   scroll-margin-top: calc(var(--bar-h) + var(--live-h, 0px) + var(--map-h, 3rem) + 0.75rem);
 }
 
@@ -1623,23 +1624,54 @@
   min-width: 0;
 }
 
-/* Profil's map slides up behind the answer strip while the reader scrolls down, and stays away while the figure guide is open: the guide card, the answer and the top bar are enough to
-   have pinned (on a phone the three pinned rows and the card left a third of the screen to the form). Focus brings it back, so a keyboard user can still reach it. */
-.profile-map .section-nav {
-  z-index: 13;
-  transition: transform 0.2s ease;
+/* ── Headroom: everything pinned at the top slides away while the reader scrolls down, and returns on the first move up ───────────────────────────────────────────────────────── */
+/* lib/useHeadroom.ts puts `data-away` on the shell. The elements stay where they are in the flow (a sticky box keeps its place), so nothing below moves; they are carried up by their own
+   height plus the largest offset anything is pinned at (the three stacked rows), out of the window. A key focusing something inside one brings it back, so the keyboard can still reach it. */
+.shell__bar,
+.live-answer,
+.results-pin,
+.section-nav {
+  transition: transform 0.22s ease;
 }
-.profile-map .section-nav[data-away],
-.page-body:has(.guide-bar) .profile-map .section-nav {
-  transform: translateY(-110%);
+.shell[data-away] .shell__bar,
+.shell[data-away] .live-answer,
+.shell[data-away] .results-pin,
+.shell[data-away] .section-nav {
+  transform: translateY(calc(-100% - 12rem));
   pointer-events: none;
 }
-.profile-map .section-nav[data-away]:focus-within {
+.shell[data-away] .shell__bar:focus-within,
+.shell[data-away] .live-answer:focus-within,
+.shell[data-away] .results-pin:focus-within,
+.shell[data-away] .section-nav:focus-within {
   transform: none;
   pointer-events: auto;
 }
+/* On a wide screen the left rail sticks under the bar: with the bar gone it takes the whole height. */
+@media (min-width: 860px) {
+  .shell__nav {
+    transition: top 0.22s ease;
+  }
+  .shell[data-away] .shell__nav {
+    top: 0;
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .profile-map .section-nav {
+  .shell__bar,
+  .live-answer,
+  .results-pin,
+  .section-nav,
+  .shell__nav {
     transition: none;
   }
+}
+/* …and Profil's map stays away while the figure guide is open (the guide card, the answer and the bar are enough to have on screen). */
+.pinned-map .section-nav {
+  z-index: 13;
+}
+.page-body:has(.guide-bar) .pinned-map .section-nav {
+  transform: translateY(-110%);
+  pointer-events: none;
 }

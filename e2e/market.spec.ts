@@ -7,7 +7,7 @@ import { EXAMPLE, savedProfile, seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('the surplus option: off by default, one tap turns it on, and it is saved', async ({ page }) => {
-  await page.goto('/hypotheses?hv=options')
+  await page.goto('/hypotheses')
   const chip = page.getByRole('switch', { name: 'Placer d’abord le surplus dans le REER' })
   await expect(chip).toHaveAttribute('aria-checked', 'false')
   await expect(page.getByText('L’argent qui reste à la fin d’une année de travail')).toBeVisible()
@@ -19,7 +19,7 @@ test('the surplus option: off by default, one tap turns it on, and it is saved',
 })
 
 test('turned on, the plan still answers (the results page runs the same engine)', async ({ page }) => {
-  await page.goto('/hypotheses?hv=options')
+  await page.goto('/hypotheses')
   await page.getByRole('switch', { name: 'Placer d’abord le surplus dans le REER' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.surplusToRrsp).toBe(true)
   await page.goto('/resultats')
@@ -74,35 +74,28 @@ test('« Essayer » ranks what moves the answer most, each lever with its age', 
   await expect(items.first()).toContainText(/plus tôt|même âge|plus tard|aucun âge|un âge existe/)
 })
 
-test('Hypothèses: the scenario is always on top; the rest is three views — the economy, the length and spending, the options — one at a time, the choice in the address', async ({ page }) => {
+test('Hypothèses is one page — the scenario first, then what it sets — with a one-line map of its blocks, and the market path stays right under the returns it shapes', async ({ page }) => {
   await page.goto('/hypotheses')
-  const views = page.getByRole('tablist', { name: 'Ce que vous supposez' })
-  await expect(views.getByRole('tab')).toHaveText(['Économie', 'Durée et dépenses', 'Options'])
-  await expect(page.getByRole('heading', { name: 'Scénario' })).toBeVisible()
-  // the economy: prices and wages, the returns, and the market path right under the returns that it shapes
-  await expect(page.getByRole('heading', { name: 'Hausse des prix et des salaires' })).toBeVisible()
+  const map = page.getByRole('navigation', { name: 'Sections des hypothèses' })
+  await expect(map.getByRole('button')).toHaveText(['Scénario', 'Prix', 'Placements', 'Marchés', 'Âge de fin', 'Dépenses', 'Options'])
+  // every block is on the page, none behind a switch
+  for (const title of ['Scénario', 'Hausse des prix et des salaires', 'Ce que rapportent vos placements', 'Le parcours des marchés', 'Jusqu’à quel âge planifier', 'Les dépenses à la retraite avec l’âge', 'Options']) {
+    await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  }
   const titles = await page.locator('.profile-section').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))
   expect(titles.indexOf('Le parcours des marchés')).toBe(titles.indexOf('Ce que rapportent vos placements') + 1)
-  await expect(page.getByRole('heading', { name: 'Jusqu’à quel âge planifier' })).toHaveCount(0)
-  await views.getByRole('tab', { name: 'Durée et dépenses' }).click()
-  await expect(page).toHaveURL(/hv=life/)
-  await expect(page.getByRole('heading', { name: 'Jusqu’à quel âge planifier' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Les dépenses à la retraite avec l’âge' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Scénario' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Hausse des prix et des salaires' })).toHaveCount(0)
-  await views.getByRole('tab', { name: 'Options' }).click()
-  await expect(page.getByRole('switch', { name: 'Placer d’abord le surplus dans le REER' })).toBeVisible()
-  // an address that names a view opens it; an unknown one is the economy
-  await page.goto('/hypotheses?hv=nope')
-  await expect(page.getByRole('heading', { name: 'Hausse des prix et des salaires' })).toBeVisible()
+  // a tap on a chip goes to its block, and the chip of the block reached is the marked one
+  await map.getByRole('button', { name: 'Options' }).click()
+  await expect(map.getByRole('button', { name: 'Options' })).toHaveAttribute('aria-current', 'true')
+  await expect(page.locator('#options')).toBeInViewport()
 })
 
-test('on a phone the three views of Hypothèses fit the screen, in both languages', async ({ page }) => {
+test('on a phone the map of Hypothèses is one line that scrolls inside its own box, in both languages', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
   for (const lang of ['fr', 'en']) {
     await page.addInitScript((l) => localStorage.setItem('horizon-lang', l), lang)
-    await page.goto('/hypotheses?hv=life')
-    await expect(page.getByRole('tablist').first()).toBeVisible()
+    await page.goto('/hypotheses')
+    await expect(page.getByRole('navigation').first()).toBeVisible()
     await expectNoHorizontalOverflow(page, page.locator('.page-body'))
   }
 })

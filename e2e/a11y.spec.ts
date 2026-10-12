@@ -46,6 +46,10 @@ async function violations(page: Page): Promise<string[]> {
   // no colour mid-transition (neither the day nor the night palette).
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 30_000 })
   await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
+  // Opening every note scrolls the page to wherever the last button was; the pinned rows (the answer strip, a section map) then sit over whatever is there, and a target-size reading depends on that
+  // accident. Read the page from the top, where every pinned row is in its own place.
+  await page.evaluate(() => document.getElementById('root')?.scrollTo({ top: 0 }))
+  await page.waitForTimeout(150)
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze()
   return results.violations.map(
     (v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`,
