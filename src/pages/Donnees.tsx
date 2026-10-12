@@ -120,7 +120,7 @@ export function Donnees() {
             <Cluster>
               {copies.map((text, i) => (
                 <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
-                  {i === 0 ? d.rescue.button : d.rescue.older}
+                  {i === 0 ? d.rescue.button : `${d.rescue.older} (${i + 1})`}
                 </button>
               ))}
             </Cluster>

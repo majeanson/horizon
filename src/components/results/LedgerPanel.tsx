@@ -145,6 +145,11 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
       <p className="field-row__hint">{c.hint}</p>
       {/* Two views, one store: these sliders and the Profil / Hypothèses fields write the same profile. */}
       <p className="field-row__hint">{c.sameStore}</p>
+      {/* What the sliders DO, said where they start: with ten of them between, a phone moved one and the verdict was off screen. */}
+      <p className={'ledger__glance' + (glance.ok ? '' : ' scenario__verdict--short')} aria-live="polite">
+        {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(formatYearAge(glance.firstShortfallYear! - 1, shown.persons.map((p) => p.birth.year), lang))} {worthDelta}
+      </p>
+      <p className="field-row__hint">{c.glanceNote}</p>
       {/* The same frame as the Profil: one column per person, a coloured top bar and the name — whether there is one or two. */}
       <div className={'persons' + (ledger.length > 1 ? ' persons--two' : '')}>
       {ledger.map((l, i) => {
@@ -196,11 +201,6 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
           </div>
         ))}
       </section>
-
-      <p className={'ledger__glance' + (glance.ok ? '' : ' scenario__verdict--short')} aria-live="polite">
-        {glance.ok ? c.glanceHolds(money(glance.netWorthEnd)) : c.glanceFails(formatYearAge(glance.firstShortfallYear! - 1, shown.persons.map((p) => p.birth.year), lang))} {worthDelta}
-      </p>
-      <p className="field-row__hint">{c.glanceNote}</p>
     </div>
   )
 }

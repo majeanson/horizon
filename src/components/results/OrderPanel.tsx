@@ -59,7 +59,7 @@ export function OrderPanel({ household, assumptions, age, firstAge }: { househol
                 <td>{x.earliestOk === null ? '—' : o.age(x.earliestOk)}</td>
                 <td>{formatMoney(x.lifetimeTax, lang)}</td>
                 <td>{formatMoney(x.worthToday, lang)}</td>
-                <td>{i !== value.current && <Chip onClick={() => adopt(x.order)}>{o.use}</Chip>}</td>
+                <td>{i !== value.current && <Chip onClick={() => adopt(x.order)} ariaLabel={`${o.use} — ${x.order.map((k) => accountName[k]).join(' → ')}`}>{o.use}</Chip>}</td>
               </tr>
             ))}
           </tbody>

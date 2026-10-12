@@ -47,7 +47,7 @@ export function ParamsPanel() {
                       </th>
                       <td className="params__value">{row.value}</td>
                       <td>
-                        <a href={row.url} target="_blank" rel="noopener noreferrer" lang={row.pageLang}>
+                        <a href={row.url} target="_blank" rel="noopener noreferrer" lang={row.pageLang} aria-label={`${row.title} — ${PARAM_LABELS[lang][row.path] ?? row.path}`}>
                           {row.title}
                         </a>{' '}
                         {!row.inReaderLanguage && <span className="mono">({r.params.pageIn(row.pageLang)}) </span>}

@@ -32,22 +32,30 @@ export function revealOnOpen(el: HTMLElement | null): () => void {
 // « Take me to that section » — and KEEP me there while the page settles. On Résultats the sections above a target keep
 // streaming in for a moment (a worker's answer replacing a placeholder, a lazy chart), so a tapped section that had
 // stopped under the pinned bar slid up or down a beat later. The first scroll is the reader's (smooth, when allowed);
-// for the next two seconds any change of the page's height re-anchors the target without animation — until the reader
-// moves (wheel, touch, a key), which hands the scroll back at once. Returns a cancel.
-export function scrollToSection(id: string, settleMs = 2000): () => void {
+// from then on any change of the page's height re-anchors the target without animation, until the page has been QUIET
+// for `quietMs` (a slow phone's workers answer late: a fixed two seconds let go too soon) or `maxMs` has passed — or until
+// the reader moves (wheel, touch, a key), which hands the scroll back at once. Returns a cancel.
+export function scrollToSection(id: string, maxMs = 8000, quietMs = 900): () => void {
   const target = document.getElementById(id)
   if (!target) return () => {}
   target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
-  const hold = () => target.isConnected && target.scrollIntoView({ block: 'start' })
+  let quiet: ReturnType<typeof setTimeout>
+  const hold = () => {
+    if (target.isConnected) target.scrollIntoView({ block: 'start' })
+    clearTimeout(quiet)
+    quiet = setTimeout(release, quietMs)
+  }
   const observer = new ResizeObserver(hold)
   observer.observe(document.body)
   const events = ['wheel', 'touchstart', 'keydown'] as const
   const release = () => {
     observer.disconnect()
     clearTimeout(timer)
+    clearTimeout(quiet)
     for (const ev of events) window.removeEventListener(ev, release)
   }
-  const timer = setTimeout(release, settleMs)
+  const timer = setTimeout(release, maxMs)
+  quiet = setTimeout(release, quietMs) // a page that never changes size lets go after one quiet spell
   for (const ev of events) window.addEventListener(ev, release, { once: true, passive: true })
   return release
 }

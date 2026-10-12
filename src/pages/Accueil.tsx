@@ -35,7 +35,9 @@ export function Accueil() {
         <ol className="welcome__cards">
           {c.steps.map((s) => (
             <li key={s.title} className="surface welcome__card">
-              <h3 className="welcome__card-title">{s.title}</h3>
+              <h3 className="welcome__card-title">
+                <Link to={s.to}>{s.title}</Link>
+              </h3>
               <p>{s.text}</p>
             </li>
           ))}

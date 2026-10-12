@@ -19,9 +19,9 @@ import { StatusMessage } from '../components/StatusMessage'
 // A definition list, so a screen reader announces term and meaning as a pair, and the browser's find-in-page works on it.
 // Words come from lib/glossaryCopy.ts (fetched with this page, not with the shell).
 
-function OfficialLink({ url, host, label }: { url: string; host?: string; label: string }) {
+function OfficialLink({ url, host, label, subject }: { url: string; host?: string; label: string; subject: string }) {
   return (
-    <a className="info-note__link" href={url} target="_blank" rel="noopener noreferrer">
+    <a className="info-note__link" href={url} target="_blank" rel="noopener noreferrer" aria-label={`${label}${host ? ` — ${host}` : ''} (${subject})`}>
       {label}
       {host ? ` — ${host}` : ''}
       <Icon name="arrow-up-right-bold" size={14} />
@@ -67,7 +67,7 @@ export function Glossaire() {
                   </dt>
                   <dd>
                     <p>{term.plain}</p>
-                    {term.url && <OfficialLink url={term.url} host={term.host} label={g.openLink} />}
+                    {term.url && <OfficialLink url={term.url} host={term.host} label={g.openLink} subject={term.name} />}
                   </dd>
                 </div>
               )
@@ -82,7 +82,7 @@ export function Glossaire() {
               <strong>{item.doc}</strong>
               <span>{item.gives}</span>
               <span className="glossary-docs__how">{item.how}</span>
-              {item.url && <OfficialLink url={item.url} host={item.host} label={g.openLink} />}
+              {item.url && <OfficialLink url={item.url} host={item.host} label={g.openLink} subject={item.doc} />}
             </li>
           ))}
         </ul>
@@ -96,7 +96,7 @@ export function Glossaire() {
             <li key={item.label} className="glossary-docs__item">
               <strong>{item.label}</strong>
               <span>{item.plain}</span>
-              <OfficialLink url={item.url} host={item.host} label={g.openLink} />
+              <OfficialLink url={item.url} host={item.host} label={g.openLink} subject={item.label} />
             </li>
           ))}
         </ul>
