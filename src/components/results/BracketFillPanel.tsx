@@ -18,10 +18,14 @@ import { SubTabs } from '../SubTabs'
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
 
 // « How far to melt down the RRSP? » — the household's plan with no meltdown, drawn up to the top of the first bracket, and drawn up to the OAS recovery line
-// (engine/bracketFillCompare.ts), one tab each: the year-by-year income against the line, what is left in the RRSP and the TFSA, and one table that sets the three
-// side by side. The household's own way is marked; the one that comes out ahead can be adopted in a tap. Computed in a worker, behind the first paint.
+// (engine/bracketFillCompare.ts), one tab each. Read top to bottom: which way is ahead; the tab and what it does; WHAT IT DOES TO THE PLAN against « no meltdown »
+// (the answer, in a sentence, before any chart); the income against the line, with where and why it leaves it; what is left in the RRSP and the TFSA; and the
+// three ways side by side. The household's own way is marked; the one on screen can be adopted in a tap. Computed in a worker, behind the first paint.
 
 const TABS = ['none', 'bracket1', 'oas'] as const
+
+/** Money differences under this are « the same »: a sentence about 40 $ is noise. */
+const SAME = 500
 
 export function BracketFillPanel({ household, assumptions, age, firstAge }: { household: Household; assumptions: Assumptions; age: number; firstAge: number }) {
   const { lang } = useLang()
@@ -30,9 +34,10 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
   const { value, busy } = useBracketFill(household, assumptions, age, firstAge)
   if (value === null) return <Skeleton count={4} />
   const shown = value.outcomes.find((o) => tabOf(o.choice) === tab) ?? value.outcomes[0]
+  const off = value.outcomes[0]
   const own = value.outcomes[value.current]
   const best = value.outcomes[value.best]
-  const name = (choice: FillChoice) => c.tabs[tabOf(choice)]
+  const name = (choice: FillChoice) => c.names[tabOf(choice)]
   const adopt = (choice: FillChoice) => updateProfile((p) => setAssumptions(p, { bracketFill: choice }))
   const birthYear = household.persons[0].birth.year
   const years = shown.years
@@ -41,6 +46,26 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
   const money = (y: number) => formatCompactMoney(y, lang)
   const detail = (y: number) => formatMoney(y, lang)
   const yearTick = (year: number) => [String(year), c.age(year - birthYear)]
+
+  // What the way on screen does to the plan, against no meltdown — said before any chart.
+  const taxDiff = shown.lifetimeTax - off.lifetimeTax
+  const tfsaDiff = shown.tfsaLeft - off.tfsaLeft
+  const effect =
+    shown.choice === null
+      ? null
+      : c.effect({
+          tax: Math.abs(taxDiff) < SAME ? null : formatMoney(Math.abs(taxDiff), lang),
+          taxLess: taxDiff < 0,
+          peak: formatMoney(shown.peakMinimum, lang),
+          peakOff: formatMoney(off.peakMinimum, lang),
+          peakSmaller: shown.peakMinimum <= off.peakMinimum,
+          tfsa: formatMoney(Math.abs(tfsaDiff), lang),
+          tfsaMore: tfsaDiff >= 0,
+        })
+
+  // Where the income leaves the line (the pensions and the forced minimum, which nobody chooses) — said under the chart and marked on it.
+  const leftAt = shown.choice === null ? undefined : years.find((y) => y.ceiling !== null && y.income > y.ceiling + 1)
+  const markers = leftAt ? [{ x: leftAt.year, label: c.markerForced, colour: 'accent' as const, named: true }] : []
 
   return (
     <div className="orders" aria-busy={busy}>
@@ -54,19 +79,21 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
         {value.best === value.current ? c.keep : c.better(name(best.choice), best.earliestOk, own.earliestOk, formatMoney(own.lifetimeTax - best.lifetimeTax, lang))}
       </p>
 
-      <SubTabs
-        size="mini"
-        ariaLabel={c.switchLabel}
-        value={tab}
-        onSelect={setTab}
-        options={TABS.map((k) => ({ key: k, label: c.tabs[k] + (k === tabOf(own.choice) ? ' ' + c.yours : '') }))}
-      />
+      <SubTabs size="mini" ariaLabel={c.switchLabel} value={tab} onSelect={setTab} options={TABS.map((k) => ({ key: k, label: c.tabs[k], ariaLabel: c.names[k] }))} />
       <p className="field-row__hint">{c.line[tab]}</p>
-      {tab !== tabOf(own.choice) && (
-        <Chip onClick={() => adopt(choiceOf(tab))} ariaLabel={`${c.use} — ${c.tabs[tab]}`}>
-          {c.use}
-        </Chip>
+      {effect !== null && (
+        <p className="verdict__note" aria-live="polite">
+          {effect}
+        </p>
       )}
+      <p className="field-row__hint">
+        {c.current(name(own.choice))}{' '}
+        {tab !== tabOf(own.choice) && (
+          <Chip onClick={() => adopt(choiceOf(tab))} ariaLabel={`${c.use} — ${c.names[tab]}`}>
+            {c.use}
+          </Chip>
+        )}
+      </p>
 
       <h3 className="bridge__heading">{c.incomeTitle}</h3>
       <p className="field-row__hint">{c.incomeHint}</p>
@@ -77,6 +104,7 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
               { id: 'income', label: c.seriesIncome, colour: 'accent' as const, points: years.map((y) => ({ x: y.year, y: y.income })) },
               ...(shown.choice === null ? [] : [{ id: 'line', label: c.seriesLine, colour: 'berry' as const, points: years.map((y) => ({ x: y.year, y: y.ceiling ?? 0 })) }]),
             ]}
+            markers={markers}
             yFormat={money}
             yDetail={detail}
             xTitle={(year) => c.tooltip(year - birthYear, year)}
@@ -85,8 +113,10 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
           />
         </Suspense>
       </div>
+      {shown.choice !== null && <p className="field-row__hint">{leftAt ? c.leaves(leftAt.year, leftAt.age) : c.staysUnder}</p>}
 
       <h3 className="bridge__heading">{c.balancesTitle}</h3>
+      <p className="field-row__hint">{c.balancesHint}</p>
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
           <LineChart
@@ -113,7 +143,6 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
               <th scope="col">{c.recovery}</th>
               <th scope="col">{c.peak}</th>
               <th scope="col">{c.rrspLeft}</th>
-              <th scope="col">{c.tfsaLeft}</th>
             </tr>
           </thead>
           <tbody>
@@ -129,7 +158,6 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
                 <td>{formatMoney(x.recoveryTotal, lang)}</td>
                 <td>{formatMoney(x.peakMinimum, lang)}</td>
                 <td>{formatMoney(x.rrspLeft, lang)}</td>
-                <td>{formatMoney(x.tfsaLeft, lang)}</td>
               </tr>
             ))}
           </tbody>

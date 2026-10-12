@@ -13,6 +13,9 @@ function texts(c: BracketFillCopy): [string, string][] {
     if (typeof v === 'string') out.push([k, v])
     else if (typeof v === 'object') for (const [kk, vv] of Object.entries(v)) out.push([`${k}.${kk}`, vv as string])
   }
+  const less = { tax: '1 000 $', taxLess: true, peak: '1 $', peakOff: '2 $', peakSmaller: true, tfsa: '3 $', tfsaMore: true }
+  const same = { tax: null, taxLess: false, peak: '2 $', peakOff: '1 $', peakSmaller: false, tfsa: '3 $', tfsaMore: false }
+  out.push(['current', c.current('X')], ['leaves', c.leaves(2036, 70)], ['effect.less', c.effect(less)], ['effect.same', c.effect(same)])
   out.push(['hint', c.hint(60)], ['age', c.age(60)], ['tooltip', c.tooltip(60, 2030)], ['incomeFigure', c.incomeFigure(60, 95)], ['balancesFigure', c.balancesFigure(60, 95)])
   for (const [name, f] of [['better', c.better], ['nudge', c.nudge]] as const) {
     out.push([`${name}.years`, f('X', 58, 62, '1 000 $')], [`${name}.never`, f('X', 58, null, '1 000 $')], [`${name}.tax`, f('X', null, 60, '1 000 $')])

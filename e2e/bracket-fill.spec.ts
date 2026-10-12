@@ -30,7 +30,7 @@ test('the three ways are tabs, the table sets them side by side, and one tap mak
   await expect(section.locator('tbody tr')).toHaveCount(3, { timeout: 90_000 })
   // the default is the first bracket; a tap on another way puts it in the address
   await expect(section.getByText('jusqu’au haut de la première tranche', { exact: false })).toBeVisible()
-  await section.getByRole('tab', { name: /Sous la récupération de la PSV/ }).click()
+  await section.getByRole('tab', { name: 'Sous la récupération de la PSV' }).click()
   await expect(page).toHaveURL(/bf=oas/)
   await expect(section.getByText('seuil à partir duquel la PSV est récupérée', { exact: false })).toBeVisible()
   // adopt it: the profile carries it, and it survives a reload

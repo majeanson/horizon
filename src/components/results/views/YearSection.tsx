@@ -72,7 +72,7 @@ function FillNudgeLine({ m }: { m: ResultsModel }) {
     <div ref={box} className="fill-nudge">
       {value !== null && nudge !== null && (
         <p className="verdict__note" role="status">
-          {c.nudge(c.tabs[value.outcomes[nudge.best].choice ?? 'none'], value.outcomes[nudge.best].earliestOk, value.outcomes[value.current].earliestOk, formatMoney(nudge.taxSaved, lang))}
+          {c.nudge(c.names[value.outcomes[nudge.best].choice ?? 'none'], value.outcomes[nudge.best].earliestOk, value.outcomes[value.current].earliestOk, formatMoney(nudge.taxSaved, lang))}
         </p>
       )}
     </div>
