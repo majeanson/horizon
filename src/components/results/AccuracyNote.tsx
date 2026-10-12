@@ -17,7 +17,7 @@ export function AccuracyNote({ onSeeFigures }: { onSeeFigures: () => void }) {
       <p className="field-row__hint">{c.intro}</p>
       <div className="verdict__range">
         <p className="verdict__range-title">{c.checkedTitle}</p>
-        <ul className="how-to-read__list">
+        <ul className="note-list">
           {c.checked.map((line) => (
             <li key={line}>{line}</li>
           ))}
@@ -25,7 +25,7 @@ export function AccuracyNote({ onSeeFigures }: { onSeeFigures: () => void }) {
       </div>
       <div className="verdict__range">
         <p className="verdict__range-title">{c.simplifiedTitle}</p>
-        <ul className="how-to-read__list">
+        <ul className="note-list">
           {c.simplified.map((line) => (
             <li key={line}>{line}</li>
           ))}

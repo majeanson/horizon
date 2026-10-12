@@ -14,18 +14,6 @@ import { MONTHS_EN, MONTHS_FR } from './months.ts'
 export const AGE_TOKEN = '\u0000'
 
 const FR_RESULTS = {
-  /** « Comment lire cette page ? » — a small chip under the answer that unfolds six one-line explanations; closed by default. */
-  howto: {
-    open: 'Comment lire cette page ?',
-    items: [
-      ['La réponse', 'le plus tôt où l’argent dure jusqu’à la fin du plan, avec vos chiffres et vos hypothèses.'],
-      ['Solidité', 'le même plan sous trois scénarios et sous un marché difficile. Si l’âge bouge beaucoup, la réponse est fragile.'],
-      ['Comparer', 'choisissez des âges de départ pour voir l’argent année par année.'],
-      ['Préciser', 'les chiffres que vous n’avez pas encore confirmés avec un document, classés par effet sur la réponse.'],
-      ['Ajuster', 'ce que vous pourriez changer (dépenses, épargne) pour partir plus tôt.'],
-      ['Le nid', 'ce que vous avez dans vos REER, CELI et comptes non enregistrés.'],
-    ] as readonly (readonly [string, string])[],
-  },
   /** « Votre plan en une ligne »: each person from today to the end of the plan in three stretches, by the ages the profile states. */
   timeline: {
     title: 'Votre plan en une ligne',
@@ -227,17 +215,6 @@ const FR_RESULTS = {
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
-  howto: {
-    open: 'How to read this page',
-    items: [
-      ['The answer', 'the earliest age at which the money lasts to the end of the plan, with your figures and your assumptions.'],
-      ['How firm', 'the same plan under three scenarios and under a hard market. If the age moves a lot, the answer is fragile.'],
-      ['Compare', 'pick departure ages to see the money year by year.'],
-      ['Refine', 'the figures you have not yet confirmed with a document, ranked by how much they move the answer.'],
-      ['Adjust', 'what you could change (spending, saving) to leave earlier.'],
-      ['The nest', 'what you hold in your RRSP, TFSA and non-registered accounts.'],
-    ] as readonly (readonly [string, string])[],
-  },
   timeline: {
     title: 'Your plan in one line',
     hint: 'By the ages in your profile: work, the years on the nest (retired, no pension yet), then pensions.',

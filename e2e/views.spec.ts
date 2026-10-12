@@ -39,19 +39,11 @@ test('on the answer, the comparison and its chart come before « Préciser le ca
   expect(compare.y).toBeLessThan(refine.y)
 })
 
-test('« Comment lire cette page ? » is closed until it is asked for, then says what each part is for', async ({ page }) => {
+test('the answer carries no « Comment lire cette page ? » chip: the guide to the whole app is on the home page', async ({ page }) => {
   await page.goto('/resultats')
-  const open = page.getByRole('button', { name: 'Comment lire cette page ?' })
-  await expect(open).toHaveAttribute('aria-expanded', 'false')
-  await expect(page.getByText('le plus tôt où l’argent dure jusqu’à la fin du plan')).toHaveCount(0)
-  await open.click()
-  await expect(open).toHaveAttribute('aria-expanded', 'true')
-  await expect(page.getByText('le plus tôt où l’argent dure jusqu’à la fin du plan')).toBeVisible()
-  await expect(page.getByText('ce que vous avez dans vos REER, CELI et comptes non enregistrés')).toBeVisible()
-  await open.click()
-  await expect(page.getByText('le plus tôt où l’argent dure jusqu’à la fin du plan')).toHaveCount(0)
+  await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByRole('button', { name: 'Comment lire cette page ?' })).toHaveCount(0)
 })
-
 
 test('« Essayer »: a link to one of its parts opens that part by itself, and an address that carries its own key does too', async ({ page }) => {
   // the door on the answer card (« Et si je dépensais moins ? ») lands on the spending view, not on a page that has no such section

@@ -1,0 +1,40 @@
+import { expect, test } from '@playwright/test'
+import { EXAMPLE, blankSeed, seedProfile } from './seed'
+
+// « COMMENT S'Y RETROUVER » — the guide to the whole app lives on the home page (it was a chip under the answer, about that one page): each place and what it is for, in a few lines,
+// with a link where the place is a page of its own.
+
+for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit', EXAMPLE]] as const) {
+  test(`the home page says what each place is for — ${who}`, async ({ page }) => {
+    await seedProfile(page, seed)
+    await page.goto('/')
+    const guide = page.getByRole('region', { name: 'Comment s’y retrouver' }).or(page.locator('section[aria-labelledby="welcome-guide"]'))
+    await expect(guide.getByRole('heading', { name: 'Comment s’y retrouver' })).toBeVisible()
+    const terms = guide.locator('dt')
+    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats › Réponse', 'Résultats › Essayer', 'Résultats › Stratégies', 'Résultats › Vérifier', 'Votre réponse', 'En haut'])
+    await expect(guide.locator('dd')).toHaveCount(8)
+    // the places that are pages lead there
+    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats › Réponse', '/resultats'], ['Résultats › Essayer', '/resultats?v=adjust'], ['Résultats › Stratégies', '/resultats?v=strategies'], ['Résultats › Vérifier', '/resultats?v=verify']] as const) {
+      await expect(guide.getByRole('link', { name, exact: true })).toHaveAttribute('href', href)
+    }
+    // …and the two that are not pages are not links
+    await expect(guide.getByRole('link', { name: 'Votre réponse' })).toHaveCount(0)
+    await expect(guide.getByRole('link', { name: 'En haut' })).toHaveCount(0)
+  })
+}
+
+test('a link of the guide opens the view it names', async ({ page }) => {
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/')
+  await page.getByRole('link', { name: 'Résultats › Stratégies', exact: true }).click()
+  await expect(page).toHaveURL(/v=strategies/)
+  await expect(page.getByRole('tab', { name: 'Stratégies' })).toHaveAttribute('aria-selected', 'true')
+})
+
+test('English', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Finding your way' })).toBeVisible()
+  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Try', 'Results › Strategies', 'Results › Check', 'Your answer', 'At the top'])
+})

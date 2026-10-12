@@ -4,7 +4,6 @@ import { Chip } from '../../Chip'
 import { Cluster, Rail } from '../../Layout'
 import { NumberField } from '../../NumberField'
 import { ChartPanel } from '../ChartPanel'
-import { HowToRead } from '../HowToRead'
 import { LevelRange } from '../LevelRange'
 import { TimelineStrip } from '../TimelineStrip'
 import { EarliestEachPanel } from '../EarliestEachPanel'
@@ -118,7 +117,6 @@ export function AnswerView({ m }: { m: ResultsModel }) {
           </div>
 
           {!answerPending && gaps.length === 0 && <TimelineStrip household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />}
-          {!answerPending && gaps.length === 0 && <HowToRead />}
           {!answerPending && gaps.length === 0 && !retiredNow && <LevelRange profile={slow} enabled={answered && firstSearchesIn} />}
 
           {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —

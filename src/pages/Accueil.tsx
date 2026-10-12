@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { InstallCard } from '../components/install/InstallHint'
 import { LiveAnswer } from '../components/LiveAnswer'
@@ -39,6 +40,19 @@ export function Accueil() {
             </li>
           ))}
         </ol>
+      </section>
+      <section aria-labelledby="welcome-guide">
+        <h2 id="welcome-guide" className="welcome__title">
+          {c.guideTitle}
+        </h2>
+        <dl className="welcome__guide">
+          {c.guide.map((g) => (
+            <Fragment key={g.name}>
+              <dt>{g.to === null ? g.name : <Link to={g.to}>{g.name}</Link>}</dt>
+              <dd>{g.text}</dd>
+            </Fragment>
+          ))}
+        </dl>
       </section>
       <section aria-labelledby="welcome-know">
         <h2 id="welcome-know" className="welcome__title">

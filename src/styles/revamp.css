@@ -1056,21 +1056,6 @@
   margin-top: 0.5rem;
 }
 
-/* « Comment lire cette page ? » — a small chip under the answer; opened, six short lines. */
-.how-to-read {
-  display: grid;
-  gap: 0.5rem;
-  justify-items: start;
-}
-.how-to-read__list {
-  margin: 0;
-  padding-left: 1.2rem;
-  display: grid;
-  gap: 0.35rem;
-  color: var(--ink-soft);
-  font-size: var(--text-sm);
-}
-
 /* ── Glossaire — a definition list: the abbreviation big, its full name beside it, then the plain sentence and the page. ── */
 .glossary__intro {
   margin: 0;
@@ -1674,4 +1659,39 @@
 .page-body:has(.guide-bar) .pinned-map .section-nav {
   transform: translateY(-110%);
   pointer-events: none;
+}
+
+/* Accueil › « Comment s'y retrouver »: a short definition list — the name of the place, then what it is for. */
+.welcome__guide {
+  margin: 0;
+  display: grid;
+  gap: 0.6rem 1rem;
+  grid-template-columns: minmax(7.5rem, max-content) 1fr;
+  align-items: baseline;
+}
+.welcome__guide dt {
+  font-weight: 700;
+}
+.welcome__guide dd {
+  margin: 0;
+  color: var(--ink-soft);
+}
+@media (max-width: 559px) {
+  .welcome__guide {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+  .welcome__guide dd {
+    margin-bottom: 0.6rem;
+  }
+}
+
+/* « À quel point est-ce précis ? »: the short lists of what was checked and what is simplified. */
+.note-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
 }
