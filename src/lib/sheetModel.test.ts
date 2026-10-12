@@ -5,7 +5,7 @@ import { exampleProfile } from './example.ts'
 import { factId } from './facts.ts'
 import { assumptionsOf } from './resultsModel.ts'
 import { defaultProfile, type Profile } from './schema.ts'
-import { LEVEL_MAX, SCALE, sheetModel, type SheetStat } from './sheetModel.ts'
+import { MOVERS_SHOWN, SCALE, SLOT_GROUP, sheetModel, unconfirmedFacts, type SheetStat } from './sheetModel.ts'
 
 const TODAY = { year: 2026, month: 10 }
 const profileOf = (id: ExampleId): Profile => exampleProfile(id)
@@ -61,20 +61,32 @@ describe('the sheet of a household', { timeout: 120_000 }, () => {
     expect(runway.fill).toBeCloseTo(Math.max(0, Math.min(1, runway.detail.margin! / SCALE.runway)), 10)
   })
 
-  it('reads the margin as the later planned age less the earliest age, and the level as that margin kept between 0 and ten', () => {
+  it('reads the margin as the later planned age less the earliest age, and a negative one when the plan does not hold at its own age', () => {
     const m = sheet('golden', 54)
     const planned = Math.max(...profileOf('golden').household.persons.map((p) => p.retirementAge))
     expect(stat(m, 'runway').value).toBe(54)
     expect(m.margin).toBe(planned - 54)
-    expect(m.level).toBe(Math.max(0, Math.min(LEVEL_MAX, planned - 54)))
-    expect(sheet('golden', 18).level).toBe(LEVEL_MAX) // a margin past ten still draws a full bar, not more
-    expect(sheet('golden', planned + 6).level).toBe(0) // a plan that does not hold at its own age has no margin to show — and no negative one
+    expect(stat(sheet('golden', 18), 'runway').fill).toBe(1) // a margin past the scale still draws a full bar, not more
+    expect(stat(sheet('golden', planned + 6), 'runway').fill).toBe(0) // …and a negative one an empty bar
     expect(sheet('golden', planned + 6).margin).toBe(-6)
+  })
+
+  it('totals the money to live on apart from the home and the pensions, and every balance leads to the profile field behind it', () => {
+    const m = sheet('golden', 54)
+    const investable = m.slots.filter((x) => SLOT_GROUP[x.kind] === 'investable')
+    expect(m.investable).toBeCloseTo(investable.reduce((sum, x) => sum + (x.amount ?? 0), 0), 6)
+    expect(m.investable).toBeGreaterThan(0)
+    for (const x of m.slots) expect(x.fact === null, x.kind).toBe(x.kind === 'pension')
+    // the home is a value, not money to live on: it is never in the total
+    const average = sheet('average')
+    const home = average.slots.find((x) => x.kind === 'home')!
+    expect(home.amount).toBeGreaterThan(0)
+    expect(average.investable).toBeCloseTo(average.slots.filter((x) => x.kind !== 'home' && x.kind !== 'pension').reduce((sum, x) => sum + x.amount!, 0), 6)
   })
 
   it('says « pending » while the earliest age is being worked out, and « none » when no age works', () => {
     expect(stat(sheet('golden', undefined), 'runway').status).toBe('pending')
-    expect(sheet('golden', undefined).level).toBeNull()
+    expect(sheet('golden', undefined).margin).toBeNull()
     const none = stat(sheet('golden', null), 'runway')
     expect(none.status).toBe('none')
     expect(none.fill).toBe(0)
@@ -83,15 +95,18 @@ describe('the sheet of a household', { timeout: 120_000 }, () => {
   it('has no runway for a household already retired, and no saving for one nobody of whom earns', () => {
     const m = sheet('retired')
     expect(stat(m, 'runway').status).toBe('none')
-    expect(m.level).toBeNull()
+    expect(m.margin).toBeNull()
     expect(stat(m, 'saving').status).toBe('none')
     expect(stat(m, 'cover').status).toBe('ready')
-    expect(m.heroes.every((x) => x.heroClass === 'retired')).toBe(true)
+    expect(m.people.every((x) => x.retired)).toBe(true)
   })
 
-  it('names a class from what the person is: retired, pensioned or a saver', () => {
-    expect(sheet('golden').heroes.map((x) => x.heroClass)).toEqual(['pensioned', 'saver'])
-    expect(sheet('average').heroes.map((x) => x.heroClass)).toEqual(['saver', 'saver'])
+  it('says who is already retired, and when a pension starts', () => {
+    expect(sheet('golden').people.map((x) => x.retired)).toEqual([false, false])
+    expect(sheet('retired').people.every((x) => x.retired)).toBe(true)
+    const pensions = sheet('golden').slots.filter((x) => x.kind === 'pension')
+    expect(pensions.length).toBeGreaterThan(0)
+    for (const x of pensions) expect(x.startAge).toBeGreaterThan(0)
   })
 
   it('counts the scenarios the plan as stated holds under, and says which', () => {
@@ -125,31 +140,44 @@ describe('the sheet of a household', { timeout: 120_000 }, () => {
     expect(golden.slots.some((s) => s.kind === 'pension' && s.label !== null)).toBe(true)
   })
 
-  it('lists what is left to do: complete the profile, confirm figures, use room, then look at the plan — and the plan is always last', () => {
-    const blank = sheetModel(defaultProfile({ year: 2026 }), assumptionsOf(defaultProfile({ year: 2026 }), TODAY), undefined)
-    expect(blank.quests[0].id).toBe('complete')
-    expect(blank.quests[blank.quests.length - 1].id).toBe('plan')
-    expect(blank.gaps.length).toBeGreaterThan(0)
-    for (const s of blank.stats) expect(s.status === 'ready', `blank ${s.id}`).toBe(false)
-    const m = sheet('average')
-    expect(m.quests.some((q) => q.id === 'confirm' && q.remaining! > 0)).toBe(true)
-    expect(m.quests.filter((q) => q.id === 'room').every((q) => q.room!.amount > 0)).toBe(true)
-    expect(m.quests[m.quests.length - 1].id).toBe('plan')
+  it('ranks the unconfirmed figures by how far the answer moves, biggest first, keeping only those that move it', () => {
+    const p = profileOf('average')
+    const a = assumptionsOf(p, TODAY)
+    const open = unconfirmedFacts(p)
+    expect(open.length).toBeGreaterThan(4)
+    const swings = Object.fromEntries(open.map((f, i) => [f.id, { years: i === 0 ? 0 : (i % 4) + 1 }]))
+    const m = sheetModel(p, a, 60, swings)
+    expect(m.sharpen.status).toBe('ready')
+    expect(m.sharpen.remaining).toBe(open.length)
+    expect(m.sharpen.movers.length).toBe(MOVERS_SHOWN)
+    expect(m.sharpen.movers.map((x) => x.years)).toEqual([...m.sharpen.movers.map((x) => x.years)].sort((x, y) => y - x))
+    expect(m.sharpen.movers.every((x) => x.years > 0 && !x.fact.confirmed)).toBe(true)
+    expect(m.sharpen.movers.some((x) => x.fact.id === open[0].id)).toBe(false) // a swing of nothing is not worth a line
   })
 
-  it('earns an achievement only for what is true', () => {
-    const got = (m: ReturnType<typeof sheet>, id: string) => m.achievements.find((a) => a.id === id)!.earned
-    expect(got(sheet('heir'), 'holds')).toBe(true)
-    expect(got(sheet('golden'), 'holds')).toBe(false) // holds under Neutre and Audacieux, not under Prudent
-    expect(got(sheet('behind'), 'holds')).toBe(false)
-    expect(got(sheet('rich'), 'diversified')).toBe(true)
-    expect(got(sheet('modest'), 'diversified')).toBe(false)
-    expect(got(sheet('average'), 'confirmed')).toBe(false)
+  it('says the ranking is pending until it is in, and has nothing to rank for a profile with gaps or a household already retired', () => {
+    const p = profileOf('average')
+    expect(sheetModel(p, assumptionsOf(p, TODAY), 60, undefined).sharpen.status).toBe('pending')
+    const blank = defaultProfile({ year: 2026 })
+    const b = sheetModel(blank, assumptionsOf(blank, TODAY), undefined)
+    expect(b.gaps.length).toBeGreaterThan(0)
+    expect(b.sharpen.status).toBe('none')
+    for (const s of b.stats) expect(s.status === 'ready', `blank ${s.id}`).toBe(false)
+    expect(sheet('retired').sharpen.status).toBe('none')
+  })
+
+  it('lists the contribution room still unused, each with an amount', () => {
+    const m = sheet('average')
+    expect(m.rooms.length).toBeGreaterThan(0)
+    expect(m.rooms.every((r) => r.amount > 0)).toBe(true)
+  })
+
+  it('reports what is already true, and only that', () => {
+    expect(sheet('rich').diversified).toBe(true)
+    expect(sheet('modest').diversified).toBe(false)
     // the average couple's mortgage ends in 2041, before they stop: no debt when they retire
-    expect(got(sheet('average'), 'debtFree')).toBe(true)
-    expect(got(sheet('modest'), 'debtFree')).toBe(false) // no home at all: nothing was paid off
-    expect(got(sheet('golden', 50), 'margin')).toBe(true)
-    expect(got(sheet('golden', 99), 'margin')).toBe(false)
+    expect(sheet('average').mortgageFree).toBe(true)
+    expect(sheet('modest').mortgageFree).toBeNull() // no home at all: nothing was paid off, and nothing to say
   })
 
   it('does not change the profile it reads', () => {

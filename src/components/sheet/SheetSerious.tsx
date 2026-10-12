@@ -1,14 +1,39 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { Lang } from '../../i18n'
 import { SHEET_COPY } from '../../lib/sheetCopy'
 import type { SheetModel } from '../../lib/sheetModel'
-import { sheetView } from '../../lib/sheetView'
-import { SectionHeader } from '../SectionHeader'
+import { sheetView, type StatView } from '../../lib/sheetView'
+import { Chip } from '../Chip'
+import { Cluster } from '../Layout'
+import { SectionHeader, SectionLevel } from '../SectionHeader'
 import { StatBar } from './StatBar'
 
-// The character sheet, serious skin: a clean page of cards. It draws the SHEET VIEW (lib/sheetView.ts) and nothing else: every figure is already text there,
-// so this file formats no number — the guard in lib/sheetSkins.test.ts keeps it that way — and the adventure skin draws the very same view.
-export function SheetSerious({ model, lang, births, names }: { model: SheetModel; lang: Lang; births: readonly number[]; names: readonly string[] }) {
+// The household sheet: a clean page of cards. It draws the SHEET VIEW (lib/sheetView.ts) and nothing else: every figure is already text there, so this file
+// formats no number — the guard in lib/sheetSkins.test.ts keeps it that way. The order is the order of the reader's questions: can we stop, and how sure
+// is that (the verdict) · when (the plan's line, handed in) · what does life look like today and once retired · what is it standing on · what would
+// make it surer. Every card that holds a figure of the profile leads to the field that changes it.
+
+/** One measure: its figure, its bar, one line of what it is read from — and, folded away, what the measure means and what a full bar stands for. */
+function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
+  return (
+    <li className="surface sheet__stat">
+      <div className="sheet__stat-head">
+        <p className="sheet__stat-name">{s.name}</p>
+        <p className="sheet__stat-value mono">{s.valueText}</p>
+      </div>
+      <StatBar name={s.name} percent={s.percent} valueText={s.valueText} />
+      {s.detail && <p className="sheet__stat-detail">{s.detail}</p>}
+      <details className="sheet__more">
+        <summary>{howToRead}</summary>
+        <p className="field-row__hint">{s.hint}</p>
+        <p className="field-row__hint sheet__scale">{s.scaleText}</p>
+      </details>
+    </li>
+  )
+}
+
+export function SheetSerious({ model, lang, births, names, timeline }: { model: SheetModel; lang: Lang; births: readonly number[]; names: readonly string[]; timeline?: ReactNode }) {
   const v = sheetView(model, lang, SHEET_COPY[lang], births, names)
   return (
     <div className="sheet sheet--serious">
@@ -22,86 +47,97 @@ export function SheetSerious({ model, lang, births, names }: { model: SheetModel
         </div>
       )}
 
-      <section className="sheet__section" aria-label={v.party}>
-        <SectionHeader title={v.party} />
-        <ul className="sheet__heroes">
-          {v.heroes.map((h) => (
-            <li key={h.id} className="surface sheet__hero">
-              <p className="sheet__hero-name">{h.name}</p>
-              <p className="sheet__hero-class">{h.className}</p>
-              <p className="field-row__hint">{h.line}</p>
-            </li>
-          ))}
-          <li className="surface sheet__hero sheet__level" title={v.level.hint}>
-            <p className="sheet__hero-class">{v.level.label}</p>
-            <p className="sheet__level-value">{v.level.text}</p>
-            <p className="field-row__hint">{v.level.hint}</p>
-          </li>
-        </ul>
+      <section className="sheet__section" aria-label={v.verdict.title}>
+        <SectionHeader title={v.verdict.title} />
         <ul className="sheet__stats">
-          {v.stats.map((s) => (
-            <li key={s.id} className="surface sheet__stat">
-              <div className="sheet__stat-head">
-                <p className="sheet__stat-name">{s.name}</p>
-                <p className="sheet__stat-value mono">{s.valueText}</p>
-              </div>
-              <StatBar name={s.name} percent={s.percent} valueText={s.valueText} />
-              <p className="field-row__hint">{s.hint}</p>
-              {s.detail && <p className="sheet__stat-detail">{s.detail}</p>}
-              <p className="field-row__hint sheet__scale">{s.scaleText}</p>
-            </li>
+          {v.verdict.stats.map((s) => (
+            <StatCard key={s.id} s={s} howToRead={v.howToRead} />
           ))}
         </ul>
+        <p className="field-row__hint">{v.verdict.accuracy}</p>
+        <Link className="btn btn--ghost btn--sm" to="/resultats">
+          {v.verdict.toResults}
+        </Link>
       </section>
 
-      <section className="sheet__section" aria-label={v.slots.title}>
-        <SectionHeader title={v.slots.title} />
-        {v.slots.items.length === 0 ? (
-          <p className="field-row__hint">{v.slots.empty}</p>
-        ) : (
-          <ul className="sheet__slots">
-            {v.slots.items.map((s) => (
-              <li key={s.key} className="surface sheet__slot">
-                <p className="sheet__slot-title">{s.title}</p>
-                <p className="field-row__hint">{s.owner}</p>
-                {s.amountText !== null && <p className="sheet__slot-amount mono">{s.amountText}</p>}
-                {s.note && <p className="field-row__hint">{s.note}</p>}
-              </li>
+      {timeline}
+
+      {v.groups.map((g) => (
+        <section key={g.id} className="sheet__section" aria-label={g.title}>
+          <SectionHeader title={g.title} subtitle={g.hint} />
+          <ul className="sheet__stats">
+            {g.stats.map((s) => (
+              <StatCard key={s.id} s={s} howToRead={v.howToRead} />
             ))}
           </ul>
+        </section>
+      ))}
+
+      <section className="sheet__section" aria-label={v.holdings.title}>
+        <SectionHeader title={v.holdings.title} />
+        {v.holdings.groups.length === 0 && <p className="field-row__hint">{v.holdings.empty}</p>}
+        <SectionLevel.Provider value={3}>
+          {v.holdings.groups.map((g) => (
+            <div key={g.id} className="sheet__group">
+              <SectionHeader title={g.title} subtitle={g.totalText ?? undefined} />
+              {g.note && <p className="field-row__hint">{g.note}</p>}
+              <ul className="sheet__slots">
+                {g.items.map((s) => (
+                  <li key={s.key} className="surface sheet__slot">
+                    <Link className="sheet__slot-title" to={s.to} aria-label={s.editLabel}>
+                      {s.title}
+                    </Link>
+                    <p className="field-row__hint">{s.owner}</p>
+                    {s.amountText !== null && <p className="sheet__slot-amount mono">{s.amountText}</p>}
+                    {s.shareText !== null && <p className="field-row__hint">{s.shareText}</p>}
+                    {s.extra && <p className="field-row__hint">{s.extra}</p>}
+                    {s.note && <p className="field-row__hint">{s.note}</p>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {v.holdings.rooms.length > 0 && (
+            <div className="sheet__group">
+              <SectionHeader title={v.holdings.roomTitle} />
+              <ul className="sheet__rooms">
+                {v.holdings.rooms.map((r) => (
+                  <li key={r.key}>
+                    <Link to={r.to} className="info-note__link">
+                      {r.text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </SectionLevel.Provider>
+        {v.holdings.tags.length > 0 && (
+          <Cluster>
+            {v.holdings.tags.map((t) => (
+              <Chip key={t}>{t}</Chip>
+            ))}
+          </Cluster>
         )}
       </section>
 
-      <section className="sheet__section" aria-label={v.quests.title}>
-        <SectionHeader title={v.quests.title} subtitle={v.quests.intro} />
-        <ul className="sheet__quests">
-          {v.quests.items.map((q) => (
-            <li key={q.key} className="sheet__quest">
-              <Link to={q.to} className="info-note__link">
-                {q.text}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="sheet__section" aria-label={v.achievements.title}>
-        <SectionHeader title={v.achievements.title} />
-        <ul className="sheet__feats">
-          {v.achievements.items.map((a) => (
-            <li key={a.id} className={'surface sheet__feat' + (a.earned ? ' is-earned' : '')}>
-              <p className="sheet__feat-name">{a.name}</p>
-              <p className="field-row__hint">{a.hint}</p>
-              <p className="sheet__feat-status">{a.status}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <p className="field-row__hint">{v.accuracy.text}</p>
-      <Link className="btn btn--ghost btn--sm" to="/resultats">
-        {v.toResults}
-      </Link>
+      {v.sharpen !== null && (
+        <section className="sheet__section" aria-label={v.sharpen.title}>
+          <SectionHeader title={v.sharpen.title} subtitle={v.sharpen.intro} />
+          <p className="field-row__hint">{v.sharpen.note}</p>
+          {v.sharpen.items.length > 0 && (
+            <ul className="sheet__movers">
+              {v.sharpen.items.map((m) => (
+                <li key={m.key} className="surface sheet__mover">
+                  <span className="sheet__mover-name">{m.name}</span>
+                  <span className="mono">{m.swingText}</span>
+                  <Chip to={m.to}>{v.sharpen!.find}</Chip>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
     </div>
   )
 }

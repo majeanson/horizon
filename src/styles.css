@@ -14,7 +14,7 @@
 @import './styles/revamp.css';
 /* Paper: @media print only — forces day ink on white, drops the chrome, un-clips the tables. */
 @import './styles/print.css';
-/* The character sheet (/fiche): one model, two skins (serious and « Aventure »). */
+/* The character sheet (/fiche): the household at a glance. */
 @import './styles/sheet.css';
 /* The phone: hit areas a thumb can find, and height not spent twice. */
 @import './styles/phone.css';

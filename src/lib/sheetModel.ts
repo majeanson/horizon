@@ -3,18 +3,18 @@ import { payoffMonths, payoffYear } from '../engine/home.ts'
 import { planGlance } from '../engine/ledger.ts'
 import { project } from '../engine/projection.ts'
 import type { Assumptions, PersonId } from '../engine/types.ts'
-import { accuracyOf, factId, type FactKind } from './facts.ts'
+import { accuracyOf, factId, factsOf, type Fact, type FactKind } from './facts.ts'
 import { profileGaps, type ProfileGap } from './profileGaps.ts'
 import type { Profile } from './schema.ts'
 import { lastPensionStart, pensionsAfterTax } from './stopWorking.ts'
 
-// THE CHARACTER SHEET'S MODEL — one household, said as a few stats, what it holds, what is left to do and what is already done. A PURE function
-// of the profile and the earliest age (the one number that comes from a search run off the page's thread): the two skins of the sheet (serious
-// and « Aventure ») draw THE SAME model, so a figure can never differ between them. Nothing here is invented: every stat is an engine output
-// (a projection of the plan as stated, or the verdict's own earliest age), and each says what it is read from. The bars are a picture of a
-// figure on a scale that is stated (`scale`), never a judgement: a short bar is « room to grow ».
+// THE HOUSEHOLD SHEET'S MODEL — one household, said as a verdict (the earliest age and how sturdy the plan is), two more measures (today · once retired),
+// what it holds (investable, pensions, home — apart, because only the first is money to live on), and the figures worth confirming first. A PURE
+// function of the profile, the earliest age (the one number that comes from a search run off the page's thread) and, once it is in, how far the answer
+// moves if each unconfirmed figure were off (the results page's own ranking). Nothing here is invented: every stat is an engine output (a projection of
+// the plan as stated, or the verdict's own earliest age), and each says what it is read from. The bars are a picture of a figure on a scale that is
+// stated (`scale`), never a judgement: a short bar is « room to grow ».
 
-export type HeroClass = 'retired' | 'pensioned' | 'saver'
 export type StatId = 'runway' | 'cover' | 'saving' | 'keep' | 'resilience'
 
 /** `pending`: not worked out yet · `none`: nothing to say (no age works, nobody earns…) · `ready`. */
@@ -34,66 +34,88 @@ export interface SheetStat {
   detail: { planned?: number; margin?: number | null; year?: number; spending?: number }
 }
 
-export interface SheetHero {
+export interface SheetPerson {
   id: PersonId
   name: string
   age: number
   retirementAge: number
-  heroClass: HeroClass
+  retired: boolean
 }
 
 export type SlotKind = 'rrsp' | 'tfsa' | 'nonReg' | 'pension' | 'home'
+/** Money to live on (the three accounts) · income that arrives by itself (a pension) · the home (a value, not money to spend). */
+export type SlotGroup = 'investable' | 'pension' | 'home'
+export const SLOT_GROUP: Record<SlotKind, SlotGroup> = { rrsp: 'investable', tfsa: 'investable', nonReg: 'investable', pension: 'pension', home: 'home' }
 
 export interface SheetSlot {
   kind: SlotKind
   owner: PersonId | 'household'
   /** What it holds, today's dollars (a pension: null, it has no balance). */
   amount: number | null
+  /** The figure behind it on the profile (lib/facts.ts), so the sheet can lead to the field that changes it; a pension has none. */
+  fact: string | null
   /** A pension's own label (« RREGOP »). */
   label: string | null
+  /** The age a pension starts (null for anything else). */
+  startAge: number | null
   /** Read off a document (true), typed or estimated (false), or not a figure at all (null: a plan pension is described, not confirmed here). */
   confirmed: boolean | null
 }
 
-export type QuestId = 'complete' | 'confirm' | 'room' | 'plan'
-export interface SheetQuest {
-  id: QuestId
-  /** `complete`: the gaps; `confirm`: how many figures are not yet read off a document; `room`: whose room, which account and how much. */
-  gaps?: readonly ProfileGap[]
-  remaining?: number
-  room?: { owner: PersonId; kind: 'rrsp' | 'tfsa'; amount: number }
+/** Contribution room still unused: not a holding, so it sits beside them. */
+export interface SheetRoom {
+  owner: PersonId
+  kind: 'rrsp' | 'tfsa'
+  amount: number
 }
 
-export type AchievementId = 'holds' | 'confirmed' | 'debtFree' | 'diversified' | 'margin'
-export interface SheetAchievement {
-  id: AchievementId
-  earned: boolean
+/** An unconfirmed figure and how many years the answer moves if it were off by the nudge (lib/useFactImpact.ts). */
+export interface SheetMover {
+  fact: Fact
+  years: number
 }
+
+/** `pending`: the ranking is being worked out · `ready` · `none`: nothing to rank (nothing left to confirm, or a household with no age to find). */
+export type SharpenStatus = 'pending' | 'ready' | 'none'
 
 export interface SheetModel {
-  heroes: SheetHero[]
+  people: SheetPerson[]
   couple: boolean
-  /** The years between the earliest age that works and the later of the planned ages; the level is that margin kept between 0 and `LEVEL_MAX`. */
+  /** The years between the earliest age that works and the later of the planned ages. */
   margin: number | null
-  level: number | null
   stats: SheetStat[]
   slots: SheetSlot[]
-  quests: SheetQuest[]
-  achievements: SheetAchievement[]
+  /** The sum of the three kinds of account, today's dollars (what the shares of the cards are shares of). */
+  investable: number
+  rooms: SheetRoom[]
+  /** True when money sits in the RRSP, the TFSA and outside a registered account. */
+  diversified: boolean
+  /** Whether the mortgage is paid off before the last person stops working: null when there is no home. */
+  mortgageFree: boolean | null
+  sharpen: { status: SharpenStatus; remaining: number; movers: SheetMover[] }
   accuracy: { confirmed: number; total: number }
   /** How many of the three scenarios (Prudent, Neutre, Audacieux) the plan as stated holds under, and which. */
   scenarios: Record<PresetKey, boolean>
   gaps: ProfileGap[]
 }
 
-export const LEVEL_MAX = 10
 /** The scales of the bars: what a full bar stands for. Stated on screen beside each bar. */
-export const SCALE = { runway: LEVEL_MAX, cover: 1, saving: 0.25, keep: 1, resilience: PRESET_KEYS.length } as const
+export const SCALE = { runway: 10, cover: 1, saving: 0.25, keep: 1, resilience: PRESET_KEYS.length } as const
+/** How many figures the sheet names as worth confirming first. */
+export const MOVERS_SHOWN = 4
 
 const clamp01 = (n: number): number => Math.max(0, Math.min(1, n))
 
-/** The sheet of a profile. `earliest`: the verdict's earliest age (undefined while it is being worked out, null when no age works). */
-export function sheetModel(profile: Profile, assumptions: Assumptions, earliest: number | null | undefined): SheetModel {
+/** The figures not yet read off a document: the list the ranking is run on (the results page ranks the same ones). */
+export function unconfirmedFacts(profile: Profile): Fact[] {
+  return factsOf(profile).filter((f) => !f.confirmed)
+}
+
+/**
+ * The sheet of a profile. `earliest`: the verdict's earliest age (undefined while it is being worked out, null when no age works). `swings`: how far the
+ * answer moves per unconfirmed figure, by fact id (undefined while it is being worked out).
+ */
+export function sheetModel(profile: Profile, assumptions: Assumptions, earliest: number | null | undefined, swings?: Record<string, { years: number }>): SheetModel {
   const h = profile.household
   const year = assumptions.today.year
   const gaps = profileGaps(profile)
@@ -102,13 +124,12 @@ export function sheetModel(profile: Profile, assumptions: Assumptions, earliest:
   const isConfirmed = (owner: PersonId | 'household', kind: FactKind): boolean => confirmedIds.has(factId(owner, kind))
   const accuracy = accuracyOf(profile)
 
-  const heroes: SheetHero[] = h.persons.map((p) => {
+  const people: SheetPerson[] = h.persons.map((p) => {
     const age = year - p.birth.year
-    const retired = p.retirementAge <= age
-    return { id: p.id, name: p.name, age, retirementAge: p.retirementAge, heroClass: retired ? 'retired' : p.pensions.length > 0 ? 'pensioned' : 'saver' }
+    return { id: p.id, name: p.name, age, retirementAge: p.retirementAge, retired: p.retirementAge <= age }
   })
   const plannedMax = Math.max(...h.persons.map((p) => p.retirementAge))
-  const everyoneRetired = heroes.every((x) => x.heroClass === 'retired')
+  const everyoneRetired = people.every((x) => x.retired)
 
   // The plan as stated, once: its year-by-year rows (the cover and what is kept are read from one year of it), and whether it holds under each scenario.
   const empty = gaps.length > 0
@@ -159,7 +180,7 @@ export function sheetModel(profile: Profile, assumptions: Assumptions, earliest:
   // RESILIENCE — under how many of the three scenarios the plan as stated lasts to its horizon.
   const resilience: SheetStat = { id: 'resilience', status: empty ? 'none' : 'ready', value: empty ? null : heldBy, unit: 'count', fill: empty ? null : heldBy / SCALE.resilience, scale: SCALE.resilience, detail: {} }
 
-  // EQUIPMENT — what each person holds, and the home.
+  // WHAT IT HOLDS — each person's accounts and pensions, then the home.
   const slots: SheetSlot[] = []
   for (const p of h.persons) {
     const balances: [SlotKind, number, FactKind][] = [
@@ -167,45 +188,46 @@ export function sheetModel(profile: Profile, assumptions: Assumptions, earliest:
       ['tfsa', p.accounts.tfsa.balance, 'tfsaBalance'],
       ['nonReg', p.accounts.nonReg.balance, 'nonRegBalance'],
     ]
-    for (const [kind, amount, fact] of balances) if (amount > 0) slots.push({ kind, owner: p.id, amount, label: null, confirmed: isConfirmed(p.id, fact) })
-    for (const d of p.pensions) slots.push({ kind: 'pension', owner: p.id, amount: null, label: d.label, confirmed: null })
+    for (const [kind, amount, fact] of balances) if (amount > 0) slots.push({ kind, owner: p.id, amount, fact: factId(p.id, fact), label: null, startAge: null, confirmed: isConfirmed(p.id, fact) })
+    for (const d of p.pensions) slots.push({ kind: 'pension', owner: p.id, amount: null, fact: null, label: d.label, startAge: d.startAge, confirmed: null })
   }
-  if (h.home) slots.push({ kind: 'home', owner: 'household', amount: Math.max(0, h.home.value - h.home.mortgage.balance), label: null, confirmed: isConfirmed('household', 'homeValue') })
+  if (h.home) slots.push({ kind: 'home', owner: 'household', amount: Math.max(0, h.home.value - h.home.mortgage.balance), fact: factId('household', 'homeValue'), label: null, startAge: null, confirmed: isConfirmed('household', 'homeValue') })
 
-  // QUESTS — what is left to do on the profile itself.
-  const quests: SheetQuest[] = []
-  if (gaps.length > 0) quests.push({ id: 'complete', gaps })
-  const remaining = accuracy.total - accuracy.confirmed
-  if (remaining > 0) quests.push({ id: 'confirm', remaining })
+  const rooms: SheetRoom[] = []
   for (const p of h.persons) {
-    if (p.accounts.tfsa.room > 0) quests.push({ id: 'room', room: { owner: p.id, kind: 'tfsa', amount: p.accounts.tfsa.room } })
-    if (p.accounts.rrsp.room > 0) quests.push({ id: 'room', room: { owner: p.id, kind: 'rrsp', amount: p.accounts.rrsp.room } })
+    if (p.accounts.tfsa.room > 0) rooms.push({ owner: p.id, kind: 'tfsa', amount: p.accounts.tfsa.room })
+    if (p.accounts.rrsp.room > 0) rooms.push({ owner: p.id, kind: 'rrsp', amount: p.accounts.rrsp.room })
   }
-  quests.push({ id: 'plan' })
 
-  // ACHIEVEMENTS — what is already true.
   const mortgageEnd = h.home && h.home.mortgage.balance > 0 ? (() => {
     const months = payoffMonths(h.home.mortgage, year)
     return months === null ? null : payoffYear(year, months)
   })() : year
-  const kinds = new Set(slots.filter((s) => s.kind === 'rrsp' || s.kind === 'tfsa' || s.kind === 'nonReg').map((s) => s.kind))
-  const achievements: SheetAchievement[] = [
-    { id: 'holds', earned: !empty && heldBy === PRESET_KEYS.length },
-    { id: 'confirmed', earned: accuracy.total > 0 && accuracy.confirmed === accuracy.total },
-    { id: 'debtFree', earned: h.home ? mortgageEnd !== null && mortgageEnd <= lastStop : false },
-    { id: 'diversified', earned: kinds.size === 3 },
-    { id: 'margin', earned: margin !== null && margin >= 2 },
-  ]
+  const kinds = new Set(slots.filter((s) => SLOT_GROUP[s.kind] === 'investable').map((s) => s.kind))
+
+  // WHAT WOULD SHARPEN THE ANSWER — the unconfirmed figures, the ones that move the answer most first.
+  const unconfirmed = unconfirmedFacts(profile)
+  const status: SharpenStatus = empty || everyoneRetired || unconfirmed.length === 0 ? 'none' : swings === undefined ? 'pending' : 'ready'
+  const movers: SheetMover[] =
+    status === 'ready' && swings !== undefined
+      ? unconfirmed
+          .map((fact) => ({ fact, years: swings[fact.id]?.years ?? 0 }))
+          .filter((m) => m.years > 0)
+          .sort((a, b) => b.years - a.years)
+          .slice(0, MOVERS_SHOWN)
+      : []
 
   return {
-    heroes,
+    people,
     couple,
     margin,
-    level: margin === null ? null : Math.max(0, Math.min(LEVEL_MAX, margin)),
     stats: [runway, cover, saving, keep, resilience],
     slots,
-    quests,
-    achievements,
+    investable: slots.filter((s) => SLOT_GROUP[s.kind] === 'investable').reduce((sum, s) => sum + (s.amount ?? 0), 0),
+    rooms,
+    diversified: kinds.size === 3,
+    mortgageFree: h.home ? mortgageEnd !== null && mortgageEnd <= lastStop : null,
+    sharpen: { status, remaining: unconfirmed.length, movers },
     accuracy: { confirmed: accuracy.confirmed, total: accuracy.total },
     scenarios,
     gaps,

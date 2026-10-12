@@ -87,20 +87,16 @@ for (const s of STATES) {
   }
 }
 
-// The character sheet in BOTH of its display modes, in every display state: « Aventure » is a different drawing of the same sheet (frames, gauges, icons,
-// tiles), so the contrast of every pair in it is judged here, day and night, with high contrast and with the largest text.
+// The household sheet, in every display state: day, night, high contrast and the largest text.
 for (const s of STATES) {
-  for (const mode of ['serious', 'adventure'] as const) {
-    test(`the character sheet (${mode}) has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
-      await setState(page, s)
-      await page.addInitScript((m) => localStorage.setItem('horizon-mode', m), mode)
-      await seedProfile(page, EXAMPLE)
-      await page.goto('/fiche')
-      await page.locator(mode === 'serious' ? '.sheet--serious' : '.sheet--rpg').waitFor({ timeout: 30_000 })
-      await page.waitForFunction(() => !(document.querySelector('.sheet')?.textContent ?? '').match(/Calcul en cours|Le sort est en train/), null, { timeout: 30_000 })
-      expect(await violations(page)).toEqual([])
-    })
-  }
+  test(`the household sheet has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
+    await setState(page, s)
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/fiche')
+    await page.locator('.sheet--serious').waitFor({ timeout: 30_000 })
+    await page.waitForFunction(() => !(document.querySelector('.sheet')?.textContent ?? '').match(/Calcul en cours/), null, { timeout: 30_000 })
+    expect(await violations(page)).toEqual([])
+  })
 }
 
 test('the gallery stays accessible with its dialog open', async ({ page }) => {

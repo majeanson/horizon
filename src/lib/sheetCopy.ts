@@ -1,20 +1,12 @@
 import type { Lang } from '../i18n.ts'
-import type { AchievementId, HeroClass, SlotKind, StatId } from './sheetModel.ts'
+import type { SlotKind, StatId } from './sheetModel.ts'
 
-// THE WORDS OF THE CHARACTER SHEET (/fiche), serious skin — and the SHAPE of the words both skins share. The « Aventure » skin has its own words
-// (lib/rpgCopy.ts) in the very same shape: the two are tested to carry the same keys, the same arguments and the same figures, so a skin can change
-// every word and never a number. Outside the eager dictionaries: only the sheet page reads them. The words are given the figures already formatted
-// (lib/sheetView.ts): nothing here types a number or a rate.
+// THE WORDS OF THE HOUSEHOLD SHEET (/fiche). Outside the eager dictionaries: only the sheet page reads them. The words are given the figures already
+// formatted (lib/sheetView.ts): nothing here types a number or a rate (lib/sheetCopy.test.ts).
 
 export interface SheetWords {
   title: string
   intro: string
-  solo: string
-  couple: string
-  heroClass: Record<HeroClass, string>
-  /** « 38 ans · retraite prévue à 58 ans » (the planned age is the profile's own). */
-  heroLine: (age: string, planned: string) => string
-  level: { label: string; value: (n: string) => string; none: string; hint: string }
   stats: Record<StatId, { name: string; hint: string }>
   value: { age: (n: string) => string; years: (n: string) => string; share: (pct: string) => string; count: (n: number, of: number) => string; pending: string; none: string; noAge: (max: number) => string }
   /** What a full bar stands for — the figures arrive formatted. */
@@ -31,40 +23,44 @@ export interface SheetWords {
     retired: string
     noEarner: string
   }
-  slots: { title: string; empty: string; kind: Record<SlotKind, string>; confirmed: string; estimated: string; household: string }
-  quests: { title: string; intro: string; complete: string; confirm: (n: number) => string; room: (account: string, amount: string) => string; plan: string; none: string; account: { rrsp: string; tfsa: string } }
-  achievements: { title: string; earned: string; locked: string; names: Record<AchievementId, string>; hints: Record<AchievementId, string> }
+  verdict: { title: string }
+  groups: { today: { title: string; hint: string }; retirement: { title: string; hint: string } }
+  howToRead: string
+  slots: {
+    title: string
+    empty: string
+    kind: Record<SlotKind, string>
+    confirmed: string
+    estimated: string
+    household: string
+    groups: { investable: string; pension: string; home: string }
+    investableTotal: (amount: string) => string
+    share: (pct: string) => string
+    pensionStart: (age: string) => string
+    homeNote: string
+    roomTitle: string
+    room: (account: string, amount: string) => string
+    account: { rrsp: string; tfsa: string }
+    edit: string
+    tags: { diversified: string; mortgageFree: string }
+  }
+  sharpen: { title: string; intro: string; swing: (years: number) => string; find: string; pending: string; remaining: (n: number) => string; allDone: string; none: string; noMover: string }
   accuracy: (confirmed: number, total: number) => string
   scenarioNames: { prudent: string; neutral: string; bold: string }
   /** The sentence under the title when nothing can be said yet. */
   empty: string
   toProfile: string
   toResults: string
-}
-
-export interface ModeWords {
-  label: string
   /** The link to the sheet, on the settings page (the header has it too, where the screen is wide enough). */
   open: string
-  hint: string
-  serious: string
-  adventure: string
-}
-
-/** The names of the two modes — the same in the sheet's own switch and on the settings page, whichever skin is in force. */
-export const MODE_COPY: Record<Lang, ModeWords> = {
-  fr: { label: 'Affichage de la fiche', open: 'Ouvrir ma fiche', hint: 'Les mêmes chiffres, présentés autrement. Seule la fiche en profite pour l’instant.', serious: 'Sérieux', adventure: 'Aventure' },
-  en: { label: 'How the sheet is shown', open: 'Open my sheet', hint: 'The same figures, shown another way. Only the sheet uses it for now.', serious: 'Serious', adventure: 'Adventure' },
 }
 
 const FR: SheetWords = {
   title: 'Ma fiche',
-  intro: 'Votre situation en cinq mesures, ce que vous avez, ce qu’il reste à faire et ce qui est déjà acquis. Tout vient du même calcul que la réponse.',
-  solo: 'Une personne',
-  couple: 'Un couple',
-  heroClass: { retired: 'À la retraite', pensioned: 'Avec une rente d’employeur', saver: 'En train d’épargner' },
-  heroLine: (age, planned) => `${age} · retraite prévue à ${planned}`,
-  level: { label: 'Marge', value: (n) => `${n} ans`, none: 'pas encore de marge à montrer', hint: 'Les années entre l’âge le plus tôt où l’argent dure et l’âge de retraite que vous prévoyez.' },
+  verdict: { title: 'Où vous en êtes' },
+  groups: { today: { title: 'Aujourd’hui', hint: 'Pendant que vous travaillez encore.' }, retirement: { title: 'À la retraite', hint: 'Une fois toutes les rentes versées.' } },
+  howToRead: 'Comment lire cette mesure',
+  intro: 'Votre ménage d’un coup d’œil. Tout vient du même calcul que la réponse, et chaque carte mène à l’endroit où le changer.',
   stats: {
     runway: { name: 'Âge le plus tôt', hint: 'Le plus tôt où tout le monde peut arrêter de travailler et où l’argent dure jusqu’au bout.' },
     cover: { name: 'Rentes', hint: 'La part des dépenses que les rentes paient seules, après impôt, une fois qu’elles sont toutes versées.' },
@@ -92,45 +88,49 @@ const FR: SheetWords = {
     retired: 'Tout le monde est déjà à la retraite : la question n’est plus « quand ? ».',
     noEarner: 'Personne ne travaille plus : rien à épargner.',
   },
-  slots: { title: 'Ce que vous avez', empty: 'Aucun compte ni aucune rente saisis pour l’instant.', kind: { rrsp: 'REER', tfsa: 'CELI', nonReg: 'Non enregistré', pension: 'Rente d’employeur', home: 'Maison, valeur nette' }, confirmed: 'lu sur un document', estimated: 'non confirmé', household: 'Le ménage' },
-  quests: {
-    title: 'Ce qu’il reste à faire',
-    intro: 'Trois façons de rendre la fiche plus juste ou le plan plus solide. Ce sont des pistes, pas des conseils.',
-    complete: 'Entrez un revenu et vos dépenses à la retraite pour que la fiche ait quelque chose à dire.',
-    confirm: (n) => `Confirmer ${n} ${n > 1 ? 'chiffres' : 'chiffre'} sur un document.`,
-    room: (account, amount) => `Il reste ${amount} de droits de cotisation ${account}.`,
-    plan: 'Voir ce que votre plan désigne pour cette année.',
-    none: 'Rien de plus à faire pour l’instant.',
-    account: { rrsp: 'au REER', tfsa: 'au CELI' },
+  slots: {
+    title: 'Ce que vous détenez',
+    empty: 'Aucun compte ni aucune rente saisis pour l’instant.',
+    kind: { rrsp: 'REER', tfsa: 'CELI', nonReg: 'Non enregistré', pension: 'Rente d’employeur', home: 'Maison, valeur nette' },
+    confirmed: 'lu sur un document',
+    estimated: 'non confirmé',
+    household: 'Le ménage',
+    groups: { investable: 'Épargne et placements', pension: 'Rentes d’employeur', home: 'Maison' },
+    investableTotal: (amount) => `Total : ${amount}, en dollars d’aujourd’hui`,
+    share: (pct) => `${pct} du total`,
+    pensionStart: (age) => `Débute à ${age}`,
+    homeNote: 'Valeur nette, présentée à part : elle n’entre pas dans le total.',
+    roomTitle: 'Droits de cotisation inutilisés',
+    room: (account, amount) => `${account} : ${amount}`,
+    account: { rrsp: 'REER', tfsa: 'CELI' },
+    edit: 'Modifier',
+    tags: { diversified: 'Trois types de comptes', mortgageFree: 'Hypothèque payée avant la retraite' },
   },
-  achievements: {
-    title: 'Ce qui est déjà acquis',
-    earned: 'Acquis',
-    locked: 'Pas encore',
-    names: { holds: 'Plan solide', confirmed: 'Chiffres confirmés', debtFree: 'Sans hypothèque à la retraite', diversified: 'Trois comptes', margin: 'Deux ans de marge' },
-    hints: {
-      holds: 'Le plan tient sous les trois scénarios.',
-      confirmed: 'Chaque chiffre est lu sur un document.',
-      debtFree: 'L’hypothèque est payée avant le départ à la retraite.',
-      diversified: 'De l’argent au REER, au CELI et hors compte enregistré.',
-      margin: 'L’âge prévu est au moins deux ans après l’âge le plus tôt.',
-    },
+  sharpen: {
+    title: 'Ce qui préciserait la réponse',
+    intro: 'Les chiffres pas encore lus sur un document, classés selon ce qu’une erreur sur chacun ferait bouger la réponse. Un classement, pas une marge d’erreur.',
+    swing: (years) => `jusqu’à ${years} ${years === 1 ? 'an' : 'ans'}`,
+    find: 'Trouver ce chiffre',
+    pending: 'Classement en cours…',
+    remaining: (n) => `${n} ${n > 1 ? 'chiffres ne sont pas encore lus' : 'chiffre n’est pas encore lu'} sur un document.`,
+    allDone: 'Tous les chiffres sont lus sur un document.',
+    none: 'Rien à classer pour l’instant.',
+    noMover: 'Aucun de ces chiffres, s’il était faux, ne déplacerait la réponse.',
   },
   accuracy: (confirmed, total) => `${confirmed} chiffres sur ${total} sont lus sur un document.`,
   scenarioNames: { prudent: 'Prudent', neutral: 'Neutre', bold: 'Audacieux' },
   empty: 'Entrez un revenu et vos dépenses à la retraite : la fiche se remplit avec le calcul.',
   toProfile: 'Aller au profil',
   toResults: 'Voir la réponse',
+  open: 'Ouvrir ma fiche',
 }
 
 const EN: SheetWords = {
   title: 'My sheet',
-  intro: 'Your situation in five measures, what you hold, what is left to do and what is already done. All of it comes from the same calculation as the answer.',
-  solo: 'One person',
-  couple: 'A couple',
-  heroClass: { retired: 'Retired', pensioned: 'With an employer pension', saver: 'Saving up' },
-  heroLine: (age, planned) => `${age} · planning to retire at ${planned}`,
-  level: { label: 'Margin', value: (n) => `${n} years`, none: 'no margin to show yet', hint: 'The years between the earliest age at which the money lasts and the retirement age you plan.' },
+  verdict: { title: 'Where you stand' },
+  groups: { today: { title: 'Today', hint: 'While you still work.' }, retirement: { title: 'Once retired', hint: 'When every pension is in pay.' } },
+  howToRead: 'How to read this measure',
+  intro: 'Your household at a glance. All of it comes from the same calculation as the answer, and each card leads to where you change it.',
   stats: {
     runway: { name: 'Earliest age', hint: 'The earliest everyone can stop working with the money lasting to the end.' },
     cover: { name: 'Pensions', hint: 'The share of spending the pensions pay on their own, after tax, once they are all in pay.' },
@@ -158,35 +158,41 @@ const EN: SheetWords = {
     retired: 'Everyone is already retired: the question is no longer “when?”.',
     noEarner: 'Nobody works any more: nothing to save.',
   },
-  slots: { title: 'What you hold', empty: 'No account or pension entered yet.', kind: { rrsp: 'RRSP', tfsa: 'TFSA', nonReg: 'Non-registered', pension: 'Employer pension', home: 'Home, net equity' }, confirmed: 'read off a document', estimated: 'unconfirmed', household: 'The household' },
-  quests: {
-    title: 'What is left to do',
-    intro: 'Three ways to make the sheet more accurate or the plan sturdier. They are leads, not advice.',
-    complete: 'Enter an income and your retirement spending so the sheet has something to say.',
-    confirm: (n) => `Confirm ${n} ${n > 1 ? 'figures' : 'figure'} on a document.`,
-    room: (account, amount) => `${amount} of ${account} contribution room is left.`,
-    plan: 'See what your plan points at for this year.',
-    none: 'Nothing more to do for now.',
+  slots: {
+    title: 'What you hold',
+    empty: 'No account or pension entered yet.',
+    kind: { rrsp: 'RRSP', tfsa: 'TFSA', nonReg: 'Non-registered', pension: 'Employer pension', home: 'Home, net equity' },
+    confirmed: 'read off a document',
+    estimated: 'unconfirmed',
+    household: 'The household',
+    groups: { investable: 'Savings and investments', pension: 'Employer pensions', home: 'Home' },
+    investableTotal: (amount) => `Total: ${amount}, in today’s dollars`,
+    share: (pct) => `${pct} of the total`,
+    pensionStart: (age) => `Starts at ${age}`,
+    homeNote: 'Net equity, shown apart: it is not in the total.',
+    roomTitle: 'Unused contribution room',
+    room: (account, amount) => `${account}: ${amount}`,
     account: { rrsp: 'RRSP', tfsa: 'TFSA' },
+    edit: 'Change',
+    tags: { diversified: 'Three kinds of account', mortgageFree: 'Mortgage paid off before retirement' },
   },
-  achievements: {
-    title: 'What is already done',
-    earned: 'Done',
-    locked: 'Not yet',
-    names: { holds: 'Sturdy plan', confirmed: 'Figures confirmed', debtFree: 'No mortgage in retirement', diversified: 'Three accounts', margin: 'Two years of margin' },
-    hints: {
-      holds: 'The plan holds under all three scenarios.',
-      confirmed: 'Every figure is read off a document.',
-      debtFree: 'The mortgage is paid off before retirement.',
-      diversified: 'Money in the RRSP, the TFSA and outside a registered account.',
-      margin: 'The planned age is at least two years after the earliest age.',
-    },
+  sharpen: {
+    title: 'What would sharpen the answer',
+    intro: 'The figures not yet read off a document, ranked by how far an error in each would move the answer. A ranking, not a margin of error.',
+    swing: (years) => `up to ${years} ${years === 1 ? 'year' : 'years'}`,
+    find: 'Find this figure',
+    pending: 'Ranking them…',
+    remaining: (n) => `${n} ${n > 1 ? 'figures are' : 'figure is'} not yet read off a document.`,
+    allDone: 'Every figure is read off a document.',
+    none: 'Nothing to rank for now.',
+    noMover: 'None of these figures, if wrong, would move the answer.',
   },
   accuracy: (confirmed, total) => `${confirmed} of ${total} figures are read off a document.`,
   scenarioNames: { prudent: 'Prudent', neutral: 'Neutral', bold: 'Bold' },
   empty: 'Enter an income and your retirement spending: the sheet fills in with the calculation.',
   toProfile: 'Go to the profile',
   toResults: 'See the answer',
+  open: 'Open my sheet',
 }
 
 export const SHEET_COPY: Record<Lang, SheetWords> = { fr: FR, en: EN }

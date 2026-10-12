@@ -4,7 +4,6 @@ import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { InstallLine } from '../components/install/InstallHint'
-import { ModeSwitch } from '../components/sheet/ModeSwitch'
 import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
@@ -21,7 +20,7 @@ import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
 import { saveCopy } from '../lib/saveCopy'
 import { clearProfile, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
-import { MODE_COPY } from '../lib/sheetCopy'
+import { SHEET_COPY } from '../lib/sheetCopy'
 import { getTheme, setTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import { useParamChoice } from '../lib/useParamChoice'
@@ -291,11 +290,8 @@ function DisplaySection() {
         />
       </div>
       <div className="field-row">
-        <p className="field-row__label">{MODE_COPY[lang].label}</p>
-        <ModeSwitch />
-        <p className="field-row__hint">{MODE_COPY[lang].hint}</p>
         <Chip to="/fiche" icon="identification-card-bold">
-          {MODE_COPY[lang].open}
+          {SHEET_COPY[lang].open}
         </Chip>
       </div>
     </Section>

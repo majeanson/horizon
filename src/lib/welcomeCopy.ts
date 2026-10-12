@@ -42,7 +42,8 @@ const FR: WelcomeCopy = {
     { name: 'Résultats › Stratégies', text: 'Quand commencer vos rentes (RRQ et PSV) et dans quel ordre puiser dans vos comptes.', to: '/resultats?v=strategies' },
     { name: 'Résultats › Vérifier', text: 'Si la réponse est solide, ce qui a été vérifié, et chaque chiffre avec son calcul.', to: '/resultats?v=verify' },
     { name: 'Votre réponse', text: 'La ligne en haut de Profil et d’Hypothèses : elle bouge à mesure que vous tapez.', to: null },
-    { name: 'En haut', text: 'Ma fiche, le glossaire des sigles et les réglages (copies de sauvegarde, plans, exemples). Les barres du haut se cachent quand vous descendez et reviennent quand vous remontez.', to: null },
+    { name: 'Ma fiche', text: 'Votre ménage d’un coup d’œil : la réponse et sa solidité, le plan en une ligne, ce que vous détenez et les chiffres à confirmer en premier. Chaque carte mène au champ qui la change.', to: '/fiche' },
+    { name: 'En haut', text: 'Le glossaire des sigles et les réglages (copies de sauvegarde, plans, exemples). Les barres du haut se cachent quand vous descendez et reviennent quand vous remontez.', to: null },
   ],
   goodToKnow: 'Bon à savoir',
   facts: [
@@ -74,7 +75,8 @@ const EN: WelcomeCopy = {
     { name: 'Results › Strategies', text: 'When to start your pensions (QPP and OAS) and in which order to draw your accounts.', to: '/resultats?v=strategies' },
     { name: 'Results › Check', text: 'Whether the answer is firm, what was checked, and every figure with its calculation.', to: '/resultats?v=verify' },
     { name: 'Your answer', text: 'The line at the top of Profile and Assumptions: it moves as you type.', to: null },
-    { name: 'At the top', text: 'My sheet, the glossary of acronyms and the settings (backup copies, plans, examples). The top bars hide as you scroll down and come back as you scroll up.', to: null },
+    { name: 'My sheet', text: 'Your household at a glance: the answer and how sturdy it is, the plan in one line, what you hold and the figures to confirm first. Each card leads to the field that changes it.', to: '/fiche' },
+    { name: 'At the top', text: 'The glossary of acronyms and the settings (backup copies, plans, examples). The top bars hide as you scroll down and come back as you scroll up.', to: null },
   ],
   goodToKnow: 'Good to know',
   facts: [

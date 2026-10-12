@@ -11,10 +11,10 @@ for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit',
     const guide = page.getByRole('region', { name: 'Comment s’y retrouver' }).or(page.locator('section[aria-labelledby="welcome-guide"]'))
     await expect(guide.getByRole('heading', { name: 'Comment s’y retrouver' })).toBeVisible()
     const terms = guide.locator('dt')
-    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats › Réponse', 'Résultats › Essayer', 'Résultats › Stratégies', 'Résultats › Vérifier', 'Votre réponse', 'En haut'])
-    await expect(guide.locator('dd')).toHaveCount(8)
+    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats › Réponse', 'Résultats › Essayer', 'Résultats › Stratégies', 'Résultats › Vérifier', 'Votre réponse', 'Ma fiche', 'En haut'])
+    await expect(guide.locator('dd')).toHaveCount(9)
     // the places that are pages lead there
-    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats › Réponse', '/resultats'], ['Résultats › Essayer', '/resultats?v=adjust'], ['Résultats › Stratégies', '/resultats?v=strategies'], ['Résultats › Vérifier', '/resultats?v=verify']] as const) {
+    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats › Réponse', '/resultats'], ['Résultats › Essayer', '/resultats?v=adjust'], ['Résultats › Stratégies', '/resultats?v=strategies'], ['Résultats › Vérifier', '/resultats?v=verify'], ['Ma fiche', '/fiche']] as const) {
       await expect(guide.getByRole('link', { name, exact: true })).toHaveAttribute('href', href)
     }
     // …and the two that are not pages are not links
@@ -36,5 +36,5 @@ test('English', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Finding your way' })).toBeVisible()
-  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Try', 'Results › Strategies', 'Results › Check', 'Your answer', 'At the top'])
+  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Try', 'Results › Strategies', 'Results › Check', 'Your answer', 'My sheet', 'At the top'])
 })

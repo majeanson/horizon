@@ -1,14 +1,15 @@
 import type { Lang } from '../i18n.ts'
 import { PRESET_KEYS } from '../engine/assumptionPresets.ts'
+import type { FactKind } from './facts.ts'
 import { formatPct, formatYearAge } from './format.ts'
+import { GUIDE_COPY } from './guideCopy.ts'
 import { formatMoney } from './money.ts'
 import { MAX_AGE } from './resultsModel.ts'
 import type { SheetWords } from './sheetCopy.ts'
-import { SCALE, type AchievementId, type HeroClass, type SheetModel, type SlotKind, type StatId } from './sheetModel.ts'
+import { SCALE, SLOT_GROUP, type SharpenStatus, type SheetModel, type SlotGroup, type SlotKind, type StatId } from './sheetModel.ts'
 
-// THE SHEET AS TEXT, once. Both skins of the character sheet draw THIS: every figure of the sheet is formatted here, from the model, and the words
-// of the skin (lib/sheetCopy.ts, lib/rpgCopy.ts) only say what the figure is. A skin that wanted to print a number another way has nowhere to do it —
-// and a test holds the figures of the two skins' views to the same digits.
+// THE SHEET AS TEXT, once. The sheet draws THIS: every figure of it is formatted here, from the model, and the words (lib/sheetCopy.ts) only say what
+// the figure is. The drawing has nowhere to format a number of its own (lib/sheetSkins.test.ts).
 
 export interface StatView {
   id: StatId
@@ -27,65 +28,76 @@ export interface StatView {
   detail: string
 }
 
-export interface HeroView {
-  id: string
-  name: string
-  className: string
-  heroClass: HeroClass
-  line: string
-}
-
 export interface SlotView {
   key: string
   kind: SlotKind
   title: string
   owner: string
   amountText: string | null
+  /** « 42 % du total » — null for anything outside the total (a pension, the home) and when the total is nothing. */
+  shareText: string | null
+  /** A pension's start, said (« Débute à 60 ans »); empty for anything else. */
+  extra: string
   note: string
+  /** What the link on the card says it does, for assistive technology. */
+  editLabel: string
+  /** The profile field that changes it. */
+  to: string
   confirmed: boolean | null
 }
 
-export interface QuestView {
+export interface HoldingGroupView {
+  id: SlotGroup
+  title: string
+  /** The total, said — only for the investable group. */
+  totalText: string | null
+  /** What to know about the group (the home is shown apart from the total). */
+  note: string
+  items: SlotView[]
+}
+
+export interface RoomView {
   key: string
   text: string
-  /** Where the quest leads: a route of the app. */
   to: string
 }
 
-export interface AchievementView {
-  id: AchievementId
+export interface MoverView {
+  key: string
   name: string
-  hint: string
-  earned: boolean
-  status: string
+  swingText: string
+  to: string
 }
 
 export interface SheetView {
   title: string
   intro: string
-  party: string
   empty: string | null
-  level: { label: string; text: string; hint: string; value: number | null }
-  heroes: HeroView[]
-  stats: StatView[]
-  slots: { title: string; empty: string; items: SlotView[] }
-  quests: { title: string; intro: string; none: string; items: QuestView[] }
-  achievements: { title: string; items: AchievementView[] }
+  /** The headline: the earliest age and how sturdy the plan is, with what the whole sheet stands on. */
+  verdict: { title: string; stats: StatView[]; accuracy: string; toResults: string }
+  groups: { id: 'today' | 'retirement'; title: string; hint: string; stats: StatView[] }[]
+  howToRead: string
+  holdings: { title: string; empty: string; groups: HoldingGroupView[]; roomTitle: string; rooms: RoomView[]; tags: string[] }
+  /** Null while the profile has gaps (the sheet asks to start instead). */
+  sharpen: { title: string; intro: string; status: SharpenStatus; note: string; items: MoverView[]; find: string } | null
   accuracy: { text: string; confirmed: number; total: number }
   toProfile: string
   toResults: string
 }
+
+const profilFact = (id: string): string => `/profil?fact=${encodeURIComponent(id)}`
 
 export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, births: readonly number[], names: readonly string[]): SheetView {
   const pct = (fraction: number): string => formatPct(fraction, lang, 0)
   const years = (n: number): string => words.value.years(String(n))
   const money = (n: number): string => formatMoney(n, lang)
   const nameOf = (id: string): string => {
-    const i = model.heroes.findIndex((h) => h.id === id)
+    const i = model.people.findIndex((h) => h.id === id)
     return (i >= 0 ? names[i] : '') || ''
   }
 
-  const stats: StatView[] = model.stats.map((s) => {
+  const statView = (id: StatId): StatView => {
+    const s = model.stats.find((x) => x.id === id)!
     const w = words.stats[s.id]
     let valueText: string
     if (s.status === 'pending') valueText = words.value.pending
@@ -99,7 +111,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
 
     let detail = ''
     if (s.id === 'runway') {
-      if (model.heroes.every((x) => x.heroClass === 'retired')) detail = words.detail.retired
+      if (model.people.every((x) => x.retired)) detail = words.detail.retired
       else if (s.status === 'none' && s.fill === 0) detail = words.detail.runwayNone
       else if (s.status === 'ready' && s.detail.margin !== null && s.detail.margin !== undefined) {
         detail = s.detail.margin >= 0 ? words.detail.runway(words.value.age(String(s.detail.planned)), years(s.detail.margin)) : words.detail.runwayLate(words.value.age(String(s.detail.planned)), words.value.age(String(s.value)))
@@ -112,56 +124,66 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
       detail = held.length === 0 ? words.detail.resilienceNone : words.detail.resilience(held.join(', '))
     }
     return { id: s.id, name: w.name, hint: w.hint, valueText, status: s.status, fill: s.fill, percent: s.fill === null ? null : Math.round(Math.max(0, Math.min(1, s.fill)) * 100), valueNow: s.value, scaleText, detail }
-  })
+  }
 
-  const heroes: HeroView[] = model.heroes.map((x) => ({
-    id: x.id,
-    name: x.name.trim() || '',
-    className: words.heroClass[x.heroClass],
-    heroClass: x.heroClass,
-    line: words.heroLine(words.value.age(String(x.age)), words.value.age(String(x.retirementAge))),
-  }))
-
-  const slotItems: SlotView[] = model.slots.map((s, i) => ({
-    key: `${s.owner}-${s.kind}-${i}`,
-    kind: s.kind,
-    title: words.slots.kind[s.kind],
-    owner: s.owner === 'household' ? words.slots.household : nameOf(s.owner),
-    amountText: s.amount === null ? null : money(s.amount),
-    note: s.label !== null ? s.label : s.confirmed === null ? '' : s.confirmed ? words.slots.confirmed : words.slots.estimated,
-    confirmed: s.confirmed,
-  }))
-
-  const questItems: QuestView[] = model.quests.map((q, i) => {
-    let text = ''
-    let to = '/profil'
-    if (q.id === 'complete') text = words.quests.complete
-    else if (q.id === 'confirm') text = words.quests.confirm(q.remaining ?? 0)
-    else if (q.id === 'room') {
-      const who = model.couple ? ` (${nameOf(q.room!.owner)})` : ''
-      text = words.quests.room(words.quests.account[q.room!.kind], money(q.room!.amount)) + who
-    } else {
-      text = words.quests.plan
-      to = '/resultats'
+  const slotItems = model.slots.map((s, i): { group: SlotGroup; view: SlotView } => {
+    const title = words.slots.kind[s.kind]
+    const owner = s.owner === 'household' ? words.slots.household : nameOf(s.owner)
+    return {
+      group: SLOT_GROUP[s.kind],
+      view: {
+        key: `${s.owner}-${s.kind}-${i}`,
+        kind: s.kind,
+        title,
+        owner,
+        amountText: s.amount === null ? null : money(s.amount),
+        shareText: s.amount === null || SLOT_GROUP[s.kind] !== 'investable' || model.investable <= 0 ? null : words.slots.share(pct(s.amount / model.investable)),
+        extra: s.startAge === null ? '' : words.slots.pensionStart(words.value.age(String(s.startAge))),
+        note: s.label !== null ? s.label : s.confirmed === null ? '' : s.confirmed ? words.slots.confirmed : words.slots.estimated,
+        editLabel: `${title}${owner ? `, ${owner}` : ''} — ${words.slots.edit}`,
+        to: s.fact === null ? '/profil' : profilFact(s.fact),
+        confirmed: s.confirmed,
+      },
     }
-    return { key: `${q.id}-${i}`, text, to }
   })
+  const holdingGroups: HoldingGroupView[] = (['investable', 'pension', 'home'] as const)
+    .map((id) => ({
+      id,
+      title: words.slots.groups[id],
+      totalText: id === 'investable' && model.investable > 0 ? words.slots.investableTotal(money(model.investable)) : null,
+      note: id === 'home' ? words.slots.homeNote : '',
+      items: slotItems.filter((s) => s.group === id).map((s) => s.view),
+    }))
+    .filter((g) => g.items.length > 0)
 
+  const rooms: RoomView[] = model.rooms.map((r, i) => ({
+    key: `${r.owner}-${r.kind}-${i}`,
+    text: words.slots.room(words.slots.account[r.kind], money(r.amount)) + (model.couple ? ` (${nameOf(r.owner)})` : ''),
+    to: profilFact(`${r.owner}:${r.kind === 'rrsp' ? 'rrspRoom' : 'tfsaRoom'}`),
+  }))
+  const tags = [...(model.diversified ? [words.slots.tags.diversified] : []), ...(model.mortgageFree ? [words.slots.tags.mortgageFree] : [])]
+
+  const guide = GUIDE_COPY[lang]
+  const factName = (owner: string, kind: FactKind): string => `${guide.kind[kind]} — ${owner === 'household' ? guide.guide.householdOwner : guide.guide.owner(nameOf(owner))}`
+  const items: MoverView[] = model.sharpen.movers.map((m) => ({ key: m.fact.id, name: factName(m.fact.owner, m.fact.kind), swingText: words.sharpen.swing(m.years), to: profilFact(m.fact.id) }))
+  const remainingText = model.sharpen.remaining > 0 ? words.sharpen.remaining(model.sharpen.remaining) : words.sharpen.allDone
+  const sharpenNote =
+    model.sharpen.status === 'pending' ? words.sharpen.pending : model.sharpen.status === 'none' ? remainingText : items.length === 0 ? words.sharpen.noMover : remainingText
+
+  const accuracyText = words.accuracy(model.accuracy.confirmed, model.accuracy.total)
   return {
     title: words.title,
     intro: words.intro,
-    party: model.couple ? words.couple : words.solo,
     empty: model.gaps.length > 0 ? words.empty : null,
-    level: { label: words.level.label, text: model.level === null ? words.level.none : words.level.value(String(model.level)), hint: words.level.hint, value: model.level },
-    heroes,
-    stats,
-    slots: { title: words.slots.title, empty: words.slots.empty, items: slotItems },
-    quests: { title: words.quests.title, intro: words.quests.intro, none: words.quests.none, items: questItems },
-    achievements: {
-      title: words.achievements.title,
-      items: model.achievements.map((a) => ({ id: a.id, name: words.achievements.names[a.id], hint: words.achievements.hints[a.id], earned: a.earned, status: a.earned ? words.achievements.earned : words.achievements.locked })),
-    },
-    accuracy: { text: words.accuracy(model.accuracy.confirmed, model.accuracy.total), confirmed: model.accuracy.confirmed, total: model.accuracy.total },
+    verdict: { title: words.verdict.title, stats: [statView('runway'), statView('resilience')], accuracy: accuracyText, toResults: words.toResults },
+    groups: [
+      { id: 'today', title: words.groups.today.title, hint: words.groups.today.hint, stats: [statView('saving')] },
+      { id: 'retirement', title: words.groups.retirement.title, hint: words.groups.retirement.hint, stats: [statView('cover'), statView('keep')] },
+    ],
+    howToRead: words.howToRead,
+    holdings: { title: words.slots.title, empty: words.slots.empty, groups: holdingGroups, roomTitle: words.slots.roomTitle, rooms, tags },
+    sharpen: model.gaps.length > 0 ? null : { title: words.sharpen.title, intro: words.sharpen.intro, status: model.sharpen.status, note: sharpenNote, items, find: words.sharpen.find },
+    accuracy: { text: accuracyText, confirmed: model.accuracy.confirmed, total: model.accuracy.total },
     toProfile: words.toProfile,
     toResults: words.toResults,
   }
