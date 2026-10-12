@@ -44,8 +44,8 @@ export function SensitivityPanel({ household, assumptions }: { household: Househ
 
   return (
     <div className="sensitivity" aria-busy={state.status !== 'done'}>
-      <p className="field-row__hint">{s.hint}</p>
       {lessReturns !== null && moreInflation !== null && <p className="answer__note sensitivity__sowhat">{s.soWhat(lessReturns, moreInflation)}</p>}
+      <p className="field-row__hint">{s.hint}</p>
       {state.status === 'running' && (
         <p className="bridge__updating" role="status">
           {s.running}

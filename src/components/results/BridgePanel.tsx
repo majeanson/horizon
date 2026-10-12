@@ -26,6 +26,7 @@ import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
+import { Fold } from '../Fold'
 import { Skeleton } from '../Skeleton'
 import { DeathSweepPanel } from './DeathSweepPanel'
 import { StrategyViews, type StrategyLayout } from './StrategyViews'
@@ -341,7 +342,6 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
               <h3 className="bridge__heading">{copy.strategyTitle}</h3>
               {pressed.length === 0 && <p className="field-row__hint">{copy.custom}</p>}
               <StrategyViews view={view} pressed={pressed} copy={copy} onPick={apply} horizonAge={endAge} who={who} matrix={matrix} layout={layout} onLayout={setLayout} />
-              <p className="field-row__hint">{copy.marksHint(ownerName)}</p>
               {applied !== null && (
                 <Cluster className="bridge__applied">
                   <StatusMessage tone="success">
@@ -357,6 +357,9 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
                   <Chip onClick={undoApply}>{copy.appliedUndo}</Chip>
                 </Cluster>
               )}
+              <Fold summary={copy.howToRead}>
+                <p className="field-row__hint">{copy.marksHint(ownerName)}</p>
+              </Fold>
               <p className="field-row__hint">{copy.todayNote}</p>
             </>
           )}

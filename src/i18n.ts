@@ -37,6 +37,7 @@ export const FR = {
     cancel: 'Annuler',
     save: 'Enregistrer',
     close: 'Fermer',
+    howToRead: 'Comment lire',
     less: 'Moins',
     more: 'Plus',
     delete: 'Supprimer',

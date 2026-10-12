@@ -5,6 +5,7 @@ import { SHEET_COPY } from '../../lib/sheetCopy'
 import type { SheetModel } from '../../lib/sheetModel'
 import { sheetView, type StatView } from '../../lib/sheetView'
 import { Chip } from '../Chip'
+import { Fold } from '../Fold'
 import { Cluster } from '../Layout'
 import { SectionHeader, SectionLevel } from '../SectionHeader'
 import { StatBar } from './StatBar'
@@ -24,11 +25,10 @@ function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
       </div>
       <StatBar name={s.name} percent={s.percent} valueText={s.valueText} />
       {s.detail && <p className="sheet__stat-detail">{s.detail}</p>}
-      <details className="sheet__more">
-        <summary>{howToRead}</summary>
+      <Fold summary={howToRead}>
         <p className="field-row__hint">{s.hint}</p>
         <p className="field-row__hint sheet__scale">{s.scaleText}</p>
-      </details>
+      </Fold>
     </li>
   )
 }

@@ -353,7 +353,7 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
                 {gaps.map((g) => (
                   <li key={g}>
                     {t.results.gaps[g]}{' '}
-                    <Chip icon="arrow-left-bold" onClick={() => goTo(steps.indexOf(STEP_OF_GAP[g]))}>
+                    <Chip icon="arrow-left-bold" onClick={() => goTo(steps.indexOf(STEP_OF_GAP[g]))} ariaLabel={`${c.done.fix} — ${t.results.gaps[g]}`}>
                       {c.done.fix}
                     </Chip>
                   </li>

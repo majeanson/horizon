@@ -20,6 +20,7 @@ import { SectionNav } from '../components/SectionNav'
 import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
+import { Fold } from '../components/Fold'
 import { SubTabs } from '../components/SubTabs'
 import { Switch } from '../components/Switch'
 import { TableChooser } from '../components/TableChooser'
@@ -333,6 +334,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Saisie', name: 'Chip', file: 'src/components/Chip.tsx', exports: ['Chip', 'ChipGroup'], kw: 'pastille filtre bascule', render: () => <ChipSpecimen /> },
     { cat: 'Saisie', name: 'Switch', file: 'src/components/Switch.tsx', kw: 'interrupteur oui non réglage bascule', render: () => <SwitchSpecimen /> },
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
+    { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     {
       cat: 'Affichage',

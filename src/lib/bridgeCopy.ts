@@ -39,6 +39,8 @@ export interface BridgeCopy {
   lifetime: string
   /** The unit of every dollar figure on the cards. */
   todayNote: string
+  /** The fold under the strategies: what the marks under each card mean. */
+  howToRead: string
   /** The standard row when the person's own plan IS the standard. */
   standardIsMine: string
   extraDrawn: (amount: string) => string
@@ -165,6 +167,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     worth95: 'Valeur nette à 95 ans',
     noWorth: '—',
     lifetime: 'Encaissé sur tout le plan, après impôt',
+    howToRead: 'Comment lire cette vue',
     todayNote: 'Montants en dollars d’aujourd’hui ; « encaissé » compte aussi les retraits du nid.',
     standardIsMine: 'Standard (c’est aussi votre plan)',
     extraDrawn: (amount) => `${amount} de plus tirés du nid entre 60 et 69 ans que le standard`,
@@ -304,6 +307,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     worth95: 'Net worth at 95',
     noWorth: '—',
     lifetime: 'Cashed over the whole plan, after tax',
+    howToRead: 'How to read this view',
     todayNote: 'Amounts in today’s dollars; “cashed” also counts nest-egg withdrawals.',
     standardIsMine: 'Standard (it is also your plan)',
     extraDrawn: (amount) => `${amount} more drawn from the nest egg at 60 to 69 than the standard`,

@@ -1,5 +1,6 @@
 import type { Household } from '../../engine/types'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
+import { Fold } from '../Fold'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { timelineOf, type MarkKind, type PhaseKind } from '../../lib/timeline'
 
@@ -8,13 +9,13 @@ import { timelineOf, type MarkKind, type PhaseKind } from '../../lib/timeline'
 // runs here, so it is instant and can never disagree with the profile. The stretches are told in text too (the bar is a picture, not the only way).
 export function TimelineStrip({ household, names, todayYear, horizonAge }: { household: Household; names: readonly string[]; todayYear: number; horizonAge: number }) {
   const { lang } = useLang()
+  const t = useT()
   const c = RESULTS_COPY[lang].timeline
   const people = timelineOf(household, todayYear, horizonAge)
   const markText = (kind: MarkKind, age: number) => (kind === 'retire' ? c.retire(age) : kind === 'rrq' ? c.rrq(age) : c.oas(age))
   return (
     <figure className="timeline surface">
       <figcaption className="timeline__title">{c.title}</figcaption>
-      <p className="field-row__hint timeline__hint">{c.hint}</p>
       {people.map((t, i) => {
         const span = t.endAge - t.nowAge
         const name = names[i] ?? ''
@@ -47,6 +48,9 @@ export function TimelineStrip({ household, names, todayYear, horizonAge }: { hou
             </li>
           ))}
       </ul>
+      <Fold summary={t.common.howToRead}>
+        <p className="field-row__hint timeline__hint">{c.hint}</p>
+      </Fold>
     </figure>
   )
 }

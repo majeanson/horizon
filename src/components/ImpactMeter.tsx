@@ -1,5 +1,6 @@
 import type { ImpactLevel, ImpactTilt } from '../engine/assumptionImpact'
 import { LEVEL_POSITION } from '../engine/assumptionImpact'
+import { Fold } from './Fold'
 
 // « Where does this number sit, and what does it do to the plan? » — a five-step track with a marker, the level and
 // what it leans toward in words, and one sentence on why it matters. The track is a picture of the words, never the
@@ -39,12 +40,9 @@ export function ImpactMeter({
       </div>
       {outside && (level === 'below' || level === 'above') && <p className="impact__outside">{outside}</p>}
       {why !== undefined && (
-        <details className="impact__why">
-          <summary>
-            <strong>{whyTitle}</strong>
-          </summary>
+        <Fold className="impact__why" summary={<strong>{whyTitle}</strong>}>
           <p>{why}</p>
-        </details>
+        </Fold>
       )}
     </div>
   )

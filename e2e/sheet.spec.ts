@@ -28,7 +28,7 @@ test('the header leads to the sheet, which shows five stats, each with its figur
   // the example's earliest age is the one the answer gives
   await expect(page.locator('.sheet__stat', { hasText: 'Âge le plus tôt' }).locator('.sheet__stat-value')).toHaveText(/59\s*ans/)
   // what a full bar stands for is one tap away, in words
-  await page.locator('.sheet__more summary').first().click()
+  await page.locator('.fold summary').first().click()
   await expect(page.locator('.sheet__scale').first()).toContainText('Barre pleine')
 })
 

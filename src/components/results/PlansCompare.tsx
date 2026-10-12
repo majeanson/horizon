@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { useLang } from '../../i18n'
 import { formatMoney } from '../../lib/money'
 import { PLANS_COPY } from '../../lib/plansCopy'
@@ -38,7 +39,13 @@ export function PlansCompare({ profile, enabled }: { profile: Profile; enabled: 
             return (
               <li key={`${i}:${a.name}`} className="levers__item">
                 <span>
-                  <strong>{a.name}</strong>
+                  {i > 0 ? (
+                    <Link className="info-note__link" to="/donnees?autres=plans">
+                      <strong>{a.name}</strong>
+                    </Link>
+                  ) : (
+                    <strong>{a.name}</strong>
+                  )}
                 </span>
                 <span className="mono levers__result">
                   {said(a)}

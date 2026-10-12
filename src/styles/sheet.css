@@ -68,16 +68,6 @@
 .sheet__stat-detail {
   font-size: var(--text-sm);
 }
-/* What a measure means and what a full bar stands for: one tap away, never in the way. */
-.sheet__more summary {
-  cursor: pointer;
-  color: var(--ink-soft);
-  font-size: var(--text-sm);
-}
-.sheet__more[open] {
-  display: grid;
-  gap: 0.25rem;
-}
 .sheet__slot-title {
   font-weight: 700;
 }
