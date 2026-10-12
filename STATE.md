@@ -31,7 +31,7 @@
 | `CLAUDE.md` | the law: how to write code here, the guards, the commands |
 | `ENGINE.md` | the calculation contract: conventions, what is official vs simplified, how trust is earned |
 | `COMPONENTS.md` | the shared-UI inventory, paired with the `/dev/kit` gallery |
-| `EXAMPLES.md` | *generated* (`npm run examples`) — the eleven example households printed: inputs, pension calculations, year-by-year table, a witness year for a tax calculator, and how to counter-verify each |
+| `EXAMPLES.md` | *generated* (`npm run examples`) — the twelve example households printed: inputs, pension calculations, year-by-year table, a witness year for a tax calculator, and how to counter-verify each |
 | `SOURCES.md` | *generated* (`npm run sources`) — every government parameter, its official page and retrieval date |
 | `SOURCES.en.md` | *generated* (`npm run sources`) — the same table in English, each page linked in its English edition |
 

@@ -496,7 +496,7 @@ test.describe('the settings page: two families, each one section with a switch',
     await expect(page.locator('.example-list li')).toHaveCount(0)
     await others.getByRole('tab', { name: 'Exemples' }).click()
     await expect(page).toHaveURL(/autres=examples/)
-    await expect(page.locator('.example-list li')).toHaveCount(11)
+    await expect(page.locator('.example-list li')).toHaveCount(12)
   })
 
   test('a copy the device could not read is the first thing shown, and still reachable beside saving and restoring', async ({ page }) => {

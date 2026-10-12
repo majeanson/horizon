@@ -114,7 +114,7 @@ npm run typecheck      # tsc -b --noEmit
 npm test               # vitest run — the engine, the guards, the helpers
 npm run test:engine    # vitest run src/engine only
 npm run sources        # regenerate SOURCES.md (FR) and SOURCES.en.md (EN) from the params files
-npm run examples       # regenerate EXAMPLES.md (the eleven example households, printed) from the engine
+npm run examples       # regenerate EXAMPLES.md (the twelve example households, printed) from the engine
 npm run check:bundle   # size budgets + the offline precache check (needs dist/)
 npm run verify         # typecheck → test → build → check:bundle, stopping at the first failure (exit code and all): run THIS before every push — never pipe it through tail/head, a pipe hides the exit code
 npm run knip           # dead-code gate (CI only: its parser needs a >4 GiB buffer that a memory-tight Windows box refuses)
