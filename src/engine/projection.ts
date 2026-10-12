@@ -675,8 +675,14 @@ function simulateYear(
       surplus -= put
     }
     if (surplus > 0.005) {
-      const i = people.length === 2 && finalTax.persons[1].netIncome < finalTax.persons[0].netIncome ? 1 : 0
-      extra.nonReg[i] = surplus
+      if (a.drawTogether === true && people.length === 2) {
+        // Together: the money left over is saved half in each name, so neither account is left to the other person's alone.
+        extra.nonReg[0] = surplus / 2
+        extra.nonReg[1] = surplus / 2
+      } else {
+        const i = people.length === 2 && finalTax.persons[1].netIncome < finalTax.persons[0].netIncome ? 1 : 0
+        extra.nonReg[i] = surplus
+      }
     }
   }
 

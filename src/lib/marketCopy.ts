@@ -27,8 +27,8 @@ const FR: MarketCopy = {
     hint: 'L’argent qui reste à la fin d’une année de travail va d’abord au REER (la déduction baisse l’impôt), puis au CELI, puis au compte non enregistré. Désactivé : au CELI d’abord.',
   },
   together: {
-    on: 'Retirer ensemble : puiser chez les deux',
-    hint: 'Chaque retrait est partagé entre vous deux, en proportion de ce que chacun a au total, et chacun puise dans ses propres comptes selon l’ordre choisi : les deux s’épuisent au même rythme et les deux barres de « D’où vient l’argent » se remplissent. Désactivé : chaque compte est puisé à tour de rôle chez la personne dont le revenu imposable est le plus bas, et l’autre attend.',
+    on: 'Tout partager : l’épargne et les retraits',
+    hint: 'L’argent qui reste est mis moitié dans le compte non enregistré de chacun (sinon, tout va chez la personne au revenu le plus bas), et chaque retrait est partagé entre vous deux en proportion de ce que chacun a au total, chacun puisant dans ses propres comptes selon l’ordre choisi : les deux s’épuisent au même rythme et les deux barres de « D’où vient l’argent » se remplissent. Désactivé : tout le surplus va chez la personne au revenu le plus bas, et chaque compte est puisé à tour de rôle chez la personne dont le revenu imposable est le plus bas.',
   },
   income: {
     line: (age, perMonth, planned) => `À ${age} ans, le plan peut financer jusqu’à ${perMonth} par mois (après impôt) — vous prévoyez ${planned}.`,
@@ -68,8 +68,8 @@ const EN: MarketCopy = {
     hint: 'The money left at the end of a working year goes to the RRSP first (the deduction lowers the tax), then the TFSA, then the non-registered account. Off: the TFSA first.',
   },
   together: {
-    on: 'Draw together: from both of you',
-    hint: 'Each withdrawal is shared between the two of you in proportion to everything each holds, and each person draws from their own accounts in the order you chose: both run down at the same pace and both people’s bars in “Where the money comes from” fill in. Off: each account in turn is drawn from whoever has the lower taxable income, and the other person waits.',
+    on: 'Share everything: the savings and the draws',
+    hint: 'The money left over goes half into each of your non-registered accounts (otherwise it all goes to the lower earner), and each withdrawal is shared between the two of you in proportion to everything each holds, each drawing from their own accounts in the order you chose: both run down at the same pace and both people’s bars in “Where the money comes from” fill in. Off: the whole surplus goes to the lower earner, and each account in turn is drawn from whoever has the lower taxable income.',
   },
   income: {
     line: (age, perMonth, planned) => `At ${age}, the plan can fund up to ${perMonth} a month (after tax) — you plan ${planned}.`,

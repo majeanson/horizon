@@ -274,8 +274,9 @@ export interface Assumptions {
   /** Try every 5 % allocation of pension income between the spouses and keep the cheapest. */
   pensionSplitting: boolean
   /**
-   * In a couple, the draw is shared between the two in proportion to ALL each holds, each taking from their own accounts in `withdrawalOrder`,
-   * so both run down together. Absent / false: each account in turn goes to whoever has the lower taxable income, and the other person's waits.
+   * In a couple, share the money between the two. SAVING: what is left over after the TFSA room goes half to each non-registered account. DRAWING: the draw is
+   * shared in proportion to ALL each holds, each taking from their own accounts in `withdrawalOrder`, so both run down together.
+   * Absent / false: the whole surplus goes to the lower earner's non-registered account, and each account in turn is drawn from whoever has the lower taxable income.
    */
   drawTogether?: boolean
   /**
