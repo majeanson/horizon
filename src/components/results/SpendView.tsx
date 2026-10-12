@@ -1,5 +1,5 @@
 import type { Assumptions, Household } from '../../engine/types'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { formatMoney } from '../../lib/money'
 import { setSpending } from '../../lib/profileEdit'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
@@ -9,6 +9,7 @@ import { useNotice } from '../../lib/toast'
 import { useSpendEarliest } from '../../lib/useSpendEarliest'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
+import { Fold } from '../Fold'
 import { Skeleton } from '../Skeleton'
 import { Slider } from '../Slider'
 
@@ -39,6 +40,7 @@ export function SpendView({
   maxAge: number
 }) {
   const { lang } = useLang()
+  const t = useT()
   const q = RESULTS_COPY[lang].questions.spend
   const notice = useNotice()
   const current = household.spending.retiredToday
@@ -75,7 +77,9 @@ export function SpendView({
         valueText={money}
         onCommit={(v) => onSpend(v === current ? null : v)}
       />
-      <p className="field-row__hint">{q.hint}</p>
+      <Fold summary={t.common.howToRead}>
+        <p className="field-row__hint">{q.hint}</p>
+      </Fold>
       {busy && age !== undefined && (
         <p className="bridge__updating" role="status">
           {q.updating}

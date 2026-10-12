@@ -1,5 +1,5 @@
 import type { Assumptions, Household } from '../../engine/types'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { pageFor } from '../../engine/params/twins'
 import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_AMOUNT_STEP, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, CARE_YEARS_MIN, careFlow, oldestBirthYear, sameCare, type Care } from '../../lib/careModel'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
@@ -13,6 +13,7 @@ import { useNotice } from '../../lib/toast'
 import { useCareEarliest } from '../../lib/useCareEarliest'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
+import { Fold } from '../Fold'
 import { Skeleton } from '../Skeleton'
 import { Slider } from '../Slider'
 
@@ -43,6 +44,7 @@ export function CareView({
   maxAge: number
 }) {
   const { lang } = useLang()
+  const t = useT()
   const c = FUTURE_COPY[lang].care
   const notice = useNotice()
   const answer = useCareEarliest(household, assumptions, care, age, true)
@@ -97,7 +99,10 @@ export function CareView({
       </p>
       <Slider label={c.fromAge} value={care.fromAge} min={CARE_FROM_MIN} max={CARE_FROM_MAX} valueText={c.age} onCommit={(v) => change({ fromAge: v })} />
       <Slider label={c.years} value={care.years} min={CARE_YEARS_MIN} max={CARE_YEARS_MAX} valueText={c.yearsOf} onCommit={(v) => change({ years: v })} />
-      <p className="field-row__hint">{c.hint}</p>
+      {/* The reference amounts' source stays beside them (a cited figure is traceable on sight); what the what-if means is one tap away. */}
+      <Fold summary={t.common.howToRead}>
+        <p className="field-row__hint">{c.hint}</p>
+      </Fold>
       <p className="answer__note">{c.starts(formatYearAge(oldestBirthYear(household) + care.fromAge, births, lang))}</p>
       <p className="answer__note">{c.total(money(care.amount * care.years), care.years)}</p>
       {busy && a !== null && (

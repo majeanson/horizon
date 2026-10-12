@@ -135,7 +135,9 @@ export function KidsCosts() {
                 </FieldRow>
               )}
               {lines?.map((l) => (l.weeks > 0 ? <p key={l.person}>{k.leave.line(nameOf(l.person), l.weeks, money(Math.round(l.lostPay)), money(Math.round(l.benefit)))}</p> : null))}
-              <p className="field-row__hint">{k.leave.hint}</p>
+              <Fold summary={t.common.howToRead}>
+                <p className="field-row__hint">{k.leave.hint}</p>
+              </Fold>
             </>
           )}
         </div>

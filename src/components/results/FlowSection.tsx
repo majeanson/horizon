@@ -5,6 +5,7 @@ import { EXPENSE_COLOUR, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, expenseBars, type Ex
 import { formatYearAge } from '../../lib/format'
 import { FLOW_COPY } from '../../lib/flowCopy'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
+import { Fold } from '../Fold'
 import { Loading } from '../Loading'
 import { Slider } from '../Slider'
 
@@ -67,10 +68,10 @@ export function FlowSection({
       {household && (
         <>
           <h4 className="chart-detail__heading">{f.title}</h4>
-          <p className="field-row__hint">
-            {f.hint}
-            {perMonth && <> {f.perMonthHint}</>}
-          </p>
+          {perMonth && <p className="field-row__hint">{f.perMonthHint}</p>}
+          <Fold summary={t.common.howToRead}>
+            <p className="field-row__hint">{f.hint}</p>
+          </Fold>
           <div className="chart-slot">
             <Suspense fallback={<Loading />}>
               <StackedBarChart
