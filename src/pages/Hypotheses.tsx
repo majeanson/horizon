@@ -56,7 +56,7 @@ export function Hypotheses() {
   const meter = (field: ImpactField, value: number) => {
     const { level, tilt } = impactOf(field, value)
     const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level
-    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} />
+    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} ends={[impact.level.below, impact.level.above]} />
   }
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
   // ONE return by default: most households hold the same mix in every account, so three boxes plus an averaged meter was

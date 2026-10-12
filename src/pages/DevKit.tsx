@@ -354,7 +354,7 @@ function ENTRIES(): Entry[] {
       render: () => (
         <>
           <ImpactMeter level="low" tilt="cautious" levelLabel="Bas" tiltLabel="Hypothèse prudente : le plan a de la marge" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." />
-          <ImpactMeter level="typical" tilt="middle" levelLabel="Typique" tiltLabel="Hypothèse centrale" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." />
+          <ImpactMeter level="typical" tilt="middle" ends={['Très bas', 'Très élevé']} levelLabel="Typique" tiltLabel="Hypothèse centrale" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." />
           <ImpactMeter level="above" tilt="optimistic" levelLabel="Très élevé" tiltLabel="Hypothèse optimiste : le plan en dépend" whyTitle="Pourquoi ça compte :" why="Une phrase sur ce que ce chiffre change au plan." outside="Au-delà de ce que couvrent les trois scénarios." />
         </>
       ),

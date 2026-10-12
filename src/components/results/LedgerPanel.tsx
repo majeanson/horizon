@@ -128,7 +128,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   const band = (field: 'inflation' | 'returns', kind?: AccountKind, withWhy = true) => (perMille: number) => {
     const { level, tilt } = field === 'inflation' ? impactOf('inflation', perMille / 1000) : impactOfReturn(kind!, perMille / 1000)
     const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level
-    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={withWhy ? impact.why[field][side] : undefined} whyTitle={impact.whyTitle} outside={impact.outside} />
+    return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={withWhy ? impact.why[field][side] : undefined} whyTitle={impact.whyTitle} outside={impact.outside} ends={[impact.level.below, impact.level.above]} />
   }
   const spend = (key: SpendKey, label: string) => {
     const now = shown.spending[spendField(key)]

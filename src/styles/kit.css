@@ -284,6 +284,10 @@
   display: inline-flex;
   gap: 3px;
 }
+.impact__end {
+  color: var(--ink-faint);
+  font-size: var(--text-xs);
+}
 .impact__step {
   width: 1.1rem;
   height: 0.55rem;

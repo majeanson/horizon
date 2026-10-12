@@ -15,6 +15,7 @@ export function ImpactMeter({
   why,
   whyTitle,
   outside,
+  ends,
 }: {
   level: ImpactLevel
   tilt: ImpactTilt
@@ -25,16 +26,28 @@ export function ImpactMeter({
   whyTitle: string
   /** Shown when the value is past the range the three scenarios span. */
   outside?: string
+  /** The two ends of the track, said (« Très bas », « Très élevé »): a marker on a bare track reads as good or bad, these say it is only a place on a scale. */
+  ends?: readonly [string, string]
 }) {
   const at = LEVEL_POSITION[level]
   return (
     <div className={`impact impact--${tilt}`}>
       <div className="impact__head">
+        {ends && (
+          <span className="impact__end" aria-hidden="true">
+            {ends[0]}
+          </span>
+        )}
         <span className="impact__track" aria-hidden="true">
           {[0, 1, 2, 3, 4].map((i) => (
             <span key={i} className={'impact__step' + (i === at ? ' impact__step--on' : '')} />
           ))}
         </span>
+        {ends && (
+          <span className="impact__end" aria-hidden="true">
+            {ends[1]}
+          </span>
+        )}
         <span className="impact__level">{levelLabel}</span>
         <span className="impact__tilt">{tiltLabel}</span>
       </div>
