@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { CHILD_COSTS, CPI_ANNUAL } from '../../engine/params/childCosts'
 import { pageFor } from '../../engine/params/twins'
 import { childStage } from '../../engine/lifeEvents'
@@ -11,6 +10,7 @@ import { patchChildSpending, patchKidsEffects } from '../../lib/profileLife'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
+import { Fold } from '../Fold'
 import { FieldRow } from '../FieldRow'
 import { Cluster } from '../Layout'
 import { NumberField } from '../NumberField'
@@ -27,7 +27,6 @@ export function KidsCosts() {
   const c = k.cost
   const profile = useProfile()
   const now = today()
-  const [how, setHow] = useState(false)
   const cost = profile.household.childSpending ?? null
   const untilAge = cost?.untilAge ?? DEFAULT_LEAVE_AGE
   const stages = (profile.household.children ?? []).map((y) => childStage(y, now.year, untilAge))
@@ -142,10 +141,8 @@ export function KidsCosts() {
         </div>
       )}
 
-      <Chip expanded={how} onClick={() => setHow((v) => !v)}>
-        {k.how.open}
-      </Chip>
-      {how && (
+      {/* Where the numbers come from: what they MEAN, one tap away (the figures themselves, and the toggles that act on them, stay on the page). */}
+      <Fold summary={k.how.open}>
         <div className="kids-cost__how">
           <ul>
             {k.how.lines.map((line) => (
@@ -166,7 +163,7 @@ export function KidsCosts() {
             })}
           </ul>
         </div>
-      )}
+      </Fold>
     </div>
   )
 }

@@ -137,12 +137,13 @@ function Cards({ shown, standard, pressed, copy, onPick, horizonAge, who, matrix
                 </span>
                 <Dots k={s.key} matrix={matrix} copy={copy} />
               </div>
+              {/* The card's own answer (it holds, or it runs out) is on the card, closed: the dots say how it holds under each scenario, this says whether. */}
+              <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v, who)}</p>
               <Chip expanded={isOpen} onClick={() => toggle(s.key)} ariaLabel={`${copy.details} — ${label(s)}`}>
                 {copy.details}
               </Chip>
               {isOpen && (
                 <>
-                  <p className={'bridge-card__verdict' + (s.summary.ok ? '' : ' bridge-card__verdict--short')}>{copy.verdict(v, who)}</p>
                   <dl className="bridge-card__facts">
                     <div>
                       <dt>{copy.lifetime}</dt>

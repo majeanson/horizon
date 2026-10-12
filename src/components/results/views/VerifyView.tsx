@@ -17,16 +17,16 @@ export function VerifyView({ m }: { m: ResultsModel }) {
   return (
     <>
         <section className="arc" aria-label={rc.tabs.verify}>
-          {/* What the calculation was checked against and what it simplifies: the frame for everything below it. */}
+          {/* How firm the answer is — the three scenarios and a hard market, and the grids of what moves it — one section, two depths. */}
+          <FirmSection m={m} />
+
+          {/* What the calculation was checked against and what it simplifies: it comes after « how firm is it? », the reader’s first question here, and before the figures it was checked on. */}
           <section id="precision" className="results-section" aria-label={ACCURACY_COPY[lang].title}>
             <SectionHeader title={ACCURACY_COPY[lang].title} />
             <Suspense fallback={<Skeleton count={4} />}>
               <AccuracyNote onSeeFigures={() => scrollTo('parametres')} />
             </Suspense>
           </section>
-
-          {/* How firm the answer is — the three scenarios and a hard market, and the grids of what moves it — one section, two depths. */}
-          <FirmSection m={m} />
 
           <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
             <SectionHeader title={LEDGER_COPY[lang].title} />

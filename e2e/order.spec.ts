@@ -43,7 +43,7 @@ test('Profil: the household, what applies, the people, then the household’s sp
 
 test('Résultats: the map of Vérifier and of Stratégies lists the sections in the order they stand', async ({ page }) => {
   for (const [view, ids] of [
-    ['verify', ['precision', 'solidite', 'donnees-calcul', 'tableau', 'parametres']],
+    ['verify', ['solidite', 'precision', 'donnees-calcul', 'tableau', 'parametres']],
     ['answer', ['verdict', 'comparer', 'preciser', 'annee']],
   ] as const) {
     await page.goto(`/resultats?v=${view}`)

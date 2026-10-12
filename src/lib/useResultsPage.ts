@@ -332,8 +332,8 @@ export function useResultsPage() {
       : view === 'strategies'
         ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
         : [
-            { id: 'precision', label: rc.nav.precision },
             { id: 'solidite', label: rc.nav.solidite },
+            { id: 'precision', label: rc.nav.precision },
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
             { id: 'parametres', label: rc.nav.parametres },
