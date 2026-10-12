@@ -7,6 +7,7 @@ import { leaveBenefit, leaveOf, leaveRulesOf } from './parentalLeave.ts'
 import { childAdd, childCost, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor, workingBudget } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
 import { pathReturn, resolvePath } from './marketPaths.ts'
+import { fillCeiling } from './bracketFill.ts'
 import { payrollContribution } from './payroll.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
 import { roundTo, type Indexation } from './params/project.ts'
@@ -646,6 +647,39 @@ function simulateYear(
         need -= gain(hi)
       }
     }
+  }
+
+  // ── 4b. fill the bracket (engine/bracketFill.ts) ──────────────────────────────────────────────
+  // A person who is not working draws MORE from the RRSP than the year needed, up to the ceiling of income — the largest extra amount
+  // that keeps their net income (after the held split, as the tax will read it) at or under the line, held by what the RRSP can still
+  // give. The cash it adds is not spent: the surplus routing below sends it to the TFSA, then non-registered. Nobody on the GIS is
+  // filled (the GIS is lost faster than the tax is saved — not modelled in v1), and a person already over the line is left alone.
+  if (a.bracketFill) {
+    const line = fillCeiling(a.bracketFill, P)
+    people.forEach((_, i) => {
+      if (fixed[i].employment > 0) return
+      const base = draw.rrsp[i]
+      const room = Math.max(0, fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin - base)
+      if (room <= 0.005) return
+      const first = evaluate(fixedSplit())
+      if (first.gis[i] > 0.005 || first.tax.persons[i].netIncomeBeforeAdjustments >= line) return
+      const incomeAt = (x: number) => {
+        draw.rrsp[i] = base + x
+        return evaluate(fixedSplit()).tax.persons[i].netIncomeBeforeAdjustments
+      }
+      let x = room
+      if (incomeAt(room) > line) {
+        let lo = 0
+        let hi = room
+        for (let it = 0; it < 40 && hi - lo > 0.01; it++) {
+          const mid = (lo + hi) / 2
+          if (incomeAt(mid) <= line) lo = mid
+          else hi = mid
+        }
+        x = lo
+      }
+      draw.rrsp[i] = base + x
+    })
   }
 
   // The tax is final: let splitting pick its best allocation for the incomes actually received.

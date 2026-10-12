@@ -1,0 +1,19 @@
+import { fillComparison, type FillComparison } from "../engine/bracketFillCompare.ts";
+import type { Assumptions, Household } from "../engine/types.ts";
+
+// Three full plans × a scan of retirement ages is a few dozen projections. It runs here, off the page's thread, and
+// answers once. Nothing here touches the network or storage.
+
+export interface BracketFillRequest {
+  household: Household;
+  assumptions: Assumptions;
+  age: number;
+  firstAge: number;
+}
+
+export type BracketFillMessage = { answer: FillComparison };
+
+self.onmessage = (event: MessageEvent<BracketFillRequest>) => {
+  const { household, assumptions, age, firstAge } = event.data;
+  self.postMessage({ answer: fillComparison(household, assumptions, age, firstAge) } satisfies BracketFillMessage);
+};

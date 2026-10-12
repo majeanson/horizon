@@ -156,6 +156,14 @@ const FR_GLOSSARY = {
           host: 'Agence du revenu du Canada',
         },
         {
+          id: 'fonte',
+          abbr: 'Fonte du REER',
+          name: 'Tirer du REER plus tôt que nécessaire',
+          plain: 'Retirer du REER (ou du FERR), dans les années où le revenu est bas, plus que ce que l’année demande : l’impôt se paie tôt, à un taux bas, et les retraits minimums de plus tard sont plus petits. Le surplus peut aller au CELI.',
+          url: 'https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/reer-regimes-connexes/options-vos-reer-lorsque-vous-atteignez-71-ans.html',
+          host: 'Agence du revenu du Canada',
+        },
+        {
           id: 'tranche',
           abbr: 'Tranche d’imposition',
           name: 'Un palier de revenu, un taux',
@@ -469,6 +477,14 @@ const EN_GLOSSARY: typeof FR_GLOSSARY = {
           name: 'What you can still put in',
           plain: 'The amount you can still put into an RRSP or a TFSA this year. It is in your CRA account; contributing more can mean a penalty tax.',
           url: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/contributing-a-rrsp-prpp/contributions-affect-your-rrsp-prpp-deduction-limit.html',
+          host: 'Canada Revenue Agency',
+        },
+        {
+          id: 'fonte',
+          abbr: 'RRSP meltdown',
+          name: 'Drawing the RRSP earlier than needed',
+          plain: 'Withdrawing from the RRSP (or the RRIF), in years when income is low, more than the year asks for: the tax is paid early, at a low rate, and the minimum withdrawals later are smaller. The surplus can go to the TFSA.',
+          url: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/rrsp-options-when-you-turn-71.html',
           host: 'Canada Revenue Agency',
         },
         {

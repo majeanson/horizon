@@ -5,7 +5,7 @@ import type { AccountKind, Assumptions, Household } from './types.ts'
 // household can see what its choice is worth. Nothing new is modelled: each order is the projection's own
 // `withdrawalOrder`, with the withdrawals still solved against the tax function year by year, the RRIF minimum still forced
 // out of the RRSP whatever the order, and GIS / OAS recovery still read from the income that results. « RRSP first » is
-// therefore the plain form of an RRSP meltdown (the projection does not fill a bracket and stop).
+// therefore the plain form of an RRSP meltdown, spending-limited (filling a bracket and stopping there is its own option: engine/bracketFill.ts).
 //
 // What it does NOT say: the net worth it reports counts what is left in the RRSP at its full value, with the tax it would
 // still owe left out — an order that spends the RRSP last looks richer at the horizon than it is. That is why the ranking

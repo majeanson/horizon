@@ -251,6 +251,8 @@ export interface Household {
 }
 
 export type AccountKind = 'nonReg' | 'rrsp' | 'tfsa'
+/** The line of income the RRSP is drawn up to when « filling the bracket » (engine/bracketFill.ts). */
+export type BracketFill = 'bracket1' | 'oas'
 
 export interface Assumptions {
   today: YearMonth
@@ -285,6 +287,12 @@ export interface Assumptions {
    * Absent / false: the surplus goes to the TFSA, then non-registered, and the RRSP only gets what the person entered.
    */
   surplusToRrsp?: boolean
+  /**
+   * « Fill the bracket » (engine/bracketFill.ts): a person who has stopped working draws MORE from the RRSP / RRIF than the year needs, up to a line of
+   * income — the top of the first bracket (`bracket1`) or the OAS recovery threshold (`oas`) — and the surplus goes to the TFSA, then non-registered.
+   * Absent / null: the RRSP gives only what the year needs (and the RRIF minimum).
+   */
+  bracketFill?: BracketFill | null
   /**
    * How the retired household's spending changes with age, in REAL terms a year, from age 70 (the oldest person alive): −0.01 is the often-observed
    * slowing of spending in later retirement. A choice, not an official figure. Absent or 0: spending stays level.

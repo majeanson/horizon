@@ -22,7 +22,7 @@ export function exampleProfile(id: ExampleId = 'golden'): Profile {
       kidsEffects: structuredClone(e.household.kidsEffects ?? null),
       flows: structuredClone([...(e.household.flows ?? [])]),
     },
-    assumptions: { drawTogether: false, surplusToRrsp: false, retiredSpendingDrift: 0, marketPath: { preset: 'smooth', custom: [] }, ...structuredClone(assumptions) },
+    assumptions: { drawTogether: false, surplusToRrsp: false, bracketFill: null, retiredSpendingDrift: 0, marketPath: { preset: 'smooth', custom: [] }, ...structuredClone(assumptions) },
     customScenario: null,
     confirmed: [],
     plans: [],

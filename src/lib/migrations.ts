@@ -130,6 +130,8 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   (profile) => profile,
   // v20 → v21: the accounts can be drawn TOGETHER across both spouses (`assumptions.drawTogether`). Every older file drew on whoever had the lower taxable income: the field reads as false.
   (profile) => profile,
+  // v21 → v22: the RRSP can be drawn up to a line of income (`assumptions.bracketFill`). Every older file drew only what the year needed: the field reads as null.
+  (profile) => profile,
 ]
 
 export type ReadResult =

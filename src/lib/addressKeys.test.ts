@@ -37,6 +37,7 @@ const KEYS: Record<string, string> = {
   bv: 'Résultats › Stratégies: the view of the pensions on screen (ways · years · death · why). Unknown is the ways of starting.',
   bp: 'Résultats › Stratégies: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Stratégies: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
+  bf: 'Résultats › Stratégies › Fonte du REER: the way on screen (none · bracket1 · oas). Unknown is the first bracket.',
   bt: 'Résultats › Stratégies: how the ways of starting are compared (cards · table). Anything else, or no key: the screen’s width chooses — a table from 860 px, cards below.',
   bw: 'Résultats › Stratégies: the window (bridge years or the whole plan). Unknown is the bridge years.',
   q: 'Résultats: an OLD deep link (`?q=save|stop`) turned into a scroll once, then dropped from the address.',

@@ -1,3 +1,4 @@
+import { BRACKET_FILL_COPY } from './bracketFillCopy'
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { usePinOffset } from './pinOffset'
@@ -330,7 +331,7 @@ export function useResultsPage() {
       : view === 'adjust'
         ? [] // « Essayer » has its own switch: a map of chips beside it would say the same thing twice
       : view === 'strategies'
-        ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }]
+        ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav }]
         : [
             { id: 'solidite', label: rc.nav.solidite },
             { id: 'precision', label: rc.nav.precision },
