@@ -110,6 +110,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
               </p>
             )}
+            {/* How much of the answer stands on the person's own documents belongs WITH the answer, not three sections down. */}
+            {confidenceLine}
             {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
                 be present, not compete with the answer. */}
             <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
@@ -228,17 +230,20 @@ export function AnswerView({ m }: { m: ResultsModel }) {
           </section>
 
           {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
-          {(refine.length > 0 || accuracy.total > 0) && (
+          {(refine.length > 0 || movers.length > 0) && (
             <div id="preciser" className="surface results-section refine" aria-label={rc.refine.title}>
               <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
-              {confidenceLine}
               {movers.length > 0 && (
                 <div className="refine__moves">
                   <p className="verdict__range-title">{rc.refine.moves}</p>
+                  {/* The figure's name IS the door to its field: one identical « Le trouver » chip per row said the same thing four times. */}
                   <ul className="refine__list">
                     {movers.map((f) => (
                       <li key={f.id}>
-                        <span>{factName(f.id)}</span> <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span> <Chip to={`/profil?fact=${encodeURIComponent(f.id)}`}>{rc.refine.find}</Chip>
+                        <Link className="info-note__link" to={`/profil?fact=${encodeURIComponent(f.id)}`}>
+                          {factName(f.id)}
+                        </Link>{' '}
+                        <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span>
                       </li>
                     ))}
                   </ul>
@@ -246,13 +251,16 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 </div>
               )}
               {refine.length > 0 && (
-                <ul className="refine__list">
-                  {refine.map((k) => (
-                    <li key={k}>
-                      {rc.refine[k]} <Chip to="/profil">{rc.refine.toProfile}</Chip>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <ul className="refine__list">
+                    {refine.map((k) => (
+                      <li key={k}>{rc.refine[k]}</li>
+                    ))}
+                  </ul>
+                  <Cluster>
+                    <Chip to="/profil">{rc.refine.toProfile}</Chip>
+                  </Cluster>
+                </>
               )}
             </div>
           )}

@@ -79,7 +79,7 @@ export interface SheetView {
   howToRead: string
   holdings: { title: string; empty: string; groups: HoldingGroupView[]; roomTitle: string; rooms: RoomView[]; tags: string[] }
   /** Null while the profile has gaps (the sheet asks to start instead). */
-  sharpen: { title: string; intro: string; status: SharpenStatus; note: string; items: MoverView[]; find: string } | null
+  sharpen: { title: string; intro: string; status: SharpenStatus; note: string; items: MoverView[] } | null
   accuracy: { text: string; confirmed: number; total: number }
   toProfile: string
   toResults: string
@@ -182,7 +182,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
     ],
     howToRead: words.howToRead,
     holdings: { title: words.slots.title, empty: words.slots.empty, groups: holdingGroups, roomTitle: words.slots.roomTitle, rooms, tags },
-    sharpen: model.gaps.length > 0 ? null : { title: words.sharpen.title, intro: words.sharpen.intro, status: model.sharpen.status, note: sharpenNote, items, find: words.sharpen.find },
+    sharpen: model.gaps.length > 0 ? null : { title: words.sharpen.title, intro: words.sharpen.intro, status: model.sharpen.status, note: sharpenNote, items },
     accuracy: { text: accuracyText, confirmed: model.accuracy.confirmed, total: model.accuracy.total },
     toProfile: words.toProfile,
     toResults: words.toResults,

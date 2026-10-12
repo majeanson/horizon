@@ -129,9 +129,10 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
             <ul className="sheet__movers">
               {v.sharpen.items.map((m) => (
                 <li key={m.key} className="surface sheet__mover">
-                  <span className="sheet__mover-name">{m.name}</span>
+                  <Link className="sheet__mover-name info-note__link" to={m.to}>
+                    {m.name}
+                  </Link>
                   <span className="mono">{m.swingText}</span>
-                  <Chip to={m.to}>{v.sharpen!.find}</Chip>
                 </li>
               ))}
             </ul>

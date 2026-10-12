@@ -8,7 +8,7 @@ test('the results page ranks the unconfirmed figures, and each one opens its own
   await seedProfile(page)
   await page.goto('/resultats')
   await expect(page.getByText('Les chiffres qui déplaceraient le plus la réponse')).toBeVisible({ timeout: 60_000 })
-  const find = page.getByRole('link', { name: 'Le trouver' })
+  const find = page.locator('.refine__moves').getByRole('link')
   expect(await find.count()).toBeGreaterThan(0)
   await expect(page.getByText(/jusqu’à \d+ ans?/).first()).toBeVisible()
 

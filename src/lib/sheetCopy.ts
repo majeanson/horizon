@@ -44,7 +44,7 @@ export interface SheetWords {
     edit: string
     tags: { diversified: string; mortgageFree: string }
   }
-  sharpen: { title: string; intro: string; swing: (years: number) => string; find: string; pending: string; remaining: (n: number) => string; allDone: string; none: string; noMover: string }
+  sharpen: { title: string; intro: string; swing: (years: number) => string; pending: string; remaining: (n: number) => string; allDone: string; none: string; noMover: string }
   accuracy: (confirmed: number, total: number) => string
   scenarioNames: { prudent: string; neutral: string; bold: string }
   /** The sentence under the title when nothing can be said yet. */
@@ -110,7 +110,6 @@ const FR: SheetWords = {
     title: 'Ce qui préciserait la réponse',
     intro: 'Les chiffres pas encore lus sur un document, classés selon ce qu’une erreur sur chacun ferait bouger la réponse. Un classement, pas une marge d’erreur.',
     swing: (years) => `jusqu’à ${years} ${years === 1 ? 'an' : 'ans'}`,
-    find: 'Trouver ce chiffre',
     pending: 'Classement en cours…',
     remaining: (n) => `${n} ${n > 1 ? 'chiffres ne sont pas encore lus' : 'chiffre n’est pas encore lu'} sur un document.`,
     allDone: 'Tous les chiffres sont lus sur un document.',
@@ -180,7 +179,6 @@ const EN: SheetWords = {
     title: 'What would sharpen the answer',
     intro: 'The figures not yet read off a document, ranked by how far an error in each would move the answer. A ranking, not a margin of error.',
     swing: (years) => `up to ${years} ${years === 1 ? 'year' : 'years'}`,
-    find: 'Find this figure',
     pending: 'Ranking them…',
     remaining: (n) => `${n} ${n > 1 ? 'figures are' : 'figure is'} not yet read off a document.`,
     allDone: 'Every figure is read off a document.',

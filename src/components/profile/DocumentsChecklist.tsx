@@ -61,7 +61,7 @@ export function DocumentsChecklist({ onNext }: { onNext: () => void }) {
                   <strong>{c.where}</strong> {it.how}
                 </p>
                 {it.url !== null ? (
-                  <a className="info-note__link" href={it.url} target="_blank" rel="noopener noreferrer">
+                  <a className="info-note__link" href={it.url} target="_blank" rel="noopener noreferrer" aria-label={`${it.name} — ${c.openOfficial}`}>
                     {c.openOfficial}
                   </a>
                 ) : (

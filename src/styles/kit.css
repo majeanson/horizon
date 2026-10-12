@@ -313,6 +313,13 @@
 .impact__why strong {
   color: var(--ink);
 }
+/* One tap away, not a paragraph under every meter. */
+.impact__why summary {
+  cursor: pointer;
+}
+.impact__why p {
+  margin: 0.25rem 0 0;
+}
 
 /* ── Switch (components/Switch.tsx): the one on/off setting ────────────────── */
 /* A knob on a track, the label beside it. The knob's position is the picture; the ARIA state and the label are the words. */

@@ -94,7 +94,7 @@ test('what would sharpen the answer is ranked, and each figure leads to its own 
   const section = page.locator('.sheet__section', { hasText: 'Ce qui préciserait la réponse' })
   await expect(section.locator('.sheet__mover').first()).toBeVisible({ timeout: 45_000 })
   expect(await section.locator('.sheet__mover').count()).toBeLessThanOrEqual(4)
-  await expect(section.locator('.sheet__mover').first().getByRole('link', { name: 'Trouver ce chiffre' })).toHaveAttribute('href', /^\/profil\?fact=/)
+  await expect(section.locator('.sheet__mover').first().getByRole('link')).toHaveAttribute('href', /^\/profil\?fact=/)
 })
 
 test('on the narrowest phones the header leaves the sheet button out, and the settings page still leads there', async ({ page }) => {

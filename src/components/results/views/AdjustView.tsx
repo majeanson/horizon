@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { Chip } from '../../Chip'
 import { Skeleton } from '../../Skeleton'
 import { SaveView } from '../SaveView'
 import { SpendView } from '../SpendView'
@@ -34,7 +35,16 @@ export function AdjustView({ m }: { m: ResultsModel }) {
                   <ul className="levers__list">
                     {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null, endGain: null }))).map((l) => (
                       <li key={l.id} className="levers__item">
-                        <span>{lc.names[l.id]}</span>
+                        {/* The name is the door: a ranked change nobody can act on is a rumour. Two have their own tool here; the other two live where they are set. */}
+                        {l.id === 'spend10' ? (
+                          <Chip onClick={() => setEssai('spend')}>{lc.names[l.id]}</Chip>
+                        ) : l.id === 'save500' ? (
+                          <Chip onClick={() => setEssai('save')}>{lc.names[l.id]}</Chip>
+                        ) : l.id === 'returns1' ? (
+                          <Chip to="/hypotheses">{lc.names[l.id]}</Chip>
+                        ) : (
+                          <Chip to="/resultats?v=strategies">{lc.names[l.id]}</Chip>
+                        )}
                         <span className="mono levers__result">
                           {levers === undefined
                             ? lc.pending

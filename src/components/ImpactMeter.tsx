@@ -39,9 +39,12 @@ export function ImpactMeter({
       </div>
       {outside && (level === 'below' || level === 'above') && <p className="impact__outside">{outside}</p>}
       {why !== undefined && (
-        <p className="impact__why">
-          <strong>{whyTitle}</strong> {why}
-        </p>
+        <details className="impact__why">
+          <summary>
+            <strong>{whyTitle}</strong>
+          </summary>
+          <p>{why}</p>
+        </details>
       )}
     </div>
   )
