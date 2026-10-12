@@ -4,12 +4,9 @@ import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
-import { ParamsPanel } from '../components/results/ParamsPanel'
-import { FirmPrint } from '../components/results/views/FirmSection'
-import { SectionHeader } from '../components/SectionHeader'
+import { PrintPlan } from '../components/results/PrintPlan'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
-import { YearTables } from '../components/results/YearTables'
 import { StatusMessage } from '../components/StatusMessage'
 import { AnswerView } from '../components/results/views/AnswerView'
 import { AdjustView } from '../components/results/views/AdjustView'
@@ -29,7 +26,7 @@ const VerifyView = lazy(() => import('../components/results/views/VerifyView').t
 // bookmarked.
 export function Resultats() {
   const m = useResultsPage()
-  const { pinned, printing, t, r, rc, year, month, dollars, gaps, assumptions, births, setParam, answerPending, runs, view, names, label, navLinks, copySummary } = m
+  const { pinned, printing, t, r, rc, gaps, setParam, answerPending, view, navLinks, copySummary } = m
 
   if (gaps.length > 0) {
     return (
@@ -52,12 +49,11 @@ export function Resultats() {
 
   return (
     <section className="page-body results-page" ref={pinned}>
-      {printing && (
-        <header className="print-head">
-          <p className="print-head__title">{rc.out.printTitle}</p>
-          <p>{rc.out.printedOn(month, year)} · {names.join(' · ')}</p>
-        </header>
-      )}
+      {/* On paper the plan is ONE short page, the same whichever view is open (components/results/PrintPlan.tsx): it replaces the page while the browser prints. */}
+      {printing ? (
+        <PrintPlan m={m} />
+      ) : (
+        <>
       <PageHead title={r.title} />
       {/* The three views stay pinned under the top bar while the page scrolls; the map of the open view pins under them from 860 px (usePinOffset measures both). */}
       <div className="results-pin">
@@ -96,21 +92,6 @@ export function Resultats() {
         </Suspense>
       )}
 
-      {/* On paper the plan is the open view AND what a reader checks it against, whichever view that is: the year by year and the cited figures. */}
-      {printing && view !== 'verify' && (
-        <section className="arc print-appendix" aria-label={rc.tabs.verify}>
-          <FirmPrint m={m} />
-          <section className="results-section" aria-label={r.table.title}>
-            <SectionHeader title={r.table.title} />
-            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
-          </section>
-          <section className="results-section" aria-label={r.params.title}>
-            <SectionHeader title={r.params.title} />
-            <ParamsPanel />
-          </section>
-        </section>
-      )}
-      {printing && <p className="print-foot">{rc.out.printFoot}</p>}
 
       {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
       <Cluster className="no-print">
@@ -122,6 +103,8 @@ export function Resultats() {
       <NextStep to="/hypotheses" label={t.next.adjustAssumptions}>
         <p>{t.next.resultsHint}</p>
       </NextStep>
+        </>
+      )}
     </section>
   )
 }

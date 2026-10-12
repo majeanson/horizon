@@ -96,9 +96,6 @@
     font-size: 1.25rem;
     font-weight: 700;
   }
-  .print-appendix {
-    break-before: page;
-  }
   .print-foot {
     margin-top: 1rem;
     border-top: 1px solid #000;
@@ -114,5 +111,98 @@
   .firm .chip,
   .refine .chip {
     display: none !important;
+  }
+}
+
+/* THE PRINTED PLAN (components/results/PrintPlan.tsx): one short page, margins a printer will not clip, the answer first. */
+@page {
+  margin: 12mm 14mm;
+}
+@media print {
+  .print-plan {
+    display: grid;
+    gap: 0.55rem;
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+  .print-plan p {
+    margin: 0;
+  }
+  .print-plan__answer {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .print-plan__line {
+    font-size: 13pt;
+    font-weight: 600;
+  }
+  .print-plan__age {
+    display: inline-block;
+    font-size: 26pt;
+    line-height: 1.1;
+    margin-inline: 0.15em;
+  }
+  .print-plan__title {
+    margin-top: 0.3rem;
+    font-size: 9.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .print-plan__list {
+    margin: 0.15rem 0 0;
+    padding-left: 1.1rem;
+  }
+  .print-plan__list li {
+    margin: 0.1rem 0;
+  }
+  .print-plan__unit {
+    font-size: 9pt;
+    color: #555;
+  }
+  .print-plan .timeline,
+  .print-plan .firm,
+  .print-plan__block {
+    break-inside: avoid;
+  }
+  .print-plan .firm__pair {
+    grid-template-columns: 1fr 1fr;
+  }
+  /* The stretches of the plan's line are colour: the browser's default would print them white. */
+  .timeline__phase,
+  .timeline__swatch,
+  .verdict__range-item.is-on {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* The solidity block on paper: the numbers only. Links and notes that point into the app lead nowhere; its heading matches the plan's other titles; the cards lose their padding. */
+@media print {
+  .print-plan .firm a,
+  .print-plan .firm .verdict__gap,
+  .print-plan .firm .verdict__note {
+    display: none !important;
+  }
+  .print-plan .firm.surface,
+  .print-plan .timeline.surface {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .print-plan .firm .section-header__title {
+    margin: 0 0 0.2rem;
+    font-size: 9.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .print-plan .timeline__title {
+    font-size: 9.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .print-plan .verdict__range-title {
+    font-size: 10pt;
   }
 }
