@@ -233,6 +233,7 @@ function DetailView({
 
       <h4 className="chart-detail__heading">{c.balancesTitle}</h4>
       <p className="field-row__hint">{c.balancesHint}</p>
+      {balanceSegments.includes('home') && <p className="field-row__hint">{c.balancesHomeHint}</p>}
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
           <StackedBarChart
