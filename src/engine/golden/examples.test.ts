@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { bridgeView, profileLevers } from '../bridge.ts'
+import { fillComparison } from '../bracketFillCompare.ts'
 import { deferralView } from '../deferral.ts'
 import { agesLedger, planGlance } from '../ledger.ts'
 import { project } from '../projection.ts'
@@ -116,6 +117,18 @@ describe('each story', () => {
     expect(l.oas.residence).toBeCloseTo(35 / 40, 6)
     expect(Math.min(...Object.keys(household.persons[0].earningsHistory).map(Number))).toBe(household.persons[0].oas.residentSince)
     expect(planGlance(household, assumptions).ok).toBe(true)
+  })
+
+  it('melter: she melts the first bracket from the day she stops — less tax over the plan, a smaller forced minimum, a fuller TFSA, and the plan holds either way', () => {
+    const { household, assumptions } = EXAMPLES.melter
+    expect(assumptions.bracketFill).toBe('bracket1')
+    const c = fillComparison(household, assumptions, 60)
+    const [off, first] = [c.outcomes[0], c.outcomes[1]]
+    expect(off.ok && first.ok).toBe(true)
+    expect(first.lifetimeTax).toBeLessThan(off.lifetimeTax - 10_000)
+    expect(first.peakMinimum).toBeLessThan(off.peakMinimum)
+    expect(first.tfsaLeft).toBeGreaterThan(off.tfsaLeft)
+    expect(c.current).toBe(1)
   })
 
   it('heir: 27 years old, the inheritance is non-registered, and stopping TODAY works — the earliest age is the first one tried, not a minimum', () => {

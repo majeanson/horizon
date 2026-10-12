@@ -2,7 +2,7 @@ import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './household.fixture.ts'
 
-// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Eleven different lives, so that
+// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Twelve different lives, so that
 // every table and every result can be looked at, and checked by hand, for more than one kind of person:
 //
 //   golden    a couple, one in the public sector (RREGOP), the other private — the household the golden snapshots pin
@@ -19,6 +19,8 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //   planner   a young couple whose life is not in the budget yet: a child still to come (its cost, the state's benefits, a parental
 //             leave), part-time work after the first retires, an inheritance, a spending that slows with age, and a care cost in the
 //             last years — each one moves the earliest age, and the household says by how much
+//   melter    one person of 60 with a very large REER and modest spending, pensions at 70: for ten years the only income is what the REER gives,
+//             far under the first bracket's top — the case for « fill the bracket » (she opts in): less tax over the plan, a smaller forced minimum
 //   family    a growing family on one big pay: a high salary and a low one (the second parent works part-time since the first baby), two
 //             children (one at home, one due), the state's benefits, a parental leave and a mortgage — what the children cost, and what
 //             the benefits give back
@@ -26,8 +28,8 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
 
-export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner' | 'family'
-export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner', 'family']
+export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner' | 'family' | 'melter'
+export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner', 'family', 'melter']
 
 export interface ExampleHousehold {
   id: ExampleId
@@ -189,6 +191,22 @@ const heir: Household = {
   spending: { workingToday: 52_000, retiredToday: 54_000 },
 }
 
+const melter: Household = {
+  livesAlone: true,
+  persons: [
+    person({
+      id: 'self', name: 'Denise', birth: { year: 1966, month: 4 }, retirementAge: 60, salaryToday: 0, earningsHistory: history(1966, 36_000), rrqStart: 70, oasStart: 70, residentSince: 1984,
+      accounts: {
+        rrsp: { balance: 1_600_000, room: 0, annualContribution: 0 },
+        tfsa: { balance: 35_000, room: 50_000, annualContribution: 0 },
+        nonReg: none,
+      },
+      pensions: [],
+    }),
+  ],
+  spending: { workingToday: 42_000, retiredToday: 42_000 },
+}
+
 const downsizer: Household = {
   livesAlone: false,
   persons: [
@@ -324,5 +342,7 @@ export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
   // Spending slows 1 % a year in real terms from 70 (a choice, not an official figure): the other life event of this household.
   // Spending slows 1 % a year in real terms from 70, as for the planner (a choice, not an official figure).
   family: { id: 'family', household: familyHousehold(), children: [2024, 2028], assumptions: { ...base(), retiredSpendingDrift: -0.01 } },
+  // Denise draws the REER up to the top of the first bracket from the day she stops (a choice: bracketFill).
+  melter: { id: 'melter', household: melter, children: [], assumptions: { ...base(), bracketFill: 'bracket1' } },
   planner: { id: 'planner', household: plannerHousehold(), children: [2028], assumptions: { ...base(), retiredSpendingDrift: -0.01 } },
 }

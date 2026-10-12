@@ -554,3 +554,46 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Olivier | 65 | 0 $ | 0 $ | 15 580 $ | 4 575 $ | 60 981 $ | 50 645 $ | 2 861 $ | 3 902 $ | 0 $ |
 | Léa | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 471 $ | 30 961 $ | 1 696 $ | 1 681 $ | 0 $ |
 
+## melter — Une personne, un très gros REER
+
+### Ce qui entre
+
+| Personne | Naissance | Retraite | Revenu | Rentes publiques |
+| --- | --- | --- | --- | --- |
+| Denise | né·e en 1966-04 | retraite à 60 ans | salaire 0 $ | RRQ à 70 ans, PSV à 70 ans (au Canada depuis 1984) |
+| ↳ comptes | REER 1 600 000 $ (+0 $/an) | CELI 35 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+
+Dépenses : 42 000 $ par année en travaillant, 42 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+### Ce qui sort
+
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 664 074 $ (dollars d’aujourd’hui).
+- Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
+
+### Le calcul des rentes
+
+| Personne | RRQ | PSV |
+| --- | --- | --- |
+| Denise | première rente 05/2036 : (base 1 940,23 $ + 1ʳᵉ supp. 77,75 $ + 2ᵉ supp. 13,73 $) × ajustement 142,0 % = 2 885,03 $/mois, soit 2 344 $ d’aujourd’hui | première pension 05/2036 : 938,64 $ × résidence 100 % × report 36,0 % = 1 276,55 $/mois, soit 1 037 $ d’aujourd’hui |
+
+### Année par année — Denise (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
+
+| Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 60 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 345 $ | 9 380 $ | 1 656 052 $ | tire du nid |
+| 65 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 344 $ | 7 177 $ | 1 587 057 $ | tire du nid |
+| 70 | 42 000 $ | 0 $ | 0 $ | 18 749 $ | 8 296 $ | 0 $ | 27 301 $ | 7 198 $ | 1 546 688 $ | tire du nid |
+| 75 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 274 $ | 0 $ | 74 304 $ | 33 298 $ | 1 580 460 $ | tire du nid |
+| 80 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 71 574 $ | 32 158 $ | 1 594 851 $ | tire du nid |
+| 85 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 68 824 $ | 30 817 $ | 1 613 444 $ | tire du nid |
+| 90 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 66 069 $ | 29 540 $ | 1 636 273 $ | tire du nid |
+| 95 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 62 915 $ | 28 064 $ | 1 664 074 $ | tire du nid |
+
+### Année témoin pour un calculateur d’impôt : 2026, en dollars d’aujourd’hui
+
+Montants de l’année divisés par l’inflation : les barèmes sont indexés sur les prix, donc un calculateur 2026 doit donner presque la même chose (à 1 % près, les arrondis des barèmes). Le revenu net compte aussi le fractionnement du revenu de pension et les gains en capital réalisés : ce n’est pas la somme des colonnes.
+
+| Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Denise | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 54 345 $ | 54 345 $ | 4 430 $ | 4 950 $ | 0 $ |
+

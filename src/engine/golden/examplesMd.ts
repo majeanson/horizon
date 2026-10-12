@@ -27,6 +27,7 @@ const NAMES: Record<string, string> = {
   downsizer: 'Couple, vendre la maison',
   planner: 'Couple, une vie à planifier',
   family: 'Couple, une famille qui grandit',
+  melter: 'Une personne, un très gros REER',
 }
 
 function personTable(p: Person): string[] {
