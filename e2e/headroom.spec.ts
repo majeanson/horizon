@@ -53,6 +53,25 @@ test('the page’s own scrolling never hides the chrome: a programmatic scroll, 
   expect(await there(page, '.results-pin')).toBe(true)
 })
 
+test('a click on a tab or a chip leaves its focus there, and scrolling down still clears the row', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
+  await page.waitForTimeout(1500)
+  await page.getByRole('tab', { name: 'Décider' }).click()
+  await expect(page.locator('#essayer')).toBeVisible({ timeout: 30_000 })
+  await page.locator('.results-page .section-nav').getByRole('button', { name: 'Ordre de retrait' }).click()
+  await page.waitForTimeout(1200)
+  await page.mouse.move(640, 400)
+  await page.mouse.wheel(0, 900)
+  await expect(page.locator('.shell')).toHaveAttribute('data-away', '')
+  for (const sel of ['.results-pin', '.results-page .section-nav']) await expect.poll(() => gone(page, sel), { message: `${sel} slid away after a click` }).toBe(true)
+  // …while the KEYBOARD still reaches it: a key focus inside a pinned row brings it back
+  await page.mouse.wheel(0, -120)
+  await expect.poll(() => away(page)).toBeNull()
+})
+
 test('a finger dragging (and its momentum) hides the chrome; once it has stopped, a page scroll of its own does not change it', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, EXAMPLE)

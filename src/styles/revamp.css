@@ -1612,7 +1612,9 @@
 
 /* ── Headroom: everything pinned at the top slides away while the reader scrolls down, and returns on the first move up ───────────────────────────────────────────────────────── */
 /* lib/useHeadroom.ts puts `data-away` on the shell. The elements stay where they are in the flow (a sticky box keeps its place), so nothing below moves; they are carried up by their own
-   height plus the largest offset anything is pinned at (the three stacked rows), out of the window. A key focusing something inside one brings it back, so the keyboard can still reach it. */
+   height plus the largest offset anything is pinned at (the three stacked rows), out of the window. A KEY focusing something inside one brings it back, so the keyboard can still reach it:
+   `:has(:focus-visible)`, not `:focus-within` — a mouse click or a tap on a tab or a chip leaves the focus on it too, and that used to pin the row for good (the reader clicked a view, scrolled
+   down, and the tabs stayed). */
 .shell__bar,
 .live-answer,
 .results-pin,
@@ -1626,10 +1628,10 @@
   transform: translateY(calc(-100% - 12rem));
   pointer-events: none;
 }
-.shell[data-away] .shell__bar:focus-within,
-.shell[data-away] .live-answer:focus-within,
-.shell[data-away] .results-pin:focus-within,
-.shell[data-away] .section-nav:focus-within {
+.shell[data-away] .shell__bar:has(:focus-visible),
+.shell[data-away] .live-answer:has(:focus-visible),
+.shell[data-away] .results-pin:has(:focus-visible),
+.shell[data-away] .section-nav:has(:focus-visible) {
   transform: none;
   pointer-events: auto;
 }
