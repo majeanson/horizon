@@ -23,6 +23,8 @@ export interface LedgerCopy {
   oasNone: (start: string) => string
   /** The result line: the monthly amount in today's money. */
   rrqResult: (monthly: string) => string
+  /** For reference, under a pension far above today's maximum: what is paid today at that age, and why the person's is higher (wages outrun prices; the enhanced plan completes). */
+  rrqContext: (max: string, gap: string) => string
   oasResult: (monthly: string) => string
   /** Spending and the economy. */
   moneyTitle: string
@@ -62,6 +64,7 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
     oasCalc: (start, full, residence, multiplier, monthly) => `Première pension : ${start}. ${full} par mois × résidence ${residence} × report ${multiplier} = ${monthly} par mois.`,
     oasNone: (start) => `Première pension : ${start}. Moins de dix ans de résidence après 18 ans : aucune pension.`,
     rrqResult: (monthly) => `${monthly} par mois, en dollars d’aujourd’hui`,
+    rrqContext: (max, gap) => `Pour repère : le maximum versé aujourd’hui à ce même âge de départ est de ${max} par mois. Le vôtre est plus haut parce que, dans vos hypothèses, les salaires montent de ${gap} de plus que les prix chaque année, et que le régime bonifié se complète d’ici là.`,
     oasResult: (monthly) => `${monthly} par mois, en dollars d’aujourd’hui`,
     moneyTitle: 'Dépenses et hypothèses',
     spendWorkLabel: 'Dépenses pendant le travail',
@@ -96,6 +99,7 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
     oasCalc: (start, full, residence, multiplier, monthly) => `First payment: ${start}. ${full} a month × residence ${residence} × deferral ${multiplier} = ${monthly} a month.`,
     oasNone: (start) => `First payment: ${start}. Under ten years of residence after 18: no pension.`,
     rrqResult: (monthly) => `${monthly} a month, in today’s dollars`,
+    rrqContext: (max, gap) => `For reference: the most paid today for a start at the same age is ${max} a month. Yours is higher because, in your assumptions, wages rise ${gap} faster than prices each year, and the enhanced plan completes by then.`,
     oasResult: (monthly) => `${monthly} a month, in today’s dollars`,
     moneyTitle: 'Spending and assumptions',
     spendWorkLabel: 'Spending while working',

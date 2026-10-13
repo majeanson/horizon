@@ -26,6 +26,8 @@ export interface AgesLedger {
     adjustment: number
     /** The monthly pension today's dollars would buy at the start (the start year's dollars deflated by prices). */
     monthlyToday: number
+    /** For reference: the most the plan pays TODAY for a start at the same age (the year's maximum pension at 65 × the same start-age multiplier), a month. */
+    maxToday: number
   }
   oas: {
     startAge: number
@@ -38,6 +40,13 @@ export interface AgesLedger {
     monthly: number
     monthlyToday: number
   }
+}
+
+/** The most the plan pays TODAY for a start at `age`: the maximum pension at 65 times TODAY'S start-age factor (a reduction a month early, an increase a month late, up to the latest age — all read from the cited parameters). A reference for the reader, not an input. */
+function maxPensionToday(age: number, R: { maxPension65: number; earlyBase: number; earlySlope: number; latePerMonth: number; lateMaxMonths: number }): number {
+  const months = Math.round((age - 65) * 12)
+  const factor = months < 0 ? 1 + months * (R.earlyBase + R.earlySlope) : 1 + Math.min(months, R.lateMaxMonths) * R.latePerMonth
+  return R.maxPension65 * factor
 }
 
 /** One person's ages and what they turn into, for the given household (the profile's own ages, unless `scenario` says otherwise). */
@@ -66,6 +75,7 @@ export function agesLedger(h: Household, a: Assumptions): AgesLedger[] {
         additionalSecond: r.rrq.additionalSecond,
         adjustment: r.rrq.adjustment,
         monthlyToday: r.rrq.monthly / deflate(r.rrq.start.year),
+        maxToday: maxPensionToday(r.rrqStartAge, paramsFor(a.today.year, indexation).rrq),
       },
       oas: { startAge: r.oasStartAge, start: oStart, done: isPast(oStart, a.today), full: O.monthly65to74, residence, multiplier, monthly: oasMonthly, monthlyToday: oasMonthly / deflate(oStart.year) },
     }

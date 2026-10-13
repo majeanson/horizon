@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { agesLedger } from './ledger.ts'
 import { GOLDEN_ASSUMPTIONS as A, GOLDEN_HOUSEHOLD as H } from './golden/household.fixture.ts'
 import { project } from './projection.ts'
+import { paramsFor } from './params/index.ts'
+import type { Household } from './types.ts'
 
 // The ledger must say what the projection does: a figure traced on the page is the figure the verdict ran on.
 
@@ -64,5 +66,48 @@ describe('what is already behind the household', () => {
     const { retirementState } = await import('./ledger.ts')
     const mixed = { ...EXAMPLES.retired.household, persons: [EXAMPLES.retired.household.persons[0], EXAMPLES.average.household.persons[0]] }
     expect(retirementState(mixed, EXAMPLES.retired.assumptions).everyoneRetired).toBe(false)
+  })
+})
+
+// THE CEILING. A pension projected 38 years ahead can look wrong beside today's figures (a 120 000 $ earner born in 1992 reads about 4 540 $ a month, in today's dollars, at 72, where
+// the maximum paid today at 72 is 2 394 $). It is not a bug — wages outrun prices by a point a year in the default assumptions (the maximum pensionable earnings grow with them) and the
+// enhanced plan will be complete — but a reader cannot tell, so the ledger carries the maximum paid TODAY beside it, and these tests hold the line in both directions.
+describe('the QPP ceiling', () => {
+  const young: Household = {
+    ...H,
+    livesAlone: true,
+    persons: [{ ...H.persons[0], birth: { year: 1992, month: 6 }, retirementAge: 60, salaryToday: 120_000, earningsHistory: {}, rrq: { startAge: 72 } }],
+  }
+  const a = { ...A, today: { year: 2026, month: 10 } }
+
+  it('the maximum paid today at 72 is the published one: 2 394,15 $ (the 2026 maximum at 65 × the 58,8 % of a start at 72)', () => {
+    const [l] = agesLedger(young, a)
+    expect(l.rrq.adjustment).toBeCloseTo(1.588, 3)
+    expect(l.rrq.maxToday).toBeCloseTo(2_394.15, 0)
+  })
+
+  it('nobody beats a maximum earner with the same dates: the pension is at most what a career above every ceiling gets', () => {
+    const [l] = agesLedger(young, a)
+    const top = agesLedger({ ...young, persons: [{ ...young.persons[0], salaryToday: 1_000_000, earningsHistory: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [2014 + i, 1_000_000])) }] }, a)[0]
+    expect(l.rrq.monthly).toBeLessThanOrEqual(top.rrq.monthly + 0.01)
+  })
+
+  it('and it stays within the ceiling the statute implies for that year: 25 % of the pensionable earnings, plus both additional components, at most ~1,9 × the maximum paid today (wages +1 point a year for 38 years, a complete enhanced plan) — a figure far past that would be a bug', () => {
+    const [l] = agesLedger(young, a)
+    expect(l.rrq.monthlyToday).toBeLessThan(l.rrq.maxToday * 2.2)
+    expect(l.rrq.monthlyToday).toBeGreaterThan(l.rrq.maxToday * 1.2) // and it IS past today's maximum: the page says why
+  })
+
+  it('with wages growing as fast as prices the gap closes to what the enhanced plan alone adds', () => {
+    const flat = agesLedger(young, { ...a, wageGrowth: a.inflation })[0]
+    const grows = agesLedger(young, a)[0]
+    expect(flat.rrq.monthlyToday).toBeLessThan(grows.rrq.monthlyToday * 0.8)
+    expect(flat.rrq.monthlyToday).toBeLessThan(flat.rrq.maxToday * 1.6)
+  })
+
+  it('the maximum paid today follows the start age, as the official table does (an early start pays less than the 65 maximum)', () => {
+    const early = agesLedger({ ...young, persons: [{ ...young.persons[0], rrq: { startAge: 60 } }] }, a)[0]
+    expect(early.rrq.maxToday).toBeCloseTo(964.9, 0)
+    expect(paramsFor(2026, { inflation: a.inflation, wageGrowth: a.wageGrowth }).rrq.maxPension65).toBeCloseTo(1_507.65, 2)
   })
 })

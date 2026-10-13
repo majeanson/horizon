@@ -170,6 +170,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
                 {c.rrqResult(money(l.rrq.monthlyToday))} <span className="ledger__delta">{delta(l.rrq.monthlyToday, was.rrq.monthlyToday, c.moreMonth, c.lessMonth)}</span>
               </p>
               <p className="ledger__calc">{c.rrqCalc(monthYear(l.rrq.start), money(l.rrq.base, true), money(l.rrq.additionalFirst, true), money(l.rrq.additionalSecond, true), formatPct(l.rrq.adjustment, lang, 1), money(l.rrq.monthly, true))}</p>
+              {!l.rrq.done && l.rrq.monthlyToday > l.rrq.maxToday * 1.2 && <p className="ledger__calc">{c.rrqContext(money(l.rrq.maxToday), formatPct(Math.max(0, assumptions.wageGrowth - assumptions.inflation), lang, 1))}</p>}
             </div>
             <div className="ledger__row">
               {ageSlider(l.id, 'oas', c.oasLabel, p.oas.startAge, l.oas.done)}
