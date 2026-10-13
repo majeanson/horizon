@@ -7,13 +7,12 @@ import type { Assumptions, Household } from "../engine/types.ts";
 export interface BracketFillRequest {
   household: Household;
   assumptions: Assumptions;
-  age: number;
   firstAge: number;
 }
 
 export type BracketFillMessage = { answer: FillComparison };
 
 self.onmessage = (event: MessageEvent<BracketFillRequest>) => {
-  const { household, assumptions, age, firstAge } = event.data;
-  self.postMessage({ answer: fillComparison(household, assumptions, age, firstAge) } satisfies BracketFillMessage);
+  const { household, assumptions, firstAge } = event.data;
+  self.postMessage({ answer: fillComparison(household, assumptions, firstAge) } satisfies BracketFillMessage);
 };

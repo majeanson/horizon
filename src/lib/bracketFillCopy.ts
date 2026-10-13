@@ -6,13 +6,12 @@ export interface BracketFillEffect {
   /** The tax difference over the whole plan against « no meltdown », formatted; null when it is about the same. */
   tax: string | null
   taxLess: boolean
-  /** The largest RRIF minimum, with this way and with none, formatted. */
-  peak: string
-  peakOff: string
-  peakSmaller: boolean
-  /** The TFSA difference at the end, formatted, and its direction. */
-  tfsa: string
-  tfsaMore: boolean
+  /** The largest RRIF minimum, with this way and with none, formatted; null when neither is worth a word (both are about nothing). */
+  peak: { now: string; off: string; smaller: boolean } | null
+  /** The TFSA difference at the end, formatted, and its direction; null when it is about the same. */
+  tfsa: { diff: string; more: boolean } | null
+  /** Does it pay (less tax)? null when the difference is too small to say. */
+  pays: boolean | null
 }
 
 export interface BracketFillCopy {
@@ -50,6 +49,9 @@ export interface BracketFillCopy {
   /** Under the income chart: where the income leaves the line, and why. */
   leaves: (year: number, age: number) => string
   staysUnder: string
+  /** Years under the line while the GIS is paid, and the year the RRSP runs out: the two reasons income can sit below it. */
+  pausedGis: (from: number, to: number) => string
+  emptied: (year: number, age: number) => string
   markerForced: string
   balancesTitle: string
   balancesHint: string
@@ -82,21 +84,25 @@ const FR: BracketFillCopy = {
   },
   current: (name) => `Votre choix actuel : « ${name} ».`,
   effect: (e) => {
-    const tax = e.tax === null ? 'à peu près le même impôt sur tout le plan' : `${e.tax} d’impôt de ${e.taxLess ? 'moins' : 'plus'} sur tout le plan`
-    return `Par rapport à « Sans fonte » : ${tax}, un retrait minimum du FERR ${e.peakSmaller ? 'plus petit' : 'plus gros'} au plus fort (${e.peak} par année au lieu de ${e.peakOff}) et ${e.tfsa} ${e.tfsaMore ? 'de plus' : 'de moins'} dans le CELI à la fin.`
+    const parts = [e.tax === null ? 'à peu près le même impôt sur tout le plan' : `${e.tax} d’impôt de ${e.taxLess ? 'moins' : 'plus'} sur tout le plan`]
+    if (e.peak) parts.push(`un retrait minimum du FERR ${e.peak.smaller ? 'plus petit' : 'plus gros'} au plus fort (${e.peak.now} par année au lieu de ${e.peak.off})`)
+    if (e.tfsa) parts.push(`${e.tfsa.diff} ${e.tfsa.more ? 'de plus' : 'de moins'} dans le CELI à la fin`)
+    const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} et ${parts[parts.length - 1]}` : parts[0]
+    const verdict = e.pays === null ? '' : e.pays ? ' Pour ce ménage, cela paie.' : ' Pour ce ménage, cela ne paie pas.'
+    return `Par rapport à « Sans fonte » : ${list}.${verdict}`
   },
   keep: 'Votre façon actuelle est la meilleure, ou l’écart est trop petit pour valoir un changement.',
   better: (name, bestAge, ownAge, saved) => {
-    const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
+    const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
     if (bestAge !== null && (ownAge === null || bestAge < ownAge)) {
-      return `« ${name} » permet de prendre sa retraite ${ownAge === null ? `à ${bestAge} ans, alors que votre façon actuelle ne dure à aucun âge` : `${years(ownAge - bestAge)} plus tôt`}.`
+      return `« ${name} » permet de prendre sa retraite ${ownAge === null ? `à ${bestAge} ans, alors que votre façon actuelle ne dure à aucun âge` : `${years(ownAge - bestAge)} plus tôt`}.`
     }
     return `« ${name} » coûte environ ${saved} d’impôt de moins sur tout le plan (en dollars d’aujourd’hui).`
   },
   nudge: (name, bestAge, ownAge, saved) => {
-    const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
+    const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
     if (bestAge !== null && (ownAge === null || bestAge < ownAge)) {
-      return `Fondre le REER (« ${name} ») permet de prendre sa retraite ${ownAge === null ? `à ${bestAge} ans, alors que le plan actuel ne dure à aucun âge` : `${years(ownAge - bestAge)} plus tôt`}.`
+      return `Fondre le REER (« ${name} ») permet de prendre sa retraite ${ownAge === null ? `à ${bestAge} ans, alors que le plan actuel ne dure à aucun âge` : `${years(ownAge - bestAge)} plus tôt`}.`
     }
     return `Fondre le REER (« ${name} ») coûterait environ ${saved} d’impôt de moins sur tout le plan (en dollars d’aujourd’hui).`
   },
@@ -115,6 +121,8 @@ const FR: BracketFillCopy = {
   incomeHint: 'Le revenu net de la personne dont le revenu est le plus élevé, en dollars d’aujourd’hui.',
   leaves: (year, age) => `Le revenu reste sur la ligne jusqu’en ${year} (${age} ans) ; ensuite, les rentes et le retrait minimum du FERR, qu’on ne choisit pas, le font passer au-dessus.`,
   staysUnder: 'Le revenu ne dépasse pas la ligne de tout le plan.',
+  pausedGis: (from, to) => `${from === to ? `En ${from}` : `De ${from} à ${to}`}, le revenu passe sous la ligne : le SRG est versé, et la fonte s’arrête pour ne pas le perdre.`,
+  emptied: (year, age) => `Dès ${year} (${age} ans), le REER est vide : il n’y a plus rien à fondre.`,
   markerForced: 'Rentes + minimum du FERR',
   balancesTitle: 'Ce qui reste dans le REER et dans le CELI',
   balancesHint: 'Le REER fond, le CELI grossit : l’argent change de compte, il n’est pas dépensé.',
@@ -135,7 +143,7 @@ const FR: BracketFillCopy = {
 const EN: BracketFillCopy = {
   title: 'How far to melt down the RRSP?',
   hint: (age) =>
-    `Your plan, retiring at ${age}, run again drawing more from the RRSP (then the RRIF) than the year asks for, up to a line of income. The surplus goes to the TFSA, then to the non-registered account. Everything is recalculated year by year with tax, the QPP, OAS and GIS.`,
+    `Your plan (retiring at ${age}), run again drawing more from the RRSP (then the RRIF) than the year asks for, up to a line of income. The surplus goes to the TFSA, then to the non-registered account. Everything is recalculated year by year with tax, the QPP, OAS and GIS.`,
   switchLabel: 'Ways to melt down the RRSP',
   tabs: { none: 'No meltdown', bracket1: '1st bracket', oas: 'OAS line' },
   names: { none: 'No meltdown', bracket1: 'Top of the 1st bracket', oas: 'Below the OAS recovery line' },
@@ -146,8 +154,12 @@ const EN: BracketFillCopy = {
   },
   current: (name) => `Your current choice: “${name}”.`,
   effect: (e) => {
-    const tax = e.tax === null ? 'about the same tax over the whole plan' : `${e.tax} ${e.taxLess ? 'less' : 'more'} tax over the whole plan`
-    return `Compared with “No meltdown”: ${tax}, a ${e.peakSmaller ? 'smaller' : 'bigger'} largest RRIF minimum (${e.peak} a year instead of ${e.peakOff}) and ${e.tfsa} ${e.tfsaMore ? 'more' : 'less'} in the TFSA at the end.`
+    const parts = [e.tax === null ? 'about the same tax over the whole plan' : `${e.tax} ${e.taxLess ? 'less' : 'more'} tax over the whole plan`]
+    if (e.peak) parts.push(`a ${e.peak.smaller ? 'smaller' : 'bigger'} largest RRIF minimum (${e.peak.now} a year instead of ${e.peak.off})`)
+    if (e.tfsa) parts.push(`${e.tfsa.diff} ${e.tfsa.more ? 'more' : 'less'} in the TFSA at the end`)
+    const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts[0]
+    const verdict = e.pays === null ? '' : e.pays ? ' For this household, it pays.' : ' For this household, it does not pay.'
+    return `Compared with “No meltdown”: ${list}.${verdict}`
   },
   keep: 'Your current way is the best one, or the gap is too small to be worth a change.',
   better: (name, bestAge, ownAge, saved) => {
@@ -179,6 +191,8 @@ const EN: BracketFillCopy = {
   incomeHint: 'The net income of the person with the higher income, in today’s dollars.',
   leaves: (year, age) => `Income stays on the line until ${year} (age ${age}); after that, the pensions and the RRIF minimum, which you do not choose, lift it above.`,
   staysUnder: 'Income never goes above the line for the whole plan.',
+  pausedGis: (from, to) => `${from === to ? `In ${from}` : `From ${from} to ${to}`}, income goes below the line: the GIS is paid, and the meltdown stops so as not to lose it.`,
+  emptied: (year, age) => `From ${year} (age ${age}), the RRSP is empty: there is nothing left to melt.`,
   markerForced: 'Pensions + RRIF minimum',
   balancesTitle: 'What is left in the RRSP and in the TFSA',
   balancesHint: 'The RRSP shrinks, the TFSA grows: the money changes account, it is not spent.',

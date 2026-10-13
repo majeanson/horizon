@@ -27,11 +27,11 @@ const TABS = ['none', 'bracket1', 'oas'] as const
 /** Money differences under this are « the same »: a sentence about 40 $ is noise. */
 const SAME = 500
 
-export function BracketFillPanel({ household, assumptions, age, firstAge }: { household: Household; assumptions: Assumptions; age: number; firstAge: number }) {
+export function BracketFillPanel({ household, assumptions, firstAge }: { household: Household; assumptions: Assumptions; firstAge: number }) {
   const { lang } = useLang()
   const c = BRACKET_FILL_COPY[lang]
   const [tab, setTab] = useParamChoice('bf', TABS, 'bracket1')
-  const { value, busy } = useBracketFill(household, assumptions, age, firstAge)
+  const { value, busy } = useBracketFill(household, assumptions, firstAge)
   if (value === null) return <Skeleton count={4} />
   const shown = value.outcomes.find((o) => tabOf(o.choice) === tab) ?? value.outcomes[0]
   const off = value.outcomes[0]
@@ -40,7 +40,8 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
   const name = (choice: FillChoice) => c.names[tabOf(choice)]
   const adopt = (choice: FillChoice) => updateProfile((p) => setAssumptions(p, { bracketFill: choice }))
   const birthYear = household.persons[0].birth.year
-  const years = shown.years
+  // From the first retired year: before it there is pay, nothing is melted, and a line drawn there would only confuse.
+  const years = shown.years.filter((y) => y.year >= value.retiredFrom)
   const first = years[0]?.age ?? 0
   const last = years[years.length - 1]?.age ?? 0
   const money = (y: number) => formatCompactMoney(y, lang)
@@ -50,22 +51,26 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
   // What the way on screen does to the plan, against no meltdown — said before any chart.
   const taxDiff = shown.lifetimeTax - off.lifetimeTax
   const tfsaDiff = shown.tfsaLeft - off.tfsaLeft
+  const peakDiff = shown.peakMinimum - off.peakMinimum
   const effect =
     shown.choice === null
       ? null
       : c.effect({
           tax: Math.abs(taxDiff) < SAME ? null : formatMoney(Math.abs(taxDiff), lang),
           taxLess: taxDiff < 0,
-          peak: formatMoney(shown.peakMinimum, lang),
-          peakOff: formatMoney(off.peakMinimum, lang),
-          peakSmaller: shown.peakMinimum <= off.peakMinimum,
-          tfsa: formatMoney(Math.abs(tfsaDiff), lang),
-          tfsaMore: tfsaDiff >= 0,
+          peak: Math.max(shown.peakMinimum, off.peakMinimum) < SAME ? null : { now: formatMoney(shown.peakMinimum, lang), off: formatMoney(off.peakMinimum, lang), smaller: peakDiff <= 0 },
+          tfsa: Math.abs(tfsaDiff) < SAME ? null : { diff: formatMoney(Math.abs(tfsaDiff), lang), more: tfsaDiff >= 0 },
+          pays: Math.abs(taxDiff) < SAME ? null : taxDiff < 0,
         })
 
   // Where the income leaves the line (the pensions and the forced minimum, which nobody chooses) — said under the chart and marked on it.
   const leftAt = shown.choice === null ? undefined : years.find((y) => y.ceiling !== null && y.income > y.ceiling + 1)
   const markers = leftAt ? [{ x: leftAt.year, label: c.markerForced, colour: 'accent' as const, named: true }] : []
+  // The two reasons income can sit BELOW the line while the RRSP is not yet used up: the RRSP is empty, or the GIS is paid (melting stops, so as not to lose it).
+  const emptiedAt = shown.choice === null ? undefined : years.find((y) => y.rrsp < 1_000)
+  const paused = shown.choice === null ? [] : years.filter((y) => y.year > value.retiredFrom && y.ceiling !== null && y.income < y.ceiling * 0.98 && y.rrsp >= 1_000 && y.gis > 0)
+  const pausedFrom = paused[0]?.year
+  const pausedTo = paused[paused.length - 1]?.year
 
   return (
     <div className="orders" aria-busy={busy}>
@@ -113,7 +118,12 @@ export function BracketFillPanel({ household, assumptions, age, firstAge }: { ho
           />
         </Suspense>
       </div>
-      {shown.choice !== null && <p className="field-row__hint">{leftAt ? c.leaves(leftAt.year, leftAt.age) : c.staysUnder}</p>}
+      {shown.choice !== null && (
+        <>
+          <p className="field-row__hint">{leftAt ? c.leaves(leftAt.year, leftAt.age) : emptiedAt ? c.emptied(emptiedAt.year, emptiedAt.age) : c.staysUnder}</p>
+          {pausedFrom !== undefined && pausedTo !== undefined && <p className="field-row__hint">{c.pausedGis(pausedFrom, pausedTo)}</p>}
+        </>
+      )}
 
       <h3 className="bridge__heading">{c.balancesTitle}</h3>
       <p className="field-row__hint">{c.balancesHint}</p>

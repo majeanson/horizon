@@ -13,9 +13,10 @@ function texts(c: BracketFillCopy): [string, string][] {
     if (typeof v === 'string') out.push([k, v])
     else if (typeof v === 'object') for (const [kk, vv] of Object.entries(v)) out.push([`${k}.${kk}`, vv as string])
   }
-  const less = { tax: '1 000 $', taxLess: true, peak: '1 $', peakOff: '2 $', peakSmaller: true, tfsa: '3 $', tfsaMore: true }
-  const same = { tax: null, taxLess: false, peak: '2 $', peakOff: '1 $', peakSmaller: false, tfsa: '3 $', tfsaMore: false }
-  out.push(['current', c.current('X')], ['leaves', c.leaves(2036, 70)], ['effect.less', c.effect(less)], ['effect.same', c.effect(same)])
+  const less = { tax: '1 000 $', taxLess: true, peak: { now: '1 $', off: '2 $', smaller: true }, tfsa: { diff: '3 $', more: true }, pays: true }
+  const same = { tax: null, taxLess: false, peak: null, tfsa: null, pays: null }
+  const worse = { tax: '4 $', taxLess: false, peak: { now: '2 $', off: '1 $', smaller: false }, tfsa: { diff: '3 $', more: false }, pays: false }
+  out.push(['current', c.current('X')], ['leaves', c.leaves(2036, 70)], ['pausedGis.one', c.pausedGis(2062, 2062)], ['pausedGis.many', c.pausedGis(2062, 2063)], ['emptied', c.emptied(2058, 66)], ['effect.less', c.effect(less)], ['effect.same', c.effect(same)], ['effect.worse', c.effect(worse)])
   out.push(['hint', c.hint(60)], ['age', c.age(60)], ['tooltip', c.tooltip(60, 2030)], ['incomeFigure', c.incomeFigure(60, 95)], ['balancesFigure', c.balancesFigure(60, 95)])
   for (const [name, f] of [['better', c.better], ['nudge', c.nudge]] as const) {
     out.push([`${name}.years`, f('X', 58, 62, '1 000 $')], [`${name}.never`, f('X', 58, null, '1 000 $')], [`${name}.tax`, f('X', null, 60, '1 000 $')])

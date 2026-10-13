@@ -7,11 +7,11 @@ import { useOffThread, type Answer } from './useOffThread.ts'
 // started behind the verdict and the chart ('idle'). `enabled` false asks nothing yet (the answer's one-line pointer waits until it is scrolled into view).
 // The last answer stays up (`busy`) while a changed profile recomputes.
 
-export function useBracketFill(household: Household, assumptions: Assumptions, age: number, firstAge: number, enabled = true): Answer<FillComparison> {
+export function useBracketFill(household: Household, assumptions: Assumptions, firstAge: number, enabled = true): Answer<FillComparison> {
   return useOffThread<BracketFillRequest, BracketFillMessage, FillComparison>(
-    { household, assumptions, age, firstAge },
+    { household, assumptions, firstAge },
     () => new Worker(new URL('./bracketFill.worker.ts', import.meta.url), { type: 'module' }),
-    () => fillComparison(household, assumptions, age, firstAge),
+    () => fillComparison(household, assumptions, firstAge),
     (m) => m.answer,
     enabled,
     'idle',

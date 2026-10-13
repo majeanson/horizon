@@ -3,7 +3,7 @@ import type { FillComparison, FillOutcome } from '../engine/bracketFillCompare.t
 import { NUDGE_MIN_DOLLARS, NUDGE_MIN_SHARE, choiceOf, fillNudge, tabOf } from './bracketFillNudge.ts'
 
 const outcome = (choice: FillOutcome['choice'], earliestOk: number | null, lifetimeTax: number): FillOutcome => ({ choice, earliestOk, ok: true, firstShortfallYear: null, lifetimeTax, recoveryTotal: 0, peakMinimum: 0, rrspLeft: 0, tfsaLeft: 0, years: [] })
-const cmp = (outcomes: FillOutcome[], current: number, best: number): FillComparison => ({ age: 60, outcomes, current, best })
+const cmp = (outcomes: FillOutcome[], current: number, best: number): FillComparison => ({ age: 60, retiredFrom: 2040, outcomes, current, best })
 
 describe('the sentence on the answer', () => {
   it('says nothing when the household’s own way is the best', () => {

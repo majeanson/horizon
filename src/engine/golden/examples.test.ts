@@ -122,7 +122,7 @@ describe('each story', () => {
   it('melter: she melts the first bracket from the day she stops — less tax over the plan, a smaller forced minimum, a fuller TFSA, and the plan holds either way', () => {
     const { household, assumptions } = EXAMPLES.melter
     expect(assumptions.bracketFill).toBe('bracket1')
-    const c = fillComparison(household, assumptions, 60)
+    const c = fillComparison(household, assumptions, 55, 62)
     const [off, first] = [c.outcomes[0], c.outcomes[1]]
     expect(off.ok && first.ok).toBe(true)
     expect(first.lifetimeTax).toBeLessThan(off.lifetimeTax - 10_000)

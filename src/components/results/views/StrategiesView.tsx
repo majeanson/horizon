@@ -27,7 +27,7 @@ export function StrategiesView({ m }: { m: ResultsModel }) {
           </section>
           <section id="fonte" className="results-section" aria-label={bf.title}>
             <SectionHeader title={bf.title} />
-            <BracketFillPanel household={profile.household} assumptions={assumptions} age={age} firstAge={firstAge} />
+            <BracketFillPanel household={profile.household} assumptions={assumptions} firstAge={firstAge} />
           </section>
         </section>
     </>

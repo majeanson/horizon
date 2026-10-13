@@ -63,10 +63,9 @@ function OrderNudgeLine({ m }: { m: ResultsModel }) {
 function FillNudgeLine({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
   const c = BRACKET_FILL_COPY[lang]
-  const { profile, assumptions, firstAge, earliest } = m
+  const { profile, assumptions, firstAge } = m
   const { box, seen } = useSeen()
-  const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
-  const { value } = useBracketFill(profile.household, assumptions, age, firstAge, seen)
+  const { value } = useBracketFill(profile.household, assumptions, firstAge, seen)
   const nudge = value === null ? null : fillNudge(value)
   return (
     <div ref={box} className="fill-nudge">

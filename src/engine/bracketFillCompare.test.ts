@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fillComparison, FILL_CHOICES } from './bracketFillCompare.ts'
+import { fillAhead, fillComparison, FILL_CHOICES } from './bracketFillCompare.ts'
 import { GOLDEN_ASSUMPTIONS } from './golden/household.fixture.ts'
 import { project } from './projection.ts'
 import type { Assumptions, Household, Person } from './types.ts'
@@ -24,7 +24,7 @@ const household = (rrsp: number): Household => ({ livesAlone: true, persons: [me
 
 describe('fillComparison', () => {
   const h = household(2_500_000)
-  const c = fillComparison(h, A(), 60, 55, 62)
+  const c = fillComparison(h, A(), 55, 62)
 
   it('has one outcome per way, in the order of FILL_CHOICES, the household’s own first when it melts nothing', () => {
     expect(c.outcomes.map((o) => o.choice)).toEqual([...FILL_CHOICES])
@@ -52,7 +52,64 @@ describe('fillComparison', () => {
   })
 
   it('a household whose own choice is already the best keeps it (the margin protects the habit)', () => {
-    const own = fillComparison(h, A({ bracketFill: c.outcomes[c.best].choice }), 60, 55, 62)
+    const own = fillComparison(h, A({ bracketFill: c.outcomes[c.best].choice }), 55, 62)
     expect(own.best).toBe(own.current)
+  })
+})
+
+// THE FRAME IS THE HOUSEHOLD'S OWN PLAN. A first version read every way at the EARLIEST age that works (44 for a 34-year-old couple who plan to stop at 60), where the RRSP was
+// already empty and every way of melting looked like pure cost; it also ranked on that earliest age, so « the current way is the best » stood beside a table showing 15 % less
+// tax. Both are pinned here with a young couple of the kind who planned it: two earners, a RRSP growing for 26 years, the QPP at 72 and 65, stopping at 60.
+describe('a young couple who plan to stop at 60', () => {
+  const person = (id: 'self' | 'spouse', salary: number, rrsp: number, rrspC: number, rrqStart: number): Person => ({
+    id,
+    name: id,
+    birth: { year: 1992, month: 6 },
+    retirementAge: 60,
+    salaryToday: salary,
+    earningsHistory: {},
+    rrq: { startAge: rrqStart },
+    oas: { startAge: 70, residentSince: 2010 },
+    accounts: { rrsp: { balance: rrsp, room: 60_000, annualContribution: rrspC }, tfsa: { balance: 40_000, room: 40_000, annualContribution: 5_000 }, nonReg: { balance: 0, acb: 0, annualContribution: 0 } },
+    pensions: [],
+  })
+  const h: Household = { livesAlone: false, persons: [person('self', 120_000, 109_000, 20_000, 72), person('spouse', 35_000, 50_000, 0, 65)], spending: { workingToday: 65_000, retiredToday: 45_000 } }
+  const a = A({ surplusToRrsp: true, pensionSplitting: true })
+  const c = fillComparison(h, a, 34)
+
+  it('is read at the plan the household has (60), not at the earliest age that works', () => {
+    expect(c.age).toBe(60)
+    expect(c.retiredFrom).toBe(1992 + 60)
+    expect(c.outcomes[0].earliestOk!).toBeLessThan(60) // the earliest age is earlier — and is NOT what the ways are read at
+    expect(c.outcomes[0].years[0].year).toBeLessThan(c.retiredFrom) // the rows include the years of work: the page cuts them off
+  })
+
+  it('melting wins on tax at that plan, by more than noise, and the way it names is a way that melts', () => {
+    const none = c.outcomes[0]
+    const best = c.outcomes[c.best]
+    expect(best.choice).not.toBeNull()
+    expect(best.lifetimeTax).toBeLessThan(none.lifetimeTax * 0.95)
+    expect(best.peakMinimum).toBeLessThan(none.peakMinimum)
+  })
+
+  it('never ranks a way with more tax ahead of the household’s own, unless its own plan fails', () => {
+    for (const o of c.outcomes) if (o.ok === c.outcomes[c.current].ok) expect(c.outcomes[c.best].lifetimeTax).toBeLessThanOrEqual(c.outcomes[c.current].lifetimeTax + 1)
+  })
+})
+
+describe('fillAhead — the ranking rule', () => {
+  it('a way with 15 % less tax is ahead even when the plan only works a year LATER at an age nobody plans (44 vs 45): the earliest age is not ranked on', () => {
+    expect(fillAhead({ ok: true, lifetimeTax: 1_645_000 }, { ok: true, lifetimeTax: 1_926_000 })).toBe(true)
+    expect(fillAhead({ ok: true, lifetimeTax: 1_926_000 }, { ok: true, lifetimeTax: 1_645_000 })).toBe(false)
+  })
+
+  it('a way that keeps the plan going beats one that does not, whatever the tax', () => {
+    expect(fillAhead({ ok: true, lifetimeTax: 2_000_000 }, { ok: false, lifetimeTax: 1_000_000 })).toBe(true)
+    expect(fillAhead({ ok: false, lifetimeTax: 1_000_000 }, { ok: true, lifetimeTax: 2_000_000 })).toBe(false)
+  })
+
+  it('less than 1 % (or 500 $) is noise: neither is ahead', () => {
+    expect(fillAhead({ ok: true, lifetimeTax: 999_000 }, { ok: true, lifetimeTax: 1_000_000 })).toBe(false)
+    expect(fillAhead({ ok: true, lifetimeTax: 100 }, { ok: true, lifetimeTax: 400 })).toBe(false)
   })
 })
