@@ -9,19 +9,19 @@ import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
 import { StatusMessage } from '../components/StatusMessage'
 import { AnswerView } from '../components/results/views/AnswerView'
-import { AdjustView } from '../components/results/views/AdjustView'
 import { Skeleton } from '../components/Skeleton'
 import { useResultsPage } from '../lib/useResultsPage'
 
-// The two heaviest views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
-const StrategiesView = lazy(() => import('../components/results/views/StrategiesView').then((m) => ({ default: m.StrategiesView })))
-const VerifyView = lazy(() => import('../components/results/views/VerifyView').then((m) => ({ default: m.VerifyView })))
+// The two other views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
+const DecideView = lazy(() => import('../components/results/views/DecideView').then((m) => ({ default: m.DecideView })))
+const ProofView = lazy(() => import('../components/results/views/ProofView').then((m) => ({ default: m.ProofView })))
 
 // The answer. It comes FIRST on the page — one sentence, the age drawn large, in dates — then what the same answer looks
 // like under the three scenarios and a hard market, what would move it most, what would make it more precise, and the
 // comparison the person chooses (« my plan », or one age for everyone) as cards and a chart. Behind that, two more
-// views: the strategies (when to start the pensions, in which order to draw) and the check (every figure with its
-// calculation, the year-by-year table, the sensitivity, the parameters). Nothing is shown until the profile holds
+// views, ONE level each (no switch inside a view): « Décider » (try a change, then choose when to start the pensions and in which
+// order to draw) and « Preuve » (how firm it is, every figure with its calculation, the year-by-year table, the parameters).
+// Results are READ-ONLY: a figure is changed on Profil, an assumption on Hypothèses. Nothing is shown until the profile holds
 // enough to mean something (profileGaps). Every choice lives in the address (`?v=&ages=&metric=…`), so a view can be
 // bookmarked.
 export function Resultats() {
@@ -63,9 +63,8 @@ export function Resultats() {
           onSelect={(v) => setParam('v', v === 'answer' ? null : v)}
           options={[
             { key: 'answer' as const, label: rc.tabs.answer },
-            { key: 'adjust' as const, label: rc.tabs.adjust },
-            { key: 'strategies' as const, label: rc.tabs.strategies },
-            { key: 'verify' as const, label: rc.tabs.verify },
+            { key: 'decide' as const, label: rc.tabs.decide },
+            { key: 'proof' as const, label: rc.tabs.proof },
           ]}
         />
       </div>
@@ -75,20 +74,17 @@ export function Resultats() {
       {/* 1 — what you asked: the answer, compared and dated, what would sharpen it, and what the plan points at. */}
       {view === 'answer' && <AnswerView m={m} />}
 
-      {/* 2 — « Essayer »: what to try — the changes ranked, the saving an age needs, the spending that moves it, a late-life care. Inputs of the plan, not of the future (those live on Hypothèses). */}
-      {view === 'adjust' && <AdjustView m={m} />}
-
-      {/* 3 — two decisions: when to start the QPP and the OAS, and in which order to draw the accounts. Once every start is behind the household, nothing to choose. */}
-      {view === 'strategies' && (
+      {/* 2 — « Décider »: what to try (the changes ranked, the saving an age needs, the spending that moves it, a late-life care) and how to carry it out (when to start the QPP and the OAS, in which order to draw, how far to melt the RRSP). */}
+      {view === 'decide' && (
         <Suspense fallback={<Skeleton count={4} />}>
-          <StrategiesView m={m} />
+          <DecideView m={m} />
         </Suspense>
       )}
 
-      {/* 4 — « Vérifier »: how firm the answer is, how it was checked, and every figure behind it. */}
-      {view === 'verify' && (
+      {/* 3 — « Preuve »: how firm the answer is, and every figure behind it with its calculation. */}
+      {view === 'proof' && (
         <Suspense fallback={<Skeleton count={4} />}>
-          <VerifyView m={m} />
+          <ProofView m={m} />
         </Suspense>
       )}
 

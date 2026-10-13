@@ -7,13 +7,13 @@ import { InstallLine } from '../components/install/InstallHint'
 import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
+import { Fold } from '../components/Fold'
 import { SubTabs } from '../components/SubTabs'
 import { useLang, useT } from '../i18n'
 import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type Contrast, type TextScale } from '../lib/accessibility'
 import { useConfirm } from '../lib/confirm'
 import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
-import { DATA_COPY } from '../lib/dataCopy'
 import { exampleProfile } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
@@ -38,10 +38,8 @@ export function Donnees() {
   // rescue section below reads storage afresh each time. (The banner itself lives in the shell, on every page.)
   useStorageIssue()
   const copies = unreadableCopies()
-  // Two families, each ONE section with a switch (they were five sections): the copies of the profile, and the other plans to look at. The address keeps both (`?copie=`, `?autres=`).
-  const dc = DATA_COPY[lang]
-  const copyKeys = ['save', 'restore', ...(copies.length > 0 ? (['rescue'] as const) : [])] as const
-  const [copyView, setCopyView] = useParamChoice('copie', copyKeys, copies.length > 0 ? 'rescue' : 'save')
+  // No switch on this page: the copy (save · restore) and the plans are plain sections, one under the other. Only the long list of examples — a try-out, used once —
+  // is a fold, and the address keeps it open (`?autres=examples`) so a link from the home page or the first-visit path can land on it.
   const [otherView, setOtherView] = useParamChoice('autres', ['plans', 'examples'] as const, 'plans')
   const fileInput = useRef<HTMLInputElement>(null)
   const [failure, setFailure] = useState<Extract<ReadResult, { ok: false }> | null>(null)
@@ -99,101 +97,82 @@ export function Donnees() {
         </Cluster>
       )}
 
-      <SubTabs
-        ariaLabel={dc.copies.label}
-        value={copyView}
-        onSelect={setCopyView}
-        options={copyKeys.map((key) => ({ key, label: dc.copies[key] }))}
-      />
-      {/* The copy is the whole reason this page exists: its button is the one filled button here. */}
-      {copyView === 'save' && (
-        <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
+      {/* An unreadable copy found on this device comes first: it is the one thing here that may be urgent. */}
+      {copies.length > 0 && (
+        <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
           <Cluster>
-            <button type="button" className="btn btn--primary" onClick={download}>
-              {d.export.button}
-            </button>
-          </Cluster>
-        </Section>
-      )}
-      {copyView === 'rescue' && copies.length > 0 && (
-          <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
-            <Cluster>
-              {copies.map((text, i) => (
-                <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
-                  {i === 0 ? d.rescue.button : `${d.rescue.older} (${i + 1})`}
-                </button>
-              ))}
-            </Cluster>
-          </Section>
-      )}
-      {copyView === 'restore' && (
-        <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">
-          <Cluster>
-            <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
-              {d.import.button}
-            </button>
-            <input
-              ref={fileInput}
-              type="file"
-              accept="application/json,.json"
-              className="sr-only"
-              tabIndex={-1}
-              aria-label={d.import.button}
-              onChange={(e) => void onFile(e.target.files?.[0])}
-            />
-          </Cluster>
-          {failure && (
-            <div role="alert" className="import-errors">
-              <StatusMessage tone="error">{failure.reason === 'json' ? d.import.notJson : failure.reason === 'newer' ? d.import.newer : d.import.problems}</StatusMessage>
-              {failure.problems.length > 0 && failure.reason !== 'newer' && (
-                <ul className="import-errors__list mono">
-                  {failure.problems.slice(0, 12).map((p) => (
-                    <li key={p.path + p.problem}>
-                      {p.path} — {d.import.problem[p.problem]}
-                    </li>
-                  ))}
-                  {failure.problems.length > 12 && <li>…</li>}
-                </ul>
-              )}
-            </div>
-          )}
-        </Section>
-      )}
-
-      <SubTabs
-        ariaLabel={dc.others.label}
-        value={otherView}
-        onSelect={setOtherView}
-        options={[
-          { key: 'plans' as const, label: dc.others.plans },
-          { key: 'examples' as const, label: dc.others.examples },
-        ]}
-      />
-      {otherView === 'plans' && <PlansSection onReplace={setPrevious} />}
-      {otherView === 'examples' && (
-        <Section title={d.example.title} subtitle={d.example.hint} icon="user-bold">
-          <ul className="example-list">
-            {EXAMPLE_IDS.map((id: ExampleId) => (
-              <li key={id}>
-                <button
-                  type="button"
-                  className="btn btn--ghost btn--sm"
-                  onClick={async () => {
-                    if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
-                      setPrevious(getProfile())
-                      replaceProfile(exampleProfile(id))
-                      notice(d.example.done)
-                    }
-                  }}
-                >
-                  {EXAMPLE_COPY[lang][id].name}
-                </button>
-                <span className="field-row__hint">{EXAMPLE_COPY[lang][id].story}</span>
-              </li>
+            {copies.map((text, i) => (
+              <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
+                {i === 0 ? d.rescue.button : `${d.rescue.older} (${i + 1})`}
+              </button>
             ))}
-          </ul>
+          </Cluster>
         </Section>
       )}
+      {/* The copy is the whole reason this page exists: its button is the one filled button here. */}
+      <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
+        <Cluster>
+          <button type="button" className="btn btn--primary" onClick={download}>
+            {d.export.button}
+          </button>
+        </Cluster>
+      </Section>
+      <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">
+        <Cluster>
+          <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
+            {d.import.button}
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            tabIndex={-1}
+            aria-label={d.import.button}
+            onChange={(e) => void onFile(e.target.files?.[0])}
+          />
+        </Cluster>
+        {failure && (
+          <div role="alert" className="import-errors">
+            <StatusMessage tone="error">{failure.reason === 'json' ? d.import.notJson : failure.reason === 'newer' ? d.import.newer : d.import.problems}</StatusMessage>
+            {failure.problems.length > 0 && failure.reason !== 'newer' && (
+              <ul className="import-errors__list mono">
+                {failure.problems.slice(0, 12).map((p) => (
+                  <li key={p.path + p.problem}>
+                    {p.path} — {d.import.problem[p.problem]}
+                  </li>
+                ))}
+                {failure.problems.length > 12 && <li>…</li>}
+              </ul>
+            )}
+          </div>
+        )}
+      </Section>
+
+      <PlansSection onReplace={setPrevious} />
+      <Fold id="exemples" className="surface" open={otherView === 'examples'} onToggle={(open) => setOtherView(open ? 'examples' : 'plans')} summary={d.example.title}>
+        <p className="field-row__hint">{d.example.hint}</p>
+        <ul className="example-list">
+          {EXAMPLE_IDS.map((id: ExampleId) => (
+            <li key={id}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={async () => {
+                  if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
+                    setPrevious(getProfile())
+                    replaceProfile(exampleProfile(id))
+                    notice(d.example.done)
+                  }
+                }}
+              >
+                {EXAMPLE_COPY[lang][id].name}
+              </button>
+              <span className="field-row__hint">{EXAMPLE_COPY[lang][id].story}</span>
+            </li>
+          ))}
+        </ul>
+      </Fold>
 
       {/* The settings a person comes here for sit above the long list of examples (a try-out, used once). */}
       <DisplaySection />

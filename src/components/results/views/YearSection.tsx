@@ -93,7 +93,7 @@ export function YearSection({ m }: { m: ResultsModel }) {
             <p className="verdict__range-title">{f.year.leverTitle}</p>
             <p>{lever === undefined ? f.year.leverPending : lever === null ? f.year.leverNone : `${lc.names[lever.id]} — ${lc.gain(lever.yearsGained, lever.earliest)}`}</p>
             <Cluster>
-              <Chip icon="caret-down-bold" onClick={() => goTo('adjust', 'ajuster')}>
+              <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'ajuster')}>
                 {rc.nav.ajuster}
               </Chip>
             </Cluster>
@@ -104,14 +104,14 @@ export function YearSection({ m }: { m: ResultsModel }) {
           <OrderNudgeLine m={m} />
           <FillNudgeLine m={m} />
           <Cluster>
-            <Chip icon="caret-down-bold" onClick={() => goTo('strategies', 'ordre')}>
+            <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'ordre')}>
               {rc.orders.title}
             </Chip>
-            <Chip icon="caret-down-bold" onClick={() => goTo('strategies', 'fonte')}>
+            <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'fonte')}>
               {BRACKET_FILL_COPY[lang].title}
             </Chip>
             {state.pensionsOpen && (
-              <Chip icon="caret-down-bold" onClick={() => goTo('strategies', 'rentes')}>
+              <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'rentes')}>
                 {f.year.pensions}
               </Chip>
             )}

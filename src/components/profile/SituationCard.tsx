@@ -7,7 +7,7 @@ import { SITUATION_COPY } from '../../lib/situationCopy'
 import { updateProfile, useProfile } from '../../lib/store'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
-import { Section } from './shared'
+import { Fold } from '../Fold'
 
 // « Ma situation » — the plain yes / no questions that decide what the rest of the form shows (lib/situation.ts). « Oui » opens the matching
 // section (or starts the home); « Non » closes it, and over typed figures says first what would be lost. Nothing here is a profile figure: a
@@ -89,9 +89,18 @@ export default function SituationCard() {
   const { lang } = useLang()
   const c = SITUATION_COPY[lang]
   return (
-    <Section id="situation" title={c.title} subtitle={c.lead} icon="users-three-bold">
+    // A fold, closed: these answers are set once (the first-visit path asks the same questions) and a returning reader is here for the figures below — a long list of yes / no ahead of them was the first thing on the page.
+    <Fold
+      id="situation"
+      className="surface"
+      summary={
+        <>
+          <strong>{c.title}</strong> — {c.lead}
+        </>
+      }
+    >
       <SituationQuestions />
       <p className="field-row__hint">{c.hidden}</p>
-    </Section>
+    </Fold>
   )
 }

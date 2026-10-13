@@ -115,7 +115,7 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
   // The skip link first — the whole point of one — then the top bar (name, language, theme, the sheet, the glossary, the settings gear), then the three destinations.
-  expect(order.slice(0, 7)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', '', '', ''])
+  expect(order.slice(0, 7)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', 'Fiche', 'Glossaire', 'Réglages'])
   expect(order.slice(7, 10)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
 })
 

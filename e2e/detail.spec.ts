@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { EXAMPLE, PROFILE_KEY, savedProfile, seedProfile, showAllSections } from './seed'
+import { EXAMPLE, PROFILE_KEY, openSituation, savedProfile, seedProfile, showAllSections } from './seed'
 
 // The results page keeps its three views and the map pinned under the top bar while it scrolls, and the chart's
 // « Détail » view shows the whole picture (sources, accounts, the three sets of hypotheses), not only the net worth.
@@ -165,6 +165,7 @@ test('the estimate shows the pay as it was — about the salary last year — an
 
 test('the home: owning one, its mortgage says when the payment stops, and it is saved with the profile', async ({ page }) => {
   await page.goto('/profil')
+  await openSituation(page)
   // « Ma situation »: the home's section opens on a « oui » to owning one
   await page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Oui' }).click()
   const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })

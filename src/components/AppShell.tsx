@@ -124,14 +124,17 @@ export function AppShell() {
           <button type="button" className="btn btn--icon btn--ghost" aria-label={themeLabel} title={themeLabel} onClick={() => setThemeState(toggleTheme())}>
             <Icon name={theme === 'night' ? 'sun-bold' : 'moon-stars-bold'} size={20} />
           </button>
-          <NavLink to="/fiche" className={({ isActive }) => 'btn btn--icon btn--ghost shell__sheet' + (isActive ? ' is-active' : '')} aria-label={t.nav.sheet} title={t.nav.sheet}>
+          <NavLink to="/fiche" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled shell__sheet' + (isActive ? ' is-active' : '')} aria-label={t.nav.sheet} title={t.nav.sheet}>
             <Icon name="identification-card-bold" size={20} />
+            <span className="btn__label" aria-hidden="true">{t.nav.sheetShort}</span>
           </NavLink>
-          <NavLink to="/glossaire" className={({ isActive }) => 'btn btn--icon btn--ghost' + (isActive ? ' is-active' : '')} aria-label={t.nav.glossary} title={t.nav.glossary}>
+          <NavLink to="/glossaire" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled' + (isActive ? ' is-active' : '')} aria-label={t.nav.glossary} title={t.nav.glossary}>
             <Icon name="book-open-text-bold" size={20} />
+            <span className="btn__label" aria-hidden="true">{t.nav.glossaryShort}</span>
           </NavLink>
-          <NavLink to="/donnees" className={({ isActive }) => 'btn btn--icon btn--ghost' + (isActive ? ' is-active' : '')} aria-label={t.nav.data} title={t.nav.data}>
+          <NavLink to="/donnees" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled' + (isActive ? ' is-active' : '')} aria-label={t.nav.data} title={t.nav.data}>
             <Icon name="gear-six-bold" size={20} />
+            <span className="btn__label" aria-hidden="true">{t.nav.dataShort}</span>
           </NavLink>
         </div>
       </header>

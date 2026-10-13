@@ -39,15 +39,16 @@ import { today } from './today'
 // the comparisons the person has chosen, and the values the views read. It holds no JSX: the page (pages/Resultats.tsx) is the shell and each
 // view (components/results/views/*) draws from the one object this returns, so a view has no state of its own to keep in step.
 
-export type View = 'answer' | 'adjust' | 'strategies' | 'verify'
+export type View = 'answer' | 'decide' | 'proof'
 
-/** The four things « Essayer » lets a person try, one at a time: the changes ranked · the saving · the spending · a late-life care. */
-export type Essai = 'levers' | 'save' | 'spend' | 'care'
+/** The addresses of the days when the results had four views: each lands on the view that holds its content now. */
+const LEGACY_VIEW: Readonly<Record<string, View>> = { adjust: 'decide', strategies: 'decide', future: 'decide', verify: 'proof' }
 
-/** « Solidité » shows one of two depths: the scenarios and a hard market in brief, or the 3 × 3 grids of what moves the age. */
-export type Firm = 'brief' | 'grids'
-/** Which of them a section id of the page belongs to (the ids stay the page's anchors; a link to one opens its view). */
-const ESSAI_OF: Readonly<Record<string, Essai>> = { ajuster: 'levers', epargner: 'save', depenser: 'spend', soins: 'care' }
+/** The three what-ifs under « Décider » that open one at a time (an accordion, kept in the address): the saving · the spending · a late-life care. The ranked changes are always on the page. */
+export type Essai = 'save' | 'spend' | 'care'
+
+/** Which what-if a section id of the page belongs to (the ids stay the page's anchors; a link to one opens it). */
+const ESSAI_OF: Readonly<Record<string, Essai>> = { epargner: 'save', depenser: 'spend', soins: 'care' }
 
 export const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
@@ -134,34 +135,30 @@ export function useResultsPage() {
   const runs = gaps.length > 0 ? [] : (runsAnswer.value ?? [])
   const runsPending = gaps.length === 0 && runsAnswer.value === null
 
-  // Three jobs, one at a time (the address keeps it: `?v=adjust|strategies|verify`): get the answer · try changes · choose how to carry it out · check it.
-  const view: View = params.get('v') === 'strategies' ? 'strategies' : params.get('v') === 'verify' ? 'verify' : params.get('v') === 'adjust' || params.get('v') === 'future' ? 'adjust' : 'answer'
-  // « Essayer » shows one thing at a time. The address keeps it (`?essai=`); an address that carries one of their own keys (an old link with `?care=`, `?spend=` or `?age=`) opens
-  // the matching one; a household that has stopped working has no change to rank and no spending to try, so it is offered the other two.
-  const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['levers', 'save', 'spend', 'care']
-  const rawEssai = params.get('essai')
-  const inferred: Essai = params.get('care') !== null ? 'care' : params.get('spend') !== null ? 'spend' : params.get('age') !== null ? 'save' : essaiKeys[0]
-  const essai: Essai = essaiKeys.find((k) => k === rawEssai) ?? (essaiKeys.includes(inferred) ? inferred : essaiKeys[0])
-  const setEssai = (next: Essai) => setParam('essai', next)
-  // « Solidité »: a household that has stopped working has no age to range over, so only the grids. The address keeps the choice (`?solidite=`).
-  const firmKeys: Firm[] = retiredNow ? ['grids'] : ['brief', 'grids']
-  const rawFirm = params.get('solidite')
-  const firm: Firm = firmKeys.find((k) => k === rawFirm) ?? firmKeys[0]
-  const setFirm = (next: Firm) => setParam('solidite', next)
-  // A view that came from one of the what-ifs' own keys is written down at once: when that key goes (« L'ajouter à mes événements » clears `?care=`), the reader stays where they are.
-  useEffect(() => {
-    if (view === 'adjust' && rawEssai !== essai && (rawEssai !== null || essai !== essaiKeys[0])) setParam('essai', essai)
-  }, [view, rawEssai, essai, essaiKeys, setParam])
-  // A view this page does not have (a typo, an old link) lands on the answer — and the ADDRESS follows, as the router's catch-all
-  // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
+  // Three jobs, one at a time (the address keeps it: `?v=decide|proof`): read the answer · decide what to do about it (try a change, choose how to start and draw) · check it.
   const rawView = params.get('v')
+  const view: View = rawView === 'decide' || rawView === 'proof' ? rawView : ((rawView !== null ? LEGACY_VIEW[rawView] : undefined) ?? 'answer')
+  // The what-ifs of « Décider » open one at a time. The address keeps it (`?essai=`; `none` is « all closed »); an address that carries one of their own keys (an old link with `?care=`,
+  // `?spend=` or `?age=`) opens the matching one; a household that has stopped working has no spending to try, so it is offered the other two.
+  const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['save', 'spend', 'care']
+  const rawEssai = params.get('essai')
+  const inferred: Essai | null = params.get('care') !== null ? 'care' : params.get('spend') !== null ? 'spend' : params.get('age') !== null ? 'save' : null
+  const essai: Essai | null = rawEssai === 'none' ? null : (essaiKeys.find((k) => k === rawEssai) ?? (inferred !== null && essaiKeys.includes(inferred) ? inferred : null))
+  const setEssai = (next: Essai | null) => setParam('essai', next ?? 'none')
+  // « Solidité »: the scenarios and a hard market are on the page; the 3 × 3 grids behind them open on request (a household that has stopped working has no age to range over: only the grids, open). The address keeps it (`?solidite=grids`).
+  const gridsOpen = retiredNow || params.get('solidite') === 'grids'
+  const setGridsOpen = (open: boolean) => setParam('solidite', open ? 'grids' : null)
+  // A what-if that came from one of its own keys is written down at once: when that key goes (« L'ajouter à mes événements » clears `?care=`), the reader stays where they are.
   useEffect(() => {
-    // « Avenir » (`?v=future`) is gone: its care what-if is part of « Essayer », and the address follows.
-    if (rawView === 'future') {
-      setParam('v', 'adjust')
-      setParam('essai', 'care')
-    }
-    else if (rawView !== null && rawView !== view) setParam('v', null)
+    if (view === 'decide' && essai !== null && rawEssai !== essai) setParam('essai', essai)
+  }, [view, rawEssai, essai, setParam])
+  // A view this page does not have (a typo) lands on the answer, and an old four-view address lands on its new view — and the ADDRESS follows, as the router's catch-all
+  // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
+  useEffect(() => {
+    if (rawView === null || rawView === view) return
+    setParam('v', rawView in LEGACY_VIEW ? view : null)
+    // « Avenir » (`?v=future`) is gone: its care what-if is a thing to try under « Décider ».
+    if (rawView === 'future') setParam('essai', 'care')
   }, [rawView, view, setParam])
 
   // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
@@ -169,23 +166,12 @@ export function useResultsPage() {
   const pendingScroll = useRef<string | null>(null)
   const scrollTo = (id: string) => scrollToSection(id)
   const goTo = (target: View, wantedId: string) => {
-    // The 3 × 3 grids are the second depth of « Solidité »: open them, and land on the section.
-    const toGrids = target === 'verify' && wantedId === 'sensibilite'
-    const id = toGrids ? 'solidite' : wantedId
-    if (toGrids && !(target === view && firm === 'grids')) setParam('solidite', 'grids')
-    // A section of « Essayer » that is not the one on screen: open its view first (the section does not exist until then), and scroll once it does.
-    const wanted = target === 'adjust' ? ESSAI_OF[id] : undefined
-    if (wanted !== undefined && !(target === view && wanted === essai)) {
-      setParam('essai', wanted)
-      if (target === view) requestAnimationFrame(() => requestAnimationFrame(() => scrollTo(id)))
-      else {
-        pendingScroll.current = id
-        setParam('v', target)
-      }
-      return
-    }
-    if (target === view) return scrollTo(id)
-    pendingScroll.current = id
+    // The what-ifs and the 3 × 3 grids are folds that open on request: open the one the link names first (its body does not exist until then), then land on it.
+    const wanted = target === 'decide' ? ESSAI_OF[wantedId] : undefined
+    if (wanted !== undefined && wanted !== essai) setEssai(wanted)
+    if (target === 'proof' && wantedId === 'sensibilite' && !gridsOpen) setGridsOpen(true)
+    if (target === view) return void requestAnimationFrame(() => requestAnimationFrame(() => scrollTo(wantedId)))
+    pendingScroll.current = wantedId
     setParam('v', target === 'answer' ? null : target)
   }
   useEffect(() => {
@@ -203,7 +189,7 @@ export function useResultsPage() {
     if (legacyQ !== 'save' && legacyQ !== 'stop') return
     setParam('q', null)
     if (legacyQ === 'save') {
-      setParam('v', 'adjust')
+      setParam('v', 'decide')
       setParam('essai', 'save')
     }
     const go = () => document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
@@ -328,15 +314,13 @@ export function useResultsPage() {
   const navLinks =
     view === 'answer'
       ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : []), { id: 'annee', label: rc.nav.annee }]
-      : view === 'adjust'
-        ? [] // « Essayer » has its own switch: a map of chips beside it would say the same thing twice
-      : view === 'strategies'
-        ? [...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav }]
+      : view === 'decide'
+        ? [{ id: 'essayer', label: rc.nav.essayer }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav }]
         : [
             { id: 'solidite', label: rc.nav.solidite },
-            { id: 'precision', label: rc.nav.precision },
             { id: 'donnees-calcul', label: rc.nav.chiffres },
             { id: 'tableau', label: rc.nav.tableau },
+            { id: 'precision', label: rc.nav.precision },
             { id: 'parametres', label: rc.nav.parametres },
           ]
 
@@ -459,9 +443,8 @@ export function useResultsPage() {
     essai,
     essaiKeys,
     setEssai,
-    firm,
-    firmKeys,
-    setFirm,
+    gridsOpen,
+    setGridsOpen,
     sentence,
     sentenceBefore,
     sentenceAfter,

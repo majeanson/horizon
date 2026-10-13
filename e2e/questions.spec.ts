@@ -9,19 +9,19 @@ test.beforeEach(async ({ page }) => {
   await seedProfile(page, EXAMPLE)
 })
 
-test('the three answers: the verdict and stopping on the first view, saving and spending on « Essayer »', async ({ page }) => {
+test('the three answers: the verdict and stopping on the first view, saving and spending under « Décider »', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
   await expect(page.locator('#epargner')).toHaveCount(0)
-  await page.goto('/resultats?v=adjust')
-  // « Essayer » shows one thing at a time: the changes ranked first, then each of the others behind its tab
+  await page.goto('/resultats?v=decide')
+  // « Décider » shows the changes ranked, and each what-if as a closed fold until it is opened
   await expect(page.locator('#ajuster')).toBeVisible()
-  await expect(page.locator('#epargner')).toHaveCount(0)
-  await page.getByRole('tab', { name: 'Épargner' }).click()
+  await expect(page.locator('#epargner')).not.toHaveAttribute('open', '')
+  await page.locator('#epargner > summary').click()
   await expect(page.locator('#epargner')).toContainText('Combien épargner ?')
-  await page.getByRole('tab', { name: 'Dépenser' }).click()
-  await expect(page.locator('#depenser')).toBeVisible()
-  await expect(page.locator('#epargner')).toHaveCount(0)
+  await page.locator('#depenser > summary').click()
+  await expect(page.locator('#depenser')).toHaveAttribute('open', '')
+  await expect(page.locator('#epargner')).not.toHaveAttribute('open', '')
   await page.goto('/resultats')
   await expect(page.locator('#arreter')).toContainText('En dates')
   await expect(page.getByText(/Camille\s: en 20\d\d/)).toBeVisible()

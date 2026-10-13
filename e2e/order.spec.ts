@@ -41,9 +41,10 @@ test('Profil: the household, what applies, the people, then the household’s sp
   await expect(page.locator('#budget').getByRole('radiogroup', { name: 'Où sont les enfants dans vos dépenses ?' })).toBeVisible()
 })
 
-test('Résultats: the map of Vérifier and of Stratégies lists the sections in the order they stand', async ({ page }) => {
+test('Résultats: the map of Preuve and of Décider lists the sections in the order they stand', async ({ page }) => {
   for (const [view, ids] of [
-    ['verify', ['solidite', 'precision', 'donnees-calcul', 'tableau', 'parametres']],
+    ['proof', ['solidite', 'donnees-calcul', 'tableau', 'precision', 'parametres']],
+    ['decide', ['essayer', 'rentes', 'ordre', 'fonte']],
     ['answer', ['verdict', 'comparer', 'preciser', 'annee']],
   ] as const) {
     await page.goto(`/resultats?v=${view}`)

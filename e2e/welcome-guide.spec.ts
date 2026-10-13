@@ -8,13 +8,16 @@ for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit',
   test(`the home page says what each place is for — ${who}`, async ({ page }) => {
     await seedProfile(page, seed)
     await page.goto('/')
-    const guide = page.getByRole('region', { name: 'Comment s’y retrouver' }).or(page.locator('section[aria-labelledby="welcome-guide"]'))
-    await expect(guide.getByRole('heading', { name: 'Comment s’y retrouver' })).toBeVisible()
+    const guide = page.locator('section[aria-labelledby="welcome-guide"]')
+    // the guide is a fold: closed it is one line, open it is the map of the app
+    await expect(guide.locator('dt').first()).toBeHidden()
+    await guide.locator('summary').click()
+    await expect(guide.locator('summary')).toContainText('Comment s’y retrouver')
     const terms = guide.locator('dt')
-    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats › Réponse', 'Résultats › Essayer', 'Résultats › Stratégies', 'Résultats › Vérifier', 'Votre réponse', 'Ma fiche', 'En haut'])
-    await expect(guide.locator('dd')).toHaveCount(9)
+    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats › Réponse', 'Résultats › Décider', 'Résultats › Preuve', 'Votre réponse', 'Ma fiche', 'En haut'])
+    await expect(guide.locator('dd')).toHaveCount(8)
     // the places that are pages lead there
-    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats › Réponse', '/resultats'], ['Résultats › Essayer', '/resultats?v=adjust'], ['Résultats › Stratégies', '/resultats?v=strategies'], ['Résultats › Vérifier', '/resultats?v=verify'], ['Ma fiche', '/fiche']] as const) {
+    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats › Réponse', '/resultats'], ['Résultats › Décider', '/resultats?v=decide'], ['Résultats › Preuve', '/resultats?v=proof'], ['Ma fiche', '/fiche']] as const) {
       await expect(guide.getByRole('link', { name, exact: true })).toHaveAttribute('href', href)
     }
     // …and the two that are not pages are not links
@@ -26,15 +29,17 @@ for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit',
 test('a link of the guide opens the view it names', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
-  await page.getByRole('link', { name: 'Résultats › Stratégies', exact: true }).click()
-  await expect(page).toHaveURL(/v=strategies/)
-  await expect(page.getByRole('tab', { name: 'Stratégies' })).toHaveAttribute('aria-selected', 'true')
+  await page.locator('section[aria-labelledby="welcome-guide"] summary').click()
+  await page.getByRole('link', { name: 'Résultats › Décider', exact: true }).click()
+  await expect(page).toHaveURL(/v=decide/)
+  await expect(page.getByRole('tab', { name: 'Décider' })).toHaveAttribute('aria-selected', 'true')
 })
 
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Finding your way' })).toBeVisible()
-  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Try', 'Results › Strategies', 'Results › Check', 'Your answer', 'My sheet', 'At the top'])
+  await expect(page.locator('section[aria-labelledby="welcome-guide"] summary')).toContainText('Finding your way')
+  await page.locator('section[aria-labelledby="welcome-guide"] summary').click()
+  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Decide', 'Results › Proof', 'Your answer', 'My sheet', 'At the top'])
 })

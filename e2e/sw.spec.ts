@@ -177,8 +177,8 @@ test('offline, the saved profile is intact and the results — the chart and the
 
   // …and the worker runs offline: the « what if » grid starts by itself and fills from the cache.
   await page.getByRole('link', { name: 'Résultats', exact: true }).click()
-  await page.getByRole('tab', { name: 'Vérifier' }).click() // the grid lives on the « Vérifier » view…
-  await page.getByRole('tab', { name: 'Si l’avenir est moins bon' }).click() // …at the second depth of « Solidité »
+  await page.getByRole('tab', { name: 'Preuve' }).click() // the grid lives on the « Preuve » view…
+  await page.locator('#sensibilite > summary').click() // …at the second depth of « Solidité »
   // 9 cells = the one 3 × 3 grid shown (the horizon is chosen in its header; the worker still works out all three).
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9, { timeout: 90_000 })
   // The 9 cells exist at once as « … » placeholders and fill as the worker streams: wait for the value, not the cell.

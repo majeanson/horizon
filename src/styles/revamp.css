@@ -922,7 +922,7 @@
   white-space: nowrap;
 }
 
-/* Vérifier › « Dépenses et hypothèses »: six sliders read as a grid, not a column, once there is room. */
+/* Preuve › « Dépenses et hypothèses »: the six figures read as a grid, not a column, once there is room. */
 @media (min-width: 900px) {
   .ledger > .ledger__person:not(.person) {
     display: grid;
@@ -931,6 +931,7 @@
     align-items: start;
   }
   .ledger > .ledger__person:not(.person) > .year-table__title,
+  .ledger > .ledger__person:not(.person) > .cluster,
   .ledger > .ledger__person:not(.person) > .chip {
     grid-column: 1 / -1;
   }

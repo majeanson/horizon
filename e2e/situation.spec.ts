@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { blankSeed, EXAMPLE, seedProfile, type SeedProfile } from './seed'
+import { blankSeed, EXAMPLE, openSituation, seedProfile, type SeedProfile } from './seed'
 
 // « Ma situation » — a few yes / no questions decide what the profile form shows: a household with no employer plan sees no plan section,
 // one that has always lived here no residence year, and so on. A yes opens a section; a no over typed figures says what is lost first.
@@ -18,7 +18,8 @@ const question = (page: Page, text: string | RegExp) => page.getByRole('radiogro
 test('a simple household sees only what concerns it — and the card says how to open the rest', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
-  await expect(section(page, 'Ma situation')).toBeVisible()
+  await openSituation(page)
+  await expect(page.locator('#situation > summary')).toBeVisible()
   // no children, home, employer plan, years abroad or dated events: none of their sections, none of their fields
   await expect(section(page, 'Régimes de retraite de l’employeur')).toHaveCount(0)
   await expect(section(page, 'Résidence principale')).toHaveCount(0)
@@ -34,6 +35,7 @@ test('a simple household sees only what concerns it — and the card says how to
 test('a yes opens its section; the answer is kept on this device; a no closes it again', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
+  await openSituation(page)
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await expect(section(page, 'Régimes de retraite de l’employeur')).toBeVisible()
   await question(page, /Des années hors du Canada/).getByRole('radio', { name: 'Oui' }).click()
@@ -44,6 +46,7 @@ test('a yes opens its section; the answer is kept on this device; a no closes it
   await expect(section(page, 'Résidence principale')).toBeVisible()
   await page.waitForFunction(() => (localStorage.getItem('horizon-situation') ?? '').includes('pension:self'))
   await page.reload()
+  await openSituation(page)
   await expect(section(page, 'Régimes de retraite de l’employeur')).toBeVisible()
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Non' }).click()
   await expect(section(page, 'Régimes de retraite de l’employeur')).toHaveCount(0)
@@ -54,6 +57,7 @@ test('a no over typed figures asks first, says what is lost, and keeps everythin
   withHome.household.home = { value: 450_000, mortgage: { balance: 120_000, rate: 0.05, monthlyPayment: 1_000 }, sale: null }
   await seedProfile(page, withHome as unknown as SeedProfile)
   await page.goto('/profil?form=1')
+  await openSituation(page)
   // this household has a home: it shows without any answer, and the question reads « oui »
   await expect(section(page, 'Résidence principale')).toBeVisible()
   const home = question(page, /Propriétaire de votre résidence/)
@@ -71,6 +75,7 @@ test('a no over typed figures asks first, says what is lost, and keeps everythin
 test('a couple is asked once per person, by name', async ({ page }) => {
   await seedProfile(page)
   await page.goto('/profil?form=1')
+  await openSituation(page)
   for (const name of ['Camille', 'Alex']) await expect(page.getByRole('group', { name })).toContainText('Un régime de retraite d’employeur')
 })
 
@@ -85,6 +90,7 @@ test('the documents list and the entry by document keep only what the household 
   await expect(page.getByText(/Étape 1 sur 5/)).toBeVisible()
   // answering yes brings the documents back
   await page.goto('/profil?form=1')
+  await openSituation(page)
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await page.goto('/documents')
   await expect(page.locator('.docs-item')).toHaveCount(5)
@@ -94,6 +100,7 @@ test('the documents list and the entry by document keep only what the household 
 test('the proof of residence is asked only of someone who lived abroad', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
+  await openSituation(page)
   await expect(page.locator('[data-fact="self:residence"]')).toHaveCount(0)
   await page.getByText(/chiffres confirmés/).first().waitFor()
   const abroad = structuredClone(simple()) as unknown as Seed
@@ -107,7 +114,8 @@ test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
-  await expect(section(page, 'My situation')).toBeVisible()
+  await openSituation(page)
+  await expect(page.locator('#situation > summary')).toBeVisible()
   await page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' }).click()
   await expect(page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' })).toBeChecked()
 })
@@ -115,7 +123,8 @@ test('English', async ({ page }) => {
 test('« Ma situation » is one of the first things on the page: right after who is in the household, before the housekeeping and before every section it decides', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
-  await expect(section(page, 'Ma situation')).toBeVisible()
+  await openSituation(page)
+  await expect(page.locator('#situation > summary')).toBeVisible()
   // document order of the page's landmarks: who → what applies → the housekeeping (backup, accuracy) → the sections the answers decide
   const order = await page.evaluate(() => {
     const at = (el: Element | null) => (el === null ? -1 : [...document.querySelectorAll('*')].indexOf(el))
@@ -143,6 +152,7 @@ test('« Ma situation » is one of the first things on the page: right after who
 test('money outside the REER and the CELI: no question answered, no fields; a « oui » opens them; a « non » over a balance says what is erased first', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
+  await openSituation(page)
   const ask = question(page, /Des placements hors REER et CELI/)
   await expect(ask.getByRole('radio', { name: 'Non' })).toBeChecked()
   // the registered accounts stay; the non-registered group (balance, cost base, yearly addition) is not offered

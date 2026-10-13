@@ -5,16 +5,15 @@
 export interface LedgerCopy {
   title: string
   hint: string
-  /** The two-views framing: these sliders and the Profil / Hypothèses fields edit the SAME stored profile. */
-  sameStore: string
   editProfile: string
+  editSpending: string
   editAssumptions: string
   person: (name: string) => string
   retireLabel: string
   rrqLabel: string
   oasLabel: string
   age: (age: string) => string
-  /** Beside an age that has already happened: it is shown as a fact, with no slider. */
+  /** Beside an age that has already happened. */
   done: string
   /** The calculation line under each age. */
   retireCalc: (lastPay: string) => string
@@ -35,23 +34,14 @@ export interface LedgerCopy {
   inflationCalc: (rate: string, cost: string) => string
   returnLabel: { rrsp: string; tfsa: string; nonReg: string }
   returnCalc: (rate: string, real: string) => string
-  /** Against the figure when the panel opened. */
-  moreMonth: (amount: string) => string
-  lessMonth: (amount: string) => string
-  /** The plan, live. */
-  glanceHolds: (worth: string) => string
-  glanceFails: (year: string) => string
-  glanceMore: (amount: string) => string
-  glanceLess: (amount: string) => string
-  glanceNote: string
 }
 
 export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
   fr: {
     title: 'Mes chiffres et leur calcul',
-    hint: 'Glissez un curseur : le calcul, le montant et l’effet sur le plan suivent, et la réponse se met à jour quand vous relâchez. C’est enregistré dans votre profil.',
-    sameStore: 'Ce sont les chiffres de votre profil, vus du côté du calcul : modifier ici ou sur Profil et Hypothèses, c’est modifier la même chose.',
+    hint: 'Chaque chiffre qui fixe la réponse, avec son calcul. Les résultats se lisent, ils ne se modifient pas : pour en changer un, passez par Profil (vos chiffres) ou Hypothèses (ce que vous supposez).',
     editProfile: 'Modifier dans le profil',
+    editSpending: 'Modifier les dépenses',
     editAssumptions: 'Modifier dans les hypothèses',
     person: (name) => `Âges de ${name}`,
     retireLabel: 'Âge de la retraite',
@@ -74,19 +64,12 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
     inflationCalc: (rate, cost) => `Les prix montent de ${rate} par an : ce qui coûte 1 000 $ aujourd’hui en coûte ${cost} dans dix ans.`,
     returnLabel: { rrsp: 'Rendement du REER', tfsa: 'Rendement du CELI', nonReg: 'Rendement du compte non enregistré' },
     returnCalc: (rate, real) => `Le compte grimpe de ${rate} par an ; une fois l’inflation retirée : ${real}.`,
-    moreMonth: (amount) => `${amount} de plus par mois qu’avant vos changements`,
-    lessMonth: (amount) => `${amount} de moins par mois qu’avant vos changements`,
-    glanceHolds: (worth) => `L’argent dure jusqu’à la fin du plan ; valeur nette à la fin : ${worth} (dollars d’aujourd’hui).`,
-    glanceFails: (year) => `L’argent dure jusqu’en ${year}.`,
-    glanceMore: (amount) => `${amount} de plus qu’avant vos changements.`,
-    glanceLess: (amount) => `${amount} de moins qu’avant vos changements.`,
-    glanceNote: 'Un seul calcul : le plan tel que vous le décrivez. La réponse, elle, cherche l’âge le plus tôt.',
   },
   en: {
     title: 'My figures and their calculation',
-    hint: 'Drag a slider: the calculation, the amount and the effect on the plan follow, and the answer updates when you let go. It is saved in your profile.',
-    sameStore: 'These are your profile’s figures, seen from the calculation’s side: editing here or on Profile and Assumptions edits the same thing.',
+    hint: 'Every figure that sets the answer, with its calculation. Results are for reading, not editing: to change one, go to Profile (your figures) or Assumptions (what you suppose).',
     editProfile: 'Edit in the profile',
+    editSpending: 'Edit the spending',
     editAssumptions: 'Edit in the assumptions',
     person: (name) => `${name}’s ages`,
     retireLabel: 'Retirement age',
@@ -109,12 +92,5 @@ export const LEDGER_COPY: { fr: LedgerCopy; en: LedgerCopy } = {
     inflationCalc: (rate, cost) => `Prices rise ${rate} a year: what costs $1,000 today costs ${cost} in ten years.`,
     returnLabel: { rrsp: 'RRSP return', tfsa: 'TFSA return', nonReg: 'Non-registered account return' },
     returnCalc: (rate, real) => `The account grows ${rate} a year; after inflation: ${real}.`,
-    moreMonth: (amount) => `${amount} a month more than before your changes`,
-    lessMonth: (amount) => `${amount} a month less than before your changes`,
-    glanceHolds: (worth) => `The money lasts to the end of the plan; net worth at the end: ${worth} (today’s dollars).`,
-    glanceFails: (year) => `The money lasts until ${year}.`,
-    glanceMore: (amount) => `${amount} more than before your changes.`,
-    glanceLess: (amount) => `${amount} less than before your changes.`,
-    glanceNote: 'One calculation: the plan as you describe it. The answer, for its part, searches for the earliest age.',
   },
 }

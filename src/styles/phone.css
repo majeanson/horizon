@@ -106,3 +106,24 @@ summary {
     animation: none !important;
   }
 }
+
+/* The header's icons name themselves where there is room (a wide window has nothing to save): an icon alone is a riddle, a word beside it is a place.
+   On a phone they stay icons — the title attribute and aria-label carry the full name. */
+.btn__label {
+  display: none;
+}
+@media (min-width: 860px) {
+  .shell__actions .btn--labeled {
+    width: auto;
+    gap: 0.4rem;
+    padding-inline: 0.85rem;
+  }
+  .shell__actions .btn--labeled .btn__label {
+    display: inline;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+}
+.shell__actions .btn--labeled.is-active .btn__label {
+  color: var(--ink);
+}

@@ -70,6 +70,12 @@ export async function showAllSections(page: Page): Promise<void> {
   })
 }
 
+/** « Ma situation » is a closed fold on Profil: open it before touching its questions (a no-op when it is already open). */
+export async function openSituation(page: Page): Promise<void> {
+  const fold = page.locator('details#situation')
+  if (!(await fold.evaluate((el: HTMLDetailsElement) => el.open))) await fold.locator('summary').click()
+}
+
 /** The profile as the app has saved it right now. */
 export async function savedProfile(page: Page): Promise<any> {
   return page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? 'null'), PROFILE_KEY)

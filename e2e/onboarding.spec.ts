@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { EXAMPLE, PROFILE_KEY, blankSeed, savedProfile, seedProfile } from './seed'
+import { EXAMPLE, PROFILE_KEY, blankSeed, openSituation, savedProfile, seedProfile } from './seed'
 
 // THE FIRST VISIT: one question per screen, information by information. A blank form is a wall; the first landing asks who, born when,
 // earning what, saving what, which employer plan, wanting to stop when, spending what, owning what — each with its one line of why —
@@ -312,6 +312,7 @@ test('what is answered here is what the full form shows: the same questions, the
   await ask(page, /Des enfants à la maison/).getByRole('radio', { name: 'Oui' }).click()
   await page.getByRole('button', { name: 'Passer au formulaire complet' }).click()
   await expect(page).toHaveURL(/form=1/)
+  await openSituation(page)
   await expect(page.locator('#situation')).toBeVisible()
   await expect(page.locator('#situation').getByRole('radiogroup', { name: /Des années hors du Canada/ }).getByRole('radio', { name: 'Oui' })).toBeChecked()
   await expect(page.locator('#situation').getByRole('radiogroup', { name: /Des enfants à la maison/ }).getByRole('radio', { name: 'Oui' })).toBeChecked()

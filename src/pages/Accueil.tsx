@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
+import { Fold } from '../components/Fold'
 import { InstallCard } from '../components/install/InstallHint'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
@@ -44,9 +45,8 @@ export function Accueil() {
         </ol>
       </section>
       <section aria-labelledby="welcome-guide">
-        <h2 id="welcome-guide" className="welcome__title">
-          {c.guideTitle}
-        </h2>
+        {/* The map of the app: a reference, one tap away — the tabs and the buttons in the bar already say where things are. */}
+        <Fold className="surface" summary={<span id="welcome-guide">{c.guideTitle}</span>}>
         <dl className="welcome__guide">
           {c.guide.map((g) => (
             <Fragment key={g.name}>
@@ -55,6 +55,7 @@ export function Accueil() {
             </Fragment>
           ))}
         </dl>
+        </Fold>
       </section>
       <section aria-labelledby="welcome-know">
         <h2 id="welcome-know" className="welcome__title">

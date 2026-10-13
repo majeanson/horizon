@@ -9,7 +9,6 @@ export function ProfileMap({ people, withHome, withEvents, withExact, page }: { 
   const n = t.profile.nav
   const links: SectionLink[] = [
     { id: 'famille', label: n.family },
-    { id: 'situation', label: n.situation },
     ...people.map((p) => ({ id: `person-${p.id}`, label: p.name })),
     { id: 'budget', label: n.budget },
     ...(withHome ? [{ id: 'maison', label: n.home }] : []),

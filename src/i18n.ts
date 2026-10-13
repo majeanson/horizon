@@ -74,6 +74,9 @@ export const FR = {
     data: 'Sauvegarde et réglages',
     glossary: 'Glossaire : les sigles expliqués',
     sheet: 'Ma fiche : la situation en cinq mesures',
+    sheetShort: 'Fiche',
+    glossaryShort: 'Glossaire',
+    dataShort: 'Réglages',
   },
 
   fields: {
@@ -92,7 +95,7 @@ export const FR = {
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
     welcome: { title: 'Pour commencer' },
     /** The page's map: one short noun per block of the form (the people's chips carry their own names). */
-    nav: { label: 'Sections du profil', family: 'Famille', situation: 'Situation', budget: 'Budget', home: 'Maison', events: 'Événements', exact: 'Précision' },
+    nav: { label: 'Sections du profil', family: 'Famille', budget: 'Budget', home: 'Maison', events: 'Événements', exact: 'Précision' },
     self: 'Moi',
     spouse: 'Partenaire',
     budget: {

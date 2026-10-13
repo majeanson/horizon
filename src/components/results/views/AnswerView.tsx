@@ -73,9 +73,9 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   {/* The WORST answer must be the most actionable one: the nudge carries its doors, and each door opens. */}
                   <p className="verdict__note">{rc.headline.tryThis}</p>
                   <Cluster>
-                    <Chip icon="caret-down-bold" onClick={() => goTo('adjust', 'depenser')}>{rc.headline.trySpend}</Chip>
+                    <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'depenser')}>{rc.headline.trySpend}</Chip>
                     <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
-                    <Chip onClick={() => goTo('verify', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
+                    <Chip onClick={() => goTo('proof', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
                   </Cluster>
                 </>
               ) : (
@@ -99,7 +99,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   )}
                   {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
                   <Cluster>
-                    <Chip icon="caret-down-bold" onClick={() => goTo('adjust', 'depenser')}>{rc.headline.trySpend}</Chip>
+                    <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'depenser')}>{rc.headline.trySpend}</Chip>
                   </Cluster>
                 </>
               )}

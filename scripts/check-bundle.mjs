@@ -68,8 +68,8 @@ const LAZY_BY_NAME = [
   'src/pages/Donnees.tsx',
   'src/pages/Glossaire.tsx',
   'src/pages/Fiche.tsx',
-  'src/components/results/views/StrategiesView.tsx',
-  'src/components/results/views/VerifyView.tsx',
+  'src/components/results/views/DecideView.tsx',
+  'src/components/results/views/ProofView.tsx',
   'src/components/charts/index.ts',
 ]
 // Chunks that must never ride the door, with the reason.

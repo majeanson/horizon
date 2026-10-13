@@ -36,12 +36,6 @@ export function impactOf(field: ImpactField, value: number): AssumptionImpact {
   return impactAmong(impactAnchors(field), value, HIGHER_IS_BETTER[field])
 }
 
-/** One account's return against the prudent / neutral / bold return OF THAT ACCOUNT (the sliders are per account). */
-export function impactOfReturn(kind: 'rrsp' | 'tfsa' | 'nonReg', value: number): AssumptionImpact {
-  const v = (['prudent', 'neutral', 'bold'] as const).map((k) => ASSUMPTION_PRESETS[k].returns[kind]).sort((a, b) => a - b)
-  return impactAmong([v[0], v[1], v[2]], value, true)
-}
-
 function impactAmong(anchors: readonly [number, number, number], value: number, higherIsBetter: boolean): AssumptionImpact {
   const [lo, mid, hi] = anchors
   const level: ImpactLevel =

@@ -15,9 +15,9 @@ async function loadExample(page: Page, name: string) {
   await page.goto('/resultats')
   await expect(page.locator('.verdict__line')).toBeVisible()
 }
-// The ledger lives on the « Vérifier » view of the results page.
+// The ledger lives on the « Preuve » view of the results page.
 const openLedger = async (page: Page) => {
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=proof')
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
@@ -55,21 +55,20 @@ test('behind: says so plainly — the plan runs out, and the card names the year
   await expect(page.locator('.verdict__line')).toContainText('69 ans')
 })
 
-test('retired couple: no retirement question, no age to compare, no pension start to choose, and the past is not a slider', async ({ page }) => {
+test('retired couple: no retirement question, no age to compare, no pension start to choose, and the past is marked as past', async ({ page }) => {
   await loadExample(page, 'Couple à la retraite')
   await expect(page.locator('.verdict__line')).toHaveText('Vous êtes déjà tous les deux à la retraite.')
   await expect(page.locator('.compare')).toHaveCount(0) // no departure ages to try (the plan's own card and chart stay)
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=decide')
   await expect(page.locator('#ordre')).toBeVisible()
   await expect(page.locator('#rentes')).toHaveCount(0)
   await openLedger(page)
   const ledger = page.locator('.ledger')
-  await expect(ledger.getByRole('slider', { name: 'Âge de la retraite' })).toHaveCount(0)
-  await expect(ledger.getByRole('slider', { name: 'Début du RRQ' })).toHaveCount(0)
+  await expect(ledger.getByRole('slider')).toHaveCount(0) // the ledger is read-only
   await expect(ledger.getByText('déjà passé').first()).toBeVisible()
-  // what can still move: spending and the economy
-  await expect(ledger.getByRole('slider', { name: 'Dépenses à la retraite' })).toBeVisible()
+  // spending and the economy are still there to read
+  await expect(ledger.getByText('Dépenses à la retraite')).toBeVisible()
 })
 
 test('newcomer: the OAS is the share her residence earns, and the ledger shows the calculation', async ({ page }) => {
