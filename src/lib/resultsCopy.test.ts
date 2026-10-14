@@ -96,4 +96,14 @@ describe('the results-page copy, in both languages', () => {
     expect(en.est.label).toBe('Estimated — to confirm')
     for (const c of [fr, en]) expect(c.est.label.toLowerCase()).toContain(c.est.mark)
   })
+
+  it('words the chart’s moments: the household’s is bare, a person’s names them, and the chip says the year with its age', () => {
+    expect(fr.moments.rrq('')).toBe('RRQ')
+    expect(fr.moments.pension('')).toBe('RRQ et PSV')
+    expect(fr.moments.oas('Alex')).toBe('PSV — Alex')
+    expect(en.moments.rrq('')).toBe('QPP')
+    expect(en.moments.oas('Alex')).toBe('OAS — Alex')
+    expect(fr.moments.chip('RRQ', '2043 (63 ans)')).toBe('RRQ, 2043 (63 ans)')
+    for (const c of [fr, en]) for (const k of ['title', 'shortfall', 'end'] as const) expect(c.moments[k].trim().length, k).toBeGreaterThan(0)
+  })
 })

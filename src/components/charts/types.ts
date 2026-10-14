@@ -40,6 +40,8 @@ export interface LineChartProps {
   /** The accessible name: the chart is a picture, and the per-year table beside it is its text. */
   ariaLabel: string
   height?: number
+  /** A tap or click on the plot reports the x it landed on (a year); never called without one. A mouse/touch convenience: the page keeps a real control for whatever it does. */
+  onXTap?: (x: number) => void
 }
 
 /** One year of a stacked bar chart: the x (a year) and one value per segment id. */

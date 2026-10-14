@@ -36,7 +36,14 @@ function merge(series: readonly ChartSeries[]): Record<string, number>[] {
   return [...byX.values()].sort((a, b) => a.x - b.x)
 }
 
-export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300 }: LineChartProps) {
+// The x a tap landed on. `activeLabel` is absent on a touch tap that came without a move first (nothing was hovered yet): then there is no x, and nothing happens.
+function tapped(label: string | number | undefined, onXTap: (x: number) => void): void {
+  if (label === undefined) return
+  const x = Number(label)
+  if (Number.isFinite(x)) onXTap(x)
+}
+
+export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300, onXTap }: LineChartProps) {
   const data = merge(series)
   // A two-line tick (the year, then the age) wants more room under the plot than the library's one-line default.
   const bottom = xTick ? 18 : 4
@@ -50,11 +57,11 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, m
           </li>
         ))}
       </ul>
-      <div className="chart__plot" style={{ height }} aria-hidden="true">
+      <div className="chart__plot" style={{ height, cursor: onXTap ? 'pointer' : undefined }} aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
           {/* accessibilityLayer is OFF on purpose: it makes the SVG focusable, and the plot is aria-hidden (a picture — its
               text is the per-year table), so a focusable node inside it is an axe « aria-hidden-focus » violation. */}
-          <RLineChart data={data} margin={{ top: 8, right: 12, bottom, left: 0 }} accessibilityLayer={false}>
+          <RLineChart data={data} margin={{ top: 8, right: 12, bottom, left: 0 }} accessibilityLayer={false} onClick={onXTap ? (state) => tapped(state.activeLabel, onXTap) : undefined}>
             <CartesianGrid stroke="var(--hairline)" vertical={false} />
             <XAxis
               dataKey="x"

@@ -27,6 +27,16 @@ const FR_RESULTS = {
     aria: (name: string, parts: string) => `${name} : ${parts}`,
     stretch: (kind: string, from: number, to: number) => `${kind} de ${from} à ${to} ans`,
   },
+  /** Under the projection chart: its notable moments, each a door to the section that explains it. `who` is empty when the moment is the household's. */
+  moments: {
+    title: 'Moments',
+    rrq: (who: string) => (who === '' ? 'RRQ' : `RRQ — ${who}`),
+    oas: (who: string) => (who === '' ? 'PSV' : `PSV — ${who}`),
+    pension: (who: string) => (who === '' ? 'RRQ et PSV' : `RRQ et PSV — ${who}`),
+    shortfall: 'L’argent manque',
+    end: 'Fin du plan',
+    chip: (label: string, yearAge: string) => `${label}, ${yearAge}`,
+  },
   /** Over the year-by-year table, when some year falls short: when the money runs out, and what the red rows are. */
   shortage: {
     from: (yearAge: string, column: string) => `L’argent manque dès ${yearAge} : les lignes en rouge sont les années où les dépenses ne sont pas couvertes (colonne « ${column} »).`,
@@ -251,6 +261,15 @@ const EN_RESULTS: typeof FR_RESULTS = {
     end: (age: number) => `End of the plan, age ${age}`,
     aria: (name: string, parts: string) => `${name}: ${parts}`,
     stretch: (kind: string, from: number, to: number) => `${kind} from ${from} to ${to}`,
+  },
+  moments: {
+    title: 'Moments',
+    rrq: (who: string) => (who === '' ? 'QPP' : `QPP — ${who}`),
+    oas: (who: string) => (who === '' ? 'OAS' : `OAS — ${who}`),
+    pension: (who: string) => (who === '' ? 'QPP and OAS' : `QPP and OAS — ${who}`),
+    shortfall: 'The money runs out',
+    end: 'End of the plan',
+    chip: (label: string, yearAge: string) => `${label}, ${yearAge}`,
   },
   shortage: {
     from: (yearAge: string, column: string) => `The money runs out from ${yearAge}: the red rows are the years when spending is not covered (column “${column}”).`,

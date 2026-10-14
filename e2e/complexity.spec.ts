@@ -16,6 +16,9 @@ type Budget = { controls: number; words: number }
 
 // TODO measure: run this spec, read the report, commit real numbers (then they only fall)
 // Measured 2026-10-13, the ratchet's first setting (the day ideas 1 · 2 · 4 of the first-visit plan landed).
+// Résultats — Réponse raised 43 → 46 controls and 639 → 668 words (2026-10-13): the « Moments » row under the projection chart — a chip per notable year
+// (the pension starts, the end of the plan; the golden couple has three), each a door to the section that explains it. A conscious trade: the chart's moments
+// were only dashed lines to guess at; the chips are the keyboard / screen-reader path that the taps on the chart mirror.
 const BUDGETS: Record<string, Budget> = {
   'Accueil (first visit)': { controls: 24, words: 294 },
   'Profil (first visit, onboarding)': { controls: 16, words: 75 },
@@ -23,7 +26,7 @@ const BUDGETS: Record<string, Budget> = {
   'Profil (form)': { controls: 314, words: 1952 },
   'Hypothèses': { controls: 66, words: 659 },
   'Fiche': { controls: 28, words: 382 },
-  'Résultats — Réponse': { controls: 43, words: 639 },
+  'Résultats — Réponse': { controls: 46, words: 668 },
   'Résultats — Décider': { controls: 50, words: 1211 },
   'Résultats — Preuve': { controls: 37, words: 1959 },
 }

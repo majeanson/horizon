@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import type { AgesLedger } from '../../engine/ledger'
 import type { AgeResult, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import {
@@ -17,10 +18,14 @@ import {
   type Dollars,
   type Per,
 } from '../../lib/chartData'
+import { moments as momentsOf, nearestMoment } from '../../lib/chartMoments'
 import { formatYearAge } from '../../lib/format'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import type { Selection } from '../../lib/resultsModel'
+import type { View } from '../../lib/useResultsPage'
+import { Chip } from '../Chip'
+import { Cluster } from '../Layout'
 import { Loading } from '../Loading'
 import { SubTabs } from '../SubTabs'
 
@@ -49,6 +54,8 @@ export function ChartPanel({
   dollars,
   onMetric,
   label,
+  ledger,
+  goTo,
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
   household: Household
@@ -62,10 +69,15 @@ export function ChartPanel({
   dollars: Dollars
   onMetric: (m: ChartMetric) => void
   label: (s: Selection) => string
+  /** When each pension starts (engine/ledger.ts): the moments of the picture that are pensions. */
+  ledger: readonly AgesLedger[]
+  /** The cross-view door (lib/useResultsPage `goTo`): a moment lands on the section that explains it. */
+  goTo: (target: View, wantedId: string) => void
 }) {
   const t = useT()
   const { lang } = useLang()
   const c = t.results.chart
+  const mc = RESULTS_COPY[lang].moments
   const detail = metric === 'detail'
 
   const series = useMemo(() => (metric === 'detail' ? [] : chartSeries(runs, { metric, dollars, todayYear, inflation, label })), [runs, metric, dollars, todayYear, inflation, label])
@@ -75,6 +87,18 @@ export function ChartPanel({
     for (const row of runs[0]?.result.rows ?? []) map.set(row.year, Object.values(row.persons).map((p) => p.age).join(' / '))
     return map
   }, [runs])
+
+  // The notable moments of the plan, as doors: the chips under the chart are the real controls; a tap on the chart itself is the mouse / touch mirror.
+  const rows = runs[0]?.result.rows
+  const births = useMemo(() => household.persons.map((p) => p.birth.year), [household])
+  const moments = useMemo(
+    () => (rows && rows.length > 0 ? momentsOf({ ledger, births, firstYear: rows[0].year, lastYear: rows[rows.length - 1].year, firstShortfallYear: runs[0].result.firstShortfallYear ?? null }) : []),
+    [ledger, births, rows, runs],
+  )
+  const momentLabel = (m: (typeof moments)[number]): string => {
+    if (m.labelKey === 'shortfall' || m.labelKey === 'end') return mc[m.labelKey]
+    return mc[m.labelKey](m.who.map((p) => names[p] ?? '').join(', '))
+  }
 
   const measure = metric === 'income' ? c.income : c.netWorth
   const years = runs[0]?.result.rows
@@ -117,10 +141,23 @@ export function ChartPanel({
                   xTitle={(x) => c.tooltip(x, agesByYear.get(x) ?? '')}
                   xTick={xTick}
                   ariaLabel={c.figure(measure, years[0].year, years[years.length - 1].year, scenarioNames)}
+                  onXTap={moments.length > 0 ? (x) => { const m = nearestMoment(moments, x); if (m) goTo(m.view, m.section) } : undefined}
                 />
               )}
             </Suspense>
           </div>
+          {series.length > 0 && moments.length > 0 && (
+            <>
+              <p className="field-row__hint">{mc.title}</p>
+              <Cluster role="group" aria-label={mc.title}>
+                {moments.map((m) => (
+                  <Chip key={m.id} onClick={() => goTo(m.view, m.section)}>
+                    {mc.chip(momentLabel(m), formatYearAge(m.year, births, lang))}
+                  </Chip>
+                ))}
+              </Cluster>
+            </>
+          )}
         </>
       )}
     </section>

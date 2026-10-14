@@ -37,6 +37,32 @@ export function revealOnOpen(el: HTMLElement | null): () => void {
 // changed yet is not a page that has settled: letting go after a short quiet spell made a CI landing test fail) AND the
 // page has been quiet for `quietMs`; `maxMs` is the end whatever happens. The reader's own wheel, touch or key hands
 // the scroll back at once. Returns a cancel.
+// …once the section EXISTS. A link to a section of another view switches the view, and that view is a lazy chunk: one frame
+// later its sections may not be on the page yet, and `scrollToSection` on an id that is not there does nothing, silently.
+// This waits for the anchor (a frame, then every 50 ms, for at most `waitMs`) and then hands over to `scrollToSection`, whose own
+// hold keeps the landing while the page settles. Returns a cancel for the wait AND the hold.
+export function scrollToSectionWhenThere(id: string, waitMs = 5000): () => void {
+  const started = Date.now()
+  let cancelled = false
+  let release: () => void = () => {}
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const tick = () => {
+    if (cancelled) return
+    if (document.getElementById(id)) {
+      release = scrollToSection(id)
+      return
+    }
+    if (Date.now() - started < waitMs) timer = setTimeout(tick, 50)
+  }
+  const frame = requestAnimationFrame(tick)
+  return () => {
+    cancelled = true
+    cancelAnimationFrame(frame)
+    clearTimeout(timer)
+    release()
+  }
+}
+
 export function scrollToSection(id: string, maxMs = 10000, quietMs = 1500, minMs = 4000): () => void {
   const target = document.getElementById(id)
   if (!target) return () => {}

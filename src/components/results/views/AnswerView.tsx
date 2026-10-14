@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip } from '../../Chip'
 import { Cluster, Rail } from '../../Layout'
@@ -14,6 +14,7 @@ import { useParamChoice } from '../../../lib/useParamChoice'
 
 import { Skeleton } from '../../Skeleton'
 import { NUDGE } from '../../../engine/factImpact'
+import { agesLedger } from '../../../engine/ledger'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
@@ -25,12 +26,14 @@ const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m
 
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AnswerView({ m }: { m: ResultsModel }) {
-  const { vintage, t, lang, r, rc, profile, slow, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
+  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
   // Three ways of comparing, one on screen at a time: departure ages (the chips, the cards, the chart), each person's own earliest age (a couple) and the saved plans (when there are some).
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
   const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
   // While figures are estimates, the computed range replaces the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
+  // When each pension starts, for the chart's moments (from the settled profile, like the runs it sits beside).
+  const ledger = useMemo(() => agesLedger(slow.household, slowAssumptions), [slow, slowAssumptions])
   const range = impact?.range
   const showRange = !!range && range.low !== null && range.low !== range.high && !retiredNow && !retiredGlance && (headline.kind === 'at' || headline.kind === 'now') && accuracy.confirmed < accuracy.total
   const confidenceText = showRange
@@ -212,6 +215,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 dollars={dollars}
                 onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}
                 label={label}
+                ledger={ledger}
+                goTo={goTo}
               />
             )}
               </>

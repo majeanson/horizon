@@ -15,7 +15,7 @@ import { NO_HEADLINE } from './answer'
 import { useAnswer } from './useAnswer'
 import { answerRequest } from './answerRequest'
 import { useRuns } from './useRuns'
-import { scrollToSection } from './motion'
+import { scrollToSection, scrollToSectionWhenThere } from './motion'
 import { usePrinting } from './usePrinting'
 import { useSettled } from './useSettled'
 import { useNotice } from './toast'
@@ -171,7 +171,7 @@ export function useResultsPage() {
     const wanted = target === 'decide' ? ESSAI_OF[wantedId] : undefined
     if (wanted !== undefined && wanted !== essai) setEssai(wanted)
     if (target === 'proof' && wantedId === 'sensibilite' && !gridsOpen) setGridsOpen(true)
-    if (target === view) return void requestAnimationFrame(() => requestAnimationFrame(() => scrollTo(wantedId)))
+    if (target === view) return void requestAnimationFrame(() => scrollToSectionWhenThere(wantedId))
     pendingScroll.current = wantedId
     setParam('v', target === 'answer' ? null : target)
   }
@@ -179,7 +179,8 @@ export function useResultsPage() {
     const id = pendingScroll.current
     if (id === null) return
     pendingScroll.current = null
-    requestAnimationFrame(() => scrollTo(id))
+    // The other view is a lazy chunk: its sections may not exist yet one frame after the switch, so wait for the anchor (≤ 5 s) rather than scroll to nothing.
+    scrollToSectionWhenThere(id)
   }, [view])
 
   // Old deep links chose one question (`?q=save|stop`); the answers share the page now, so the link becomes a scroll
