@@ -41,7 +41,18 @@ const FR_RESULTS = {
   idle: (name: string, from: string, to: string) => `Entre ${from} et ${to}, rien ne vient de ${name} : le ménage vit alors des comptes et des revenus de l’autre personne. Des barres vides ici sont normales.`,
   tabs: { label: 'Vues des résultats', answer: 'Réponse', decide: 'Décider', proof: 'Preuve' },
   /** « Décider »: the two steps of the view. */
-  decide: { tryTitle: 'Essayer un changement', tryHint: 'Chaque essai se fait sur votre plan tel qu’il est ; rien n’est enregistré. Ouvrez-en un à la fois.' },
+  decide: {
+    tryTitle: 'Essayer un changement',
+    tryHint: 'Chaque essai se fait sur votre plan tel qu’il est ; rien n’est enregistré. Ouvrez-en un à la fois.',
+    /** What changes little for this household is folded, never removed: one chip opens everything, the same chip closes it again. */
+    showAll: 'Tout montrer',
+    showLess: 'Réduire',
+    /** « Fonte du REER », when no way of melting clearly beats the household's own: the line stays, the detail folds. */
+    fonteSame: 'Pour vous, remplir la tranche change peu : aucune façon de fondre le REER ne fait nettement mieux que la vôtre.',
+    fonteFold: 'Voir le détail quand même',
+    /** The levers that move nothing for this household, under the ranked ones. */
+    leversFold: 'Les leviers qui changent peu pour vous',
+  },
   /** Under one person's bars, when the two plans end in different years: why the first one's bars stop and the other's jump. */
   lifeEnd: (gone: string, yearAge: string, other: string, viewingGone: boolean) => viewingGone ? `Le plan va jusqu’à ${yearAge} pour ${gone} : après cette année, les barres de ${gone} s’arrêtent et son épargne passe à ${other}.` : `Après ${yearAge}, le plan s’arrête pour ${gone} et son épargne s’ajoute à celle de ${other} : le saut dans les barres est voulu, ce n’est pas une erreur.`,
   /** « Comparer des âges de départ » has three ways of comparing; one on screen at a time. */
@@ -249,7 +260,15 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   idle: (name: string, from: string, to: string) => `From${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', decide: 'Decide', proof: 'Proof' },
-  decide: { tryTitle: 'Try a change', tryHint: 'Each try runs on your plan as it stands; nothing is saved. Open one at a time.' },
+  decide: {
+    tryTitle: 'Try a change',
+    tryHint: 'Each try runs on your plan as it stands; nothing is saved. Open one at a time.',
+    showAll: 'Show everything',
+    showLess: 'Show less',
+    fonteSame: 'For you, filling the bracket changes little: no way of melting the RRSP clearly does better than yours.',
+    fonteFold: 'See the detail anyway',
+    leversFold: 'The changes that matter little for you',
+  },
   lifeEnd: (gone: string, yearAge: string, other: string, viewingGone: boolean) => viewingGone ? `The plan runs to ${yearAge} for ${gone}: after that year ${gone}’s bars stop and the savings pass to ${other}.` : `After ${yearAge} the plan ends for ${gone} and the savings are added to ${other}’s: the jump in the bars is intended, not an error.`,
   compareViews: { label: 'Ways to compare', ages: 'Departure ages', each: 'Each of us', plans: 'My plans' },
   firm: { label: 'Two ways to see how firm it is', brief: 'In brief', grids: 'If the future is worse' },

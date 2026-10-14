@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ReactNode } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { BracketFillPanel } from '../BracketFillPanel'
 import { BridgePanel } from '../BridgePanel'
 import { OrderPanel } from '../OrderPanel'
@@ -13,8 +13,15 @@ import { BRACKET_FILL_COPY } from '../../../lib/bracketFillCopy'
 import { FUTURE_COPY } from '../../../lib/futureCopy'
 import { formatCompactMoney } from '../../../lib/money'
 import { MAX_AGE } from '../../../lib/resultsModel'
+import { fonteRelevant, leverPruned } from '../../../lib/relevance'
 import { SPOUSE_BALANCE_COPY } from '../../../lib/spouseBalanceCopy'
+import { useBracketFill } from '../../../lib/useBracketFill'
+import { useParamChoice } from '../../../lib/useParamChoice'
 import type { Essai, ResultsModel } from '../../../lib/useResultsPage'
+import type { LeverId } from '../../../engine/levers'
+
+type LeverRow = { id: LeverId; earliest: number | null; yearsGained: number | null; endGain: number | null }
+const LEVER_PLACEHOLDERS: LeverRow[] = (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null, endGain: null }))
 
 const CareSection = lazy(() => import('./CareSection').then((m) => ({ default: m.CareSection })))
 
@@ -34,48 +41,67 @@ export function DecideView({ m }: { m: ResultsModel }) {
       {body}
     </Fold>
   )
+  // WHAT CHANGES LITTLE FOR THIS HOUSEHOLD FOLDS, never disappears (lib/relevance.ts). A search that has not answered prunes nothing, and `?tout=1` opens everything.
+  const [tout, setTout] = useParamChoice('tout', ['off', '1'] as const, 'off')
+  const showAll = tout === '1'
+  // The ONE comparison of the RRSP's melting on this view: the section reads it to decide whether it is worth the page, and the panel draws it.
+  const fill = useBracketFill(profile.household, assumptions, firstAge)
+  const [fonteOpen, setFonteOpen] = useState(false)
+  const fontePruned = fill.value !== null && !fonteRelevant(fill.value)
+  const rows: LeverRow[] = levers?.levers ?? LEVER_PLACEHOLDERS
+  // The top lever always stays out; the ones that move neither the age nor the nest go under one fold at the end of the list.
+  const quiet = levers === undefined ? [] : rows.filter((l, i) => i > 0 && leverPruned(l))
+  const anyPruned = fontePruned || (!retiredNow && quiet.length > 0)
+  const leverRow = (l: LeverRow) => (
+    <li key={l.id} className="levers__item">
+      {/* The name is the door: a ranked change nobody can act on is a rumour. Two open their what-if just below; the other two live where they are set. */}
+      {l.id === 'spend10' ? (
+        <Chip onClick={() => m.goTo('decide', 'depenser')}>{lc.names[l.id]}</Chip>
+      ) : l.id === 'save500' ? (
+        <Chip onClick={() => m.goTo('decide', 'epargner')}>{lc.names[l.id]}</Chip>
+      ) : l.id === 'returns1' ? (
+        <Chip to="/hypotheses">{lc.names[l.id]}</Chip>
+      ) : (
+        <Chip onClick={() => m.goTo('decide', 'rentes')}>{lc.names[l.id]}</Chip>
+      )}
+      <span className="mono levers__result">
+        {levers === undefined
+          ? lc.pending
+          : l.earliest === null
+            ? lc.none
+            : l.yearsGained === null
+              ? lc.found(l.earliest)
+              : l.yearsGained > 0
+                ? lc.gain(l.yearsGained, l.earliest)
+                : l.yearsGained === 0
+                  ? lc.same(l.earliest)
+                  : lc.later(-l.yearsGained, l.earliest)}
+        {levers !== undefined && l.endGain !== null && Math.abs(l.endGain) >= 1000 && (
+          <span className="levers__end">{lc.end((l.endGain > 0 ? '+' : '−') + formatCompactMoney(Math.abs(l.endGain), lang))}</span>
+        )}
+      </span>
+    </li>
+  )
+  const panel = <BracketFillPanel household={profile.household} fill={fill} />
   return (
     <>
       <section className="arc" aria-label={rc.tabs.decide}>
         <section id="essayer" className="results-section" aria-label={rc.decide.tryTitle}>
           <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} />
+          {anyPruned && (
+            <Chip onClick={() => setTout(showAll ? 'off' : '1')}>{showAll ? rc.decide.showLess : rc.decide.showAll}</Chip>
+          )}
           {!retiredNow && (
             <div id="ajuster" className="surface">
               {/* The changes a household could make, each tried alone and ranked by the years it gains. */}
               <div className="verdict__range ajuster__levers">
                 <p className="verdict__range-title">{lc.title}</p>
-                <ul className="levers__list">
-                  {(levers?.levers ?? (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null, endGain: null }))).map((l) => (
-                    <li key={l.id} className="levers__item">
-                      {/* The name is the door: a ranked change nobody can act on is a rumour. Two open their what-if just below; the other two live where they are set. */}
-                      {l.id === 'spend10' ? (
-                        <Chip onClick={() => m.goTo('decide', 'depenser')}>{lc.names[l.id]}</Chip>
-                      ) : l.id === 'save500' ? (
-                        <Chip onClick={() => m.goTo('decide', 'epargner')}>{lc.names[l.id]}</Chip>
-                      ) : l.id === 'returns1' ? (
-                        <Chip to="/hypotheses">{lc.names[l.id]}</Chip>
-                      ) : (
-                        <Chip onClick={() => m.goTo('decide', 'rentes')}>{lc.names[l.id]}</Chip>
-                      )}
-                      <span className="mono levers__result">
-                        {levers === undefined
-                          ? lc.pending
-                          : l.earliest === null
-                            ? lc.none
-                            : l.yearsGained === null
-                              ? lc.found(l.earliest)
-                              : l.yearsGained > 0
-                                ? lc.gain(l.yearsGained, l.earliest)
-                                : l.yearsGained === 0
-                                  ? lc.same(l.earliest)
-                                  : lc.later(-l.yearsGained, l.earliest)}
-                        {levers !== undefined && l.endGain !== null && Math.abs(l.endGain) >= 1000 && (
-                          <span className="levers__end">{lc.end((l.endGain > 0 ? '+' : '−') + formatCompactMoney(Math.abs(l.endGain), lang))}</span>
-                        )}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <ul className="levers__list">{(showAll ? rows : rows.filter((l) => !quiet.includes(l))).map(leverRow)}</ul>
+                {!showAll && quiet.length > 0 && (
+                  <Fold summary={rc.decide.leversFold}>
+                    <ul className="levers__list">{quiet.map(leverRow)}</ul>
+                  </Fold>
+                )}
                 <p className="verdict__note">{lc.hint}</p>
               </div>
             </div>
@@ -117,7 +143,17 @@ export function DecideView({ m }: { m: ResultsModel }) {
         </section>
         <section id="fonte" className="results-section" aria-label={bf.title}>
           <SectionHeader title={bf.title} />
-          <BracketFillPanel household={profile.household} assumptions={assumptions} firstAge={firstAge} />
+          {/* Pruned only on an ANSWERED search that found nothing worth a sentence: the line says what the section means for this household and stays on the page; the machinery folds. */}
+          {fontePruned && !showAll ? (
+            <>
+              <p className="answer__note">{rc.decide.fonteSame}</p>
+              <Fold summary={rc.decide.fonteFold} open={fonteOpen} onToggle={setFonteOpen} mountOnOpen>
+                {panel}
+              </Fold>
+            </>
+          ) : (
+            panel
+          )}
         </section>
         {/* A couple only: a one-person household has no second RRSP to even out against. */}
         {profile.household.persons.length > 1 && (

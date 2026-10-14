@@ -37,6 +37,7 @@ const KEYS: Record<string, string> = {
   bp: 'Résultats › Décider: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Décider: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
   bf: 'Résultats › Décider › Fonte du REER: the way on screen (none · bracket1 · oas). Unknown is the first bracket.',
+  tout: 'Résultats › Décider: « 1 » shows everything, including what changes little for this household (the melting of the RRSP, the levers that move nothing); no key is the pruned presentation. Any other value counts as no key.',
   bt: 'Résultats › Décider: how the ways of starting are compared (cards · table). Anything else, or no key: the screen’s width chooses — a table from 860 px, cards below.',
   bw: 'Résultats › Décider: the window (bridge years or the whole plan). Unknown is the bridge years.',
   q: 'Résultats: an OLD deep link (`?q=save|stop`) turned into a scroll once, then dropped from the address.',

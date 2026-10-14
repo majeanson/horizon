@@ -23,7 +23,8 @@ const melter = () => {
 test('the three ways are tabs, the table sets them side by side, and one tap makes the choice the profile’s', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page, melter() as never)
-  await page.goto('/resultats?v=strategies')
+  // `tout=1`: once the way is adopted the household's own is the best, so the section would present as a line and a closed fold (e2e/prune.spec.ts); this test drives the whole panel.
+  await page.goto('/resultats?v=strategies&tout=1')
   const section = page.locator('#fonte')
   await section.scrollIntoViewIfNeeded()
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })

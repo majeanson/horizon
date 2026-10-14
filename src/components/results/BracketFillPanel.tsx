@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react'
-import type { FillChoice, FillOutcome } from '../../engine/bracketFillCompare'
-import type { Assumptions, Household } from '../../engine/types'
+import type { FillChoice, FillComparison, FillOutcome } from '../../engine/bracketFillCompare'
+import type { Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRACKET_FILL_COPY } from '../../lib/bracketFillCopy'
 import { choiceOf, tabOf } from '../../lib/bracketFillNudge'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { setAssumptions } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
-import { useBracketFill } from '../../lib/useBracketFill'
+import type { Answer } from '../../lib/useOffThread'
 import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Fold } from '../Fold'
@@ -27,11 +27,12 @@ const TABS = ['none', 'bracket1', 'oas'] as const
 /** Money differences under this are « the same »: a sentence about 40 $ is noise. */
 const SAME = 500
 
-export function BracketFillPanel({ household, assumptions, firstAge }: { household: Household; assumptions: Assumptions; firstAge: number }) {
+// The comparison is computed ONCE by the view (DecideView needs it to decide whether the section is worth the page) and passed down: DecideView is the only caller.
+export function BracketFillPanel({ household, fill }: { household: Household; fill: Answer<FillComparison> }) {
   const { lang } = useLang()
   const c = BRACKET_FILL_COPY[lang]
   const [tab, setTab] = useParamChoice('bf', TABS, 'bracket1')
-  const { value, busy } = useBracketFill(household, assumptions, firstAge)
+  const { value, busy } = fill
   if (value === null) return <Skeleton count={4} />
   const shown = value.outcomes.find((o) => tabOf(o.choice) === tab) ?? value.outcomes[0]
   const off = value.outcomes[0]
