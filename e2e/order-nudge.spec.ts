@@ -21,6 +21,9 @@ const rrspHeavy = () => {
 }
 
 test('the answer says when another order of drawing clearly wins, and says what « Stratégies » says', async ({ page }) => {
+  // The nudge rides TWO idle workers (the six orders behind the answer's own searches): its 90 s expects below are honest,
+  // but the default 45 s TEST budget cut them off on CI's slow runner (the element was there, still empty at 45.1 s — red 2026-10-14).
+  test.slow()
   await seedProfile(page, rrspHeavy() as never)
   await page.goto('/resultats')
   const year = page.locator('#annee')
