@@ -97,6 +97,11 @@ export interface Person {
   /** Gross employment income now, in today's dollars. The engine grows it by wage growth until retirement. */
   salaryToday: number
   /**
+   * What the person's pay actually comes to in a year, after tax and everything withheld: the deposits of twelve months. Kept as a CHECK against what the engine says
+   * the salary leaves (engine/takeHome.ts), never as an input: nothing reads it but that comparison. Absent: not given.
+   */
+  netPayYearly?: number
+  /**
    * Work kept after the retirement age: a `share` of the salary (0 to 1) until the person reaches `untilAge`. It is paid, taxed and charged EI, QPIP and
    * QPP contributions like any employment; the savings the person chose to make "while working", and the employer-plan contributions, are NOT
    * made on it. Absent or null: none.
@@ -126,9 +131,14 @@ export interface Person {
       lockedIn?: number
       /** An employer's VRSP contribution per year, today's dollars, while working: it lands in the locked part, costs the person no cash and uses RRSP room. Absent: none. */
       employerContribution?: number
+      /**
+       * What has been put into the account over the years, less what was taken out: kept (here and on the two accounts below) as a CHECK, never an input — set beside
+       * the balance it says what the money did, and nothing else reads it. Absent: not given.
+       */
+      deposited?: number
     }
-    tfsa: { balance: number; room: number; annualContribution: number }
-    nonReg: { balance: number; acb: number; annualContribution: number }
+    tfsa: { balance: number; room: number; annualContribution: number; deposited?: number }
+    nonReg: { balance: number; acb: number; annualContribution: number; deposited?: number }
   }
   pensions: DbPension[]
 }

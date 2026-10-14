@@ -252,6 +252,21 @@ export function setEarning(person: Person, year: number, value: number | null): 
   return { ...person, earningsHistory: history }
 }
 
+/** Set (or, with null, clear) the year's net pay: a check against the salary, never an input (engine/types.ts). The same person back when nothing changes. */
+export function setNetPay(person: Person, value: number | null): Person {
+  if ((person.netPayYearly ?? null) === value) return person
+  const { netPayYearly: _gone, ...rest } = person
+  return value === null ? rest : { ...rest, netPayYearly: value }
+}
+
+/** Set (or, with null, clear) what has been put into an account less what was taken out: a check beside its balance, never an input. The same person back when nothing changes. */
+export function setDeposited(person: Person, kind: 'rrsp' | 'tfsa' | 'nonReg', value: number | null): Person {
+  const account = person.accounts[kind]
+  if ((account.deposited ?? null) === value) return person
+  const { deposited: _gone, ...rest } = account
+  return { ...person, accounts: { ...person.accounts, [kind]: value === null ? rest : { ...rest, deposited: value } } }
+}
+
 /**
  * Set (or, with null, clear) the relevé's own « Montant actuel » at 60 or 65 (monthly). Kept as a CHECK against the engine, never as an
  * input (engine/types.ts): nothing here confirms a fact, and the projection never reads it.

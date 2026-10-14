@@ -385,7 +385,7 @@ describe('schema v18 — the cost of a child by age, and what the household coun
 
   it('a household that states nothing is the same file as before, version apart', () => {
     const result = migrateProfile(oldFixture(17))
-    const raw = oldFixture(24)
+    const raw = oldFixture(25)
     expect(result.ok).toBe(true)
     if (!result.ok) return
     // A file keeps the figures it has: the v17 file's wage growth stays 3,1 %, while the current example holds the Neutre scenario's 2,7 % (Retraite Québec's 2024

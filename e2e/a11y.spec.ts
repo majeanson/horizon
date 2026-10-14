@@ -127,6 +127,25 @@ for (const s of STATES) {
   })
 }
 
+// « Vérifier avec mes relevés » opened with a net pay and a deposit typed: the two lines it says and the warning under an account worth far less than it received.
+for (const s of STATES) {
+  test(`the checks against my statements, opened with figures typed, have no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
+    await setState(page, s)
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/profil?form=1')
+    await page.locator('.page-head__title').waitFor()
+    const fold = page.locator('#person-self').locator('details.fold', { hasText: 'Vérifier avec mes relevés' })
+    await fold.locator('summary').click()
+    for (const [name, value] of [['Paie nette reçue par année', '10000'], ['Total déposé (CELI)', '300000']] as const) {
+      const box = fold.getByRole('textbox', { name })
+      await box.fill(value)
+      await box.press('Enter')
+    }
+    await expect(fold.getByRole('status').filter({ hasText: 'nettement moins' })).toBeVisible()
+    expect(await violations(page)).toEqual([])
+  })
+}
+
 // The household sheet, in every display state: day, night, high contrast and the largest text.
 for (const s of STATES) {
   test(`the household sheet has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {

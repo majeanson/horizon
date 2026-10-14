@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 24
+export const SCHEMA_VERSION = 25
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -297,6 +297,12 @@ function readFlows(r: Reader, v: unknown, persons: number): Flow[] {
   })
 }
 
+/** The optional `deposited` of an account (v25): what was put in less what was taken out, a check beside the balance. Absent: nothing. */
+function readDeposited(r: Reader, v: unknown, path: string): { deposited?: number } {
+  const o = r.obj(v, path) ?? {}
+  return o.deposited == null ? {} : { deposited: r.num(o.deposited, `${path}.deposited`, 0, 1e9) }
+}
+
 function readAccount<K extends string>(r: Reader, v: unknown, path: string, keys: readonly K[]): Record<K, number> {
   const o = r.obj(v, path) ?? {}
   const out = {} as Record<K, number>
@@ -337,6 +343,8 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
     // Work kept after the retirement age (v16): a share of the salary until an age, or none. An older file has none.
     partTime: readPartTime(r, o.partTime, `${path}.partTime`),
     salaryToday: r.num(o.salaryToday, `${path}.salaryToday`, 0, 1e8),
+    // The year's net pay, a check against the salary (v25). Absent: not given.
+    ...(o.netPayYearly != null ? { netPayYearly: r.num(o.netPayYearly, `${path}.netPayYearly`, 0, 1e8) } : {}),
     earningsHistory,
     rrq: {
       startAge: r.num(rrq.startAge, `${path}.rrq.startAge`, 60, 72, true),
@@ -348,9 +356,9 @@ function readPerson(r: Reader, v: unknown, path: string, expected: PersonId): Pe
       residentSince: r.num(oas.residentSince, `${path}.oas.residentSince`, 1900, 2100, true),
     },
     accounts: {
-      rrsp,
-      tfsa: readAccount(r, accounts.tfsa, `${path}.accounts.tfsa`, ['balance', 'room', 'annualContribution'] as const),
-      nonReg: readAccount(r, accounts.nonReg, `${path}.accounts.nonReg`, ['balance', 'acb', 'annualContribution'] as const),
+      rrsp: { ...rrsp, ...readDeposited(r, accounts.rrsp, `${path}.accounts.rrsp`) },
+      tfsa: { ...readAccount(r, accounts.tfsa, `${path}.accounts.tfsa`, ['balance', 'room', 'annualContribution'] as const), ...readDeposited(r, accounts.tfsa, `${path}.accounts.tfsa`) },
+      nonReg: { ...readAccount(r, accounts.nonReg, `${path}.accounts.nonReg`, ['balance', 'acb', 'annualContribution'] as const), ...readDeposited(r, accounts.nonReg, `${path}.accounts.nonReg`) },
     },
     pensions,
   }

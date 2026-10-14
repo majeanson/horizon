@@ -10,6 +10,7 @@ import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { Section, type PersonEditor } from './shared'
 import { LevelSlot } from './LevelSlot'
+import { PersonChecks } from './PersonChecks'
 import { TfsaRoomHelper } from './TfsaRoomHelper'
 
 // Old Age Security (when it starts, and the residence that decides how much), then the three kinds of savings
@@ -141,6 +142,7 @@ export function AccountsSection({ person, edit, withoutRoom = false, withNonReg 
         </FieldRow>
       </Group>
       )}
+      <PersonChecks person={person} edit={edit} withNonReg={withNonReg} />
     </Section>
   )
 }

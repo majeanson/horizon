@@ -33,7 +33,9 @@ const BUDGETS: Record<string, Budget> = {
   // count only once opened): the CRA's January 1 figure less this year's deposits.
   // controls 324 → 325, words 2026 → 2031 (2026-10-14): « Importer un relevé de banque » — the Budget section's one summary (the file picker, the paste box and the groups sit in a closed fold, so they
   // count only once opened): a bank export counted by category, read on the device.
-  'Profil (form)': { controls: 325, words: 2031 },
+  // controls 325 → 327, words 2031 → 2039 (2026-10-14): « Vérifier avec mes relevés » — one closed fold per person under the accounts (the year's net pay against what the salary leaves, and the deposits
+  // in each account against its balance): two checks the plan never reads, counted only by their summary until opened.
+  'Profil (form)': { controls: 327, words: 2039 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   'Hypothèses': { controls: 66, words: 680 },

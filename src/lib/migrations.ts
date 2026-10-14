@@ -137,6 +137,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   // v23 → v24: nothing in the SHAPE changed. The blank profile's default wage growth became the Neutre scenario's new figure (2,7 %, Retraite Québec's 2024 valuation, was
   // 3,1 %); a saved file keeps the figures it has — the step is the identity, and the version exists so the ceremony records the change where every other one is.
   (profile) => profile,
+  // v24 → v25: a person may give the year's NET PAY (`netPayYearly`) and an account the total `deposited` in it: two checks against what the engine says, never inputs. Every older file
+  // gave neither: the fields are absent.
+  (profile) => profile,
 ]
 
 export type ReadResult =
