@@ -75,7 +75,9 @@ test('retired couple: no retirement question, no age to compare, no pension star
 test('newcomer: the OAS is the share her residence earns, and the ledger shows the calculation', async ({ page }) => {
   await loadExample(page, 'Arrivée au Canada à 30 ans')
   await openLedger(page)
-  await expect(page.locator('.ledger')).toContainText('résidence 88 %')
+  // the calculation is in the OAS amount's own note (Figure): open it, and the residence share is in the formula
+  await page.locator('.ledger__row').filter({ hasText: 'Début de la PSV' }).locator('button.figure').click()
+  await expect(page.locator('.ledger .figure-note__formula').filter({ hasText: 'pension complète' })).toContainText(/résidence 87,5\s%/)
 })
 
 test('heir: young and rich — « dès maintenant » rather than a first age tried, in the verdict and in the spending answer', async ({ page }) => {

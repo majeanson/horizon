@@ -19,16 +19,20 @@ type Budget = { controls: number; words: number }
 // Résultats — Réponse raised 43 → 46 controls and 639 → 668 words (2026-10-13): the « Moments » row under the projection chart — a chip per notable year
 // (the pension starts, the end of the plan; the golden couple has three), each a door to the section that explains it. A conscious trade: the chart's moments
 // were only dashed lines to guess at; the chips are the keyboard / screen-reader path that the taps on the chart mirror.
+// Résultats — Preuve, 2026-10-13 (idea 3, the Figure): controls 37 → 43 — the four Figure buttons on the golden couple's two pension rows (QPP and OAS, one each
+// per person), the two EstFlag links on the spending rows, and one glossary link another session added to the average-rate sentence. Words 1959 → 1859 (the
+// ratchet FALLS): the old calculation lines under the pensions folded into the figures' notes, which are hidden until asked for — one home per figure.
 const BUDGETS: Record<string, Budget> = {
   'Accueil (first visit)': { controls: 24, words: 294 },
   'Profil (first visit, onboarding)': { controls: 16, words: 75 },
   'Accueil (with a plan)': { controls: 20, words: 183 },
-  'Profil (form)': { controls: 314, words: 1952 },
+  // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
+  'Profil (form)': { controls: 322, words: 2018 },
   'Hypothèses': { controls: 66, words: 659 },
   'Fiche': { controls: 28, words: 382 },
   'Résultats — Réponse': { controls: 46, words: 668 },
   'Résultats — Décider': { controls: 50, words: 1211 },
-  'Résultats — Preuve': { controls: 37, words: 1959 },
+  'Résultats — Preuve': { controls: 43, words: 1859 },
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]
