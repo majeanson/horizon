@@ -1,6 +1,5 @@
 import { useDeferredValue, useMemo } from 'react'
-import { MAX_AGE, MIN_AGE, assumptionsOf } from '../lib/resultsModel'
-import { retirementState } from '../engine/ledger'
+import { answerRequest } from '../lib/answerRequest'
 import { PageHead } from '../components/PageHead'
 import { TimelineStrip } from '../components/results/TimelineStrip'
 import { SheetSerious } from '../components/sheet/SheetSerious'
@@ -26,17 +25,15 @@ export function Fiche() {
   // The projections behind the sheet run on the SETTLED profile, as the results page's do: a figure typed on another tab must not re-run them at every key.
   const settled = useDeferredValue(useSettled(profile))
   const { year, month } = today()
-  const assumptions = useMemo(() => assumptionsOf(settled, { year, month }), [settled, year, month])
+  const request = useMemo(() => answerRequest(settled, { year, month }), [settled, year, month])
+  const { assumptions } = request
   const gaps = profileGaps(settled)
-  const state = useMemo(() => retirementState(settled.household, assumptions), [settled, assumptions])
-  const ages = settled.household.persons.map((p) => year - p.birth.year)
-  const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, Math.max(...ages)))
-  const answer = useAnswer(settled.household, assumptions, firstAge, Math.min(...ages), state.everyoneRetired, gaps.length === 0)
+  const answer = useAnswer(request, gaps.length === 0)
   // undefined while the search is out; null when no age up to 70 works.
   const earliest = gaps.length > 0 ? undefined : answer.value === null ? undefined : answer.value.earliest
   // The figures not yet read off a document, and how far the answer moves if each were off: idle work, once the answer itself is in.
   const unconfirmed = useMemo(() => unconfirmedFacts(settled).map((f) => ({ id: f.id, owner: f.owner, kind: f.kind })), [settled])
-  const impact = useFactImpact(settled.household, assumptions, unconfirmed, gaps.length === 0 && !state.everyoneRetired && answer.value !== null)
+  const impact = useFactImpact(settled.household, assumptions, unconfirmed, gaps.length === 0 && !request.everyoneRetired && answer.value !== null)
   const model = useMemo(() => sheetModel(settled, assumptions, earliest, impact?.swings), [settled, assumptions, earliest, impact])
   const births = settled.household.persons.map((p) => p.birth.year)
   const names = settled.household.persons.map((p, i) => p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse))

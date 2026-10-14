@@ -1,11 +1,11 @@
 import { useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { retirementState } from '../engine/ledger'
 import { useLang } from '../i18n'
 import { useAnswer } from '../lib/useAnswer'
+import { answerRequest } from '../lib/answerRequest'
 import { LIVE_COPY } from '../lib/liveCopy'
 import { profileGaps } from '../lib/profileGaps'
-import { MAX_AGE, MIN_AGE, assumptionsOf } from '../lib/resultsModel'
+import { MAX_AGE } from '../lib/resultsModel'
 import { useProfile } from '../lib/store'
 import { today } from '../lib/today'
 import { useSettled } from '../lib/useSettled'
@@ -20,12 +20,9 @@ export function LiveAnswer() {
   const profile = useProfile()
   const slow = useSettled(profile)
   const { year, month } = today()
-  const assumptions = useMemo(() => assumptionsOf(slow, { year, month }), [slow, year, month])
-  const state = useMemo(() => retirementState(slow.household, assumptions), [slow, assumptions])
-  const ready = profileGaps(profile).length === 0 && !state.everyoneRetired
-  const ages = slow.household.persons.map((p) => year - p.birth.year)
-  const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, Math.max(...ages)))
-  const answer = useAnswer(slow.household, assumptions, firstAge, Math.min(...ages), state.everyoneRetired, ready)
+  const request = useMemo(() => answerRequest(slow, { year, month }), [slow, year, month])
+  const ready = profileGaps(profile).length === 0 && !request.everyoneRetired
+  const answer = useAnswer(request, ready)
   const got = ready ? answer.value : null
   // The first answer seen is the reference: « since you arrived ». null = it was « no age », the only value that is not a number.
   const first = useRef<{ earliest: number | null } | null>(null)

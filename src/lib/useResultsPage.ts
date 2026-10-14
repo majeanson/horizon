@@ -12,6 +12,7 @@ import { paramsVintage } from './vintage'
 import { prudentDiffers } from './headline'
 import { NO_HEADLINE } from './answer'
 import { useAnswer } from './useAnswer'
+import { answerRequest } from './answerRequest'
 import { useRuns } from './useRuns'
 import { scrollToSection } from './motion'
 import { usePrinting } from './usePrinting'
@@ -24,7 +25,7 @@ import { LEVERS_COPY } from './leversCopy'
 import { useLevers } from './useLevers'
 import { formatMoney } from './money'
 import { profileGaps } from './profileGaps'
-import { MAX_AGE, MIN_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, type Selection } from './resultsModel'
+import { MAX_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, type Selection } from './resultsModel'
 import { accuracyOf, factsOf } from './facts'
 import { GUIDE_COPY } from './guideCopy'
 import { useFactImpact } from './useFactImpact'
@@ -109,14 +110,13 @@ export function useResultsPage() {
   )
 
   const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
-  const youngest = Math.min(...profile.household.persons.map((p) => year - p.birth.year))
-  // Clamped on BOTH sides: someone past 70 and still working used to leave firstAge above MAX_AGE —
-  // an empty compare rail and an age box whose min sat over its max.
-  const firstAge = Math.min(MAX_AGE, Math.max(MIN_AGE, oldest))
+  // The question put to the answer worker (the ages it starts from, whether everybody has stopped) is worked out in ONE place: lib/answerRequest.ts.
+  const request = useMemo(() => answerRequest(slow, { year, month }), [slow, year, month])
+  const { firstAge, youngest } = request
   // THE answer — the earliest age, « dès maintenant », the headline, the monthly comfort, the dates — is one job worked out
   // off the page's thread (lib/answer.ts): null until the first one is in (the card shows a skeleton), then the LAST one
   // while a re-asked question runs (the card says it is busy). Forty projections never again run between two taps.
-  const answer = useAnswer(slow.household, slowAssumptions, firstAge, youngest, state.everyoneRetired, gaps.length === 0)
+  const answer = useAnswer(request, gaps.length === 0)
   const got = gaps.length === 0 ? answer.value : null
   const answerPending = gaps.length === 0 && got === null
   const earliest = got?.earliest ?? null
