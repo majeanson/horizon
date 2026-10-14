@@ -4,7 +4,8 @@ import { everyoneAt, runScenario } from '../engine/retireAt.ts'
 import type { AgeResult } from '../engine/types.ts'
 import { SOURCE_SEGMENTS, chartSeries, deflator, expenseBars, sourceBars } from './chartData.ts'
 import { yearCsv, type YearCsvHeads } from './yearCsv.ts'
-import { lockedOf, yearTableModel } from './yearTable.ts'
+import { retiredRates } from './retiredRates.ts'
+import { averageRateOf, lockedOf, yearTableModel } from './yearTable.ts'
 
 // THE TABLE CAN BE TRUSTED. The year-by-year table and its spreadsheet are written from ONE model (lib/yearTable.ts). Held here, for all eleven example households and
 // three retirement ages each: the model is the engine's row divided by the year's factor and nothing else; it agrees with the charts' bars and lines; a year is « short » exactly when
@@ -167,5 +168,46 @@ describe('the edge of « short »', { timeout: 120_000 }, () => {
     expect(model.firstShortYear).toBe(result.firstShortfallYear)
     // and just under the edge, nothing is short anywhere
     expect(yearTableModel(at(lo).rows).hasShortfall).toBe(false)
+  })
+})
+
+describe('the average tax rate of a year', { timeout: 120_000 }, () => {
+  it('is the household’s tax over everyone’s net income, a share that no dollar factor touches — and null when nobody has a net income', () => {
+    for (const r of runs) {
+      const f = factorOf(r.id)
+      const model = yearTableModel(r.result.rows, f)
+      model.rows.forEach((m, i) => {
+        const row = r.result.rows[i]
+        const net = Object.values(row.persons).reduce((s, p) => s + (p?.netIncome ?? 0), 0)
+        if (net > 0) {
+          expect(m.avgRate, `${label(r)} ${m.year}`).toBeCloseTo(row.household.tax / net, 10)
+          expect(m.avgRate!, `${label(r)} ${m.year}`).toBeGreaterThanOrEqual(0)
+          expect(m.avgRate!, `${label(r)} ${m.year}`).toBeLessThan(1)
+        } else expect(m.avgRate, `${label(r)} ${m.year}`).toBeNull()
+        expect(yearTableModel(r.result.rows).rows[i].avgRate).toBe(m.avgRate)
+      })
+    }
+    const none = structuredClone(runs[0].result.rows.slice(0, 1))
+    for (const p of Object.values(none[0].persons)) if (p) p.netIncome = 0
+    expect(yearTableModel(none).rows[0].avgRate).toBeNull()
+    expect(averageRateOf(none[0])).toBeNull()
+  })
+})
+
+describe('the average rate beside the marginal rate of a retired year', { timeout: 120_000 }, () => {
+  it('names the first year with no salary, and the cost of one more dollar is a real share (a hair under nought where the first 2 000 $ of RRIF income earn the pension credit) that there', () => {
+    let seen = 0
+    for (const r of runs) {
+      const { assumptions } = EXAMPLES[r.id]
+      const rates = retiredRates(r.result.rows, assumptions)
+      if (!rates) continue
+      seen++
+      const row = r.result.rows.find((x) => x.year === rates.year)!
+      expect(Object.values(row.persons).every((p) => (p?.employment ?? 0) === 0), label(r)).toBe(true)
+      expect(rates.average, label(r)).toBe(averageRateOf(row))
+      for (const k of ['tax', 'oasRecovery', 'gisLost', 'rate'] as const) expect(Number.isFinite(rates.marginal[k]) && rates.marginal[k] >= -0.05, `${label(r)} ${k}`).toBe(true)
+      expect(rates.marginal.rate, label(r)).toBeLessThan(1.5)
+    }
+    expect(seen, 'most examples retire inside their plan').toBeGreaterThan(runs.length / 2)
   })
 })

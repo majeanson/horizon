@@ -1,7 +1,11 @@
 import { useMemo } from 'react'
 import { useLang, useT } from '../../i18n'
 import { deflator, type Dollars } from '../../lib/chartData'
-import { formatYearAge } from '../../lib/format'
+import { Link } from 'react-router-dom'
+import { formatPct, formatYearAge } from '../../lib/format'
+import { glossaryAnchor } from '../../lib/glossIndex'
+import { retiredRates } from '../../lib/retiredRates'
+import { Gloss } from '../Gloss'
 import { formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { useNotice } from '../../lib/toast'
@@ -11,7 +15,7 @@ import { yearTableModel } from '../../lib/yearTable'
 import { Chip } from '../Chip'
 import { TableChooser } from '../TableChooser'
 import type { Selection } from '../../lib/resultsModel'
-import type { AgeResult } from '../../engine/types'
+import type { AgeResult, Assumptions } from '../../engine/types'
 
 // The picture's text: one row per year for the retirement age chosen in the table's header, every figure the chart
 // draws and the ones it does not (tax, spending, what is left to cover). One table, not one per age: the header picks
@@ -29,14 +33,18 @@ export function YearTables({
   label,
   dollars,
   todayYear,
-  inflation,
+  assumptions,
+  livesAlone,
   births,
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
   label: (s: Selection) => string
   dollars: Dollars
   todayYear: number
-  inflation: number
+  /** The plan's assumptions: the inflation that deflates the dollars, and what the marginal rate of a retired year is worked out with. */
+  assumptions: Assumptions
+  /** Whether a one-adult household lives alone (Québec's living-alone amount); a couple never does. */
+  livesAlone?: boolean
   /** The birth years of the household, for the « year (ages) » of the first year that falls short. */
   births: readonly number[]
 }) {
@@ -50,6 +58,7 @@ export function YearTables({
   const keys = runs.map((x) => String(x.selection))
   const [key, setKey] = useParamChoice('table', keys, keys[0] ?? '')
   const shown = runs[Math.max(0, keys.indexOf(key))]
+  const { inflation } = assumptions
   const factor = (year: number) => (dollars === 'today' ? deflator(year, todayYear, inflation) : 1)
   const money = (n: number) => formatMoney(n, lang)
   const unit = dollars === 'today' ? c.today : c.nominal
@@ -65,6 +74,8 @@ export function YearTables({
   }
   // The rows of the table, already in the dollars shown (lib/yearTable.ts — the same model the spreadsheet is written from).
   const model = useMemo(() => (shown ? yearTableModel(shown.result.rows, factor) : null), [shown, dollars, todayYear, inflation]) // eslint-disable-line react-hooks/exhaustive-deps
+  // The average rate against the cost of one more REER dollar, in the first year without a salary (rates, not dollars: the unit does not matter).
+  const rates = useMemo(() => (shown ? retiredRates(shown.result.rows, assumptions, livesAlone) : null), [shown, assumptions, livesAlone])
   if (!shown || !model) return null
   const { rows, hasHome, hasLocked, hasShortfall, firstShortYear } = model
   return (
@@ -84,6 +95,15 @@ export function YearTables({
       <h3 className="year-table__title">{r.scenario.retireAt(label(shown.selection))}</h3>
       <p className="field-row__hint year-table__unit">{unit}.</p>
       {firstShortYear !== null && <p className="year-table__short">{RESULTS_COPY[lang].shortage.from(formatYearAge(firstShortYear, births, lang), r.table.shortfall)}</p>}
+      {/* The cost of a dollar is shown as at least nought: where the first 2 000 $ of RRIF income earn the pension credit, the engine's step is a hair NEGATIVE, which a sentence about a « cost » cannot say. */}
+      {rates && (
+        <p className="field-row__hint year-table__rates">
+          <Gloss>{RESULTS_COPY[lang].rates.line(formatYearAge(rates.year, births, lang), formatPct(rates.average, lang, 1), formatPct(Math.max(0, rates.marginal.rate), lang, 1), births.length > 1)}</Gloss>{' '}
+          <Link className="gloss" to={{ pathname: '/glossaire', hash: glossaryAnchor('taux-moyen') }} title={t.common.inGlossary}>
+            {RESULTS_COPY[lang].rates.gloss}
+          </Link>
+        </p>
+      )}
       <div className="table-wrap table-wrap--pinned" role="region" aria-label={`${r.table.title} — ${label(shown.selection)} (${unit})`} tabIndex={0}>
         <table>
           <thead>
@@ -93,6 +113,7 @@ export function YearTables({
               </th>
               <th scope="col">{r.table.income}</th>
               <th scope="col">{r.table.tax}</th>
+              <th scope="col">{r.table.avgRate}</th>
               <th scope="col">{r.table.spending}</th>
               {hasShortfall && <th scope="col">{r.table.shortfall}</th>}
               <th scope="col">{r.table.netWorth}</th>
@@ -111,6 +132,7 @@ export function YearTables({
                 </th>
                 <td>{money(row.income)}</td>
                 <td>{money(row.tax)}</td>
+                <td>{row.avgRate === null ? '—' : formatPct(row.avgRate, lang, 1)}</td>
                 <td>{money(row.spending)}</td>
                 {hasShortfall && <td>{row.short ? money(row.shortfall) : '—'}</td>}
                 <td>{money(row.netWorth)}</td>

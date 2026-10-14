@@ -7,6 +7,12 @@ import type { YearRow } from '../engine/types.ts'
 /** The locked-in part of the household's REER at the end of the year (0 for most households). */
 export const lockedOf = (row: YearRow): number => Object.values(row.persons).reduce((s, p) => s + p.rrspLockedEnd, 0)
 
+/** The year's average tax rate: the household's tax (income tax + OAS recovery) ÷ everyone's net income (line 23600) — the basis of lib/sheetModel.ts's « keep ». Null when nobody has a positive net income. */
+export function averageRateOf(row: YearRow): number | null {
+  const net = Object.values(row.persons).reduce((s, p) => s + (p?.netIncome ?? 0), 0)
+  return net > 0 ? row.household.tax / net : null
+}
+
 interface YearTableRow {
   year: number
   /** Each person's age that year, in household order. */
@@ -18,6 +24,8 @@ interface YearTableRow {
   // Every figure below is already in the dollars shown (the year's own, or today's): the engine's figure divided by `factor(year)`.
   income: number
   tax: number
+  /** Tax ÷ net income, a share (no dollar factor applies); null when there is no net income. */
+  avgRate: number | null
   spending: number
   /** What the year could not pay (0 when it is paid). */
   shortfall: number
@@ -52,6 +60,7 @@ export function yearTableModel(rows: readonly YearRow[], factor: (year: number) 
       short: h.shortfall > 0,
       income: h.grossIncome / k,
       tax: h.tax / k,
+      avgRate: averageRateOf(row),
       spending: h.spending / k,
       shortfall: h.shortfall / k,
       netWorth: h.netWorthEnd / k,

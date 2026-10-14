@@ -423,6 +423,7 @@ export const FR = {
       ages: 'Âges',
       income: 'Revenu brut',
       tax: 'Impôt',
+      avgRate: 'Taux moyen',
       spending: 'Dépenses',
       shortfall: 'À combler',
       netWorth: 'Valeur nette',

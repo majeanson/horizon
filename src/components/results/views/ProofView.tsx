@@ -33,7 +33,7 @@ export function ProofView({ m }: { m: ResultsModel }) {
         <section id="tableau" className="results-section" aria-label={r.table.title}>
           <SectionHeader title={r.table.title} />
           {runsPending && <Skeleton count={6} />}
-          <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
+          <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={assumptions} livesAlone={profile.household.livesAlone} births={births} />
         </section>
 
         {/* What the calculation was checked against and what it simplifies: after the figures it was checked on. */}
