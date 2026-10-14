@@ -11,7 +11,7 @@ export interface RealWageCopy {
 
 const FR: RealWageCopy = {
   line: (real, reference) => `Après inflation : ${real} par année. Retraite Québec suppose ${reference} pour la rente du RRQ (évaluation actuarielle de 2024).`,
-  above: 'Plus haut que son hypothèse : la rente du RRQ projetée en profite.',
+  above: 'Plus haut que son hypothèse : la rente du RRQ projetée en profite.',
 }
 
 const EN: RealWageCopy = {
