@@ -1,10 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
+import { EXAMPLE_IDS } from '../src/engine/golden/examples'
 import { slowCpu } from './seed'
 
 // The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
 test.beforeEach(({ page }) => slowCpu(page))
 
-// EVERY EXAMPLE, THROUGH THE REAL PAGES. The twelve example households (src/engine/golden/examples.ts) are loaded the way a person
+// EVERY EXAMPLE, THROUGH THE REAL PAGES. The example households (src/engine/golden/examples.ts — EXAMPLE_IDS is the count) are loaded the way a person
 // loads them — the data page — and each one must read as its own story on the results page: the headline, the cards, the ledger,
 // and which panels are offered at all. The arithmetic behind each is printed in EXAMPLES.md and pinned by engine/golden/examples.test.ts.
 
@@ -21,9 +22,9 @@ const openLedger = async (page: Page) => {
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
-test('the data page offers all twelve examples, each with its story', async ({ page }) => {
+test('the data page offers every example the engine ships, each with its story', async ({ page }) => {
   await page.goto('/donnees?autres=examples')
-  await expect(page.locator('.example-list li')).toHaveCount(12)
+  await expect(page.locator('.example-list li')).toHaveCount(EXAMPLE_IDS.length)
   await expect(page.locator('.example-list')).toContainText('Julien, 52 ans')
 })
 

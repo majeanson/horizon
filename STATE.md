@@ -72,7 +72,6 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] Year-by-year projection: the cash identity holds to the cent every year; withdrawal order with a gross-up solved against the tax function (`projection.test.ts`, twelve planted bugs red)
 - [x] Couple, splitting, RRIF minimum, GIS and OAS recovery wired in; `retireAt`, `compare`, the sensitivity grid
-- [x] `golden/` committed (`golden.projection.json`, `golden.retireAt.json`) — reviewed for plausibility: the DB steps down at 65, RRQ/OAS start, the drawdown order is respected
 - [x] The sensitivity grid runs by itself, in a worker, idle-priority behind the verdict's first paint; its grids detail the verdict's own range line
 - [ ] Survivor scenarios (one spouse dies) — v2
 
@@ -147,7 +146,8 @@ official page, and any guard it added has been **planted against its own bug** a
 
 - [x] The answer is a RANGE while figures are estimates: `engine/factImpact.ts` `uncertaintyRange` (every unconfirmed figure nudged 15 % at once, enforced to contain the base; `high: null` = « peut-être aucun âge avant 70 »), said in the verdict's confidence line; each « Préciser » mover says what confirming buys (« resserre la réponse d'environ N ans »); the accuracy note explains the range with the engine's own NUDGE passed in (never retyped — the copy test pins it); Accueil asks ONE question per visit (`DripQuestion`, « Plus tard » = this visit only, « Voir tout ce qui reste estimé » → `/profil#exact`); the live answer shows the range and appears INSIDE the first-visit path as soon as it is computable
 - [x] Accueil proves the product before asking anything: a demo verdict on an example household (`DemoAnswer`, the results page's own sentence; « Essayer avec ce ménage » loads it through `lib/example.ts` `loadExample` — now the ONE loading path, shared with Données), then three doors by effort — « J'ai 2 minutes » (`?debut=rapide`: who · naissance · revenu · épargne · dépenses; the done screen calls the departure age an ASSUMPTION and « Préciser » re-opens the full questions at « Ma situation »), « Je prends le temps », « J'ai mes documents en main »
-- [ ] In flight: prune-by-impact on Décider (`#fonte` + levers behind one verdict line and `?tout=1`), the first-paint complexity ratchet (`e2e/complexity.spec.ts` authored — budgets to be measured at its first run), then the `Figure` provenance primitive, the chart's « moments » doors, the facsimile entry (RRQ relevé · compte ARC) and the guided tour of one's own result
+- [x] Prune by impact on Décider (`lib/relevance.ts`: `#fonte` + the zero-effect levers behind one TRUE verdict line and a closed fold, `?tout=1` opens all, an unanswered search never prunes) · the first-paint complexity ratchet (`e2e/complexity.spec.ts`: per-route controls+words with every fold closed, never scrolled; budgets measured 2026-10-13 — Profil form 314/1952 is the quantified wall — may only fall; planted red at 23 < 24, restored)
+- [ ] In flight: the `Figure` provenance primitive, the chart's « moments » doors, the facsimile entry (RRQ relevé · compte ARC — binds `rrq.statementAt60/65`, actuel only, check-not-input), the « si vous sautez » wizard defaults, the estimated-figure marks outside Profil, and the guided tour of one's own result
 
 ## 5. Lessons carried over from Babillard
 

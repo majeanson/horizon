@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
+import { EXAMPLE_IDS } from '../src/engine/golden/examples'
 import { EXAMPLE, blankSeed, savedProfile, seedProfile, showAllSections } from './seed'
 
 // The profile, end to end in a real browser: what is typed is what is saved, what is saved is what comes back, and
@@ -489,7 +490,7 @@ test.describe('the settings page: no switch, one section under the other', () =>
     await expect(page.locator('.example-list li').first()).toBeHidden()
     await page.locator('details#exemples > summary').click()
     await expect(page).toHaveURL(/autres=examples/)
-    await expect(page.locator('.example-list li')).toHaveCount(12)
+    await expect(page.locator('.example-list li')).toHaveCount(EXAMPLE_IDS.length)
     await expect(page.locator('.example-list li').first()).toBeVisible()
   })
 
