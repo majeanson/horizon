@@ -1,4 +1,4 @@
-import { factSwings, type FactSwing, type ImpactKind } from '../engine/factImpact.ts'
+import { factSwings, type FactSwing, type ImpactKind, type UncertaintyRange } from '../engine/factImpact.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
 
 // Off the page's thread: two short walks of a few full projections for every figure not yet read off a document. Nothing here
@@ -10,7 +10,7 @@ export interface FactImpactRequest {
   facts: { id: string; owner: 'self' | 'spouse' | 'household'; kind: ImpactKind }[]
 }
 
-export type FactImpactAnswer = { base: number | null; swings: Record<string, FactSwing> }
+export type FactImpactAnswer = { base: number | null; swings: Record<string, FactSwing>; range: UncertaintyRange | null }
 
 self.onmessage = (event: MessageEvent<FactImpactRequest>) => {
   const { household, assumptions, facts } = event.data

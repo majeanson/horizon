@@ -93,11 +93,23 @@ export interface FactSwing {
   years: number
 }
 
+export interface UncertaintyRange {
+  /** The earliest age if EVERY listed figure were nudged 15 % the way that helps (null: none up to 70). Never later than `base`. */
+  low: number | null
+  /** The earliest age if every one were nudged 15 % the way that hurts. `null` means « maybe no age before 70 »: it stays distinct from a number so the page can say so. Never earlier than `base`. */
+  high: number | null
+}
+
 /**
- * Each requested figure's swing against the answer as the plan stands. `facts` are `{ id, owner, kind }` as the profile lists them;
- * the result is keyed by `id`. A figure the household does not carry (no home, no pension) cannot be nudged and swings 0.
+ * Each requested figure's swing against the answer as the plan stands, and the range when all of them are off at once. `facts` are
+ * `{ id, owner, kind }` as the profile lists them; `swings` is keyed by `id`. A figure the household does not carry (no home, no
+ * pension) cannot be nudged and swings 0. `range` is null when `facts` is empty.
  */
-export function factSwings(h: Household, a: Assumptions, facts: readonly { id: string; owner: Owner; kind: ImpactKind }[]): { base: number | null; swings: Record<string, FactSwing> } {
+export function factSwings(
+  h: Household,
+  a: Assumptions,
+  facts: readonly { id: string; owner: Owner; kind: ImpactKind }[],
+): { base: number | null; swings: Record<string, FactSwing>; range: UncertaintyRange | null } {
   const base = retireAt(h, a, { stopAtFirstOk: true }).earliestOk
   const oldest = Math.max(0, ...h.persons.map((p) => a.today.year - p.birth.year))
   const lowest = Math.max(MIN_TRY_AGE, oldest)
@@ -114,10 +126,24 @@ export function factSwings(h: Household, a: Assumptions, facts: readonly { id: s
   }
   const n = (x: number | null) => x ?? NO_AGE
   const swings: Record<string, FactSwing> = {}
+  // The household with every figure nudged the way that hurts / helps, composed one after the other (each clamp re-reads the
+  // current value, so the order is safe). A figure whose two nudges land on the same age says nothing about a direction: left out.
+  let worst = h
+  let best = h
   for (const f of facts) {
     const down = earliest(nudged(h, a.today.year, f.owner, f.kind, -1))
     const up = earliest(nudged(h, a.today.year, f.owner, f.kind, 1))
     swings[f.id] = { down, up, years: Math.max(Math.abs(n(down) - n(base)), Math.abs(n(up) - n(base))) }
+    if (n(down) === n(up)) continue
+    const worseDir: -1 | 1 = n(up) > n(down) ? 1 : -1
+    worst = nudged(worst, a.today.year, f.owner, f.kind, worseDir)
+    best = nudged(best, a.today.year, f.owner, f.kind, worseDir === 1 ? -1 : 1)
   }
-  return { base, swings }
+  if (facts.length === 0) return { base, swings, range: null }
+  // ENFORCED, not assumed: clamps and non-monotone plans can let a composed household land on the wrong side of the answer, so the
+  // range is pinned to contain it. NO_AGE converts back to null on the way out (« none works up to 70 », the unlucky end).
+  const back = (x: number) => (x >= NO_AGE ? null : x)
+  const low = Math.min(n(earliest(best)), n(base))
+  const high = Math.max(n(earliest(worst)), n(base))
+  return { base, swings, range: { low: back(low), high: back(high) } }
 }
