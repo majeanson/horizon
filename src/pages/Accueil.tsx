@@ -1,25 +1,43 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Fold } from '../components/Fold'
 import { InstallCard } from '../components/install/InstallHint'
+import { DripQuestion } from '../components/DripQuestion'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
 import { useLang } from '../i18n'
+import { answerRequest } from '../lib/answerRequest'
+import { factsOf } from '../lib/facts'
 import { profileGaps } from '../lib/profileGaps'
 import { useProfile } from '../lib/store'
+import { today } from '../lib/today'
+import { useFactImpact } from '../lib/useFactImpact'
+import { useSettled } from '../lib/useSettled'
 import { WELCOME_COPY } from '../lib/welcomeCopy'
 
 // « Accueil » — the front door at `/`. Profil used to be the first thing seen, and a returning household landed on a full form.
 // This page says what Horizon is, offers ONE next step (begin, or — once the profile holds enough for an answer — see it), and keeps
 // the rest (how it works, what to know) to three short cards each. It reads the profile and writes nothing.
+//
+// A ready profile is also asked ONE question (components/DripQuestion.tsx) and shows the answer's range. Both read the SAME idle search
+// (`useFactImpact`, how far the answer moves if each unconfirmed figure were off), so it is made here, once, on the settled profile, and handed down.
 export function Accueil() {
   const { lang } = useLang()
   const c = WELCOME_COPY[lang]
-  const ready = profileGaps(useProfile()).length === 0
+  const profile = useProfile()
+  const ready = profileGaps(profile).length === 0
+  const slow = useSettled(profile)
+  const { year, month } = today()
+  const request = useMemo(() => answerRequest(slow, { year, month }), [slow, year, month])
+  // The same gate as the live answer: a settled profile with no gap, and somebody still working (a retired household's answer is a plan, not an age).
+  const asking = profileGaps(slow).length === 0 && !request.everyoneRetired
+  const unconfirmed = useMemo(() => factsOf(slow).filter((f) => !f.confirmed).map((f) => ({ id: f.id, owner: f.owner, kind: f.kind })), [slow])
+  const impact = useFactImpact(slow.household, request.assumptions, unconfirmed, asking)
   return (
     <section className="page-body welcome">
       <PageHead title={c.title} subtitle={c.subtitle} />
-      {ready && <LiveAnswer />}
+      {ready && <LiveAnswer range={asking ? impact?.range : null} />}
+      {ready && asking && <DripQuestion impact={impact} facts={unconfirmed} />}
       <div className="welcome__go">
         <Link className="btn btn--primary" to={ready ? '/resultats' : '/profil'}>
           {ready ? c.seeAnswer : c.begin}

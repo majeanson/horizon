@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { BudgetSection } from '../components/profile/BudgetSection'
 import { HomeSection } from '../components/profile/HomeSection'
@@ -106,6 +106,19 @@ export function Profil() {
       { replace: true },
     )
   }, [wantedFact, setParams])
+
+  // `/profil#exact` (the front door's « Voir tout ce qui reste estimé »): the figure guide loads on its own, after the form, so the browser's own jump to the anchor finds nothing — wait for it.
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (hash !== '#exact') return
+    let tries = 0
+    const timer = window.setInterval(() => {
+      const el = document.getElementById('exact')
+      if (el) el.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
+      if (el || ++tries > 20) window.clearInterval(timer)
+    }, 150)
+    return () => window.clearInterval(timer)
+  }, [hash])
 
   // First visit: a blank form is a wall. The page IS one question at a time (components/Onboarding.tsx) until the person finishes it or
   // asks for the full form (`?form=1`, which the path writes and a link can carry). Decided at arrival, like the card it replaces: a

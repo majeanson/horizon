@@ -17,6 +17,9 @@ export interface LiveCopy {
   lost: string
   see: string
   working: string
+  /** While figures are estimates: the answer's range (every estimate nudged 15 % at once). `open`: the worse end is « no age before the maximum ». */
+  range: (low: number, high: number) => string
+  rangeOpen: (low: number, max: number) => string
 }
 
 const FR: LiveCopy = {
@@ -30,6 +33,8 @@ const FR: LiveCopy = {
   lost: 'plus aucun âge ne fonctionne',
   see: 'Voir',
   working: '…',
+  range: (low, high) => `Entre ${low} et ${high} ans selon vos chiffres estimés`,
+  rangeOpen: (low, max) => `Entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés`,
 }
 
 const EN: LiveCopy = {
@@ -43,6 +48,8 @@ const EN: LiveCopy = {
   lost: 'no age works any more',
   see: 'See',
   working: '…',
+  range: (low, high) => `Between age ${low} and ${high}, depending on your estimated figures`,
+  rangeOpen: (low, max) => `Between age ${low} and possibly no age before ${max}, depending on your estimated figures`,
 }
 
 export const LIVE_COPY: Record<Lang, LiveCopy> = { fr: FR, en: EN }

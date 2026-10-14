@@ -18,6 +18,7 @@ import { updateProfile, useProfile } from '../lib/store'
 import { today } from '../lib/today'
 import { Chip } from './Chip'
 import { Cluster } from './Layout'
+import { LiveAnswer } from './LiveAnswer'
 import { SituationQuestions } from './profile/SituationCard'
 import { FieldRow } from './FieldRow'
 import { NumberField } from './NumberField'
@@ -387,6 +388,8 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
       <div className="onboard__body" onKeyUp={onKeyUp}>
         {body}
       </div>
+      {/* Once the answer can be computed, it forms under the question: a passive line (a status, no box, no focus) that moves as the figures are typed. Not on the landing screen. */}
+      {at > 0 && gaps.length === 0 && <LiveAnswer inline />}
       <div className="onboard__nav">
         {at > 0 && (
           <button type="button" className="btn btn--ghost" onClick={() => goTo(at - 1)}>

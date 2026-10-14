@@ -18,6 +18,8 @@ export interface WelcomeCopy {
   guide: { name: string; text: string; to: string | null }[]
   goodToKnow: string
   facts: { title: string; text: string; link: string; to: string }[]
+  /** The one question of a returning visit (components/DripQuestion.tsx): the unconfirmed figure that most narrows the answer. */
+  drip: { title: string; swing: (years: number) => string; go: string; all: string; later: string }
 }
 
 const FR: WelcomeCopy = {
@@ -50,6 +52,13 @@ const FR: WelcomeCopy = {
     { title: 'Chaque chiffre a sa source', text: 'Les montants du gouvernement viennent d’une page officielle, citée, que n’importe qui peut vérifier.', link: 'Glossaire des sigles', to: '/glossaire' },
     { title: 'Mieux vaut des documents en main', text: 'Le relevé de Retraite Québec et vos avis de cotisation rendent les chiffres exacts.', link: 'Documents à rassembler', to: '/profil?form=1&par=document&etape=gather' },
   ],
+  drip: {
+    title: 'Une question pour préciser votre réponse',
+    swing: (years) => `Le confirmer pourrait resserrer la réponse d’environ ${years} ${years === 1 ? 'an' : 'ans'}.`,
+    go: 'Confirmer ce chiffre',
+    all: 'Voir tout ce qui reste estimé',
+    later: 'Plus tard',
+  },
 }
 
 const EN: WelcomeCopy = {
@@ -82,6 +91,13 @@ const EN: WelcomeCopy = {
     { title: 'Every figure has a source', text: 'Government amounts come from a cited official page that anyone can check.', link: 'Glossary of acronyms', to: '/glossaire' },
     { title: 'Documents in hand help', text: 'The Retraite Québec statement and your notices of assessment make the figures exact.', link: 'Documents to gather', to: '/profil?form=1&par=document&etape=gather' },
   ],
+  drip: {
+    title: 'One question to sharpen your answer',
+    swing: (years) => `Confirming it could narrow the answer by about ${years} ${years === 1 ? 'year' : 'years'}.`,
+    go: 'Confirm this figure',
+    all: 'See everything still estimated',
+    later: 'Later',
+  },
 }
 
 export const WELCOME_COPY: Record<Lang, WelcomeCopy> = { fr: FR, en: EN }

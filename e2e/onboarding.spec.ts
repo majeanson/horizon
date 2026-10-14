@@ -104,6 +104,28 @@ test('walking through for one person: each answer is saved as typed, and the ans
   await expect(page.locator('.refine')).toContainText('Préciser le calcul')
 })
 
+test('the answer forms under the question as soon as it can be computed: absent on the landing and while a figure is missing, present once income and spending are typed, and it never takes the focus', async ({ page }) => {
+  const strip = page.getByRole('status').filter({ hasText: 'Votre réponse' })
+  await page.goto('/profil')
+  await expect(strip).toHaveCount(0) // the landing screen
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  await next(page) // « Ma situation »: every answer « non »
+  await fill(page, 'Revenu de travail par année', '90000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Que contiennent vos comptes d’épargne ?')
+  await expect(strip).toHaveCount(0) // an income is not enough: the spending is still missing
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('À quel âge pensez-vous arrêter de travailler ?')
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien dépensez-vous par année ?')
+  await fill(page, 'Dépenses par année', '50000') // Enter commits it and moves on to the last screen
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('C’est assez pour une première réponse')
+  await expect(strip).toContainText('ans', { timeout: 30_000 })
+  // a passive line: it never takes the focus
+  await expect(strip.getByRole('link', { name: 'Voir' })).not.toBeFocused()
+  await expect(strip.getByRole('link', { name: 'Voir' })).toHaveAttribute('href', '/resultats')
+})
+
 test('a couple adds a person’s questions in the same order, and the progress counts them', async ({ page }) => {
   await page.goto('/profil')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()

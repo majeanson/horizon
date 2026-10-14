@@ -33,3 +33,21 @@ describe('the home page guide', () => {
     }
   })
 })
+
+// THE DRIP QUESTION: the card on the front door speaks both languages, counts in the right plural, and its two links are routes the Profil page answers
+// (the figure's own link is built from a fact id in the component; the second one is the figure guide's anchor).
+describe('the front door drip question', () => {
+  const { fr, en } = WELCOME_COPY
+  it('is translated, line by line', () => {
+    for (const key of ['title', 'go', 'all', 'later'] as const) {
+      expect(fr.drip[key].length, key).toBeGreaterThan(3)
+      expect(en.drip[key], key).not.toBe(fr.drip[key])
+    }
+  })
+  it('says the gain in years with the right plural, in both languages', () => {
+    expect(fr.drip.swing(1)).toContain('1 an.')
+    expect(fr.drip.swing(3)).toContain('3 ans.')
+    expect(en.drip.swing(1)).toContain('1 year.')
+    expect(en.drip.swing(3)).toContain('3 years.')
+  })
+})
