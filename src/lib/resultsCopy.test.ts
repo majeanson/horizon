@@ -90,4 +90,10 @@ describe('the results-page copy, in both languages', () => {
     expect(fr.questions.stop.share('50 %', '2040')).toContain('après impôt')
     expect(en.questions.stop.share('50%', '2040')).toContain('after tax')
   })
+
+  it('words the estimate mark in both languages, its name containing its visible word', () => {
+    expect(fr.est.label).toBe('Estimé — à confirmer')
+    expect(en.est.label).toBe('Estimated — to confirm')
+    for (const c of [fr, en]) expect(c.est.label.toLowerCase()).toContain(c.est.mark)
+  })
 })

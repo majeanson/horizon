@@ -45,8 +45,6 @@ export const FR = {
     clear: 'Effacer le texte',
     whereToFind: 'Où trouver ce chiffre',
     inGlossary: 'Voir dans le glossaire',
-    estMark: 'estimé',
-    estLabel: 'Estimé — à confirmer',
     openPage: 'Ouvrir la page officielle',
     projected: 'projeté',
     themeToNight: 'Passer au mode nuit',

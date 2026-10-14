@@ -235,6 +235,8 @@ const FR_RESULTS = {
     compareLabel: (name: string, age: number, other: string, held: number) => `Comparer ${name} à ${age} ans et ${other} à ${held} ans`,
     busy: 'Calcul en cours…',
   },
+  // The mark beside an estimated input restated on the results (components/EstFlag.tsx).
+  est: { mark: 'estimé', label: 'Estimé — à confirmer' },
 }
 
 const EN_RESULTS: typeof FR_RESULTS = {
@@ -431,6 +433,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
     compareLabel: (name: string, age: number, other: string, held: number) => `Compare ${name} at ${age} and ${other} at ${held}`,
     busy: 'Working it out…',
   },
+  est: { mark: 'estimated', label: 'Estimated — to confirm' },
 }
 
 export const RESULTS_COPY = { fr: FR_RESULTS, en: EN_RESULTS }

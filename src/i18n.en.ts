@@ -29,8 +29,6 @@ export const EN: typeof FR = {
     clear: 'Clear text',
     whereToFind: 'Where to find this number',
     inGlossary: 'See in the glossary',
-    estMark: 'estimated',
-    estLabel: 'Estimated — to confirm',
     openPage: 'Open the official page',
     projected: 'projected',
     themeToNight: 'Switch to night mode',
