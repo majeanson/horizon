@@ -17,6 +17,7 @@ import { NumberField } from '../NumberField'
 import { SectionHeader } from '../SectionHeader'
 import { StatusMessage } from '../StatusMessage'
 import { PasteEarnings } from './PasteEarnings'
+import { StatementCheck } from './StatementCheck'
 import { Section, type PersonEditor } from './shared'
 
 // The RRQ: when the pension starts, and the pensionable earnings the relevé lists year by year.
@@ -77,6 +78,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
             )}
           </FieldRow>
         ))}
+        <StatementCheck person={person} />
       </fieldset>
 
         <div className={'earnings' + (guided === factId(person.id, 'earnings') ? ' earnings--guided' : '')} data-fact={factId(person.id, 'earnings')}>

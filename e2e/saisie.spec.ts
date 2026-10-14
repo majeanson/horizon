@@ -149,6 +149,29 @@ test('relevé step: the table has four boxes, the projected pair is not fillable
   await expect(page.getByRole('textbox', { name: 'Montant actuel à 60 ans' }).first()).toHaveValue('')
 })
 
+test('relevé step: a typed « Montant actuel » is set beside the calculation\'s — the same figure, or the gap and where to look', async ({ page }) => {
+  await page.goto('/saisie?etape=rrq')
+  await page.getByRole('tab', { name: 'Comme sur le document' }).click()
+  const screen = page.locator('.facsimile').first()
+  const check = page.locator('.statement-check').first()
+  await expect(check).toHaveCount(0) // nothing typed, nothing to check
+  const actual = screen.getByRole('textbox', { name: 'Montant actuel, 65 ans' })
+  // The golden couple's first person, from the earnings on the page: the calculation gives 988,12 $ at 65.
+  await actual.fill('988')
+  await actual.press('Enter')
+  await expect(check).toContainText(/65\s*—\s*Le calcul donne le même montant\s*:\s*988\s*\$ par mois/)
+  await expect(check).toContainText('Ce n’est pas la rente de votre plan')
+  await expect(check).not.toContainText('Un écart vient')
+  await actual.fill('1100')
+  await actual.press('Enter')
+  await expect(check).toContainText(/Le calcul donne 988\s*\$ par mois, soit 112\s*\$ \(10\s*%\) de moins que votre relevé/)
+  await expect(check).toContainText('Un écart vient presque toujours des revenus saisis plus bas')
+  // The same check under the form's own field; a figure for the other age is checked on its own.
+  await page.getByRole('tab', { name: 'Formulaire' }).click()
+  await expect(page.locator('.statement-check').first()).toContainText('de moins que votre relevé')
+  expect(((await savedProfile(page)).confirmed as string[]).filter((id) => /statement/i.test(id))).toEqual([]) // a check confirms nothing
+})
+
 for (const [step, label] of [['tax', 'CRA screen'], ['rrq', 'relevé table']] as const) {
   test(`no accessibility violation on the ${label} (both looks of the step)`, async ({ page }) => {
     await page.goto(`/saisie?etape=${step}`)

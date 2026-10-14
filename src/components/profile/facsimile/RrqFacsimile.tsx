@@ -6,6 +6,7 @@ import { setStatement } from '../../../lib/profileEdit'
 import { today } from '../../../lib/today'
 import { NumberField } from '../../NumberField'
 import { PasteEarnings } from '../PasteEarnings'
+import { StatementCheck } from '../StatementCheck'
 import type { PersonEditor } from '../shared'
 import { FacsimileFrame } from './FacsimileFrame'
 
@@ -64,6 +65,7 @@ export function RrqFacsimile({ person, edit }: PersonEditor) {
         </tbody>
       </table>
       <p className="facsimile__note">{c.rrq.projectedWhy}</p>
+      <StatementCheck person={person} />
       <div className="earnings__paste-wrap">
         <PasteEarnings person={person} edit={edit} years={years} />
       </div>

@@ -81,6 +81,11 @@ export interface RrqRules {
   careerMaxAge: number
   /** 65 — the age at which a pension is neither reduced nor increased. */
   normalAge: number
+  /**
+   * A fixed AMPE5, whatever the start year. Absent: the average ceiling of the five years ending with the start year. Retraite Québec's relevé estimates the pension
+   * « as if » it were paid under TODAY's rules, so its estimate rests on today's average of the last five ceilings (engine/statementCheck.ts), not on a future one.
+   */
+  ampe5Fixed?: number
 }
 
 export interface RrqPensionInput {
@@ -129,6 +134,7 @@ const fromIndex = (i: number): YearMonth => ({ year: Math.floor(i / 12), month: 
 
 /** The average ceiling of the five years ending with `year`. Retraite Québec does not publish a table of it; it publishes the method. */
 export function ampe5(year: number, rules: RrqRules): number {
+  if (rules.ampe5Fixed !== undefined) return rules.ampe5Fixed
   let sum = 0
   for (let y = year - 4; y <= year; y++) sum += rules.mga(y)
   return sum / 5
