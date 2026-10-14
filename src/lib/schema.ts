@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 22
+export const SCHEMA_VERSION = 23
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -45,6 +45,8 @@ export const MAX_PLANS = 6
 export const MAX_PLAN_NAME = 40
 /** The most dated flows a household may carry. */
 export const MAX_FLOWS = 20
+/** The longest id a flow's `estimate` may carry (the id of a starting point in lib/plannedExpenses.ts). */
+export const MAX_ESTIMATE_ID = 30
 
 /** What is wrong with one field of a profile read from outside (a file, or storage). The UI words each one. */
 export interface ProfileProblem {
@@ -289,6 +291,8 @@ function readFlows(r: Reader, v: unknown, persons: number): Flow[] {
       toYear: r.num(o.toYear, `${path}.toYear`, fromYear, 2150, true),
       owner,
       taxable: r.bool(o.taxable, `${path}.taxable`),
+      // An estimate still (v23): the id of the starting point it came from. Absent: the person's own figure.
+      ...(o.estimate != null ? { estimate: r.str(o.estimate, `${path}.estimate`, MAX_ESTIMATE_ID) } : {}),
     }
   })
 }

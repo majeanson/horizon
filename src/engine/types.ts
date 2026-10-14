@@ -184,6 +184,12 @@ export interface Flow {
   toYear: number
   owner: PersonId
   taxable: boolean
+  /**
+   * The figure is still an ESTIMATE: it came from a starting point (lib/plannedExpenses.ts) and the person has neither typed another amount nor confirmed this one.
+   * The value is the starting point's id, which is how the page finds the basis (statistic, rule or placeholder) and its source. The engine never reads it.
+   * Absent: the amount is the person's own.
+   */
+  estimate?: string
 }
 
 /**

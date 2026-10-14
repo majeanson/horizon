@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { test, expect, type Page } from '@playwright/test'
-import { EXAMPLE, seedProfile } from './seed'
+import { EXAMPLE, seedProfile, showAllSections } from './seed'
 
 // Accessibility, as a gate: axe-core runs over every page in the display states a reader can
 // actually be in — day and night, normal and high contrast, and the largest text size. A
@@ -89,6 +89,26 @@ for (const s of STATES) {
       expect(await violations(page)).toEqual([])
     })
   }
+}
+
+// A dated event that is still an ESTIMATE (schema v23): the « estimé » word beside its figure, the way to confirm it, and — opened — what it rests on and its source link.
+// Nothing on the page holds one until the household has added one, so the specimen is a household that has added three: a statistic, a rule and a plain starting point.
+for (const s of STATES) {
+  test(`the profile with its estimated events open has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
+    const home = { value: 650000, mortgage: { balance: 266000, rate: 0.05, monthlyPayment: 1761.11 }, sale: null }
+    const flow = (id: string, label: string, amount: number) => ({ label, kind: 'expense', amount, fromYear: 2027, toYear: 2060, owner: 'self', taxable: false, estimate: id })
+    const profile = structuredClone(EXAMPLE) as typeof EXAMPLE & { household: { home: unknown; flows: unknown[] } }
+    profile.household.home = home
+    profile.household.flows = [flow('upkeep', 'Entretien et réparations de la maison', 1667), flow('renovation', 'Réserve de rénovations', 4800), flow('project', 'Un projet', 10000)]
+    await setState(page, s)
+    await seedProfile(page, profile)
+    await showAllSections(page)
+    await page.goto('/profil?form=1')
+    await page.locator('.page-head__title').waitFor()
+    await expect(page.locator('.flow__estimate')).toHaveCount(3)
+    for (const fold of await page.locator('.flow__estimate details').all()) await fold.locator('summary').click()
+    expect(await violations(page)).toEqual([])
+  })
 }
 
 // The household sheet, in every display state: day, night, high contrast and the largest text.

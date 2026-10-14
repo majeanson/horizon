@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n.ts'
+import type { StarterId, Tenure } from './plannedExpenses.ts'
 
 // THE WORDS OF A LIFE BEYOND THE BUDGET — what a child costs until they leave, the work kept after the retirement age, the dated flows
 // (an inheritance, a roof, a rent, a care reserve) and the slowing of spending with age. Outside the eager dictionaries: only the profile
@@ -42,7 +43,32 @@ export interface LifeCopy {
     empty: string
     add: string
     full: (max: number) => string
-    starters: { heritage: string; roof: string; car: string; rent: string; care: string }
+    /** The name an event is added under, one per starting point (lib/plannedExpenses.ts). */
+    starters: Record<StarterId, string>
+    /** « Dépenses à prévoir »: the starting points that rest on a statistic or a rule, offered apart from the plain ones. */
+    planned: {
+      title: string
+      hint: string
+      doubleCount: string
+      /** The group of households a Statistics Canada average is for. */
+      tenure: Record<Tenure, string>
+      upkeep: (tenure: string, figure: string) => string
+      vehicle: (tenure: string, figure: string) => string
+      /** The rule of thumb, built on the upkeep statistic: its share, the home's value, and the upkeep already counted. */
+      renovation: (share: string, homeValue: string, upkeep: string) => string
+      /** No statistic exists: a round number to be replaced. */
+      placeholder: string
+    }
+    /** What an event that is still an estimate says about itself, and the way to keep it. */
+    estimate: {
+      /** The word beside the figure, and its accessible name. */
+      mark: string
+      label: string
+      /** « D'où vient ce montant ? » — the title of the note that says what the figure rests on. */
+      basisTitle: string
+      sourceTitle: string
+      confirm: string
+    }
     kind: Record<FlowKindName, string>
     kindHint: Record<FlowKindName, string>
     name: string
@@ -111,7 +137,37 @@ const FR: LifeCopy = {
     empty: 'Aucun événement noté. Ajoutez-en un seulement s’il change vraiment votre plan.',
     add: 'Ajouter',
     full: (max) => `${max} événements, c’est le maximum : retirez-en un pour en ajouter un autre.`,
-    starters: { heritage: 'Un héritage', roof: 'Une grosse dépense', car: 'Une voiture', rent: 'Un loyer reçu', care: 'Des soins plus tard' },
+    starters: {
+      upkeep: 'Entretien et réparations de la maison',
+      renovation: 'Réserve de rénovations',
+      vehicle: 'Remplacement des voitures',
+      heritage: 'Un héritage',
+      roof: 'Une grosse dépense',
+      car: 'Une voiture',
+      rent: 'Un loyer reçu',
+      care: 'Des soins plus tard',
+      project: 'Un projet',
+    },
+    planned: {
+      title: 'Dépenses à prévoir',
+      hint: 'Ce qu’un budget mensuel ne voit pas venir. Chaque montant dit sur quoi il repose : une statistique de Statistique Canada ou une règle courante, nommée comme telle. C’est un estimé tant que vous ne l’avez pas confirmé ou remplacé par votre propre chiffre.',
+      doubleCount: 'Si votre budget annuel compte déjà ces dépenses, n’ajoutez pas celles-ci : elles seraient comptées deux fois.',
+      tenure: { ownerWithMortgage: 'propriétaires avec hypothèque', ownerWithoutMortgage: 'propriétaires sans hypothèque', renter: 'locataires' },
+      upkeep: (tenure, figure) =>
+        `Moyenne annuelle des ${tenure} au Canada (2023) : ${figure} par année en entretien et en réparations. Les rénovations n’y sont pas comptées : Statistique Canada les traite comme un achat de bien, non comme une dépense courante.`,
+      vehicle: (tenure, figure) =>
+        `Moyenne annuelle des ${tenure} au Canada (2023) : ${figure} par année pour l’achat d’autos, de camionnettes et de VUS. C’est une moyenne de tous les ménages, y compris ceux qui n’ont rien acheté cette année-là : ce qui en fait une provision par année. Elle est comptée jusqu’à vos 80 ans ; changez l’année de fin au besoin.`,
+      renovation: (share, homeValue, upkeep) =>
+        `Règle courante, pas un chiffre officiel : ${share} de la valeur de la maison (${homeValue}) par année pour l’entretien et les rénovations ensemble, moins les ${upkeep} déjà comptés à l’entretien ci-dessus.`,
+      placeholder: 'Un point de départ, pas une statistique : aucune source officielle ne fonde ce montant. Remplacez-le par le vôtre.',
+    },
+    estimate: {
+      mark: 'estimé',
+      label: 'Estimé — à confirmer',
+      basisTitle: 'D’où vient ce montant ?',
+      sourceTitle: 'Source',
+      confirm: 'Confirmer ce montant',
+    },
     kind: { windfall: 'Argent reçu une fois', expense: 'Dépense', income: 'Revenu' },
     kindHint: {
       windfall: 'Un héritage, un cadeau, la vente d’un bien : arrive d’un coup, sans impôt, dans vos placements non enregistrés.',
@@ -191,7 +247,37 @@ const EN: LifeCopy = {
     empty: 'No event noted. Add one only if it really changes your plan.',
     add: 'Add',
     full: (max) => `${max} events is the most: remove one to add another.`,
-    starters: { heritage: 'An inheritance', roof: 'A big expense', car: 'A car', rent: 'Rent received', care: 'Care later on' },
+    starters: {
+      upkeep: 'House upkeep and repairs',
+      renovation: 'Renovation reserve',
+      vehicle: 'Replacing vehicles',
+      heritage: 'An inheritance',
+      roof: 'A big expense',
+      car: 'A car',
+      rent: 'Rent received',
+      care: 'Care later on',
+      project: 'A project',
+    },
+    planned: {
+      title: 'Expenses to plan for',
+      hint: 'What a monthly budget does not see coming. Each amount says what it rests on: a Statistics Canada figure or a common rule, named as such. It is an estimate until you confirm it or replace it with your own figure.',
+      doubleCount: 'If your annual budget already counts these expenses, do not add these: they would be counted twice.',
+      tenure: { ownerWithMortgage: 'homeowners with a mortgage', ownerWithoutMortgage: 'homeowners without a mortgage', renter: 'renters' },
+      upkeep: (tenure, figure) =>
+        `Yearly average of ${tenure} in Canada (2023): ${figure} a year on upkeep and repairs. Renovations are not counted in it: Statistics Canada treats them as buying an asset, not as a running expense.`,
+      vehicle: (tenure, figure) =>
+        `Yearly average of ${tenure} in Canada (2023): ${figure} a year buying cars, vans and SUVs. It is an average of all households, those that bought nothing that year included: that is what makes it a yearly allowance. It is counted until you are 80; change the end year if you like.`,
+      renovation: (share, homeValue, upkeep) =>
+        `A common rule, not an official figure: ${share} of the home’s value (${homeValue}) a year for upkeep and renovations together, less the ${upkeep} already counted under upkeep above.`,
+      placeholder: 'A starting point, not a statistic: no official source backs this amount. Replace it with your own.',
+    },
+    estimate: {
+      mark: 'estimate',
+      label: 'Estimate — to confirm',
+      basisTitle: 'Where does this amount come from?',
+      sourceTitle: 'Source',
+      confirm: 'Confirm this amount',
+    },
     kind: { windfall: 'Money received once', expense: 'Expense', income: 'Income' },
     kindHint: {
       windfall: 'An inheritance, a gift, the sale of an asset: arrives at once, untaxed, in your non-registered savings.',

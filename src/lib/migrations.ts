@@ -132,6 +132,8 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   (profile) => profile,
   // v21 → v22: the RRSP can be drawn up to a line of income (`assumptions.bracketFill`). Every older file drew only what the year needed: the field reads as null.
   (profile) => profile,
+  // v22 → v23: a dated flow can say it is still an ESTIMATE (`household.flows[].estimate`: the starting point it came from). Every older flow was the person's own figure: the field is absent.
+  (profile) => profile,
 ]
 
 export type ReadResult =

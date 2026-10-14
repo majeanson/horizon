@@ -66,11 +66,30 @@ export function addFlow(p: Profile, flow: Flow): Profile {
   return { ...p, household: { ...p.household, flows: [...flows, normalFlow(p, flow)] } }
 }
 
+/** The same event, with its figure its own: no longer an estimate. (The key is dropped, not set to undefined: a saved profile never carries it.) */
+function owned(f: Flow): Flow {
+  const { estimate: _estimate, ...rest } = f
+  return rest
+}
+
+/**
+ * Change an event. Typing another AMOUNT makes the figure the person's own, so it stops being an estimate; any other change (the name, the years) leaves the estimate
+ * as it was, because the amount it rests on has not moved.
+ */
 export function updateFlow(p: Profile, index: number, change: (f: Flow) => Flow): Profile {
   const flows = p.household.flows ?? []
   if (index < 0 || index >= flows.length) return p
-  const next = normalFlow(p, change(flows[index]))
+  const before = flows[index]
+  const changed = change(before)
+  const next = normalFlow(p, changed.amount !== before.amount ? owned(changed) : changed)
   return { ...p, household: { ...p.household, flows: flows.map((f, i) => (i === index ? next : f)) } }
+}
+
+/** « Confirmer ce montant »: the person has checked the estimate and keeps it. The figure is unchanged; it is no longer an estimate. The same profile when it already was theirs. */
+export function confirmFlow(p: Profile, index: number): Profile {
+  const flows = p.household.flows ?? []
+  if (index < 0 || index >= flows.length || flows[index].estimate === undefined) return p
+  return { ...p, household: { ...p.household, flows: flows.map((f, i) => (i === index ? owned(f) : f)) } }
 }
 
 export function removeFlow(p: Profile, index: number): Profile {
