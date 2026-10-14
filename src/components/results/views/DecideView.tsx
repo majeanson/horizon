@@ -4,6 +4,7 @@ import { BridgePanel } from '../BridgePanel'
 import { OrderPanel } from '../OrderPanel'
 import { SaveView } from '../SaveView'
 import { SpendView } from '../SpendView'
+import { SpouseBalancePanel } from '../SpouseBalancePanel'
 import { Chip } from '../../Chip'
 import { Fold } from '../../Fold'
 import { SectionHeader } from '../../SectionHeader'
@@ -12,6 +13,7 @@ import { BRACKET_FILL_COPY } from '../../../lib/bracketFillCopy'
 import { FUTURE_COPY } from '../../../lib/futureCopy'
 import { formatCompactMoney } from '../../../lib/money'
 import { MAX_AGE } from '../../../lib/resultsModel'
+import { SPOUSE_BALANCE_COPY } from '../../../lib/spouseBalanceCopy'
 import type { Essai, ResultsModel } from '../../../lib/useResultsPage'
 
 const CareSection = lazy(() => import('./CareSection').then((m) => ({ default: m.CareSection })))
@@ -25,6 +27,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
   const { lang, rc, profile, state, retiredNow, assumptions, setParam, firstAge, earliest, nowOk, lc, levers, saveAge, spend, essai, setEssai, names } = m
   const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
   const bf = BRACKET_FILL_COPY[lang]
+  const sb = SPOUSE_BALANCE_COPY[lang]
   // One what-if: a fold open when the address says so. The body is mounted only then, so a closed one costs no projection.
   const tryFold = (key: Essai, id: string, title: string, body: ReactNode) => (
     <Fold id={id} className="results-section try-fold" open={essai === key} onToggle={(open) => setEssai(open ? key : null)} mountOnOpen summary={title}>
@@ -116,6 +119,13 @@ export function DecideView({ m }: { m: ResultsModel }) {
           <SectionHeader title={bf.title} />
           <BracketFillPanel household={profile.household} assumptions={assumptions} firstAge={firstAge} />
         </section>
+        {/* A couple only: a one-person household has no second RRSP to even out against. */}
+        {profile.household.persons.length > 1 && (
+          <section id="equilibre" className="results-section" aria-label={sb.title}>
+            <SectionHeader title={sb.title} />
+            <SpouseBalancePanel household={profile.household} assumptions={assumptions} age={age} firstAge={firstAge} names={names} />
+          </section>
+        )}
       </section>
     </>
   )

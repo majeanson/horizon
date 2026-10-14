@@ -44,7 +44,7 @@ test('Profil: the household, what applies, the people, then the household’s sp
 test('Résultats: the map of Preuve and of Décider lists the sections in the order they stand', async ({ page }) => {
   for (const [view, ids] of [
     ['proof', ['solidite', 'donnees-calcul', 'tableau', 'precision', 'parametres']],
-    ['decide', ['essayer', 'rentes', 'ordre', 'fonte']],
+    ['decide', ['essayer', 'rentes', 'ordre', 'fonte', 'equilibre']],
     ['answer', ['verdict', 'comparer', 'preciser', 'annee']],
   ] as const) {
     await page.goto(`/resultats?v=${view}`)

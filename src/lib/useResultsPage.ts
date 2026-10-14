@@ -1,4 +1,5 @@
 import { BRACKET_FILL_COPY } from './bracketFillCopy'
+import { SPOUSE_BALANCE_COPY } from './spouseBalanceCopy'
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { usePinOffset } from './pinOffset'
@@ -315,7 +316,7 @@ export function useResultsPage() {
     view === 'answer'
       ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : []), { id: 'annee', label: rc.nav.annee }]
       : view === 'decide'
-        ? [{ id: 'essayer', label: rc.nav.essayer }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav }]
+        ? [{ id: 'essayer', label: rc.nav.essayer }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav }] : [])]
         : [
             { id: 'solidite', label: rc.nav.solidite },
             { id: 'donnees-calcul', label: rc.nav.chiffres },

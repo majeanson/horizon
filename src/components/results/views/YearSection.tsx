@@ -9,7 +9,10 @@ import { fillNudge } from '../../../lib/bracketFillNudge'
 import { orderNudge } from '../../../lib/orderNudge'
 import { RESULTS_COPY } from '../../../lib/resultsCopy'
 import { MAX_AGE } from '../../../lib/resultsModel'
+import { SPOUSE_BALANCE_COPY } from '../../../lib/spouseBalanceCopy'
+import { spouseBalanceNudge } from '../../../lib/spouseBalanceNudge'
 import { useBracketFill } from '../../../lib/useBracketFill'
+import { useSpouseBalance } from '../../../lib/useSpouseBalance'
 import { useWithdrawalOrders } from '../../../lib/useWithdrawalOrders'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 import { Chip } from '../../Chip'
@@ -78,12 +81,34 @@ function FillNudgeLine({ m }: { m: ResultsModel }) {
   )
 }
 
+/** The same, for evening out the two spouses' RRSPs (lib/spouseBalanceNudge.ts): one sentence when moving part of the larger one clearly pays. A couple only; asked once scrolled into view. */
+function BalanceNudgeLine({ m }: { m: ResultsModel }) {
+  const { lang } = useLang()
+  const c = SPOUSE_BALANCE_COPY[lang]
+  const { profile, assumptions, firstAge, earliest } = m
+  const { box, seen } = useSeen()
+  const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
+  const { value } = useSpouseBalance(profile.household, assumptions, age, firstAge, seen)
+  const r = value?.balance ?? null
+  const nudge = spouseBalanceNudge(r)
+  return (
+    <div ref={box} className="balance-nudge">
+      {r !== null && nudge !== null && (
+        <p className="verdict__note" role="status">
+          {c.nudge(formatMoney(r.moved, lang), formatMoney(nudge.taxSaved, lang), r.balanced.earliestOk, r.current.earliestOk)}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export function YearSection({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
   const f = FUTURE_COPY[lang]
   const lc = LEVERS_COPY[lang]
   const rc = RESULTS_COPY[lang]
   const { retiredNow, bestLever: lever, state, goTo } = m
+  const isCouple = m.profile.household.persons.length > 1
   return (
     <section id="annee" className="results-section" aria-label={f.year.title}>
       <SectionHeader title={f.year.title} subtitle={f.year.hint} />
@@ -103,6 +128,7 @@ export function YearSection({ m }: { m: ResultsModel }) {
           <p className="verdict__range-title">{f.year.moreTitle}</p>
           <OrderNudgeLine m={m} />
           <FillNudgeLine m={m} />
+          {isCouple && <BalanceNudgeLine m={m} />}
           <Cluster>
             <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'ordre')}>
               {rc.orders.title}
@@ -110,6 +136,11 @@ export function YearSection({ m }: { m: ResultsModel }) {
             <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'fonte')}>
               {BRACKET_FILL_COPY[lang].title}
             </Chip>
+            {isCouple && (
+              <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'equilibre')}>
+                {SPOUSE_BALANCE_COPY[lang].title}
+              </Chip>
+            )}
             {state.pensionsOpen && (
               <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'rentes')}>
                 {f.year.pensions}
