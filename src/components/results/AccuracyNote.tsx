@@ -1,5 +1,7 @@
 import { useLang } from '../../i18n'
+import { NUDGE } from '../../engine/factImpact'
 import { ACCURACY_COPY } from '../../lib/accuracyCopy'
+import { formatPct } from '../../lib/format'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 
@@ -15,6 +17,8 @@ export function AccuracyNote({ onSeeFigures }: { onSeeFigures: () => void }) {
   return (
     <div className="surface accuracy">
       <p className="field-row__hint">{c.intro}</p>
+      {/* What the range on the answer means: the nudge size is the engine's own, passed in. */}
+      <p className="field-row__hint">{c.range(formatPct(NUDGE, lang, 0))}</p>
       <div className="verdict__range">
         <p className="verdict__range-title">{c.checkedTitle}</p>
         <ul className="note-list">

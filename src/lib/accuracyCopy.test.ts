@@ -16,6 +16,7 @@ function texts(c: AccuracyCopy): [string, string][] {
   return [
     ['title', c.title],
     ['intro', c.intro],
+    ['range', c.range('15 %')],
     ['checkedTitle', c.checkedTitle],
     ['simplifiedTitle', c.simplifiedTitle],
     ['seeFigures', c.seeFigures],
@@ -54,6 +55,13 @@ describe('the accuracy note, in both languages', () => {
     // The two figures the copy states are the ones those documents state.
     expect(fr.checked.join(' ')).toMatch(/1\s\$ par mois/)
     expect(en.checked.join(' ')).toMatch(/\$1 a month/)
+  })
+
+  it('says what the range means, with the nudge passed in rather than typed', () => {
+    expect(fr.range('X')).toContain('X')
+    expect(en.range('X')).toContain('X')
+    expect(fr.range('X')).not.toMatch(/15/)
+    expect(en.range('X')).not.toMatch(/15/)
   })
 
   it('links the two files that list everything, by their names', () => {

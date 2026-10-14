@@ -7,6 +7,8 @@ import type { Lang } from '../i18n.ts'
 export interface AccuracyCopy {
   title: string
   intro: string
+  /** What the range on the answer MEANS; the nudge (« 15 % ») arrives formatted, from the engine. */
+  range: (nudge: string) => string
   checkedTitle: string
   checked: readonly string[]
   simplifiedTitle: string
@@ -20,6 +22,7 @@ export interface AccuracyCopy {
 const FR: AccuracyCopy = {
   title: 'À quel point est-ce précis ?',
   intro: 'Ce calcul est un estimé, pas un avis. Voici contre quoi il a été vérifié, et ce qu’il simplifie.',
+  range: (nudge: string) => `La fourchette de la réponse déplace chaque chiffre estimé de ${nudge}, tous à la fois : tous dans le sens qui aide pour l’âge du bas, tous dans le sens qui nuit pour l’âge du haut. Ce n’est pas une marge d’erreur garantie.`,
   checkedTitle: 'Ce qui est vérifié',
   checked: [
     'Chaque chiffre du gouvernement cite sa page officielle et le jour où il a été lu.',
@@ -45,6 +48,7 @@ const FR: AccuracyCopy = {
 const EN: AccuracyCopy = {
   title: 'How accurate is this?',
   intro: 'This calculation is an estimate, not advice. Here is what it has been checked against, and what it simplifies.',
+  range: (nudge: string) => `The answer’s range moves every estimated figure by ${nudge}, all at once: all in the helpful direction for the lower age, all in the harmful one for the higher age. It is not a guaranteed margin of error.`,
   checkedTitle: 'What is checked',
   checked: [
     'Every government figure cites its official page and the day it was read.',

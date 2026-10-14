@@ -107,10 +107,11 @@ const FR_RESULTS = {
     spendingWork: 'Vos dépenses pendant les années de travail.',
     toProfile: 'Ouvrir le profil',
     toAssumptions: 'Ouvrir les hypothèses',
-    /** The unconfirmed figures ranked by how far the answer moves if each were off by 15 %. */
+    /** The unconfirmed figures ranked by how far the answer moves if each were off by the engine's nudge (passed in, never typed here). */
     moves: 'Les chiffres qui déplaceraient le plus la réponse',
-    movesHint: 'Chaque chiffre non confirmé est poussé de 15 % dans un sens, puis dans l’autre ; la réponse dit de combien d’années elle bouge. C’est un classement, pas une marge d’erreur.',
-    swing: (years: number) => `jusqu’à ${years} ${years === 1 ? 'an' : 'ans'}`,
+    movesHint: (nudge: string) => `Chaque chiffre non confirmé est poussé de ${nudge} dans un sens, puis dans l’autre ; la réponse dit de combien d’années elle bouge. C’est un classement, pas une marge d’erreur.`,
+    /** What confirming ONE figure buys: the answer's range narrows by about this many years. */
+    swing: (years: number) => `resserre la réponse d’environ ${years} ${years === 1 ? 'an' : 'ans'}`,
   },
   /** The page's map: one short noun per section, the same word as the section's own title. */
   nav: {
@@ -181,6 +182,9 @@ const FR_RESULTS = {
     confidence: (confirmed: number, total: number) => `Votre profil : ${confirmed} sur ${total} chiffres confirmés ; le reste est estimé.`,
     confidenceAll: 'Tous les chiffres de votre profil sont confirmés par vos documents.',
     confidenceLink: 'Rendre mon profil exact',
+    /** While figures are estimates: the answer's range when every estimated figure is off at once (ages already formatted by the caller; `max` is the oldest age tried). */
+    confidenceRange: (low: number, high: number, confirmed: number, total: number) => `Entre ${low} et ${high} ans selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
+    confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `Entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
     now: 'Vous pouvez déjà prendre votre retraite.',
     retired: (together: boolean): string => (together ? 'Vous êtes déjà tous les deux à la retraite.' : 'Vous êtes déjà à la retraite.'),
     runsOut: (year: string) => `Mais l’argent ne durerait que jusqu’en ${year}.`,
@@ -303,8 +307,8 @@ const EN_RESULTS: typeof FR_RESULTS = {
     toProfile: 'Open the profile',
     toAssumptions: 'Open the assumptions',
     moves: 'The figures that would move the answer most',
-    movesHint: 'Each unconfirmed figure is pushed 15% one way, then the other; the answer says by how many years it moves. A ranking, not a margin of error.',
-    swing: (years: number) => `up to ${years} ${years === 1 ? 'year' : 'years'}`,
+    movesHint: (nudge: string) => `Each unconfirmed figure is pushed ${nudge} one way, then the other; the answer says by how many years it moves. A ranking, not a margin of error.`,
+    swing: (years: number) => `narrows the answer by about ${years} ${years === 1 ? 'year' : 'years'}`,
   },
   nav: {
     label: 'Results sections',
@@ -372,6 +376,8 @@ const EN_RESULTS: typeof FR_RESULTS = {
     confidence: (confirmed: number, total: number) => `Your profile: ${confirmed} of ${total} figures confirmed; the rest is estimated.`,
     confidenceAll: 'Every figure in your profile is confirmed by your documents.',
     confidenceLink: 'Make my profile exact',
+    confidenceRange: (low: number, high: number, confirmed: number, total: number) => `Between age ${low} and ${high}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
+    confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `Between age ${low} and possibly no age before ${max}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
     now: 'You can already retire.',
     retired: (together: boolean): string => (together ? 'You are both already retired.' : 'You are already retired.'),
     runsOut: (year: string) => `But the money would only last until ${year}.`,

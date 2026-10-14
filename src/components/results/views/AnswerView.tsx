@@ -13,6 +13,7 @@ import { SubTabs } from '../../SubTabs'
 import { useParamChoice } from '../../../lib/useParamChoice'
 
 import { Skeleton } from '../../Skeleton'
+import { NUDGE } from '../../../engine/factImpact'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
@@ -29,9 +30,19 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
   const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
+  // While figures are estimates, the computed range replaces the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
+  const range = impact?.range
+  const showRange = !!range && range.low !== null && range.low !== range.high && !retiredNow && !retiredGlance && (headline.kind === 'at' || headline.kind === 'now') && accuracy.confirmed < accuracy.total
+  const confidenceText = showRange
+    ? range.high === null
+      ? rc.headline.confidenceRangeOpen(range.low!, MAX_AGE, accuracy.confirmed, accuracy.total)
+      : rc.headline.confidenceRange(range.low!, range.high, accuracy.confirmed, accuracy.total)
+    : accuracy.confirmed === accuracy.total
+      ? rc.headline.confidenceAll
+      : rc.headline.confidence(accuracy.confirmed, accuracy.total)
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
-      {accuracy.confirmed === accuracy.total ? rc.headline.confidenceAll : rc.headline.confidence(accuracy.confirmed, accuracy.total)}{' '}
+      {confidenceText}{' '}
       <Link className="info-note__link" to="/profil">
         {rc.headline.confidenceLink}
       </Link>
@@ -247,7 +258,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                       </li>
                     ))}
                   </ul>
-                  <p className="verdict__note">{rc.refine.movesHint}</p>
+                  <p className="verdict__note">{rc.refine.movesHint(pct(NUDGE))}</p>
                 </div>
               )}
               {refine.length > 0 && (
