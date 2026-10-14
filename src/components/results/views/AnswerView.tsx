@@ -17,6 +17,8 @@ import { NUDGE } from '../../../engine/factImpact'
 import { agesLedger } from '../../../engine/ledger'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
+import { answerSpread } from '../../../lib/answerSpread'
+import { ANSWER_SPREAD_COPY } from '../../../lib/answerSpreadCopy'
 import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
@@ -128,6 +130,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
             )}
             {/* How much of the answer stands on the person's own documents belongs WITH the answer, not three sections down. */}
             {confidenceLine}
+            {/* …and how far it moves when the future is kinder or harsher than assumed: the scenarios and the market paths, already out for the page below. */}
+            {!answerPending && !retiredNow && headline.kind === 'at' && headline.age !== null && <AnswerSpreadLine age={headline.age} m={m} />}
             {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
                 be present, not compete with the answer. */}
             <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
@@ -289,4 +293,12 @@ export function AnswerView({ m }: { m: ResultsModel }) {
         </section>
     </>
   )
+}
+
+/** « Selon les trois scénarios et les parcours de marché : de 57 à 64 ans » — only once both searches are in, and only when it says something the big age does not. */
+function AnswerSpreadLine({ age, m }: { age: number; m: ResultsModel }) {
+  const spread = answerSpread(age, m.range, m.stress)
+  if (spread === null) return null
+  const c = ANSWER_SPREAD_COPY[m.lang]
+  return <p className="verdict__note">{spread.high === null ? c.open(spread.low, MAX_AGE) : c.range(spread.low, spread.high)}</p>
 }

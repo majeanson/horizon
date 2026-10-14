@@ -21,6 +21,8 @@ type Budget = { controls: number; words: number }
 // were only dashed lines to guess at; the chips are the keyboard / screen-reader path that the taps on the chart mirror.
 // Résultats — Réponse raised again 46 → 47 controls and 668 → 670 words (2026-10-13): the « Visite guidée » chip beside the answer card's « Et si je dépensais moins ? » — the one door to the
 // four-step walk through the reader's own answer. The tour's bar itself exists only with `?visite=` set, which this route never sets.
+// Résultats — Réponse raised a third time 670 → 683 words (2026-10-14): the answer's range line under the big age — « Selon les trois scénarios et les parcours de marché : de 57 à 64 ans »
+// (lib/answerSpread.ts). A conscious trade: the scenarios and the market paths were three sections down; one sentence now says how far the answer moves.
 // Résultats — Preuve, 2026-10-13 (idea 3, the Figure): controls 37 → 43 — the four Figure buttons on the golden couple's two pension rows (QPP and OAS, one each
 // per person), the two EstFlag links on the spending rows, and one glossary link another session added to the average-rate sentence. Words 1959 → 1859 (the
 // ratchet FALLS): the old calculation lines under the pensions folded into the figures' notes, which are hidden until asked for — one home per figure.
@@ -40,7 +42,7 @@ const BUDGETS: Record<string, Budget> = {
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   'Hypothèses': { controls: 66, words: 680 },
   'Fiche': { controls: 28, words: 382 },
-  'Résultats — Réponse': { controls: 47, words: 670 },
+  'Résultats — Réponse': { controls: 47, words: 683 },
   'Résultats — Décider': { controls: 50, words: 1217 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
