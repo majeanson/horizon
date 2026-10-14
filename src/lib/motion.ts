@@ -29,15 +29,7 @@ export function revealOnOpen(el: HTMLElement | null): () => void {
   return () => cancelAnimationFrame(raf)
 }
 
-// « Take me to that section » — and KEEP me there while the page settles. On Résultats the sections above a target keep
-// streaming in for a moment (a worker's answer replacing a placeholder, a lazy chart), so a tapped section that had
-// stopped under the pinned bar slid up or down a beat later. The first scroll is the reader's (smooth, when allowed);
-// from then on any change of the page's height re-anchors the target without animation. It lets go only when BOTH hold:
-// `minMs` has passed since the tap (a slow phone's or runner's workers answer seconds late, and a page that has not
-// changed yet is not a page that has settled: letting go after a short quiet spell made a CI landing test fail) AND the
-// page has been quiet for `quietMs`; `maxMs` is the end whatever happens. The reader's own wheel, touch or key hands
-// the scroll back at once. Returns a cancel.
-// …once the section EXISTS. A link to a section of another view switches the view, and that view is a lazy chunk: one frame
+// « Take me to that section », once it EXISTS (see scrollToSection below). A link to a section of another view switches the view, and that view is a lazy chunk: one frame
 // later its sections may not be on the page yet, and `scrollToSection` on an id that is not there does nothing, silently.
 // This waits for the anchor (a frame, then every 50 ms, for at most `waitMs`) and then hands over to `scrollToSection`, whose own
 // hold keeps the landing while the page settles. Returns a cancel for the wait AND the hold.
@@ -63,6 +55,14 @@ export function scrollToSectionWhenThere(id: string, waitMs = 5000): () => void 
   }
 }
 
+// « Take me to that section » — and KEEP me there while the page settles. On Résultats the sections above a target keep
+// streaming in for a moment (a worker's answer replacing a placeholder, a lazy chart), so a tapped section that had
+// stopped under the pinned bar slid up or down a beat later. The first scroll is the reader's (smooth, when allowed);
+// from then on any change of the page's height re-anchors the target without animation. It lets go only when BOTH hold:
+// `minMs` has passed since the tap (a slow phone's or runner's workers answer seconds late, and a page that has not
+// changed yet is not a page that has settled: letting go after a short quiet spell made a CI landing test fail) AND the
+// page has been quiet for `quietMs`; `maxMs` is the end whatever happens. The reader's own wheel, touch or key hands
+// the scroll back at once. Returns a cancel.
 export function scrollToSection(id: string, maxMs = 10000, quietMs = 1500, minMs = 4000): () => void {
   const target = document.getElementById(id)
   if (!target) return () => {}

@@ -168,13 +168,20 @@ export function useResultsPage() {
   // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
   // scroll to an id that is not on the page did nothing, on the one screen (« no age works ») where the reader most needs it.
   const pendingScroll = useRef<string | null>(null)
+  // The landing in progress (a wait for the anchor, then the hold): a new link or leaving the page cancels it, so two landings never fight over the scroll.
+  const landing = useRef<() => void>(() => {})
+  const land = (id: string) => {
+    landing.current()
+    landing.current = scrollToSectionWhenThere(id)
+  }
+  useEffect(() => () => landing.current(), [])
   const scrollTo = (id: string) => scrollToSection(id)
   const goTo = (target: View, wantedId: string) => {
     // The what-ifs and the 3 × 3 grids are folds that open on request: open the one the link names first (its body does not exist until then), then land on it.
     const wanted = target === 'decide' ? ESSAI_OF[wantedId] : undefined
     if (wanted !== undefined && wanted !== essai) setEssai(wanted)
     if (target === 'proof' && wantedId === 'sensibilite' && !gridsOpen) setGridsOpen(true)
-    if (target === view) return void requestAnimationFrame(() => scrollToSectionWhenThere(wantedId))
+    if (target === view) return void land(wantedId)
     pendingScroll.current = wantedId
     setParam('v', target === 'answer' ? null : target)
   }
@@ -183,7 +190,7 @@ export function useResultsPage() {
     if (id === null) return
     pendingScroll.current = null
     // The other view is a lazy chunk: its sections may not exist yet one frame after the switch, so wait for the anchor (≤ 5 s) rather than scroll to nothing.
-    scrollToSectionWhenThere(id)
+    land(id)
   }, [view])
 
   // Old deep links chose one question (`?q=save|stop`); the answers share the page now, so the link becomes a scroll
@@ -325,7 +332,7 @@ export function useResultsPage() {
   // and a link shares it; any other value is no tour. It is offered only on a real answer ('at' / 'now') for a household still working: several steps speak of departure ages, and
   // a household that has already stopped (retiredNow) or whose money never lasts (« none ») has no age to walk through. Nothing opens it by itself.
   const tourRaw = params.get('visite')
-  const tourStep = tourRaw !== null && /^[1-4]$/.test(tourRaw) ? Number(tourRaw) : 0
+  const tourStep = tourRaw !== null && new RegExp(`^[1-${TOUR_STEPS}]$`).test(tourRaw) ? Number(tourRaw) : 0
   const tourAvailable = answered && !retiredNow && headline.kind !== 'none'
   const tour = tourAvailable ? tourStep : 0
   const setTour = (step: number) => setParam('visite', step >= 1 && step <= TOUR_STEPS ? String(step) : null)

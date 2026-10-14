@@ -59,7 +59,7 @@ official page, and any guard it added has been **planted against its own bug** a
 ### Phase 4 — taxes
 
 - [x] Taxes: federal and Québec brackets, credits, the abatement, `householdTax` and pension splitting; the top marginal rate 53.31 % and the lowest 25.69 % reproduced (ENGINE.md names what is simplified)
-- [ ] Re-check against Revenu Québec's TP-1.G guide (now in `docs/`): the base-QPP-contribution treatment and the 14 % conversion rate (the line-361 age gate is confirmed)
+- [ ] TP-1.G (2025-12) re-read 2026-10-14: no Québec credit for the base QPP contribution exists in its credit lines (98 / 98.2 only split base+1st from 2nd additional; the deduction is line 248 via annexe U), so that treatment stands. STILL OPEN: the 14 % credit rate is not stated in TP-1.G, and annexe U (the enhanced-QPP deduction's worksheet) is not in `docs/`
 
 ### Phase 5 — accounts and defined-benefit pensions
 
