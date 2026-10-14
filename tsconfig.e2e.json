@@ -13,6 +13,10 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
+    // A spec may read a CONTRACT from src (e2e/examples.spec.ts holds the example list to
+    // EXAMPLE_IDS.length): src files import each other with explicit .ts extensions, so the
+    // spec project must allow them too (legal here because noEmit is on, same as the app).
+    "allowImportingTsExtensions": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
