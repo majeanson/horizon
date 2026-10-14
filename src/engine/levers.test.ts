@@ -33,7 +33,7 @@ describe('leverRanking — the money each change adds at the end of the plan', (
     for (const id of ['spend10', 'returns1'] as const) expect(r.levers.find((l) => l.id === id)!.endGain, id).toBeGreaterThan(0)
     const behind = leverRanking(EXAMPLES.behind.household, EXAMPLES.behind.assumptions)
     if (behind.base === null) for (const l of behind.levers) expect(l.endGain).toBeNull()
-  })
+  }, 60_000) // two searches of every lever: seconds on a slow runner, and the default of five is no room
   it('equal years: the change worth more money comes first', () => {
     const { household, assumptions } = EXAMPLES.average
     const { levers } = leverRanking(household, assumptions)
