@@ -34,7 +34,9 @@ const BUDGETS: Record<string, Budget> = {
   'Fiche': { controls: 28, words: 382 },
   'Résultats — Réponse': { controls: 47, words: 670 },
   'Résultats — Décider': { controls: 50, words: 1211 },
-  'Résultats — Preuve': { controls: 43, words: 1859 },
+  // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
+  // for the pending « … » cells, and the final page holds the prudent-gap line with its « Voir la sensibilité » chip.
+  'Résultats — Preuve': { controls: 44, words: 1887 },
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]
@@ -56,6 +58,8 @@ const ROUTES: readonly Route[] = [
 interface Counts {
   controls: number
   words: number
+  /** Each counted control's accessible name or text — printed when a budget fails, so the failure says WHAT grew. */
+  names: string[]
 }
 
 /**
@@ -74,6 +78,7 @@ async function count(page: Page): Promise<Counts> {
     const SKIP = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'])
     let controls = 0
     let words = 0
+    const names: string[] = []
 
     const walk = (el: Element, ariaHidden: boolean): void => {
       if (SKIP.has(el.tagName)) return
@@ -84,7 +89,11 @@ async function count(page: Page): Promise<Counts> {
 
       if (!hiddenFromAt && el.matches(CONTROL) && !(el instanceof HTMLInputElement && el.type === 'hidden')) {
         const r = el.getBoundingClientRect()
-        if (r.width > 0 && r.height > 0) controls++
+        if (r.width > 0 && r.height > 0) {
+          controls++
+          // Each counted control's name, so a budget failure says WHAT grew, not only by how much.
+          names.push((el.getAttribute('aria-label') ?? el.textContent ?? el.tagName).trim().replace(/\s+/g, ' ').slice(0, 48))
+        }
       }
 
       // A closed <details> is entered through its first <summary> only; nothing else of it is on show.
@@ -106,7 +115,7 @@ async function count(page: Page): Promise<Counts> {
     }
 
     walk(document.body, false)
-    return { controls, words }
+    return { controls, words, names }
   })
 }
 
@@ -155,7 +164,10 @@ test.describe('complexity ratchet', () => {
     // [hidden] button, and every button inside a closed fold, nested or not, are out)
     // words: Title here 2 · Go 1 · Link 1 · Ghost link 2 (read by the eye, so counted) · Closed sum 2 · Outer 1 · Open sum 2 ·
     // shown text 2 · Nested closed 2 = 15
-    expect(await count(page)).toEqual({ controls: 7, words: 15 })
+    const got = await count(page)
+    expect({ controls: got.controls, words: got.words }).toEqual({ controls: 7, words: 15 })
+    expect(got.names).toContain('Go') // the names ride along for the failure message
+    expect(got.names).not.toContain('Nope')
   })
 
   for (const [label, path, ready, seed, sentinel] of ROUTES) {
@@ -166,6 +178,9 @@ test.describe('complexity ratchet', () => {
       await page.locator(ready).first().waitFor({ timeout: 30_000 })
       if (sentinel) await page.locator(sentinel).first().waitFor({ state: 'attached', timeout: 30_000 })
       await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 30_000 })
+      // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
+      // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).
+      await expect(page.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 30_000 })
       await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
       await page.evaluate(() => document.getElementById('root')?.scrollTo({ top: 0 }))
 
@@ -173,10 +188,11 @@ test.describe('complexity ratchet', () => {
       const line = `complexity ${label}: controls=${measured.controls} words=${measured.words}`
       testInfo.annotations.push({ type: 'complexity', description: `controls=${measured.controls} words=${measured.words}` })
       console.log(line)
+      if (process.env.COMPLEXITY_NAMES) console.log(`  counted: ${measured.names.join(' · ')}`)
 
       const budget = BUDGETS[label]
       const why = `${line} — lower the budget only in the commit that earns it; raise it only with a history comment`
-      expect(measured.controls, `controls: ${why}`).toBeLessThanOrEqual(budget.controls)
+      expect(measured.controls, `controls: ${why}\n  counted: ${measured.names.join(' · ')}`).toBeLessThanOrEqual(budget.controls)
       expect(measured.words, `words: ${why}`).toBeLessThanOrEqual(budget.words)
     })
   }
