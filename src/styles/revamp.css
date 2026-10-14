@@ -1744,3 +1744,87 @@
   color: var(--ink);
   text-decoration-style: solid;
 }
+
+/* A COMPUTED figure that answers « d'où vient ce chiffre ? » (components/Figure.tsx): the value itself is the button, marked by a quiet ink-soft dotted
+   underline and a small « i » — distinct from .est (the warning tint, a word) and .gloss (the text colour, a sigle). Its note opens in place under it. */
+.figure-block {
+  display: grid;
+  gap: 0.4rem;
+}
+.figure-block > p {
+  margin: 0;
+}
+.figure {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline dotted var(--ink-soft);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+}
+.figure::after {
+  content: 'i';
+  content: 'i' / '';
+  display: inline-grid;
+  place-items: center;
+  width: 1.3em;
+  height: 1.3em;
+  margin-inline-start: 0.3em;
+  border: 1px solid var(--ink-soft);
+  border-radius: 50%;
+  color: var(--ink-soft);
+  font: italic 700 0.65em/1 var(--font-body);
+  vertical-align: 0.12em;
+}
+.figure:hover,
+.figure.is-on,
+.figure:focus-visible {
+  text-decoration-style: solid;
+}
+.figure:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.figure-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+.figure-note[hidden] {
+  display: none;
+}
+.figure-note p {
+  margin: 0;
+}
+.figure-note__title {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.figure-note__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.figure-note__door {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ink);
+  text-decoration: underline;
+}
+.figure-note__lang {
+  color: var(--ink-soft);
+}

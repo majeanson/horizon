@@ -72,6 +72,7 @@ const PAGES = [
   ['the try view of the results', '/resultats?v=adjust', '.page-head__title'],
   ['the check view of the results', '/resultats?v=verify', '.page-head__title'],
   ['the detail chart of the results', '/resultats?metric=detail', '.page-head__title'],
+  ['the proof view of the results', '/resultats?v=proof', '.page-head__title'],
 ] as const
 
 for (const s of STATES) {
@@ -82,6 +83,9 @@ for (const s of STATES) {
       await page.goto(path)
       await page.locator(ready).waitFor()
       for (const b of await page.locator('.info-btn').all()) await b.click()
+      // A computed figure's note (Figure) on its tinted ground: open the first one the page holds (only the proof view has any).
+      const figure = page.locator('button.figure').first()
+      if ((await figure.count()) > 0) await figure.click()
       expect(await violations(page)).toEqual([])
     })
   }

@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react'
 import { agesLedger } from '../../engine/ledger'
+import { oasTrace, rrqTrace } from '../../engine/trace'
 import type { AccountKind, Assumptions, Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { factId } from '../../lib/facts'
@@ -8,6 +10,7 @@ import { formatMoney } from '../../lib/money'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { EstFlag } from '../EstFlag'
+import { Figure } from '../Figure'
 
 // « Mes chiffres et leur calcul »: every number that sets the answer, with the calculation it triggers and the amount it becomes.
 // The ages (when the pay stops, when the QPP starts, when the OAS starts), then the spending and the economy (inflation, returns).
@@ -26,18 +29,18 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   const pct = (rate: number) => formatPct(rate, lang, 1)
 
   /** One figure: its name and value on a line, then the amount it becomes (when there is one) and the calculation under it. */
-  const rowOf = (fact: string | null, label: string, value: string, result: string | null, ...calcs: (string | null)[]) => (
+  const rowOf = (fact: string | null, label: string, value: string, result: ReactNode, ...calcs: (string | null)[]) => (
     <div className="ledger__row">
       <p className="ledger__fixed">
         <span className="field-row__label">{label}</span> <span className="mono">{value}</span>
         {fact !== null && <EstFlag fact={fact} />}
       </p>
-      {result !== null && <p className="ledger__result">{result}</p>}
+      {typeof result === 'string' ? <p className="ledger__result">{result}</p> : result}
       {calcs.map((line, i) => (line === null ? null : <p key={i} className="ledger__calc">{line}</p>))}
     </div>
   )
 
-  const row = (label: string, value: string, result: string | null, ...calcs: (string | null)[]) => rowOf(null, label, value, result, ...calcs)
+  const row = (label: string, value: string, result: ReactNode, ...calcs: (string | null)[]) => rowOf(null, label, value, result, ...calcs)
   // A spending figure is the household's own input, restated here: while it is still an estimate, the mark says so and leads to its field.
   const spendRow = (fact: 'spendingWorking' | 'spendingRetired', label: string, value: number) => rowOf(factId('household', fact), label, money(value), null, c.spendCalc(money(value), money(value / 12)))
 
@@ -58,15 +61,14 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
               {row(
                 c.rrqLabel,
                 c.age(String(p.rrq.startAge)) + done(l.rrq.done),
-                c.rrqResult(money(l.rrq.monthlyToday)),
-                c.rrqCalc(monthYear(l.rrq.start), money(l.rrq.base, true), money(l.rrq.additionalFirst, true), money(l.rrq.additionalSecond, true), formatPct(l.rrq.adjustment, lang, 1), money(l.rrq.monthly, true)),
+                <Figure trace={rrqTrace(l)} after={c.perMonthToday} lineClassName="ledger__result" />,
                 !l.rrq.done && l.rrq.monthlyToday > l.rrq.maxToday * 1.2 ? c.rrqContext(money(l.rrq.maxToday), formatPct(Math.max(0, assumptions.wageGrowth - assumptions.inflation), lang, 1)) : null,
               )}
               {row(
                 c.oasLabel,
                 c.age(String(p.oas.startAge)) + done(l.oas.done),
-                c.oasResult(money(l.oas.monthlyToday)),
-                l.oas.monthly > 0 ? c.oasCalc(monthYear(l.oas.start), money(l.oas.full, true), formatPct(l.oas.residence, lang, 0), formatPct(l.oas.multiplier - 1, lang, 1), money(l.oas.monthly, true)) : c.oasNone(monthYear(l.oas.start)),
+                <Figure trace={oasTrace(l)} after={c.perMonthToday} lineClassName="ledger__result" />,
+                l.oas.monthly > 0 ? null : c.oasNone(monthYear(l.oas.start)),
               )}
             </section>
           )

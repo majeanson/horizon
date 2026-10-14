@@ -13,12 +13,6 @@ describe('the ledger copy', () => {
     expect(Object.keys(en).sort()).toEqual(Object.keys(fr).sort())
     for (const c of [fr, en]) for (const [k, t] of sample(c)) expect(t.trim(), k).not.toBe('')
   })
-  it('puts every argument it is given into the sentence (a dropped one is a missing number)', () => {
-    for (const c of [fr, en]) {
-      expect(c.rrqCalc('S', 'B', 'F', 'G', 'AJ', 'MM')).toEqual(expect.stringMatching(/S.*B.*F.*G.*AJ.*MM/))
-      expect(c.oasCalc('S', 'FU', 'RE', 'MU', 'MM')).toEqual(expect.stringMatching(/S.*FU.*RE.*MU.*MM/))
-    }
-  })
   it('is not left in the other language', () => {
     for (const [k, t] of sample(en)) expect(t, k).not.toMatch(/ à l’|valeur nette|dollars d’aujourd’hui|Le plan /)
     for (const [k, t] of sample(fr)) expect(t, k).not.toMatch(/ the | a month|The plan/)

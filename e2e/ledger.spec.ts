@@ -14,7 +14,10 @@ test('each age shows its calculation and its amount — and no control that edit
   // the QPP line states its start age, its amount in today's dollars and its formula
   await expect(panel.locator('.ledger__fixed').filter({ hasText: 'Début du RRQ' }).first()).toContainText('65 ans')
   await expect(panel.locator('.ledger__result').first()).toContainText('par mois, en dollars d’aujourd’hui')
-  await expect(panel.locator('.ledger__calc').filter({ hasText: 'ajustement' }).first()).toBeVisible()
+  // …and its formula lives in the amount's own note (Figure), not beside it: one home per figure
+  await expect(panel.locator('.ledger__calc').filter({ hasText: 'ajustement' })).toHaveCount(0)
+  await panel.locator('button.figure').first().click()
+  await expect(panel.locator('.figure-note__formula').first()).toContainText('ajustement')
   // nothing here is a slider
   await expect(panel.getByRole('slider')).toHaveCount(0)
 })

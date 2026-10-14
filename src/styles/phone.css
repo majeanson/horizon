@@ -137,3 +137,13 @@ summary {
   position: absolute;
   inset: -13px -6px;
 }
+
+/* The computed figure (Figure): small to look at, 44 px to tap. */
+.figure {
+  position: relative;
+}
+.figure::before {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
+}

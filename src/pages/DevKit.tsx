@@ -9,6 +9,8 @@ import { EditField } from '../components/EditField'
 import { EmptyState } from '../components/EmptyState'
 import { FieldInfo } from '../components/FieldInfo'
 import { FieldRow } from '../components/FieldRow'
+import { Figure } from '../components/Figure'
+import type { Trace } from '../engine/trace'
 import { Icon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Modal } from '../components/Modal'
@@ -54,6 +56,25 @@ interface Entry {
   exports?: string[]
   kw: string
   render: () => ReactNode
+}
+
+// A small trace for the Figure specimen: a pension that a start age moves, with its three layers (formula, inputs, official page).
+const FIGURE_SPECIMEN: Trace = {
+  labelKey: 'rrq',
+  value: 1180.5,
+  today: 1020,
+  start: { year: 2043, month: 4 },
+  parts: [
+    { labelKey: 'rrqBase', value: 900, kind: 'money', op: 'add' },
+    { labelKey: 'rrqFirst', value: 120, kind: 'money', op: 'add' },
+    { labelKey: 'rrqSecond', value: 80, kind: 'money', op: 'add' },
+    { labelKey: 'rrqAdjustment', value: 1.0755, kind: 'pct', op: 'mul' },
+  ],
+  inputs: [
+    { labelKey: 'retirement', value: 60, kind: 'age', door: 'person:self' },
+    { labelKey: 'rrqStart', value: 65, kind: 'age', door: 'person:self' },
+  ],
+  source: { title: 'Retirement pension paid as of age 65 and 1 month (1036-1-RRQ, 2025-06)', url: 'https://www.retraitequebec.gouv.qc.ca/' },
 }
 
 // A labelled sub-variant inside one specimen.
@@ -365,6 +386,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
     { cat: 'Affichage', name: 'Gloss', file: 'src/components/Gloss.tsx', exports: ['Gloss', 'glossed'], kw: 'glossaire sigle abréviation lien explication', render: () => <p><Gloss>Votre rente du RRQ et la PSV commencent à l’âge choisi ; le REER et le CELI s’ajoutent.</Gloss></p> },
     { cat: 'Affichage', name: 'EstFlag', file: 'src/components/EstFlag.tsx', kw: 'estimé confirmer chiffre dépenses marque lien', render: () => <p>Dépenses à la retraite : 54 000 $ <EstFlag fact="household:spendingRetired" /></p> },
+    { cat: 'Affichage', name: 'Figure', file: 'src/components/Figure.tsx', kw: 'chiffre calculé d’où vient formule source provenance trace rente pension', render: () => <p><Figure trace={FIGURE_SPECIMEN} after="par mois, en dollars d’aujourd’hui" /></p> },
     { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
     { cat: 'Affichage', name: 'LiveAnswer', file: 'src/components/LiveAnswer.tsx', kw: 'réponse en direct âge bandeau', render: () => <LiveAnswer /> },
     { cat: 'Affichage', name: 'DemoAnswer', file: 'src/components/DemoAnswer.tsx', kw: 'exemple démo première visite accueil réponse ménage', render: () => <DemoAnswer /> },
