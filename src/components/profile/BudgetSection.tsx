@@ -9,6 +9,7 @@ import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { Cluster } from '../Layout'
 import { NumberField } from '../NumberField'
+import { BankImport } from './BankImport'
 import { ChildCosts } from './FamilySection'
 import { LevelSlot } from './LevelSlot'
 import { Section } from './shared'
@@ -32,6 +33,7 @@ export function BudgetSection({ withKids = false }: { /** The children’s cost 
 
   const together = (
     <>
+      <BankImport />
       <FieldRow label={b.working} infoId="spendingWorking" hint={b.hint} fact={factId('household', 'spendingWorking')}>
         {(w) => <NumberField kind="money" max={1e8} value={household.spending.workingToday} onChange={(workingToday) => updateProfile((p) => setSpending(p, { workingToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>

@@ -111,6 +111,22 @@ for (const s of STATES) {
   })
 }
 
+// « Importer un relevé de banque » opened with a statement read: the file picker, the paste box, the ticked and unticked category chips and the total.
+for (const s of STATES) {
+  test(`the bank import, opened with a statement read, has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
+    await setState(page, s)
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/profil?form=1')
+    await page.locator('.page-head__title').waitFor()
+    const fold = page.locator('details.fold', { hasText: 'Importer un relevé de banque' })
+    await fold.locator('summary').click()
+    const csv = ['Date;Description;Catégorie;Montant', '2025-01-28;IGA;Épicerie;-500,00', '2025-01-28;Virement;Transfert;-2 000,00', '2025-02-28;IGA;Épicerie;-500,00'].join('\n')
+    await fold.getByRole('textbox', { name: 'Opérations copiées du relevé' }).fill(csv)
+    await expect(fold.getByRole('status')).toContainText('opérations lues')
+    expect(await violations(page)).toEqual([])
+  })
+}
+
 // The household sheet, in every display state: day, night, high contrast and the largest text.
 for (const s of STATES) {
   test(`the household sheet has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
