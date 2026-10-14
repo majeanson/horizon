@@ -5,7 +5,7 @@ import { BudgetSection } from '../components/profile/BudgetSection'
 import { HomeSection } from '../components/profile/HomeSection'
 import { LifeSection } from '../components/profile/LifeSection'
 import { FamilySection } from '../components/profile/FamilySection'
-import { AccountsSection, OasSection } from '../components/profile/OasAccountsSections'
+import { AccountsSection, CashBufferReadout, OasSection } from '../components/profile/OasAccountsSections'
 import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
 import { BackupLine } from '../components/profile/BackupLine'
@@ -194,6 +194,7 @@ export function Profil() {
           )
         })}
       </div>
+      <CashBufferReadout />
       {/* The household’s own costs come after the people, as on the first visit: the retirement ages are known by the time a budget is asked. */}
       <BudgetSection withKids={applies(profile, yes, 'kids')} />
       {applies(profile, yes, 'home') && <HomeSection />}

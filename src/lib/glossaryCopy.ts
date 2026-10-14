@@ -274,6 +274,12 @@ const FR_GLOSSARY = {
           plain: 'L’ensemble de vos REER, CELI et comptes non enregistrés. « Tiré du nid », sur le graphique, c’est ce que vous retirez de vos économies cette année-là.',
         },
         {
+          id: 'coussin',
+          abbr: 'Coussin de liquidités',
+          name: 'Des mois de dépenses à portée de main',
+          plain: 'L’argent du CELI et des comptes non enregistrés, en mois de dépenses de retraite. Le REER n’est pas compté : il est imposable quand on le retire.',
+        },
+        {
           id: 'scenario',
           abbr: 'Scénario',
           name: 'Prudent · Neutre · Audacieux',
@@ -604,6 +610,12 @@ const EN_GLOSSARY: typeof FR_GLOSSARY = {
           abbr: 'Nest egg',
           name: 'Your savings',
           plain: 'All your RRSPs, TFSAs and non-registered accounts. “Drawn from the nest egg”, on the chart, is what you take out of your savings that year.',
+        },
+        {
+          id: 'coussin',
+          abbr: 'Cash buffer',
+          name: 'Months of spending within reach',
+          plain: 'The money in the TFSA and in non-registered accounts, counted in months of retirement spending. The RRSP is not counted: it is taxable when withdrawn.',
         },
         {
           id: 'scenario',
