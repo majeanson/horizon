@@ -7,7 +7,7 @@ import { useGuided } from '../../lib/guide'
 import { FactMark } from '../FactMark'
 import { formatYearAge } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
-import { setEarning } from '../../lib/profileEdit'
+import { setEarning, setStatement } from '../../lib/profileEdit'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
@@ -57,6 +57,27 @@ export function RrqSection({ person, edit }: PersonEditor) {
           <NumberField kind="int" min={60} max={72} unit={t.fields.years} value={person.rrq.startAge} onChange={(startAge) => edit((x) => ({ ...x, rrq: { ...x.rrq, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />
         )}
       </FieldRow>
+
+      {/* The relevé's own « Montant actuel » at 60 and at 65 — the facsimile of « Par document » edits the same two fields. They are a CHECK against the
+          engine, never an input (engine/types.ts), so no fact is confirmed here and the projection never reads them. */}
+      <fieldset className="account-group">
+        <legend className="account-group__title mono">{r.statementTitle}</legend>
+        {([60, 65] as const).map((at) => (
+          <FieldRow key={at} label={at === 60 ? r.statementAt60 : r.statementAt65} infoId="rrqStatement" hint={at === 65 ? r.statementHint : undefined}>
+            {(w) => (
+              <NumberField
+                kind="money"
+                allowEmpty
+                max={1e5}
+                value={at === 60 ? (person.rrq.statementAt60 ?? null) : (person.rrq.statementAt65 ?? null)}
+                onChange={(v) => edit((x) => setStatement(x, at, v))}
+                id={w.id}
+                ariaDescribedBy={w.describedBy}
+              />
+            )}
+          </FieldRow>
+        ))}
+      </fieldset>
 
         <div className={'earnings' + (guided === factId(person.id, 'earnings') ? ' earnings--guided' : '')} data-fact={factId(person.id, 'earnings')}>
           <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed, years.length)} />

@@ -169,6 +169,10 @@ export const FR = {
       filled: (n: number) => (n === 1 ? '1 année estimée' : `${n} années estimées`),
       fillUndo: 'Retirer les années estimées',
       nothingToFill: 'Aucune année à estimer : saisissez un salaire d’abord, ou toutes les années sont remplies.',
+      statementTitle: 'Estimation du relevé',
+      statementAt60: 'Montant actuel à 60 ans',
+      statementAt65: 'Montant actuel à 65 ans',
+      statementHint: 'Par mois, tel que le relevé l’indique. Un repère de contrôle : le calcul ne s’en sert pas.',
     },
     oas: {
       title: 'Pension de la Sécurité de la vieillesse (PSV)',
@@ -553,6 +557,12 @@ export const FR = {
       label: 'B – Revenus de travail admissibles',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/emploi-et-regime-rentes-quebec/releve-participation-regime-rentes-quebec',
       note: 'Les années sous 3 500 $ y paraissent à 0 $, et les dernières années peuvent manquer : Revenu Québec les déclare avec du retard.',
+    },
+    rrqStatement: {
+      where: 'Retraite Québec ▸ Mon dossier ▸ Relevé de participation ▸ Estimation des prestations ▸ Rente de retraite, colonne « Montant actuel ».',
+      label: 'Montant actuel',
+      url: 'https://www.retraitequebec.gouv.qc.ca/fr/citoyens/travail/emploi-et-regime-rentes-quebec/releve-participation-regime-rentes-quebec',
+      note: 'Recopiez la colonne « Montant actuel », pas « Montant projeté » : celle-ci ne compte que la première bonification du régime.',
     },
     rrqStartAge: {
       where: 'C’est votre choix : aucune pièce ne l’imprime. La page officielle montre l’effet de chaque mois plus tôt ou plus tard.',

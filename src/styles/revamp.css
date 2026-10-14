@@ -1828,3 +1828,69 @@
 .figure-note__lang {
   color: var(--ink-soft);
 }
+
+/* « Comme sur le document » (components/profile/facsimile): the boxes laid out like the paper the reader holds. STRUCTURE ONLY — a plain paper
+   surface and the document's own words; no logo, no brand colour, and a frame line saying it is a layout, never the document. */
+.facsimile-wrap {
+  display: grid;
+  gap: 0.5rem;
+}
+.facsimile {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.85rem 0.9rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+.facsimile__screen {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.facsimile__table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.facsimile__caption {
+  caption-side: top;
+  text-align: start;
+  padding-bottom: 0.4rem;
+  color: var(--ink-soft);
+}
+.facsimile__table th,
+.facsimile__table td {
+  padding: 0.35rem 0.3rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.facsimile__table thead th {
+  font-weight: 600;
+}
+.facsimile__table tbody th {
+  font-weight: 500;
+  width: 22%;
+}
+.facsimile__row {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.facsimile__label {
+  overflow-wrap: anywhere;
+}
+.facsimile__note,
+.facsimile__frame {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+.facsimile__frame {
+  border-top: 1px dashed var(--line-strong);
+  padding-top: 0.5rem;
+}

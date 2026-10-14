@@ -12,6 +12,7 @@ import { TaxFields } from './TaxFields'
 import type { PersonEditor } from './shared'
 import { Chip } from '../Chip'
 import { Cluster, Rail } from '../Layout'
+import { SubTabs } from '../SubTabs'
 import { DocumentsChecklist } from './DocumentsChecklist'
 import { GuideBar } from './GuideBar'
 import { StatusMessage } from '../StatusMessage'
@@ -50,7 +51,7 @@ function Persons({ render }: { render: (person: Person, edit: PersonEditor['edit
 }
 
 // The household's first step is where « Ma situation » is answered: what it says decides which documents the next steps are about.
-function StepBody({ step }: { step: Step }) {
+function StepBody({ step, view }: { step: Step; view: View }) {
   const profile = useProfile()
   const yes = useYes()
   switch (step.id) {
@@ -65,9 +66,21 @@ function StepBody({ step }: { step: Step }) {
         </>
       )
     case 'rrq':
-      return <Persons render={(person, edit) => <RrqSection person={person} edit={edit} />} />
+      return view === 'document' ? (
+        <Suspense fallback={null}>
+          <Persons render={(person, edit) => <RrqFacsimile person={person} edit={edit} />} />
+        </Suspense>
+      ) : (
+        <Persons render={(person, edit) => <RrqSection person={person} edit={edit} />} />
+      )
     case 'tax':
-      return <Persons render={(person, edit) => <TaxFields person={person} edit={edit} />} />
+      return view === 'document' ? (
+        <Suspense fallback={null}>
+          <Persons render={(person, edit) => <CraFacsimile person={person} edit={edit} />} />
+        </Suspense>
+      ) : (
+        <Persons render={(person, edit) => <TaxFields person={person} edit={edit} />} />
+      )
     case 'bank':
       return <Persons render={(person, edit) => <AccountsSection person={person} edit={edit} withoutRoom withNonReg={applies(profile, yes, 'nonReg', person.id)} />} />
     case 'employer':
@@ -82,6 +95,13 @@ function StepBody({ step }: { step: Step }) {
 }
 
 const SituationCard = lazy(() => import('./SituationCard'))
+
+// « Comme sur le document »: the two steps whose document is a table or a screen to copy get a second look, laid out like the paper. It is the page's
+// own state, not an address key: a way of looking, not a place to come back to. The facsimiles (and their quoted words) load only when asked for.
+type View = 'form' | 'document'
+const FACSIMILE_STEPS: ReadonlySet<string> = new Set(['rrq', 'tax'])
+const RrqFacsimile = lazy(() => import('./facsimile/RrqFacsimile').then((m) => ({ default: m.RrqFacsimile })))
+const CraFacsimile = lazy(() => import('./facsimile/CraFacsimile').then((m) => ({ default: m.CraFacsimile })))
 
 export default function EntryByDocument() {
   const t = useT()
@@ -110,12 +130,14 @@ export default function EntryByDocument() {
   const anyTicked = ticks.size > 0
   const saved = lastStep()
   // « Me guider »: the guide of « Rendre mon profil exact », for the figures of THIS document only (fixed when it starts, so confirming one does not reshuffle the rest).
+  const [view, setView] = useState<View>('form')
   const [tour, setTour] = useState<{ ids: string[]; at: number } | null>(null)
   const todo = ids.filter((id) => !new Set(profile.confirmed).has(id))
 
   useEffect(() => {
     rememberStep(step.id)
     setTour(null) // a guide belongs to the step it was started on
+    setView('form') // …and a look is chosen per step
   }, [step.id])
 
   const go = (id: string) =>
@@ -180,7 +202,19 @@ export default function EntryByDocument() {
         )}
       </header>
 
-      <StepBody step={step} />
+      {FACSIMILE_STEPS.has(step.id) && (
+        <SubTabs
+          size="mini"
+          ariaLabel={c.views.label}
+          value={view}
+          onSelect={setView}
+          options={[
+            { key: 'form', label: c.views.form },
+            { key: 'document', label: c.views.document },
+          ]}
+        />
+      )}
+      <StepBody step={step} view={FACSIMILE_STEPS.has(step.id) ? view : 'form'} />
 
       {ids.length > 0 && (
         <div className="saisie__confirm surface">

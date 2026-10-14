@@ -252,6 +252,20 @@ export function setEarning(person: Person, year: number, value: number | null): 
   return { ...person, earningsHistory: history }
 }
 
+/**
+ * Set (or, with null, clear) the relevé's own « Montant actuel » at 60 or 65 (monthly). Kept as a CHECK against the engine, never as an
+ * input (engine/types.ts): nothing here confirms a fact, and the projection never reads it.
+ */
+export function setStatement(person: Person, at: 60 | 65, value: number | null): Person {
+  const key = at === 60 ? 'statementAt60' : 'statementAt65'
+  const current = person.rrq[key]
+  if ((current ?? null) === value) return person
+  const rrq = { ...person.rrq }
+  if (value === null) delete rrq[key]
+  else rrq[key] = value
+  return { ...person, rrq }
+}
+
 // ── Employer pensions ───────────────────────────────────────────────────────────────────────────────
 
 /** A plan the person enters by hand: a typical final-average-salary shape with nothing assumed beyond it. */

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
 import { savedProfile, seedProfile, showAllSections } from './seed'
 
 // « Par document » (the second way to fill Profil; it was the Saisie page): the profile typed one document at a time. Same fields, same store — gathered in the order the papers are held.
@@ -94,3 +95,70 @@ test('the last step leads to the result, and the checklist leads to the first st
   await page.getByRole('button', { name: 'Suivant' }).click()
   await expect(page.getByText(/Étape 1 sur/)).toBeVisible()
 })
+
+// « Comme sur le document »: the tax and relevé steps can be laid out like the paper in hand. Same fields, same store — only the look changes.
+const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
+
+test('only the relevé and the tax steps offer « Comme sur le document »; the other steps keep the form', async ({ page }) => {
+  for (const id of ['rrq', 'tax']) {
+    await page.goto(`/saisie?etape=${id}`)
+    await expect(page.getByRole('tab', { name: 'Comme sur le document' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Formulaire' })).toHaveAttribute('aria-selected', 'true')
+  }
+  await page.goto('/saisie?etape=bank')
+  await expect(page.getByRole('tab', { name: 'Comme sur le document' })).toHaveCount(0)
+  await expect(page).not.toHaveURL(/vue|view/) // a way of looking, not an address
+})
+
+test('tax step: a figure typed on the CRA screen lands in the form field and confirms the same fact', async ({ page }) => {
+  await page.goto('/saisie?etape=tax')
+  await page.getByRole('tab', { name: 'Comme sur le document' }).click()
+  const screen = page.locator('.facsimile').first()
+  await expect(screen.getByText('Savings and pension plans')).toBeVisible()
+  await expect(screen.getByText('RRSP deduction limit')).toBeVisible()
+  await expect(page.locator('[data-fact]')).toHaveCount(0) // the facsimile owns no second copy of a fact mark
+  expect(((await savedProfile(page)).confirmed as string[]).includes('self:tfsaRoom')).toBe(false)
+  const box = screen.getByRole('textbox', { name: 'TFSA contribution room — As of January 1' })
+  await box.fill('23456')
+  await box.press('Enter')
+  await expect.poll(async () => (await savedProfile(page)).household.persons[0].accounts.tfsa.room).toBe(23456)
+  await expect.poll(async () => ((await savedProfile(page)).confirmed as string[]).includes('self:tfsaRoom')).toBe(true)
+  expect(((await savedProfile(page)).confirmed as string[]).includes('self:rrspRoom')).toBe(false) // only the figure that was typed
+  await page.getByRole('tab', { name: 'Formulaire' }).click()
+  await expect(page.locator('[data-fact="self:tfsaRoom"]').getByRole('textbox')).toHaveValue(/23\D*456/)
+})
+
+test('relevé step: the table has four boxes, the projected pair is not fillable, and « Montant actuel » lands in the form', async ({ page }) => {
+  await page.goto('/saisie?etape=rrq')
+  await page.getByRole('tab', { name: 'Comme sur le document' }).click()
+  const screen = page.locator('.facsimile').first()
+  for (const w of ['Estimation des prestations', 'Rente de retraite', 'Montant actuel', 'Montant projeté', '60 ans', '65 ans']) await expect(screen.getByText(w, { exact: true }).first()).toBeVisible()
+  await expect(screen.getByRole('textbox')).toHaveCount(4)
+  await expect(screen.getByRole('textbox', { name: 'Montant projeté, 60 ans' })).toBeDisabled()
+  await expect(screen.getByRole('textbox', { name: 'Montant projeté, 65 ans' })).toBeDisabled()
+  await expect(screen.getByText('première bonification', { exact: false })).toBeVisible()
+  await expect(screen.getByRole('button', { name: 'Coller mon relevé' })).toBeVisible() // the same door as the form's
+  const actual = screen.getByRole('textbox', { name: 'Montant actuel, 65 ans' })
+  await expect(actual).toBeEnabled()
+  await actual.fill('1450')
+  await actual.press('Enter')
+  await expect.poll(async () => (await savedProfile(page)).household.persons[0].rrq.statementAt65).toBe(1450)
+  expect(((await savedProfile(page)).confirmed as string[]).filter((id) => /statement/i.test(id))).toEqual([]) // a check against the engine confirms nothing
+  await page.getByRole('tab', { name: 'Formulaire' }).click()
+  await expect(page.getByRole('textbox', { name: 'Montant actuel à 65 ans' }).first()).toHaveValue(/1\D*450/)
+  await expect(page.getByRole('textbox', { name: 'Montant actuel à 60 ans' }).first()).toHaveValue('')
+})
+
+for (const [step, label] of [['tax', 'CRA screen'], ['rrq', 'relevé table']] as const) {
+  test(`no accessibility violation on the ${label} (both looks of the step)`, async ({ page }) => {
+    await page.goto(`/saisie?etape=${step}`)
+    await expect(page.locator('.field-row').first()).toBeVisible()
+    const form = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze()
+    expect(form.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(' ')}`), 'form look').toEqual([])
+    await page.getByRole('tab', { name: 'Comme sur le document' }).click()
+    await expect(page.locator('.facsimile').first()).toBeVisible()
+    await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
+    const doc = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze()
+    expect(doc.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(' ')}`), 'facsimile look').toEqual([])
+  })
+}

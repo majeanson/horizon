@@ -29,6 +29,8 @@ export interface EntryCopy {
   readOff: string
   where: string
   openOfficial: string
+  /** The two looks of a step whose document has a table to copy: the form, or the screen laid out like the document (components/profile/facsimile). */
+  views: { label: string; form: string; document: string }
 }
 
 const FR: EntryCopy = {
@@ -56,6 +58,7 @@ const FR: EntryCopy = {
   readOff: 'Vous y lirez',
   where: 'Où le trouver',
   openOfficial: 'Ouvrir la page officielle',
+  views: { label: 'Présentation des cases', form: 'Formulaire', document: 'Comme sur le document' },
 }
 
 const EN: EntryCopy = {
@@ -83,6 +86,7 @@ const EN: EntryCopy = {
   readOff: 'You will read',
   where: 'Where to find it',
   openOfficial: 'Open the official page',
+  views: { label: 'How the boxes are laid out', form: 'Form', document: 'Like the document' },
 }
 
 export const ENTRY_COPY: Record<Lang, EntryCopy> = { fr: FR, en: EN }

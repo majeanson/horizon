@@ -12,7 +12,7 @@ import { rregopPension } from '../engine/presets.ts'
 import { ASSUMED_FIRST_JOB_AGE, earningsCeiling, fillFromSalary, historyYears } from './earnings.ts'
 import {
   addChild, addPension, applyPreset, addSpouse, blankPension, hasSpouse, mapPerson, removeChild, removePension, removeSpouse,
-  applyDeferredRule, isRregopRules, needsDeferredRule, restoreCustom, scenarioOf, setAssumptions, setBirthYear, setEarning, setLivesAlone, setReturn, setSpending, updatePension,
+  applyDeferredRule, isRregopRules, needsDeferredRule, restoreCustom, scenarioOf, setAssumptions, setBirthYear, setEarning, setLivesAlone, setStatement, setReturn, setSpending, updatePension,
 } from './profileEdit.ts'
 import { migrateProfile } from './migrations.ts'
 import { profileGaps } from './profileGaps.ts'
@@ -85,6 +85,16 @@ describe('profile edits are pure, and never produce a profile the validator woul
     expect(2001 in setEarning(person, 2001, null).earningsHistory).toBe(false)
     expect(setEarning(person, 2000, person.earningsHistory[2000])).toBe(person)
     expect(setEarning(person, 1990, null)).toBe(person)
+  })
+
+  it('the relevé’s « Montant actuel » is set, cleared, and unchanged when nothing changes', () => {
+    const person = golden().household.persons[0]
+    const set = setStatement(person, 65, 1_450)
+    expect(set.rrq.statementAt65).toBe(1_450)
+    expect('statementAt60' in set.rrq).toBe(false)
+    expect(setStatement(set, 65, 1_450)).toBe(set)
+    expect('statementAt65' in setStatement(set, 65, null).rrq).toBe(false)
+    expect(setStatement(person, 60, null)).toBe(person)
   })
 
   it('employer pensions: add (capped at 8), edit, remove', () => {

@@ -152,6 +152,10 @@ export const EN: typeof FR = {
       filled: (n: number) => (n === 1 ? '1 year estimated' : `${n} years estimated`),
       fillUndo: 'Remove the estimated years',
       nothingToFill: 'No year to estimate: enter a salary first, or every year is already filled.',
+      statementTitle: 'The statement’s estimate',
+      statementAt60: 'Current amount at 60',
+      statementAt65: 'Current amount at 65',
+      statementHint: 'Per month, as the statement prints it. A reference to check against: the calculation does not use it.',
     },
     oas: {
       title: 'Old Age Security (OAS)',
@@ -530,6 +534,12 @@ export const EN: typeof FR = {
       label: 'B – Pensionable earnings',
       url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/planning-your-retirement/statement-participation',
       note: 'Years under $3,500 show as $0, and the latest years may be missing: Revenu Québec reports them late.',
+    },
+    rrqStatement: {
+      where: 'Retraite Québec ▸ My Account ▸ Statement of Participation ▸ the benefit estimate, retirement pension table, “Current amount” column.',
+      label: 'Current amount',
+      url: 'https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/planning-your-retirement/statement-participation',
+      note: 'Copy the “Current amount” column, not “Projected amount”: the latter counts only the first enhancement of the plan.',
     },
     rrqStartAge: {
       where: 'It is your choice: no document prints it. The official page shows the effect of each month earlier or later.',
