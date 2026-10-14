@@ -30,7 +30,9 @@ const BUDGETS: Record<string, Budget> = {
   'Accueil (with a plan)': { controls: 20, words: 183 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   'Profil (form)': { controls: 322, words: 2018 },
-  'Hypothèses': { controls: 66, words: 659 },
+  // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
+  // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
+  'Hypothèses': { controls: 66, words: 680 },
   'Fiche': { controls: 28, words: 382 },
   'Résultats — Réponse': { controls: 47, words: 670 },
   'Résultats — Décider': { controls: 50, words: 1217 },

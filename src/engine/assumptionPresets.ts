@@ -25,6 +25,12 @@ import type { Assumptions } from './types.ts'
 // ∓ 0,5 pt (a prudent household's pay falls a little behind prices), and a life to 100 or to 90. They bracket a reasonable range; they are not forecasts and carry no
 // probability (see simulate.ts on why there is no Monte-Carlo).
 
+/**
+ * The real growth of average earnings Retraite Québec assumes from 2028 (0,4 % in 2025–2027): 0,6 % a year on top of inflation. The Neutre wage growth is the inflation plus this,
+ * and the page sets a person's own figure beside it.
+ */
+export const REAL_WAGE_GROWTH_RQ = 0.006
+
 export type PresetKey = 'prudent' | 'neutral' | 'bold'
 
 export const PRESET_KEYS: readonly PresetKey[] = ['prudent', 'neutral', 'bold']

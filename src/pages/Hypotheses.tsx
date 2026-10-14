@@ -24,6 +24,8 @@ import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
 import { HYPOTHESES_COPY } from '../lib/hypothesesCopy'
+import { realWage } from '../lib/realWage'
+import { REAL_WAGE_COPY } from '../lib/realWageCopy'
 import { LIFE_COPY } from '../lib/lifeCopy'
 import { MARKET_COPY } from '../lib/marketCopy'
 import { useNotice } from '../lib/toast'
@@ -145,6 +147,7 @@ export function Hypotheses() {
         <FieldRow label={a.economy.wageGrowth} infoId="wageGrowth" hint={a.economy.wageHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.wageGrowth} onChange={(wageGrowth) => updateProfile((p) => setAssumptions(p, { wageGrowth }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
+        <RealWageLine wageGrowth={assumptions.wageGrowth} inflation={assumptions.inflation} />
         {meter('wageGrowth', assumptions.wageGrowth)}
       </Section>
 
@@ -276,5 +279,19 @@ export function Hypotheses() {
         </NextStep>
       )}
     </section>
+  )
+}
+
+/** Wage growth after inflation, beside Retraite Québec's: the rate typed above is nominal, and the pension grows by the real part. */
+function RealWageLine({ wageGrowth, inflation }: { wageGrowth: number; inflation: number }) {
+  const { lang } = useLang()
+  const c = REAL_WAGE_COPY[lang]
+  const w = realWage(wageGrowth, inflation)
+  const signed = (x: number) => (x > 0 ? '+' : '') + formatPct(x, lang, 1)
+  return (
+    <p className="field-row__hint">
+      {c.line(signed(w.real), signed(w.reference))}
+      {w.above && ` ${c.above}`}
+    </p>
   )
 }

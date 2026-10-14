@@ -429,6 +429,19 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
   })
 }
 
+test('the wage growth is said after inflation, beside Retraite Québec\'s, and a clearly higher figure says so', async ({ page }) => {
+  await seedProfile(page, EXAMPLE) // the Neutre scenario: 2,1 % inflation, 2,7 % wages
+  await page.goto('/hypotheses')
+  const line = page.locator('#prix .field-row__hint').filter({ hasText: 'Après inflation' })
+  await expect(line).toContainText(/Après inflation\s*:\s*\+0,6\s%\s*par année\. Retraite Québec suppose \+0,6\s%/)
+  await expect(line).not.toContainText('Plus haut que son hypothèse')
+  const wages = page.getByRole('textbox', { name: 'Hausse des salaires, par année' })
+  await wages.fill('4')
+  await wages.press('Enter')
+  await expect(line).toContainText(/\+1,9\s%\s*par année/)
+  await expect(line).toContainText('Plus haut que son hypothèse : la rente du RRQ projetée en profite.')
+})
+
 // A ready-made scenario fills the economy in at once, the picker follows any hand edit back to « Personnalisé », and on a
 // wide desktop screen no control stretches to fill the width it is given (measured at 1440 px: a percent in a 52 rem box).
 test('the scenario picker sets the economy, follows a hand edit, and the desktop layout caps what should not stretch', async ({ page }) => {
