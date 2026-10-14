@@ -29,7 +29,9 @@ const BUDGETS: Record<string, Budget> = {
   'Profil (first visit, onboarding)': { controls: 16, words: 75 },
   'Accueil (with a plan)': { controls: 20, words: 183 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
-  'Profil (form)': { controls: 322, words: 2018 },
+  // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
+  // count only once opened): the CRA's January 1 figure less this year's deposits.
+  'Profil (form)': { controls: 324, words: 2026 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   'Hypothèses': { controls: 66, words: 680 },

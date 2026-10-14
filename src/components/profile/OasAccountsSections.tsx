@@ -10,6 +10,7 @@ import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { Section, type PersonEditor } from './shared'
 import { LevelSlot } from './LevelSlot'
+import { TfsaRoomHelper } from './TfsaRoomHelper'
 
 // Old Age Security (when it starts, and the residence that decides how much), then the three kinds of savings
 // account. Grouped in one file because each is a short list of the same FieldRow + NumberField pair.
@@ -108,6 +109,7 @@ function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & 
           {(w) => <NumberField kind="money" max={1e9} value={account.room} onChange={(room) => set({ room })} id={w.id} />}
         </FieldRow>
       )}
+      {withRoom && kind === 'tfsa' && <TfsaRoomHelper person={person} edit={edit} />}
       <FieldRow label={a.contribution} hint={a.contributionHint}>
         {(w) => <NumberField kind="money" max={1e9} value={account.annualContribution} onChange={(annualContribution) => set({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
