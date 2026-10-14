@@ -342,6 +342,80 @@ test('what is answered here is what the full form shows: the same questions, the
   await expect(page.getByText('Au Canada depuis (année)')).toBeVisible()
 })
 
+// THE QUICK PATH (« J'ai 2 minutes », `?debut=rapide`): who, born when, income, savings, spending — nothing else — and a last screen that calls the departure age an assumption.
+test('the quick path asks only what a first answer needs: five questions for one person, and none of situation, plan, retirement age or home', async ({ page }) => {
+  await page.goto('/profil?debut=rapide')
+  await expect(page.locator('.onboard__lead')).toContainText('5 questions')
+  await expect(progress(page)).toHaveText('Question 1 sur 5')
+  await next(page) // who: Juste moi
+  await fill(page, 'Année de naissance', '1985') // straight to the income — « Ma situation » is not asked
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien gagnez-vous par année ?')
+  await expect(progress(page)).toHaveText('Question 3 sur 5')
+  await fill(page, 'Revenu de travail par année', '90000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Que contiennent vos comptes d’épargne ?')
+  await next(page)
+  // no retirement-age screen: spending is next
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien dépensez-vous par année ?')
+  await fill(page, 'Dépenses par année', '50000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('C’est assez pour une première réponse')
+})
+
+test('the quick path’s last screen states the departure age as an ASSUMPTION, never as an answer', async ({ page }) => {
+  await page.goto('/profil?debut=rapide')
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  await fill(page, 'Revenu de travail par année', '90000')
+  await next(page)
+  await fill(page, 'Dépenses par année', '50000')
+  const summary = page.locator('.onboard__summary')
+  await expect(summary).toContainText('On a supposé un départ à 65 ans — à vous de le changer.')
+  await expect(summary).not.toContainText('Retraite visée')
+  await expect(summary).toContainText('On n’a compté ni régime d’employeur ni maison pour l’instant.')
+  // what WAS answered is still said as answered
+  await expect(summary).toContainText('Année de naissance : 1985')
+  await expect(summary).toContainText('Dépenses : 50 000 $ par année')
+})
+
+test('a couple on the quick path is asked each person’s birth, income and savings, and the assumption names both ages', async ({ page }) => {
+  await page.goto('/profil?debut=rapide')
+  await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
+  await expect(progress(page)).toHaveText('Question 1 sur 8')
+  await next(page)
+  await fill(page, 'Année de naissance', '1980')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelle est l’année de naissance de votre partenaire ?')
+  await fill(page, 'Année de naissance', '1982')
+  await fill(page, 'Revenu de travail par année', '100000')
+  await fill(page, 'Revenu de travail par année', '60000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Que contiennent vos comptes d’épargne ?')
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Et les comptes de votre partenaire ?')
+  await next(page)
+  await fill(page, 'Dépenses par année', '70000')
+  await expect(page.locator('.onboard__summary')).toContainText('On a supposé un départ à 65 ans pour vous et à 65 ans pour votre partenaire')
+})
+
+test('« Préciser » on the quick path’s last screen re-enters the FULL questions at « Ma situation »', async ({ page }) => {
+  await page.goto('/profil?debut=rapide')
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  await fill(page, 'Revenu de travail par année', '90000')
+  await next(page)
+  await fill(page, 'Dépenses par année', '50000')
+  await page.getByRole('button', { name: 'Préciser (départ, régime, maison)' }).click()
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelques oui ou non sur votre situation')
+  // the full path: seven questions, the situation third
+  await expect(progress(page)).toHaveText('Question 3 sur 7')
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien gagnez-vous par année ?')
+  // what was typed is kept
+  await expect(box(page, 'Revenu de travail par année')).toHaveValue(/90/)
+})
+
+test('an unknown value of the quick key is the full path', async ({ page }) => {
+  await page.goto('/profil?debut=lent')
+  await expect(progress(page)).toHaveText('Question 1 sur 7')
+})
+
 test('a figure typed on the path is confirmed; the « Estimer » figure is an estimate until typed over', async ({ page }) => {
   await toSituation(page)
   await next(page)

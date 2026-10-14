@@ -20,6 +20,11 @@ export interface WelcomeCopy {
   facts: { title: string; text: string; link: string; to: string }[]
   /** The one question of a returning visit (components/DripQuestion.tsx): the unconfirmed figure that most narrows the answer. */
   drip: { title: string; swing: (years: number) => string; go: string; all: string; later: string }
+  /** The first visit's demo card (components/DemoAnswer.tsx): a real answer for an example household. The households' names and stories are exampleCopy's. */
+  demo: { title: string; pick: string; frame: string; try: string }
+  /** The three doors in, by effort. `to` is a route of the app (welcomeCopy.test.ts holds it to one). */
+  doorsTitle: string
+  doors: { label: string; hint: string; to: string }[]
 }
 
 const FR: WelcomeCopy = {
@@ -59,6 +64,18 @@ const FR: WelcomeCopy = {
     all: 'Voir tout ce qui reste estimé',
     later: 'Plus tard',
   },
+  demo: {
+    title: 'Voyez à quoi ressemble une réponse',
+    pick: 'Choisir un ménage exemple',
+    frame: 'Un exemple, pas votre situation',
+    try: 'Essayer avec ce ménage',
+  },
+  doorsTitle: 'Par où commencer ?',
+  doors: [
+    { label: 'J’ai 2 minutes', hint: 'Quelques questions, et une première réponse tout de suite.', to: '/profil?debut=rapide' },
+    { label: 'Je prends le temps (≈ 15 minutes)', hint: 'Une question à la fois, avec la raison de chacune.', to: '/profil' },
+    { label: 'J’ai mes documents en main', hint: 'Avec le relevé de Retraite Québec et vos avis de cotisation, les chiffres sont exacts dès le départ.', to: '/profil?form=1&par=document&etape=gather' },
+  ],
 }
 
 const EN: WelcomeCopy = {
@@ -98,6 +115,18 @@ const EN: WelcomeCopy = {
     all: 'See everything still estimated',
     later: 'Later',
   },
+  demo: {
+    title: 'See what an answer looks like',
+    pick: 'Choose an example household',
+    frame: 'An example, not your situation',
+    try: 'Try it with this household',
+  },
+  doorsTitle: 'Where to start?',
+  doors: [
+    { label: 'I have 2 minutes', hint: 'A few questions, and a first answer right away.', to: '/profil?debut=rapide' },
+    { label: 'I will take my time (≈ 15 minutes)', hint: 'One question at a time, with the reason for each.', to: '/profil' },
+    { label: 'I have my documents at hand', hint: 'With the Retraite Québec statement and your notices of assessment, the figures are exact from the start.', to: '/profil?form=1&par=document&etape=gather' },
+  ],
 }
 
 export const WELCOME_COPY: Record<Lang, WelcomeCopy> = { fr: FR, en: EN }

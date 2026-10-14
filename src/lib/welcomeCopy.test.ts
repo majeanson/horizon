@@ -34,6 +34,36 @@ describe('the home page guide', () => {
   })
 })
 
+// THE THREE DOORS and the demo card: each door is translated, says something, and leads to a route the app has; the quick door carries the address key Profil reads.
+describe('the front door doors and demo card', () => {
+  const { fr, en } = WELCOME_COPY
+  it('has three doors, in the same order, to the same places, in both languages', () => {
+    expect(fr.doors.length).toBe(3)
+    expect(en.doors.map((d) => d.to)).toEqual(fr.doors.map((d) => d.to))
+    for (const [i, d] of fr.doors.entries()) {
+      expect(d.label.length, `${i} label`).toBeGreaterThan(5)
+      expect(d.hint.length, `${i} hint`).toBeGreaterThan(20)
+      expect(en.doors[i].label, `${i} label translated`).not.toBe(d.label)
+      expect(en.doors[i].hint, `${i} hint translated`).not.toBe(d.hint)
+    }
+    expect(fr.doorsTitle).not.toBe(en.doorsTitle)
+  })
+  it('leads each door to a route the app has, the quick one with its key and the document one to the checklist', () => {
+    for (const d of [...fr.doors, ...en.doors]) expect(ROUTES.has(new URL(d.to, 'https://horizon.test').pathname), d.to).toBe(true)
+    const [quick, full, docs] = fr.doors.map((d) => new URL(d.to, 'https://horizon.test'))
+    expect(quick.searchParams.get('debut')).toBe('rapide')
+    expect(full.search).toBe('')
+    expect(docs.searchParams.get('par')).toBe('document')
+    expect(docs.searchParams.get('etape')).toBe('gather')
+  })
+  it('translates the demo card, line by line', () => {
+    for (const key of ['title', 'pick', 'frame', 'try'] as const) {
+      expect(fr.demo[key].length, key).toBeGreaterThan(8)
+      expect(en.demo[key], key).not.toBe(fr.demo[key])
+    }
+  })
+})
+
 // THE DRIP QUESTION: the card on the front door speaks both languages, counts in the right plural, and its two links are routes the Profil page answers
 // (the figure's own link is built from a fact id in the component; the second one is the figure guide's anchor).
 describe('the front door drip question', () => {

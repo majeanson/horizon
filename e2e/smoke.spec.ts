@@ -151,10 +151,10 @@ test('the bottom navigation is a bar on a phone and a rail on a wide screen — 
   await expect(nav).toHaveCSS('position', 'sticky')
 })
 
-test('the front door offers one way in: « Commencer » opens the first question on Profil', async ({ page }) => {
+test('the front door offers three ways in: « Je prends le temps » opens the first question on Profil', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('retraite')
-  await page.getByRole('link', { name: 'Commencer' }).click()
+  await page.getByRole('link', { name: /Je prends le temps/ }).click()
   await expect(page).toHaveURL(/\/profil$/)
   await expect(page.locator('.onboard')).toBeVisible()
 })

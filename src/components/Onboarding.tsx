@@ -50,10 +50,26 @@ const stepsOf = (couple: boolean, has: { pension: boolean; spousePension: boolea
   'done',
 ]
 
+// THE QUICK PATH (`?debut=rapide`, « J'ai 2 minutes »): only what a first answer cannot be made without — who, born when, earns what, saves what, spends what. It
+// never asks for « Ma situation », an employer plan, a retirement age or a home, so the last screen must call what it did not ask an ASSUMPTION (the departure age
+// it shows is the profile's default, not an answer), and its « Préciser » re-opens the FULL questions at « Ma situation »: the document checklist also reads
+// those answers, and would otherwise leave documents out.
+const quickStepsOf = (couple: boolean): StepId[] => [
+  'who',
+  'birth',
+  ...(couple ? (['spouseBirth'] as const) : []),
+  'income',
+  ...(couple ? (['spouseIncome'] as const) : []),
+  'savings',
+  ...(couple ? (['spouseSavings'] as const) : []),
+  'spending',
+  'done',
+]
+
 /** The question a gap a result needs is answered on. */
 const STEP_OF_GAP: Record<ProfileGap, StepId> = { income: 'income', spending: 'spending' }
 
-export default function Onboarding({ onSkip }: { onSkip: () => void }) {
+export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => void; mode?: 'full' | 'quick' }) {
   const t = useT()
   const { lang } = useLang()
   const notice = useNotice()
@@ -63,7 +79,9 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
   const profile = useProfile()
   const couple = hasSpouse(profile)
   const yes = useYes()
-  const steps = stepsOf(couple, { pension: applies(profile, yes, 'pension', 'self'), spousePension: couple && applies(profile, yes, 'pension', 'spouse'), home: applies(profile, yes, 'home') })
+  // The quick path ends the first time « Préciser » is tapped: from then on the person is on the full questions.
+  const [quick, setQuick] = useState(mode === 'quick')
+  const steps = quick ? quickStepsOf(couple) : stepsOf(couple, { pension: applies(profile, yes, 'pension', 'self'), spousePension: couple && applies(profile, yes, 'pension', 'spouse'), home: applies(profile, yes, 'home') })
   const [at, setAt] = useState(0)
   const step = steps[Math.min(at, steps.length - 1)]
   const last = steps.length - 1
@@ -343,9 +361,11 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
             <li>{s.income(money(grossIncome))}</li>
             <li>{s.savings(money(savings))}</li>
             {plans.length > 0 && <li>{s.pension(plans.join(', '))}</li>}
-            <li>{s.retire(self.retirementAge)}</li>
+            {/* The quick path never asked the departure age: it is the profile's own default, so it is said as an assumption — never as « Retraite visée à… ». */}
+            {quick ? <li>{c.done.assumed.retire(self.retirementAge, spouse ? spouse.retirementAge : null)}</li> : <li>{s.retire(self.retirementAge)}</li>}
             <li>{s.spending(money(profile.household.spending.retiredToday))}</li>
             {home && <li>{s.home(money(home.value))}</li>}
+            {quick && plans.length === 0 && !home && <li>{c.done.assumed.skipped}</li>}
           </ul>
           {gaps.length > 0 && (
             <div className="onboard__missing">
@@ -405,8 +425,20 @@ export default function Onboarding({ onSkip }: { onSkip: () => void }) {
             <button type="button" className="btn btn--primary" onClick={() => navigate('/resultats')} disabled={gaps.length > 0}>
               {c.done.see}
             </button>
-            <button type="button" className="btn btn--ghost" onClick={onSkip}>
-              {c.done.refine}
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={
+                quick
+                  ? () => {
+                      // Back into the FULL questions, at « Ma situation » (the third screen): the answers there decide which documents the checklist lists.
+                      setQuick(false)
+                      setAt(stepsOf(couple, { pension: false, spousePension: false, home: false }).indexOf('situation'))
+                    }
+                  : onSkip
+              }
+            >
+              {quick ? c.done.refineQuick : c.done.refine}
             </button>
           </>
         )}

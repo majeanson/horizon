@@ -14,7 +14,7 @@ import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type
 import { useConfirm } from '../lib/confirm'
 import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
-import { exampleProfile } from '../lib/example'
+import { loadExample } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
@@ -160,8 +160,7 @@ export function Donnees() {
                 className="btn btn--ghost btn--sm"
                 onClick={async () => {
                   if (await confirm({ message: d.example.confirm(EXAMPLE_COPY[lang][id].name), confirmLabel: d.example.confirmLabel, tone: 'default' })) {
-                    setPrevious(getProfile())
-                    replaceProfile(exampleProfile(id))
+                    setPrevious(loadExample(id))
                     notice(d.example.done)
                   }
                 }}

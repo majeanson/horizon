@@ -2,6 +2,7 @@ import { Fragment, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Fold } from '../components/Fold'
 import { InstallCard } from '../components/install/InstallHint'
+import { DemoAnswer } from '../components/DemoAnswer'
 import { DripQuestion } from '../components/DripQuestion'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
@@ -38,14 +39,34 @@ export function Accueil() {
       <PageHead title={c.title} subtitle={c.subtitle} />
       {ready && <LiveAnswer range={asking ? impact?.range : null} />}
       {ready && asking && <DripQuestion impact={impact} facts={unconfirmed} />}
-      <div className="welcome__go">
-        <Link className="btn btn--primary" to={ready ? '/resultats' : '/profil'}>
-          {ready ? c.seeAnswer : c.begin}
-        </Link>
-        <Link className="btn btn--ghost" to={ready ? '/profil' : '/donnees?autres=examples'}>
-          {ready ? c.editProfile : c.example}
-        </Link>
-      </div>
+      {/* A blank first visit sees the product working (a real answer for an example household), then three doors in, by effort. */}
+      {!ready && <DemoAnswer />}
+      {ready ? (
+        <div className="welcome__go">
+          <Link className="btn btn--primary" to="/resultats">
+            {c.seeAnswer}
+          </Link>
+          <Link className="btn btn--ghost" to="/profil">
+            {c.editProfile}
+          </Link>
+        </div>
+      ) : (
+        <section aria-labelledby="welcome-doors">
+          <h2 id="welcome-doors" className="welcome__title">
+            {c.doorsTitle}
+          </h2>
+          <ul className="welcome__doors">
+            {c.doors.map((d) => (
+              <li key={d.to}>
+                <Link className="welcome__door surface" to={d.to}>
+                  <span className="welcome__door-label">{d.label}</span>
+                  <span className="welcome__door-hint">{d.hint}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <InstallCard />
       <section aria-labelledby="welcome-steps">
         <h2 id="welcome-steps" className="welcome__title">

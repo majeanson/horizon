@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip, ChipGroup } from '../components/Chip'
 import { DripQuestion } from '../components/DripQuestion'
+import { DemoAnswer } from '../components/DemoAnswer'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { NextStep } from '../components/NextStep'
 import { EditField } from '../components/EditField'
@@ -364,6 +365,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'Gloss', file: 'src/components/Gloss.tsx', exports: ['Gloss', 'glossed'], kw: 'glossaire sigle abréviation lien explication', render: () => <p><Gloss>Votre rente du RRQ et la PSV commencent à l’âge choisi ; le REER et le CELI s’ajoutent.</Gloss></p> },
     { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
     { cat: 'Affichage', name: 'LiveAnswer', file: 'src/components/LiveAnswer.tsx', kw: 'réponse en direct âge bandeau', render: () => <LiveAnswer /> },
+    { cat: 'Affichage', name: 'DemoAnswer', file: 'src/components/DemoAnswer.tsx', kw: 'exemple démo première visite accueil réponse ménage', render: () => <DemoAnswer /> },
     {
       cat: 'Affichage',
       name: 'DripQuestion',

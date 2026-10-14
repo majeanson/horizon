@@ -1,5 +1,14 @@
 import { EXAMPLES, type ExampleId } from '../engine/golden/examples.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
+import { getProfile, replaceProfile } from './store.ts'
+
+// The ONE way an example becomes the household on this device (Données' list and the front door's demo card both call it): the profile it
+// displaces is handed back so the caller can offer « rétablir » for the visit. Confirming first, and the « Exemple chargé » notice, are the caller's.
+export function loadExample(id: ExampleId = 'golden'): Profile {
+  const previous = getProfile()
+  replaceProfile(exampleProfile(id))
+  return previous
+}
 
 // « Charger un exemple »: an invented household as a saved profile. The default is the golden couple — the same couple the
 // golden snapshots, the e2e seed and the gallery use, so what a first-time visitor sees is what the tests pin; the others

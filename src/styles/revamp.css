@@ -1535,6 +1535,17 @@
 .welcome__card p { margin: 0; color: var(--ink-soft); }
 .welcome__card-title { margin: 0; font-size: var(--text-md, 1rem); }
 
+/* The first visit's demo card (components/DemoAnswer.tsx) and the three doors in. The answer's own type is the verdict's (.verdict__line / __big / __age). */
+.demo { display: grid; gap: 0.6rem; padding: 1rem 1.2rem; }
+.demo .welcome__title { margin: 0; }
+.demo .field-row__hint, .demo .verdict__note { margin: 0; }
+.demo__answer.is-busy { opacity: 0.6; transition: opacity 0.2s ease-out; }
+.welcome__doors { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3, 0.75rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.welcome__door { display: grid; gap: 0.25rem; align-content: start; height: 100%; padding: 0.9rem 1.1rem; color: inherit; text-decoration: none; }
+.welcome__door:hover { border-color: var(--accent, currentColor); }
+.welcome__door-label { font-weight: 700; }
+.welcome__door-hint { color: var(--ink-soft); font-size: var(--text-sm); }
+
 /* ── « Où va l'argent » and « Une année en détail » (the Détail view's second half) ───────────────────────────────────────────── */
 .flow-readout {
   display: grid;

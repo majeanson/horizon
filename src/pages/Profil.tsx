@@ -129,6 +129,8 @@ export function Profil() {
         <PageHead title={t.profile.welcome.title} />
         <Suspense fallback={<Loading />}>
           <Onboarding
+            // `?debut=rapide` is the quick path (« J'ai 2 minutes »); any other value is the full one.
+            mode={params.get('debut') === 'rapide' ? 'quick' : 'full'}
             onSkip={() =>
               setParams(
                 () => {

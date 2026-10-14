@@ -32,6 +32,15 @@ export interface OnboardCopy {
     see: string
     refine: string
     missing: string
+    /** The quick path's « Préciser »: it re-opens the full questions at « Ma situation » (the screens the quick path skipped). */
+    refineQuick: string
+    /** The quick path never asked these, so the last screen says they are ASSUMED, in words that cannot be read as answers. */
+    assumed: {
+      /** The departure age(s) the profile holds by default. `spouseAge` is null for a person alone. */
+      retire: (age: number, spouseAge: number | null) => string
+      /** Said only while no employer plan and no home is in the profile. */
+      skipped: string
+    }
     /** On each missing item: the way back to its question. */
     fix: string
     summary: {
@@ -110,6 +119,12 @@ const FR: OnboardCopy = {
     see: 'Voir ma réponse',
     refine: 'Préciser mon profil',
     missing: 'Il manque encore :',
+    refineQuick: 'Préciser (départ, régime, maison)',
+    assumed: {
+      retire: (age, spouseAge) =>
+        spouseAge === null ? `On a supposé un départ à ${age} ans — à vous de le changer.` : `On a supposé un départ à ${age} ans pour vous et à ${spouseAge} ans pour votre partenaire — à vous de les changer.`,
+      skipped: 'On n’a compté ni régime d’employeur ni maison pour l’instant.',
+    },
     fix: 'Répondre',
     summary: {
       birth: (year) => `Année de naissance : ${year}`,
@@ -187,6 +202,12 @@ const EN: OnboardCopy = {
     see: 'See my answer',
     refine: 'Make my profile exact',
     missing: 'Still missing:',
+    refineQuick: 'Refine (retirement age, plan, home)',
+    assumed: {
+      retire: (age, spouseAge) =>
+        spouseAge === null ? `We assumed you stop at ${age} — yours to change.` : `We assumed you stop at ${age} and your partner at ${spouseAge} — yours to change.`,
+      skipped: 'No employer plan and no home are counted for now.',
+    },
     fix: 'Answer',
     summary: {
       birth: (year) => `Year of birth: ${year}`,

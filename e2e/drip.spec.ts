@@ -44,7 +44,7 @@ test.describe('the drip question', () => {
   test('a blank profile is asked nothing', async ({ page }) => {
     await seedProfile(page, blankSeed())
     await page.goto('/')
-    await expect(page.getByRole('link', { name: 'Commencer' })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Je prends le temps/ })).toBeVisible()
     await page.waitForTimeout(1500)
     await expect(card(page)).toHaveCount(0)
   })
