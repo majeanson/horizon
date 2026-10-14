@@ -597,3 +597,52 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Denise | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 54 345 $ | 54 345 $ | 4 430 $ | 4 950 $ | 0 $ |
 
+## couple62 — Couple, retraite à 62 ans avec 150 000 $
+
+### Ce qui entre
+
+| Personne | Naissance | Retraite | Revenu | Rentes publiques |
+| --- | --- | --- | --- | --- |
+| Dave | né·e en 1964-05 | retraite à 62 ans | salaire 32 500 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1982) |
+| ↳ comptes | REER 40 000 $ (+0 $/an) | CELI 35 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+| Linda | né·e en 1964-05 | retraite à 62 ans | salaire 32 500 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1982) |
+| ↳ comptes | REER 40 000 $ (+0 $/an) | CELI 35 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
+
+Dépenses : 48 000 $ par année en travaillant, 48 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+Résidence principale : valeur 450 000 $, hypothèque 0 $ à 5,0 % (0 $ par mois, aucune hypothèque), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
+
+### Ce qui sort
+
+- Le plan tel que décrit : manque d’argent en 2031.
+- Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
+
+### Le calcul des rentes
+
+| Personne | RRQ | PSV |
+| --- | --- | --- |
+| Dave | première rente 06/2029 : (base 802,06 $ + 1ʳᵉ supp. 20,87 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 822,93 $/mois, soit 773 $ d’aujourd’hui | première pension 06/2029 : 811,55 $ × résidence 100 % × report 0,0 % = 811,55 $/mois, soit 762 $ d’aujourd’hui |
+| Linda | première rente 06/2029 : (base 802,06 $ + 1ʳᵉ supp. 20,87 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 822,93 $/mois, soit 773 $ d’aujourd’hui | première pension 06/2029 : 811,55 $ × résidence 100 % × report 0,0 % = 811,55 $/mois, soit 762 $ d’aujourd’hui |
+
+### Année par année — Dave (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
+
+| Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 62 | 48 000 $ | 21 667 $ | 0 $ | 0 $ | 0 $ | 0 $ | 31 409 $ | 3 777 $ | 124 642 $ | tire du nid |
+| 65 | 48 000 $ | 0 $ | 0 $ | 10 825 $ | 10 675 $ | 5 740 $ | 20 761 $ | 0 $ | 6 721 $ | tire du nid |
+| 70 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 18 300 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+| 75 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 19 367 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+| 80 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+| 85 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+| 90 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+| 95 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+
+### Année témoin pour un calculateur d’impôt : 2027, en dollars d’aujourd’hui
+
+Montants de l’année divisés par l’inflation : les barèmes sont indexés sur les prix, donc un calculateur 2026 doit donner presque la même chose (à 1 % près, les arrondis des barèmes). Le revenu net compte aussi le fractionnement du revenu de pension et les gains en capital réalisés : ce n’est pas la somme des colonnes.
+
+| Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Dave | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 25 217 $ | 25 217 $ | 1 025 $ | 877 $ | 0 $ |
+| Linda | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 25 217 $ | 25 217 $ | 1 025 $ | 877 $ | 0 $ |
+

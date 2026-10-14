@@ -2,7 +2,7 @@ import { ASSUMPTION_PRESETS } from '../assumptionPresets.ts'
 import type { Assumptions, Household, Person } from '../types.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './household.fixture.ts'
 
-// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Twelve different lives, so that
+// THE EXAMPLE HOUSEHOLDS — invented, round, plausible; nothing here is anyone's real data. Thirteen different lives, so that
 // every table and every result can be looked at, and checked by hand, for more than one kind of person:
 //
 //   golden    a couple, one in the public sector (RREGOP), the other private — the household the golden snapshots pin
@@ -25,11 +25,14 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //             children (one at home, one due), the state's benefits, a parental leave and a mortgage — what the children cost, and what
 //             the benefits give back
 //
+//   couple62  a couple retiring at 62 on 150 000 $ and a paid-off home, spending 48 000 $: the money runs out two years after the pensions
+//             start; working to 64 or spending less fixes it, taking the QPP at 62 only pushes it back (modelled on a public planner demo)
+//
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
 
-export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner' | 'family' | 'melter'
-export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner', 'family', 'melter']
+export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner' | 'family' | 'melter' | 'couple62'
+export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner', 'family', 'melter', 'couple62']
 
 export interface ExampleHousehold {
   id: ExampleId
@@ -207,6 +210,35 @@ const melter: Household = {
   spending: { workingToday: 42_000, retiredToday: 42_000 },
 }
 
+const flatPay = (pay: number, lastYear = 2025, firstYear = 1985): Record<number, number> => Object.fromEntries(Array.from({ length: lastYear - firstYear + 1 }, (_, i) => [firstYear + i, pay]))
+
+const couple62: Household = {
+  livesAlone: false,
+  persons: [
+    person({
+      id: 'self', name: 'Dave', birth: { year: 1964, month: 5 }, retirementAge: 62, salaryToday: 32_500, earningsHistory: flatPay(20_000),
+      accounts: {
+        rrsp: { balance: 40_000, room: 10_000, annualContribution: 0 },
+        tfsa: { balance: 35_000, room: 30_000, annualContribution: 0 },
+        nonReg: none,
+      },
+      pensions: [],
+    }),
+    person({
+      id: 'spouse', name: 'Linda', birth: { year: 1964, month: 5 }, retirementAge: 62, salaryToday: 32_500, earningsHistory: flatPay(20_000),
+      accounts: {
+        rrsp: { balance: 40_000, room: 10_000, annualContribution: 0 },
+        tfsa: { balance: 35_000, room: 30_000, annualContribution: 0 },
+        nonReg: none,
+      },
+      pensions: [],
+    }),
+  ],
+  // Owned outright: the home is a safety net, not liquid money.
+  home: { value: 450_000, mortgage: { balance: 0, rate: 0.05, monthlyPayment: 0 }, sale: null },
+  spending: { workingToday: 48_000, retiredToday: 48_000 },
+}
+
 const downsizer: Household = {
   livesAlone: false,
   persons: [
@@ -344,5 +376,6 @@ export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
   family: { id: 'family', household: familyHousehold(), children: [2024, 2028], assumptions: { ...base(), retiredSpendingDrift: -0.01 } },
   // Denise draws the REER up to the top of the first bracket from the day she stops (a choice: bracketFill).
   melter: { id: 'melter', household: melter, children: [], assumptions: { ...base(), bracketFill: 'bracket1' } },
+  couple62: { id: 'couple62', household: couple62, children: [], assumptions: base() },
   planner: { id: 'planner', household: plannerHousehold(), children: [2028], assumptions: { ...base(), retiredSpendingDrift: -0.01 } },
 }

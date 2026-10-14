@@ -94,6 +94,25 @@ describe('each story', () => {
     expect(earliest === null || earliest > household.persons[0].retirementAge).toBe(true)
   })
 
+  it('couple62: retiring at 62 runs short about two years after the pensions start; working to 64 or spending $12 000 less holds; the QPP at 62 only pushes the shortfall back, for about a fifth less a month', () => {
+    const { household, assumptions } = EXAMPLES.couple62
+    const g = planGlance(household, assumptions)
+    expect(g.ok).toBe(false)
+    expect(g.firstShortfallYear!).toBeGreaterThanOrEqual(2030)
+    expect(g.firstShortfallYear!).toBeLessThanOrEqual(2033)
+    const retiredAt = (age: number) => ({ ...household, persons: household.persons.map((p) => ({ ...p, retirementAge: age })) })
+    expect(planGlance(retiredAt(64), assumptions).ok).toBe(true)
+    expect(planGlance({ ...household, spending: { workingToday: 36_000, retiredToday: 36_000 } }, assumptions).ok).toBe(true)
+    const early = { ...household, persons: household.persons.map((p) => ({ ...p, rrq: { startAge: 62 } })) }
+    const g62 = planGlance(early, assumptions)
+    expect(g62.ok).toBe(false)
+    expect(g62.firstShortfallYear!).toBeGreaterThan(g.firstShortfallYear!)
+    const at = (h: typeof household) => project(h, assumptions).find((r) => r.year === 2031)!.persons.self!.rrq
+    const ratio = at(early) / at(household) // 0,6 % a month for 36 months is 21,6 %; the rest is the three fewer years of work counted
+    expect(ratio).toBeGreaterThan(0.76)
+    expect(ratio).toBeLessThan(0.81)
+  })
+
   it('retired: nobody earns, the employer pension and both public pensions pay from the first year, and the nest is drawn', () => {
     const rows = rowsOf('retired')
     expect(sumOver(rows, (p) => p.employment)).toBe(0)
