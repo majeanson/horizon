@@ -19,19 +19,32 @@ describe('the three ready-made assumption sets', () => {
     expect(neutral.horizonAge).toBeGreaterThan(bold.horizonAge)
   })
 
-  it('neutral is the FP Canada 2026 guideline: inflation 2,1 %, wage growth 3,1 %, 60/40 of 6,3 / 3,2 less fees', () => {
+  it('neutral is the FP Canada 2026 guideline for inflation and returns (2,1 %, 60/40 of 6,3 / 3,2 less fees) and Retraite Québec\'s 2024 valuation for wages (0,6 % real)', () => {
     const n = ASSUMPTION_PRESETS.neutral
     expect(n.inflation).toBe(0.021)
-    expect(n.wageGrowth).toBe(0.031)
+    // Retraite Québec, actuarial valuation at 31 December 2024, annex 3 table 30: real growth of average earnings 0,6 % from 2028, on 2,1 % inflation.
+    expect(n.wageGrowth).toBeCloseTo(0.021 + 0.006, 12)
     const gross = 0.6 * 0.0635 + 0.4 * 0.032
     expect(n.returns.rrsp).toBeCloseTo(gross - 0.006, 2)
   })
 
-  it('the neutral wage growth is what the ⓘ says: the MGA grew about 3,1 % a year from 2016 to 2026 (Retraite Québec)', () => {
+  it('the ⓘ says the MGA grew about 3,1 % a year from 2016 to 2026, while prices rose 2,8 %: history is not the assumption, and the gap is the real growth it implies', () => {
     const mga = RRQ_MGA_HISTORY.value
     const growth = Math.pow(74_600 / mga[2016]!, 1 / 10) - 1
     expect(mga[2016]).toBe(54_900)
-    expect(growth).toBeCloseTo(ASSUMPTION_PRESETS.neutral.wageGrowth, 3)
+    expect(growth).toBeCloseTo(0.031, 3)
+    // Statistics Canada, table 18-10-0005-01, Canada all-items CPI, annual average: 128,4 in 2016 and 164,2 in 2025 — 2,77 % a year.
+    const prices = Math.pow(164.2 / 128.4, 1 / 9) - 1
+    expect(prices).toBeCloseTo(0.028, 3)
+    // The real growth of the ceiling over those years (0,3 to 0,4 pt) is of the order of the 0,6 pt Retraite Québec assumes, not of the 1,0 pt the old 3,1 % implied.
+    expect(growth - prices).toBeLessThan(0.006)
+    expect(ASSUMPTION_PRESETS.neutral.wageGrowth - ASSUMPTION_PRESETS.neutral.inflation).toBeCloseTo(0.006, 12)
+  })
+
+  it('the three scenarios keep the half-point spread on wages around the neutral one', () => {
+    const { prudent, neutral, bold } = ASSUMPTION_PRESETS
+    expect(neutral.wageGrowth - prudent.wageGrowth).toBeCloseTo(0.005, 12)
+    expect(bold.wageGrowth - neutral.wageGrowth).toBeCloseTo(0.005, 12)
   })
 
   it('every value sits inside the limits the saved profile accepts (a preset must never blank the plan)', () => {

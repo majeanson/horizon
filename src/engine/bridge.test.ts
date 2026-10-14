@@ -179,11 +179,11 @@ describe('the strategies side by side', () => {
   })
 
   it('a good-sized nest can defer to 70; a small one retiring early runs out sooner when it defers than when it does not', () => {
-    // Retiring at 57 on the golden nest: starting at 65 runs out at 98, deferring to 72/70 lasts to the horizon.
-    const big = view(H, { ...profileLevers(H, 'self'), retirementAge: 57 })
+    // Retiring at 58 on the golden nest: starting at 65 runs out at 97, deferring to 72/70 lasts to the horizon.
+    const big = view(H, { ...profileLevers(H, 'self'), retirementAge: 58 })
     expect(card(big, 'standard').summary.ok).toBe(false)
     expect(card(big, 'max').summary.ok).toBe(true)
-    // Retiring at 55 on 70 % of that nest: both fail, and the deferral fails FIRST (68 against 73) — the bridge years cannot be carried.
+    // Retiring at 55 on 70 % of that nest: both fail, and the deferral fails FIRST (67 against 69) — the bridge years cannot be carried.
     const small = view(withNest(0.7), { ...profileLevers(H, 'self'), retirementAge: 55 })
     expect(card(small, 'standard').summary.ok).toBe(false)
     expect(card(small, 'max').summary.ok).toBe(false)
@@ -198,9 +198,11 @@ describe('the strategies side by side', () => {
   })
 
   it('the lowest nest of the bridge years is read over ages 60 to 70 only', () => {
-    // « max » bottoms out at 70; « asap » at 60 (the nest is higher by 70 because the pensions came early) — both ends of the window.
+    // On a nest half as big again as the golden one, « max » bottoms out at 70 and « asap » at 60 (the nest is higher by 70 because the pensions came early) — both
+    // ends of the window. (On the golden nest itself « asap » now bottoms out at 70 too: the ceiling's real growth is 0,6 %, so the early pensions are smaller.)
+    const h = withNest(1.5)
     for (const [key, atAge] of [['max', 70], ['asap', 60]] as const) {
-      const run = bridgeRun(H, A, leversFor(key, H, 'self', 60))
+      const run = bridgeRun(h, A, leversFor(key, h, 'self', 60))
       const low = run.summary.lowestNest!
       expect(low.age, key).toBe(atAge)
       const inWindow = run.rows.filter((r) => r.age >= 60 && r.age <= 70).map((r) => r.nest.total)

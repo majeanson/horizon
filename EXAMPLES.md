@@ -21,35 +21,35 @@
 | Alex | né·e en 1981-09 | retraite à 62 ans | salaire 65 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1999) |
 | ↳ comptes | REER 60 000 $ (+4 000 $/an) | CELI 36 000 $ (+6 000 $/an) | non enregistré 10 000 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 88 000 $ par année en travaillant, 90 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 88 000 $ par année en travaillant, 90 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 666 075 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 437 119 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 60 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Camille | première rente 04/2043 : (base 2 339,73 $ + 1ʳᵉ supp. 345,99 $ + 2ᵉ supp. 153,92 $) × ajustement 100,0 % = 2 839,64 $/mois, soit 1 994 $ d’aujourd’hui | première pension 04/2043 : 1 085,62 $ × résidence 100 % × report 0,0 % = 1 085,62 $/mois, soit 763 $ d’aujourd’hui |
-| Alex | première rente 10/2046 : (base 2 193,91 $ + 1ʳᵉ supp. 436,06 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 2 629,97 $/mois, soit 1 736 $ d’aujourd’hui | première pension 10/2046 : 1 155,46 $ × résidence 100 % × report 0,0 % = 1 155,46 $/mois, soit 763 $ d’aujourd’hui |
+| Camille | première rente 04/2043 : (base 2 206,53 $ + 1ʳᵉ supp. 326,29 $ + 2ᵉ supp. 145,25 $) × ajustement 100,0 % = 2 678,07 $/mois, soit 1 881 $ d’aujourd’hui | première pension 04/2043 : 1 085,62 $ × résidence 100 % × report 0,0 % = 1 085,62 $/mois, soit 763 $ d’aujourd’hui |
+| Alex | première rente 10/2046 : (base 2 045,39 $ + 1ʳᵉ supp. 406,55 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 2 451,94 $/mois, soit 1 618 $ d’aujourd’hui | première pension 10/2046 : 1 155,46 $ × résidence 100 % × report 0,0 % = 1 155,46 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Camille (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 48 | 88 000 $ | 150 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 24 925 $ | 296 398 $ | couvert |
-| 50 | 88 000 $ | 152 953 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 25 913 $ | 354 487 $ | couvert |
-| 55 | 88 000 $ | 160 591 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 30 447 $ | 517 049 $ | couvert |
-| 60 | 88 000 $ | 88 989 $ | 30 658 $ | 0 $ | 0 $ | 0 $ | 0 $ | 19 669 $ | 697 289 $ | couvert |
-| 65 | 90 000 $ | 51 142 $ | 29 689 $ | 17 950 $ | 6 863 $ | 0 $ | 4 467 $ | 16 159 $ | 777 917 $ | tire du nid |
-| 70 | 90 000 $ | 0 $ | 25 336 $ | 44 760 $ | 18 300 $ | 0 $ | 17 281 $ | 15 310 $ | 702 838 $ | tire du nid |
-| 75 | 90 000 $ | 0 $ | 24 059 $ | 44 760 $ | 18 986 $ | 0 $ | 17 388 $ | 15 194 $ | 695 954 $ | tire du nid |
-| 80 | 90 000 $ | 0 $ | 22 848 $ | 44 760 $ | 20 130 $ | 0 $ | 17 837 $ | 15 335 $ | 687 580 $ | tire du nid |
-| 85 | 90 000 $ | 0 $ | 21 697 $ | 44 760 $ | 20 130 $ | 0 $ | 19 594 $ | 15 556 $ | 673 688 $ | tire du nid |
-| 90 | 90 000 $ | 0 $ | 20 604 $ | 44 760 $ | 20 130 $ | 0 $ | 13 977 $ | 9 471 $ | 671 320 $ | tire du nid |
-| 95 | 90 000 $ | 0 $ | 19 566 $ | 44 760 $ | 20 130 $ | 0 $ | 14 741 $ | 9 197 $ | 676 705 $ | tire du nid |
+| 50 | 88 000 $ | 151 768 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 25 516 $ | 353 482 $ | couvert |
+| 55 | 88 000 $ | 156 280 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 29 001 $ | 507 064 $ | couvert |
+| 60 | 88 000 $ | 84 933 $ | 29 482 $ | 0 $ | 0 $ | 0 $ | 604 $ | 19 520 $ | 667 138 $ | tire du nid |
+| 65 | 90 000 $ | 47 872 $ | 28 551 $ | 16 929 $ | 6 863 $ | 0 $ | 8 563 $ | 15 038 $ | 724 004 $ | tire du nid |
+| 70 | 90 000 $ | 0 $ | 24 364 $ | 41 989 $ | 18 300 $ | 0 $ | 20 579 $ | 15 176 $ | 617 541 $ | tire du nid |
+| 75 | 90 000 $ | 0 $ | 23 137 $ | 41 989 $ | 18 986 $ | 0 $ | 22 085 $ | 15 529 $ | 578 693 $ | tire du nid |
+| 80 | 90 000 $ | 0 $ | 21 971 $ | 41 989 $ | 20 130 $ | 0 $ | 19 373 $ | 13 036 $ | 536 891 $ | tire du nid |
+| 85 | 90 000 $ | 0 $ | 20 864 $ | 41 989 $ | 20 130 $ | 0 $ | 15 756 $ | 8 739 $ | 520 294 $ | tire du nid |
+| 90 | 90 000 $ | 0 $ | 19 813 $ | 41 989 $ | 20 130 $ | 0 $ | 16 531 $ | 8 463 $ | 497 509 $ | tire du nid |
+| 95 | 90 000 $ | 0 $ | 18 815 $ | 41 989 $ | 20 130 $ | 0 $ | 17 266 $ | 8 199 $ | 467 894 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2044, en dollars d’aujourd’hui
 
@@ -57,8 +57,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Camille | 66 | 0 $ | 26 405 $ | 23 934 $ | 9 150 $ | 0 $ | 52 565 $ | 3 092 $ | 3 614 $ | 0 $ |
-| Alex | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 337 $ | 17 195 $ | 87 $ | 0 $ | 0 $ |
+| Camille | 66 | 0 $ | 25 392 $ | 22 572 $ | 9 150 $ | 0 $ | 45 897 $ | 2 205 $ | 3 772 $ | 0 $ |
+| Alex | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 37 223 $ | 51 453 $ | 4 092 $ | 4 429 $ | 0 $ |
 
 ## average — Couple, revenus moyens
 
@@ -71,38 +71,38 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Luc | né·e en 1982-02 | retraite à 63 ans | salaire 58 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2000) |
 | ↳ comptes | REER 55 000 $ (dont immobilisé 25 000 $) (+3 000 $/an, employeur +2 000 $/an) | CELI 40 000 $ (+5 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 72 000 $ par année en travaillant, 74 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 72 000 $ par année en travaillant, 74 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 520 000 $, hypothèque 150 000 $ à 4,9 % (1 150 $ par mois, payée en 2041), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 036 439 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 757 441 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 60 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Marie | première rente 06/2049 : (base 2 768,55 $ + 1ʳᵉ supp. 597,41 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 3 365,96 $/mois, soit 2 087 $ d’aujourd’hui | première pension 06/2049 : 1 229,79 $ × résidence 100 % × report 0,0 % = 1 229,79 $/mois, soit 762 $ d’aujourd’hui |
-| Luc | première rente 03/2047 : (base 2 101,23 $ + 1ʳᵉ supp. 431,29 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 2 532,52 $/mois, soit 1 637 $ d’aujourd’hui | première pension 03/2047 : 1 179,72 $ × résidence 100 % × report 0,0 % = 1 179,72 $/mois, soit 762 $ d’aujourd’hui |
+| Marie | première rente 06/2049 : (base 2 551,42 $ + 1ʳᵉ supp. 550,56 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 3 101,98 $/mois, soit 1 923 $ d’aujourd’hui | première pension 06/2049 : 1 229,79 $ × résidence 100 % × report 0,0 % = 1 229,79 $/mois, soit 762 $ d’aujourd’hui |
+| Luc | première rente 03/2047 : (base 1 951,30 $ + 1ʳᵉ supp. 400,52 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 2 351,82 $/mois, soit 1 520 $ d’aujourd’hui | première pension 03/2047 : 1 179,72 $ × résidence 100 % × report 0,0 % = 1 179,72 $/mois, soit 762 $ d’aujourd’hui |
 
 ### Année par année — Marie (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 42 | 85 800 $ | 130 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 21 044 $ | 271 511 $ | couvert |
-| 45 | 84 966 $ | 133 857 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 22 230 $ | 345 265 $ | couvert |
-| 50 | 83 686 $ | 140 542 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 24 430 $ | 502 377 $ | couvert |
-| 55 | 82 533 $ | 147 561 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 876 $ | 706 340 $ | couvert |
-| 60 | 72 000 $ | 154 930 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 29 445 $ | 999 345 $ | couvert |
-| 65 | 74 000 $ | 0 $ | 0 $ | 34 251 $ | 14 487 $ | 0 $ | 33 802 $ | 8 540 $ | 903 564 $ | tire du nid |
-| 70 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 18 300 $ | 0 $ | 19 594 $ | 8 580 $ | 909 987 $ | tire du nid |
-| 75 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 19 749 $ | 0 $ | 18 182 $ | 8 616 $ | 920 255 $ | tire du nid |
-| 80 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 17 833 $ | 8 649 $ | 938 155 $ | tire du nid |
-| 85 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 17 955 $ | 8 704 $ | 958 041 $ | tire du nid |
-| 90 | 74 000 $ | 0 $ | 0 $ | 44 686 $ | 20 130 $ | 0 $ | 13 987 $ | 4 803 $ | 987 850 $ | tire du nid |
-| 95 | 51 800 $ | 0 $ | 0 $ | 32 828 $ | 10 065 $ | 0 $ | 13 411 $ | 4 504 $ | 1 036 439 $ | tire du nid |
+| 45 | 84 966 $ | 132 305 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 21 741 $ | 343 305 $ | couvert |
+| 50 | 83 686 $ | 136 239 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 22 998 $ | 490 143 $ | couvert |
+| 55 | 82 533 $ | 140 289 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 24 335 $ | 674 029 $ | couvert |
+| 60 | 72 000 $ | 144 460 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 25 787 $ | 935 149 $ | couvert |
+| 65 | 74 000 $ | 0 $ | 0 $ | 31 704 $ | 14 487 $ | 0 $ | 36 349 $ | 8 540 $ | 811 582 $ | tire du nid |
+| 70 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 18 300 $ | 0 $ | 22 960 $ | 8 580 $ | 788 643 $ | tire du nid |
+| 75 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 19 749 $ | 0 $ | 21 547 $ | 8 616 $ | 765 932 $ | tire du nid |
+| 80 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 21 835 $ | 8 829 $ | 746 382 $ | tire du nid |
+| 85 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 16 400 $ | 3 850 $ | 746 635 $ | tire du nid |
+| 90 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 16 400 $ | 3 850 $ | 750 754 $ | tire du nid |
+| 95 | 51 800 $ | 0 $ | 0 $ | 29 789 $ | 10 065 $ | 0 $ | 15 670 $ | 3 723 $ | 757 441 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2047, en dollars d’aujourd’hui
 
@@ -110,8 +110,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Marie | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 43 197 $ | 49 566 $ | 3 871 $ | 3 847 $ | 0 $ |
-| Luc | 65 | 0 $ | 0 $ | 16 369 $ | 7 625 $ | 17 787 $ | 35 683 $ | 1 021 $ | 2 342 $ | 0 $ |
+| Marie | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 41 772 $ | 50 182 $ | 3 943 $ | 3 940 $ | 0 $ |
+| Luc | 65 | 0 $ | 0 $ | 15 201 $ | 7 625 $ | 20 886 $ | 35 357 $ | 983 $ | 2 297 $ | 0 $ |
 
 ## modest — Une personne, petit revenu
 
@@ -122,32 +122,32 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Hélène | né·e en 1971-11 | retraite à 65 ans | salaire 40 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1989) |
 | ↳ comptes | REER 22 000 $ (+1 000 $/an) | CELI 18 000 $ (+1 500 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 30 000 $ par année en travaillant, 28 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 30 000 $ par année en travaillant, 28 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 107 150 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 86 718 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 64 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Hélène | première rente 12/2036 : (base 981,28 $ + 1ʳᵉ supp. 139,52 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 120,80 $/mois, soit 910 $ d’aujourd’hui | première pension 12/2036 : 938,64 $ × résidence 100 % × report 0,0 % = 938,64 $/mois, soit 763 $ d’aujourd’hui |
+| Hélène | première rente 12/2036 : (base 951,04 $ + 1ʳᵉ supp. 135,22 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 086,26 $/mois, soit 882 $ d’aujourd’hui | première pension 12/2036 : 938,64 $ × résidence 100 % × report 0,0 % = 938,64 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Hélène (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 55 | 30 000 $ | 40 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 359 $ | 44 508 $ | couvert |
-| 60 | 30 000 $ | 41 998 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 848 $ | 68 354 $ | couvert |
-| 65 | 28 000 $ | 36 746 $ | 0 $ | 910 $ | 763 $ | 0 $ | 0 $ | 2 348 $ | 102 387 $ | couvert |
-| 70 | 28 000 $ | 0 $ | 0 $ | 10 926 $ | 9 150 $ | 4 262 $ | 3 662 $ | 0 $ | 95 380 $ | tire du nid |
-| 75 | 28 000 $ | 0 $ | 0 $ | 10 926 $ | 9 226 $ | 4 338 $ | 3 510 $ | 0 $ | 87 666 $ | tire du nid |
-| 80 | 28 000 $ | 0 $ | 0 $ | 10 926 $ | 10 065 $ | 5 177 $ | 1 832 $ | 0 $ | 88 649 $ | tire du nid |
-| 85 | 28 000 $ | 0 $ | 0 $ | 10 926 $ | 10 065 $ | 6 093 $ | 916 $ | 0 $ | 93 195 $ | tire du nid |
-| 90 | 28 000 $ | 0 $ | 0 $ | 10 926 $ | 10 065 $ | 6 093 $ | 916 $ | 0 $ | 99 768 $ | tire du nid |
-| 95 | 28 000 $ | 0 $ | 0 $ | 10 926 $ | 10 065 $ | 6 093 $ | 916 $ | 0 $ | 107 150 $ | tire du nid |
+| 60 | 30 000 $ | 41 189 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 649 $ | 66 649 $ | couvert |
+| 65 | 28 000 $ | 35 345 $ | 0 $ | 882 $ | 763 $ | 0 $ | 0 $ | 1 996 $ | 95 885 $ | couvert |
+| 70 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 9 150 $ | 4 262 $ | 3 999 $ | 0 $ | 86 273 $ | tire du nid |
+| 75 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 9 226 $ | 4 338 $ | 3 846 $ | 0 $ | 75 634 $ | tire du nid |
+| 80 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 6 251 $ | 1 095 $ | 0 $ | 75 078 $ | tire du nid |
+| 85 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 6 261 $ | 1 084 $ | 0 $ | 78 517 $ | tire du nid |
+| 90 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 6 261 $ | 1 085 $ | 0 $ | 82 379 $ | tire du nid |
+| 95 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 6 261 $ | 1 085 $ | 0 $ | 86 718 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2037, en dollars d’aujourd’hui
 
@@ -155,7 +155,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Hélène | 66 | 0 $ | 0 $ | 10 926 $ | 9 150 $ | 3 662 $ | 23 738 $ | 0 $ | 0 $ | 0 $ |
+| Hélène | 66 | 0 $ | 0 $ | 10 589 $ | 9 150 $ | 3 999 $ | 23 738 $ | 0 $ | 0 $ | 0 $ |
 
 ## rich — Couple, hauts revenus
 
@@ -168,34 +168,34 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Marc | né·e en 1978-08 | retraite à 60 ans | salaire 130 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1996) |
 | ↳ comptes | REER 380 000 $ (+20 000 $/an) | CELI 98 000 $ (+7 000 $/an) | non enregistré 150 000 $ (+10 000 $/an) | rente d’employeur : aucune |
 
-Dépenses : 150 000 $ par année en travaillant, 130 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 150 000 $ par année en travaillant, 130 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 193 709 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 972 482 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 57 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Sophie | première rente 05/2041 : (base 2 181,22 $ + 1ʳᵉ supp. 257,00 $ + 2ᵉ supp. 101,97 $) × ajustement 100,0 % = 2 540,19 $/mois, soit 1 860 $ d’aujourd’hui | première pension 05/2041 : 1 041,42 $ × résidence 100 % × report 0,0 % = 1 041,42 $/mois, soit 762 $ d’aujourd’hui |
-| Marc | première rente 09/2043 : (base 2 459,17 $ + 1ʳᵉ supp. 362,58 $ + 2ᵉ supp. 155,45 $) × ajustement 100,0 % = 2 977,20 $/mois, soit 2 091 $ d’aujourd’hui | première pension 09/2043 : 1 085,62 $ × résidence 100 % × report 0,0 % = 1 085,62 $/mois, soit 763 $ d’aujourd’hui |
+| Sophie | première rente 05/2041 : (base 2 073,17 $ + 1ʳᵉ supp. 244,27 $ + 2ᵉ supp. 97,03 $) × ajustement 100,0 % = 2 414,47 $/mois, soit 1 768 $ d’aujourd’hui | première pension 05/2041 : 1 041,42 $ × résidence 100 % × report 0,0 % = 1 041,42 $/mois, soit 762 $ d’aujourd’hui |
+| Marc | première rente 09/2043 : (base 2 319,17 $ + 1ʳᵉ supp. 341,94 $ + 2ᵉ supp. 146,65 $) × ajustement 100,0 % = 2 807,76 $/mois, soit 1 972 $ d’aujourd’hui | première pension 09/2043 : 1 085,62 $ × résidence 100 % × report 0,0 % = 1 085,62 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Sophie (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 50 | 150 000 $ | 320 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 80 839 $ | 1 975 167 $ | couvert |
-| 55 | 150 000 $ | 335 981 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 87 828 $ | 2 637 126 $ | couvert |
-| 60 | 150 000 $ | 143 309 $ | 0 $ | 0 $ | 0 $ | 0 $ | 55 448 $ | 41 822 $ | 2 998 165 $ | tire du nid |
-| 65 | 130 000 $ | 0 $ | 0 $ | 14 879 $ | 6 100 $ | 1 774 $ | 109 729 $ | 2 482 $ | 2 824 561 $ | tire du nid |
-| 70 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 18 300 $ | 0 $ | 83 939 $ | 18 983 $ | 2 701 396 $ | tire du nid |
-| 75 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 18 910 $ | 0 $ | 107 617 $ | 40 873 $ | 2 477 519 $ | tire du nid |
-| 80 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 103 705 $ | 39 880 $ | 2 230 305 $ | tire du nid |
-| 85 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 547 $ | 39 088 $ | 1 960 313 $ | tire du nid |
-| 90 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 582 $ | 39 124 $ | 1 657 673 $ | tire du nid |
-| 95 | 130 000 $ | 0 $ | 0 $ | 47 411 $ | 20 130 $ | 0 $ | 101 615 $ | 39 156 $ | 1 317 122 $ | tire du nid |
+| 55 | 150 000 $ | 329 514 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 84 971 $ | 2 626 681 $ | couvert |
+| 60 | 150 000 $ | 137 845 $ | 0 $ | 0 $ | 0 $ | 0 $ | 58 215 $ | 39 398 $ | 2 968 256 $ | tire du nid |
+| 65 | 130 000 $ | 0 $ | 0 $ | 14 142 $ | 6 100 $ | 1 792 $ | 110 418 $ | 2 452 $ | 2 784 983 $ | tire du nid |
+| 70 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 18 300 $ | 0 $ | 105 303 $ | 38 481 $ | 2 628 523 $ | tire du nid |
+| 75 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 18 910 $ | 0 $ | 105 215 $ | 39 004 $ | 2 385 342 $ | tire du nid |
+| 80 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 039 $ | 39 048 $ | 2 120 222 $ | tire du nid |
+| 85 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 080 $ | 39 088 $ | 1 823 913 $ | tire du nid |
+| 90 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 105 482 $ | 39 641 $ | 1 489 861 $ | tire du nid |
+| 95 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 147 $ | 39 156 $ | 1 115 254 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2039, en dollars d’aujourd’hui
 
@@ -203,8 +203,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Sophie | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 17 586 $ | 133 $ | 0 $ | 0 $ |
-| Marc | 61 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 15 753 $ | 0 $ | 0 $ | 0 $ |
+| Sophie | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 17 788 $ | 156 $ | 0 $ | 0 $ |
+| Marc | 61 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 15 963 $ | 0 $ | 0 $ | 0 $ |
 
 ## behind — Une personne, en retard
 
@@ -215,33 +215,33 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Julien | né·e en 1974-06 | retraite à 60 ans | salaire 62 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1992) |
 | ↳ comptes | REER 35 000 $ (+3 000 $/an) | CELI 12 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 46 000 $ par année en travaillant, 38 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 46 000 $ par année en travaillant, 38 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
 - Le plan tel que décrit : manque d’argent en 2036.
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 69 ans.
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 70 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Julien | première rente 07/2039 : (base 1 604,88 $ + 1ʳᵉ supp. 199,88 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 804,76 $/mois, soit 1 377 $ d’aujourd’hui | première pension 07/2039 : 999,02 $ × résidence 100 % × report 0,0 % = 999,02 $/mois, soit 762 $ d’aujourd’hui |
+| Julien | première rente 07/2039 : (base 1 537,64 $ + 1ʳᵉ supp. 191,52 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 729,16 $/mois, soit 1 320 $ d’aujourd’hui | première pension 07/2039 : 999,02 $ × résidence 100 % × report 0,0 % = 999,02 $/mois, soit 762 $ d’aujourd’hui |
 
 ### Année par année — Julien (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 52 | 46 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 507 $ | 49 866 $ | couvert |
-| 55 | 46 000 $ | 63 840 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 562 $ | 59 133 $ | couvert |
-| 60 | 38 000 $ | 27 928 $ | 0 $ | 0 $ | 0 $ | 0 $ | 18 594 $ | 6 467 $ | 62 425 $ | tire du nid |
-| 65 | 38 000 $ | 0 $ | 0 $ | 8 265 $ | 4 575 $ | 3 991 $ | 0 $ | 0 $ | 0 $ | manque |
-| 70 | 38 000 $ | 0 $ | 0 $ | 16 530 $ | 9 150 $ | 3 291 $ | 0 $ | 82 $ | 0 $ | manque |
-| 75 | 38 000 $ | 0 $ | 0 $ | 16 530 $ | 9 607 $ | 3 291 $ | 0 $ | 200 $ | 0 $ | manque |
-| 80 | 38 000 $ | 0 $ | 0 $ | 16 530 $ | 10 065 $ | 3 291 $ | 0 $ | 317 $ | 0 $ | manque |
-| 85 | 38 000 $ | 0 $ | 0 $ | 16 530 $ | 10 065 $ | 3 291 $ | 0 $ | 317 $ | 0 $ | manque |
-| 90 | 38 000 $ | 0 $ | 0 $ | 16 530 $ | 10 065 $ | 3 291 $ | 0 $ | 317 $ | 0 $ | manque |
-| 95 | 38 000 $ | 0 $ | 0 $ | 16 530 $ | 10 065 $ | 3 291 $ | 0 $ | 317 $ | 0 $ | manque |
+| 55 | 46 000 $ | 63 099 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 542 $ | 57 768 $ | couvert |
+| 60 | 38 000 $ | 27 073 $ | 0 $ | 0 $ | 0 $ | 0 $ | 19 367 $ | 6 453 $ | 55 954 $ | tire du nid |
+| 65 | 38 000 $ | 0 $ | 0 $ | 7 919 $ | 4 575 $ | 4 120 $ | 0 $ | 0 $ | 0 $ | manque |
+| 70 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 9 150 $ | 3 637 $ | 0 $ | 0 $ | 0 $ | manque |
+| 75 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 9 607 $ | 3 637 $ | 0 $ | 47 $ | 0 $ | manque |
+| 80 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 10 065 $ | 3 637 $ | 0 $ | 139 $ | 0 $ | manque |
+| 85 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 10 065 $ | 3 637 $ | 0 $ | 139 $ | 0 $ | manque |
+| 90 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 10 065 $ | 3 637 $ | 0 $ | 139 $ | 0 $ | manque |
+| 95 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 10 065 $ | 3 637 $ | 0 $ | 139 $ | 0 $ | manque |
 
 ### Année témoin pour un calculateur d’impôt : 2035, en dollars d’aujourd’hui
 
@@ -249,7 +249,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Julien | 61 | 0 $ | 0 $ | 0 $ | 0 $ | 44 285 $ | 44 285 $ | 3 254 $ | 3 277 $ | 0 $ |
+| Julien | 61 | 0 $ | 0 $ | 0 $ | 0 $ | 40 003 $ | 40 003 $ | 2 753 $ | 2 643 $ | 0 $ |
 
 ## retired — Couple à la retraite
 
@@ -262,7 +262,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Francine | né·e en 1960-09 | retraite à 63 ans | salaire 0 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1978) |
 | ↳ comptes | REER 120 000 $ (+0 $/an) | CELI 70 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
@@ -306,33 +306,33 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Amira | né·e en 1976-02 | retraite à 65 ans | salaire 58 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2006) |
 | ↳ comptes | REER 110 000 $ (+3 000 $/an) | CELI 50 000 $ (+3 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 38 000 $ par année en travaillant, 36 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 38 000 $ par année en travaillant, 36 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 272 336 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 62 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 217 429 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 63 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Amira | première rente 03/2041 : (base 1 536,98 $ + 1ʳᵉ supp. 299,02 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 836,00 $/mois, soit 1 344 $ d’aujourd’hui | première pension 03/2041 : 1 041,42 $ × résidence 88 % × report 0,0 % = 911,24 $/mois, soit 667 $ d’aujourd’hui |
+| Amira | première rente 03/2041 : (base 1 460,89 $ + 1ʳᵉ supp. 284,22 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 745,11 $/mois, soit 1 278 $ d’aujourd’hui | première pension 03/2041 : 1 041,42 $ × résidence 88 % × report 0,0 % = 911,24 $/mois, soit 667 $ d’aujourd’hui |
 
 ### Année par année — Amira (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 50 | 38 000 $ | 58 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 8 539 $ | 174 380 $ | couvert |
-| 55 | 38 000 $ | 60 897 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 365 $ | 239 241 $ | couvert |
-| 60 | 38 000 $ | 63 938 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 360 $ | 321 780 $ | couvert |
-| 65 | 36 000 $ | 5 594 $ | 0 $ | 13 443 $ | 6 672 $ | 0 $ | 13 109 $ | 2 530 $ | 397 901 $ | tire du nid |
-| 70 | 36 000 $ | 0 $ | 0 $ | 16 131 $ | 8 006 $ | 0 $ | 14 666 $ | 2 804 $ | 368 396 $ | tire du nid |
-| 75 | 36 000 $ | 0 $ | 0 $ | 16 131 $ | 8 673 $ | 0 $ | 14 019 $ | 2 824 $ | 335 825 $ | tire du nid |
-| 80 | 36 000 $ | 0 $ | 0 $ | 16 131 $ | 8 807 $ | 0 $ | 13 904 $ | 2 843 $ | 302 744 $ | tire du nid |
-| 85 | 36 000 $ | 0 $ | 0 $ | 16 131 $ | 8 807 $ | 3 490 $ | 7 572 $ | 0 $ | 284 140 $ | tire du nid |
-| 90 | 36 000 $ | 0 $ | 0 $ | 16 131 $ | 8 807 $ | 3 490 $ | 7 572 $ | 0 $ | 278 580 $ | tire du nid |
-| 95 | 36 000 $ | 0 $ | 0 $ | 16 131 $ | 8 807 $ | 3 490 $ | 7 571 $ | 0 $ | 272 336 $ | tire du nid |
+| 55 | 38 000 $ | 59 724 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 019 $ | 236 935 $ | couvert |
+| 60 | 38 000 $ | 61 500 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 542 $ | 312 999 $ | couvert |
+| 65 | 36 000 $ | 5 277 $ | 0 $ | 12 777 $ | 6 672 $ | 0 $ | 14 065 $ | 2 529 $ | 379 375 $ | tire du nid |
+| 70 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 006 $ | 0 $ | 15 465 $ | 2 804 $ | 343 310 $ | tire du nid |
+| 75 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 673 $ | 0 $ | 14 818 $ | 2 824 $ | 303 371 $ | tire du nid |
+| 80 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 0 $ | 14 703 $ | 2 843 $ | 262 014 $ | tire du nid |
+| 85 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 7 971 $ | 0 $ | 244 217 $ | tire du nid |
+| 90 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 7 971 $ | 0 $ | 231 600 $ | tire du nid |
+| 95 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 7 971 $ | 0 $ | 217 429 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2042, en dollars d’aujourd’hui
 
@@ -340,7 +340,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Amira | 66 | 0 $ | 0 $ | 16 131 $ | 8 006 $ | 14 648 $ | 38 786 $ | 1 367 $ | 1 419 $ | 0 $ |
+| Amira | 66 | 0 $ | 0 $ | 15 333 $ | 8 006 $ | 15 447 $ | 38 786 $ | 1 367 $ | 1 419 $ | 0 $ |
 
 ## heir — Une personne, grand héritage
 
@@ -351,38 +351,38 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Jules | né·e en 1999-09 | retraite à 30 ans | salaire 62 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2017) |
 | ↳ comptes | REER 18 000 $ (+0 $/an) | CELI 70 000 $ (+5 000 $/an) | non enregistré 3 500 000 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 52 000 $ par année en travaillant, 54 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 52 000 $ par année en travaillant, 54 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 6 790 234 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 6 763 578 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 27 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Jules | première rente 10/2064 : (base 891,24 $ + 1ʳᵉ supp. 253,41 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 144,65 $/mois, soit 520 $ d’aujourd’hui | première pension 10/2064 : 1 679,65 $ × résidence 100 % × report 0,0 % = 1 679,65 $/mois, soit 763 $ d’aujourd’hui |
+| Jules | première rente 10/2064 : (base 774,74 $ + 1ʳᵉ supp. 220,28 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 995,02 $/mois, soit 452 $ d’aujourd’hui | première pension 10/2064 : 1 679,65 $ × résidence 100 % × report 0,0 % = 1 679,65 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Jules (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 27 | 52 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 559 $ | 10 801 $ | 3 726 290 $ | tire du nid |
-| 30 | 54 000 $ | 42 560 $ | 0 $ | 0 $ | 0 $ | 0 $ | 20 250 $ | 5 600 $ | 3 908 292 $ | tire du nid |
-| 35 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 002 569 $ | tire du nid |
-| 40 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 106 273 $ | tire du nid |
-| 45 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 220 356 $ | tire du nid |
-| 50 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 345 863 $ | tire du nid |
-| 55 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 226 $ | 226 $ | 4 483 231 $ | tire du nid |
-| 60 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 417 $ | 417 $ | 4 633 286 $ | tire du nid |
-| 65 | 54 000 $ | 0 $ | 0 $ | 1 559 $ | 2 288 $ | 252 $ | 49 902 $ | 0 $ | 4 802 273 $ | tire du nid |
-| 70 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 9 150 $ | 202 $ | 40 081 $ | 1 669 $ | 5 061 587 $ | tire du nid |
-| 75 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 9 379 $ | 0 $ | 40 122 $ | 1 737 $ | 5 344 099 $ | tire du nid |
-| 80 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 39 702 $ | 2 003 $ | 5 657 395 $ | tire du nid |
-| 85 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 39 830 $ | 2 131 $ | 6 000 738 $ | tire du nid |
-| 90 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 39 938 $ | 2 239 $ | 6 377 223 $ | tire du nid |
-| 95 | 54 000 $ | 0 $ | 0 $ | 6 236 $ | 10 065 $ | 0 $ | 40 030 $ | 2 330 $ | 6 790 234 $ | tire du nid |
+| 30 | 54 000 $ | 42 066 $ | 0 $ | 0 $ | 0 $ | 0 $ | 20 589 $ | 5 484 $ | 3 907 503 $ | tire du nid |
+| 35 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 001 703 $ | tire du nid |
+| 40 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 105 324 $ | tire du nid |
+| 45 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 219 315 $ | tire du nid |
+| 50 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 000 $ | 0 $ | 4 344 723 $ | tire du nid |
+| 55 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 226 $ | 226 $ | 4 481 980 $ | tire du nid |
+| 60 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 417 $ | 417 $ | 4 631 915 $ | tire du nid |
+| 65 | 54 000 $ | 0 $ | 0 $ | 1 355 $ | 2 288 $ | 268 $ | 50 090 $ | 0 $ | 4 800 577 $ | tire du nid |
+| 70 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 9 150 $ | 551 $ | 40 369 $ | 1 490 $ | 5 058 218 $ | tire du nid |
+| 75 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 9 379 $ | 0 $ | 40 803 $ | 1 602 $ | 5 337 237 $ | tire du nid |
+| 80 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 40 385 $ | 1 871 $ | 5 646 262 $ | tire du nid |
+| 85 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 40 515 $ | 2 001 $ | 5 984 909 $ | tire du nid |
+| 90 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 40 625 $ | 2 110 $ | 6 356 234 $ | tire du nid |
+| 95 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 40 718 $ | 2 203 $ | 6 763 578 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2030, en dollars d’aujourd’hui
 
@@ -403,35 +403,35 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Paul | né·e en 1973-01 | retraite à 58 ans | salaire 74 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1991) |
 | ↳ comptes | REER 170 000 $ (+4 000 $/an) | CELI 62 000 $ (+5 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 92 000 $ par année en travaillant, 80 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 92 000 $ par année en travaillant, 80 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 880 000 $, hypothèque 70 000 $ à 4,5 % (1 300 $ par mois, payée en 2031), vendue à 58 ans (logement de remplacement : 360 000 $). Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 333 490 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 276 312 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 58 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Nadia | première rente 07/2036 : (base 1 867,39 $ + 1ʳᵉ supp. 136,24 $ + 2ᵉ supp. 41,43 $) × ajustement 100,0 % = 2 045,06 $/mois, soit 1 661 $ d’aujourd’hui | première pension 07/2036 : 938,64 $ × résidence 100 % × report 0,0 % = 938,64 $/mois, soit 763 $ d’aujourd’hui |
-| Paul | première rente 02/2038 : (base 1 940,11 $ + 1ʳᵉ supp. 169,84 $ + 2ᵉ supp. 14,60 $) × ajustement 100,0 % = 2 124,55 $/mois, soit 1 656 $ d’aujourd’hui | première pension 02/2038 : 978,47 $ × résidence 100 % × report 0,0 % = 978,47 $/mois, soit 762 $ d’aujourd’hui |
+| Nadia | première rente 07/2036 : (base 1 809,81 $ + 1ʳᵉ supp. 132,04 $ + 2ᵉ supp. 40,18 $) × ajustement 100,0 % = 1 982,03 $/mois, soit 1 610 $ d’aujourd’hui | première pension 07/2036 : 938,64 $ × résidence 100 % × report 0,0 % = 938,64 $/mois, soit 763 $ d’aujourd’hui |
+| Paul | première rente 02/2038 : (base 1 865,84 $ + 1ʳᵉ supp. 163,34 $ + 2ᵉ supp. 14,04 $) × ajustement 100,0 % = 2 043,22 $/mois, soit 1 592 $ d’aujourd’hui | première pension 02/2038 : 978,47 $ × résidence 100 % × report 0,0 % = 978,47 $/mois, soit 762 $ d’aujourd’hui |
 
 ### Année par année — Nadia (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 55 | 107 600 $ | 170 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 112 $ | 617 669 $ | couvert |
-| 60 | 80 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 80 000 $ | 0 $ | 1 143 011 $ | tire du nid |
-| 65 | 80 000 $ | 0 $ | 0 $ | 9 968 $ | 4 575 $ | 6 187 $ | 59 270 $ | 0 $ | 870 694 $ | tire du nid |
-| 70 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 18 300 $ | 0 $ | 32 734 $ | 10 837 $ | 787 390 $ | tire du nid |
-| 75 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 18 758 $ | 0 $ | 32 325 $ | 10 885 $ | 709 243 $ | tire du nid |
-| 80 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 31 018 $ | 10 934 $ | 629 515 $ | tire du nid |
-| 85 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 31 032 $ | 10 965 $ | 540 855 $ | tire du nid |
-| 90 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 31 667 $ | 11 170 $ | 440 365 $ | tire du nid |
-| 95 | 80 000 $ | 0 $ | 0 $ | 39 803 $ | 20 130 $ | 0 $ | 23 488 $ | 3 420 $ | 360 062 $ | tire du nid |
+| 60 | 80 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 80 000 $ | 0 $ | 1 140 144 $ | tire du nid |
+| 65 | 80 000 $ | 0 $ | 0 $ | 9 661 $ | 4 575 $ | 6 253 $ | 59 511 $ | 0 $ | 867 270 $ | tire du nid |
+| 70 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 18 300 $ | 0 $ | 34 109 $ | 10 837 $ | 775 811 $ | tire du nid |
+| 75 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 18 758 $ | 0 $ | 33 731 $ | 10 894 $ | 688 902 $ | tire du nid |
+| 80 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 32 369 $ | 10 927 $ | 599 328 $ | tire du nid |
+| 85 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 32 975 $ | 11 126 $ | 499 292 $ | tire du nid |
+| 90 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 27 218 $ | 5 285 $ | 391 965 $ | tire du nid |
+| 95 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 24 473 $ | 3 031 $ | 309 143 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2031, en dollars d’aujourd’hui
 
@@ -439,7 +439,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Nadia | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 3 078 $ | 0 $ | 0 $ | 0 $ |
+| Nadia | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 3 080 $ | 0 $ | 0 $ | 0 $ |
 | Paul | 58 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ |
 
 ## planner — Couple, une vie à planifier
@@ -453,7 +453,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Thomas | né·e en 1987-09 | retraite à 58 ans | salaire 74 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2005) |
 | ↳ comptes | REER 30 000 $ (+5 000 $/an) | CELI 18 000 $ (+6 000 $/an) | non enregistré 12 000 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 78 000 $ par année en travaillant, 72 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 78 000 $ par année en travaillant, 72 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 470 000 $, hypothèque 215 000 $ à 4,9 % (1 550 $ par mois, payée en 2042), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
@@ -461,33 +461,33 @@ Résidence principale : valeur 470 000 $, hypothèque 215 000 $ à 4,9 % (1
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 892 960 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 56 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 493 003 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 57 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Élise | première rente 04/2054 : (base 3 161,34 $ + 1ʳᵉ supp. 742,16 $ + 2ᵉ supp. 349,70 $) × ajustement 100,0 % = 4 253,20 $/mois, soit 2 377 $ d’aujourd’hui | première pension 04/2054 : 1 364,46 $ × résidence 100 % × report 0,0 % = 1 364,46 $/mois, soit 763 $ d’aujourd’hui |
-| Thomas | première rente 10/2052 : (base 2 795,11 $ + 1ʳᵉ supp. 639,36 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 3 434,47 $/mois, soit 2 001 $ d’aujourd’hui | première pension 10/2052 : 1 308,91 $ × résidence 100 % × report 0,0 % = 1 308,91 $/mois, soit 763 $ d’aujourd’hui |
+| Élise | première rente 04/2054 : (base 2 856,96 $ + 1ʳᵉ supp. 670,71 $ + 2ᵉ supp. 316,14 $) × ajustement 100,0 % = 3 843,81 $/mois, soit 2 148 $ d’aujourd’hui | première pension 04/2054 : 1 364,46 $ × résidence 100 % × report 0,0 % = 1 364,46 $/mois, soit 763 $ d’aujourd’hui |
+| Thomas | première rente 10/2052 : (base 2 545,81 $ + 1ʳᵉ supp. 582,34 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 3 128,15 $/mois, soit 1 822 $ d’aujourd’hui | première pension 10/2052 : 1 308,91 $ × résidence 100 % × report 0,0 % = 1 308,91 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Élise (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 37 | 96 600 $ | 162 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 30 504 $ | 156 239 $ | couvert |
-| 40 | 106 476 $ | 154 099 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 717 $ | 216 466 $ | couvert |
-| 45 | 103 251 $ | 177 772 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 085 $ | 370 915 $ | couvert |
-| 50 | 101 696 $ | 186 250 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 38 135 $ | 641 866 $ | couvert |
-| 55 | 89 500 $ | 195 152 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 41 338 $ | 933 147 $ | couvert |
-| 60 | 78 000 $ | 33 034 $ | 0 $ | 0 $ | 0 $ | 0 $ | 56 135 $ | 8 653 $ | 914 489 $ | tire du nid |
-| 65 | 72 000 $ | 0 $ | 0 $ | 44 704 $ | 16 013 $ | 0 $ | 19 074 $ | 7 790 $ | 782 356 $ | tire du nid |
-| 70 | 70 567 $ | 0 $ | 0 $ | 51 683 $ | 18 300 $ | 0 $ | 8 676 $ | 7 496 $ | 828 922 $ | tire du nid |
-| 75 | 67 109 $ | 0 $ | 0 $ | 51 683 $ | 19 901 $ | 0 $ | 11 061 $ | 8 648 $ | 898 026 $ | tire du nid |
-| 80 | 63 820 $ | 0 $ | 0 $ | 51 683 $ | 20 130 $ | 0 $ | 10 654 $ | 8 618 $ | 997 963 $ | tire du nid |
-| 85 | 105 692 $ | 0 $ | 0 $ | 51 683 $ | 20 130 $ | 0 $ | 45 672 $ | 11 162 $ | 946 311 $ | tire du nid |
-| 90 | 102 717 $ | 0 $ | 0 $ | 51 683 $ | 20 130 $ | 0 $ | 37 689 $ | 6 785 $ | 854 526 $ | tire du nid |
-| 95 | 39 202 $ | 0 $ | 0 $ | 37 382 $ | 10 065 $ | 0 $ | 0 $ | 5 810 $ | 892 960 $ | couvert |
+| 40 | 106 476 $ | 152 369 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 675 $ | 213 391 $ | couvert |
+| 45 | 103 251 $ | 172 553 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 33 211 $ | 355 816 $ | couvert |
+| 50 | 101 696 $ | 177 445 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 969 $ | 602 859 $ | couvert |
+| 55 | 89 500 $ | 182 483 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 36 779 $ | 856 085 $ | couvert |
+| 60 | 78 000 $ | 30 209 $ | 0 $ | 0 $ | 0 $ | 0 $ | 64 507 $ | 14 427 $ | 796 160 $ | tire du nid |
+| 65 | 72 000 $ | 0 $ | 0 $ | 40 569 $ | 16 013 $ | 0 $ | 24 165 $ | 8 061 $ | 631 674 $ | tire du nid |
+| 70 | 70 567 $ | 0 $ | 0 $ | 46 877 $ | 18 300 $ | 0 $ | 13 543 $ | 7 513 $ | 632 759 $ | tire du nid |
+| 75 | 67 109 $ | 0 $ | 0 $ | 46 877 $ | 19 901 $ | 0 $ | 6 599 $ | 6 023 $ | 660 312 $ | tire du nid |
+| 80 | 63 820 $ | 0 $ | 0 $ | 46 877 $ | 20 130 $ | 0 $ | 2 293 $ | 5 480 $ | 721 351 $ | tire du nid |
+| 85 | 105 692 $ | 0 $ | 0 $ | 46 877 $ | 20 130 $ | 0 $ | 44 109 $ | 5 423 $ | 659 660 $ | tire du nid |
+| 90 | 102 717 $ | 0 $ | 0 $ | 46 877 $ | 20 130 $ | 0 $ | 41 134 $ | 5 423 $ | 514 097 $ | tire du nid |
+| 95 | 39 202 $ | 0 $ | 0 $ | 33 199 $ | 10 065 $ | 0 $ | 545 $ | 4 608 $ | 493 003 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2053, en dollars d’aujourd’hui
 
@@ -495,8 +495,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Élise | 64 | 0 $ | 0 $ | 0 $ | 0 $ | 41 689 $ | 44 607 $ | 3 291 $ | 3 092 $ | 0 $ |
-| Thomas | 66 | 0 $ | 0 $ | 23 764 $ | 9 150 $ | 8 338 $ | 38 334 $ | 1 348 $ | 2 713 $ | 0 $ |
+| Élise | 64 | 0 $ | 0 $ | 0 $ | 0 $ | 51 838 $ | 51 838 $ | 4 137 $ | 4 604 $ | 0 $ |
+| Thomas | 66 | 0 $ | 0 $ | 21 644 $ | 9 150 $ | 426 $ | 31 221 $ | 600 $ | 1 718 $ | 0 $ |
 
 ## family — Couple, une famille qui grandit
 
@@ -509,7 +509,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Léa | né·e en 1990-02 | retraite à 62 ans | salaire 24 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2008) |
 | ↳ comptes | REER 22 000 $ (+1 000 $/an) | CELI 26 000 $ (+2 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 80 000 $ par année en travaillant, 66 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 80 000 $ par année en travaillant, 66 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 590 000 $, hypothèque 410 000 $ à 4,9 % (2 350 $ par mois, payée en 2051), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
@@ -517,33 +517,33 @@ Résidence principale : valeur 590 000 $, hypothèque 410 000 $ à 4,9 % (2
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 394 354 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 963 277 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 60 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Olivier | première rente 07/2053 : (base 3 337,08 $ + 1ʳᵉ supp. 818,76 $ + 2ᵉ supp. 395,17 $) × ajustement 100,0 % = 4 551,01 $/mois, soit 2 597 $ d’aujourd’hui | première pension 07/2053 : 1 336,40 $ × résidence 100 % × report 0,0 % = 1 336,40 $/mois, soit 763 $ d’aujourd’hui |
-| Léa | première rente 03/2055 : (base 1 711,83 $ + 1ʳᵉ supp. 326,50 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 2 038,33 $/mois, soit 1 116 $ d’aujourd’hui | première pension 03/2055 : 1 393,11 $ × résidence 100 % × report 0,0 % = 1 393,11 $/mois, soit 762 $ d’aujourd’hui |
+| Olivier | première rente 07/2053 : (base 3 027,50 $ + 1ʳᵉ supp. 742,80 $ + 2ᵉ supp. 358,53 $) × ajustement 100,0 % = 4 128,83 $/mois, soit 2 356 $ d’aujourd’hui | première pension 07/2053 : 1 336,40 $ × résidence 100 % × report 0,0 % = 1 336,40 $/mois, soit 763 $ d’aujourd’hui |
+| Léa | première rente 03/2055 : (base 1 540,91 $ + 1ʳᵉ supp. 293,90 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 834,81 $/mois, soit 1 004 $ d’aujourd’hui | première pension 03/2055 : 1 393,11 $ × résidence 100 % × report 0,0 % = 1 393,11 $/mois, soit 762 $ d’aujourd’hui |
 
 ### Année par année — Olivier (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 38 | 108 200 $ | 162 818 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 406 $ | 211 117 $ | couvert |
-| 40 | 118 052 $ | 161 561 $ | 0 $ | 0 $ | 0 $ | 0 $ | 1 548 $ | 37 917 $ | 233 315 $ | tire du nid |
-| 45 | 115 382 $ | 177 635 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 40 098 $ | 306 157 $ | couvert |
-| 50 | 111 476 $ | 184 398 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 43 773 $ | 437 646 $ | couvert |
-| 55 | 111 307 $ | 189 825 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 47 632 $ | 606 303 $ | couvert |
-| 60 | 94 852 $ | 197 025 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 51 680 $ | 839 472 $ | couvert |
-| 65 | 66 000 $ | 0 $ | 0 $ | 15 580 $ | 4 575 $ | 0 $ | 61 451 $ | 10 141 $ | 765 782 $ | tire du nid |
-| 70 | 66 000 $ | 0 $ | 0 $ | 44 415 $ | 18 300 $ | 0 $ | 9 680 $ | 5 717 $ | 776 903 $ | tire du nid |
-| 75 | 62 765 $ | 0 $ | 0 $ | 44 415 $ | 18 757 $ | 0 $ | 12 721 $ | 6 744 $ | 831 397 $ | tire du nid |
-| 80 | 59 689 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 12 254 $ | 7 025 $ | 914 413 $ | tire du nid |
-| 85 | 56 764 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 11 783 $ | 6 907 $ | 1 025 128 $ | tire du nid |
-| 90 | 53 982 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 11 312 $ | 6 787 $ | 1 165 337 $ | tire du nid |
-| 95 | 51 336 $ | 0 $ | 0 $ | 44 415 $ | 20 130 $ | 0 $ | 10 771 $ | 6 645 $ | 1 337 993 $ | tire du nid |
+| 40 | 118 052 $ | 160 496 $ | 0 $ | 0 $ | 0 $ | 0 $ | 2 275 $ | 37 632 $ | 232 223 $ | tire du nid |
+| 45 | 115 382 $ | 173 368 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 38 178 $ | 294 683 $ | couvert |
+| 50 | 111 476 $ | 176 662 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 40 248 $ | 408 146 $ | couvert |
+| 55 | 111 307 $ | 178 173 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 42 438 $ | 546 811 $ | couvert |
+| 60 | 94 852 $ | 180 876 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 44 693 $ | 733 742 $ | couvert |
+| 65 | 66 000 $ | 0 $ | 0 $ | 14 135 $ | 4 575 $ | 0 $ | 63 027 $ | 10 169 $ | 620 934 $ | tire du nid |
+| 70 | 66 000 $ | 0 $ | 0 $ | 40 201 $ | 18 300 $ | 0 $ | 13 928 $ | 5 727 $ | 593 517 $ | tire du nid |
+| 75 | 62 765 $ | 0 $ | 0 $ | 40 201 $ | 18 757 $ | 0 $ | 9 851 $ | 4 726 $ | 610 997 $ | tire du nid |
+| 80 | 59 689 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 9 489 $ | 5 033 $ | 655 032 $ | tire du nid |
+| 85 | 56 764 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 9 125 $ | 4 949 $ | 721 784 $ | tire du nid |
+| 90 | 53 982 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 8 759 $ | 4 863 $ | 812 429 $ | tire du nid |
+| 95 | 51 336 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 8 341 $ | 4 760 $ | 929 219 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2053, en dollars d’aujourd’hui
 
@@ -551,8 +551,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Olivier | 65 | 0 $ | 0 $ | 15 580 $ | 4 575 $ | 60 981 $ | 50 645 $ | 2 861 $ | 3 902 $ | 0 $ |
-| Léa | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 471 $ | 30 961 $ | 1 696 $ | 1 681 $ | 0 $ |
+| Olivier | 65 | 0 $ | 0 $ | 14 135 $ | 4 575 $ | 62 882 $ | 50 150 $ | 2 795 $ | 3 836 $ | 0 $ |
+| Léa | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 145 $ | 31 586 $ | 1 769 $ | 1 769 $ | 0 $ |
 
 ## melter — Une personne, un très gros REER
 
@@ -563,18 +563,18 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Denise | né·e en 1966-04 | retraite à 60 ans | salaire 0 $ | RRQ à 70 ans, PSV à 70 ans (au Canada depuis 1984) |
 | ↳ comptes | REER 1 600 000 $ (+0 $/an) | CELI 35 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 42 000 $ par année en travaillant, 42 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 42 000 $ par année en travaillant, 42 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 664 074 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 649 065 $ (dollars d’aujourd’hui).
 - Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Denise | première rente 05/2036 : (base 1 940,23 $ + 1ʳᵉ supp. 77,75 $ + 2ᵉ supp. 13,73 $) × ajustement 142,0 % = 2 885,03 $/mois, soit 2 344 $ d’aujourd’hui | première pension 05/2036 : 938,64 $ × résidence 100 % × report 36,0 % = 1 276,55 $/mois, soit 1 037 $ d’aujourd’hui |
+| Denise | première rente 05/2036 : (base 1 880,39 $ + 1ʳᵉ supp. 75,35 $ + 2ᵉ supp. 13,31 $) × ajustement 142,0 % = 2 796,05 $/mois, soit 2 271 $ d’aujourd’hui | première pension 05/2036 : 938,64 $ × résidence 100 % × report 36,0 % = 1 276,55 $/mois, soit 1 037 $ d’aujourd’hui |
 
 ### Année par année — Denise (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
@@ -582,12 +582,12 @@ Dépenses : 42 000 $ par année en travaillant, 42 000 $ à la retraite (dol
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 60 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 345 $ | 9 380 $ | 1 656 052 $ | tire du nid |
 | 65 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 344 $ | 7 177 $ | 1 587 057 $ | tire du nid |
-| 70 | 42 000 $ | 0 $ | 0 $ | 18 749 $ | 8 296 $ | 0 $ | 27 301 $ | 7 198 $ | 1 546 688 $ | tire du nid |
-| 75 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 274 $ | 0 $ | 74 304 $ | 33 298 $ | 1 580 460 $ | tire du nid |
-| 80 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 71 574 $ | 32 158 $ | 1 594 851 $ | tire du nid |
-| 85 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 68 824 $ | 30 817 $ | 1 613 444 $ | tire du nid |
-| 90 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 66 069 $ | 29 540 $ | 1 636 273 $ | tire du nid |
-| 95 | 42 000 $ | 0 $ | 0 $ | 28 124 $ | 13 688 $ | 0 $ | 62 915 $ | 28 064 $ | 1 664 074 $ | tire du nid |
+| 70 | 42 000 $ | 0 $ | 0 $ | 18 171 $ | 8 296 $ | 0 $ | 27 879 $ | 7 199 $ | 1 546 097 $ | tire du nid |
+| 75 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 274 $ | 0 $ | 74 228 $ | 32 827 $ | 1 577 163 $ | tire du nid |
+| 80 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 71 501 $ | 31 689 $ | 1 589 101 $ | tire du nid |
+| 85 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 68 754 $ | 30 384 $ | 1 604 926 $ | tire du nid |
+| 90 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 66 002 $ | 29 099 $ | 1 624 658 $ | tire du nid |
+| 95 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 62 851 $ | 27 625 $ | 1 649 065 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2026, en dollars d’aujourd’hui
 
@@ -608,7 +608,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Linda | né·e en 1964-05 | retraite à 62 ans | salaire 32 500 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1982) |
 | ↳ comptes | REER 40 000 $ (+0 $/an) | CELI 35 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 48 000 $ par année en travaillant, 48 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 3,1 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 48 000 $ par année en travaillant, 48 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 450 000 $, hypothèque 0 $ à 5,0 % (0 $ par mois, aucune hypothèque), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
@@ -621,21 +621,21 @@ Résidence principale : valeur 450 000 $, hypothèque 0 $ à 5,0 % (0 $ par
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Dave | première rente 06/2029 : (base 802,06 $ + 1ʳᵉ supp. 20,87 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 822,93 $/mois, soit 773 $ d’aujourd’hui | première pension 06/2029 : 811,55 $ × résidence 100 % × report 0,0 % = 811,55 $/mois, soit 762 $ d’aujourd’hui |
-| Linda | première rente 06/2029 : (base 802,06 $ + 1ʳᵉ supp. 20,87 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 822,93 $/mois, soit 773 $ d’aujourd’hui | première pension 06/2029 : 811,55 $ × résidence 100 % × report 0,0 % = 811,55 $/mois, soit 762 $ d’aujourd’hui |
+| Dave | première rente 06/2029 : (base 798,09 $ + 1ʳᵉ supp. 20,76 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 818,85 $/mois, soit 769 $ d’aujourd’hui | première pension 06/2029 : 811,55 $ × résidence 100 % × report 0,0 % = 811,55 $/mois, soit 762 $ d’aujourd’hui |
+| Linda | première rente 06/2029 : (base 798,09 $ + 1ʳᵉ supp. 20,76 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 818,85 $/mois, soit 769 $ d’aujourd’hui | première pension 06/2029 : 811,55 $ × résidence 100 % × report 0,0 % = 811,55 $/mois, soit 762 $ d’aujourd’hui |
 
 ### Année par année — Dave (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 62 | 48 000 $ | 21 667 $ | 0 $ | 0 $ | 0 $ | 0 $ | 31 409 $ | 3 777 $ | 124 642 $ | tire du nid |
-| 65 | 48 000 $ | 0 $ | 0 $ | 10 825 $ | 10 675 $ | 5 740 $ | 20 761 $ | 0 $ | 6 721 $ | tire du nid |
-| 70 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 18 300 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
-| 75 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 19 367 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
-| 80 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
-| 85 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
-| 90 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
-| 95 | 48 000 $ | 0 $ | 0 $ | 18 557 $ | 20 130 $ | 5 986 $ | 0 $ | 0 $ | 0 $ | manque |
+| 65 | 48 000 $ | 0 $ | 0 $ | 10 771 $ | 10 675 $ | 5 755 $ | 20 799 $ | 0 $ | 6 682 $ | tire du nid |
+| 70 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 18 300 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 75 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 19 367 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 80 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 85 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 90 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 95 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
 
 ### Année témoin pour un calculateur d’impôt : 2027, en dollars d’aujourd’hui
 

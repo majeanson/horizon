@@ -291,7 +291,7 @@ export const FR = {
       ],
       sourceTitle: 'D’où viennent ces chiffres ?',
       source:
-        'Neutre : inflation 2,1 %, actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 %, croissance du MGA 3,1 % (FP Canada et Institut de planification financière, normes 2026), soit environ 5,1 % pour un mélange 60 / 40, moins 0,6 point de frais estimés. Prudent et Audacieux déplacent ces chiffres d’une marge fixe. Ce sont des hypothèses, ni des chiffres officiels ni des prévisions.',
+        'Neutre : inflation 2,1 %, actions canadiennes 6,3 %, américaines 6,4 %, revenu fixe 3,2 % (FP Canada et Institut de planification financière, normes 2026), soit environ 5,1 % pour un mélange 60 / 40, moins 0,6 point de frais estimés. Hausse des salaires : 2,7 % par année, soit l’inflation de 2,1 % et la hausse réelle de 0,6 % des gains que retient Retraite Québec (évaluation actuarielle du RRQ au 31 décembre 2024). Prudent et Audacieux déplacent ces chiffres d’une marge fixe. Ce sont des hypothèses, ni des chiffres officiels ni des prévisions.',
     },
     impact: {
       whyTitle: 'Pourquoi ça compte :',
@@ -310,7 +310,7 @@ export const FR = {
         },
         wageGrowth: {
           low: 'Votre salaire progresse peu : la rente du RRQ et celle d’un régime d’employeur, calculées sur vos gains, sont plus petites.',
-          typical: 'Le salaire suit la croissance moyenne des gains : le plafond du RRQ a crû d’environ 3,1 % par année de 2016 à 2026.',
+          typical: 'Le salaire suit la croissance moyenne des gains : Retraite Québec en suppose 2,7 % par année, soit l’inflation de 2,1 % et 0,6 % de hausse réelle.',
           high: 'Votre salaire grimpe vite : les rentes du RRQ et du régime d’employeur, calculées sur vos gains, sont plus grosses. Le plan compte sur des augmentations qui ne sont pas garanties.',
         },
         returns: {
@@ -667,10 +667,10 @@ export const FR = {
       note: 'Le scénario Neutre retient 2,1 %, Prudent 2,5 % et Audacieux 2,0 %. Le 2,1 % vient des normes de projection 2026 de FP Canada et de l’Institut de planification financière.',
     },
     wageGrowth: {
-      where: 'Retraite Québec publie le maximum des gains admissibles (MGA) de chaque année depuis 1966 : 74 600 $ en 2026. Comparer deux années donne la hausse des salaires.',
+      where: 'L’évaluation actuarielle du RRQ de Retraite Québec donne la hausse des gains qu’elle suppose (rapport en français). Le maximum des gains admissibles (MGA) de chaque année est publié depuis 1966 : 74 600 $ en 2026.',
       label: '',
-      url: 'https://www.retraitequebec.gouv.qc.ca/fr/programmes/regime-rentes-quebec/travail-et-cotisations/revenus-travail-admissibles-et-cotisations',
-      note: 'Le MGA est passé de 54 900 $ en 2016 à 74 600 $ en 2026 : environ 3,1 % par année. Les normes 2026 et le scénario Neutre retiennent 3,1 % aussi.',
+      url: 'https://www.retraitequebec.gouv.qc.ca/fr/publications/programmes/regime-rentes-quebec-rrq/evaluations-actuarielles',
+      note: 'Le scénario Neutre retient 2,7 % par année : l’inflation de 2,1 % et la hausse réelle de 0,6 % des gains moyens que suppose l’évaluation actuarielle du RRQ au 31 décembre 2024. Le MGA est passé de 54 900 $ en 2016 à 74 600 $ en 2026, soit environ 3,1 % par année, mais pendant que les prix montaient de 2,8 % par année (Statistique Canada, 2016 à 2025).',
     },
     returns: {
       where: 'Le relevé annuel de votre courtier ou de votre assureur donne le rendement de chaque compte (« rendement personnel »). Vos frais sont sur son rapport annuel sur les frais.',

@@ -153,7 +153,7 @@ test('offline, the saved profile is intact and the results — the chart and the
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
   await waitControlled(page)
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
 
   const consoleErrors: string[] = []
   page.on('console', (m) => {
@@ -167,7 +167,7 @@ test('offline, the saved profile is intact and the results — the chart and the
 
   await page.context().setOffline(true)
   await page.reload()
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.chart-panel figure.chart')).toBeVisible()
   await expect(page.locator('.chart-panel path.recharts-line-curve')).toHaveCount(2)
 
@@ -182,7 +182,7 @@ test('offline, the saved profile is intact and the results — the chart and the
   // 9 cells = the one 3 × 3 grid shown (the horizon is chosen in its header; the worker still works out all three).
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9, { timeout: 90_000 })
   // The 9 cells exist at once as « … » placeholders and fill as the worker streams: wait for the value, not the cell.
-  await expect(page.locator('.sensitivity__grids td.is-base')).toHaveText('59', { timeout: 90_000 })
+  await expect(page.locator('.sensitivity__grids td.is-base')).toHaveText('60', { timeout: 90_000 })
 
   expect(failed, 'nothing the offline app asked for failed').toEqual([])
   expect(consoleErrors).toEqual([])

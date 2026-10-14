@@ -190,9 +190,10 @@ test.describe('it reaches the answer', () => {
   test('a large dated expense moves the answer later; the answer on arrival says so on Profil', async ({ page }) => {
     await seedProfile(page, withFlows([{ label: 'Toit', kind: 'expense', amount: 90000, fromYear: 2030, toYear: 2055, owner: 'self', taxable: false }]))
     await page.goto('/resultats')
-    // 90 000 $ a year more than the budget, for twenty-five years: no age works any more (the example answers 59 without it).
+    // 90 000 $ a year more than the budget, for twenty-five years: no age works any more (the example answers 60 without it).
     await expect(page.getByText(/l’argent ne suffit pas encore/)).toBeVisible({ timeout: 60_000 })
-    await expect(page.getByText('59 ans', { exact: true })).toHaveCount(0)
+    // (« 60 ans » alone is not a sign: the profile's own retirement age is on the page. The headline is — it names an age only when one works.)
+    await expect(page.locator('.verdict__line')).not.toContainText('Vous pouvez prendre votre retraite')
   })
 
   test('the printed year-by-year and the charts name the dated income in the work bar', async ({ page }) => {

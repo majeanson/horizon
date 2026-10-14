@@ -274,7 +274,7 @@ export const EN: typeof FR = {
       ],
       sourceTitle: 'Where these figures come from',
       source:
-        'Neutral: inflation 2.1%, Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2%, YMPE growth 3.1% (FP Canada and the Institute of Financial Planning, 2026 guidelines) — about 5.1% for a 60 / 40 mix, less an estimated 0.6 point of fees. Conservative and Aggressive move those figures by a fixed margin. These are assumptions, neither official figures nor forecasts.',
+        'Neutral: inflation 2.1%, Canadian equities 6.3%, U.S. equities 6.4%, fixed income 3.2% (FP Canada and the Institute of Financial Planning, 2026 guidelines) — about 5.1% for a 60 / 40 mix, less an estimated 0.6 point of fees. Wage growth: 2.7% a year, the 2.1% inflation plus the 0.6% real growth in earnings that Retraite Québec assumes (QPP actuarial valuation at 31 December 2024). Conservative and Aggressive move those figures by a fixed margin. These are assumptions, neither official figures nor forecasts.',
     },
     impact: {
       whyTitle: 'Why it matters:',
@@ -293,7 +293,7 @@ export const EN: typeof FR = {
         },
         wageGrowth: {
           low: 'Your pay grows little: the QPP pension and any employer pension, both worked out from your earnings, come out smaller.',
-          typical: 'Pay follows average earnings growth: the QPP earnings ceiling grew about 3.1 % a year from 2016 to 2026.',
+          typical: 'Pay follows average earnings growth: Retraite Québec assumes 2.7% a year, the 2.1% inflation plus 0.6% real growth.',
           high: 'Your pay climbs fast: the QPP and employer pensions, worked out from your earnings, come out bigger. The plan counts on raises that are not guaranteed.',
         },
         returns: {
@@ -644,10 +644,10 @@ export const EN: typeof FR = {
       note: 'The Neutral scenario uses 2.1%, Conservative 2.5% and Aggressive 2.0%. The 2.1% comes from the 2026 projection guidelines of FP Canada and the Institute of Financial Planning.',
     },
     wageGrowth: {
-      where: 'Retraite Québec publishes each year’s maximum pensionable earnings (MPE) since 1966: $74,600 in 2026. Comparing two years gives wage growth.',
+      where: 'The QPP actuarial valuation from Retraite Québec gives the earnings growth it assumes (the full report is in French). The maximum pensionable earnings (MPE) of each year has been published since 1966: $74,600 in 2026.',
       label: '',
-      url: 'https://www.retraitequebec.gouv.qc.ca/en/programs/quebec-pension-plan/work-contributions/pensionable-earnings-contributions',
-      note: 'The MPE went from $54,900 in 2016 to $74,600 in 2026: about 3.1% a year. The 2026 guidelines and the Neutral scenario use 3.1% too.',
+      url: 'https://www.retraitequebec.gouv.qc.ca/en/publications/our-programs/quebec-pension-plan/actuarial-valuations',
+      note: 'The Neutral scenario uses 2.7% a year: the 2.1% inflation plus the 0.6% real growth in average earnings that the QPP actuarial valuation at 31 December 2024 assumes. The MPE went from $54,900 in 2016 to $74,600 in 2026, about 3.1% a year, but while prices rose 2.8% a year (Statistics Canada, 2016 to 2025).',
     },
     returns: {
       where: 'The annual statement from your broker or insurer gives each account’s return (“personal rate of return”). Your fees are on its annual fee report.',

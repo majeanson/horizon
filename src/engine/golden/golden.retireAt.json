@@ -1,5 +1,5 @@
 {
- "earliestOk": 59,
+ "earliestOk": 60,
  "byAge": [
   {
    "age": 48,
@@ -52,92 +52,92 @@
   {
    "age": 56,
    "ok": false,
-   "firstShortfallYear": 2044,
+   "firstShortfallYear": 2043,
    "netWorthAtHorizon": 0
   },
   {
    "age": 57,
    "ok": false,
-   "firstShortfallYear": 2050,
+   "firstShortfallYear": 2048,
    "netWorthAtHorizon": 0
   },
   {
    "age": 58,
    "ok": false,
-   "firstShortfallYear": 2062,
+   "firstShortfallYear": 2057,
    "netWorthAtHorizon": 0
   },
   {
    "age": 59,
-   "ok": true,
-   "firstShortfallYear": null,
-   "netWorthAtHorizon": 113253.18
+   "ok": false,
+   "firstShortfallYear": 2070,
+   "netWorthAtHorizon": 0
   },
   {
    "age": 60,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 1191082.12
+   "netWorthAtHorizon": 574713.89
   },
   {
    "age": 61,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 2218032.82
+   "netWorthAtHorizon": 1555479.17
   },
   {
    "age": 62,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 3154315.23
+   "netWorthAtHorizon": 2457240.67
   },
   {
    "age": 63,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 4070820.95
+   "netWorthAtHorizon": 3357266.03
   },
   {
    "age": 64,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 4924892.24
+   "netWorthAtHorizon": 4177378.74
   },
   {
    "age": 65,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 5808426.06
+   "netWorthAtHorizon": 5014422.92
   },
   {
    "age": 66,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 6838426.92
+   "netWorthAtHorizon": 5980297.4
   },
   {
    "age": 67,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 7581978.26
+   "netWorthAtHorizon": 6669442.15
   },
   {
    "age": 68,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 8314363.21
+   "netWorthAtHorizon": 7356570.79
   },
   {
    "age": 69,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 9038265.17
+   "netWorthAtHorizon": 8032951.28
   },
   {
    "age": 70,
    "ok": true,
    "firstShortfallYear": null,
-   "netWorthAtHorizon": 9761429.78
+   "netWorthAtHorizon": 8691545.55
   }
  ]
 }

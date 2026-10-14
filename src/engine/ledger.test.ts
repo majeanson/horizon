@@ -101,7 +101,7 @@ describe('the QPP ceiling', () => {
   it('with wages growing as fast as prices the gap closes to what the enhanced plan alone adds', () => {
     const flat = agesLedger(young, { ...a, wageGrowth: a.inflation })[0]
     const grows = agesLedger(young, a)[0]
-    expect(flat.rrq.monthlyToday).toBeLessThan(grows.rrq.monthlyToday * 0.8)
+    expect(flat.rrq.monthlyToday).toBeLessThan(grows.rrq.monthlyToday * 0.85) // 0,6 point a year of real growth (Retraite Québec's 2024 valuation), over 38 years
     expect(flat.rrq.monthlyToday).toBeLessThan(flat.rrq.maxToday * 1.6)
   })
 

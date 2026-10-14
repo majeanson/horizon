@@ -91,7 +91,8 @@ describe('the projection — dated flows', () => {
     expect(row(taxable, 2045).persons.self!.otherIncome).toBeCloseTo(12000 * inflate(2045), 1)
     expect(row(free, 2045).persons.self!.otherIncome).toBeCloseTo(12000 * inflate(2045), 1)
     expect(row(taxable, 2044).persons.self!.otherIncome).toBeUndefined()
-    expect(row(taxable, 2045).household.tax).toBeGreaterThan(row(BASE, 2045).household.tax)
+    // Taxed: more tax than the same money untaxed. (Against the base it can go either way — the income replaces taxable RRSP draws.)
+    expect(row(taxable, 2045).household.tax).toBeGreaterThan(row(free, 2045).household.tax)
     // Tax-free money adds no tax of its own — and it covers part of the need, so less is taken out of the taxable RRSP: the tax can only fall.
     expect(row(free, 2045).household.tax).toBeLessThanOrEqual(row(BASE, 2045).household.tax + 0.01)
     expect(row(free, 2045).persons.self!.withdrawals.rrsp).toBeLessThanOrEqual(row(BASE, 2045).persons.self!.withdrawals.rrsp + 0.01)

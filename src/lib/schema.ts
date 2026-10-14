@@ -11,7 +11,7 @@ import { FACT_ID_PATTERN } from './facts.ts'
 //
 // `today` is NOT stored: it is read from the clock when a profile is used, so a saved profile never goes stale.
 
-export const SCHEMA_VERSION = 23
+export const SCHEMA_VERSION = 24
 
 /** The most a pension already in pay may be, per year, in today's dollars. NumberField bounds read this same figure. */
 export const MAX_IN_PAY_ANNUAL = 1_000_000
@@ -85,7 +85,7 @@ export const defaultProfile = (today: { year: number }): Profile => ({
   // on « Personnalisé » for figures nobody typed (the defaults used to be 2 / 3 / 5 / 5 / 4 %, matching no scenario).
   assumptions: {
     inflation: 0.021,
-    wageGrowth: 0.031,
+    wageGrowth: 0.027,
     returns: { nonReg: 0.04, rrsp: 0.045, tfsa: 0.045 },
     horizonAge: 95,
     survivorSpending: 0.7,

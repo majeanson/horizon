@@ -12,8 +12,8 @@ test('copies the answer, its dates and its assumptions as plain text', async ({ 
   await expect(page.getByText('Résumé copié.')).toBeVisible()
   const text = await page.evaluate(() => navigator.clipboard.readText())
   expect(text).toContain('Horizon — mon plan de retraite')
-  expect(text).toMatch(/Vous pouvez prendre votre retraite à.*59 ans/s)
-  expect(text).toContain('- Camille : en 2037 (59 ans)')
+  expect(text).toMatch(/Vous pouvez prendre votre retraite à.*60 ans/s)
+  expect(text).toContain('- Camille : en 2038 (60 ans)')
   expect(text).toMatch(/Inflation 2,1\s%/)
   expect(text).toContain('pas un conseil financier')
   // A caveat the card already carries is not said twice, and no button label leaks in.

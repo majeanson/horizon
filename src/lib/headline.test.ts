@@ -58,7 +58,7 @@ describe('when the headline also names the prudent scenario', () => {
     expect(presetOf(A)).toBe('neutral')
     const own = retireAt(H, A, { stopAtFirstOk: true }).earliestOk
     const prudent = retireAt(H, withPreset(A, 'prudent'), { stopAtFirstOk: true }).earliestOk
-    expect(own).toBe(59)
+    expect(own).toBe(60)
     expect(prudentDiffers(prudent, own)).toBe(true)
   })
 })

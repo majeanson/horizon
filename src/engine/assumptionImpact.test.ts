@@ -7,7 +7,7 @@ const FIELDS: readonly ImpactField[] = ['inflation', 'wageGrowth', 'returns', 'h
 describe('the impact of an assumption — where it sits against the three scenarios, and which way it leans', () => {
   it('the anchors are the prudent / neutral / bold values, ascending (returns: the mean of the three accounts)', () => {
     expect(impactAnchors('inflation')).toEqual([0.02, 0.021, 0.025])
-    expect(impactAnchors('wageGrowth')).toEqual([0.025, 0.031, 0.035])
+    expect(impactAnchors('wageGrowth')).toEqual([0.022, 0.027, 0.032])
     expect(impactAnchors('horizonAge')).toEqual([90, 95, 100])
     const [lo, mid, hi] = impactAnchors('returns')
     expect(lo).toBeCloseTo((0.03 + 0.03 + 0.025) / 3, 12)

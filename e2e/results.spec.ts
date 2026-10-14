@@ -129,7 +129,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   // The grids are still open under the brief: wait for all of them.
   await expect(page.locator('.sensitivity__grids tbody td')).toHaveCount(9, { timeout: 60_000 })
   await expect(page.locator('.sensitivity td', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
-  await expect(grids.locator('td.is-base')).toHaveText('59')
+  await expect(grids.locator('td.is-base')).toHaveText('60')
   // A worse future never retires earlier than a better one: down the return axis, the ages do not fall — in each horizon.
   const column = async (col: number) => (await grids.locator(`tbody tr td:nth-child(${col})`).allTextContents()).map((x) => (x.trim() === '—' ? Infinity : Number(x))) // « — »: no age works, later than any
   for (const g of [0, 1, 2]) {

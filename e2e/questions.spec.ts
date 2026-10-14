@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 
 test('the three answers: the verdict and stopping on the first view, saving and spending under « Décider »', async ({ page }) => {
   await page.goto('/resultats')
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
   await expect(page.locator('#epargner')).toHaveCount(0)
   await page.goto('/resultats?v=decide')
   // « Décider » shows the changes ranked, and each what-if as a closed fold until it is opened
@@ -45,8 +45,8 @@ test('« Quand arrêter de travailler ? » gives each person a year, and says wh
 })
 
 test('« Combien épargner ? » says nothing more at an age that already works, an amount before it, and « ne tient pas » far too early', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&age=59')
-  await expect(page.getByText('Rien de plus : à 59 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
+  await page.goto('/resultats?v=adjust&age=60')
+  await expect(page.getByText('Rien de plus : à 60 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
   await page.goto('/resultats?v=adjust&age=58')
   await expect(page.getByText(/de plus par année/)).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText(/Soit environ .* par mois/)).toBeVisible()
@@ -55,8 +55,8 @@ test('« Combien épargner ? » says nothing more at an age that already works, 
 })
 
 test('typing an age in « Combien épargner ? » recomputes the answer and keeps it in the address', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&age=59')
-  await expect(page.getByText('Rien de plus : à 59 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
+  await page.goto('/resultats?v=adjust&age=60')
+  await expect(page.getByText('Rien de plus : à 60 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
   const box = page.getByRole('textbox', { name: 'Partir à (âge)' })
   await box.fill('58')
   await box.press('Enter')
@@ -78,11 +78,11 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   await page.getByRole('button', { name: 'Et si je dépensais moins ?' }).first().click()
   await expect(page.locator('#depenser')).toBeInViewport()
   await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses. Glissez pour voir l’âge à un autre montant.')
-  await expect(page.locator('#depenser')).not.toContainText('dès 59 ans')
+  await expect(page.locator('#depenser')).not.toContainText('dès 60 ans')
   // A lower amount from the address: an earlier age, said against the profile's own.
   await page.goto('/resultats?v=adjust&spend=70000')
   await expect(page.locator('#depenser')).toContainText('À 70 000 $ par année : dès 56 ans.', { timeout: 30_000 })
-  await expect(page.locator('#depenser')).toContainText('3 ans plus tôt qu’avec les 90 000 $ de vos hypothèses.')
+  await expect(page.locator('#depenser')).toContainText('4 ans plus tôt qu’avec les 90 000 $ de vos hypothèses.')
   // The slider's step button is one exact step, kept in the address.
   await page.getByRole('button', { name: 'Moins : Dépenses à la retraite' }).click()
   await expect(page).toHaveURL(/spend=69500/)

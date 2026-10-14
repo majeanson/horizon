@@ -134,6 +134,9 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
   (profile) => profile,
   // v22 → v23: a dated flow can say it is still an ESTIMATE (`household.flows[].estimate`: the starting point it came from). Every older flow was the person's own figure: the field is absent.
   (profile) => profile,
+  // v23 → v24: nothing in the SHAPE changed. The blank profile's default wage growth became the Neutre scenario's new figure (2,7 %, Retraite Québec's 2024 valuation, was
+  // 3,1 %); a saved file keeps the figures it has — the step is the identity, and the version exists so the ceremony records the change where every other one is.
+  (profile) => profile,
 ]
 
 export type ReadResult =

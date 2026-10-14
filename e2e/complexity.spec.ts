@@ -33,7 +33,9 @@ const BUDGETS: Record<string, Budget> = {
   'Hypothèses': { controls: 66, words: 659 },
   'Fiche': { controls: 28, words: 382 },
   'Résultats — Réponse': { controls: 47, words: 670 },
-  'Résultats — Décider': { controls: 50, words: 1211 },
+  'Résultats — Décider': { controls: 50, words: 1217 },
+  // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
+  // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
   // for the pending « … » cells, and the final page holds the prudent-gap line with its « Voir la sensibilité » chip.
   'Résultats — Preuve': { controls: 44, words: 1887 },

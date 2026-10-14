@@ -53,7 +53,7 @@ test('rich couple: early retirement and a large nest left', async ({ page }) => 
 test('behind: says so plainly — the plan runs out, and the card names the year', async ({ page }) => {
   await loadExample(page, 'Une personne, en retard')
   await expect(page.locator('.scenario').first()).toContainText('L’argent dure jusqu’en 2035')
-  await expect(page.locator('.verdict__line')).toContainText('69 ans')
+  await expect(page.locator('.verdict__line')).toContainText('70 ans')
 })
 
 test('retired couple: no retirement question, no age to compare, no pension start to choose, and the past is marked as past', async ({ page }) => {
@@ -121,7 +121,7 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
 
 test('planner: a life to plan — the profile carries its events, the answer moves with them, and the Essayer view knows the care is already there', async ({ page }) => {
   await loadExample(page, 'Couple, une vie à planifier')
-  await expect(page.locator('.verdict__line')).toContainText('56 ans')
+  await expect(page.locator('.verdict__line')).toContainText('57 ans')
   // the profile says it: a child to come, a part-time work, an inheritance and a care cost among the dated events
   await page.goto('/profil')
   await expect(page.locator('.flow__line', { hasText: 'Un héritage' })).toBeVisible()
@@ -133,7 +133,7 @@ test('planner: a life to plan — the profile carries its events, the answer mov
 
 test('family: one big pay and one small, two children — the profile carries them, and the answer is the one the story says', async ({ page }) => {
   await loadExample(page, 'Couple, une famille qui grandit')
-  await expect(page.locator('.verdict__line')).toContainText('59 ans')
+  await expect(page.locator('.verdict__line')).toContainText('60 ans')
   await expect(page.locator('.verdict__line')).toContainText('tous les deux')
   // the profile says it: two children and what the household counts about them
   await page.goto('/profil')

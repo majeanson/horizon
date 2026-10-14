@@ -8,7 +8,7 @@ test.describe('the live answer', () => {
     await seedProfile(page)
     await page.goto('/profil?form=1')
     const strip = page.getByRole('status').filter({ hasText: 'Votre réponse' })
-    await expect(strip).toContainText('59 ans', { timeout: 30_000 })
+    await expect(strip).toContainText('60 ans', { timeout: 30_000 })
     await expect(strip).not.toContainText('qu’à votre arrivée')
 
     const spend = page.getByRole('textbox', { name: 'Dépenses par année, une fois tout le monde à la retraite', exact: true })

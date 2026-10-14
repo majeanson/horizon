@@ -200,7 +200,7 @@ test.describe('the example household', () => {
   test('the results page gives a verdict, four comparisons at most, and the year-by-year table', async ({ page }) => {
     const problems = watchConsole(page)
     await page.goto('/resultats')
-    await expect(page.getByText('Vous pouvez prendre votre retraite à 59 ans, tous les deux.')).toBeVisible()
+    await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
     // The verdict says what it is, on the card itself: an estimate under assumptions, not advice.
     await expect(page.locator('.verdict').getByText('Selon ces hypothèses — une estimation, pas un conseil financier.')).toBeVisible()
     // It opens on the household's OWN plan beside 65 — not on a pair the profile never mentioned.
@@ -438,7 +438,7 @@ test('the scenario picker sets the economy, follows a hand edit, and the desktop
   const picker = page.getByRole('tablist', { name: 'Choisir un scénario' })
   await picker.getByRole('tab', { name: 'Prudent' }).click()
   await expect(picker.getByRole('tab', { name: 'Prudent' })).toHaveAttribute('aria-selected', 'true')
-  await expect.poll(async () => (await savedProfile(page)).assumptions).toMatchObject({ inflation: 0.025, wageGrowth: 0.025, horizonAge: 100, returns: { rrsp: 0.03, tfsa: 0.03, nonReg: 0.025 } })
+  await expect.poll(async () => (await savedProfile(page)).assumptions).toMatchObject({ inflation: 0.025, wageGrowth: 0.022, horizonAge: 100, returns: { rrsp: 0.03, tfsa: 0.03, nonReg: 0.025 } })
 
   const rrsp = page.getByRole('textbox', { name: 'REER' })
   await rrsp.fill('7')

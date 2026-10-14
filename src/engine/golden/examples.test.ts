@@ -195,11 +195,11 @@ describe('each story', () => {
     const earliest = (events: Partial<Parameters<typeof plannerHousehold>[0]>) =>
       retireAt(plannerHousehold({ child: true, care: true, heritage: true, partTime: true, ...events }), assumptions, { stopAtFirstOk: true }).earliestOk!
     const all = earliest({})
-    expect(all).toBe(56)
+    expect(all).toBe(57)
     // a child still to come adds its cost (and the state's benefits take some back): without it they could stop two years sooner
-    expect(earliest({ child: false })).toBe(54)
+    expect(earliest({ child: false })).toBe(55)
     // the care of the last years is paid decades before it is spent: without it, two years sooner as well
-    expect(earliest({ care: false })).toBe(54)
+    expect(earliest({ care: false })).toBe(55)
     // an inheritance and part-time work each help: take either away and the earliest age is the same or later, never sooner
     expect(earliest({ heritage: false })).toBeGreaterThanOrEqual(all)
     expect(earliest({ partTime: false })).toBeGreaterThanOrEqual(all)
@@ -222,11 +222,11 @@ describe('each story', () => {
     const earliest = (events: Partial<Parameters<typeof familyHousehold>[0]>) =>
       retireAt(familyHousehold({ kids: true, benefits: true, exclusion: true, ...events }), assumptions, { stopAtFirstOk: true }).earliestOk!
     const all = earliest({})
-    expect(all).toBe(59)
+    expect(all).toBe(60)
     // two children: the cost of raising them, net of what the state pays — without them, two years sooner
-    expect(earliest({ kids: false, benefits: false, exclusion: false })).toBe(57)
+    expect(earliest({ kids: false, benefits: false, exclusion: false })).toBe(58)
     // the Canada Child Benefit and Allocation famille: without them, a year later
-    expect(earliest({ benefits: false })).toBe(60)
+    expect(earliest({ benefits: false })).toBe(61)
     const worth = (events: Partial<Parameters<typeof familyHousehold>[0]>) => planGlance(familyHousehold({ kids: true, benefits: true, exclusion: true, ...events }), assumptions).netWorthEnd
     expect(worth({})).toBeGreaterThan(worth({ benefits: false }) + 100_000)
     // the year at home with a child under 7 and no earnings is not counted against her: a higher QPP than with it counted
