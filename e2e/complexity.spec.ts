@@ -19,6 +19,8 @@ type Budget = { controls: number; words: number }
 // Résultats — Réponse raised 43 → 46 controls and 639 → 668 words (2026-10-13): the « Moments » row under the projection chart — a chip per notable year
 // (the pension starts, the end of the plan; the golden couple has three), each a door to the section that explains it. A conscious trade: the chart's moments
 // were only dashed lines to guess at; the chips are the keyboard / screen-reader path that the taps on the chart mirror.
+// Résultats — Réponse raised again 46 → 47 controls and 668 → 670 words (2026-10-13): the « Visite guidée » chip beside the answer card's « Et si je dépensais moins ? » — the one door to the
+// four-step walk through the reader's own answer. The tour's bar itself exists only with `?visite=` set, which this route never sets.
 // Résultats — Preuve, 2026-10-13 (idea 3, the Figure): controls 37 → 43 — the four Figure buttons on the golden couple's two pension rows (QPP and OAS, one each
 // per person), the two EstFlag links on the spending rows, and one glossary link another session added to the average-rate sentence. Words 1959 → 1859 (the
 // ratchet FALLS): the old calculation lines under the pensions folded into the figures' notes, which are hidden until asked for — one home per figure.
@@ -30,7 +32,7 @@ const BUDGETS: Record<string, Budget> = {
   'Profil (form)': { controls: 322, words: 2018 },
   'Hypothèses': { controls: 66, words: 659 },
   'Fiche': { controls: 28, words: 382 },
-  'Résultats — Réponse': { controls: 46, words: 668 },
+  'Résultats — Réponse': { controls: 47, words: 670 },
   'Résultats — Décider': { controls: 50, words: 1211 },
   'Résultats — Preuve': { controls: 43, words: 1859 },
 }

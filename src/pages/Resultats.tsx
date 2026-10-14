@@ -15,6 +15,8 @@ import { useResultsPage } from '../lib/useResultsPage'
 // The two other views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
 const DecideView = lazy(() => import('../components/results/views/DecideView').then((m) => ({ default: m.DecideView })))
 const ProofView = lazy(() => import('../components/results/views/ProofView').then((m) => ({ default: m.ProofView })))
+// The guided tour's bar only exists while `?visite=` is set: nobody who did not ask for it pays for its chunk.
+const TourBar = lazy(() => import('../components/results/TourBar').then((m) => ({ default: m.TourBar })))
 
 // The answer. It comes FIRST on the page — one sentence, the age drawn large, in dates — then what the same answer looks
 // like under the three scenarios and a hard market, what would move it most, what would make it more precise, and the
@@ -99,6 +101,11 @@ export function Resultats() {
       <NextStep to="/hypotheses" label={t.next.adjustAssumptions}>
         <p>{t.next.resultsHint}</p>
       </NextStep>
+      {m.tour > 0 && (
+        <Suspense fallback={null}>
+          <TourBar m={m} />
+        </Suspense>
+      )}
         </>
       )}
     </section>

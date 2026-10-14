@@ -50,6 +50,7 @@ const KEYS: Record<string, string> = {
   table: 'Résultats › Preuve › Détail année par année: which retirement age’s table is shown (the compared ages). Unknown falls back to the first.',
   horizon: 'Résultats › Preuve › Solidité › Grilles: which plan horizon’s 3 × 3 grid is shown. Unknown falls back to the plan’s own.',
   debut: 'Profil (first visit): « rapide » opens the quick question path (who · birth · income · savings · spending; its last screen calls the departure age an assumption). Any other value, or no key, is the full path.',
+  visite: 'Résultats › Réponse: the step (1 to 4) of the guided tour over the reader’s own answer; the key IS the tour being on. Unknown, 0 or absent is no tour (an unreadable value is dropped from the address); so is a household that has stopped working or whose answer is « none » — the key is dropped once the answer is known.',
   fact: 'Profil: one figure’s id (« self:rrspBalance »): scroll to its field and light it once, then drop the key from the address. An unknown id scrolls nowhere.',
 }
 

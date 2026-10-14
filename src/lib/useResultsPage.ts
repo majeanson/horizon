@@ -43,6 +43,9 @@ import { today } from './today'
 
 export type View = 'answer' | 'decide' | 'proof'
 
+/** The steps of the guided tour (`?visite=`). */
+export const TOUR_STEPS = 4
+
 /** The addresses of the days when the results had four views: each lands on the view that holds its content now. */
 const LEGACY_VIEW: Readonly<Record<string, View>> = { adjust: 'decide', strategies: 'decide', future: 'decide', verify: 'proof' }
 
@@ -312,6 +315,27 @@ export function useResultsPage() {
     ...(profile.household.spending.workingToday <= 0 && !retiredNow ? (['spendingWork'] as const) : []),
   ]
 
+  // The answer's range while figures are estimates, replacing the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
+  // ONE home: the answer card words it, and the guided tour (components/results/TourBar.tsx) says the same numbers.
+  const impactRange = impact?.range
+  const showRange = !!impactRange && impactRange.low !== null && impactRange.low !== impactRange.high && !retiredNow && !retiredGlance && (headline.kind === 'at' || headline.kind === 'now') && accuracy.confirmed < accuracy.total
+  const confidenceRange = showRange ? { low: impactRange.low!, high: impactRange.high } : null
+
+  // THE GUIDED TOUR (`?visite=1..4`): four steps over THIS reader's own answer, each scrolling to a section of the answer view. The address keeps the step, so a reload resumes it
+  // and a link shares it; any other value is no tour. It is offered only on a real answer ('at' / 'now') for a household still working: several steps speak of departure ages, and
+  // a household that has already stopped (retiredNow) or whose money never lasts (« none ») has no age to walk through. Nothing opens it by itself.
+  const tourRaw = params.get('visite')
+  const tourStep = tourRaw !== null && /^[1-4]$/.test(tourRaw) ? Number(tourRaw) : 0
+  const tourAvailable = answered && !retiredNow && headline.kind !== 'none'
+  const tour = tourAvailable ? tourStep : 0
+  const setTour = (step: number) => setParam('visite', step >= 1 && step <= TOUR_STEPS ? String(step) : null)
+  // The section each step lands on. « Préciser » exists only while something is left to say there; without it the confidence line on the answer card is the step's home.
+  const tourTarget = (step: number): string => (step === 1 ? 'verdict' : step === 2 ? 'ligne' : step === 3 ? 'comparer' : refine.length > 0 || movers.length > 0 ? 'preciser' : 'verdict')
+  // An unreadable step is dropped from the address at once; a tour that cannot apply (the answer arrived and it is « none », or everyone has stopped) is dropped once the answer is known.
+  useEffect(() => {
+    if (tourRaw !== null && (tourStep === 0 || (answered && !tourAvailable))) setParam('visite', null)
+  }, [tourRaw, tourStep, answered, tourAvailable, setParam])
+
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
@@ -419,6 +443,10 @@ export function useResultsPage() {
     gc,
     factName,
     movers,
+    confidenceRange,
+    tour,
+    setTour,
+    tourTarget,
     pathName,
     bestLever,
     prudentGap,

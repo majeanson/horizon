@@ -17,6 +17,7 @@ import { NUDGE } from '../../../engine/factImpact'
 import { agesLedger } from '../../../engine/ledger'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
+import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
@@ -26,7 +27,7 @@ const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m
 
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AnswerView({ m }: { m: ResultsModel }) {
-  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
+  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, confidenceRange, setTour, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
   // Three ways of comparing, one on screen at a time: departure ages (the chips, the cards, the chart), each person's own earliest age (a couple) and the saved plans (when there are some).
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
@@ -34,12 +35,10 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   // While figures are estimates, the computed range replaces the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
   // When each pension starts, for the chart's moments (from the settled profile, like the runs it sits beside).
   const ledger = useMemo(() => agesLedger(slow.household, slowAssumptions), [slow, slowAssumptions])
-  const range = impact?.range
-  const showRange = !!range && range.low !== null && range.low !== range.high && !retiredNow && !retiredGlance && (headline.kind === 'at' || headline.kind === 'now') && accuracy.confirmed < accuracy.total
-  const confidenceText = showRange
-    ? range.high === null
-      ? rc.headline.confidenceRangeOpen(range.low!, MAX_AGE, accuracy.confirmed, accuracy.total)
-      : rc.headline.confidenceRange(range.low!, range.high, accuracy.confirmed, accuracy.total)
+  const confidenceText = confidenceRange
+    ? confidenceRange.high === null
+      ? rc.headline.confidenceRangeOpen(confidenceRange.low, MAX_AGE, accuracy.confirmed, accuracy.total)
+      : rc.headline.confidenceRange(confidenceRange.low, confidenceRange.high, accuracy.confirmed, accuracy.total)
     : accuracy.confirmed === accuracy.total
       ? rc.headline.confidenceAll
       : rc.headline.confidence(accuracy.confirmed, accuracy.total)
@@ -114,6 +113,9 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}
                   <Cluster>
                     <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'depenser')}>{rc.headline.trySpend}</Chip>
+                    {/* The guided tour has ONE home: here, beside the card's other door. It walks the departure ages, so a household that has already stopped working is not offered it
+                        (this branch is the working household with a real answer; the tour's own availability, `tour`, lives in the model). */}
+                    {!retiredNow && <Chip icon="arrow-right-bold" onClick={() => setTour(1)}>{TOUR_COPY[lang].open}</Chip>}
                   </Cluster>
                 </>
               )}

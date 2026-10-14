@@ -14,7 +14,7 @@ export function TimelineStrip({ household, names, todayYear, horizonAge }: { hou
   const people = timelineOf(household, todayYear, horizonAge)
   const markText = (kind: MarkKind, age: number) => (kind === 'retire' ? c.retire(age) : kind === 'rrq' ? c.rrq(age) : c.oas(age))
   return (
-    <figure className="timeline surface">
+    <figure id="ligne" className="timeline surface">
       <figcaption className="timeline__title">{c.title}</figcaption>
       {people.map((t, i) => {
         const span = t.endAge - t.nowAge
