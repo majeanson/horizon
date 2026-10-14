@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { EXAMPLES } from './golden/examples.ts'
-import { PAYMENTS_PER_YEAR, amortizeYear, homeYear, initialHome, levelPayment, monthlyRate, monthsToPayoff, payoffMonths, payoffYear, termsAtRenewal } from './home.ts'
+import { PAYMENTS_PER_YEAR, amortizeYear, homeYear, initialHome, levelPayment, lumpSum, monthlyRate, monthsToPayoff, payoffMonths, payoffRun, payoffYear, termsAtRenewal } from './home.ts'
 import { project } from './projection.ts'
 import { retireAt } from './retireAt.ts'
 import type { Home } from './types.ts'
@@ -231,5 +231,55 @@ describe('what the terms become at a renewal', () => {
     expect(at.balance).toBeLessThan(266_000)
     const oldDate = monthsToPayoff(266_000, 0.0389, 1_761.11)!
     expect(monthsToPayoff(at.balance, 0.055, at.payment)! + 36).toBeCloseTo(oldDate, 0)
+  })
+})
+
+describe('a lump sum on the balance: the date the loan ends and the interest it saves', () => {
+  const payment = levelPayment(300_000, 0.05, 300) // pays 300 000 $ at 5 % off in exactly 300 months
+  const mortgage = (balance = 300_000, monthlyPayment = payment): Home['mortgage'] => ({ balance, rate: 0.05, monthlyPayment })
+
+  it('the interest of a loan is what it costs over its payments: the closed form, payment × months less the balance', () => {
+    const run = payoffRun(mortgage(), 2026)
+    expect(run.months).toBe(300)
+    expect(run.interest).toBeCloseTo(payment * 300 - 300_000, -1) // to the ten dollars: the last payment is a few cents short
+  })
+
+  it('payoffMonths is the same run read for its months only', () => {
+    for (const m of [mortgage(), mortgage(120_000, 2_000), { ...mortgage(), renewal: { year: 2030, rate: 0.065, keep: 'payment' as const } }]) expect(payoffMonths(m, 2026)).toBe(payoffRun(m, 2026).months)
+  })
+
+  it('a lump sum ends the loan sooner and saves interest, and a bigger one saves more', () => {
+    const small = lumpSum(mortgage(), 25_000, 2026)!
+    const big = lumpSum(mortgage(), 100_000, 2026)!
+    expect(small.months.without).toBe(300)
+    expect(small.months.with).toBeLessThan(300)
+    expect(small.interest.with).toBeLessThan(small.interest.without)
+    expect(big.months.with).toBeLessThan(small.months.with)
+    expect(big.interest.without - big.interest.with).toBeGreaterThan(small.interest.without - small.interest.with)
+  })
+
+  it('is the run of the loan with that much less owed — nothing else moves', () => {
+    const l = lumpSum(mortgage(), 40_000, 2026)!
+    const direct = payoffRun(mortgage(260_000), 2026)
+    expect(l.months.with).toBe(direct.months)
+    expect(l.interest.with).toBeCloseTo(direct.interest, 6)
+  })
+
+  it('a lump sum that clears the balance ends it at once and saves every cent of interest', () => {
+    const l = lumpSum(mortgage(), 400_000, 2026)!
+    expect(l.months.with).toBe(0)
+    expect(l.interest.with).toBe(0)
+    expect(l.interest.without).toBeGreaterThan(0)
+  })
+
+  it('has nothing to compare without a lump sum, without a balance, or when the loan is never paid off as it stands', () => {
+    expect(lumpSum(mortgage(), 0, 2026)).toBeNull()
+    expect(lumpSum(mortgage(), -5, 2026)).toBeNull()
+    expect(lumpSum(mortgage(0), 10_000, 2026)).toBeNull()
+    expect(lumpSum(mortgage(300_000, 500), 10_000, 2026)).toBeNull() // 500 $ a month does not cover the interest
+    // …even when the lump sum would bring a payoff date: there is no date « without » to set it against.
+    expect(payoffMonths(mortgage(300_000, 1_200), 2026)).toBeNull()
+    expect(payoffMonths(mortgage(200_000, 1_200), 2026)).not.toBeNull()
+    expect(lumpSum(mortgage(300_000, 1_200), 100_000, 2026)).toBeNull()
   })
 })

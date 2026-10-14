@@ -10,6 +10,7 @@ import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { Cluster } from '../Layout'
 import { NumberField } from '../NumberField'
+import { LumpSumWhatIf } from './LumpSumWhatIf'
 
 // How the mortgage's PAYMENT is counted, and a RENEWAL. The payment is typed in the unit the statement uses (every 2 weeks, say) and kept as its monthly
 // equivalent — the calculation only ever sees that; the frequency is the screen's. A renewal is optional: a new rate from a year, and whether the
@@ -77,6 +78,7 @@ export function MortgageTerms({ home, label }: { home: Home; /** The row label o
           {effect !== null && <p className="field-row__hint">{effect}</p>}
         </>
       )}
+      <LumpSumWhatIf home={home} />
     </>
   )
 }

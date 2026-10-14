@@ -64,3 +64,32 @@ test('English', async ({ page }) => {
   await expect(box(page, 'Payment every 2 weeks')).toBeVisible()
   await expect(page.getByRole('button', { name: 'The rate will be renegotiated when the term ends' })).toBeVisible()
 })
+
+test('a lump sum on the balance: the date the loan ends sooner and the interest saved — nothing saved until it is applied, and then the balance drops', async ({ page }) => {
+  await seedProfile(page, withHome())
+  await page.goto('/profil?form=1')
+  const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })
+  const sheet = section.locator('details.fold', { hasText: 'Et si je remboursais un montant d’un coup' })
+  await sheet.locator('summary').click()
+  await expect(sheet.getByRole('status')).toHaveCount(0) // nothing typed, nothing said
+  const lump = sheet.getByRole('textbox', { name: 'Montant remboursé sur le solde' })
+  await lump.fill('25000')
+  await lump.press('Enter')
+  await expect(sheet.getByRole('status')).toContainText(/Le prêt serait payé en 20\d\d au lieu de 20\d\d \(\d+ ans? plus tôt\), avec environ .*\$ d’intérêts de moins\./)
+  expect((await savedProfile(page)).household.home.mortgage.balance).toBe(266_000) // a worksheet
+  await sheet.getByRole('button', { name: 'Appliquer à mon solde' }).click()
+  await expect.poll(async () => (await savedProfile(page)).household.home.mortgage.balance).toBe(241_000)
+  await expect(lump).toHaveValue('') // the worksheet is emptied
+  await expect(sheet.getByRole('status')).toHaveCount(0)
+})
+
+test('a lump sum that pays the whole balance says so', async ({ page }) => {
+  await seedProfile(page, withHome())
+  await page.goto('/profil?form=1')
+  const sheet = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) }).locator('details.fold', { hasText: 'Et si je remboursais un montant d’un coup' })
+  await sheet.locator('summary').click()
+  const lump = sheet.getByRole('textbox', { name: 'Montant remboursé sur le solde' })
+  await lump.fill('300000')
+  await lump.press('Enter')
+  await expect(sheet.getByRole('status')).toContainText(/Ce montant paie le solde en entier\s*:\s*environ .*\$ d’intérêts de moins\./)
+})

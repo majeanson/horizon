@@ -20,6 +20,21 @@ interface HomeCopy {
     effectNever: string
     effectNone: string
   }
+  /** « Et si je remboursais un montant d'un coup ? » — what a lump sum on the balance does. */
+  lump: {
+    summary: string
+    amount: string
+    amountHint: string
+    /** The loan is paid off in the first year instead of the second, `sooner` earlier, with `interest` less paid. */
+    effect: (withYear: string, withoutYear: string, sooner: string, interest: string) => string
+    /** Same year of payoff, less interest. */
+    sameYear: (year: string, interest: string) => string
+    /** The lump sum clears the balance. */
+    clears: (interest: string) => string
+    sooner: (years: number) => string
+    apply: string
+    applyHint: string
+  }
   nudge: string
 }
 
@@ -41,6 +56,17 @@ const FR: HomeCopy = {
     effectNever: 'À ce taux, votre paiement ne couvre plus les intérêts : le prêt ne se rembourse jamais.',
     effectNone: 'Le prêt est payé avant ce renouvellement.',
   },
+  lump: {
+    summary: 'Et si je remboursais un montant d’un coup ?',
+    amount: 'Montant remboursé sur le solde',
+    amountHint: 'Le paiement et le taux restent les mêmes : le prêt se termine plus tôt. Rien n’est enregistré tant que vous n’appliquez pas.',
+    effect: (withYear, withoutYear, sooner, interest) => `Le prêt serait payé en ${withYear} au lieu de ${withoutYear} (${sooner}), avec environ ${interest} d’intérêts de moins.`,
+    sameYear: (year, interest) => `Le prêt reste payé en ${year}, avec environ ${interest} d’intérêts de moins.`,
+    clears: (interest) => `Ce montant paie le solde en entier : environ ${interest} d’intérêts de moins.`,
+    sooner: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tôt`,
+    apply: 'Appliquer à mon solde',
+    applyHint: 'À faire une fois le remboursement fait : le solde baisse de ce montant.',
+  },
   nudge: 'Les taxes foncières, l’assurance habitation et l’entretien ne sont pas comptés ici : mettez-les dans vos dépenses (Budget).',
 }
 
@@ -61,6 +87,17 @@ const EN: HomeCopy = {
     effectPayoff: (now, was) => (now === was ? `The loan is still paid off in ${now}.` : `The loan would be paid off in ${now}, instead of ${was} without a renewal.`),
     effectNever: 'At that rate your payment no longer covers the interest: the loan is never paid off.',
     effectNone: 'The loan is paid off before this renewal.',
+  },
+  lump: {
+    summary: 'What if I paid a lump sum on the balance?',
+    amount: 'Amount paid on the balance',
+    amountHint: 'The payment and the rate stay the same: the loan ends sooner. Nothing is saved until you apply it.',
+    effect: (withYear, withoutYear, sooner, interest) => `The loan would be paid off in ${withYear} instead of ${withoutYear} (${sooner}), with about ${interest} less interest.`,
+    sameYear: (year, interest) => `The loan is still paid off in ${year}, with about ${interest} less interest.`,
+    clears: (interest) => `That amount pays the whole balance: about ${interest} less interest.`,
+    sooner: (years) => `${years} ${years === 1 ? 'year' : 'years'} sooner`,
+    apply: 'Apply to my balance',
+    applyHint: 'Do this once the payment is made: the balance drops by this amount.',
   },
   nudge: 'Property tax, home insurance and upkeep are not counted here: put them in your spending (Budget).',
 }

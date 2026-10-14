@@ -96,19 +96,44 @@ export function monthsToPayoff(balance: number, annualRate: number, monthlyPayme
  * the renewal). The same month-by-month arithmetic the projection runs a year at a time, so the date shown and the plan's table agree.
  */
 export function payoffMonths(mortgage: Home['mortgage'], fromYear: number): number | null {
-  if (mortgage.balance <= 0.005) return 0
+  return payoffRun(mortgage, fromYear).months
+}
+
+/** The same run as `payoffMonths`, with the interest paid on the way (nothing meaningful when the mortgage is never paid off: `months` is then null). */
+export function payoffRun(mortgage: Home['mortgage'], fromYear: number): { months: number | null; interest: number } {
+  if (mortgage.balance <= 0.005) return { months: 0, interest: 0 }
   let owed = mortgage.balance
   let rate = mortgage.rate
   let payment = mortgage.monthlyPayment
+  let interest = 0
   const renewal = mortgage.renewal ?? null
   for (let month = 0; month < 600; month++) {
     if (renewal !== null && month % 12 === 0 && fromYear + month / 12 === renewal.year) ({ rate, payment } = renewed(owed, rate, payment, renewal))
     const i = monthlyRate(rate)
-    if (payment <= owed * i + 1e-9) return null
+    if (payment <= owed * i + 1e-9) return { months: null, interest }
+    interest += owed * i
     owed = owed * (1 + i) - Math.min(payment, owed * (1 + i))
-    if (owed <= 0.005) return month + 1
+    if (owed <= 0.005) return { months: month + 1, interest }
   }
-  return null
+  return { months: null, interest }
+}
+
+/** What a lump sum paid on the balance now does, the payment and the rate staying as they are. */
+export interface LumpSum {
+  /** Months to pay off, without and with the lump sum (0 when it clears the balance). */
+  months: { without: number; with: number }
+  /** The interest paid over the rest of the loan, without and with it. */
+  interest: { without: number; with: number }
+}
+
+/** The comparison, or null when there is nothing to compare: no lump sum, no balance, or a loan that is never paid off as it stands. */
+export function lumpSum(mortgage: Home['mortgage'], lump: number, fromYear: number): LumpSum | null {
+  if (!(lump > 0) || mortgage.balance <= 0.005) return null
+  const without = payoffRun(mortgage, fromYear)
+  if (without.months === null) return null
+  const after = payoffRun({ ...mortgage, balance: Math.max(0, mortgage.balance - lump) }, fromYear)
+  if (after.months === null) return null
+  return { months: { without: without.months, with: after.months }, interest: { without: without.interest, with: after.interest } }
 }
 
 /**
