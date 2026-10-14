@@ -1726,3 +1726,21 @@
   transform: none;
   pointer-events: auto;
 }
+
+/* « Estimé » beside a figure restated outside the Profil (components/EstFlag.tsx): a dotted underline in the estimate's own tint (the dashed
+   circle of .fact-btn), distinct from .gloss, which is the text colour. Colour is never the only cue: the word is there. Tokens follow the theme. */
+.est {
+  margin-inline-start: 0.35em;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: underline dotted var(--marigold-deep);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  white-space: nowrap;
+}
+.est:hover,
+.est:focus-visible {
+  color: var(--ink);
+  text-decoration-style: solid;
+}

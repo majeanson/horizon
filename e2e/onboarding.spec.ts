@@ -429,3 +429,34 @@ test('a figure typed on the path is confirmed; the « Estimer » figure is an es
   await fill(page, 'Dépenses par année', '48000')
   await expect.poll(async () => (await savedProfile(page)).confirmed.sort()).toEqual(['household:spendingRetired', 'household:spendingWorking', 'self:salary'])
 })
+
+// « SI VOUS SAUTEZ »: under a question's why, one line says what is assumed if the screen is left as it is — only while its value is still the default.
+test('the savings screen says what a skip assumes while it is empty, and the line goes once a figure is typed; birth and income never carry one', async ({ page }) => {
+  const skip = page.getByText('Sans chiffre, on suppose 0 $ — votre réponse sera prudente.')
+  await toSituation(page)
+  await expect(skip).toHaveCount(0) // « Ma situation »: nothing to assume
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien gagnez-vous par année ?')
+  await expect(page.getByText(/on suppose|sera prudente/)).toHaveCount(0) // income is a gap, not an assumption
+  await fill(page, 'Revenu de travail par année', '80000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Que contiennent vos comptes d’épargne ?')
+  await expect(skip).toBeVisible()
+  await box(page, 'REER (épargne-retraite)').fill('85000')
+  await box(page, 'REER (épargne-retraite)').blur()
+  await expect(skip).toHaveCount(0)
+  await box(page, 'REER (épargne-retraite)').fill('')
+  await box(page, 'REER (épargne-retraite)').blur()
+  await expect(skip).toBeVisible() // back to the default: the line is back (derived, never stored)
+})
+
+test('the spending screen says that no figure means no answer yet', async ({ page }) => {
+  await toSituation(page)
+  await next(page)
+  await fill(page, 'Revenu de travail par année', '80000')
+  await next(page)
+  await next(page)
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Combien dépensez-vous par année ?')
+  await expect(page.getByText(/Sans chiffre, il n’y a pas encore de réponse/)).toBeVisible()
+  await fill(page, 'Dépenses par année', '50000')
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('C’est assez pour une première réponse')
+})

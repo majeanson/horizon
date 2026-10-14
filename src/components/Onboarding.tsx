@@ -195,6 +195,10 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
   let body: ReactNode = null
   let question = ''
   let why = ''
+  // What is assumed if this screen is left as it is — said only while its value IS still the default (derived from the stored profile, never kept).
+  let skipped = ''
+  const emptySavings = (id: PersonId) => (['rrsp', 'tfsa', 'nonReg'] as const).every((kind) => personOf(id).accounts[kind].balance === 0)
+  const noPlan = (id: PersonId) => !personOf(id).pensions.some((p) => isRregopRules(p) && !p.inPay) && !otherPlan[id]
   switch (step) {
     case 'who':
       question = c.who.q
@@ -249,21 +253,25 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
     case 'savings':
       question = c.savings.q
       why = c.savings.why
+      if (emptySavings('self')) skipped = c.ifSkipped.savings
       body = savingsFields('self')
       break
     case 'spouseSavings':
       question = c.spouseSavings.q
       why = c.spouseSavings.why
+      if (emptySavings('spouse')) skipped = c.ifSkipped.savings
       body = savingsFields('spouse')
       break
     case 'pension':
       question = c.pension.q
       why = c.pension.why
+      if (noPlan('self')) skipped = c.ifSkipped.pension
       body = pensionFields('self')
       break
     case 'spousePension':
       question = c.pension.spouseQ
       why = c.pension.why
+      if (noPlan('spouse')) skipped = c.ifSkipped.pension
       body = pensionFields('spouse')
       break
     case 'retire':
@@ -282,6 +290,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
     case 'spending':
       question = c.spending.q
       why = c.spending.why
+      if (profile.household.spending.retiredToday <= 0) skipped = grossIncome > 0 ? c.ifSkipped.spendingEstimate : c.ifSkipped.spending
       body = (
         <>
           <FieldRow label={c.spending.label} infoId="spendingRetired">
@@ -319,6 +328,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
     case 'home':
       question = c.home.q
       why = c.home.why
+      if (home === null) skipped = c.ifSkipped.home
       body = (
         <>
           <Cluster role="group" aria-label={c.home.q}>
@@ -405,6 +415,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
         {question}
       </h2>
       <p className="onboard__why">{why}</p>
+      {skipped && <p className="field-row__hint">{skipped}</p>}
       <div className="onboard__body" onKeyUp={onKeyUp}>
         {body}
       </div>

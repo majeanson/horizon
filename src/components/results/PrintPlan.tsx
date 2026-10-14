@@ -3,6 +3,7 @@ import { worthAtHorizon } from '../../lib/resultsModel'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { FirmPrint } from './views/FirmSection'
 import { TimelineStrip } from './TimelineStrip'
+import { EstFlag } from '../EstFlag'
 import { formatPct, formatYearAge } from '../../lib/format'
 
 // THE PRINTED PLAN — one short page (two at most), the same whichever view is open: what the household asked, what the answer is, in dates, what it can spend, the assumptions it stands on, the
@@ -61,7 +62,7 @@ export function PrintPlan({ m }: { m: ResultsModel }) {
         )}
         {headline.age !== null && !retiredNow && comfort !== undefined && (
           <p>
-            {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
+            {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note} <EstFlag fact="household:spendingRetired" />
           </p>
         )}
       </section>

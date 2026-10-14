@@ -33,6 +33,15 @@ describe('the first-visit copy', () => {
     expect(fr.done.assumed.retire(65, null)).not.toBe(fr.done.summary.retire(65))
     expect(en.done.assumed.retire(65, null)).not.toBe(en.done.summary.retire(65))
   })
+  it('says what a skipped screen assumes, and which way it leans, in words an answer would not use', () => {
+    expect(fr.ifSkipped.savings).toMatch(/0.\$.*prudente/)
+    expect(en.ifSkipped.savings).toMatch(/\$0.*cautious/)
+    expect(fr.ifSkipped.pension).toMatch(/aucune rente.*prudente/)
+    expect(en.ifSkipped.pension).toMatch(/no employer pension.*cautious/)
+    // a skipped spending screen is a gap, not an assumption: it says there is no answer yet
+    expect(fr.ifSkipped.spending).toMatch(/pas encore de réponse/)
+    expect(en.ifSkipped.spending).toMatch(/no answer yet/)
+  })
   it('is not left in the other language', () => {
     for (const [k, t] of texts(en)) expect(t, k).not.toMatch(/ votre | vous |Préciser|supposé/)
     for (const [k, t] of texts(fr)) expect(t, k).not.toMatch(/ the | your |We assumed/)

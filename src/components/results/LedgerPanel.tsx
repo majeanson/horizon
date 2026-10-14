@@ -1,11 +1,13 @@
 import { agesLedger } from '../../engine/ledger'
 import type { AccountKind, Assumptions, Household } from '../../engine/types'
 import { useLang } from '../../i18n'
+import { factId } from '../../lib/facts'
 import { formatPct } from '../../lib/format'
 import { LEDGER_COPY } from '../../lib/ledgerCopy'
 import { formatMoney } from '../../lib/money'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
+import { EstFlag } from '../EstFlag'
 
 // « Mes chiffres et leur calcul »: every number that sets the answer, with the calculation it triggers and the amount it becomes.
 // The ages (when the pay stops, when the QPP starts, when the OAS starts), then the spending and the economy (inflation, returns).
@@ -24,15 +26,20 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
   const pct = (rate: number) => formatPct(rate, lang, 1)
 
   /** One figure: its name and value on a line, then the amount it becomes (when there is one) and the calculation under it. */
-  const row = (label: string, value: string, result: string | null, ...calcs: (string | null)[]) => (
+  const rowOf = (fact: string | null, label: string, value: string, result: string | null, ...calcs: (string | null)[]) => (
     <div className="ledger__row">
       <p className="ledger__fixed">
         <span className="field-row__label">{label}</span> <span className="mono">{value}</span>
+        {fact !== null && <EstFlag fact={fact} />}
       </p>
       {result !== null && <p className="ledger__result">{result}</p>}
       {calcs.map((line, i) => (line === null ? null : <p key={i} className="ledger__calc">{line}</p>))}
     </div>
   )
+
+  const row = (label: string, value: string, result: string | null, ...calcs: (string | null)[]) => rowOf(null, label, value, result, ...calcs)
+  // A spending figure is the household's own input, restated here: while it is still an estimate, the mark says so and leads to its field.
+  const spendRow = (fact: 'spendingWorking' | 'spendingRetired', label: string, value: number) => rowOf(factId('household', fact), label, money(value), null, c.spendCalc(money(value), money(value / 12)))
 
   return (
     <div className="ledger">
@@ -72,8 +79,8 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
           <Chip to="/profil?fact=household:spendingRetired">{c.editSpending}</Chip>
           <Chip to="/hypotheses">{c.editAssumptions}</Chip>
         </Cluster>
-        {row(c.spendWorkLabel, money(household.spending.workingToday), null, c.spendCalc(money(household.spending.workingToday), money(household.spending.workingToday / 12)))}
-        {row(c.spendRetLabel, money(household.spending.retiredToday), null, c.spendCalc(money(household.spending.retiredToday), money(household.spending.retiredToday / 12)))}
+        {spendRow('spendingWorking', c.spendWorkLabel, household.spending.workingToday)}
+        {spendRow('spendingRetired', c.spendRetLabel, household.spending.retiredToday)}
         {row(c.inflationLabel, pct(assumptions.inflation), null, c.inflationCalc(pct(assumptions.inflation), money(1000 * (1 + assumptions.inflation) ** 10)))}
         {KINDS.map((kind) => (
           <div key={kind}>{row(c.returnLabel[kind], pct(assumptions.returns[kind]), null, c.returnCalc(pct(assumptions.returns[kind]), formatPct((1 + assumptions.returns[kind]) / (1 + assumptions.inflation) - 1, lang, 1)))}</div>

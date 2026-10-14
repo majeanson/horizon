@@ -34,6 +34,24 @@ test('the economy and the spending are read here and changed where they live', a
   expect(await savedProfile(page)).toEqual(before)
 })
 
+test('a spending figure that is still an estimate is marked where it is restated, leads to its field, and the mark goes once it is confirmed', async ({ page }) => {
+  await page.goto('/resultats?v=proof')
+  const spend = page.locator('.ledger__row').filter({ hasText: 'Dépenses à la retraite' })
+  const mark = spend.getByRole('link', { name: 'Estimé — à confirmer' })
+  await expect(mark).toHaveAttribute('href', '/profil?fact=household%3AspendingRetired')
+  // read-only: it is a link, never a control that writes
+  expect((await savedProfile(page)).confirmed).toEqual([])
+  await mark.click()
+  const row = page.locator('[data-fact="household:spendingRetired"]')
+  await row.getByRole('button', { name: /^Estimé/ }).click()
+  await expect.poll(async () => (await savedProfile(page)).confirmed).toContain('household:spendingRetired')
+  await page.goto('/resultats?v=proof')
+  await expect(page.locator('.ledger')).toBeVisible()
+  await expect(page.locator('.ledger__row').filter({ hasText: 'Dépenses à la retraite' }).getByRole('link', { name: 'Estimé — à confirmer' })).toHaveCount(0)
+  // the other (working) spending is a separate fact: still an estimate
+  await expect(page.locator('.ledger__row').filter({ hasText: 'Dépenses pendant le travail' }).getByRole('link', { name: 'Estimé — à confirmer' })).toHaveCount(1)
+})
+
 test('the page has no horizontal overflow at phone width with the panel open', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
   await page.goto('/resultats?v=proof')

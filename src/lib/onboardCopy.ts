@@ -24,6 +24,8 @@ export interface OnboardCopy {
   retire: { q: string; why: string; you: string; spouse: string }
   spending: { q: string; why: string; label: string; estimate: string; estimated: (amount: string) => string }
   home: { q: string; why: string; no: string; yes: string; value: string; balance: string; payment: string }
+  /** Under a question's « why », only while its boxes are still empty or at their default: what is ASSUMED if the screen is skipped, and which way that leans. */
+  ifSkipped: { savings: string; pension: string; home: string; spending: string; spendingEstimate: string }
   done: {
     q: string
     /** The last screen when something a result needs is still blank. */
@@ -112,6 +114,13 @@ const FR: OnboardCopy = {
     balance: 'Solde de l’hypothèque',
     payment: 'Paiement mensuel',
   },
+  ifSkipped: {
+    savings: 'Sans chiffre, on suppose 0 $ — votre réponse sera prudente.',
+    pension: 'Sans régime, aucune rente d’employeur n’est comptée — votre réponse sera prudente.',
+    home: 'Sans maison, ni sa valeur ni son hypothèque ne sont comptées.',
+    spending: 'Sans chiffre, il n’y a pas encore de réponse : les dépenses la fixent.',
+    spendingEstimate: 'Sans chiffre, il n’y a pas encore de réponse : « Estimer » en propose un, à remplacer.',
+  },
   done: {
     q: 'C’est assez pour une première réponse',
     qMissing: 'Il manque une réponse',
@@ -194,6 +203,13 @@ const EN: OnboardCopy = {
     value: 'Value of the home',
     balance: 'Mortgage balance',
     payment: 'Monthly payment',
+  },
+  ifSkipped: {
+    savings: 'With no figure, we assume $0 — your answer will be cautious.',
+    pension: 'With no plan, no employer pension is counted — your answer will be cautious.',
+    home: 'With no home, neither its value nor its mortgage is counted.',
+    spending: 'With no figure there is no answer yet: spending sets it.',
+    spendingEstimate: 'With no figure there is no answer yet: “Estimate” offers one, to be replaced.',
   },
   done: {
     q: 'That is enough for a first answer',
