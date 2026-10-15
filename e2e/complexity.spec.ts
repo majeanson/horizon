@@ -21,15 +21,18 @@ type Budget = { controls: number; words: number }
 // were only dashed lines to guess at; the chips are the keyboard / screen-reader path that the taps on the chart mirror.
 // Résultats — Réponse raised again 46 → 47 controls and 668 → 670 words (2026-10-13): the « Visite guidée » chip beside the answer card's « Et si je dépensais moins ? » — the one door to the
 // four-step walk through the reader's own answer. The tour's bar itself exists only with `?visite=` set, which this route never sets.
+// Accueil raised 24 → 34 controls / 294 → 372 words (first visit) and 20 → 30 / 183 → 261 (with a plan) (2026-10-14): the reading card (components/ReadingHelp.tsx) — language, day / night,
+// contrast and the size of the letters, in plain words, offered BEFORE anything else and put away with one button. A conscious trade: for a reader who cannot see the page well, nothing
+// below it exists until it is readable; it leaves the door for good once put away (the budget is measured on a first visit, which has not put it away).
 // Résultats — Réponse raised a third time 670 → 683 words (2026-10-14): the answer's range line under the big age — « Selon les trois scénarios et les parcours de marché : de 57 à 64 ans »
 // (lib/answerSpread.ts). A conscious trade: the scenarios and the market paths were three sections down; one sentence now says how far the answer moves.
 // Résultats — Preuve, 2026-10-13 (idea 3, the Figure): controls 37 → 43 — the four Figure buttons on the golden couple's two pension rows (QPP and OAS, one each
 // per person), the two EstFlag links on the spending rows, and one glossary link another session added to the average-rate sentence. Words 1959 → 1859 (the
 // ratchet FALLS): the old calculation lines under the pensions folded into the figures' notes, which are hidden until asked for — one home per figure.
 const BUDGETS: Record<string, Budget> = {
-  'Accueil (first visit)': { controls: 24, words: 294 },
+  'Accueil (first visit)': { controls: 34, words: 372 },
   'Profil (first visit, onboarding)': { controls: 16, words: 75 },
-  'Accueil (with a plan)': { controls: 20, words: 183 },
+  'Accueil (with a plan)': { controls: 30, words: 261 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
   // count only once opened): the CRA's January 1 figure less this year's deposits.

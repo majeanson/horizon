@@ -2,6 +2,8 @@ import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
+import { DisplayControls } from '../components/DisplayControls'
+import { ReadingHelp } from '../components/ReadingHelp'
 import { CONCEPTS, FAMILIES, FAMILY_HUE, type ConceptId } from '../lib/concepts'
 import { DripQuestion } from '../components/DripQuestion'
 import { DemoAnswer } from '../components/DemoAnswer'
@@ -386,6 +388,8 @@ function ENTRIES(): Entry[] {
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
+    { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
+    { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelp /> },
     { cat: 'Affichage', name: 'ConceptPip', file: 'src/components/ConceptPip.tsx', exports: ['ConceptPip', 'FamilyPip'], kw: 'pastille concept icône couleur famille glossaire', render: () => <ConceptPipSpecimen /> },
     {
       cat: 'Affichage',

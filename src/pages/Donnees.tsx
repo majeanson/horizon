@@ -8,9 +8,8 @@ import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { Fold } from '../components/Fold'
-import { SubTabs } from '../components/SubTabs'
+import { DisplayControls } from '../components/DisplayControls'
 import { useLang, useT } from '../i18n'
-import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type Contrast, type TextScale } from '../lib/accessibility'
 import { useConfirm } from '../lib/confirm'
 import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
@@ -21,7 +20,6 @@ import type { Profile } from '../lib/schema'
 import { saveCopy } from '../lib/saveCopy'
 import { clearProfile, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { SHEET_COPY } from '../lib/sheetCopy'
-import { getTheme, setTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import { useParamChoice } from '../lib/useParamChoice'
 
@@ -217,56 +215,9 @@ function DisplaySection() {
   const t = useT()
   const { lang } = useLang()
   const d = t.data.display
-  const [theme, setThemeShown] = useState<Theme>(getTheme)
-  const [contrast, setContrastShown] = useState<Contrast>(getContrast)
-  const [scale, setScaleShown] = useState<TextScale>(getTextScale)
   return (
     <Section title={d.title} subtitle={d.hint} icon="sliders-horizontal-bold">
-      <div className="field-row">
-        <p className="field-row__label">{d.theme}</p>
-        <SubTabs
-          size="mini"
-          ariaLabel={d.theme}
-          value={theme}
-          onSelect={(v: Theme) => {
-            setTheme(v)
-            setThemeShown(v)
-          }}
-          options={[
-            { key: 'day', label: d.themeDay, icon: 'sun-bold' },
-            { key: 'night', label: d.themeNight, icon: 'moon-stars-bold' },
-          ]}
-        />
-      </div>
-      <div className="field-row">
-        <p className="field-row__label">{d.contrast}</p>
-        <SubTabs
-          size="mini"
-          ariaLabel={d.contrast}
-          value={contrast}
-          onSelect={(c: Contrast) => {
-            setContrast(c)
-            setContrastShown(c)
-          }}
-          options={[
-            { key: 'normal', label: d.contrastNormal },
-            { key: 'high', label: d.contrastHigh },
-          ]}
-        />
-      </div>
-      <div className="field-row">
-        <p className="field-row__label">{d.textSize}</p>
-        <SubTabs
-          size="mini"
-          ariaLabel={d.textSize}
-          value={scale}
-          onSelect={(s: TextScale) => {
-            setTextScale(s)
-            setScaleShown(s)
-          }}
-          options={TEXT_SCALES.map((s) => ({ key: s, label: d.textSizes[s] }))}
-        />
-      </div>
+      <DisplayControls />
       <div className="field-row">
         <Chip to="/fiche" icon="identification-card-bold">
           {SHEET_COPY[lang].open}

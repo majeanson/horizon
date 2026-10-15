@@ -6,6 +6,7 @@ import { DemoAnswer } from '../components/DemoAnswer'
 import { DripQuestion } from '../components/DripQuestion'
 import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
+import { ReadingHelp } from '../components/ReadingHelp'
 import { useLang } from '../i18n'
 import { answerRequest } from '../lib/answerRequest'
 import { factsOf } from '../lib/facts'
@@ -37,6 +38,7 @@ export function Accueil() {
   return (
     <section className="page-body welcome">
       <PageHead title={c.title} subtitle={c.subtitle} />
+      <ReadingHelp />
       {ready && <LiveAnswer range={asking ? impact?.range : null} />}
       {ready && asking && <DripQuestion impact={impact} facts={unconfirmed} />}
       {/* A blank first visit sees the product working (a real answer for an example household), then three doors in, by effort. */}
