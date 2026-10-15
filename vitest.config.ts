@@ -8,6 +8,9 @@ export default defineConfig({
     globals: true,
     include: ['{src,worker}/**/*.test.ts', 'scripts/**/*.test.mjs'],
     exclude: ['**/node_modules/**'],
+    // The engine's earliest-age searches run a few seconds each; on a busy box or CI's runner the 5 s default tipped them over (levers, plansCompare, spendModel, the examples).
+    // A wrong answer still fails at once; only a slow one waits.
+    testTimeout: 30_000,
     // 6 workers crash (« Worker exited unexpectedly ») on a memory-tight Windows box; 3 is reliable.
     maxWorkers: process.env.CI ? undefined : 3,
     // Node 25+ ships its own global localStorage, which shadows happy-dom's.

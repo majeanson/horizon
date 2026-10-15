@@ -995,9 +995,7 @@
   border-bottom: 1px solid var(--line);
   font-size: var(--text-sm);
 }
-.live-answer.is-busy .live-answer__age {
-  opacity: 0.6;
-}
+/* Busy is said in words (« … calcul »), never dimmed: text at 60 % opacity fails 4.5:1 whenever a reader — or axe — happens to look before the worker answers. */
 .live-answer__label {
   color: var(--ink-soft);
 }

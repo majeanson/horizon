@@ -16,6 +16,8 @@ const dir = dirname(fileURLToPath(import.meta.url))
 const golden = (): Profile => JSON.parse(readFileSync(join(dir, 'fixtures', `profile.v${SCHEMA_VERSION}.json`), 'utf8'))
 const labels = Object.fromEntries(STARTER_IDS.map((id) => [id, `name:${id}`])) as Record<StarterId, string>
 const NOW = 2026
+// Each runs the engine's earliest-age search a few times: more than vitest's 5 s on a busy runner (the levers test had the same fix).
+const SLOW = 60_000
 // The clock is an input to the engine: stored assumptions carry no `today`, so the test supplies the year.
 const engine = (p: Profile) => ({ ...p.assumptions, today: { year: NOW } }) as Parameters<typeof project>[1]
 const rows = (p: Profile) => project(p.household, engine(p))
@@ -28,7 +30,7 @@ describe('the figures kept only to check against a statement', () => {
     checked.household.persons[0] = setDeposited(setNetPay(checked.household.persons[0], 61_234), 'tfsa', 12_345)
     expect(rows(checked)).toEqual(rows(p))
     expect(earliest(checked)).toEqual(earliest(p))
-  })
+  }, SLOW)
 })
 
 describe('a planned expense is a real expense', () => {
@@ -42,19 +44,19 @@ describe('a planned expense is a real expense', () => {
       if (b === null) expect(after[i]).toBeNull()
       else if (after[i] !== null) expect(after[i]).toBeGreaterThanOrEqual(b)
     })
-  })
+  }, SLOW)
 
   it('confirming an estimate changes the label of its status, not the plan; editing its amount drops the estimate', () => {
     const base = golden()
     const [first] = plannedStarters(base, NOW, labels)
     const p = addFlow(base, first.flow)
-    const i = p.household.flows.length - 1
-    expect(p.household.flows[i].estimate).toBe(first.id)
+    const i = p.household.flows!.length - 1
+    expect(p.household.flows![i].estimate).toBe(first.id)
     const confirmed = confirmFlow(p, i)
-    expect(confirmed.household.flows[i].estimate).toBeUndefined()
+    expect(confirmed.household.flows![i].estimate).toBeUndefined()
     expect(rows(confirmed)).toEqual(rows(p))
     const edited = updateFlow(p, i, (f) => ({ ...f, amount: f.amount + 100 }))
-    expect(edited.household.flows[i].estimate).toBeUndefined()
+    expect(edited.household.flows![i].estimate).toBeUndefined()
   })
 
   it('survives a save: validation keeps the estimate marker of every starting point', () => {
@@ -62,7 +64,7 @@ describe('a planned expense is a real expense', () => {
     for (const s of plannedStarters(p, NOW, labels)) p = addFlow(p, s.flow)
     const out = validateProfile(JSON.parse(JSON.stringify(p)))
     expect(out.ok, JSON.stringify(out.ok ? '' : out.problems)).toBe(true)
-    if (out.ok) expect(out.profile.household.flows.map((f) => f.estimate)).toEqual(p.household.flows.map((f) => f.estimate))
+    if (out.ok) expect(out.profile.household.flows!.map((f) => f.estimate)).toEqual(p.household.flows!.map((f) => f.estimate))
   })
 
   it('every starting point has a name in both languages', () => {
