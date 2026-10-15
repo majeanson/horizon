@@ -2,7 +2,7 @@
 // tags the Worker writes for it and the text drawn on the card image. Pure data and no imports, because the Worker (worker/shareRoutes.ts)
 // and the card script (scripts/gen-og.ts) read it too. The English is written again for an English reader, not carried over word by word.
 // Every function takes already-checked values (lib/shareLink.ts validates the address), and French punctuation holds its non-breaking spaces
-// (lib/frenchSpacing.test.ts); this copy tutoie, because it speaks to the person who received the link.
+// (lib/frenchSpacing.test.ts); this copy vouvoie, like the rest of the app.
 
 import type { ShareHome } from './shareLink.ts'
 
@@ -45,20 +45,20 @@ export const SHARE_COPY: { fr: ShareCopy; en: ShareCopy } = {
     pageTitle: 'Un scénario partagé',
     headline: (age) => `Retraite possible à ${age} ans`,
     home: { seul: 'Scénario pour une personne seule.', couple: 'Scénario pour un couple, au même âge de départ.' },
-    frame: 'Ces chiffres viennent du lien, pas de tes données. Refais le calcul avec tes vrais montants pour savoir ce qui vaut pour toi.',
+    frame: 'Ces chiffres viennent du lien, pas de vos données. Refaites le calcul avec vos vrais montants pour savoir ce qui vaut pour vous.',
     holds: 'Le lien ne contient que l’âge et le type de foyer. Aucun revenu, aucun compte, aucun nom.',
     cta: 'Faire mon calcul',
     brokenTitle: 'Ce lien est incomplet',
-    brokenBody: 'Il ne contient pas de scénario lisible. Tu peux quand même faire ton propre calcul.',
+    brokenBody: 'Il ne contient pas de scénario lisible. Vous pouvez quand même faire votre propre calcul.',
     ogTitle: (age) => `Retraite possible à ${age} ans`,
-    ogDescription: (home) => `${home === 'couple' ? 'Pour un couple' : 'Pour une personne seule'}, selon Horizon. Ces chiffres sont un exemple. Refais le calcul avec tes montants, ils restent sur ton appareil.`,
+    ogDescription: (home) => `${home === 'couple' ? 'Pour un couple' : 'Pour une personne seule'}, selon Horizon. Ces chiffres sont un exemple. Refaites le calcul avec vos montants, ils restent sur votre appareil.`,
     ogAlt: (age, home) => `Retraite possible à ${age} ans, ${home === 'couple' ? 'pour un couple' : 'pour une personne seule'}. Horizon.`,
     ogGenericTitle: 'Horizon',
     ogGenericDescription: 'Quand pouvez-vous prendre votre retraite ? Calculé sur les paramètres officiels du Québec et du Canada, avec des données qui restent sur votre appareil.',
     cardHome: { seul: 'Pour une personne seule', couple: 'Pour un couple' },
     cardLead: 'Retraite possible à',
     cardAge: (age) => `${age} ans`,
-    cardNote: 'Estimation. Refais le calcul avec tes montants.',
+    cardNote: 'Estimation. Refaites le calcul avec vos montants.',
     siteName: 'Horizon',
   },
   en: {
