@@ -121,7 +121,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
   const birthField = (id: PersonId): ReactNode => {
     const person = personOf(id)
     return (
-      <FieldRow label={c.birth.year}>
+      <FieldRow label={c.birth.year} help="birthYear">
         {(w) => (
           <NumberField
             kind="year"
@@ -280,7 +280,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
       body = (
         <>
           {[self, ...(spouse ? [spouse] : [])].map((p, i) => (
-            <FieldRow key={p.id} label={i === 0 ? c.retire.you : c.retire.spouse}>
+            <FieldRow key={p.id} label={i === 0 ? c.retire.you : c.retire.spouse} help="retirementAge">
               {(w) => <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={p.retirementAge} onChange={(retirementAge) => edit(p.id, (x) => ({ ...x, retirementAge }))} id={w.id} autoFocus={focus && i === 0} />}
             </FieldRow>
           ))}
@@ -341,14 +341,14 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
           </Cluster>
           {home !== null && (
             <>
-              <FieldRow label={c.home.value}>
+              <FieldRow label={c.home.value} help="homeValue">
                 {(w) => <NumberField kind="money" max={1e8} value={home.value} onChange={(value) => typed((p) => updateHome(p, (x) => ({ ...x, value })), factId('household', 'homeValue'))} id={w.id} />}
               </FieldRow>
-              <FieldRow label={c.home.balance}>
+              <FieldRow label={c.home.balance} help="mortgageBalance">
                 {(w) => <NumberField kind="money" max={1e8} value={home.mortgage.balance} onChange={(balance) => typed((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, balance } })), factId('household', 'mortgage'))} id={w.id} />}
               </FieldRow>
               {home.mortgage.balance > 0 && (
-                <FieldRow label={c.home.payment}>
+                <FieldRow label={c.home.payment} help="mortgagePayment">
                   {(w) => <NumberField kind="money" max={1e6} value={home.mortgage.monthlyPayment} onChange={(monthlyPayment) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, monthlyPayment } })))} id={w.id} />}
                 </FieldRow>
               )}

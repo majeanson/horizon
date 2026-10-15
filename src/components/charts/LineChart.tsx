@@ -2,6 +2,7 @@ import { CartesianGrid, Line, LineChart as RLineChart, ReferenceLine, Responsive
 import { SERIES_CSS } from './palette'
 import { TwoLineTick } from './tick'
 import type { ChartSeries, LineChartProps } from './types'
+import { ConceptPip } from '../ConceptPip'
 
 // The ONE line chart. A thin adapter over the chart library: it takes plain series, draws them in the app's own
 // colours, and keeps everything a reader can misread — the legend, the units, the tooltip's words — in HTML that
@@ -45,6 +46,7 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, m
         {series.map((s) => (
           <li key={s.id} className="chart__legend-item">
             <span className="chart__swatch" style={{ background: COLOUR[s.colour] }} />
+            {s.concept && <ConceptPip id={s.concept} size="sm" />}
             {s.label}
           </li>
         ))}

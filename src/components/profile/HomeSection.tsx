@@ -1,4 +1,5 @@
 import { useLang, useT } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { payoffMonths, payoffYear } from '../../engine/home'
 import { useConfirm } from '../../lib/confirm'
 import { factId } from '../../lib/facts'
@@ -38,7 +39,7 @@ export function HomeSection() {
   })()
 
   return (
-    <Section id="maison" title={h.title} subtitle={h.hint} concept="maison">
+    <Section id="maison" title={h.title} subtitle={CARD_COPY[lang].home} details={h.hint} concept="maison">
       {home === null ? (
         <>
           <p className="field-row__hint">{h.none}</p>
@@ -46,16 +47,16 @@ export function HomeSection() {
         </>
       ) : (
         <>
-          <FieldRow label={h.value} hint={h.valueHint} fact={factId('household', 'homeValue')}>
+          <FieldRow label={h.value} help="homeValue" hint={h.valueHint} fact={factId('household', 'homeValue')}>
             {(w) => <NumberField kind="money" max={1e8} value={home.value} onChange={(value) => updateProfile((p) => updateHome(p, (x) => ({ ...x, value })))} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
           <LevelSlot kind="homeValue" owner="household" />
-          <FieldRow label={h.balance} fact={factId('household', 'mortgage')}>
+          <FieldRow label={h.balance} help="mortgageBalance" fact={factId('household', 'mortgage')}>
             {(w) => <NumberField kind="money" max={1e8} value={home.mortgage.balance} onChange={(balance) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, balance } })))} id={w.id} />}
           </FieldRow>
           {home.mortgage.balance > 0 && (
             <>
-              <FieldRow label={h.rate} hint={h.rateHint}>
+              <FieldRow label={h.rate} help="mortgageRate" hint={h.rateHint}>
                 {(w) => <NumberField kind="percent" min={0} max={0.25} value={home.mortgage.rate} onChange={(rate) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, rate } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
               </FieldRow>
               <MortgageTerms home={home} label={h.payment} />
@@ -77,10 +78,10 @@ export function HomeSection() {
           </Chip>
           {home.sale !== null && (
             <>
-              <FieldRow label={h.sellAge} hint={h.sellHint}>
+              <FieldRow label={h.sellAge} help="homeSellAge" hint={h.sellHint}>
                 {(w) => <NumberField kind="int" min={40} max={100} unit={t.fields.years} value={home.sale!.age} onChange={(age) => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: { ...x.sale!, age } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
               </FieldRow>
-              <FieldRow label={h.replacement} hint={h.replacementHint}>
+              <FieldRow label={h.replacement} help="homeReplacement" hint={h.replacementHint}>
                 {(w) => <NumberField kind="money" max={1e8} value={home.sale!.replacementCost} onChange={(replacementCost) => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: { ...x.sale!, replacementCost } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
               </FieldRow>
             </>

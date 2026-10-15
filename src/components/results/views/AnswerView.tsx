@@ -23,6 +23,8 @@ import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
+import { ConceptPip } from '../../ConceptPip'
+import { FACT_CONCEPT } from '../../../lib/concepts'
 
 // « À faire cette année » rides with the care copy, outside the page's own chunk.
 const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m.YearSection })))
@@ -255,6 +257,18 @@ export function AnswerView({ m }: { m: ResultsModel }) {
           {(refine.length > 0 || movers.length > 0) && (
             <div id="preciser" className="surface results-section refine" aria-label={rc.refine.title}>
               <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} concept="precision" />
+              {/* How much of the profile stands on documents, at a glance: the same count the headline says in words. */}
+              {accuracy.total > 0 && (
+                <div className="refine__gauge">
+                  <div className="refine__meter" role="meter" aria-valuemin={0} aria-valuemax={accuracy.total} aria-valuenow={accuracy.confirmed} aria-label={rc.headline.confidence(accuracy.confirmed, accuracy.total)}>
+                    <span className="refine__meter-fill" style={{ width: `${(100 * accuracy.confirmed) / accuracy.total}%` }} />
+                  </div>
+                  {/* the count beside the bar: an empty bar alone read as a divider (the meter's own name says it in words) */}
+                  <span className="refine__meter-count mono" aria-hidden="true">
+                    {accuracy.confirmed}/{accuracy.total}
+                  </span>
+                </div>
+              )}
               {movers.length > 0 && (
                 <div className="refine__moves">
                   <p className="verdict__range-title">{rc.refine.moves}</p>
@@ -262,6 +276,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   <ul className="refine__list">
                     {movers.map((f) => (
                       <li key={f.id}>
+                        <ConceptPip id={FACT_CONCEPT[f.kind]} size="sm" />
                         <Link className="info-note__link" to={`/profil?fact=${encodeURIComponent(f.id)}`}>
                           {factName(f.id)}
                         </Link>{' '}

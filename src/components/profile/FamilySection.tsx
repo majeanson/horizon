@@ -8,6 +8,7 @@ import { scrollBehavior } from '../../lib/motion'
 import { addSpouse, hasSpouse, removeChild, removeSpouse, setLivesAlone } from '../../lib/profileEdit'
 import { childStage } from '../../engine/lifeEvents'
 import { KIDS_COPY } from '../../lib/kidsCopy'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { addChildCounted, patchChildSpending } from '../../lib/profileLife'
 import { KidsCosts } from './KidsCosts'
 import { updateProfile, useProfile } from '../../lib/store'
@@ -47,7 +48,13 @@ export function FamilySection({ withKids = true }: { /** The children and what e
   }
 
   return (
-    <Section id="famille" title={f.title} subtitle={withKids ? f.childrenHint : undefined} details={withKids ? kc.planned.hint : undefined} concept="famille">
+    <Section
+      id="famille"
+      title={f.title}
+      subtitle={CARD_COPY[lang].family}
+      details={withKids ? (<><p>{f.childrenHint}</p><p>{kc.planned.hint}</p></>) : undefined}
+      concept="famille"
+    >
       <Cluster>
         {spouse ? (
           <button
@@ -162,7 +169,7 @@ export function ChildCosts({ withKids = true }: { withKids?: boolean }) {
               <p className="field-row__hint">{cost.onTop ? lc.onTopHint : lc.insideHint}</p>
             </div>
           )}
-          <FieldRow label={lc.cost} hint={lc.costHint}>
+          <FieldRow label={lc.cost} help="childCost" hint={lc.costHint}>
             {(w) => (
               <NumberField
                 kind="money"
@@ -176,7 +183,7 @@ export function ChildCosts({ withKids = true }: { withKids?: boolean }) {
           </FieldRow>
           {cost && (
             <>
-              <FieldRow label={lc.leaves} hint={lc.leavesHint}>
+              <FieldRow label={lc.leaves} help="childLeaves" hint={lc.leavesHint}>
                 {(w) => (
                   <NumberField kind="int" min={16} max={35} unit={t.fields.years} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => patchChildSpending(p, { untilAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
                 )}

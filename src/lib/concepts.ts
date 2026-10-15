@@ -1,6 +1,6 @@
 import type { StrategyKey } from '../engine/bridge'
 import type { AccountKind } from '../engine/types'
-import type { DocId } from './facts'
+import type { DocId, FactKind } from './facts'
 import type { StarterId } from './plannedExpenses'
 import type { IconName } from './pipIcons'
 import type { PIP_ICONS_MORE } from './pipIconsMore'
@@ -133,6 +133,24 @@ export const STRATEGY_CONCEPT: Record<StrategyKey, ConceptId> = { mine: 'stratMi
 export const ACCOUNT_CONCEPT: Record<AccountKind, ConceptId> = { rrsp: 'reer', tfsa: 'celi', nonReg: 'nonEnregistre' }
 /** The seven documents of the checklist (lib/facts.ts). */
 export const DOC_CONCEPT: Record<DocId, ConceptId> = { rrq: 'rrq', tax: 'impot', bank: 'reer', employer: 'employeur', home: 'maison', budget: 'budget', residence: 'residence' }
+/** The figures a document confirms (lib/facts.ts): the pip each wears where it is named — « Préciser », the documents' lists. */
+export const FACT_CONCEPT: Record<FactKind, ConceptId> = {
+  salary: 'salaire',
+  earnings: 'releve',
+  residence: 'residence',
+  rrspBalance: 'reer',
+  rrspRoom: 'droits',
+  rrspLocked: 'verrouille',
+  tfsaBalance: 'celi',
+  tfsaRoom: 'droits',
+  nonRegBalance: 'nonEnregistre',
+  nonRegAcb: 'pbr',
+  pension: 'employeur',
+  spendingWorking: 'budget',
+  spendingRetired: 'depenses',
+  homeValue: 'maison',
+  mortgage: 'hypotheque',
+}
 /** The nine starting points of « Dépenses à prévoir » (lib/plannedExpenses.ts). */
 export const STARTER_CONCEPT: Record<StarterId, ConceptId> = { upkeep: 'entretien', renovation: 'renovation', vehicle: 'vehicule', heritage: 'heritage', roof: 'toit', car: 'vehicule', rent: 'loyer', care: 'soins', project: 'projet' }
 

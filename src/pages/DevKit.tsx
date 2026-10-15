@@ -11,6 +11,7 @@ import { LiveAnswer } from '../components/LiveAnswer'
 import { NextStep } from '../components/NextStep'
 import { EditField } from '../components/EditField'
 import { EmptyState } from '../components/EmptyState'
+import { FieldHelp } from '../components/FieldHelp'
 import { FieldInfo } from '../components/FieldInfo'
 import { FieldRow } from '../components/FieldRow'
 import { Figure } from '../components/Figure'
@@ -393,6 +394,18 @@ function ENTRIES(): Entry[] {
         <div className="field-row__control">
           <span>Un chiffre à trouver sur un relevé</span>
           <FieldInfo id="earnings" label="Revenus de travail admissibles" />
+        </div>
+      ),
+    },
+    {
+      cat: 'Saisie',
+      name: 'FieldHelp',
+      file: 'src/components/FieldHelp.tsx',
+      kw: 'ⓘ à propos de ce champ aide explication choix',
+      render: () => (
+        <div className="field-row__control">
+          <span>Un âge que la personne choisit</span>
+          <FieldHelp id="retirementAge" label="Âge de la retraite" />
         </div>
       ),
     },

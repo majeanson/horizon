@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { scrollToSection } from '../lib/motion'
 import { Chip } from './Chip'
+import { Icon } from './Icon'
+import type { Progress } from '../lib/mapProgress'
 import type { ConceptId } from '../lib/concepts'
 import { Rail } from './Layout'
 
@@ -16,6 +18,9 @@ export interface SectionLink {
   label: string
   /** The idea the section is about: its pip leads the chip. */
   concept?: ConceptId
+  /** How much of the section's figures is confirmed: a quiet « 3/7 » after the name, a ✓ once all are. Decorative — the page says it in words
+   *  (« 3 sur 19 chiffres confirmés »), and the chip keeps its own name for a screen reader and for the specs that find it by name. */
+  progress?: Progress
   /** Opens a new group in the map: a quiet label drawn before this chip (the page's story arcs). */
   arc?: string
 }
@@ -65,6 +70,11 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
             )}
             <Chip current={inView === l.id} concept={l.concept} onClick={() => scrollToSection(l.id)}>
               {l.label}
+              {l.progress && l.progress.total > 0 && (
+                <span className={'section-nav__progress' + (l.progress.done === l.progress.total ? ' is-done' : '')} aria-hidden="true">
+                  {l.progress.done === l.progress.total ? <Icon name="check-bold" size={14} /> : `${l.progress.done}/${l.progress.total}`}
+                </span>
+              )}
             </Chip>
           </Fragment>
         ))}

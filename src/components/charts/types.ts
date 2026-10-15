@@ -2,6 +2,8 @@
 // engine's rows (lib/chartData.ts) and hands them to <LineChart>, and only components/charts/* ever imports the
 // library behind it (chartBoundary.test.ts) — so the library can be replaced by editing one folder.
 
+import type { ConceptId } from '../../lib/concepts'
+
 /** The four series colours, as the design tokens they resolve to (never a hex literal: night mode would not follow). */
 export type SeriesColour =
   | 'accent' | 'sky' | 'sage' | 'berry' | 'ink' | 'clay' | 'sun' | 'coral'
@@ -17,6 +19,8 @@ export interface ChartSeries {
   id: string
   label: string
   colour: SeriesColour
+  /** The idea the series stands for (a segment of money: the RRQ, the REER…): the legend wears its pip, the same disc as the form's. Positional series (one line per scenario) have none. */
+  concept?: ConceptId
   points: readonly ChartPoint[]
 }
 
@@ -53,7 +57,7 @@ export type StackedBarDatum = { x: number } & Record<string, number>
 export interface StackedBarChartProps {
   data: readonly StackedBarDatum[]
   /** The segments, bottom to top, each in a colour token. */
-  series: readonly Pick<ChartSeries, 'id' | 'label' | 'colour'>[]
+  series: readonly Pick<ChartSeries, 'id' | 'label' | 'colour' | 'concept'>[]
   /** One more value per year drawn as a dashed line across the bars (the year's spending plus tax). */
   line?: { id: string; label: string }
   yFormat: (y: number) => string

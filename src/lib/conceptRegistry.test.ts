@@ -2,7 +2,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { STRATEGY_KEYS } from '../engine/bridge'
-import { BALANCE_COLOUR, EXPENSE_COLOUR, SOURCE_COLOUR, seriesFor } from './chartData'
+import { BALANCE_COLOUR, BALANCE_CONCEPT, EXPENSE_COLOUR, EXPENSE_CONCEPT, SOURCE_COLOUR, SOURCE_CONCEPT, seriesFor } from './chartData'
 import {
   ACCOUNT_CONCEPT,
   CONCEPTS,
@@ -126,6 +126,13 @@ describe('the charts draw the registry’s hues', () => {
   const SOURCE_CONCEPTS = { work: 'salaire', db: 'employeur', rrq: 'rrq', oas: 'psv', nest: 'nid' } as const
   const BALANCE_CONCEPTS = { rrsp: 'reer', rrspLocked: 'verrouille', tfsa: 'celi', nonReg: 'nonEnregistre', home: 'maison' } as const
   const EXPENSE_CONCEPTS = { living: 'budget', children: 'enfants', events: 'evenements', mortgage: 'hypotheque', tax: 'impot', deductions: 'salaire', saved: 'reer', unmet: 'depenses' } as const
+
+  // The legends wear these concepts' pips: the maps the charts read must say the same as this table.
+  it('the segments name the concepts their legends show', () => {
+    expect(SOURCE_CONCEPT).toEqual(SOURCE_CONCEPTS)
+    expect(BALANCE_CONCEPT).toEqual(BALANCE_CONCEPTS)
+    expect(EXPENSE_CONCEPT).toEqual(EXPENSE_CONCEPTS)
+  })
 
   const cases = [
     ['the sources', SOURCE_COLOUR, SOURCE_CONCEPTS],

@@ -45,6 +45,7 @@ export const FR = {
     confirmTitle: 'Confirmer',
     clear: 'Effacer le texte',
     whereToFind: 'Où trouver ce chiffre',
+    aboutField: 'À propos de ce champ',
     inGlossary: 'Voir dans le glossaire',
     openPage: 'Ouvrir la page officielle',
     projected: 'projeté',

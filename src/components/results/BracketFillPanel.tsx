@@ -108,8 +108,8 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
         <Suspense fallback={<Loading />}>
           <LineChart
             series={[
-              { id: 'income', label: c.seriesIncome, colour: seriesFor('impot', 'mid'), points: years.map((y) => ({ x: y.year, y: y.income })) },
-              ...(shown.choice === null ? [] : [{ id: 'line', label: c.seriesLine, colour: seriesFor('tranche'), points: years.map((y) => ({ x: y.year, y: y.ceiling ?? 0 })) }]),
+              { id: 'income', label: c.seriesIncome, colour: seriesFor('impot', 'mid'), concept: 'impot', points: years.map((y) => ({ x: y.year, y: y.income })) },
+              ...(shown.choice === null ? [] : [{ id: 'line', label: c.seriesLine, colour: seriesFor('tranche'), concept: 'tranche' as const, points: years.map((y) => ({ x: y.year, y: y.ceiling ?? 0 })) }]),
             ]}
             markers={markers}
             yFormat={money}
@@ -133,8 +133,8 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
         <Suspense fallback={<Loading />}>
           <LineChart
             series={[
-              { id: 'rrsp', label: c.seriesRrsp, colour: seriesFor('reer'), points: years.map((y) => ({ x: y.year, y: y.rrsp })) },
-              { id: 'tfsa', label: c.seriesTfsa, colour: seriesFor('celi', 'mid'), points: years.map((y) => ({ x: y.year, y: y.tfsa })) },
+              { id: 'rrsp', label: c.seriesRrsp, colour: seriesFor('reer'), concept: 'reer', points: years.map((y) => ({ x: y.year, y: y.rrsp })) },
+              { id: 'tfsa', label: c.seriesTfsa, colour: seriesFor('celi', 'mid'), concept: 'celi', points: years.map((y) => ({ x: y.year, y: y.tfsa })) },
             ]}
             yFormat={money}
             yDetail={detail}

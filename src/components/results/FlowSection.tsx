@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import type { YearRow } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
-import { EXPENSE_COLOUR, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, expenseBars, type ExpenseSegment, type Per, type SourceSegment, type sourceBars } from '../../lib/chartData'
+import { EXPENSE_COLOUR, EXPENSE_CONCEPT, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, expenseBars, type ExpenseSegment, type Per, type SourceSegment, type sourceBars } from '../../lib/chartData'
 import { formatYearAge } from '../../lib/format'
 import { FLOW_COPY } from '../../lib/flowCopy'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
@@ -76,7 +76,7 @@ export function FlowSection({
             <Suspense fallback={<Loading />}>
               <StackedBarChart
                 data={spent}
-                series={present.map((id: ExpenseSegment) => ({ id, label: f.segment[id], colour: EXPENSE_COLOUR[id] }))}
+                series={present.map((id: ExpenseSegment) => ({ id, label: f.segment[id], colour: EXPENSE_COLOUR[id], concept: EXPENSE_CONCEPT[id] }))}
                 yFormat={(y) => formatCompactMoney(y, lang)}
                 yDetail={money}
                 xTitle={(x) => c.tooltip(x, agesByYear.get(x) ?? '')}

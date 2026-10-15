@@ -28,10 +28,10 @@ export function TfsaRoomHelper({ person, edit }: PersonEditor) {
   }
   return (
     <Fold summary={c.summary}>
-      <FieldRow label={c.jan1} hint={c.jan1Hint}>
+      <FieldRow label={c.jan1} infoId="tfsaRoom" hint={c.jan1Hint}>
         {(w) => <NumberField kind="money" allowEmpty max={1e9} value={jan1} onChange={setJan1} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
-      <FieldRow label={c.deposited} hint={c.depositedHint}>
+      <FieldRow label={c.deposited} help="tfsaDepositedThisYear" hint={c.depositedHint}>
         {(w) => <NumberField kind="money" allowEmpty max={1e9} value={deposited} onChange={setDeposited} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       {room !== null && (

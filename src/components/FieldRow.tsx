@@ -1,7 +1,9 @@
 import { useId, type ReactNode } from 'react'
 import type { InfoId } from '../i18n'
+import type { HelpId } from '../lib/fieldHelpCopy'
 import { useGuided } from '../lib/guide'
 import { FactMark } from './FactMark'
+import { FieldHelp } from './FieldHelp'
 import { FieldInfo } from './FieldInfo'
 import { glossed } from './Gloss'
 
@@ -22,12 +24,15 @@ import { glossed } from './Gloss'
 export function FieldRow({
   label,
   infoId,
+  help,
   hint,
   fact,
   children,
 }: {
   label: string
   infoId?: InfoId
+  /** The ⓘ of a field that is NOT on a document (a choice, a plan rule, an estimate): « À propos de ce champ », lazily worded (FieldHelp.tsx). Every row has this or `infoId` (fieldHelp.test.ts). */
+  help?: HelpId
   hint?: ReactNode
   /** The figure this row holds, when it is one a person confirms against a document (lib/facts.ts). */
   fact?: string
@@ -42,10 +47,10 @@ export function FieldRow({
         <label className="field-row__label" htmlFor={id}>
           {label}
         </label>
-        {(fact !== undefined || infoId) && (
+        {(fact !== undefined || infoId || help) && (
           <span className="field-row__tools">
             {fact !== undefined && <FactMark id={fact} label={label} />}
-            {infoId && <FieldInfo id={infoId} label={label} />}
+            {infoId ? <FieldInfo id={infoId} label={label} /> : help && <FieldHelp id={help} label={label} />}
           </span>
         )}
       </div>

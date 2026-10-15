@@ -62,3 +62,59 @@
 .glossary dt .pip { align-self: center; }
 .docs-item__name .pip { margin-inline-end: 0.4rem; }
 
+
+/* Profil's map: how much of each block is confirmed, after the chip's name — quiet while partial, the sage « done » tick once complete. */
+.section-nav__progress {
+  margin-inline-start: 0.35rem;
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.section-nav__progress.is-done { display: inline-flex; color: var(--sage-ink); }
+
+/* « Préciser »: how much of the profile stands on documents, as a bar (the headline says it in words). Sage = confirmed, the same « done » ink as the map's tick. */
+.refine__gauge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.75rem;
+}
+.refine__meter-count {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.refine__meter {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--paper-deep);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+.refine__meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sage-deep);
+}
+/* A ranked figure: its pip, then its name — the pip sits tight against the name it stands for. */
+.refine__moves .refine__list li > .pip { margin-inline-end: -0.4rem; }
+
+/* A phone (or the largest text on any narrow screen): the header's pip stays big, but it rides the TITLE line only, and the one sentence under the
+   title takes the card's whole width — beside a 2.6 rem disc it had a ~165 px column and wrapped to three lines at « Très grand ». The text box
+   dissolves into the header's grid (display: contents: it is a plain div, no role is lost), so title and sentence become its rows. */
+@media (max-width: 40rem) {
+  .section-header__main:has(> .pip) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.6rem;
+    row-gap: 0.35rem;
+  }
+  .section-header__main:has(> .pip) > .pip { align-self: center; }
+  .section-header__main:has(> .pip) > .section-header__text { display: contents; }
+  .section-header__main:has(> .pip) .section-header__sub { grid-column: 1 / -1; }
+}

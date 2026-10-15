@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { accuracyOf, DOC_IDS, factId, factsOf, FACT_ID_PATTERN } from './facts.ts'
+import { mapProgress } from './mapProgress.ts'
 import { migrateProfile } from './migrations.ts'
 import { addHome, addSpouse, removeSpouse, setFact, setFacts, toggleFact, updateHome } from './profileEdit.ts'
 import { defaultProfile, SCHEMA_VERSION, validateProfile, type Profile } from './schema.ts'
@@ -139,5 +140,27 @@ describe('saved with the profile', () => {
     const old = JSON.parse(readFileSync(join(dir, 'fixtures', 'profile.v8.json'), 'utf8'))
     const read = migrateProfile(old)
     expect(read.ok && read.profile.confirmed).toEqual([])
+  })
+})
+
+describe("the map's counts (Profil's chips)", () => {
+  it('each person counts their own figures, Budget the two budgets, and a block with no figure has no count', () => {
+    const p = defaultProfile(TODAY)
+    const progress = mapProgress(p)
+    expect(progress['person-self']).toEqual({ done: 0, total: 5 })
+    expect(progress.budget).toEqual({ done: 0, total: 2 })
+    expect(progress.maison).toBeUndefined() // no home: nothing to count
+    expect(progress.famille).toBeUndefined()
+  })
+
+  it('confirming a figure moves its own chip only, and the house counts once there is one', () => {
+    const p = addHome(setFact(defaultProfile(TODAY), factId('self', 'earnings'), true))
+    const progress = mapProgress(p)
+    expect(progress['person-self']).toEqual({ done: 1, total: 5 })
+    expect(progress.budget).toEqual({ done: 0, total: 2 })
+    expect(progress.maison?.total).toBeGreaterThanOrEqual(1)
+    // the chips add up to the page's own « n sur N chiffres confirmés »
+    const sum = Object.values(progress).reduce((a, c) => ({ done: a.done + c.done, total: a.total + c.total }), { done: 0, total: 0 })
+    expect(sum).toEqual({ done: accuracyOf(p).confirmed, total: accuracyOf(p).total })
   })
 })

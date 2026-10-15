@@ -4,8 +4,10 @@ import type { AgeResult, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import {
   BALANCE_COLOUR,
+  BALANCE_CONCEPT,
   type BalanceBarSegment,
   SOURCE_COLOUR,
+  SOURCE_CONCEPT,
   SOURCE_SEGMENTS,
   balanceBars,
   chartSeries,
@@ -252,7 +254,7 @@ function DetailView({
         <Suspense fallback={<Loading />}>
           <StackedBarChart
             data={sources}
-            series={SOURCE_SEGMENTS.map((id) => ({ id, label: id === 'work' && hasDatedIncome(rows) ? c.source.workOther : c.source[id], colour: SOURCE_COLOUR[id] }))}
+            series={SOURCE_SEGMENTS.map((id) => ({ id, label: id === 'work' && hasDatedIncome(rows) ? c.source.workOther : c.source[id], colour: SOURCE_COLOUR[id], concept: SOURCE_CONCEPT[id] }))}
             line={personId === null ? { id: 'need', label: c.need } : undefined}
             yFormat={yFormat}
             yDetail={yDetail}
@@ -275,7 +277,7 @@ function DetailView({
         <Suspense fallback={<Loading />}>
           <StackedBarChart
             data={balances}
-            series={balanceSegments.map((id) => ({ id, label: c.balance[id], colour: BALANCE_COLOUR[id] }))}
+            series={balanceSegments.map((id) => ({ id, label: c.balance[id], colour: BALANCE_COLOUR[id], concept: BALANCE_CONCEPT[id] }))}
             yFormat={yFormat}
             yDetail={yDetail}
             xTitle={xTitle}

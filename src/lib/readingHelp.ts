@@ -1,3 +1,5 @@
+import { isPreview } from './preview'
+
 // THE FRONT DOOR'S READING CARD (components/ReadingHelp.tsx): offered once, to a first visit, before anything else. Whether it was put away is a
 // preference of THIS device, like the theme and the text size it offers — not part of the profile, so it is not in the versioned store.
 
@@ -7,7 +9,7 @@ export const READING_HELP_KEY = 'horizon-reading-help'
  *  Also true inside a frame (the portfolio's live preview at marcportal.com, worker/securityHeaders.ts): a full-screen settings dialog is not the
  *  product, and the preview should show the front door — the example answer — as a first visit sees it once the offer is put away. */
 export function readingHelpDone(): boolean {
-  if (framed()) return true
+  if (framed() || isPreview()) return true
   try {
     return localStorage.getItem(READING_HELP_KEY) === 'done'
   } catch {

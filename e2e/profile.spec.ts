@@ -423,7 +423,8 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
     for (const path of ['/profil', '/hypotheses', '/resultats', '/donnees']) {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
-      for (const t of await page.locator('.info-btn').all()) await t.click()
+      // every ⓘ a reader can reach — one inside a closed fold is not on the page until the fold is opened
+      for (const t of await page.locator('.info-btn').all()) if (await t.isVisible()) await t.click()
       await expectNoHorizontalOverflow(page)
     }
   })

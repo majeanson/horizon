@@ -42,12 +42,17 @@ const BUDGETS: Record<string, Budget> = {
   // in each account against its balance): two checks the plan never reads, counted only by their summary until opened.
   // controls 327 → 329, words 2039 → 2001 (2026-10-15): one card anatomy (Section `details`) — the Famille card's « enfant prévu » note and the Coussin card's
   // caveat fold under « En savoir plus »: two closed summaries added, ~40 words of prose off the first read.
-  'Profil (form)': { controls: 329, words: 2001 },
+  // controls 329 → 361, words 2001 → 2093 (2026-10-15): every field has its ⓘ (Marc: « inputs with (i) ») — « À propos de ce champ » on the fifty-odd rows
+  // that had none (FieldHelp.tsx; its words load on first open and count only then), the one sentence under every card title, and the map's « 3/7 » counts.
+  'Profil (form)': { controls: 361, words: 2093 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
-  'Hypothèses': { controls: 66, words: 680 },
+  // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
+  // their explanation folded under « En savoir plus »: four closed summaries added, ~80 words off the first read.
+  'Hypothèses': { controls: 70, words: 603 },
   'Fiche': { controls: 28, words: 382 },
-  'Résultats — Réponse': { controls: 47, words: 683 },
+  // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
+  'Résultats — Réponse': { controls: 47, words: 686 },
   'Résultats — Décider': { controls: 50, words: 1217 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.

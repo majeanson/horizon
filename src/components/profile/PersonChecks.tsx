@@ -26,7 +26,7 @@ export function PersonChecks({ person, edit, withNonReg = true }: PersonEditor &
   const rrspPlanned = person.accounts.rrsp.annualContribution
   return (
     <Fold summary={c.summary}>
-      <FieldRow label={c.netPay.label} hint={c.netPay.hint}>
+      <FieldRow label={c.netPay.label} help="checkNetPay" hint={c.netPay.hint}>
         {(w) => <NumberField kind="money" allowEmpty max={1e8} value={person.netPayYearly ?? null} onChange={(v) => edit((x) => setNetPay(x, v))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       {netPay !== null && (
@@ -42,7 +42,7 @@ export function PersonChecks({ person, edit, withNonReg = true }: PersonEditor &
         const check = depositsCheck(account.deposited, account.balance)
         return (
           <div key={kind}>
-            <FieldRow label={c.deposits.label(accountName[kind])} hint={c.deposits.hint}>
+            <FieldRow label={c.deposits.label(accountName[kind])} help="checkDeposits" hint={c.deposits.hint}>
               {(w) => <NumberField kind="money" allowEmpty max={1e9} value={account.deposited ?? null} onChange={(v) => edit((x) => setDeposited(x, kind, v))} id={w.id} ariaDescribedBy={w.describedBy} />}
             </FieldRow>
             {check !== null && (

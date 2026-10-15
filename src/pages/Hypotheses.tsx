@@ -16,6 +16,7 @@ import { StatusMessage } from '../components/StatusMessage'
 import { SubTabs } from '../components/SubTabs'
 import { Switch } from '../components/Switch'
 import { useLang, useT } from '../i18n'
+import { CARD_COPY } from '../lib/cardCopy'
 import { useConfirm } from '../lib/confirm'
 import { formatPct } from '../lib/format'
 import { applyPreset, hasSpouse, mapPerson, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn } from '../lib/profileEdit'
@@ -88,7 +89,7 @@ export function Hypotheses() {
       <PageHead title={a.title} subtitle={a.subtitle} />
       <PinnedMap links={links} ariaLabel={nav.label} page={page} />
 
-      <Section id="scenario" title={a.presets.title} subtitle={a.presets.hint} concept="scenario">
+      <Section id="scenario" title={a.presets.title} subtitle={CARD_COPY[lang].scenario} details={a.presets.hint} concept="scenario">
         <SubTabs<PresetKey | 'custom'>
           ariaLabel={a.presets.label}
           value={active ?? 'custom'}
@@ -139,7 +140,7 @@ export function Hypotheses() {
         </div>
       </Section>
 
-      <Section id="prix" title={a.economy.title} concept="inflation">
+      <Section id="prix" title={a.economy.title} subtitle={CARD_COPY[lang].prices} concept="inflation">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
@@ -176,7 +177,7 @@ export function Hypotheses() {
         {meter('returns', averageReturn)}
       </Section>
 
-      <Section id="marches" title={m.path.title} subtitle={m.path.hint} concept="marches">
+      <Section id="marches" title={m.path.title} subtitle={CARD_COPY[lang].markets} details={m.path.hint} concept="marches">
         <SubTabs
           ariaLabel={m.path.title}
           value={assumptions.marketPath.preset}
@@ -190,7 +191,7 @@ export function Hypotheses() {
         {assumptions.marketPath.preset === 'custom' && (
           <>
             {assumptions.marketPath.custom.map((v, i) => (
-              <FieldRow key={i} label={m.path.year(i + 1)}>
+              <FieldRow key={i} label={m.path.year(i + 1)} help="marketYear">
                 {(w) => <NumberField kind="percent" min={-0.6} max={0.6} value={v ?? averageReturn} onChange={(x) => updateProfile((p) => setMarketYear(p, i, x))} id={w.id} />}
               </FieldRow>
             ))}
@@ -205,7 +206,7 @@ export function Hypotheses() {
 
       {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
           first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
-      <Section id="age" title={a.horizon.title} subtitle={a.horizon.hint} concept="finPlan">
+      <Section id="age" title={a.horizon.title} subtitle={CARD_COPY[lang].horizon} details={a.horizon.hint} concept="finPlan">
         {profile.household.persons.map((person, i) => {
           const own = person.horizonAge ?? null
           const name = person.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
@@ -243,7 +244,7 @@ export function Hypotheses() {
         )}
       </Section>
 
-      <Section id="depenses" title={LIFE_COPY[lang].drift.title} subtitle={LIFE_COPY[lang].drift.hint} concept="depenses">
+      <Section id="depenses" title={LIFE_COPY[lang].drift.title} subtitle={CARD_COPY[lang].drift} details={LIFE_COPY[lang].drift.hint} concept="depenses">
         <Cluster role="radiogroup" aria-label={LIFE_COPY[lang].drift.title}>
           {[0, -0.01, -0.02].map((v) => (
             <Chip key={v} radio selected={(assumptions.retiredSpendingDrift ?? 0) === v} onClick={() => updateProfile((p) => setAssumptions(p, { retiredSpendingDrift: v }))}>
@@ -257,7 +258,7 @@ export function Hypotheses() {
           )}
         </Cluster>
       </Section>
-      <Section id="options" title={a.options.title} icon="lock-bold">
+      <Section id="options" title={a.options.title} subtitle={CARD_COPY[lang].options} icon="lock-bold">
         {/* The splitting switch only when there is someone to split with. */}
         {hasSpouse(profile) && <Switch checked={assumptions.pensionSplitting} onChange={(pensionSplitting) => updateProfile((p) => setAssumptions(p, { pensionSplitting }))} label={a.splitting.on} hint={a.splitting.hint} />}
         {hasSpouse(profile) && <Switch checked={assumptions.drawTogether === true} onChange={(drawTogether) => updateProfile((p) => setAssumptions(p, { drawTogether }))} label={m.together.on} hint={m.together.hint} />}

@@ -29,6 +29,7 @@ export const EN: typeof FR = {
     confirmTitle: 'Confirm',
     clear: 'Clear text',
     whereToFind: 'Where to find this number',
+    aboutField: 'About this field',
     inGlossary: 'See in the glossary',
     openPage: 'Open the official page',
     projected: 'projected',

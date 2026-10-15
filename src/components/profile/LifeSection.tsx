@@ -1,4 +1,5 @@
 import { useLang, useT } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import type { Flow, PersonId } from '../../engine/types'
 import { useConfirm } from '../../lib/confirm'
 import { formatPct, formatYearAge } from '../../lib/format'
@@ -56,7 +57,7 @@ export function LifeSection() {
   const ownerName = (id: PersonId) => persons.find((p) => p.id === id)?.name.trim() || (id === 'self' ? t.profile.self : t.profile.spouse)
 
   return (
-    <Section id="evenements" title={c.title} subtitle={c.hint} concept="evenements">
+    <Section id="evenements" title={c.title} subtitle={CARD_COPY[lang].events} details={c.hint} concept="evenements">
       {flows.length === 0 && <p className="field-row__hint">{c.empty}</p>}
       {flows.length > 0 && (
         <ul className="flows">
@@ -68,7 +69,7 @@ export function LifeSection() {
                 <p className="flow__line">
                   <strong>{f.label.trim() || c.unnamed}</strong> — {c.line(f.kind, formatMoney(f.amount, lang), at(f.fromYear), once || f.kind === 'windfall' ? null : at(f.toYear))}
                 </p>
-                <FieldRow label={c.name}>
+                <FieldRow label={c.name} help="eventName">
                   {(w) => <EditField as="div" value={f.label} onChange={(label) => set((x) => ({ ...x, label }))} submitIcon={null} maxLength={60} id={w.id} ariaLabel={c.name} />}
                 </FieldRow>
                 <Cluster role="radiogroup" aria-label={c.title}>
@@ -79,10 +80,10 @@ export function LifeSection() {
                   ))}
                 </Cluster>
                 <p className="field-row__hint">{c.kindHint[f.kind]}</p>
-                <FieldRow label={f.kind === 'windfall' ? c.amountOnce : c.amountYearly} hint={c.amountHint}>
+                <FieldRow label={f.kind === 'windfall' ? c.amountOnce : c.amountYearly} help="eventAmount" hint={c.amountHint}>
                   {(w) => <NumberField kind="money" max={1e8} value={f.amount} onChange={(amount) => set((x) => ({ ...x, amount }))} id={w.id} ariaDescribedBy={w.describedBy} />}
                 </FieldRow>
-                <FieldRow label={c.from} hint={at(f.fromYear)}>
+                <FieldRow label={c.from} help="eventFrom" hint={at(f.fromYear)}>
                   {(w) => <NumberField kind="year" min={2000} max={2150} value={f.fromYear} onChange={(fromYear) => set((x) => ({ ...x, fromYear, toYear: Math.max(x.toYear, fromYear) }))} id={w.id} ariaDescribedBy={w.describedBy} />}
                 </FieldRow>
                 {f.estimate !== undefined && <EstimateNote estimate={f.estimate} starters={starters} copy={c} lang={lang} onConfirm={() => updateProfile((p) => confirmFlow(p, i))} />}
@@ -97,7 +98,7 @@ export function LifeSection() {
                       </Chip>
                     </Cluster>
                     {!once && (
-                      <FieldRow label={c.to} hint={at(f.toYear)}>
+                      <FieldRow label={c.to} help="eventTo" hint={at(f.toYear)}>
                         {(w) => <NumberField kind="year" min={f.fromYear} max={2150} value={f.toYear} onChange={(toYear) => set((x) => ({ ...x, toYear }))} id={w.id} ariaDescribedBy={w.describedBy} />}
                       </FieldRow>
                     )}

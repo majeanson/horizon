@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLang } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { estimateMissing } from '../../lib/estimates'
 import { needsLevel } from '../../lib/levels'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
@@ -29,7 +30,7 @@ export default function FillBlanks() {
   if (views.length === 0) return null
   const view = picked !== null && views.includes(picked) ? picked : views[0]
   return (
-    <Section id="niveau" title={c.fill.title} subtitle={c.fill.lead} concept="estimation">
+    <Section id="niveau" title={c.fill.title} subtitle={CARD_COPY[lang].levels} details={c.fill.lead} concept="estimation">
       {views.length > 1 && (
         <SubTabs
           size="mini"

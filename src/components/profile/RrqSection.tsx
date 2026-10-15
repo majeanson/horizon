@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { makeRrqRules } from '../../engine/rrqRules'
 import { useLang, useT } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { earningsCeiling, fillFromSalary, historyYears } from '../../lib/earnings'
 import { factId } from '../../lib/facts'
 import { useGuided } from '../../lib/guide'
@@ -52,7 +53,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
   }
 
   return (
-    <Section title={r.title} concept="rrq">
+    <Section title={r.title} subtitle={CARD_COPY[lang].rrq} concept="rrq">
       <FieldRow label={r.startAge} infoId="rrqStartAge" hint={r.startHint}>
         {(w) => (
           <NumberField kind="int" min={60} max={72} unit={t.fields.years} value={person.rrq.startAge} onChange={(startAge) => edit((x) => ({ ...x, rrq: { ...x.rrq, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />

@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { readProfileJson } from './migrations.ts'
 import { defaultProfile, validateProfile, type Profile } from './schema.ts'
+import { isPreview } from './preview.ts'
 import { today } from './today.ts'
 
 // THE ONE PLACE A PROFILE LIVES. In memory it is a single immutable object that components read through
@@ -34,6 +35,8 @@ let timer: ReturnType<typeof setTimeout> | undefined
 const listeners = new Set<() => void>()
 
 function load(): Profile {
+  // The portfolio preview never reads the visitor's own profile: it shows an invented one (components/PreviewGate.tsx), from a blank start.
+  if (isPreview()) return defaultProfile(today())
   let text: string | null
   try {
     text = localStorage.getItem(KEY)
@@ -71,6 +74,8 @@ function notify(): void {
 
 function save(): void {
   timer = undefined
+  // The preview's household lives in memory only: nothing it shows or that is changed in it is ever written to this device.
+  if (isPreview()) return
   // NEVER WRITE WHAT WOULD NOT READ BACK. A profile with a figure outside the schema's limits saved fine and blanked the
   // whole plan at the next launch. The pages hold the same limits at the keyboard (numberFieldBounds.test.ts); this is
   // the net under them, so an edit that slips past them costs one unsaved figure, not the household's plan.

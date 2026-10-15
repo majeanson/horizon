@@ -254,7 +254,7 @@ export function useResultsPage() {
     const who = f.owner === 'household' ? gc.guide.householdOwner : gc.guide.owner(profile.household.persons.find((p) => p.id === f.owner)?.name.trim() || (f.owner === 'self' ? t.profile.self : t.profile.spouse))
     return `${gc.kind[f.kind]} — ${who}`
   }
-  const movers = impact === undefined ? [] : unconfirmed.filter((f) => (impact.swings[f.id]?.years ?? 0) > 0).sort((x, y) => impact.swings[y.id].years - impact.swings[x.id].years).slice(0, 4)
+  const movers = impact === undefined ? [] : unconfirmed.filter((f) => (impact.swings[f.id]?.years ?? 0) > 0).sort((x, y) => impact.swings[y.id].years - impact.swings[x.id].years).slice(0, 5)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   // The change that brings the age forward most (« À faire cette année »): undefined while the levers are worked out, null when none does.
   const bestLever = levers === undefined ? undefined : (levers.levers.filter((l) => l.earliest !== null && (l.yearsGained ?? 0) > 0).sort((x, y) => (y.yearsGained ?? 0) - (x.yearsGained ?? 0))[0] as { id: LeverId; yearsGained: number; earliest: number } | undefined) ?? null

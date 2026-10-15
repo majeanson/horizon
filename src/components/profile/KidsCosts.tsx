@@ -68,7 +68,7 @@ export function KidsCosts() {
         <div className="kids-cost__edit" role="group" aria-label={c.byAgeTitle}>
           <p className="field-row__hint">{c.byAgeTitle}</p>
           {byAge.map((value, i) => (
-            <FieldRow key={c.bands[i]} label={c.bands[i]}>
+            <FieldRow key={c.bands[i]} label={c.bands[i]} help="childCostByAge">
               {(w) => (
                 <NumberField
                   kind="money"
@@ -123,13 +123,13 @@ export function KidsCosts() {
                   ))}
                 </Cluster>
               )}
-              <FieldRow label={k.leave.weeksOf(nameOf(leave.birthParent))}>
+              <FieldRow label={k.leave.weeksOf(nameOf(leave.birthParent))} help="parentalLeaveWeeks">
                 {(w) => (
                   <NumberField kind="int" min={0} max={32 - (people.length > 1 ? leave.otherParentWeeks : 0)} value={leave.birthParentWeeks} onChange={(birthParentWeeks) => updateProfile((p) => patchKidsEffects(p, { leave: { ...leave, birthParentWeeks } }))} id={w.id} />
                 )}
               </FieldRow>
               {people.length > 1 && (
-                <FieldRow label={k.leave.weeksOf(nameOf(otherOf(leave.birthParent)))}>
+                <FieldRow label={k.leave.weeksOf(nameOf(otherOf(leave.birthParent)))} help="parentalLeaveWeeks">
                   {(w) => (
                     <NumberField kind="int" min={0} max={32 - leave.birthParentWeeks} value={leave.otherParentWeeks} onChange={(otherParentWeeks) => updateProfile((p) => patchKidsEffects(p, { leave: { ...leave, otherParentWeeks } }))} id={w.id} />
                   )}

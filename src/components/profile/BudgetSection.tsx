@@ -1,4 +1,5 @@
 import { useLang, useT } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { factId } from '../../lib/facts'
 import { BUDGET_COPY } from '../../lib/budgetCopy'
 import { formatMoney } from '../../lib/money'
@@ -53,10 +54,10 @@ export function BudgetSection({ withKids = false }: { /** The children’s cost 
     return (
       <fieldset className="account-group" key={id}>
         <legend className="account-group__title mono">{title}</legend>
-        <FieldRow label={b.working} infoId={marks ? 'spendingWorking' : undefined} hint={marks ? b.hint : undefined} fact={marks ? factId('household', 'spendingWorking') : undefined}>
+        <FieldRow label={b.working} infoId="spendingWorking" hint={marks ? b.hint : undefined} fact={marks ? factId('household', 'spendingWorking') : undefined}>
           {(w) => <NumberField kind="money" max={1e8} value={row.working} onChange={(working) => updateProfile((p) => setSplitRow(p, id, { working }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
-        <FieldRow label={b.retired} infoId={marks ? 'spendingRetired' : undefined} fact={marks ? factId('household', 'spendingRetired') : undefined}>
+        <FieldRow label={b.retired} infoId="spendingRetired" fact={marks ? factId('household', 'spendingRetired') : undefined}>
           {(w) => <NumberField kind="money" max={1e8} value={row.retired} onChange={(retired) => updateProfile((p) => setSplitRow(p, id, { retired }))} id={w.id} />}
         </FieldRow>
       </fieldset>
@@ -64,7 +65,7 @@ export function BudgetSection({ withKids = false }: { /** The children’s cost 
   }
 
   return (
-    <Section id="budget" title={b.title} concept="budget">
+    <Section id="budget" title={b.title} subtitle={CARD_COPY[lang].budget} concept="budget">
       {couple && (
         <div className="situation__q">
           <p id="budget-how" className="situation__question">

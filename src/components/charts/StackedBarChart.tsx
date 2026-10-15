@@ -2,6 +2,7 @@ import { Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveConta
 import { SERIES_CSS } from './palette'
 import { TwoLineTick } from './tick'
 import type { StackedBarChartProps } from './types'
+import { ConceptPip } from '../ConceptPip'
 
 // The ONE stacked bar chart: where each year's money comes from — plain bars, one segment per source, in the app's own
 // colour tokens. Like the line chart it is a thin adapter: only this folder imports the library, the legend and the
@@ -21,6 +22,7 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
         {series.map((s) => (
           <li key={s.id} className="chart__legend-item">
             <span className="chart__swatch" style={{ background: COLOUR[s.colour] }} />
+            {s.concept && <ConceptPip id={s.concept} size="sm" />}
             {s.label}
           </li>
         ))}

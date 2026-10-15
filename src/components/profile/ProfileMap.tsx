@@ -1,5 +1,7 @@
 import type { RefObject } from 'react'
 import { useT } from '../../i18n'
+import { mapProgress } from '../../lib/mapProgress'
+import { useProfile } from '../../lib/store'
 import { PinnedMap } from '../PinnedMap'
 import type { SectionLink } from '../SectionNav'
 
@@ -7,13 +9,15 @@ import type { SectionLink } from '../SectionNav'
 export function ProfileMap({ people, withHome, withEvents, withExact, page }: { people: ReadonlyArray<{ id: string; name: string }>; withHome: boolean; withEvents: boolean; withExact: boolean; page: RefObject<HTMLElement | null> }) {
   const t = useT()
   const n = t.profile.nav
+  // Each chip says how much of its block is confirmed: where the gaps are, without scrolling the form.
+  const progress = mapProgress(useProfile())
   const links: SectionLink[] = [
-    { id: 'famille', label: n.family, concept: 'famille' },
+    { id: 'famille', label: n.family, concept: 'famille' as const },
     ...people.map((p) => ({ id: `person-${p.id}`, label: p.name, concept: 'personne' as const })),
-    { id: 'budget', label: n.budget, concept: 'budget' },
+    { id: 'budget', label: n.budget, concept: 'budget' as const },
     ...(withHome ? [{ id: 'maison', label: n.home, concept: 'maison' as const }] : []),
     ...(withEvents ? [{ id: 'evenements', label: n.events, concept: 'evenements' as const }] : []),
     ...(withExact ? [{ id: 'exact', label: n.exact, concept: 'documents' as const }] : []),
-  ]
+  ].map((l): SectionLink => (progress[l.id] ? { ...l, progress: progress[l.id] } : l))
   return <PinnedMap links={links} ariaLabel={n.label} page={page} />
 }

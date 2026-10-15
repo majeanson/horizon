@@ -7,6 +7,7 @@ import { useLang } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
 import {
   SEGMENT_COLOUR,
+  SEGMENT_CONCEPT,
   SEGMENTS,
   barRows,
   bridgeQuery,
@@ -103,7 +104,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
         <Suspense fallback={<Loading />}>
           <StackedBarChart
             data={bars}
-            series={SEGMENTS.map((id) => ({ id, label: id === 'work' && rows.some((r) => r.dated > 0) ? copy.segment.workOther : copy.segment[id], colour: SEGMENT_COLOUR[id] }))}
+            series={SEGMENTS.map((id) => ({ id, label: id === 'work' && rows.some((r) => r.dated > 0) ? copy.segment.workOther : copy.segment[id], colour: SEGMENT_COLOUR[id], concept: SEGMENT_CONCEPT[id] }))}
             line={{ id: 'need', label: copy.needLine }}
             yFormat={(y) => formatCompactMoney(y, lang)}
             yDetail={(y) => formatMoney(y, lang)}

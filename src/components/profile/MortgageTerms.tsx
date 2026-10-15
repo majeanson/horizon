@@ -51,7 +51,7 @@ export function MortgageTerms({ home, label }: { home: Home; /** The row label o
           </Chip>
         ))}
       </Cluster>
-      <FieldRow label={label && frequency === 'monthly' ? label : c.payment[frequency]}>
+      <FieldRow label={label && frequency === 'monthly' ? label : c.payment[frequency]} help="mortgagePayment">
         {(w) => <NumberField kind="money" max={1e6} value={shown} onChange={(typed) => set({ monthlyPayment: (typed * perYear) / 12 })} id={w.id} />}
       </FieldRow>
       {frequency !== 'monthly' && <p className="field-row__hint">{c.equals(formatMoney(Math.round(m.monthlyPayment * 100) / 100, lang, { cents: true }))}</p>}
@@ -61,10 +61,10 @@ export function MortgageTerms({ home, label }: { home: Home; /** The row label o
       </Chip>
       {renewal !== null && (
         <>
-          <FieldRow label={c.renewal.year} hint={c.renewal.yearHint}>
+          <FieldRow label={c.renewal.year} help="renewalYear" hint={c.renewal.yearHint}>
             {(w) => <NumberField kind="year" min={now.year} max={2100} value={renewal.year} onChange={(year) => set({ renewal: { ...renewal, year } })} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
-          <FieldRow label={c.renewal.rate}>
+          <FieldRow label={c.renewal.rate} help="renewalRate">
             {(w) => <NumberField kind="percent" min={0} max={0.25} value={renewal.rate} onChange={(rate) => set({ renewal: { ...renewal, rate } })} id={w.id} />}
           </FieldRow>
           <Cluster role="radiogroup" aria-label={c.renewal.keepTitle}>

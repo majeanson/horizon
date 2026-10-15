@@ -80,7 +80,9 @@ export type ChartMetric = Metric | 'detail'
 export const SOURCE_SEGMENTS = ['work', 'db', 'rrq', 'oas', 'nest'] as const
 export type SourceSegment = (typeof SOURCE_SEGMENTS)[number]
 /** Work and the employer's pension are the work family (berry), the QPP and the OAS the public pensions (sage), what is drawn from savings the nest. */
-export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: seriesFor('salaire'), db: seriesFor('employeur', 'soft'), rrq: seriesFor('rrq'), oas: seriesFor('psv', 'soft'), nest: seriesFor('nid') }
+/** The concept each segment stands for: its colour comes from it, and its legend wears its pip (components/charts). */
+export const SOURCE_CONCEPT: Record<SourceSegment, ConceptId> = { work: 'salaire', db: 'employeur', rrq: 'rrq', oas: 'psv', nest: 'nid' }
+export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: seriesFor(SOURCE_CONCEPT.work), db: seriesFor(SOURCE_CONCEPT.db, 'soft'), rrq: seriesFor(SOURCE_CONCEPT.rrq), oas: seriesFor(SOURCE_CONCEPT.oas, 'soft'), nest: seriesFor(SOURCE_CONCEPT.nest) }
 
 export const BALANCE_SEGMENTS = ['rrsp', 'tfsa', 'nonReg'] as const
 export type BalanceSegment = (typeof BALANCE_SEGMENTS)[number]
@@ -88,7 +90,8 @@ export type BalanceSegment = (typeof BALANCE_SEGMENTS)[number]
 export type BalanceBarSegment = BalanceSegment | 'rrspLocked' | 'home'
 /** `rrspLocked` splits the locked-in part out of the REER bar (the `rrsp` bar is then the free part): a segment only when someone has one. */
 /** The REER, the CELI and the locked-in part are the registered accounts (marigold, three tiers); the non-registered money and the house are the household's (sky). */
-export const BALANCE_COLOUR: Record<BalanceBarSegment, SeriesColour> = { rrsp: seriesFor('reer'), rrspLocked: seriesFor('verrouille', 'soft'), tfsa: seriesFor('celi', 'mid'), nonReg: seriesFor('nonEnregistre'), home: seriesFor('maison', 'soft') }
+export const BALANCE_CONCEPT: Record<BalanceBarSegment, ConceptId> = { rrsp: 'reer', rrspLocked: 'verrouille', tfsa: 'celi', nonReg: 'nonEnregistre', home: 'maison' }
+export const BALANCE_COLOUR: Record<BalanceBarSegment, SeriesColour> = { rrsp: seriesFor(BALANCE_CONCEPT.rrsp), rrspLocked: seriesFor(BALANCE_CONCEPT.rrspLocked, 'soft'), tfsa: seriesFor(BALANCE_CONCEPT.tfsa, 'mid'), nonReg: seriesFor(BALANCE_CONCEPT.nonReg), home: seriesFor(BALANCE_CONCEPT.home, 'soft') }
 
 /** `year`: the sums of each year (the default) · `month`: the same sums over twelve — « how much a month », which is how a household lives with money. */
 export type Per = 'year' | 'month'
@@ -164,6 +167,7 @@ export const EXPENSE_SEGMENTS = ['living', 'children', 'events', 'mortgage', 'ta
 export type ExpenseSegment = (typeof EXPENSE_SEGMENTS)[number]
 /** `unmet`: what the plan needed and could not pay — drawn only in a plan that runs out. */
 /** The budget, the tax and what could not be paid are the money that leaves (terracotta, three tiers); the children, the events and the mortgage the household's (sky); the deductions come off the pay (berry); what is saved goes to the accounts (marigold). */
+export const EXPENSE_CONCEPT: Record<ExpenseSegment, ConceptId> = { living: 'budget', children: 'enfants', events: 'evenements', mortgage: 'hypotheque', tax: 'impot', deductions: 'salaire', saved: 'reer', unmet: 'depenses' }
 export const EXPENSE_COLOUR: Record<ExpenseSegment, SeriesColour> = { living: seriesFor('budget', 'soft'), children: seriesFor('enfants'), events: seriesFor('evenements', 'soft'), mortgage: seriesFor('hypotheque', 'mid'), tax: seriesFor('impot', 'mid'), deductions: seriesFor('salaire'), saved: seriesFor('reer'), unmet: seriesFor('depenses') }
 
 /**

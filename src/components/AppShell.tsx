@@ -1,14 +1,17 @@
 import { NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useHeadroom } from '../lib/useHeadroom'
 import { useLang, useT } from '../i18n'
 import { saveCopy } from '../lib/saveCopy'
+import { isPreview } from '../lib/preview'
 import { snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import { Icon, type IconName } from './Icon'
 import { Skeleton } from './Skeleton'
 import { StatusMessage } from './StatusMessage'
+
+const PreviewGate = lazy(() => import('./PreviewGate'))
 
 // The chrome around every page: a top bar (name, language, day/night, the settings gear) and the main
 // navigation — a bottom bar on a phone, a left rail on a wide screen. The switch between the
@@ -172,7 +175,14 @@ export function AppShell() {
         {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched — and the
             wait has a shape (a few quiet blocks where the page's cards will be), not a lone word. */}
         <Suspense fallback={<Skeleton count={4} />}>
-          <Outlet />
+          {/* The portfolio preview (lib/preview.ts) wraps the page: its invented household is in the store before the page first renders. */}
+          {isPreview() ? (
+            <PreviewGate>
+              <Outlet />
+            </PreviewGate>
+          ) : (
+            <Outlet />
+          )}
         </Suspense>
       </main>
     </div>

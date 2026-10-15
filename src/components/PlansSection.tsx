@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLang } from '../i18n'
+import { CARD_COPY } from '../lib/cardCopy'
 import { useConfirm } from '../lib/confirm'
 import { PLANS_COPY } from '../lib/plansCopy'
 import { cleanPlanName, deletePlan, openPlan, planIsCurrent, savePlan } from '../lib/profileEdit'
@@ -31,7 +32,7 @@ export function PlansSection({ onReplace }: { onReplace: (before: Profile) => vo
   }
 
   return (
-    <Section title={c.title} subtitle={c.hint} concept="plans">
+    <Section title={c.title} subtitle={CARD_COPY[lang].plans} details={c.hint} concept="plans">
       <form
         className="plans__new"
         onSubmit={(e) => {

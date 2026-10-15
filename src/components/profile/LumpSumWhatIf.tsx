@@ -37,7 +37,7 @@ export function LumpSumWhatIf({ home }: { home: Home }) {
   })()
   return (
     <Fold summary={c.summary}>
-      <FieldRow label={c.amount} hint={c.amountHint}>
+      <FieldRow label={c.amount} help="lumpSum" hint={c.amountHint}>
         {(w) => <NumberField kind="money" allowEmpty max={1e8} value={lump} onChange={setLump} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       {sentence !== null && (

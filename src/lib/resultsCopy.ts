@@ -109,6 +109,16 @@ const FR_RESULTS = {
     printedOn: (month: number, year: number) => `Imprimé en ${MONTHS_FR[month - 1]} ${year}`,
     /** The title of the assumptions line on the printed plan. */
     assumptions: 'Hypothèses retenues',
+    /** The printed plan's « dossier » block: every figure the answer stands on, as the profile holds it, and whether a document confirms it — what a planner checks first. */
+    figures: {
+      title: 'Les chiffres du profil',
+      intro: 'Tels que saisis dans Horizon. « Confirmé » : lu sur le document qui le donne ; « estimé » : à vérifier.',
+      confirmed: 'confirmé',
+      estimated: 'estimé',
+      years: (n: number) => `${n} ${n === 1 ? 'année saisie' : 'années saisies'}`,
+      since: (year: number) => `depuis ${year}`,
+      plans: (n: number) => `${n} ${n === 1 ? 'régime' : 'régimes'}`,
+    },
     printFoot: 'Une estimation selon vos hypothèses, pas un conseil financier. Chaque chiffre du gouvernement est cité, avec sa page officielle, dans l’application (Vérifier › Paramètres utilisés).',
     csv: 'Télécharger en tableur (CSV)',
     csvDone: 'Tableau exporté',
@@ -328,6 +338,15 @@ const EN_RESULTS: typeof FR_RESULTS = {
     printTitle: 'Horizon — my retirement plan',
     printedOn: (month: number, year: number) => `Printed in ${MONTHS_EN[month - 1]} ${year}`,
     assumptions: 'Assumptions used',
+    figures: {
+      title: 'The figures of the profile',
+      intro: 'As entered in Horizon. “Confirmed”: read on the document that gives it; “estimated”: to be checked.',
+      confirmed: 'confirmed',
+      estimated: 'estimated',
+      years: (n: number) => `${n} ${n === 1 ? 'year entered' : 'years entered'}`,
+      since: (year: number) => `since ${year}`,
+      plans: (n: number) => `${n} ${n === 1 ? 'plan' : 'plans'}`,
+    },
     printFoot: 'An estimate based on your assumptions, not financial advice. Every government figure is cited, with its official page, in the app (Check › Parameters used).',
     csv: 'Download as a spreadsheet (CSV)',
     csvDone: 'Table exported',

@@ -35,7 +35,7 @@ export function SaveView({
   const saving = household.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
   return (
     <div className="surface answer" aria-live={busy ? 'off' : 'polite'} aria-busy={busy}>
-      <FieldRow label={q.age}>
+      <FieldRow label={q.age} help="saveTargetAge">
         {(w) => <NumberField kind="int" min={minAge} max={maxAge} unit={t.fields.years} value={age} onChange={onAge} id={w.id} />}
       </FieldRow>
       {busy && answer !== null && (

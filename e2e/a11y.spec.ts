@@ -82,7 +82,8 @@ for (const s of STATES) {
       await seedProfile(page, EXAMPLE)
       await page.goto(path)
       await page.locator(ready).waitFor()
-      for (const b of await page.locator('.info-btn').all()) await b.click()
+      // every ⓘ a reader can reach — one inside a closed fold is not on the page until the fold is opened
+      for (const b of await page.locator('.info-btn').all()) if (await b.isVisible()) await b.click()
       // A computed figure's note (Figure) on its tinted ground: open the first one the page holds (only the proof view has any).
       const figure = page.locator('button.figure').first()
       if ((await figure.count()) > 0) await figure.click()

@@ -33,10 +33,10 @@ export function PartTimeFields({ person, edit }: PersonEditor) {
       </Cluster>
       {pt !== null && (
         <>
-          <FieldRow label={c.share} hint={c.shareHint}>
+          <FieldRow label={c.share} help="partTimeShare" hint={c.shareHint}>
             {(w) => <NumberField kind="percent" min={0.05} max={1} value={pt.share} onChange={(share) => set({ ...pt, share })} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
-          <FieldRow label={c.until} hint={c.untilHint}>
+          <FieldRow label={c.until} help="partTimeUntil" hint={c.untilHint}>
             {(w) => <NumberField kind="int" min={50} max={80} unit={t.fields.years} value={pt.untilAge} onChange={(untilAge) => set({ ...pt, untilAge })} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
           <p className="field-row__hint">{pt.untilAge > person.retirementAge ? c.summary(formatPct(pt.share, lang, 0), person.retirementAge, pt.untilAge) : c.nothing(person.retirementAge, pt.untilAge)}</p>

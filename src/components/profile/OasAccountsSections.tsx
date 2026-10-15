@@ -2,6 +2,7 @@ import { lazy, Suspense, useState, type ReactNode } from 'react'
 import type { Person } from '../../engine/types'
 import type { InfoId } from '../../i18n'
 import { useLang, useT } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { ACCOUNT_CONCEPT, type ConceptId } from '../../lib/concepts'
 import { factId } from '../../lib/facts'
 import { formatMoney } from '../../lib/money'
@@ -21,8 +22,9 @@ import { TfsaRoomHelper } from './TfsaRoomHelper'
 export function OasSection({ person, edit, withoutResidence = false }: PersonEditor & { /** The years of residence are asked only of someone who lived abroad after 18 (« Ma situation »). */ withoutResidence?: boolean }) {
   const t = useT()
   const o = t.profile.oas
+  const { lang } = useLang()
   return (
-    <Section title={o.title} concept="psv">
+    <Section title={o.title} subtitle={CARD_COPY[lang].oas} concept="psv">
       {!withoutResidence && (<>
       <FieldRow label={o.residentSince} infoId="oasResidence" hint={o.residentHint} fact={factId(person.id, 'residence')}>
         {(w) => (
@@ -88,7 +90,7 @@ function LockedPart({ person, set }: { person: Person; set: (patch: Partial<Pers
           <FieldRow label={a.locked} infoId="rrspLocked" hint={a.lockedHint} fact={factId(person.id, 'rrspLocked')}>
             {(w) => <NumberField kind="money" max={rrsp.balance} value={locked} onChange={(lockedIn) => set({ lockedIn })} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
-          <FieldRow label={a.employerContribution} hint={a.employerHint}>
+          <FieldRow label={a.employerContribution} help="employerContribution" hint={a.employerHint}>
             {(w) => <NumberField kind="money" max={1e9} value={employer} onChange={(employerContribution) => set({ employerContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
         </>
@@ -115,7 +117,7 @@ function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & 
         </FieldRow>
       )}
       {withRoom && kind === 'tfsa' && <TfsaRoomHelper person={person} edit={edit} />}
-      <FieldRow label={a.contribution} hint={a.contributionHint}>
+      <FieldRow label={a.contribution} help="annualContribution" hint={a.contributionHint}>
         {(w) => <NumberField kind="money" max={1e9} value={account.annualContribution} onChange={(annualContribution) => set({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       {kind === 'rrsp' && <LockedPart person={person} set={set} />}
@@ -126,10 +128,11 @@ function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & 
 export function AccountsSection({ person, edit, withoutRoom = false, withNonReg = true }: PersonEditor & { /** The room left comes from the tax notice: the stepper asks for it there. */ withoutRoom?: boolean; /** Money outside the REER and the CELI: its group shows only when « Ma situation » says there is some (or there already is). */ withNonReg?: boolean }) {
   const t = useT()
   const a = t.profile.accounts
+  const { lang } = useLang()
   const nonReg = person.accounts.nonReg
   const setNonReg = (patch: Partial<typeof nonReg>) => edit((x) => ({ ...x, accounts: { ...x.accounts, nonReg: { ...x.accounts.nonReg, ...patch } } }))
   return (
-    <Section title={a.title} concept="nid">
+    <Section title={a.title} subtitle={CARD_COPY[lang].accounts} concept="nid">
       <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} withRoom={!withoutRoom} />
       <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} withRoom={!withoutRoom} />
       {withNonReg && (
@@ -141,7 +144,7 @@ export function AccountsSection({ person, edit, withoutRoom = false, withNonReg 
         <FieldRow label={a.acb} infoId="nonRegAcb" hint={a.acbHint} fact={factId(person.id, 'nonRegAcb')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.acb} onChange={(acb) => setNonReg({ acb })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
-        <FieldRow label={a.contribution} hint={a.contributionHint}>
+        <FieldRow label={a.contribution} help="annualContribution" hint={a.contributionHint}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.annualContribution} onChange={(annualContribution) => setNonReg({ annualContribution })} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
       </Group>
