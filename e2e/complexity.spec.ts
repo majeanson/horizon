@@ -40,7 +40,9 @@ const BUDGETS: Record<string, Budget> = {
   // count only once opened): a bank export counted by category, read on the device.
   // controls 325 → 327, words 2031 → 2039 (2026-10-14): « Vérifier avec mes relevés » — one closed fold per person under the accounts (the year's net pay against what the salary leaves, and the deposits
   // in each account against its balance): two checks the plan never reads, counted only by their summary until opened.
-  'Profil (form)': { controls: 327, words: 2039 },
+  // controls 327 → 329, words 2039 → 2001 (2026-10-15): one card anatomy (Section `details`) — the Famille card's « enfant prévu » note and the Coussin card's
+  // caveat fold under « En savoir plus »: two closed summaries added, ~40 words of prose off the first read.
+  'Profil (form)': { controls: 329, words: 2001 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   'Hypothèses': { controls: 66, words: 680 },

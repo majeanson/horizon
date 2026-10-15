@@ -38,7 +38,7 @@ export function HomeSection() {
   })()
 
   return (
-    <Section id="maison" title={h.title} subtitle={h.hint} details={home === null ? undefined : HOME_COPY[lang].nudge} concept="maison">
+    <Section id="maison" title={h.title} subtitle={h.hint} concept="maison">
       {home === null ? (
         <>
           <p className="field-row__hint">{h.none}</p>
@@ -69,6 +69,8 @@ export function HomeSection() {
           )}
           {home.mortgage.balance <= 0 && <p className="field-row__hint">{h.paidOff}</p>}
           <p className="field-row__hint">{h.equity(money(Math.max(0, home.value - home.mortgage.balance)))}</p>
+          {/* Stays on the card, not in « En savoir plus »: it says where to put the costs owning brings — needed to act (Fold.tsx). */}
+          <p className="field-row__hint">{HOME_COPY[lang].nudge}</p>
 
           <Chip selected={home.sale !== null} expanded={home.sale !== null} onClick={() => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: x.sale ? null : { age: 75, replacementCost: 0 } })))}>
             {h.sell}
