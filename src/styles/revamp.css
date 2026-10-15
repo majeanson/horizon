@@ -944,6 +944,8 @@
 }
 .ajuster__levers {
   margin-top: 0;
+  /* the one child of a bare `.surface` (DecideView #ajuster), which carries no padding of its own: without this the title and the levers sat flush against the card's edge */
+  padding: 0.9rem 1.1rem;
 }
 
 /* On paper the relevé is the whole list, not a box with a scroll bar. */

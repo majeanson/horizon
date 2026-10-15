@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
@@ -15,6 +15,8 @@ import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
 import { loadExample } from '../lib/example'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
+import { freshStart, profileLooksReal } from '../lib/freshStart'
+import { FRESH_START_COPY } from '../lib/freshStartCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
 import { saveCopy } from '../lib/saveCopy'
@@ -57,6 +59,17 @@ export function Donnees() {
   const download = () => {
     saveCopy()
     notice(d.export.done)
+  }
+
+  // « Repartir à neuf » (lib/freshStart.ts): the device as a first visit finds it, then the front door — which asks its two questions again. A profile
+  // that looks like somebody's asks first, in words that say what is lost; a blank one is not worth a question. No notice: the first-visit dialog
+  // that opens IS the confirmation, and it covers the screen.
+  const navigate = useNavigate()
+  const fc = FRESH_START_COPY[lang]
+  const restart = async () => {
+    if (profileLooksReal(getProfile()) && !(await confirm({ message: fc.confirm, confirmLabel: fc.confirmLabel, tone: 'danger' }))) return
+    freshStart()
+    navigate('/')
   }
 
   const onFile = async (file: File | undefined) => {
@@ -192,6 +205,14 @@ export function Donnees() {
             }}
           >
             {d.clear.button}
+          </button>
+        </Cluster>
+      </Section>
+      {/* No icon: the core set (lib/pipIcons.ts, in the shell) has no « again » glyph and the eager entry is at its cap; the words carry it. */}
+      <Section title={fc.title} subtitle={fc.hint}>
+        <Cluster>
+          <button type="button" className="btn btn--danger" onClick={() => void restart()}>
+            {fc.button}
           </button>
         </Cluster>
       </Section>

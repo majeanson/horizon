@@ -332,6 +332,14 @@
 .fold__body > p {
   margin: 0;
 }
+/* A fold that is a card of its own (`className="surface"`: the examples on Données, « Ma situation », the map and the folded doors on Accueil): a `.surface`
+   carries no padding, so without this its summary and its body sat flush against the card's edge. The same inset as a door. */
+.fold.surface {
+  padding: 0.9rem 1.1rem;
+}
+.fold.surface > .fold__body {
+  margin-top: 0.6rem;
+}
 
 /* ── Switch (components/Switch.tsx): the one on/off setting ────────────────── */
 /* A knob on a track, the label beside it. The knob's position is the picture; the ARIA state and the label are the words. */
