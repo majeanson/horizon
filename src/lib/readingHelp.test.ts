@@ -29,6 +29,16 @@ describe('whether the reading card was put away', () => {
     expect(() => markReadingHelpDone()).not.toThrow()
   })
 
+  it('inside a frame (the portfolio preview) it counts as put away, whatever the storage says', () => {
+    vi.spyOn(window, 'top', 'get').mockReturnValue({} as Window)
+    expect(readingHelpDone()).toBe(true)
+    // a frame whose top cannot even be compared is taken as framed too
+    vi.spyOn(window, 'top', 'get').mockImplementation(() => {
+      throw new Error('cross-origin')
+    })
+    expect(readingHelpDone()).toBe(true)
+  })
+
   it('any other stored value is not « done »', () => {
     localStorage.setItem(READING_HELP_KEY, 'yes')
     expect(readingHelpDone()).toBe(false)

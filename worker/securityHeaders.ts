@@ -12,6 +12,8 @@
 // strictly `'self'`. If a zone's edge ever injects an inline script of its own (Cloudflare's
 // Web Analytics beacon does when auto-install is on), the browser will refuse it and log a
 // CSP error — the app does not need it — rather than the policy being loosened to admit it.
+const FRAME_ANCESTORS = ["'self'", 'https://marcportal.com', 'https://*.marcportal.com'] as const
+
 const CSP_DIRECTIVES = [
   "default-src 'self'",
   "script-src 'self'",
@@ -24,7 +26,9 @@ const CSP_DIRECTIVES = [
   "base-uri 'self'",
   "form-action 'self'",
   "object-src 'none'",
-  "frame-ancestors 'none'",
+  // Framed ONLY by Marc's portfolio (marcportal.com/projects shows a live preview). Nothing else may embed the app.
+  // A frame on that origin still cannot read the profile: storage is per-origin, and the app sends nothing anywhere.
+  `frame-ancestors ${FRAME_ANCESTORS.join(' ')}`,
 ].join('; ')
 
 export const ENFORCED: ReadonlyArray<readonly [name: string, value: string]> = [
@@ -34,11 +38,11 @@ export const ENFORCED: ReadonlyArray<readonly [name: string, value: string]> = [
   // The app uses no device capability at all.
   ['Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()'],
   ['Content-Security-Policy', CSP_DIRECTIVES],
-  // Nothing cross-origin is ever embedded or embedding: isolate the browsing context, refuse
-  // cross-origin reads of our responses, and keep the pre-CSP framing header for old browsers.
+  // Isolate the browsing context and refuse cross-origin reads of our responses.
+  // NO X-Frame-Options: it has no multi-origin allowlist (DENY would refuse the portfolio's frame), and
+  // `frame-ancestors` above supersedes it in every browser that honours CSP.
   ['Cross-Origin-Opener-Policy', 'same-origin'],
   ['Cross-Origin-Resource-Policy', 'same-origin'],
-  ['X-Frame-Options', 'DENY'],
 ]
 
 // THE OTHER HALF OF THE SAME GUARANTEE. Cloudflare's assets router serves a request that
