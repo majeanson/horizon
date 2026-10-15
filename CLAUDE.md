@@ -146,6 +146,7 @@ the local run, and **which test flaked is the whole signal**; never dismiss one 
   first. The chart library rides with `Resultats` and never in the shell (`check-bundle.mjs`).
 - **`worker/index.ts`** — serves `dist/` and turns the SPA fallback into a **404 for `/assets/*`**
   (a stale shell asking for a gone chunk must not receive HTML as JavaScript).
+  It also answers two share routes from the ADDRESS alone (`worker/shareRoutes.ts`): `/partage?age=62&foyer=couple&l=fr` (the shell with link-preview tags rewritten) and `/og/scenario?…` (a card PNG pre-rendered by `npm run og` into `public/og/`, never drawn at request time: a Worker dies at its CPU limit under a burst). A share link carries an age, a household type and a language, never a figure from the profile (`lib/shareLink.ts`).
 - **PWA / offline** — `vite.config.ts` generates `dist/sw.js` with the real hashed asset list, so
   the app reopens offline *with the profile intact*. Bump `SW_POLICY` when the caching rules
   change; keep `ONLINE_ONLY_CHUNKS` ↔ `check-bundle.mjs` in sync. Chrome logs a benign « A preload

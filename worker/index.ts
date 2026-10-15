@@ -1,8 +1,10 @@
 import { withSecurityHeaders } from './securityHeaders'
+import { isShareRoute, shareRoute } from './shareRoutes'
 
 // The whole backend: serve the built SPA from the ASSETS binding. There is no /api — the
 // profile never leaves the browser — so this file is deliberately tiny, and the fact that it
-// has nothing else to do is part of the product's privacy story.
+// has nothing else to do is part of the product's privacy story. (The one addition, worker/shareRoutes.ts, is a
+// function of the ADDRESS alone: link-preview tags and a card image for a shared result. It reads nothing.)
 interface Env {
   ASSETS: Fetcher
 }
@@ -11,8 +13,14 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     // The assets binding serves a real file when one matches, else index.html (the SPA
     // fallback) so a client-side route like /resultats survives a reload.
-    const res = await env.ASSETS.fetch(request)
     const path = new URL(request.url).pathname
+    if (isShareRoute(request, path)) {
+      const shared = withSecurityHeaders(await shareRoute(request, env))
+      // The card is fetched across origins by whoever unfurls the link; withSecurityHeaders' same-origin policy would refuse it.
+      if (path !== '/partage') shared.headers.set('Cross-Origin-Resource-Policy', 'cross-origin')
+      return shared
+    }
+    const res = await env.ASSETS.fetch(request)
 
     // …but /assets/* is the hashed build output, never a client route, so the SPA fallback is
     // WRONG there: a stale shell asking for a previous build's chunk would get 200 + index.html

@@ -1329,3 +1329,20 @@
   display: grid;
   gap: 0.35rem;
 }
+
+/* ── The foot of every page: who built it ─────────────────────────────────────────────────────────────────────── */
+.shell__foot {
+  margin: 2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: center;
+}
+.shell__foot a {
+  color: inherit;
+  text-decoration: underline;
+}
+@media print {
+  .shell__foot {
+    display: none;
+  }
+}

@@ -184,6 +184,13 @@ export function AppShell() {
             <Outlet />
           )}
         </Suspense>
+        {/* One quiet line at the foot of every page: who built it, as a plain link. It leaves the app, so it opens nothing of the profile. */}
+        <p className="shell__foot">
+          {t.common.builtBy}{' '}
+          <a href="https://marcportal.com" rel="noopener">
+            marc.portal
+          </a>
+        </p>
       </main>
     </div>
   )

@@ -23,6 +23,7 @@ import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
+import { ShareChip } from '../ShareChip'
 import { ConceptPip } from '../../ConceptPip'
 import { FACT_CONCEPT } from '../../../lib/concepts'
 
@@ -120,6 +121,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                     {/* The guided tour has ONE home: here, beside the card's other door. It walks the departure ages, so a household that has already stopped working is not offered it
                         (this branch is the working household with a real answer; the tour's own availability, `tour`, lives in the model). */}
                     {!retiredNow && <Chip icon="arrow-right-bold" onClick={() => setTour(1)}>{TOUR_COPY[lang].open}</Chip>}
+                    {/* The result as a link: the age and the household type, nothing from the profile (lib/shareLink.ts). */}
+                    {!retiredNow && headline.age !== null && <ShareChip age={headline.age} isCouple={isCouple} />}
                   </Cluster>
                 </>
               )}

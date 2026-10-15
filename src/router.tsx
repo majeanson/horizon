@@ -12,6 +12,7 @@ const Hypotheses = lazy(() => import('./pages/Hypotheses').then((m) => ({ defaul
 const Resultats = lazy(() => import('./pages/Resultats').then((m) => ({ default: m.Resultats })))
 const Donnees = lazy(() => import('./pages/Donnees').then((m) => ({ default: m.Donnees })))
 const Fiche = lazy(() => import('./pages/Fiche').then((m) => ({ default: m.Fiche })))
+const Partage = lazy(() => import('./pages/Partage').then((m) => ({ default: m.Partage })))
 const Glossaire = lazy(() => import('./pages/Glossaire').then((m) => ({ default: m.Glossaire })))
 const DevKit = lazy(() => import('./pages/DevKit').then((m) => ({ default: m.DevKit })))
 
@@ -37,6 +38,7 @@ export function AppRoutes() {
           <Route path="documents" element={<EntryRedirect step="gather" />} />
           <Route path="saisie" element={<EntryRedirect step={null} />} />
           <Route path="fiche" element={<Fiche />} />
+          <Route path="partage" element={<Partage />} />
           <Route path="glossaire" element={<Glossaire />} />
           <Route path="donnees" element={<Donnees />} />
           {/* Unknown paths land on the first page rather than a dead end — and the ADDRESS follows:

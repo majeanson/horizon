@@ -20,6 +20,7 @@
     "verify": "npm run typecheck && npm test && npm run build && npm run check:bundle",
     "sources": "node scripts/gen-sources.ts",
     "examples": "node scripts/gen-examples.ts",
+    "og": "node scripts/gen-og.ts",
     "sources:check": "node scripts/check-sources.ts",
     "knip": "knip",
     "deploy": "npm run build && wrangler deploy"
@@ -42,6 +43,8 @@
     "@vitejs/plugin-react": "^6.1.1",
     "happy-dom": "^20.14.5",
     "knip": "^6.38.0",
+    "satori": "^0.60.0",
+    "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.1",
     "vitest": "^4.1.11",
