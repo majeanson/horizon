@@ -8,7 +8,6 @@ import { NextStep } from '../components/NextStep'
 import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
-import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
 import { PinnedMap } from '../components/PinnedMap'
 import { Section } from '../components/profile/shared'
@@ -85,7 +84,6 @@ export function Hypotheses() {
 
   return (
     <section className="page-body" ref={page}>
-      <LiveAnswer />
       <PageHead title={a.title} subtitle={a.subtitle} />
       <PinnedMap links={links} ariaLabel={nav.label} page={page} />
 

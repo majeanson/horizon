@@ -1,7 +1,7 @@
 import type { Lang } from '../i18n.ts'
 
-// THE WORDS OF THE LIVE ANSWER — the strip that follows the answer while Profil and Hypothèses are edited. Outside the eager
-// dictionaries: the strip is a lazy chunk (its worker is not the shell's business), and so are its words.
+// THE WORDS OF THE LIVE ANSWER — the age in the top bar (components/BarAnswer.tsx) and the strip under the first-visit path's question
+// (components/LiveAnswer.tsx). Outside the eager dictionaries: both are lazy chunks (a worker is not the shell's business), and so are their words.
 
 export interface LiveCopy {
   label: string
@@ -17,9 +17,8 @@ export interface LiveCopy {
   lost: string
   see: string
   working: string
-  /** While figures are estimates: the answer's range (every estimate nudged 15 % at once). `open`: the worse end is « no age before the maximum ». */
-  range: (low: number, high: number) => string
-  rangeOpen: (low: number, max: number) => string
+  /** The top bar: room for two words, and the link's full name for a screen reader. */
+  bar: { none: string; aria: (said: string) => string }
 }
 
 const FR: LiveCopy = {
@@ -33,8 +32,7 @@ const FR: LiveCopy = {
   lost: 'plus aucun âge ne fonctionne',
   see: 'Voir',
   working: '…',
-  range: (low, high) => `Entre ${low} et ${high} ans selon vos chiffres estimés`,
-  rangeOpen: (low, max) => `Entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés`,
+  bar: { none: 'aucun âge', aria: (said) => `Votre réponse : ${said}. Voir les résultats` },
 }
 
 const EN: LiveCopy = {
@@ -48,8 +46,7 @@ const EN: LiveCopy = {
   lost: 'no age works any more',
   see: 'See',
   working: '…',
-  range: (low, high) => `Between age ${low} and ${high}, depending on your estimated figures`,
-  rangeOpen: (low, max) => `Between age ${low} and possibly no age before ${max}, depending on your estimated figures`,
+  bar: { none: 'no age', aria: (said) => `Your answer: ${said}. See the results` },
 }
 
 export const LIVE_COPY: Record<Lang, LiveCopy> = { fr: FR, en: EN }

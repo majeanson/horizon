@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
 import { EXAMPLE_IDS } from '../src/engine/golden/examples'
-import { EXAMPLE, blankSeed, savedProfile, seedProfile, showAllSections } from './seed'
+import { EXAMPLE, blankSeed, savedProfile, seedProfile, showAllSections, switchLanguage } from './seed'
 
 // The profile, end to end in a real browser: what is typed is what is saved, what is saved is what comes back, and
 // every number has its ⓘ. The unit tests pin the logic; this pins that a PERSON can drive it.
@@ -189,7 +189,7 @@ test.describe('first visit', () => {
       await page.goto(path)
       await expect(page).toHaveTitle(title)
     }
-    await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+    await switchLanguage(page, 'en')
     await expect(page).toHaveTitle('Backup and settings · Horizon')
   })
 })

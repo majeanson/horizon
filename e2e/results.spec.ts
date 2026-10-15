@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { EXAMPLE, seedProfile } from './seed'
+import { EXAMPLE, seedProfile, switchLanguage } from './seed'
 
 // The results page in a real browser: the chart is drawn from the engine's rows and says what the table says, the
 // controls live in the address, and the « what if » grid fills in off the page's thread. The numbers themselves are
@@ -93,7 +93,7 @@ test('the year-by-year table says which dollars it holds, and its last net worth
 
 test('the chart speaks English too', async ({ page }) => {
   await page.goto('/resultats')
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+  await switchLanguage(page, 'en')
   await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan (age 60 / 62), 65.')
   await expect(page.getByRole('tab', { name: 'Income excluding savings' })).toBeVisible()
 })
@@ -161,7 +161,7 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
   await expect(row(/quebec\.creditRate/)).not.toContainText('page en anglais seulement')
   await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTFR_/)
 
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+  await switchLanguage(page, 'en')
 
   // English reader: the English edition, « 1,507.65 », the English parameters PDF, and an honest label on the fiche that
   // exists in French only.

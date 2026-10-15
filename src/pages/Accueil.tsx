@@ -5,7 +5,6 @@ import { Fold } from '../components/Fold'
 import { InstallCard } from '../components/install/InstallHint'
 import { DemoAnswer } from '../components/DemoAnswer'
 import { DripQuestion } from '../components/DripQuestion'
-import { LiveAnswer } from '../components/LiveAnswer'
 import { PageHead } from '../components/PageHead'
 import { ReadingHelp } from '../components/ReadingHelp'
 import { TimeBudget } from '../components/TimeBudget'
@@ -30,8 +29,8 @@ import { WELCOME_COPY, type WelcomeCopy } from '../lib/welcomeCopy'
 // how much TIME it has (components/TimeBudget.tsx, lib/timeBudget.ts). The time shapes the page: the matching door becomes the one « Commencer » and the
 // other two fold away; two minutes also folds the explanations. « Changer » on the line, or the settings page, reopens the question.
 //
-// A ready profile is also asked ONE question (components/DripQuestion.tsx) and shows the answer's range. Both read the SAME idle search
-// (`useFactImpact`, how far the answer moves if each unconfirmed figure were off), so it is made here, once, on the settled profile, and handed down.
+// A ready profile is asked ONE question (components/DripQuestion.tsx), from an idle search (`useFactImpact`, how far the answer moves if each
+// unconfirmed figure were off) made here, on the settled profile. Its answer is in the top bar, like on every page (components/BarAnswer.tsx).
 export function Accueil() {
   const { lang } = useLang()
   const c = WELCOME_COPY[lang]
@@ -128,7 +127,6 @@ export function Accueil() {
           setTimeOpen(false)
         }}
       />
-      {ready && <LiveAnswer range={asking ? impact?.range : null} />}
       {ready && asking && <DripQuestion impact={impact} facts={unconfirmed} />}
       {/* The chosen time, the door it opens as the one big button, and the way to change one's mind — before anything else on the page. */}
       {!ready && chosen && (

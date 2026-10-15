@@ -982,19 +982,17 @@
   letter-spacing: 0.06em;
 }
 
-/* « Votre réponse », above the pages that edit the plan: one quiet line, pinned under the top bar so a typed figure moves it in view. */
+/* « Votre réponse » under the first-visit path's question (components/LiveAnswer.tsx): one quiet line, in the flow, so a typed figure moves it in view.
+   (It used to be pinned under the top bar on Profil and Hypothèses; the age now sits IN the bar on every page — components/BarAnswer.tsx, styles/horizon.css.) */
 .live-answer {
-  position: sticky;
-  top: var(--bar-h);
-  z-index: 14;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.15rem 0.75rem;
   padding: 0.45rem var(--gutter);
-  margin: -1rem calc(-1 * var(--gutter)) 0.75rem;
-  border-radius: 0;
-  border-bottom: 1px solid var(--line);
+  margin: 0.75rem 0 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
   font-size: var(--text-sm);
 }
 /* Busy is said in words (« … calcul »), never dimmed: text at 60 % opacity fails 4.5:1 whenever a reader — or axe — happens to look before the worker answers. */
@@ -1009,12 +1007,6 @@
 }
 .live-answer__see {
   margin-left: auto;
-}
-/* The range, on a line of its own under the age. */
-.live-answer__range {
-  flex-basis: 100%;
-  color: var(--ink-soft);
-  font-size: var(--text-xs);
 }
 
 /* « Les chiffres qui déplaceraient le plus la réponse »: the figure, how far it moves the answer, the way to it — on one wrapping line. */
@@ -1601,18 +1593,18 @@
 }
 
 /* ── Profil: a pinned map of the form ─────────────────────────────────────────────────────────────────────────── */
-/* The map sticks under « Votre réponse » (PinnedMap measures that strip into --live-h); a tapped block stops below both. */
+/* The map sticks under the top bar; a tapped block stops below both (PinnedMap measures the map into --map-h). */
 /* The wrapper must not box the map: a sticky child only travels inside its parent. */
 .pinned-map {
   display: contents;
 }
 .pinned-map .section-nav {
-  top: calc(var(--bar-h) + var(--live-h, 0px));
+  top: var(--bar-h);
 }
 .page-body:has(.pinned-map) .profile-section[id],
 .page-body:has(.pinned-map) .person[id],
 .page-body:has(.pinned-map) .profile-section[id] {
-  scroll-margin-top: calc(var(--bar-h) + var(--live-h, 0px) + var(--map-h, 3rem) + 0.75rem);
+  scroll-margin-top: calc(var(--bar-h) + var(--map-h, 3rem) + 0.75rem);
 }
 
 /* « Remplir ce qui manque »: each view of the section opens with its own small heading. */
@@ -1633,20 +1625,17 @@
    `:has(:focus-visible)`, not `:focus-within` — a mouse click or a tap on a tab or a chip leaves the focus on it too, and that used to pin the row for good (the reader clicked a view, scrolled
    down, and the tabs stayed). */
 .shell__bar,
-.live-answer,
 .results-pin,
 .section-nav {
   transition: transform 0.22s ease;
 }
 .shell[data-away] .shell__bar,
-.shell[data-away] .live-answer,
 .shell[data-away] .results-pin,
 .shell[data-away] .section-nav {
   transform: translateY(calc(-100% - 12rem));
   pointer-events: none;
 }
 .shell[data-away] .shell__bar:has(:focus-visible),
-.shell[data-away] .live-answer:has(:focus-visible),
 .shell[data-away] .results-pin:has(:focus-visible),
 .shell[data-away] .section-nav:has(:focus-visible) {
   transform: none;
@@ -1665,7 +1654,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .shell__bar,
-  .live-answer,
   .results-pin,
   .section-nav,
   .shell__nav {
@@ -1714,17 +1702,6 @@
   gap: 0.35rem;
   color: var(--ink-soft);
   font-size: var(--text-sm);
-}
-
-/* « Votre réponse » inside the first-visit path: in the flow, not pinned — and never carried away with the bars (headroom). */
-.live-answer.live-answer--inline,
-.shell[data-away] .live-answer.live-answer--inline {
-  position: static;
-  margin: 0.75rem 0 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  transform: none;
-  pointer-events: auto;
 }
 
 /* « Estimé » beside a figure restated outside the Profil (components/EstFlag.tsx): a dotted underline in the estimate's own tint (the dashed

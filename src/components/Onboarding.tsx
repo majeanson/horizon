@@ -420,7 +420,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
         {body}
       </div>
       {/* Once the answer can be computed, it forms under the question: a passive line (a status, no box, no focus) that moves as the figures are typed. Not on the landing screen. */}
-      {at > 0 && gaps.length === 0 && <LiveAnswer inline />}
+      {at > 0 && gaps.length === 0 && <LiveAnswer />}
       <div className="onboard__nav">
         {at > 0 && (
           <button type="button" className="btn btn--ghost" onClick={() => goTo(at - 1)}>

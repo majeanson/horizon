@@ -182,7 +182,7 @@ for (const [name, size, maxShare] of [
           async () => {
             const f = (await field.boundingBox())!
             const bb = (await bar.boundingBox())!
-            const pinned = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.shell__bar, .live-answer, .section-nav')].filter((e) => getComputedStyle(e).position === 'sticky' || getComputedStyle(e).position === 'fixed').map((e) => e.getBoundingClientRect()).filter((r) => r.height > 0 && r.top < 240).map((r) => r.bottom)))
+            const pinned = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.shell__bar, .section-nav')].filter((e) => getComputedStyle(e).position === 'sticky' || getComputedStyle(e).position === 'fixed').map((e) => e.getBoundingClientRect()).filter((r) => r.height > 0 && r.top < 240).map((r) => r.bottom)))
             return f.y >= pinned - 1 && f.y + Math.min(f.height, 120) <= bb.y
           },
           { timeout: 8_000, message: 'the guided figure sits in the free band' },

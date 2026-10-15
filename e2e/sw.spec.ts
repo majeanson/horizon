@@ -62,11 +62,16 @@ test('the app reopens offline with no network — shell, language and theme inta
   await page.goto('/')
   await waitControlled(page)
 
-  // Set a language and a theme, as a returning visitor would have.
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+  // Set a language and a theme, as a returning visitor would have — on the settings page, where both live.
+  await page.goto('/donnees')
+  await page.getByRole('tab', { name: 'English' }).click()
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible()
-  await page.getByRole('button', { name: /Switch to (day|night) mode/ }).click()
+  const before = await page.locator('html').getAttribute('data-theme')
+  await page.getByRole('tab', { name: before === 'night' ? 'Day' : 'Night' }).click()
   const theme = await page.locator('html').getAttribute('data-theme')
+  expect(theme).not.toBe(before)
+  await page.goto('/')
+  await waitControlled(page)
 
   const consoleErrors: string[] = []
   page.on('console', (m) => {

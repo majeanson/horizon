@@ -1,6 +1,6 @@
 import { useEffect, type RefObject } from 'react'
 
-// HEADROOM — the pinned chrome (the top bar, the « Votre réponse » strip, the views' tabs, the sections' map) is for FINDING and CHANGING things, not for reading beside: pinned all the
+// HEADROOM — the pinned chrome (the top bar, the views' tabs, the sections' map) is for FINDING and CHANGING things, not for reading beside: pinned all the
 // time, on a phone, it left a third of the screen to the page. It slides away while the reader scrolls DOWN and comes back at the first move UP (and at the top, and when a key
 // focuses something inside it). The bottom navigation stays: it is where the thumb is.
 //

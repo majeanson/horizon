@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
-import { slowCpu } from './seed'
+import { slowCpu, switchLanguage } from './seed'
 
 // The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
 test.beforeEach(({ page }) => slowCpu(page))
@@ -30,14 +30,15 @@ test('boots, renders the shell, and prints nothing to the console', async ({ pag
   expect(problems).toEqual([])
 })
 
-test('the language toggle flips the whole shell to English and back, and remembers', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+test('the language row on the settings page flips the whole shell to English and back, and remembers — the top bar has no toggle', async ({ page }) => {
+  await page.goto('/donnees')
+  await expect(page.locator('.shell__bar').getByRole('button')).toHaveCount(0)
+  await page.getByRole('tablist', { name: 'Langue' }).getByRole('tab', { name: 'English' }).click()
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.reload()
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible()
-  await page.getByRole('button', { name: 'Switch to French' }).click()
+  await page.getByRole('tablist', { name: 'Language' }).getByRole('tab', { name: 'Français' }).click()
   await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toBeVisible()
 })
 
@@ -47,7 +48,7 @@ test('the page head follows the language: description, link preview and install 
   await page.goto('/')
   await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
   await expect(description).toHaveAttribute('content', /retraite/)
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+  await switchLanguage(page, 'en')
   await expect(manifest).toHaveAttribute('href', '/manifest.en.webmanifest')
   await expect(description).toHaveAttribute('content', /retire/)
   await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'en_CA')
@@ -58,15 +59,15 @@ test('the page head follows the language: description, link preview and install 
   // …and a reload keeps it.
   await page.reload()
   await expect(manifest).toHaveAttribute('href', '/manifest.en.webmanifest')
-  await page.getByRole('button', { name: 'Switch to French' }).click()
+  await switchLanguage(page, 'fr')
   await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
 })
 
-test('the theme toggle flips data-theme and survives a reload with no flash of the other one', async ({ page }) => {
-  await page.goto('/')
+test('the theme row on the settings page flips data-theme, and it survives a reload with no flash of the other one', async ({ page }) => {
+  await page.goto('/donnees')
   const html = page.locator('html')
   const before = await html.getAttribute('data-theme')
-  await page.getByRole('button', { name: /Passer au mode (jour|nuit)/ }).click()
+  await page.getByRole('tablist', { name: 'Thème' }).getByRole('tab', { name: before === 'night' ? 'Jour' : 'Nuit' }).click()
   const after = await html.getAttribute('data-theme')
   expect(after).not.toBe(before)
   await page.reload()

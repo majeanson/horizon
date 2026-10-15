@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { FR } from '../i18n.ts'
+import { EN } from '../i18n.en.ts'
 import { TEXT_SCALES } from './accessibility.ts'
 import { READING_HELP_KEY, markReadingHelpDone, readingHelpDone } from './readingHelp.ts'
 import { READING_HELP_COPY } from './readingHelpCopy.ts'
@@ -54,8 +56,9 @@ describe('the words', () => {
         expect(c.sizes[s]).not.toMatch(/%/)
       }
       expect(new Set(TEXT_SCALES.map((s) => c.sizes[s])).size).toBe(TEXT_SCALES.length)
-      expect(c.languages).toEqual({ fr: 'Français', en: 'English' }) // each language is named in itself, in both editions
     }
+    // the language row (components/DisplayControls.tsx, shared with the settings page): each language is named in itself, in both editions
+    for (const t of [FR, EN]) expect(t.data.display.languages).toEqual({ fr: 'Français', en: 'English' })
     expect(READING_HELP_COPY.fr.title).not.toBe(READING_HELP_COPY.en.title)
     expect(READING_HELP_COPY.fr.done).not.toBe(READING_HELP_COPY.en.done)
   })

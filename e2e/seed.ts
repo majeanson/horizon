@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { test, type Page } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 // Horizon has no API to stub: a spec « logs in » by putting a profile into localStorage BEFORE first paint, which
 // is exactly where the app itself keeps it. The example is the golden couple (src/lib/fixtures/profile.v10.json) —
@@ -74,6 +74,18 @@ export async function showAllSections(page: Page): Promise<void> {
 export async function openSituation(page: Page): Promise<void> {
   const fold = page.locator('details#situation')
   if (!(await fold.evaluate((el: HTMLDetailsElement) => el.open))) await fold.locator('summary').click()
+}
+
+/**
+ * Change the language the way a person does — the row on the settings page (the top bar has no toggle: its room went to the answer) — then come back
+ * to where the spec was. The choice is on the device, so the page comes back in the new language.
+ */
+export async function switchLanguage(page: Page, lang: 'fr' | 'en'): Promise<void> {
+  const url = page.url()
+  await page.goto('/donnees')
+  await page.getByRole('tab', { name: lang === 'en' ? 'English' : 'Français' }).click()
+  await expect(page.locator('html')).toHaveAttribute('lang', lang)
+  await page.goto(url)
 }
 
 /** The profile as the app has saved it right now. */

@@ -105,7 +105,8 @@ test('walking through for one person: each answer is saved as typed, and the ans
 })
 
 test('the answer forms under the question as soon as it can be computed: absent on the landing and while a figure is missing, present once income and spending are typed, and it never takes the focus', async ({ page }) => {
-  const strip = page.getByRole('status').filter({ hasText: 'Votre réponse' })
+  // the strip IN the path (the top bar carries the same answer, outside <main>)
+  const strip = page.locator('main').getByRole('status').filter({ hasText: 'Votre réponse' })
   await page.goto('/profil')
   await expect(strip).toHaveCount(0) // the landing screen
   await next(page)

@@ -20,16 +20,10 @@ async function hitsAt(link: Locator, dx: number, dy: number): Promise<boolean> {
   )
 }
 
-test('the answer bar’s « Voir », the brand and a sigle in a hint can be tapped from 20 px above and below their text', async ({ page }) => {
+test('the answer in the bar, the brand and a sigle in a hint can be tapped from 20 px above and below their text', async ({ page }) => {
   await page.goto('/profil')
-  await page.locator('.live-answer__see').waitFor()
-  // (the answer bar sits right under the sticky top bar, which is on top of the strip above it: « Voir » is checked below and to the sides)
-  const bar = page.locator('.live-answer__see')
-  expect(await hitsAt(bar, 0, 0), 'Voir centre').toBe(true)
-  expect(await hitsAt(bar, 0, 20), 'Voir 20 px below').toBe(true)
-  expect(await hitsAt(bar, -22, 0), 'Voir 22 px to the left').toBe(true)
-  expect(await hitsAt(bar, 22, 0), 'Voir 22 px to the right').toBe(true)
-  for (const selector of ['.shell__brand', 'main a.gloss:visible']) {
+  await page.locator('.shell__answer-link').waitFor()
+  for (const selector of ['.shell__answer-link', '.shell__brand', 'main a.gloss:visible']) {
     const link = page.locator(selector)
     await link.first().scrollIntoViewIfNeeded()
     expect(await hitsAt(link, 0, 0), `${selector} centre`).toBe(true)
@@ -40,8 +34,6 @@ test('the answer bar’s « Voir », the brand and a sigle in a hint can be tapp
 
 test('a larger hit area is not a larger look: the link keeps its size', async ({ page }) => {
   await page.goto('/profil')
-  const see = (await page.locator('.live-answer__see').boundingBox())!
-  expect(see.height, '« Voir » still reads as a line of text').toBeLessThan(30)
   const gloss = (await page.locator('main a.gloss:visible').first().boundingBox())!
   expect(gloss.height).toBeLessThan(30)
 })

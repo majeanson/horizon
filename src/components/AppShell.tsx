@@ -1,21 +1,24 @@
 import { NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useHeadroom } from '../lib/useHeadroom'
-import { useLang, useT } from '../i18n'
+import { useT } from '../i18n'
 import { saveCopy } from '../lib/saveCopy'
 import { isPreview } from '../lib/preview'
 import { snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
-import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import { Icon, type IconName } from './Icon'
 import { Skeleton } from './Skeleton'
 import { StatusMessage } from './StatusMessage'
 
 const PreviewGate = lazy(() => import('./PreviewGate'))
+// The answer in the bar rides its own chunk: its worker and request builder are not the door's business (the bar paints, then the age arrives).
+const BarAnswer = lazy(() => import('./BarAnswer'))
 
-// The chrome around every page: a top bar (name, language, day/night, the settings gear) and the main
+// The chrome around every page: a top bar (the name, the answer's age, the sheet, the glossary, the settings gear) and the main
 // navigation — a bottom bar on a phone, a left rail on a wide screen. The switch between the
 // two is CSS only (styles/horizon.css), never a width check in JS: one markup, two layouts.
+// The language and the day / night choice are on the settings page and in the first visit's reading dialog, not in the bar: set once, they
+// do not earn two buttons on every screen, and the age they made room for is looked at every time.
 //
 // THREE destinations, in the order a person works in: who you are (Profil), what comes out (Résultats), and what
 // you assume about the future (Hypothèses) — optional, since the defaults are the Neutre scenario, and reached from
@@ -70,10 +73,8 @@ export function AppShell() {
     e.preventDefault()
     void import('../lib/pageTransition').then((m) => m.changePage(to, navigate), () => navigate(to))
   }
-  const { lang, setLang } = useLang()
   const { pathname } = useLocation()
   const notice = useNotice()
-  const [theme, setThemeState] = useState<Theme>(getTheme)
   // A deploy while the page is OPEN and VISIBLE: registerSw never reloads under a reader; it raises
   // this event instead, and the shell offers the reload as a one-line notice with a button.
   const [swUpdate, setSwUpdate] = useState(false)
@@ -92,7 +93,6 @@ export function AppShell() {
     saveCopy()
     notice(t.data.export.done)
   }
-  const themeLabel = theme === 'night' ? t.common.themeToDay : t.common.themeToNight
   // The pinned chrome slides away while the reader scrolls down and returns on the first move up (lib/useHeadroom.ts; the sliding is styles/revamp.css).
   const shell = useRef<HTMLDivElement>(null)
   useHeadroom(shell)
@@ -114,19 +114,11 @@ export function AppShell() {
         <NavLink to="/" end className="shell__brand">
           {t.appName}
         </NavLink>
+        {/* Silent until there is an answer; its chunk arrives after the bar has painted, so the bar never waits for it. */}
+        <Suspense fallback={null}>
+          <BarAnswer />
+        </Suspense>
         <div className="shell__actions">
-          <button
-            type="button"
-            className="btn btn--ghost btn--sm"
-            aria-label={t.common.langLabel}
-            title={t.common.langLabel}
-            onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
-          >
-            {t.common.lang}
-          </button>
-          <button type="button" className="btn btn--icon btn--ghost" aria-label={themeLabel} title={themeLabel} onClick={() => setThemeState(toggleTheme())}>
-            <Icon name={theme === 'night' ? 'sun-bold' : 'moon-stars-bold'} size={20} />
-          </button>
           <NavLink to="/fiche" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled shell__sheet' + (isActive ? ' is-active' : '')} aria-label={t.nav.sheet} title={t.nav.sheet}>
             <Icon name="identification-card-bold" size={20} />
             <span className="btn__label" aria-hidden="true">{t.nav.sheetShort}</span>

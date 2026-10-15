@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, seedProfile } from './seed'
 
-// HEADROOM. Scroll down: nothing pinned at the top (the bar, the answer strip, the views' tabs, the sections' map). Scroll up: all of it comes back. The page's own scrolling — a tap on a
+// HEADROOM. Scroll down: nothing pinned at the top (the bar, the views' tabs, the sections' map). Scroll up: all of it comes back. The page's own scrolling — a tap on a
 // chip, a guide, a deep link — never hides what the reader just used; only a hand (a drag, the wheel, a scroll key) does.
 
 const away = (page: Page) => page.locator('.shell').getAttribute('data-away')
@@ -11,11 +11,11 @@ const gone = async (page: Page, sel: string) => (await rect(page, sel)).bottom <
 const there = async (page: Page, sel: string) => { const r = await rect(page, sel); return r.height > 0 && r.top >= -1 && r.bottom > 1 }
 
 for (const [name, size, path, pinned] of [
-  ['phone', { width: 390, height: 844 }, '/profil', ['.shell__bar', '.live-answer', '.pinned-map .section-nav']],
+  ['phone', { width: 390, height: 844 }, '/profil', ['.shell__bar', '.pinned-map .section-nav']],
   ['phone', { width: 390, height: 844 }, '/resultats', ['.shell__bar', '.results-pin']],
   ['desktop', { width: 1280, height: 800 }, '/resultats', ['.shell__bar', '.results-pin', '.results-page .section-nav']],
-  ['desktop', { width: 1280, height: 800 }, '/profil', ['.shell__bar', '.live-answer', '.pinned-map .section-nav']],
-  ['phone', { width: 390, height: 844 }, '/hypotheses', ['.shell__bar', '.live-answer', '.pinned-map .section-nav']],
+  ['desktop', { width: 1280, height: 800 }, '/profil', ['.shell__bar', '.pinned-map .section-nav']],
+  ['phone', { width: 390, height: 844 }, '/hypotheses', ['.shell__bar', '.pinned-map .section-nav']],
 ] as const) {
   test(`${name} ${path}: scrolling down clears every pinned row, scrolling up brings them all back`, async ({ page }) => {
     await page.setViewportSize(size)

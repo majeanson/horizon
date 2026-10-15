@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { DisplayControls } from './DisplayControls'
 import { Modal } from './Modal'
-import { SubTabs } from './SubTabs'
-import { useLang, type Lang } from '../i18n'
+import { useLang } from '../i18n'
 import { markReadingHelpDone, readingHelpDone } from '../lib/readingHelp'
 import { READING_HELP_COPY } from '../lib/readingHelpCopy'
 
@@ -12,7 +11,7 @@ import { READING_HELP_COPY } from '../lib/readingHelpCopy'
 // `open` + `onClose` make it CONTROLLED (the kit's specimen opens it on demand and never marks anything done); left out, it is the one-time offer, and
 // `onDone` says when it was put away — the front door's next question (components/TimeBudget.tsx) waits for that.
 export function ReadingHelp({ open, onClose, onDone }: { open?: boolean; onClose?: () => void; onDone?: () => void } = {}) {
-  const { lang, setLang } = useLang()
+  const { lang } = useLang()
   const c = READING_HELP_COPY[lang]
   const [away, setAway] = useState(readingHelpDone)
   const close = () => {
@@ -23,19 +22,6 @@ export function ReadingHelp({ open, onClose, onDone }: { open?: boolean; onClose
   }
   return (
     <Modal open={open ?? !away} onClose={close} title={c.title} className="kit-modal--full reading-help">
-      <div className="field-row">
-        <p className="field-row__label">{c.language}</p>
-        <SubTabs
-          size="mini"
-          ariaLabel={c.language}
-          value={lang}
-          onSelect={(l: Lang) => setLang(l)}
-          options={[
-            { key: 'fr', label: c.languages.fr },
-            { key: 'en', label: c.languages.en },
-          ]}
-        />
-      </div>
       <DisplayControls sizeLabels={c.sizes} />
       <p className="field-row__hint">{c.zoomTip}</p>
       <div className="welcome__go">

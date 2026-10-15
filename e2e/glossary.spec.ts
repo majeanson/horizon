@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { EXAMPLE, seedProfile } from './seed'
+import { EXAMPLE, seedProfile, switchLanguage } from './seed'
 
 // THE GLOSSARY. A sigle in a hint is a link to its entry; following it lands on that entry, marked, and the page keeps working
 // as a page of its own (the map, the documents, the official links).
@@ -38,7 +38,7 @@ test('the glossary page: every group, the documents list and official links that
 
 test('the glossary follows the language and the top-bar book leads to it', async ({ page }) => {
   await page.goto('/profil')
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+  await switchLanguage(page, 'en')
   await page.getByRole('link', { name: 'Glossary: abbreviations explained' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Glossary' })).toBeVisible()
   await expect(page.getByRole('term').filter({ hasText: /^QPP/ })).toHaveCount(1)

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { seedProfile } from './seed'
+import { seedProfile, switchLanguage } from './seed'
 
 // The answer as a range, under the big age: the lowest and highest age across the three scenarios and the market paths, once both searches are in.
 
@@ -18,7 +18,7 @@ test('the golden couple\'s answer is a range once the searches are in, and the r
 test('it is the same in English', async ({ page }) => {
   await seedProfile(page)
   await page.goto('/resultats')
-  await page.getByRole('button', { name: 'Passer à l’anglais' }).click()
+  await switchLanguage(page, 'en')
   await expect(page.locator('#verdict').getByText(/Across the three scenarios and the market paths: from \d+ to (\d+|over \d+)/)).toBeVisible({ timeout: 90_000 })
 })
 

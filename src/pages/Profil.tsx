@@ -12,7 +12,6 @@ import { BackupLine } from '../components/profile/BackupLine'
 import { ProfileMap } from '../components/profile/ProfileMap'
 import { ENTRY_COPY } from '../lib/entryCopy'
 import { Chip } from '../components/Chip'
-import { LiveAnswer } from '../components/LiveAnswer'
 import { Loading } from '../components/Loading'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
@@ -156,7 +155,6 @@ export function Profil() {
 
   return (
     <section className="page-body" ref={page}>
-      <LiveAnswer />
       <PageHead title={t.profile.title} subtitle={t.profile.subtitle} />
       <SubTabs
         ariaLabel={entry.modes.label}
