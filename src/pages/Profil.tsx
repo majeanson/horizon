@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useSearchParams } from 'react-router-dom'
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { AboutSection } from '../components/profile/AboutSection'
 import { BudgetSection } from '../components/profile/BudgetSection'
 import { HomeSection } from '../components/profile/HomeSection'
@@ -28,6 +28,7 @@ import { hasSpouse, mapPerson } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
 import { applies, useYes } from '../lib/situation'
 import { updateProfile, useProfile } from '../lib/store'
+import { TIME_BUDGET_PATH, useTimeBudget } from '../lib/timeBudget'
 
 const EntryByDocument = lazy(() => import('../components/profile/EntryByDocument'))
 const AccuracyGuide = lazy(() => import('../components/profile/AccuracyGuide'))
@@ -54,6 +55,7 @@ export function Profil() {
   // committing the last number (Enter or blur — possibly in a field inside the card) swaps its
   // content to « c'est assez » instead of yanking the card, and the focus with it, out of the page.
   const [welcome] = useState(gaps.length > 0)
+  const budget = useTimeBudget()
   const page = useRef<HTMLElement>(null)
   // Two ways to fill the SAME profile: by topic (the form below) or by document (one paper at a time, the first step being the list of what to gather). The address keeps it.
   const byDoc = params.get('par') === 'document'
@@ -119,6 +121,11 @@ export function Profil() {
     }, 150)
     return () => window.clearInterval(timer)
   }, [hash])
+
+  // A first visit that arrives with NO way in named (the Profil tab, a bare link) takes the one the person's time allows — asked on the front door
+  // (lib/timeBudget.ts): two minutes is the quick path, thirty is by document, and the address says so (a reload keeps it). Fifteen is the full
+  // questions, which a bare /profil already is. A door that names its path (`debut`, `par`, `form`) is never overridden.
+  if (welcome && budget !== null && budget !== '15' && !['form', 'par', 'debut'].some((k) => params.has(k))) return <Navigate to={TIME_BUDGET_PATH[budget]} replace />
 
   // First visit: a blank form is a wall. The page IS one question at a time (components/Onboarding.tsx) until the person finishes it or
   // asks for the full form (`?form=1`, which the path writes and a link can carry). Decided at arrival, like the card it replaces: a

@@ -155,6 +155,7 @@ test('the front door offers three ways in: « Je prends le temps » opens the fi
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('retraite')
   await page.getByRole('link', { name: /Je prends le temps/ }).click()
-  await expect(page).toHaveURL(/\/profil$/)
+  // the door names its path (the full questions), so a time budget chosen on the front door (lib/timeBudget.ts) never overrides it
+  await expect(page).toHaveURL(/\/profil\?debut=complet$/)
   await expect(page.locator('.onboard')).toBeVisible()
 })

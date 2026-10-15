@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n.ts'
+import type { TimeBudget } from './timeBudget.ts'
 
 // THE WORDS OF THE FRONT DOOR (« Accueil », the page at `/`): what Horizon is, one button to begin, and three short things worth
 // knowing before typing a figure. Outside the eager dictionaries — the page is a lazy chunk, and so are its words.
@@ -22,9 +23,9 @@ export interface WelcomeCopy {
   drip: { title: string; swing: (years: number) => string; go: string; all: string; later: string }
   /** The first visit's demo card (components/DemoAnswer.tsx): a real answer for an example household. The households' names and stories are exampleCopy's. */
   demo: { title: string; pick: string; frame: string; try: string }
-  /** The three doors in, by effort. `to` is a route of the app (welcomeCopy.test.ts holds it to one). */
+  /** The three doors in, by effort — one per time budget (lib/timeBudget.ts, whose paths timeBudget.test.ts holds equal to these). `to` is a route of the app (welcomeCopy.test.ts holds it to one). */
   doorsTitle: string
-  doors: { label: string; hint: string; to: string }[]
+  doors: { budget: TimeBudget; label: string; hint: string; to: string }[]
 }
 
 const FR: WelcomeCopy = {
@@ -72,9 +73,9 @@ const FR: WelcomeCopy = {
   },
   doorsTitle: 'Par où commencer ?',
   doors: [
-    { label: 'J’ai 2 minutes', hint: 'Quelques questions, et une première réponse tout de suite.', to: '/profil?debut=rapide' },
-    { label: 'Je prends le temps (≈ 15 minutes)', hint: 'Une question à la fois, avec la raison de chacune.', to: '/profil' },
-    { label: 'J’ai mes documents en main', hint: 'Avec le relevé de Retraite Québec et vos avis de cotisation, les chiffres sont exacts dès le départ.', to: '/profil?form=1&par=document&etape=gather' },
+    { budget: '2', label: 'J’ai 2 minutes', hint: 'Quelques questions, et une première réponse tout de suite.', to: '/profil?debut=rapide' },
+    { budget: '15', label: 'Je prends le temps (≈ 15 minutes)', hint: 'Une question à la fois, avec la raison de chacune.', to: '/profil?debut=complet' },
+    { budget: '30', label: 'J’ai mes documents en main', hint: 'Avec le relevé de Retraite Québec et vos avis de cotisation, les chiffres sont exacts dès le départ.', to: '/profil?form=1&par=document&etape=gather' },
   ],
 }
 
@@ -123,9 +124,9 @@ const EN: WelcomeCopy = {
   },
   doorsTitle: 'Where to start?',
   doors: [
-    { label: 'I have 2 minutes', hint: 'A few questions, and a first answer right away.', to: '/profil?debut=rapide' },
-    { label: 'I will take my time (≈ 15 minutes)', hint: 'One question at a time, with the reason for each.', to: '/profil' },
-    { label: 'I have my documents at hand', hint: 'With the Retraite Québec statement and your notices of assessment, the figures are exact from the start.', to: '/profil?form=1&par=document&etape=gather' },
+    { budget: '2', label: 'I have 2 minutes', hint: 'A few questions, and a first answer right away.', to: '/profil?debut=rapide' },
+    { budget: '15', label: 'I will take my time (≈ 15 minutes)', hint: 'One question at a time, with the reason for each.', to: '/profil?debut=complet' },
+    { budget: '30', label: 'I have my documents at hand', hint: 'With the Retraite Québec statement and your notices of assessment, the figures are exact from the start.', to: '/profil?form=1&par=document&etape=gather' },
   ],
 }
 

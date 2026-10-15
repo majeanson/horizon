@@ -30,7 +30,7 @@ test.describe('golden couple', () => {
     expect(link.replace(/^https?:\/\/[^/]+/, '')).toMatch(/^\/partage\?age=\d{2}&foyer=(seul|couple)&l=(fr|en)$/)
 
     // A fresh context: no profile, no storage — what the spouse sees.
-    const fresh = await browser.newContext({ storageState: { cookies: [], origins: [{ origin: url.origin, localStorage: [{ name: 'horizon-reading-help', value: 'done' }] }] } })
+    const fresh = await browser.newContext({ storageState: { cookies: [], origins: [{ origin: url.origin, localStorage: [{ name: 'horizon-reading-help', value: 'done' }, { name: 'horizon-time', value: 'later' }] }] } })
     const other = await fresh.newPage()
     await other.goto(url.pathname + url.search)
     await expect(other.getByRole('heading', { level: 1, name: 'Un scénario partagé' })).toBeVisible()

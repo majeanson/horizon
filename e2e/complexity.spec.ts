@@ -30,9 +30,12 @@ type Budget = { controls: number; words: number }
 // per person), the two EstFlag links on the spending rows, and one glossary link another session added to the average-rate sentence. Words 1959 → 1859 (the
 // ratchet FALLS): the old calculation lines under the pensions folded into the figures' notes, which are hidden until asked for — one home per figure.
 const BUDGETS: Record<string, Budget> = {
-  'Accueil (first visit)': { controls: 34, words: 372 },
+  // 34 → 28 controls, 372 → 309 words (2026-10-15, the ratchet FALLS): the reading card is a one-time dialog now (closed here), its subtitle is gone, and the demo
+  // card's three early-retirement households (+3 chips) cost less than what left. The time question (components/TimeBudget.tsx) is a dialog too, put off here.
+  'Accueil (first visit)': { controls: 28, words: 309 },
   'Profil (first visit, onboarding)': { controls: 17, words: 78 },
-  'Accueil (with a plan)': { controls: 30, words: 261 },
+  // 30 → 21 controls, 261 → 186 words (2026-10-15, the ratchet FALLS): the same reading card, gone from the page.
+  'Accueil (with a plan)': { controls: 21, words: 186 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
   // count only once opened): the CRA's January 1 figure less this year's deposits.

@@ -17,8 +17,8 @@ export function readingHelpDone(): boolean {
   }
 }
 
-/** Comparing the two windows is allowed across origins; anything that throws is taken as framed. */
-function framed(): boolean {
+/** Comparing the two windows is allowed across origins; anything that throws is taken as framed. (lib/timeBudget.ts asks the same.) */
+export function framed(): boolean {
   try {
     return typeof window !== 'undefined' && window.self !== window.top
   } catch {

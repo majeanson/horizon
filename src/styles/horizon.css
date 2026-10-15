@@ -1346,3 +1346,50 @@
     display: none;
   }
 }
+
+/* ── « Combien de temps avez-vous ? » (components/TimeBudget.tsx) and the line it leaves on the front door ───────────── */
+/* The dialog's three doors are the front door's own `.welcome__door` card, as a BUTTON: stacked on a phone, side by side when the screen allows. */
+button.welcome__door {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.welcome__door.is-on {
+  border-color: var(--accent, currentColor);
+  box-shadow: inset 0 0 0 1px var(--accent, currentColor);
+}
+/* …and stacked at every width here: three choices read top-down (side by side they went 2 + 1 in the dialog's column). */
+.time-budget .welcome__doors {
+  margin-top: 0.5rem;
+  grid-template-columns: 1fr;
+}
+.welcome__time {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+}
+.welcome__time-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 700;
+}
+.welcome__time .welcome__door-hint {
+  margin: 0;
+}
+/* The one big button fills a phone's width; on a wider screen it keeps its own. */
+.welcome__time .btn--primary {
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .welcome__time .btn--primary {
+    justify-self: start;
+  }
+}
+.welcome__fold > summary {
+  font-weight: 700;
+}

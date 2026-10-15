@@ -19,10 +19,12 @@ import { Cluster } from './Layout'
 import { Skeleton } from './Skeleton'
 
 // THE FIRST VISIT'S PROOF: before a blank household types anything, Accueil shows the product WORKING — the real answer (the same worker, the same
-// sentence as the results page) for an example household, in a frame that says it is not theirs. Three households to swap between; « Essayer avec ce
-// ménage » makes the shown one the household on this device and opens the results. Nothing here writes until that tap, and a profile that already
-// holds something typed is replaced only after the same confirmation Données asks.
-const DEMO_IDS = ['average', 'modest', 'family'] as const satisfies readonly ExampleId[]
+// sentence as the results page) for an example household, in a frame that says it is not theirs. Six households to swap between — the average couple
+// first, then three that stop EARLY (the house sold at 58, the high earners at 57, the planned life at 57: the answer a visitor hopes to see is shown
+// reachable, not only the one at 64), then the modest and the growing family; « Essayer avec ce ménage » makes the shown one the household on this
+// device and opens the results. Nothing here writes until that tap, and a profile that already holds something typed is replaced only after the same
+// confirmation Données asks.
+const DEMO_IDS = ['average', 'downsizer', 'rich', 'planner', 'modest', 'family'] as const satisfies readonly ExampleId[]
 
 export function DemoAnswer() {
   const t = useT()

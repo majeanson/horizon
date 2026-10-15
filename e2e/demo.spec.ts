@@ -28,7 +28,10 @@ test('swapping the household swaps the story and the answer', async ({ page }) =
   await expect(card(page).getByRole('radio', { name: 'Une personne, petit revenu' })).toBeChecked()
   await expect(card(page)).toContainText('Hélène')
   await expect(answer).not.toHaveText(before, { timeout: 60_000 })
-  await expect(card(page).getByRole('radio')).toHaveCount(3)
+  // six households, three of which stop early (the house sold, the high earners, the planned life): an early answer is shown reachable
+  await expect(card(page).getByRole('radio')).toHaveCount(6)
+  await card(page).getByRole('radio', { name: 'Couple, vendre la maison' }).click()
+  await expect(card(page)).toContainText('58 ans')
 })
 
 test('« Essayer avec ce ménage » on a blank profile loads the example and opens the results — with no dialog', async ({ page }) => {
@@ -60,7 +63,7 @@ test('three doors, by effort, each to its own place', async ({ page }) => {
   await page.goto('/')
   const door = (name: RegExp) => page.getByRole('link', { name })
   await expect(door(/J’ai 2 minutes/)).toHaveAttribute('href', '/profil?debut=rapide')
-  await expect(door(/Je prends le temps \(≈ 15 minutes\)/)).toHaveAttribute('href', '/profil')
+  await expect(door(/Je prends le temps \(≈ 15 minutes\)/)).toHaveAttribute('href', '/profil?debut=complet')
   await expect(door(/J’ai mes documents en main/)).toHaveAttribute('href', '/profil?form=1&par=document&etape=gather')
   // each door says in one line what it is
   await expect(page.locator('.welcome__door-hint')).toHaveCount(3)
@@ -73,7 +76,7 @@ test('three doors, by effort, each to its own place', async ({ page }) => {
   await expect(page.locator('#person-self, .onboard')).toHaveCount(0)
   await page.goto('/')
   await door(/Je prends le temps/).click()
-  await expect(page).toHaveURL(/\/profil$/)
+  await expect(page).toHaveURL(/\/profil\?debut=complet$/)
   await expect(page.locator('.onboard')).toBeVisible()
 })
 

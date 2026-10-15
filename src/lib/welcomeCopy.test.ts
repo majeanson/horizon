@@ -52,7 +52,8 @@ describe('the front door doors and demo card', () => {
     for (const d of [...fr.doors, ...en.doors]) expect(ROUTES.has(new URL(d.to, 'https://horizon.test').pathname), d.to).toBe(true)
     const [quick, full, docs] = fr.doors.map((d) => new URL(d.to, 'https://horizon.test'))
     expect(quick.searchParams.get('debut')).toBe('rapide')
-    expect(full.search).toBe('')
+    // The full questions are what a bare /profil opens; the door still NAMES them, so a reader who chose two minutes on the front door (lib/timeBudget.ts) and then picks this door is not sent back to the quick path.
+    expect(full.searchParams.get('debut')).toBe('complet')
     expect(docs.searchParams.get('par')).toBe('document')
     expect(docs.searchParams.get('etape')).toBe('gather')
   })

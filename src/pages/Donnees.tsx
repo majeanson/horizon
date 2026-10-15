@@ -18,6 +18,8 @@ import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { readProfileJson, type ReadResult } from '../lib/migrations'
 import type { Profile } from '../lib/schema'
 import { saveCopy } from '../lib/saveCopy'
+import { TIME_BUDGETS, setTimeBudget, useTimeBudget } from '../lib/timeBudget'
+import { TIME_BUDGET_COPY } from '../lib/timeBudgetCopy'
 import { clearProfile, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { SHEET_COPY } from '../lib/sheetCopy'
 import { useNotice } from '../lib/toast'
@@ -218,11 +220,32 @@ function DisplaySection() {
   return (
     <Section title={d.title} subtitle={d.hint} icon="sliders-horizontal-bold">
       <DisplayControls />
+      <TimeBudgetRow />
       <div className="field-row">
         <Chip to="/fiche" icon="identification-card-bold">
           {SHEET_COPY[lang].open}
         </Chip>
       </div>
     </Section>
+  )
+}
+
+// « Combien de temps avez-vous ? », asked on the front door and changeable here for good (lib/timeBudget.ts): the way in the front door and the Profil
+// tab propose. A choose-one row of chips; nothing chosen is a valid state (the question was put off), so no chip is lit then.
+function TimeBudgetRow() {
+  const c = TIME_BUDGET_COPY[useLang().lang]
+  const budget = useTimeBudget()
+  return (
+    <div className="field-row">
+      <p className="field-row__label">{c.settings.label}</p>
+      <Cluster role="group" aria-label={c.settings.label}>
+        {TIME_BUDGETS.map((b) => (
+          <Chip key={b} radio selected={budget === b} onClick={() => setTimeBudget(b)}>
+            {c.options[b].label}
+          </Chip>
+        ))}
+      </Cluster>
+      <p className="field-row__hint">{c.settings.hint}</p>
+    </div>
   )
 }

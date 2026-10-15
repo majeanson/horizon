@@ -4,6 +4,8 @@ import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { DisplayControls } from '../components/DisplayControls'
 import { ReadingHelp } from '../components/ReadingHelp'
+import { TimeBudget } from '../components/TimeBudget'
+import type { TimeBudget as TimeBudgetValue } from '../lib/timeBudget'
 import { CONCEPTS, FAMILIES, FAMILY_HUE, type ConceptId } from '../lib/concepts'
 import { DripQuestion } from '../components/DripQuestion'
 import { DemoAnswer } from '../components/DemoAnswer'
@@ -238,6 +240,28 @@ function ReadingHelpSpecimen() {
   )
 }
 
+// TimeBudget is a full-screen dialog too: opened on demand, its choice kept in the kit's own state — never written to the device.
+function TimeBudgetSpecimen() {
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState<TimeBudgetValue | null>(null)
+  return (
+    <>
+      <button type="button" className="btn" onClick={() => setOpen(true)}>
+        Ouvrir
+      </button>
+      <TimeBudget
+        open={open}
+        value={value}
+        onChoose={(b) => {
+          setValue(b)
+          setOpen(false)
+        }}
+        onClose={() => setOpen(false)}
+      />
+    </>
+  )
+}
+
 // Every concept of the registry, grouped by family: the page to judge the hues and the glyphs on (day, night, contrast, text size).
 function ConceptPipSpecimen() {
   const ids = Object.keys(CONCEPTS) as ConceptId[]
@@ -416,6 +440,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
     { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelpSpecimen /> },
+    { cat: 'Affichage', name: 'TimeBudget', file: 'src/components/TimeBudget.tsx', kw: 'temps minutes accueil première visite façon de commencer porte', render: () => <TimeBudgetSpecimen /> },
     { cat: 'Affichage', name: 'ConceptPip', file: 'src/components/ConceptPip.tsx', exports: ['ConceptPip', 'FamilyPip'], kw: 'pastille concept icône couleur famille glossaire', render: () => <ConceptPipSpecimen /> },
     {
       cat: 'Affichage',
