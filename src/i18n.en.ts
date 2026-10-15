@@ -22,6 +22,7 @@ export const EN: typeof FR = {
     save: 'Save',
     close: 'Close',
     howToRead: 'How to read',
+    moreDetails: 'More details',
     less: 'Less',
     more: 'More',
     delete: 'Delete',

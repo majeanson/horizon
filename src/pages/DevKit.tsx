@@ -224,6 +224,19 @@ function TableChooserSpecimen() {
   )
 }
 
+// ReadingHelp is a full-screen dialog: the kit opens it on demand (controlled), so it never covers the page it is judged on.
+function ReadingHelpSpecimen() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" className="btn" onClick={() => setOpen(true)}>
+        Ouvrir
+      </button>
+      <ReadingHelp open={open} onClose={() => setOpen(false)} />
+    </>
+  )
+}
+
 // Every concept of the registry, grouped by family: the page to judge the hues and the glyphs on (day, night, contrast, text size).
 function ConceptPipSpecimen() {
   const ids = Object.keys(CONCEPTS) as ConceptId[]
@@ -389,7 +402,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
-    { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelp /> },
+    { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelpSpecimen /> },
     { cat: 'Affichage', name: 'ConceptPip', file: 'src/components/ConceptPip.tsx', exports: ['ConceptPip', 'FamilyPip'], kw: 'pastille concept icône couleur famille glossaire', render: () => <ConceptPipSpecimen /> },
     {
       cat: 'Affichage',

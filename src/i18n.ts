@@ -38,6 +38,7 @@ export const FR = {
     save: 'Enregistrer',
     close: 'Fermer',
     howToRead: 'Comment lire',
+    moreDetails: 'En savoir plus',
     less: 'Moins',
     more: 'Plus',
     delete: 'Supprimer',

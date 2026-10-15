@@ -23,6 +23,8 @@ export default defineConfig({
     navigationTimeout: 20_000,
     actionTimeout: 15_000,
     timezoneId: 'America/Toronto',
+    // The front door's one-time full-screen reading offer (lib/readingHelp.ts) is « already seen » for every spec but its own (reading-help.spec.ts clears this).
+    storageState: { cookies: [], origins: [{ origin: 'http://127.0.0.1:5173', localStorage: [{ name: 'horizon-reading-help', value: 'done' }] }] },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

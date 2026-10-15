@@ -22,14 +22,20 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fam-deep) 28%, transparent);
   vertical-align: middle;
 }
-.pip--sm { width: 1.2rem; height: 1.2rem; }
-.pip--md { width: 1.7rem; height: 1.7rem; }
-.pip--lg { width: 2.2rem; height: 2.2rem; }
+.pip--sm { width: 1.7rem; height: 1.7rem; }
+.pip--md { width: 2.6rem; height: 2.6rem; }
+.pip--lg { width: 3.2rem; height: 3.2rem; }
+.pip > svg { width: 82%; height: 82%; }
 
-/* A pip before a chip's, a tab's or a heading's name keeps the row's own gap. */
-.chip .pip, .subtabs__opt .pip { margin-inline-start: -0.15rem; }
+/* In a chip or a tab the pip is as tall as the control lets it be and no taller: the negative block margin takes its extra height back out of the
+   layout, so the button keeps its size (44 px touch target) and the picture fills the space it already had. */
+.chip .pip, .subtabs__opt .pip { margin-inline-start: -0.3rem; margin-block: -0.4rem; }
 /* With a subtitle under the title the header is two lines: the pip rides the TITLE line, not the middle of the block. */
 .section-header__main > .pip { align-self: flex-start; margin-inline-end: 0.05rem; }
+
+/* A card's « En savoir plus » (Section `details`): sits between the one-sentence subtitle and the fields, quiet, with room to breathe on both sides. */
+.profile-section__details { margin: 0 0 0.75rem; }
+.profile-section__details .fold__body { color: var(--ink-soft); font-size: var(--text-sm); }
 
 /* A group of the Glossaire: the family's hue as a rule down the card's edge, the family's pip in its header. */
 .profile-section.fam-rule { border-inline-start: 4px solid var(--fam-deep); }

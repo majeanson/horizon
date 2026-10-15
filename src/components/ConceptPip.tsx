@@ -15,7 +15,8 @@ export function ConceptPip({ id, size = 'md' }: { id: ConceptId; size?: 'sm' | '
   const { glyph, family } = CONCEPTS[id]
   return (
     <span className={`pip pip--${FAMILY_HUE[family]} pip--${size}`} aria-hidden="true">
-      <Glyph markup={MARKUP[glyph] ?? ''} size={size === 'sm' ? 12 : size === 'lg' ? 22 : 16} />
+      {/* The glyph fills ~80 % of the disc whatever its size (pips.css scales the svg), so the picture — not the empty wash — is what the eye reads. */}
+      <Glyph markup={MARKUP[glyph] ?? ''} size={20} />
     </span>
   )
 }

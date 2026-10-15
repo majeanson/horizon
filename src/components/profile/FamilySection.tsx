@@ -47,7 +47,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
   }
 
   return (
-    <Section id="famille" title={f.title} concept="famille">
+    <Section id="famille" title={f.title} subtitle={withKids ? f.childrenHint : undefined} details={withKids ? kc.planned.hint : undefined} concept="famille">
       <Cluster>
         {spouse ? (
           <button
@@ -85,7 +85,6 @@ export function FamilySection({ withKids = true }: { /** The children and what e
       )}
 
       {withKids && (<div className="family__children">
-        <p className="field-row__hint">{f.childrenHint}</p>
         {(profile.household.children ?? []).length === 0 ? (
           <p className="field-row__hint">{f.none}</p>
         ) : (
@@ -115,7 +114,6 @@ export function FamilySection({ withKids = true }: { /** The children and what e
         <Cluster>
           <Chip onClick={() => updateProfile((p) => addChildCounted(p, today().year + 1))}>{kc.planned.add}</Chip>
         </Cluster>
-        <p className="field-row__hint">{kc.planned.hint}</p>
       </div>)}
 
     </Section>
