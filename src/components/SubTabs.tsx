@@ -1,5 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
+import { ConceptPip } from './ConceptPip'
 import { Icon, InlineIcon, type IconName } from './Icon'
+import type { ConceptId } from '../lib/concepts'
 import { useHScroll } from '../lib/hscroll'
 import { useT } from '../i18n'
 
@@ -13,6 +15,8 @@ export interface SubTabOption<K extends string> {
   label: ReactNode
   // Optional leading glyph (the shared <Icon> set — never an emoji).
   icon?: IconName
+  // The idea the tab names: its pip (glyph + family colour, lib/concepts.ts) before the label.
+  concept?: ConceptId
   // Accessible name + tooltip for a segment whose `label` carries no text (an icon-only
   // tab). Without it such a tab reaches AT as an unnamed button.
   ariaLabel?: string
@@ -128,6 +132,7 @@ export function SubTabs<K extends string>({
           >
             {o.who !== undefined && <span className="who-dot" aria-hidden="true" />}
             {o.tone !== undefined && <span className="tone__dot" aria-hidden="true" />}
+            {o.concept && <ConceptPip id={o.concept} size="sm" />}
             {o.icon && <InlineIcon name={o.icon} size={15} />}
             {o.label}
           </button>

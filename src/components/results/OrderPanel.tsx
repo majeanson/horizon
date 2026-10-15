@@ -6,6 +6,8 @@ import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { updateProfile } from '../../lib/store'
 import { useWithdrawalOrders } from '../../lib/useWithdrawalOrders'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
+import { ACCOUNT_CONCEPT } from '../../lib/concepts'
 import { Skeleton } from '../Skeleton'
 
 // « In which order should I draw my accounts? » — the household's plan under each of the six orders (engine/withdrawalOrders.ts),
@@ -52,7 +54,12 @@ export function OrderPanel({ household, assumptions, age, firstAge }: { househol
             {value.outcomes.map((x, i) => (
               <tr key={x.order.join('>')} className={i === value.current ? 'is-own' : undefined}>
                 <th scope="row">
-                  {x.order.map((k) => accountName[k]).join(' → ')}
+                  {x.order.map((k, n) => (
+                    <span key={k} className="order-step">
+                      {n > 0 && ' → '}
+                      <ConceptPip id={ACCOUNT_CONCEPT[k]} size="sm" /> {accountName[k]}
+                    </span>
+                  ))}
                   {i === value.current && <span className="projected mono"> {o.yours}</span>}
                   {i === value.best && i !== value.current && <span className="projected mono"> {o.ahead}</span>}
                 </th>

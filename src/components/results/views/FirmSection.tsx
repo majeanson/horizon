@@ -74,7 +74,7 @@ export function FirmSection({ m }: { m: ResultsModel }) {
   )
   return (
     <div id="solidite" className="surface results-section firm" aria-label={rc.headline.firmTitle}>
-      <SectionHeader title={rc.headline.firmTitle} />
+      <SectionHeader title={rc.headline.firmTitle} concept="solidite" />
       {retiredNow ? (
         <>
           <p className="verdict__range-title">{r.sensitivity.title}</p>
@@ -99,7 +99,7 @@ export function FirmPrint({ m }: { m: ResultsModel }) {
   if (retiredNow) return null
   return (
     <div id="solidite" className="surface results-section firm" aria-label={rc.headline.firmTitle}>
-      <SectionHeader title={rc.headline.firmTitle} />
+      <SectionHeader title={rc.headline.firmTitle} concept="solidite" />
       <Brief m={m} />
     </div>
   )

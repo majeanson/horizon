@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
+import { DOC_CONCEPT } from '../../lib/concepts'
 import { Cluster } from '../Layout'
 import { useLang, useT } from '../../i18n'
 import { DOCUMENTS_COPY } from '../../lib/documentsCopy'
@@ -48,7 +50,7 @@ export function DocumentsChecklist({ onNext }: { onNext: () => void }) {
                 <span>{c.have}</span>
               </label>
               <div className="docs-item__body">
-                <h3 className="docs-item__name">{it.name}</h3>
+                <h3 className="docs-item__name"><ConceptPip id={DOC_CONCEPT[it.doc]} size="sm" />{it.name}</h3>
                 <p className={`docs-item__weight docs-item__weight--${it.weight} mono`}>
                   {c.importance} : {c.weights[it.weight]}
                 </p>

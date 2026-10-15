@@ -12,7 +12,7 @@ export function AboutSection({ person, edit, withoutSalary = false, withoutPartT
   const t = useT()
   const a = t.profile.about
   return (
-    <Section title={a.title} icon="user-bold">
+    <Section title={a.title} concept="personne">
       <FieldRow label={a.name}>
         {(w) => (
           <EditField as="div" value={person.name} onChange={(name) => edit((x) => ({ ...x, name }))} submitIcon={null} maxLength={60} id={w.id} ariaLabel={a.name} />

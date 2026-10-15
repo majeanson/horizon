@@ -1,6 +1,8 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { ConceptPip } from './ConceptPip'
 import { InlineIcon, type IconName } from './Icon'
+import type { ConceptId } from '../lib/concepts'
 
 // The ONE chip — the small mono pill used for filters, toggles, day-pickers and
 // tags across the app. Wraps the existing `.chip` / `.chip.is-on` look so the
@@ -50,6 +52,7 @@ export function Chip({
   expanded,
   current,
   icon,
+  concept,
   ariaLabel,
   title,
   disabled,
@@ -72,6 +75,8 @@ export function Chip({
   /** The « you are here » of a nav — `aria-current` + the is-on look, not pressed. */
   current?: boolean
   icon?: IconName
+  /** The idea the chip names: its pip (glyph + family colour, lib/concepts.ts) leads, before any `icon`. */
+  concept?: ConceptId
   ariaLabel?: string
   title?: string
   /** Interactive: disables the button. Static: marks the label `aria-disabled`. */
@@ -95,6 +100,7 @@ export function Chip({
   // head of the chip's text (« Neutre 2,1 % » read as "  Neutre…" to a test matching the start of the name).
   const body = (
     <>
+      {concept && <ConceptPip id={concept} size="sm" />}
       {lead && <InlineIcon name={lead} />}
       {children}
       {onRemove && <InlineIcon name="x-bold" size={12} />}

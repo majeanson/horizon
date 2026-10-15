@@ -10,6 +10,7 @@ import { patchChildSpending, patchKidsEffects } from '../../lib/profileLife'
 import { updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
 import { Fold } from '../Fold'
 import { FieldRow } from '../FieldRow'
 import { Cluster } from '../Layout'
@@ -48,7 +49,7 @@ export function KidsCosts() {
   return (
     <div className="kids-cost">
       <p className="kids-cost__title">
-        <strong>{c.title}</strong> <span className="mono">({c.estimated})</span>
+        <ConceptPip id="enfants" size="sm" /> <strong>{c.title}</strong> <span className="mono">({c.estimated})</span>
       </p>
       <p className="field-row__hint">{c.lead(c.families[s.family], c.levels[s.level], s.children)}</p>
       <ul className="kids-cost__bands">
@@ -86,7 +87,7 @@ export function KidsCosts() {
       {summary && (
         <div className="kids-benefits">
           <p className="kids-cost__title">
-            <strong>{b.title}</strong> <span className="mono">({c.estimated})</span>
+            <ConceptPip id="enfants" size="sm" /> <strong>{b.title}</strong> <span className="mono">({c.estimated})</span>
           </p>
           {summary.atHome && <p>{b.atHome(summary.atHome.children, money(Math.round(summary.atHome.cost)), money(Math.round(summary.atHome.benefit)), money(Math.round(summary.atHome.net)))}</p>}
           {summary.planned && (

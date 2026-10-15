@@ -1,5 +1,6 @@
 import { leversFor, profileLevers, strategyKeysFor, type BridgeLevers, type BridgeSummary, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
 import type { Household, PersonId } from '../engine/types.ts'
+import { SOURCE_COLOUR } from './chartData.ts'
 import { MAX_AGE, MIN_AGE } from './resultsModel.ts'
 
 // What the « Mes années 60 à 70 » view keeps in the address bar, and the pure helpers around it: which strategy a set of
@@ -77,7 +78,8 @@ export function verdictOf(l: BridgeLevers, summary: BridgeSummary, standard: Bri
 /** The bar chart's rows: each year's sources (and the nest drawn), as plain numbers keyed by the segment ids below. */
 export const SEGMENTS = ['work', 'db', 'rrq', 'oas', 'nest'] as const
 export type SegmentId = (typeof SEGMENTS)[number]
-export const SEGMENT_COLOUR = { work: 'ink', db: 'sky', rrq: 'sage', oas: 'berry', nest: 'accent' } as const
+/** The bars of these years are the sources chart's own (lib/chartData.ts): one colour per kind of money, whichever page draws it. */
+export const SEGMENT_COLOUR: Record<SegmentId, (typeof SOURCE_COLOUR)[SegmentId]> = SOURCE_COLOUR
 
 export function barRows(rows: readonly BridgeYear[]): ({ x: number; need: number } & Record<SegmentId, number>)[] {
   return rows.map((r) => ({ x: r.age, need: r.spending + r.tax, work: r.employment, db: r.db, rrq: r.rrq, oas: r.oas + r.gis, nest: r.drawn }))

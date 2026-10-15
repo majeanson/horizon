@@ -52,7 +52,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
   }
 
   return (
-    <Section title={r.title} icon="calendar-blank-bold">
+    <Section title={r.title} concept="rrq">
       <FieldRow label={r.startAge} infoId="rrqStartAge" hint={r.startHint}>
         {(w) => (
           <NumberField kind="int" min={60} max={72} unit={t.fields.years} value={person.rrq.startAge} onChange={(startAge) => edit((x) => ({ ...x, rrq: { ...x.rrq, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />
@@ -82,7 +82,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
       </fieldset>
 
         <div className={'earnings' + (guided === factId(person.id, 'earnings') ? ' earnings--guided' : '')} data-fact={factId(person.id, 'earnings')}>
-          <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed, years.length)} />
+          <SectionHeader title={r.earnings} subtitle={r.earningsCount(typed, years.length)} concept="releve" />
           <p className="field-row__hint">{r.earningsHint}</p>
           <FactMark id={factId(person.id, 'earnings')} label={r.earnings} line />
           <div className="earnings__tools">

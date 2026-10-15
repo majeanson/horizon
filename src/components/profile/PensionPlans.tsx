@@ -144,7 +144,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
   const add = (pension: DbPension) => edit((x) => addPension(x, pension))
 
   return (
-    <Section title={p.title} subtitle={p.subtitle} icon="bank-bold">
+    <Section title={p.title} subtitle={p.subtitle} concept="employeur">
       {person.pensions.length === 0 && <p className="field-row__hint">{p.empty}</p>}
       {person.pensions.length > 0 && (
         <div className={'fact-line' + (guided === factId(person.id, 'pension') ? ' fact-line--guided' : '')} data-fact={factId(person.id, 'pension')}>
@@ -216,7 +216,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
               </>
             )}
             <div className="plan-card__rules">
-              <SectionHeader title={pension.inPay ? p.inPayRules : p.rules} />
+              <SectionHeader title={pension.inPay ? p.inPayRules : p.rules} concept="employeur" />
               <Rules pension={pension} set={set} />
             </div>
           </article>

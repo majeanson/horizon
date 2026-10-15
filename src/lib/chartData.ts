@@ -1,6 +1,7 @@
 import type { ChartMarker, ChartSeries, SeriesColour } from '../components/charts/types.ts'
 import type { AgeResult, Household, YearRow } from '../engine/types.ts'
 import { selectionAge, type Selection } from './resultsModel.ts'
+import { CONCEPTS, FAMILY_HUE, type ConceptId } from './concepts.ts'
 
 // From the engine's year rows to what the chart draws: which number, in which dollars, for which scenario.
 // Pure, so « the chart says what the table says » is a test and not a hope.
@@ -11,7 +12,24 @@ export type Metric = 'netWorth' | 'income'
 /** `today`: deflated to today's purchasing power (what a reader can feel) · `nominal`: the dollars of each year. */
 export type Dollars = 'today' | 'nominal'
 
+// The runs of a COMPARISON (departure ages, strategies) are an ordered set that must stay tellable apart on one line chart, not one concept each: four hues by position.
 export const SERIES_COLOURS: readonly SeriesColour[] = ['accent', 'sky', 'sage', 'berry']
+
+/** deep: the family's own ink · mid: the base ink · soft: the deep ink thinned toward the card. Siblings of one family in one chart take different tiers. */
+export type Tier = 'deep' | 'mid' | 'soft'
+const HUE_SERIES: Record<ReturnType<typeof hueOf>, Record<Tier, SeriesColour>> = {
+  sage: { deep: 'sage', mid: 'sage-mid', soft: 'sage-soft' },
+  marigold: { deep: 'accent', mid: 'sun', soft: 'accent-soft' },
+  sky: { deep: 'sky', mid: 'sky-mid', soft: 'sky-soft' },
+  berry: { deep: 'berry', mid: 'berry-mid', soft: 'berry-soft' },
+  terracotta: { deep: 'clay', mid: 'coral', soft: 'clay-soft' },
+  ink: { deep: 'ink', mid: 'ink', soft: 'ink' },
+}
+function hueOf(concept: ConceptId) {
+  return FAMILY_HUE[CONCEPTS[concept].family]
+}
+/** The colour a chart gives a concept: its family's hue (lib/concepts.ts), at the tier that tells it from its siblings. */
+export const seriesFor = (concept: ConceptId, tier: Tier = 'deep'): SeriesColour => HUE_SERIES[hueOf(concept)][tier]
 
 export function metricValue(row: YearRow, metric: Metric): number {
   if (metric === 'netWorth') return row.household.netWorthEnd
@@ -61,14 +79,16 @@ export type ChartMetric = Metric | 'detail'
 
 export const SOURCE_SEGMENTS = ['work', 'db', 'rrq', 'oas', 'nest'] as const
 export type SourceSegment = (typeof SOURCE_SEGMENTS)[number]
-export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: 'ink', db: 'sky', rrq: 'sage', oas: 'berry', nest: 'accent' }
+/** Work and the employer's pension are the work family (berry), the QPP and the OAS the public pensions (sage), what is drawn from savings the nest. */
+export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: seriesFor('salaire'), db: seriesFor('employeur', 'soft'), rrq: seriesFor('rrq'), oas: seriesFor('psv', 'soft'), nest: seriesFor('nid') }
 
 export const BALANCE_SEGMENTS = ['rrsp', 'tfsa', 'nonReg'] as const
 export type BalanceSegment = (typeof BALANCE_SEGMENTS)[number]
 /** The house's equity: wealth beside the accounts, never drawn on — a segment only for the household, and only when it has a home. */
 export type BalanceBarSegment = BalanceSegment | 'rrspLocked' | 'home'
 /** `rrspLocked` splits the locked-in part out of the REER bar (the `rrsp` bar is then the free part): a segment only when someone has one. */
-export const BALANCE_COLOUR: Record<BalanceBarSegment, SeriesColour> = { rrsp: 'accent', rrspLocked: 'ink', tfsa: 'sage', nonReg: 'sky', home: 'berry' }
+/** The REER, the CELI and the locked-in part are the registered accounts (marigold, three tiers); the non-registered money and the house are the household's (sky). */
+export const BALANCE_COLOUR: Record<BalanceBarSegment, SeriesColour> = { rrsp: seriesFor('reer'), rrspLocked: seriesFor('verrouille', 'soft'), tfsa: seriesFor('celi', 'mid'), nonReg: seriesFor('nonEnregistre'), home: seriesFor('maison', 'soft') }
 
 /** `year`: the sums of each year (the default) · `month`: the same sums over twelve — « how much a month », which is how a household lives with money. */
 export type Per = 'year' | 'month'
@@ -143,7 +163,8 @@ export function survivorJump(household: Household, defaultHorizon: number): { go
 export const EXPENSE_SEGMENTS = ['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved', 'unmet'] as const
 export type ExpenseSegment = (typeof EXPENSE_SEGMENTS)[number]
 /** `unmet`: what the plan needed and could not pay — drawn only in a plan that runs out. */
-export const EXPENSE_COLOUR: Record<ExpenseSegment, SeriesColour> = { living: 'sky', children: 'sun', events: 'coral', mortgage: 'berry', tax: 'ink', deductions: 'sage', saved: 'accent', unmet: 'clay' }
+/** The budget, the tax and what could not be paid are the money that leaves (terracotta, three tiers); the children, the events and the mortgage the household's (sky); the deductions come off the pay (berry); what is saved goes to the accounts (marigold). */
+export const EXPENSE_COLOUR: Record<ExpenseSegment, SeriesColour> = { living: seriesFor('budget', 'soft'), children: seriesFor('enfants'), events: seriesFor('evenements', 'soft'), mortgage: seriesFor('hypotheque', 'mid'), tax: seriesFor('impot', 'mid'), deductions: seriesFor('salaire'), saved: seriesFor('reer'), unmet: seriesFor('depenses') }
 
 /**
  * One bar per year: where the household's money goes. `living` is the budget less the mortgage, the children and the dated expenses (care, a roof…), which are drawn apart so they can be seen, `mortgage` the

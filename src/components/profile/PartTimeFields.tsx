@@ -2,6 +2,7 @@ import { useLang, useT } from '../../i18n'
 import { formatPct } from '../../lib/format'
 import { LIFE_COPY } from '../../lib/lifeCopy'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
 import { Cluster } from '../Layout'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
@@ -18,7 +19,9 @@ export function PartTimeFields({ person, edit }: PersonEditor) {
   const set = (partTime: { untilAge: number; share: number } | null) => edit((x) => ({ ...x, partTime }))
   return (
     <div className="part-time">
-      <p className="field-row__label">{c.title}</p>
+      <p className="field-row__label">
+        <ConceptPip id="tempsPartiel" size="sm" /> {c.title}
+      </p>
       <p className="field-row__hint">{c.hint}</p>
       <Cluster role="radiogroup" aria-label={c.title}>
         <Chip radio selected={pt === null} onClick={() => set(null)}>

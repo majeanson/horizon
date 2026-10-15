@@ -2,10 +2,12 @@ import { lazy, Suspense, useState, type ReactNode } from 'react'
 import type { Person } from '../../engine/types'
 import type { InfoId } from '../../i18n'
 import { useLang, useT } from '../../i18n'
+import { ACCOUNT_CONCEPT, type ConceptId } from '../../lib/concepts'
 import { factId } from '../../lib/facts'
 import { formatMoney } from '../../lib/money'
 import { setRrspBalance } from '../../lib/profileEdit'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
 import { Section, type PersonEditor } from './shared'
@@ -20,7 +22,7 @@ export function OasSection({ person, edit, withoutResidence = false }: PersonEdi
   const t = useT()
   const o = t.profile.oas
   return (
-    <Section title={o.title} icon="identification-card-bold">
+    <Section title={o.title} concept="psv">
       {!withoutResidence && (<>
       <FieldRow label={o.residentSince} infoId="oasResidence" hint={o.residentHint} fact={factId(person.id, 'residence')}>
         {(w) => (
@@ -53,10 +55,12 @@ export function CashBufferReadout() {
   )
 }
 
-function Group({ title, children }: { title: string; children: ReactNode }) {
+function Group({ title, concept, children }: { title: string; concept: ConceptId; children: ReactNode }) {
   return (
     <fieldset className="account-group">
-      <legend className="account-group__title mono">{title}</legend>
+      <legend className="account-group__title mono">
+        <ConceptPip id={concept} size="sm" /> {title}
+      </legend>
       {children}
     </fieldset>
   )
@@ -100,7 +104,7 @@ function RegisteredGroup({ kind, person, edit, info, withRoom }: PersonEditor & 
   const account = person.accounts[kind]
   const set = (patch: Partial<Person['accounts'][Registered]>) => edit((x) => ({ ...x, accounts: { ...x.accounts, [kind]: { ...x.accounts[kind], ...patch } } }))
   return (
-    <Group title={a[kind]}>
+    <Group title={a[kind]} concept={ACCOUNT_CONCEPT[kind]}>
       <FieldRow label={a.balance} infoId={info.balance} fact={factId(person.id, kind === 'rrsp' ? 'rrspBalance' : 'tfsaBalance')}>
         {(w) => <NumberField kind="money" max={1e9} value={account.balance} onChange={(balance) => (kind === 'rrsp' ? edit((x) => setRrspBalance(x, balance)) : set({ balance }))} id={w.id} />}
       </FieldRow>
@@ -125,11 +129,11 @@ export function AccountsSection({ person, edit, withoutRoom = false, withNonReg 
   const nonReg = person.accounts.nonReg
   const setNonReg = (patch: Partial<typeof nonReg>) => edit((x) => ({ ...x, accounts: { ...x.accounts, nonReg: { ...x.accounts.nonReg, ...patch } } }))
   return (
-    <Section title={a.title} icon="piggy-bank-bold">
+    <Section title={a.title} concept="nid">
       <RegisteredGroup kind="rrsp" person={person} edit={edit} info={{ balance: 'rrspBalance', room: 'rrspRoom' }} withRoom={!withoutRoom} />
       <RegisteredGroup kind="tfsa" person={person} edit={edit} info={{ balance: 'tfsaBalance', room: 'tfsaRoom' }} withRoom={!withoutRoom} />
       {withNonReg && (
-      <Group title={a.nonReg}>
+      <Group title={a.nonReg} concept={ACCOUNT_CONCEPT.nonReg}>
         <FieldRow label={a.balance} infoId="nonRegBalance" fact={factId(person.id, 'nonRegBalance')}>
           {(w) => <NumberField kind="money" max={1e9} value={nonReg.balance} onChange={(balance) => setNonReg({ balance })} id={w.id} />}
         </FieldRow>

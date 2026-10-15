@@ -144,7 +144,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
           {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
               is ONE section: the same runs, seen as cards, as a picture, and per person. */}
           <section id="comparer" className="results-section" aria-label={r.compare.label}>
-            <SectionHeader title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} />
+            <SectionHeader title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} concept="depart" />
             {compareKeys.length > 1 && (
               <SubTabs
                 size="mini"
@@ -254,7 +254,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
           {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
           {(refine.length > 0 || movers.length > 0) && (
             <div id="preciser" className="surface results-section refine" aria-label={rc.refine.title}>
-              <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} />
+              <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} concept="precision" />
               {movers.length > 0 && (
                 <div className="refine__moves">
                   <p className="verdict__range-title">{rc.refine.moves}</p>

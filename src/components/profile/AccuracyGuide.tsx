@@ -45,7 +45,7 @@ export default function AccuracyGuide() {
   const pct = acc.total === 0 ? 0 : Math.round((100 * acc.confirmed) / acc.total)
   return (
     <>
-      <Section id="exact" title={c.panel.title} subtitle={c.panel.lead} icon="check-bold">
+      <Section id="exact" title={c.panel.title} subtitle={c.panel.lead} concept="documents">
         <div className="accuracy__meter">
           <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={acc.total} aria-valuenow={acc.confirmed} aria-label={c.panel.count(acc.confirmed, acc.total)}>
             <span className="meter__fill" style={{ width: `${pct}%` }} />

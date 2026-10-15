@@ -64,7 +64,7 @@ export function BudgetSection({ withKids = false }: { /** The children’s cost 
   }
 
   return (
-    <Section id="budget" title={b.title}>
+    <Section id="budget" title={b.title} concept="budget">
       {couple && (
         <div className="situation__q">
           <p id="budget-how" className="situation__question">

@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { scrollToSection } from '../lib/motion'
 import { Chip } from './Chip'
+import type { ConceptId } from '../lib/concepts'
 import { Rail } from './Layout'
 
 // The map of a long page: one chip per section, in reading order, in a sticky Rail under the top
@@ -13,6 +14,8 @@ import { Rail } from './Layout'
 export interface SectionLink {
   id: string
   label: string
+  /** The idea the section is about: its pip leads the chip. */
+  concept?: ConceptId
   /** Opens a new group in the map: a quiet label drawn before this chip (the page's story arcs). */
   arc?: string
 }
@@ -60,7 +63,7 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
               // Plain text, NOT aria-hidden: the grouping is wayfinding for a screen-reader user too.
               <span className="section-nav__arc mono">{l.arc}</span>
             )}
-            <Chip current={inView === l.id} onClick={() => scrollToSection(l.id)}>
+            <Chip current={inView === l.id} concept={l.concept} onClick={() => scrollToSection(l.id)}>
               {l.label}
             </Chip>
           </Fragment>

@@ -20,7 +20,7 @@ export default function CashBufferLine() {
   const months = formatDecimal(buffer.months, lang, 1)
   const line = buffer.status === 'empty' ? c.empty(min, max) : c[buffer.status](months, min, max)
   return (
-    <Section title={c.title} icon="piggy-bank-bold" subtitle={`${c.basis(formatMoney(buffer.liquid, lang))} ${c.caveat}`}>
+    <Section title={c.title} concept="coussin" subtitle={`${c.basis(formatMoney(buffer.liquid, lang))} ${c.caveat}`}>
       <StatusMessage tone={buffer.status === 'within' ? 'success' : 'info'}>{line}</StatusMessage>
     </Section>
   )

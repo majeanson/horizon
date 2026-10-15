@@ -31,7 +31,7 @@ export function PlansSection({ onReplace }: { onReplace: (before: Profile) => vo
   }
 
   return (
-    <Section title={c.title} subtitle={c.hint} icon="users-three-bold">
+    <Section title={c.title} subtitle={c.hint} concept="plans">
       <form
         className="plans__new"
         onSubmit={(e) => {

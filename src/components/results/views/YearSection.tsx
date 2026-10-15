@@ -111,7 +111,7 @@ export function YearSection({ m }: { m: ResultsModel }) {
   const isCouple = m.profile.household.persons.length > 1
   return (
     <section id="annee" className="results-section" aria-label={f.year.title}>
-      <SectionHeader title={f.year.title} subtitle={f.year.hint} />
+      <SectionHeader title={f.year.title} subtitle={f.year.hint} concept="annee" />
       <div className="surface future-year">
         {!retiredNow && (
           <div className="verdict__range">

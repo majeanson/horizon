@@ -346,15 +346,15 @@ export function useResultsPage() {
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse }, { id: 'comparer', label: rc.nav.comparer }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser }] : []), { id: 'annee', label: rc.nav.annee }]
+      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser, concept: 'precision' as const }] : []), { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }]
       : view === 'decide'
-        ? [{ id: 'essayer', label: rc.nav.essayer }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes }] : []), { id: 'ordre', label: rc.nav.ordre }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav }] : [])]
+        ? [{ id: 'essayer', label: rc.nav.essayer, concept: 'essayer' as const }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, concept: 'rrq' as const }] : []), { id: 'ordre', label: rc.nav.ordre, concept: 'ordre' as const }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav, concept: 'fonte' as const }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav, concept: 'reer' as const }] : [])]
         : [
-            { id: 'solidite', label: rc.nav.solidite },
-            { id: 'donnees-calcul', label: rc.nav.chiffres },
-            { id: 'tableau', label: rc.nav.tableau },
-            { id: 'precision', label: rc.nav.precision },
-            { id: 'parametres', label: rc.nav.parametres },
+            { id: 'solidite', label: rc.nav.solidite, concept: 'solidite' as const },
+            { id: 'donnees-calcul', label: rc.nav.chiffres, concept: 'documents' as const },
+            { id: 'tableau', label: rc.nav.tableau, concept: 'annee' as const },
+            { id: 'precision', label: rc.nav.precision, concept: 'precision' as const },
+            { id: 'parametres', label: rc.nav.parametres, concept: 'hypotheses' as const },
           ]
 
   // The headline sentence with its age drawn large: the copy marks where the age sits, the page splits it there.

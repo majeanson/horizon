@@ -8,12 +8,12 @@ export function ProfileMap({ people, withHome, withEvents, withExact, page }: { 
   const t = useT()
   const n = t.profile.nav
   const links: SectionLink[] = [
-    { id: 'famille', label: n.family },
-    ...people.map((p) => ({ id: `person-${p.id}`, label: p.name })),
-    { id: 'budget', label: n.budget },
-    ...(withHome ? [{ id: 'maison', label: n.home }] : []),
-    ...(withEvents ? [{ id: 'evenements', label: n.events }] : []),
-    ...(withExact ? [{ id: 'exact', label: n.exact }] : []),
+    { id: 'famille', label: n.family, concept: 'famille' },
+    ...people.map((p) => ({ id: `person-${p.id}`, label: p.name, concept: 'personne' as const })),
+    { id: 'budget', label: n.budget, concept: 'budget' },
+    ...(withHome ? [{ id: 'maison', label: n.home, concept: 'maison' as const }] : []),
+    ...(withEvents ? [{ id: 'evenements', label: n.events, concept: 'evenements' as const }] : []),
+    ...(withExact ? [{ id: 'exact', label: n.exact, concept: 'documents' as const }] : []),
   ]
   return <PinnedMap links={links} ariaLabel={n.label} page={page} />
 }

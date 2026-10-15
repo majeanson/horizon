@@ -6,6 +6,7 @@ import type { BridgeCopy } from '../../lib/bridgeCopy'
 import { sturdiest, verdictOf } from '../../lib/bridgeModel'
 import { formatMoney } from '../../lib/money'
 import { useWide } from '../../lib/useWide'
+import { STRATEGY_CONCEPT } from '../../lib/concepts'
 import { Chip } from '../Chip'
 
 // THE WAYS OF STARTING THE PENSIONS, side by side — one comparison, two ways of showing it, and the reader chooses (`?bt=cards|table`):
@@ -126,7 +127,7 @@ function Cards({ shown, standard, pressed, copy, onPick, horizonAge, who, matrix
           return (
             <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short')}>
               {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
-              <Chip radio selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
+              <Chip radio selected={pressed.includes(s.key)} concept={STRATEGY_CONCEPT[s.key]} onClick={() => onPick(s.key)}>
                 {label(s)}
               </Chip>
               <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>

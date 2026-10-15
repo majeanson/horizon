@@ -1,0 +1,58 @@
+/* Concept pips — a small disc in the colour of a concept's FAMILY, with the concept's own glyph (components/ConceptPip.tsx,
+   lib/concepts.ts). Similar ideas share a hue; each keeps its own glyph, and its name is always written beside it, so colour is
+   never the only cue. The glyph is the `-deep` tier of the hue on its `-wash` (≥ 3:1, documented in core.css), a label beside
+   it the `-ink` tier (≥ 4.5:1). `.fam--*` sets the same three tokens on any wrapper (a group's rule, a legend row). */
+
+.fam--sage, .pip--sage { --fam-deep: var(--sage-deep); --fam-wash: var(--sage-wash); --fam-ink: var(--sage-ink); }
+.fam--marigold, .pip--marigold { --fam-deep: var(--marigold-deep); --fam-wash: var(--marigold-wash); --fam-ink: var(--marigold-ink); }
+.fam--sky, .pip--sky { --fam-deep: var(--sky-deep); --fam-wash: var(--sky-wash); --fam-ink: var(--sky-ink); }
+.fam--berry, .pip--berry { --fam-deep: var(--berry-deep); --fam-wash: var(--berry-wash); --fam-ink: var(--berry-ink); }
+.fam--terracotta, .pip--terracotta { --fam-deep: var(--terracotta-deep); --fam-wash: var(--terracotta-wash); --fam-ink: var(--terracotta-ink); }
+.fam--ink, .pip--ink { --fam-deep: var(--ink-soft); --fam-wash: var(--paper-deep); --fam-ink: var(--ink-soft); }
+
+.pip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--fam-deep);
+  background: var(--fam-wash);
+  /* The wash alone melts into a cream card; a hairline of the hue keeps the disc a disc. */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fam-deep) 28%, transparent);
+  vertical-align: middle;
+}
+.pip--sm { width: 1.2rem; height: 1.2rem; }
+.pip--md { width: 1.7rem; height: 1.7rem; }
+.pip--lg { width: 2.2rem; height: 2.2rem; }
+
+/* A pip before a chip's, a tab's or a heading's name keeps the row's own gap. */
+.chip .pip, .subtabs__opt .pip { margin-inline-start: -0.15rem; }
+/* With a subtitle under the title the header is two lines: the pip rides the TITLE line, not the middle of the block. */
+.section-header__main > .pip { align-self: flex-start; margin-inline-end: 0.05rem; }
+
+/* A group of the Glossaire: the family's hue as a rule down the card's edge, the family's pip in its header. */
+.profile-section.fam-rule { border-inline-start: 4px solid var(--fam-deep); }
+
+/* The Glossaire's legend: what each colour means, one row per family. A list, so a screen reader counts them. */
+.pip-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pip-legend__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.pip-legend__name { font-weight: 700; color: var(--fam-ink); }
+.pip-legend__what { display: block; font-size: var(--text-sm); color: var(--ink-soft); }
+
+/* A glossary term / a document: the pip sits before the name, the name keeps its baseline. */
+.glossary dt .pip { align-self: center; }
+.docs-item__name .pip { margin-inline-end: 0.4rem; }
+

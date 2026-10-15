@@ -64,9 +64,9 @@ export function Resultats() {
           value={view}
           onSelect={(v) => setParam('v', v === 'answer' ? null : v)}
           options={[
-            { key: 'answer' as const, label: rc.tabs.answer },
-            { key: 'decide' as const, label: rc.tabs.decide },
-            { key: 'proof' as const, label: rc.tabs.proof },
+            { key: 'answer' as const, label: rc.tabs.answer, concept: 'reponse' as const },
+            { key: 'decide' as const, label: rc.tabs.decide, concept: 'decider' as const },
+            { key: 'proof' as const, label: rc.tabs.proof, concept: 'preuve' as const },
           ]}
         />
       </div>

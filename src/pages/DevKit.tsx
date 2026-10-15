@@ -1,6 +1,8 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip, ChipGroup } from '../components/Chip'
+import { ConceptPip, FamilyPip } from '../components/ConceptPip'
+import { CONCEPTS, FAMILIES, FAMILY_HUE, type ConceptId } from '../lib/concepts'
 import { DripQuestion } from '../components/DripQuestion'
 import { DemoAnswer } from '../components/DemoAnswer'
 import { LiveAnswer } from '../components/LiveAnswer'
@@ -220,6 +222,30 @@ function TableChooserSpecimen() {
   )
 }
 
+// Every concept of the registry, grouped by family: the page to judge the hues and the glyphs on (day, night, contrast, text size).
+function ConceptPipSpecimen() {
+  const ids = Object.keys(CONCEPTS) as ConceptId[]
+  return (
+    <div className="pip-legend">
+      {FAMILIES.map((family) => (
+        <div key={family} className={`pip-legend__item fam--${FAMILY_HUE[family]}`}>
+          <FamilyPip family={family} size="lg" />
+          <span>
+            <span className="pip-legend__name">{family}</span>
+            <span className="pip-legend__what">
+              {ids.filter((id) => CONCEPTS[id].family === family).map((id) => (
+                <span key={id} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', marginInlineEnd: '0.6rem' }}>
+                  <ConceptPip id={id} size="sm" /> {id}
+                </span>
+              ))}
+            </span>
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function SubTabsSpecimen() {
   const [k, setK] = useState<'self' | 'spouse'>('self')
   return (
@@ -360,6 +386,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
+    { cat: 'Affichage', name: 'ConceptPip', file: 'src/components/ConceptPip.tsx', exports: ['ConceptPip', 'FamilyPip'], kw: 'pastille concept icône couleur famille glossaire', render: () => <ConceptPipSpecimen /> },
     {
       cat: 'Affichage',
       name: 'SectionHeader',

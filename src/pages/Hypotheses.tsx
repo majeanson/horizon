@@ -73,12 +73,12 @@ export function Hypotheses() {
   const page = useRef<HTMLElement>(null)
   const nav = HYPOTHESES_COPY[lang].nav
   const links = [
-    { id: 'scenario', label: nav.scenario },
-    { id: 'prix', label: nav.prices },
-    { id: 'placements', label: nav.returns },
-    { id: 'marches', label: nav.markets },
-    { id: 'age', label: nav.age },
-    { id: 'depenses', label: nav.spending },
+    { id: 'scenario', label: nav.scenario, concept: 'scenario' as const },
+    { id: 'prix', label: nav.prices, concept: 'inflation' as const },
+    { id: 'placements', label: nav.returns, concept: 'rendement' as const },
+    { id: 'marches', label: nav.markets, concept: 'marches' as const },
+    { id: 'age', label: nav.age, concept: 'finPlan' as const },
+    { id: 'depenses', label: nav.spending, concept: 'depenses' as const },
     { id: 'options', label: nav.options },
   ]
 
@@ -88,7 +88,7 @@ export function Hypotheses() {
       <PageHead title={a.title} subtitle={a.subtitle} />
       <PinnedMap links={links} ariaLabel={nav.label} page={page} />
 
-      <Section id="scenario" title={a.presets.title} subtitle={a.presets.hint} icon="sliders-horizontal-bold">
+      <Section id="scenario" title={a.presets.title} subtitle={a.presets.hint} concept="scenario">
         <SubTabs<PresetKey | 'custom'>
           ariaLabel={a.presets.label}
           value={active ?? 'custom'}
@@ -139,7 +139,7 @@ export function Hypotheses() {
         </div>
       </Section>
 
-      <Section id="prix" title={a.economy.title} icon="chart-line-up-bold">
+      <Section id="prix" title={a.economy.title} concept="inflation">
         <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
           {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
         </FieldRow>
@@ -151,7 +151,7 @@ export function Hypotheses() {
         {meter('wageGrowth', assumptions.wageGrowth)}
       </Section>
 
-      <Section id="placements" title={a.returns.title} subtitle={a.returns.hint} icon="chart-line-up-bold">
+      <Section id="placements" title={a.returns.title} subtitle={a.returns.hint} concept="rendement">
         {perAccount ? (
           (['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
             <FieldRow key={kind} label={accountName[kind]} infoId="returns">
@@ -176,7 +176,7 @@ export function Hypotheses() {
         {meter('returns', averageReturn)}
       </Section>
 
-      <Section id="marches" title={m.path.title} subtitle={m.path.hint} icon="chart-line-up-bold">
+      <Section id="marches" title={m.path.title} subtitle={m.path.hint} concept="marches">
         <SubTabs
           ariaLabel={m.path.title}
           value={assumptions.marketPath.preset}
@@ -205,7 +205,7 @@ export function Hypotheses() {
 
       {/* Each person's own age — the scenario's (95 in Neutre) until they set one; a chip gives it back to the scenario. In a couple the
           first death hands the plan to the survivor (engine/projection.ts), so the survivor's spending share sits here too. */}
-      <Section id="age" title={a.horizon.title} subtitle={a.horizon.hint} icon="calendar-blank-bold">
+      <Section id="age" title={a.horizon.title} subtitle={a.horizon.hint} concept="finPlan">
         {profile.household.persons.map((person, i) => {
           const own = person.horizonAge ?? null
           const name = person.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
@@ -243,7 +243,7 @@ export function Hypotheses() {
         )}
       </Section>
 
-      <Section id="depenses" title={LIFE_COPY[lang].drift.title} subtitle={LIFE_COPY[lang].drift.hint} icon="chart-line-up-bold">
+      <Section id="depenses" title={LIFE_COPY[lang].drift.title} subtitle={LIFE_COPY[lang].drift.hint} concept="depenses">
         <Cluster role="radiogroup" aria-label={LIFE_COPY[lang].drift.title}>
           {[0, -0.01, -0.02].map((v) => (
             <Chip key={v} radio selected={(assumptions.retiredSpendingDrift ?? 0) === v} onClick={() => updateProfile((p) => setAssumptions(p, { retiredSpendingDrift: v }))}>

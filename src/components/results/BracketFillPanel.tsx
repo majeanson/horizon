@@ -4,6 +4,7 @@ import type { Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRACKET_FILL_COPY } from '../../lib/bracketFillCopy'
 import { choiceOf, tabOf } from '../../lib/bracketFillNudge'
+import { seriesFor } from '../../lib/chartData'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { setAssumptions } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
@@ -107,8 +108,8 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
         <Suspense fallback={<Loading />}>
           <LineChart
             series={[
-              { id: 'income', label: c.seriesIncome, colour: 'accent' as const, points: years.map((y) => ({ x: y.year, y: y.income })) },
-              ...(shown.choice === null ? [] : [{ id: 'line', label: c.seriesLine, colour: 'berry' as const, points: years.map((y) => ({ x: y.year, y: y.ceiling ?? 0 })) }]),
+              { id: 'income', label: c.seriesIncome, colour: seriesFor('impot', 'mid'), points: years.map((y) => ({ x: y.year, y: y.income })) },
+              ...(shown.choice === null ? [] : [{ id: 'line', label: c.seriesLine, colour: seriesFor('tranche'), points: years.map((y) => ({ x: y.year, y: y.ceiling ?? 0 })) }]),
             ]}
             markers={markers}
             yFormat={money}
@@ -132,8 +133,8 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
         <Suspense fallback={<Loading />}>
           <LineChart
             series={[
-              { id: 'rrsp', label: c.seriesRrsp, colour: 'sky' as const, points: years.map((y) => ({ x: y.year, y: y.rrsp })) },
-              { id: 'tfsa', label: c.seriesTfsa, colour: 'sage' as const, points: years.map((y) => ({ x: y.year, y: y.tfsa })) },
+              { id: 'rrsp', label: c.seriesRrsp, colour: seriesFor('reer'), points: years.map((y) => ({ x: y.year, y: y.rrsp })) },
+              { id: 'tfsa', label: c.seriesTfsa, colour: seriesFor('celi', 'mid'), points: years.map((y) => ({ x: y.year, y: y.tfsa })) },
             ]}
             yFormat={money}
             yDetail={detail}

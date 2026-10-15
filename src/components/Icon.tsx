@@ -18,7 +18,12 @@ export function Icon({
   color?: string
   style?: React.CSSProperties
 }) {
-  const inner = PIP_ICONS[name] || ''
+  return <Glyph markup={PIP_ICONS[name] || ''} size={size} color={color} style={style} />
+}
+
+// The drawing itself, from the markup of a registry entry. <Icon> hands it the core set; <ConceptPip> hands it the concept
+// glyphs (lib/pipIconsMore.ts) — which are NOT in the core set, so the shell never carries them.
+export function Glyph({ markup, size = 24, color, style }: { markup: string; size?: number; color?: string; style?: React.CSSProperties }) {
   return (
     <svg
       viewBox="0 0 256 256"
@@ -28,7 +33,7 @@ export function Icon({
       aria-hidden="true"
       focusable="false"
       style={{ display: 'block', color, flex: 'none', ...style }}
-      dangerouslySetInnerHTML={{ __html: inner }}
+      dangerouslySetInnerHTML={{ __html: markup }}
     />
   )
 }

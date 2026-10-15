@@ -31,7 +31,7 @@ export function TaxFields({ person, edit }: PersonEditor) {
     </fieldset>
   )
   return (
-    <Section title={c.taxTitle} subtitle={c.taxHint} icon="identification-card-bold">
+    <Section title={c.taxTitle} subtitle={c.taxHint} concept="impot">
       <FieldRow label={a.salary} infoId="salary" hint={a.salaryHint} fact={factId(person.id, 'salary')}>
         {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>

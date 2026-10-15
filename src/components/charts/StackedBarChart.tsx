@@ -1,6 +1,7 @@
 import { Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { SERIES_CSS } from './palette'
 import { TwoLineTick } from './tick'
-import type { StackedBarChartProps, SeriesColour } from './types'
+import type { StackedBarChartProps } from './types'
 
 // The ONE stacked bar chart: where each year's money comes from — plain bars, one segment per source, in the app's own
 // colour tokens. Like the line chart it is a thin adapter: only this folder imports the library, the legend and the
@@ -10,16 +11,7 @@ import type { StackedBarChartProps, SeriesColour } from './types'
 // `line` draws one more thing across the bars: a single value per year (the page passes the year's spending plus tax), so
 // a reader sees at a glance whether the segments reach it (the year is covered) or stop short.
 
-const COLOUR: Record<SeriesColour, string> = {
-  accent: 'var(--marigold-deep)',
-  sky: 'var(--sky-deep)',
-  sage: 'var(--sage-deep)',
-  berry: 'var(--berry-deep)',
-  ink: 'var(--ink-faint)',
-  clay: 'var(--terracotta-deep)',
-  sun: 'var(--marigold)',
-  coral: 'var(--terracotta)',
-}
+const COLOUR = SERIES_CSS
 
 export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300 }: StackedBarChartProps) {
   const bottom = xTick ? 18 : 4
@@ -82,7 +74,8 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
               />
             ))}
             {series.map((s) => (
-              <Bar key={s.id} dataKey={s.id} stackId="year" fill={COLOUR[s.colour]} isAnimationActive={false} />
+              // A hairline of the card between segments: siblings of one family differ by tier, and the line keeps two neighbours apart.
+              <Bar key={s.id} dataKey={s.id} stackId="year" fill={COLOUR[s.colour]} stroke="var(--card)" strokeWidth={1} isAnimationActive={false} />
             ))}
             {line && <Line type="monotone" dataKey={line.id} name={line.label} stroke="var(--ink)" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />}
           </ComposedChart>

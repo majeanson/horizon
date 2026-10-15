@@ -1,6 +1,8 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { glossed } from './Gloss'
+import { ConceptPip } from './ConceptPip'
 import { Icon, type IconName } from './Icon'
+import type { ConceptId } from '../lib/concepts'
 
 // A small section header: an optional icon, a title, an optional subtitle, and an optional
 // trailing action. One anatomy for every section of the profile and the results.
@@ -13,18 +15,21 @@ export function SectionHeader({
   title,
   subtitle,
   icon,
+  concept,
   action,
 }: {
   title: ReactNode
   subtitle?: ReactNode
   icon?: IconName
+  /** The idea this section is about: its pip (glyph + family colour, lib/concepts.ts) replaces a plain `icon`. */
+  concept?: ConceptId
   action?: ReactNode
 }) {
   const Heading = useContext(SectionLevel) === 3 ? 'h3' : 'h2'
   return (
     <div className="section-header">
       <div className="section-header__main">
-        {icon && <Icon name={icon} size={18} />}
+        {concept ? <ConceptPip id={concept} /> : icon && <Icon name={icon} size={18} />}
         <div className="section-header__text">
           <Heading className="section-header__title">{title}</Heading>
           {subtitle != null && <span className="section-header__sub">{glossed(subtitle)}</span>}

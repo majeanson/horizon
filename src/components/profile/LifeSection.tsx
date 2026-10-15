@@ -4,6 +4,7 @@ import { useConfirm } from '../../lib/confirm'
 import { formatPct, formatYearAge } from '../../lib/format'
 import { LIFE_COPY, type FlowKindName, type LifeCopy } from '../../lib/lifeCopy'
 import { formatMoney } from '../../lib/money'
+import { STARTER_CONCEPT } from '../../lib/concepts'
 import { isStarterId, plannedStarters, type Starter } from '../../lib/plannedExpenses'
 import { addFlow, confirmFlow, removeFlow, updateFlow } from '../../lib/profileLife'
 import { MAX_FLOWS } from '../../lib/schema'
@@ -55,7 +56,7 @@ export function LifeSection() {
   const ownerName = (id: PersonId) => persons.find((p) => p.id === id)?.name.trim() || (id === 'self' ? t.profile.self : t.profile.spouse)
 
   return (
-    <Section id="evenements" title={c.title} subtitle={c.hint} icon="calendar-blank-bold">
+    <Section id="evenements" title={c.title} subtitle={c.hint} concept="evenements">
       {flows.length === 0 && <p className="field-row__hint">{c.empty}</p>}
       {flows.length > 0 && (
         <ul className="flows">
@@ -147,7 +148,7 @@ export function LifeSection() {
               </p>
               <Cluster aria-label={c.planned.title}>
                 {planned.map((s) => (
-                  <Chip key={s.id} onClick={() => add(s)}>
+                  <Chip key={s.id} concept={STARTER_CONCEPT[s.id]} onClick={() => add(s)}>
                     {c.add} · {s.flow.label}
                   </Chip>
                 ))}
@@ -157,7 +158,7 @@ export function LifeSection() {
           )}
           <Cluster aria-label={c.add}>
             {plain.map((s) => (
-              <Chip key={s.id} onClick={() => add(s)}>
+              <Chip key={s.id} concept={STARTER_CONCEPT[s.id]} onClick={() => add(s)}>
                 {c.add} · {s.flow.label}
               </Chip>
             ))}

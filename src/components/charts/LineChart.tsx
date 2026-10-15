@@ -1,6 +1,7 @@
 import { CartesianGrid, Line, LineChart as RLineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { SERIES_CSS } from './palette'
 import { TwoLineTick } from './tick'
-import type { ChartSeries, LineChartProps, SeriesColour } from './types'
+import type { ChartSeries, LineChartProps } from './types'
 
 // The ONE line chart. A thin adapter over the chart library: it takes plain series, draws them in the app's own
 // colours, and keeps everything a reader can misread — the legend, the units, the tooltip's words — in HTML that
@@ -9,16 +10,7 @@ import type { ChartSeries, LineChartProps, SeriesColour } from './types'
 // It is a PICTURE: role="img" with an accessible name, and the per-year table next to it carries the same
 // numbers as text. Colours are CSS variables (`var(--sky-deep)`), so day, night and high contrast all follow.
 
-const COLOUR: Record<SeriesColour, string> = {
-  accent: 'var(--marigold-deep)',
-  sky: 'var(--sky-deep)',
-  sage: 'var(--sage-deep)',
-  berry: 'var(--berry-deep)',
-  ink: 'var(--ink-faint)',
-  clay: 'var(--terracotta-deep)',
-  sun: 'var(--marigold)',
-  coral: 'var(--terracotta)',
-}
+const COLOUR = SERIES_CSS
 
 // One dash pattern per series position (undefined = solid, for the first).
 const DASHES: (string | undefined)[] = [undefined, '7 3', '2 3', '9 3 2 3']

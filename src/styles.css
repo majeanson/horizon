@@ -18,5 +18,7 @@
 @import './styles/sheet.css';
 /* The phone: hit areas a thumb can find, and height not spent twice. */
 @import './styles/phone.css';
+/* Concept pips: a concept's glyph in its family's hue (components/ConceptPip.tsx). Last, so a family's tokens win. */
+@import './styles/pips.css';
 /* The dev-only component gallery (/dev/kit) is NOT imported here: pages/DevKit.tsx imports
    its own stylesheet as a side effect, so the shell never pays for it. */

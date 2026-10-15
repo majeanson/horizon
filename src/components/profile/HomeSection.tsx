@@ -38,7 +38,7 @@ export function HomeSection() {
   })()
 
   return (
-    <Section id="maison" title={h.title} subtitle={h.hint} icon="house-bold">
+    <Section id="maison" title={h.title} subtitle={h.hint} concept="maison">
       {home === null ? (
         <>
           <p className="field-row__hint">{h.none}</p>

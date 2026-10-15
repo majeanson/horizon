@@ -87,7 +87,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
     <>
       <section className="arc" aria-label={rc.tabs.decide}>
         <section id="essayer" className="results-section" aria-label={rc.decide.tryTitle}>
-          <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} />
+          <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} concept="essayer" />
           {anyPruned && (
             <Chip onClick={() => setTout(showAll ? 'off' : '1')}>{showAll ? rc.decide.showLess : rc.decide.showAll}</Chip>
           )}
@@ -132,17 +132,17 @@ export function DecideView({ m }: { m: ResultsModel }) {
 
         {state.pensionsOpen && (
           <section id="rentes" className="results-section" aria-label={rc.pensions.title}>
-            <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} />
+            <SectionHeader title={rc.pensions.title} subtitle={rc.pensions.hint} concept="rrq" />
             <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
           </section>
         )}
         <section id="ordre" className="results-section" aria-label={rc.orders.title}>
-          <SectionHeader title={rc.orders.title} />
+          <SectionHeader title={rc.orders.title} concept="ordre" />
           {/* The age is the answer's; when no age works, the plan's own. Never the « Combien épargner ? » box from another view. */}
           <OrderPanel household={profile.household} assumptions={assumptions} age={age} firstAge={firstAge} />
         </section>
         <section id="fonte" className="results-section" aria-label={bf.title}>
-          <SectionHeader title={bf.title} />
+          <SectionHeader title={bf.title} concept="fonte" />
           {/* Pruned only on an ANSWERED search that found nothing worth a sentence: the line says what the section means for this household and stays on the page; the machinery folds. */}
           {fontePruned && !showAll ? (
             <>
@@ -158,7 +158,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
         {/* A couple only: a one-person household has no second RRSP to even out against. */}
         {profile.household.persons.length > 1 && (
           <section id="equilibre" className="results-section" aria-label={sb.title}>
-            <SectionHeader title={sb.title} />
+            <SectionHeader title={sb.title} concept="reer" />
             <SpouseBalancePanel household={profile.household} assumptions={assumptions} age={age} firstAge={firstAge} names={names} />
           </section>
         )}

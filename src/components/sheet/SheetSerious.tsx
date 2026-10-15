@@ -48,7 +48,7 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
       )}
 
       <section className="sheet__section" aria-label={v.verdict.title}>
-        <SectionHeader title={v.verdict.title} />
+        <SectionHeader title={v.verdict.title} concept="reponse" />
         <ul className="sheet__stats">
           {v.verdict.stats.map((s) => (
             <StatCard key={s.id} s={s} howToRead={v.howToRead} />
@@ -64,7 +64,7 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
 
       {v.groups.map((g) => (
         <section key={g.id} className="sheet__section" aria-label={g.title}>
-          <SectionHeader title={g.title} subtitle={g.hint} />
+          <SectionHeader title={g.title} subtitle={g.hint} concept={g.id === 'today' ? 'budget' : 'depart'} />
           <ul className="sheet__stats">
             {g.stats.map((s) => (
               <StatCard key={s.id} s={s} howToRead={v.howToRead} />
@@ -74,12 +74,12 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
       ))}
 
       <section className="sheet__section" aria-label={v.holdings.title}>
-        <SectionHeader title={v.holdings.title} />
+        <SectionHeader title={v.holdings.title} concept="nid" />
         {v.holdings.groups.length === 0 && <p className="field-row__hint">{v.holdings.empty}</p>}
         <SectionLevel.Provider value={3}>
           {v.holdings.groups.map((g) => (
             <div key={g.id} className="sheet__group">
-              <SectionHeader title={g.title} subtitle={g.totalText ?? undefined} />
+              <SectionHeader title={g.title} subtitle={g.totalText ?? undefined} concept={g.id === 'investable' ? 'nid' : g.id === 'pension' ? 'employeur' : 'maison'} />
               {g.note && <p className="field-row__hint">{g.note}</p>}
               <ul className="sheet__slots">
                 {g.items.map((s) => (
@@ -99,7 +99,7 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
           ))}
           {v.holdings.rooms.length > 0 && (
             <div className="sheet__group">
-              <SectionHeader title={v.holdings.roomTitle} />
+              <SectionHeader title={v.holdings.roomTitle} concept="droits" />
               <ul className="sheet__rooms">
                 {v.holdings.rooms.map((r) => (
                   <li key={r.key}>
@@ -123,7 +123,7 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
 
       {v.sharpen !== null && (
         <section className="sheet__section" aria-label={v.sharpen.title}>
-          <SectionHeader title={v.sharpen.title} subtitle={v.sharpen.intro} />
+          <SectionHeader title={v.sharpen.title} subtitle={v.sharpen.intro} concept="precision" />
           <p className="field-row__hint">{v.sharpen.note}</p>
           {v.sharpen.items.length > 0 && (
             <ul className="sheet__movers">

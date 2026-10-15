@@ -47,7 +47,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
   }
 
   return (
-    <Section id="famille" title={f.title} icon="users-three-bold">
+    <Section id="famille" title={f.title} concept="famille">
       <Cluster>
         {spouse ? (
           <button
