@@ -64,6 +64,17 @@ test('the sizes are said in percent on the settings page and in words on the fro
   await expect(page.getByRole('tab', { name: 'Grand', exact: true })).toHaveCount(0)
 })
 
+test('changing the text size takes the page back to its top', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 500 })
+  await page.goto('/donnees')
+  const size = page.getByRole('tab', { name: '115 %' })
+  await expect(size).toBeVisible()
+  await page.evaluate(() => document.getElementById('root')?.scrollTo({ top: 300 }))
+  await expect.poll(() => page.evaluate(() => document.getElementById('root')!.scrollTop)).toBeGreaterThan(0)
+  await size.click()
+  await expect.poll(() => page.evaluate(() => document.getElementById('root')!.scrollTop)).toBe(0)
+})
+
 test('a household with a profile already saved still sees the dialog until it is put away', async ({ page }) => {
   await seedProfile(page, blankSeed())
   await page.goto('/')

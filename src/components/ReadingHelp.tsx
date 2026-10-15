@@ -21,7 +21,6 @@ export function ReadingHelp({ open, onClose }: { open?: boolean; onClose?: () =>
   }
   return (
     <Modal open={open ?? !away} onClose={close} title={c.title} className="kit-modal--full reading-help">
-      <p className="field-row__hint">{c.text}</p>
       <div className="field-row">
         <p className="field-row__label">{c.language}</p>
         <SubTabs

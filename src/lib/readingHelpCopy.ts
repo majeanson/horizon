@@ -6,7 +6,6 @@ import type { TextScale } from './accessibility.ts'
 
 export interface ReadingHelpCopy {
   title: string
-  text: string
   language: string
   languages: { fr: string; en: string }
   /** The text sizes in words, where the settings page says them in percent. */
@@ -18,7 +17,6 @@ export interface ReadingHelpCopy {
 
 const FR: ReadingHelpCopy = {
   title: 'Lire plus confortablement ?',
-  text: 'Choisissez la langue, la taille des lettres et les couleurs qui vous reposent les yeux. Le changement se voit tout de suite, et vous pourrez le refaire à tout moment dans les Réglages.',
   language: 'Langue',
   languages: { fr: 'Français', en: 'English' },
   sizes: { normal: 'Normal', large: 'Grand', 'x-large': 'Très grand' },
@@ -28,7 +26,6 @@ const FR: ReadingHelpCopy = {
 
 const EN: ReadingHelpCopy = {
   title: 'Easier to read?',
-  text: 'Pick the language, the size of the letters and the colours that rest your eyes. The change shows at once, and you can redo it any time in Settings.',
   language: 'Language',
   languages: { fr: 'Français', en: 'English' },
   sizes: { normal: 'Normal', large: 'Large', 'x-large': 'Extra large' },
