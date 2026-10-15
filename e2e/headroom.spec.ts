@@ -68,8 +68,13 @@ test('a click on a tab or a chip leaves its focus there, and scrolling down stil
   await expect(page.locator('.shell')).toHaveAttribute('data-away', '')
   for (const sel of ['.results-pin', '.results-page .section-nav']) await expect.poll(() => gone(page, sel), { message: `${sel} slid away after a click` }).toBe(true)
   // …while the KEYBOARD still reaches it: a key focus inside a pinned row brings it back
-  await page.mouse.wheel(0, -120)
-  await expect.poll(() => away(page)).toBeNull()
+  // A single wheel tick can land while the page is still settling from the 900 px scroll and be swallowed (CI's slow runner, once): the gesture is repeated until it takes.
+  await expect
+    .poll(async () => {
+      await page.mouse.wheel(0, -120)
+      return away(page)
+    })
+    .toBeNull()
 })
 
 test('a finger dragging (and its momentum) hides the chrome; once it has stopped, a page scroll of its own does not change it', async ({ page }) => {
