@@ -8,6 +8,7 @@ import { LevelRange } from '../LevelRange'
 import { TimelineStrip } from '../TimelineStrip'
 import { EarliestEachPanel } from '../EarliestEachPanel'
 import { PlansCompare } from '../PlansCompare'
+import { Fold } from '../../Fold'
 import { SectionHeader } from '../../SectionHeader'
 import { SubTabs } from '../../SubTabs'
 import { useParamChoice } from '../../../lib/useParamChoice'
@@ -151,7 +152,14 @@ export function AnswerView({ m }: { m: ResultsModel }) {
             {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
                 be present, not compete with the answer. */}
             <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
-            <p className="verdict__note">{rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang))}{year > vintage.year ? ' ' + rc.out.vintageProjected(vintage.year, year) : ''}</p>
+            {/* The year of the rates is a provenance, one fold away — unless the year is ahead of them: then it is a warning, and stays in view. */}
+            {year > vintage.year ? (
+              <p className="verdict__note">{rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang)) + ' ' + rc.out.vintageProjected(vintage.year, year)}</p>
+            ) : (
+              <Fold summary={rc.out.vintageTitle}>
+                <p className="verdict__note">{rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang))}</p>
+              </Fold>
+            )}
           </div>
 
           {!answerPending && gaps.length === 0 && <TimelineStrip household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />}

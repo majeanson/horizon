@@ -79,7 +79,8 @@ const BUDGETS: Record<string, Budget> = {
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
   // 47 → 43 controls, 695 → 603 words (2026-10-16, the ratchet FALLS): « Préciser le calcul » left the answer for Ma fiche, which already ranked the same figures (the bar, the ranked list and the three « still missing » lines moved there; the answer card keeps its range line and a link to the sheet). The tour is three steps.
-  'Résultats — Réponse': { controls: 43, words: 603 },
+  // 43 → 44 controls, 603 → 592 words (2026-10-16): the line saying which year's rates are used folds under « Barèmes utilisés » (one summary, one sentence fewer in view) unless the year is ahead of the rates, when it stays in view as a warning.
+  'Résultats — Réponse': { controls: 44, words: 592 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   'Résultats — Décider': { controls: 48, words: 823 },
