@@ -85,6 +85,16 @@ describe('each story', () => {
     expect(sumOver(rowsOf('rich'), (p) => p.gis)).toBeLessThan(25_000)
   })
 
+  it('early: a couple of 35 saving hard can stop at 47 and the money lasts; a few years sooner it does not', () => {
+    const { household, assumptions } = EXAMPLES.early
+    expect(planGlance(household, assumptions).ok).toBe(true)
+    const earliest = retireAt(household, assumptions, { stopAtFirstOk: true }).earliestOk!
+    expect(earliest).toBeGreaterThanOrEqual(45)
+    expect(earliest).toBeLessThanOrEqual(47)
+    const retiredAt = (age: number) => ({ ...household, persons: household.persons.map((p) => ({ ...p, retirementAge: age })) })
+    expect(planGlance(retiredAt(43), assumptions).ok).toBe(false)
+  })
+
   it('behind: runs out of money well before the horizon, and no retirement age up to 70 fixes it by itself', () => {
     const { household, assumptions } = EXAMPLES.behind
     const g = planGlance(household, assumptions)

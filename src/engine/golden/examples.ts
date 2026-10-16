@@ -31,8 +31,8 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
 
-export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner' | 'family' | 'melter' | 'couple62'
-export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner', 'family', 'melter', 'couple62']
+export type ExampleId = 'golden' | 'average' | 'modest' | 'rich' | 'behind' | 'retired' | 'newcomer' | 'heir' | 'downsizer' | 'planner' | 'family' | 'melter' | 'couple62' | 'early'
+export const EXAMPLE_IDS: readonly ExampleId[] = ['golden', 'average', 'modest', 'rich', 'behind', 'retired', 'newcomer', 'heir', 'downsizer', 'planner', 'family', 'melter', 'couple62', 'early']
 
 export interface ExampleHousehold {
   id: ExampleId
@@ -210,6 +210,33 @@ const melter: Household = {
   spending: { workingToday: 42_000, retiredToday: 42_000 },
 }
 
+const early: Household = {
+  livesAlone: false,
+  persons: [
+    person({
+      id: 'self', name: 'Juliette', birth: { year: 1991, month: 4 }, retirementAge: 47, salaryToday: 98_000, earningsHistory: history(1991, 44_000),
+      accounts: {
+        rrsp: { balance: 135_000, room: 30_000, annualContribution: 14_000 },
+        tfsa: { balance: 80_000, room: 20_000, annualContribution: 7_000 },
+        nonReg: { balance: 60_000, acb: 48_000, annualContribution: 10_000 },
+      },
+      pensions: [],
+    }),
+    person({
+      id: 'spouse', name: 'Mathieu', birth: { year: 1990, month: 9 }, retirementAge: 47, salaryToday: 86_000, earningsHistory: history(1990, 40_000),
+      accounts: {
+        rrsp: { balance: 110_000, room: 25_000, annualContribution: 12_000 },
+        tfsa: { balance: 72_000, room: 20_000, annualContribution: 7_000 },
+        nonReg: { balance: 30_000, acb: 25_000, annualContribution: 8_000 },
+      },
+      pensions: [],
+    }),
+  ],
+  // A modest house, bought small on purpose; the payment is its own line (12 000 $ a year) and the living costs below do not carry it.
+  home: { value: 420_000, mortgage: { balance: 130_000, rate: 0.045, monthlyPayment: 1_000 }, sale: null },
+  spending: { workingToday: 72_000, retiredToday: 62_000 },
+}
+
 const flatPay = (pay: number, lastYear = 2025, firstYear = 1985): Record<number, number> => Object.fromEntries(Array.from({ length: lastYear - firstYear + 1 }, (_, i) => [firstYear + i, pay]))
 
 const couple62: Household = {
@@ -377,5 +404,6 @@ export const EXAMPLES: Readonly<Record<ExampleId, ExampleHousehold>> = {
   // Denise draws the REER up to the top of the first bracket from the day she stops (a choice: bracketFill).
   melter: { id: 'melter', household: melter, children: [], assumptions: { ...base(), bracketFill: 'bracket1' } },
   couple62: { id: 'couple62', household: couple62, children: [], assumptions: base() },
+  early: { id: 'early', household: early, children: [], assumptions: base() },
   planner: { id: 'planner', household: plannerHousehold(), children: [2028], assumptions: { ...base(), retiredSpendingDrift: -0.01 } },
 }

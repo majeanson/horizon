@@ -646,3 +646,57 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Dave | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 25 217 $ | 25 217 $ | 1 025 $ | 877 $ | 0 $ |
 | Linda | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 25 217 $ | 25 217 $ | 1 025 $ | 877 $ | 0 $ |
 
+## early — Couple, retraite avant 50 ans
+
+### Ce qui entre
+
+| Personne | Naissance | Retraite | Revenu | Rentes publiques |
+| --- | --- | --- | --- | --- |
+| Juliette | né·e en 1991-04 | retraite à 47 ans | salaire 98 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2009) |
+| ↳ comptes | REER 135 000 $ (+14 000 $/an) | CELI 80 000 $ (+7 000 $/an) | non enregistré 60 000 $ (+10 000 $/an) | rente d’employeur : aucune |
+| Mathieu | né·e en 1990-09 | retraite à 47 ans | salaire 86 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 2008) |
+| ↳ comptes | REER 110 000 $ (+12 000 $/an) | CELI 72 000 $ (+7 000 $/an) | non enregistré 30 000 $ (+8 000 $/an) | rente d’employeur : aucune |
+
+Dépenses : 72 000 $ par année en travaillant, 62 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+
+Résidence principale : valeur 420 000 $, hypothèque 130 000 $ à 4,5 % (1 000 $ par mois, payée en 2040), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
+
+### Ce qui sort
+
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 917 372 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 46 ans.
+
+### Le calcul des rentes
+
+| Personne | RRQ | PSV |
+| --- | --- | --- |
+| Juliette | première rente 05/2056 : (base 2 122,24 $ + 1ʳᵉ supp. 465,14 $ + 2ᵉ supp. 188,99 $) × ajustement 100,0 % = 2 776,37 $/mois, soit 1 488 $ d’aujourd’hui | première pension 05/2056 : 1 422,37 $ × résidence 100 % × report 0,0 % = 1 422,37 $/mois, soit 763 $ d’aujourd’hui |
+| Mathieu | première rente 10/2055 : (base 2 038,62 $ + 1ʳᵉ supp. 433,54 $ + 2ᵉ supp. 163,27 $) × ajustement 100,0 % = 2 635,43 $/mois, soit 1 442 $ d’aujourd’hui | première pension 10/2055 : 1 393,11 $ × résidence 100 % × report 0,0 % = 1 393,11 $/mois, soit 762 $ d’aujourd’hui |
+
+### Année par année — Juliette (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
+
+| Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 35 | 84 000 $ | 184 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 33 226 $ | 564 041 $ | couvert |
+| 40 | 82 816 $ | 189 470 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 134 $ | 934 710 $ | couvert |
+| 45 | 81 748 $ | 195 103 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 37 102 $ | 1 371 385 $ | couvert |
+| 50 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 62 000 $ | 0 $ | 1 319 983 $ | tire du nid |
+| 55 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 71 117 $ | 9 117 $ | 1 120 786 $ | tire du nid |
+| 60 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 71 117 $ | 9 117 $ | 877 862 $ | tire du nid |
+| 65 | 62 000 $ | 0 $ | 0 $ | 29 216 $ | 15 250 $ | 0 $ | 22 240 $ | 4 096 $ | 662 038 $ | tire du nid |
+| 70 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 18 300 $ | 0 $ | 10 121 $ | 1 590 $ | 688 000 $ | tire du nid |
+| 75 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 19 825 $ | 0 $ | 9 027 $ | 2 022 $ | 719 823 $ | tire du nid |
+| 80 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 761 306 $ | tire du nid |
+| 85 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 807 899 $ | tire du nid |
+| 90 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 860 231 $ | tire du nid |
+| 95 | 43 400 $ | 0 $ | 0 $ | 25 560 $ | 10 065 $ | 0 $ | 10 412 $ | 2 637 $ | 917 372 $ | tire du nid |
+
+### Année témoin pour un calculateur d’impôt : 2039, en dollars d’aujourd’hui
+
+Montants de l’année divisés par l’inflation : les barèmes sont indexés sur les prix, donc un calculateur 2026 doit donner presque la même chose (à 1 % près, les arrondis des barèmes). Le revenu net compte aussi le fractionnement du revenu de pension et les gains en capital réalisés : ce n’est pas la somme des colonnes.
+
+| Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Juliette | 48 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 6 233 $ | 0 $ | 0 $ | 0 $ |
+| Mathieu | 49 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 756 $ | 0 $ | 0 $ | 0 $ |
+

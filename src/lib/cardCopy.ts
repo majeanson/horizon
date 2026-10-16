@@ -41,7 +41,7 @@ const FR: Record<CardId, string> = {
   markets: 'L’ordre des bonnes et des mauvaises années, pas seulement leur moyenne.',
   horizon: 'L’âge jusqu’où le plan doit tenir, pour chacun.',
   drift: 'Dépenser un peu moins en vieillissant, si vous le pensez.',
-  options: 'Des choix d’impôt qui ne changent rien d’autre.',
+  options: 'Des choix d’impôt : ils peuvent déplacer la réponse d’un an ou deux.',
 }
 
 const EN: Record<CardId, string> = {
@@ -60,7 +60,7 @@ const EN: Record<CardId, string> = {
   markets: 'The order of the good and the bad years, not just their average.',
   horizon: 'The age the plan must last to, for each of you.',
   drift: 'Spending a little less as you age, if you expect to.',
-  options: 'Tax choices that change nothing else.',
+  options: 'Tax choices: they can move the answer by a year or two.',
 }
 
 export const CARD_COPY: Record<Lang, Record<CardId, string>> = { fr: FR, en: EN }

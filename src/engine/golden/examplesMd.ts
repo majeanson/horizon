@@ -27,6 +27,7 @@ const NAMES: Record<string, string> = {
   downsizer: 'Couple, vendre la maison',
   planner: 'Couple, une vie à planifier',
   family: 'Couple, une famille qui grandit',
+  early: 'Couple, retraite avant 50 ans',
   melter: 'Une personne, un très gros REER',
   couple62: 'Couple, retraite à 62 ans avec 150 000 $',
 }

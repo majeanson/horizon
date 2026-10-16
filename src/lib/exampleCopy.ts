@@ -22,6 +22,7 @@ export const EXAMPLE_COPY: { fr: Record<ExampleId, ExampleText>; en: Record<Exam
     planner: { name: 'Couple, une vie à planifier', story: 'Élise (88 000 $) et Thomas (74 000 $) : un enfant en 2028 (coût, allocations, congé parental), du temps partiel pour Élise, un héritage, des dépenses qui ralentissent avec l’âge et des soins à 85 ans. Chaque événement déplace l’âge le plus tôt ; le plan tient à 58 ans.' },
     melter: { name: 'Une personne, un très gros REER', story: 'Denise, 60 ans, 1,6 M$ dans son REER et des dépenses modestes, rentes à 70 ans : elle tire du REER jusqu’au haut de la première tranche dès l’arrêt du travail. Moins d’impôt sur tout le plan, et un retrait minimum du FERR plus petit.' },
     couple62: { name: 'Couple, retraite à 62 ans avec 150 000 $', story: 'Dave et Linda, 62 ans, 150 000 $ en REER et CELI, une maison payée de 450 000 $, 48 000 $ de dépenses par année : l’argent manque à 67 ans. Travailler jusqu’à 64 ans ou dépenser moins le règle ; demander la RRQ à 62 ans ne fait que reculer le manque, pour une rente plus petite à vie.' },
+    early: { name: 'Couple, retraite avant 50 ans', story: 'Juliette (98 000 $) et Mathieu (86 000 $), 35 ans, une petite maison, des dépenses de 72 000 $ et près de la moitié du revenu net épargné chaque année : ils peuvent arrêter à 47 ans, et l’argent dure jusqu’à 95 ans. C’est possible avec une longue période d’épargne forte, pas avec un revenu moyen.' },
     heir: { name: 'Une personne, grand héritage', story: 'Jules, 27 ans, hérite de 3,5 M$ : il pourrait arrêter de travailler dès maintenant, et l’argent doit durer soixante-dix ans.' },
   },
   en: {
@@ -37,6 +38,7 @@ export const EXAMPLE_COPY: { fr: Record<ExampleId, ExampleText>; en: Record<Exam
     planner: { name: 'Couple, a life to plan', story: 'Élise ($88,000) and Thomas ($74,000): a child in 2028 (cost, benefits, parental leave), part-time work for Élise, an inheritance, spending that slows with age, and care at 85. Each event moves the earliest age; the plan holds at 58.' },
     melter: { name: 'One person, a very large RRSP', story: 'Denise, 60, $1.6M in her RRSP and modest spending, pensions at 70: she draws the RRSP up to the top of the first bracket from the day she stops working. Less tax over the plan, and a smaller RRIF minimum.' },
     couple62: { name: 'Couple, retiring at 62 on $150,000', story: 'Dave and Linda, 62, $150,000 in RRSP and TFSA, a paid-off $450,000 home, $48,000 a year of spending: the money runs out at 67. Working to 64 or spending less fixes it; taking the QPP at 62 only pushes the shortfall back, for a smaller pension for life.' },
+    early: { name: 'Couple, retiring before 50', story: 'Juliette ($98,000) and Mathieu ($86,000), 35, a small house, $72,000 of spending and nearly half of their take-home pay saved every year: they can stop at 47 and the money lasts to 95. It takes a long stretch of heavy saving, not an average income.' },
     heir: { name: 'One person, large inheritance', story: 'Jules, 27, inherits $3.5M: he could stop working right now, and the money has to last seventy years.' },
   },
 }
