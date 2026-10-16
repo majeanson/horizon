@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { accuracyOf, factsOf } from '../../lib/facts'
 import { GUIDE_COPY } from '../../lib/guideCopy'
 import { useProfile } from '../../lib/store'
 import { Chip } from '../Chip'
+import { Fold } from '../Fold'
 import { Cluster } from '../Layout'
 import { GuideBar } from './GuideBar'
 import { Section } from './shared'
@@ -22,6 +23,7 @@ import { Section } from './shared'
 export default function AccuracyGuide() {
   const { lang } = useLang()
   const c = GUIDE_COPY[lang]
+  const t = useT()
   const profile = useProfile()
   const facts = useMemo(() => factsOf(profile), [profile])
   const acc = useMemo(() => accuracyOf(profile), [profile])
@@ -50,14 +52,17 @@ export default function AccuracyGuide() {
           <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={acc.total} aria-valuenow={acc.confirmed} aria-label={c.panel.count(acc.confirmed, acc.total)}>
             <span className="meter__fill" style={{ width: `${pct}%` }} />
           </div>
+          {/* The progress stays in view (the bar and « n sur N »); what the dots mean and what is left to confirm is one fold away. */}
           <p className="accuracy__count">
             <strong>{c.panel.count(acc.confirmed, acc.total)}</strong>
-            <span className="accuracy__legend">
+          </p>
+          <Fold summary={t.common.moreDetails}>
+            <p className="accuracy__legend">
               <span className="fact-dot is-on" aria-hidden="true" /> {c.panel.legendConfirmed}
               <span className="fact-dot" aria-hidden="true" /> {c.panel.legendEstimated}
-            </span>
-          </p>
-          <p className="field-row__hint">{acc.confirmed === 0 ? c.panel.none : acc.confirmed === acc.total ? c.panel.allDone : c.panel.estimatedNote(acc.total - acc.confirmed)}</p>
+            </p>
+            <p className="field-row__hint">{acc.confirmed === 0 ? c.panel.none : acc.confirmed === acc.total ? c.panel.allDone : c.panel.estimatedNote(acc.total - acc.confirmed)}</p>
+          </Fold>
         </div>
 
         <Cluster>
