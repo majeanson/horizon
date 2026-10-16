@@ -19,8 +19,8 @@ export const MUTANTS = [
     file: `${ENGINE}/projection.ts`,
     from: 'for (let pass = 0; pass < 2; pass++) fillOrder.forEach',
     to: 'for (let pass = 0; pass < 1; pass++) fillOrder.forEach',
-    tests: [`${LIB}/randomMatrix.test.ts`],
-    why: 'the first person is skipped for a GIS the spouse’s fill then removes, and is never revisited',
+    tests: [`${LIB}/fillSecondPass.test.ts`, `${LIB}/randomMatrix.test.ts`],
+    why: 'the first person is skipped for a GIS the spouse’s fill then removes, or filled before the spouse’s draw moves the split — and is never revisited',
   },
   {
     id: 'fill-in-listing-order',
