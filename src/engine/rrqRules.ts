@@ -17,7 +17,11 @@ export function makeRrqRules(indexation: Indexation): RrqRules {
   const mgaCache = new Map<number, number>()
   const yampeCache = new Map<number, number | null>()
 
-  const mga = (year: number): number => {
+  // the plan began with the first year of the table: before it there is no ceiling. A year earlier than that is asked for only by a pension that would START before the plan existed — an age no living
+  // person has — and gets the first year's figure, so that it is a pension of nothing and not an error.
+  const planStart = Math.min(...Object.keys(RRQ_MGA_HISTORY.value).map(Number))
+  const mga = (asked: number): number => {
+    const year = Math.max(asked, planStart)
     const hit = mgaCache.get(year)
     if (hit !== undefined) return hit
     const v = RRQ_MGA_HISTORY.value[year] ?? paramsFor(year, indexation).rrq.mga
@@ -35,6 +39,8 @@ export function makeRrqRules(indexation: Indexation): RrqRules {
   return {
     mga,
     yampe,
+    // the plan began with the first year of the ceilings table (1966): there is no ceiling, and no contributory period, before it
+    planStartYear: planStart,
     baseRate: k.baseReplacement,
     excludedShare: k.excludedShare,
     exemption: knownYear(LAST_KNOWN_YEAR).rrq.exemption,

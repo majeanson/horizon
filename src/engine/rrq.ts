@@ -77,6 +77,11 @@ export interface RrqRules {
   lateProtectionFrom: number
   /** 18 — the reference period begins the month after this birthday. */
   careerStartAge: number
+  /**
+   * The year the plan began: no reference period starts before January of it, whatever age a person was (someone whose 18th birthday fell earlier — born 1947 or before — has a period that starts here). Absent: the 18th
+   * birthday alone. Taken from the first year of the cited ceilings table, so no date is typed.
+   */
+  planStartYear?: number
   /** 72 — the reference period ends no later than this birthday's month. */
   careerMaxAge: number
   /** 65 — the age at which a pension is neither reduced nor increased. */
@@ -186,7 +191,10 @@ interface BaseResult {
 }
 
 /** The first month of the reference period: the month after the 18th birthday. */
-const careerStartIndex = (input: RrqPensionInput, rules: RrqRules): number => monthIndex({ year: input.birth.year + rules.careerStartAge, month: input.birth.month }) + 1
+const careerStartIndex = (input: RrqPensionInput, rules: RrqRules): number => {
+  const eighteenth = monthIndex({ year: input.birth.year + rules.careerStartAge, month: input.birth.month }) + 1
+  return rules.planStartYear === undefined ? eighteenth : Math.max(eighteenth, monthIndex({ year: rules.planStartYear, month: 1 }))
+}
 
 function basePension(input: RrqPensionInput, rules: RrqRules, startIdx: number, ampe: number): BaseResult {
   const careerStart = careerStartIndex(input, rules)

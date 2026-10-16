@@ -33,6 +33,7 @@ const RULES: RrqRules = {
   lateMaxMonths: 84,
   lateProtectionFrom: 2024,
   careerStartAge: 18,
+  planStartYear: 1966, // the first row of the published ceilings table: the plan began in January 1966
   careerMaxAge: 72,
   normalAge: 65,
 }

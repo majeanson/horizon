@@ -109,7 +109,8 @@ export function resolve(p: Person, a: Assumptions, s: Scenario, rrqRules: RrqRul
   const oasStartAge = s.oasStartAge?.[p.id] ?? p.oas.startAge
   const leaving = leavingDate(p.birth, retirementAge)
   const horizonAge = a.horizonForAll ?? p.horizonAge ?? a.horizonAge
-  const r = { p, retirementAge, rrqStartAge, oasStartAge, leaving, horizonAge, deathYear: p.birth.year + horizonAge } as ResolvedPerson
+  // A person is alive in the year the plan is made: someone already past the horizon age (a 96-year-old with a horizon of 95, which the schema accepts) has THIS year, not a plan that ended before it began.
+  const r = { p, retirementAge, rrqStartAge, oasStartAge, leaving, horizonAge, deathYear: Math.max(p.birth.year + horizonAge, a.today.year) } as ResolvedPerson
 
   // Pensionable earnings: the statement's past years, then the salary until the retirement date.
   const earnings: Record<number, number> = { ...p.earningsHistory }
