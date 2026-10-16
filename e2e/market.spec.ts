@@ -77,7 +77,7 @@ test('« Essayer » ranks what moves the answer most, each lever with its age', 
 test('Hypothèses is one page — the scenario first, then what it sets — with a one-line map of its blocks, and the market path stays right under the returns it shapes', async ({ page }) => {
   await page.goto('/hypotheses?bloc=tout')
   const map = page.getByRole('navigation', { name: 'Sections des hypothèses' })
-  await expect(map.getByRole('button')).toHaveText(['Scénario', 'Prix', 'Placements', 'Marchés', 'Âge de fin', 'Dépenses', 'Options'])
+  await expect(map.locator('.rail').getByRole('button')).toHaveText(['Scénario', 'Prix', 'Placements', 'Marchés', 'Âge de fin', 'Dépenses', 'Options'])
   // every block is on the page, none behind a switch
   for (const title of ['Scénario', 'Hausse des prix et des salaires', 'Ce que rapportent vos placements', 'Le parcours des marchés', 'Jusqu’à quel âge planifier', 'Les dépenses à la retraite avec l’âge', 'Options']) {
     await expect(page.getByRole('heading', { name: title })).toBeVisible()
