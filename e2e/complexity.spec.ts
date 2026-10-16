@@ -71,8 +71,8 @@ const BUDGETS: Record<string, Budget> = {
   // 29 → 28, 385 → 388 (2026-10-15): the top bar (−1 control, +3 words on a route with an answer).
   // 28 → 32, 388 → 590 (2026-10-16): the two cards that left Profil — « Coussin de liquidités » and « Ce que coûtent les enfants » (four amounts, what the state pays back, a fold of sources): a conscious
   // trade, the sheet is where the household is READ.
-  // 32 → 36 controls, 590 → 637 words (2026-10-16, seen on CI at 47ae5f2 and reproduced locally on a private port): the sheet's own files did not change in that commit, so the rise comes
-  // from the polish round's shared chrome or the READ cards being in the page when it is counted. Cause not isolated; the list of counted controls is in the failure message if it needs a ratchet back down.
+  // 32 → 36 controls, 590 → 637 words (2026-10-16): the same 36 / 637 on 5d1b62d, BEFORE the polish round, so it is the sheet's own content (the two READ cards counted once settled), not the shared chrome;
+  // the 32 / 590 above was measured before the cards had all landed. The counted list is in the failure message if it needs a ratchet back down.
   'Fiche': { controls: 36, words: 637 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
