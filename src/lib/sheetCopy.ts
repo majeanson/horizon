@@ -1,5 +1,5 @@
 import type { Lang } from '../i18n.ts'
-import type { SlotKind, StatId } from './sheetModel.ts'
+import type { SheetAbsence, SlotKind, StatId } from './sheetModel.ts'
 
 // THE WORDS OF THE HOUSEHOLD SHEET (/fiche). Outside the eager dictionaries: only the sheet page reads them. The words are given the figures already
 // formatted (lib/sheetView.ts): nothing here types a number or a rate (lib/sheetCopy.test.ts).
@@ -44,7 +44,7 @@ export interface SheetWords {
     edit: string
     tags: { diversified: string; mortgageFree: string }
   }
-  sharpen: { title: string; intro: string; swing: (years: number) => string; pending: string; remaining: (n: number) => string; allDone: string; none: string; noMover: string }
+  sharpen: { title: string; intro: string; swing: (years: number) => string; pending: string; remaining: (n: number) => string; allDone: string; none: string; noMover: string; absentTitle: string; absent: Record<SheetAbsence, string> }
   accuracy: (confirmed: number, total: number) => string
   scenarioNames: { prudent: string; neutral: string; bold: string }
   /** The sentence under the title when nothing can be said yet. */
@@ -115,6 +115,12 @@ const FR: SheetWords = {
     allDone: 'Tous les chiffres sont lus sur un document.',
     none: 'Rien à classer pour l’instant.',
     noMover: 'Aucun de ces chiffres, s’il était faux, ne déplacerait la réponse.',
+    absentTitle: 'Ce qui manque encore au profil',
+    absent: {
+      statement: 'Vos revenus admissibles de votre relevé RRQ, année par année.',
+      accounts: 'Les soldes de vos comptes : REER, CELI, non enregistré.',
+      spendingWork: 'Vos dépenses pendant les années de travail.',
+    },
   },
   accuracy: (confirmed, total) => `${confirmed} chiffres sur ${total} sont lus sur un document.`,
   scenarioNames: { prudent: 'Prudent', neutral: 'Neutre', bold: 'Audacieux' },
@@ -184,6 +190,12 @@ const EN: SheetWords = {
     allDone: 'Every figure is read off a document.',
     none: 'Nothing to rank for now.',
     noMover: 'None of these figures, if wrong, would move the answer.',
+    absentTitle: 'What the profile still lacks',
+    absent: {
+      statement: 'Your pensionable earnings from your QPP statement, year by year.',
+      accounts: 'Your account balances: RRSP, TFSA, non-registered.',
+      spendingWork: 'Your spending during the working years.',
+    },
   },
   accuracy: (confirmed, total) => `${confirmed} of ${total} figures are read off a document.`,
   scenarioNames: { prudent: 'Prudent', neutral: 'Neutral', bold: 'Bold' },

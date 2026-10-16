@@ -130,22 +130,6 @@ const FR_RESULTS = {
     title: 'Quand commencer mes rentes ?',
     hint: 'Chaque façon de commencer vos rentes, et ce qu’elle fait à tout le plan.',
   },
-  refine: {
-    title: 'Préciser le calcul',
-    hint: 'Votre réponse est déjà solide. Ces chiffres la rendraient plus précise.',
-    /** When the answer is « the money does not last », nothing is « solid ». */
-    hintNone: 'Ces chiffres rendraient le calcul plus précis.',
-    statement: 'Vos revenus admissibles de votre relevé RRQ, année par année.',
-    accounts: 'Les soldes de vos comptes : REER, CELI, non enregistré.',
-    spendingWork: 'Vos dépenses pendant les années de travail.',
-    toProfile: 'Ouvrir le profil',
-    toAssumptions: 'Ouvrir les hypothèses',
-    /** The unconfirmed figures ranked by how far the answer moves if each were off by the engine's nudge (passed in, never typed here). */
-    moves: 'Les chiffres qui déplaceraient le plus la réponse',
-    movesHint: (nudge: string) => `Chaque chiffre non confirmé est poussé de ${nudge} dans un sens, puis dans l’autre ; la réponse dit de combien d’années elle bouge. C’est un classement, pas une marge d’erreur.`,
-    /** What confirming ONE figure buys: the answer's range narrows by about this many years. */
-    swing: (years: number) => `resserre la réponse d’environ ${years} ${years === 1 ? 'an' : 'ans'}`,
-  },
   /** The page's map: one short noun per section, the same word as the section's own title. */
   nav: {
     label: 'Sections des résultats',
@@ -155,7 +139,6 @@ const FR_RESULTS = {
     rentes: 'Rentes',
     essayer: 'Essayer',
     ajuster: 'Ce qui change',
-    preciser: 'Préciser',
     epargner: 'Épargner',
     depenser: 'Dépenser',
     chiffres: 'Mes chiffres',
@@ -215,6 +198,8 @@ const FR_RESULTS = {
     confidence: (confirmed: number, total: number) => `Votre profil : ${confirmed} sur ${total} chiffres confirmés ; le reste est estimé.`,
     confidenceAll: 'Tous les chiffres de votre profil sont confirmés par vos documents.',
     confidenceLink: 'Rendre mon profil exact',
+    confidenceSheet: 'Voir ce qui préciserait la réponse',
+    toAssumptions: 'Ouvrir les hypothèses',
     /** While figures are estimates: the answer's range when every estimated figure is off at once (ages already formatted by the caller; `max` is the oldest age tried). */
     confidenceRange: (low: number, high: number, confirmed: number, total: number) => `Entre ${low} et ${high} ans selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
     confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `Entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
@@ -359,19 +344,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
     title: 'When should my pensions start?',
     hint: 'Each way of starting your pensions, and what it does to the whole plan.',
   },
-  refine: {
-    title: 'Refine the calculation',
-    hint: 'Your answer already stands. These numbers would make it more precise.',
-    hintNone: 'These numbers would make the calculation more precise.',
-    statement: 'Your pensionable earnings from your QPP statement, year by year.',
-    accounts: 'Your account balances: RRSP, TFSA, non-registered.',
-    spendingWork: 'Your spending during the working years.',
-    toProfile: 'Open the profile',
-    toAssumptions: 'Open the assumptions',
-    moves: 'The figures that would move the answer most',
-    movesHint: (nudge: string) => `Each unconfirmed figure is pushed ${nudge} one way, then the other; the answer says by how many years it moves. A ranking, not a margin of error.`,
-    swing: (years: number) => `narrows the answer by about ${years} ${years === 1 ? 'year' : 'years'}`,
-  },
   nav: {
     label: 'Results sections',
     reponse: 'The answer',
@@ -380,7 +352,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
     rentes: 'Pensions',
     essayer: 'Try',
     ajuster: 'What changes',
-    preciser: 'Refine',
     epargner: 'Save',
     depenser: 'Spend',
     chiffres: 'My figures',
@@ -438,6 +409,8 @@ const EN_RESULTS: typeof FR_RESULTS = {
     confidence: (confirmed: number, total: number) => `Your profile: ${confirmed} of ${total} figures confirmed; the rest is estimated.`,
     confidenceAll: 'Every figure in your profile is confirmed by your documents.',
     confidenceLink: 'Make my profile exact',
+    confidenceSheet: 'See what would sharpen the answer',
+    toAssumptions: 'Open the assumptions',
     confidenceRange: (low: number, high: number, confirmed: number, total: number) => `Between age ${low} and ${high}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
     confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `Between age ${low} and possibly no age before ${max}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
     now: 'You can already retire.',

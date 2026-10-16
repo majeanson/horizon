@@ -77,6 +77,8 @@ export interface SheetMover {
 
 /** `pending`: the ranking is being worked out · `ready` · `none`: nothing to rank (nothing left to confirm, or a household with no age to find). */
 export type SharpenStatus = 'pending' | 'ready' | 'none'
+/** A figure the profile plainly lacks (detectable absences only, never a guess about what the household owns). */
+export type SheetAbsence = 'statement' | 'accounts' | 'spendingWork'
 
 export interface SheetModel {
   people: SheetPerson[]
@@ -92,7 +94,7 @@ export interface SheetModel {
   diversified: boolean
   /** Whether the mortgage is paid off before the last person stops working: null when there is no home. */
   mortgageFree: boolean | null
-  sharpen: { status: SharpenStatus; remaining: number; movers: SheetMover[] }
+  sharpen: { status: SharpenStatus; remaining: number; movers: SheetMover[]; absent: SheetAbsence[] }
   accuracy: { confirmed: number; total: number }
   /** How many of the three scenarios (Prudent, Neutre, Audacieux) the plan as stated holds under, and which. */
   scenarios: Record<PresetKey, boolean>
@@ -217,6 +219,14 @@ export function sheetModel(profile: Profile, assumptions: Assumptions, earliest:
           .slice(0, MOVERS_SHOWN)
       : []
 
+  const absent: SheetAbsence[] = empty
+    ? []
+    : [
+        ...(h.persons.some((p) => p.salaryToday > 0 && Object.keys(p.earningsHistory).length === 0) ? (['statement'] as const) : []),
+        ...(h.persons.every((p) => p.accounts.rrsp.balance + p.accounts.tfsa.balance + p.accounts.nonReg.balance === 0) ? (['accounts'] as const) : []),
+        ...(h.spending.workingToday <= 0 && !everyoneRetired ? (['spendingWork'] as const) : []),
+      ]
+
   return {
     people,
     couple,
@@ -227,7 +237,7 @@ export function sheetModel(profile: Profile, assumptions: Assumptions, earliest:
     rooms,
     diversified: kinds.size === 3,
     mortgageFree: h.home ? mortgageEnd !== null && mortgageEnd <= lastStop : null,
-    sharpen: { status, remaining: unconfirmed.length, movers },
+    sharpen: { status, remaining: unconfirmed.length, movers, absent },
     accuracy: { confirmed: accuracy.confirmed, total: accuracy.total },
     scenarios,
     gaps,

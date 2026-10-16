@@ -27,7 +27,6 @@ import { formatMoney } from './money'
 import { profileGaps } from './profileGaps'
 import { MAX_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, type Selection } from './resultsModel'
 import { accuracyOf, factsOf } from './facts'
-import { GUIDE_COPY } from './guideCopy'
 import { useFactImpact } from './useFactImpact'
 import { parseSpend } from './spendModel'
 import type { LeverId } from '../engine/levers'
@@ -43,7 +42,7 @@ import { today } from './today'
 export type View = 'answer' | 'decide' | 'proof'
 
 /** The steps of the guided tour (`?visite=`). */
-export const TOUR_STEPS = 4
+export const TOUR_STEPS = 3
 
 /** The addresses of the days when the results had four views: each lands on the view that holds its content now. */
 const LEGACY_VIEW: Readonly<Record<string, View>> = { adjust: 'decide', strategies: 'decide', future: 'decide', verify: 'proof' }
@@ -267,13 +266,6 @@ export function useResultsPage() {
   // machine they would otherwise run beside the range, the stress and the levers and slow the very figures the reader is waiting for.
   const firstSearchesIn = range !== undefined && stress !== undefined && levers !== undefined
   const impact = useFactImpact(slow.household, slowAssumptions, unconfirmed, answered && firstSearchesIn && !retiredNow)
-  const gc = GUIDE_COPY[lang]
-  const factName = (id: string): string => {
-    const f = unconfirmed.find((x) => x.id === id)!
-    const who = f.owner === 'household' ? gc.guide.householdOwner : gc.guide.owner(profile.household.persons.find((p) => p.id === f.owner)?.name.trim() || (f.owner === 'self' ? t.profile.self : t.profile.spouse))
-    return `${gc.kind[f.kind]} — ${who}`
-  }
-  const movers = impact === undefined ? [] : unconfirmed.filter((f) => (impact.swings[f.id]?.years ?? 0) > 0).sort((x, y) => impact.swings[y.id].years - impact.swings[x.id].years).slice(0, 5)
   const pathName = assumptions.marketPath?.preset ?? 'smooth'
   // The change that brings the age forward most (« À faire cette année »): undefined while the levers are worked out, null when none does.
   const bestLever = levers === undefined ? undefined : (levers.levers.filter((l) => l.earliest !== null && (l.yearsGained ?? 0) > 0).sort((x, y) => (y.yearsGained ?? 0) - (x.yearsGained ?? 0))[0] as { id: LeverId; yearsGained: number; earliest: number } | undefined) ?? null
@@ -334,13 +326,6 @@ export function useResultsPage() {
   // « Et si les dernières années coûtaient plus cher ? » too (`?care=amount,age,years`); absent, the sliders sit on the starting figures.
   const care = parseCare(params.get('care')) ?? CARE_START
 
-  // What would make the answer more precise — detectable absences only, never a guess about what the household owns.
-  const refine = [
-    ...(profile.household.persons.some((p) => p.salaryToday > 0 && Object.keys(p.earningsHistory).length === 0) ? (['statement'] as const) : []),
-    ...(profile.household.persons.every((p) => p.accounts.rrsp.balance + p.accounts.tfsa.balance + p.accounts.nonReg.balance === 0) ? (['accounts'] as const) : []),
-    ...(profile.household.spending.workingToday <= 0 && !retiredNow ? (['spendingWork'] as const) : []),
-  ]
-
   // The answer's range while figures are estimates, replacing the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
   // ONE home: the answer card words it, and the guided tour (components/results/TourBar.tsx) says the same numbers.
   const impactRange = impact?.range
@@ -355,8 +340,8 @@ export function useResultsPage() {
   const tourAvailable = answered && !retiredNow && headline.kind !== 'none'
   const tour = tourAvailable ? tourStep : 0
   const setTour = (step: number) => setParam('visite', step >= 1 && step <= TOUR_STEPS ? String(step) : null)
-  // The section each step lands on. « Préciser » exists only while something is left to say there; without it the confidence line on the answer card is the step's home.
-  const tourTarget = (step: number): string => (step === 1 ? 'verdict' : step === 2 ? 'ligne' : step === 3 ? 'comparer' : refine.length > 0 || movers.length > 0 ? 'preciser' : 'verdict')
+  // The section each step lands on.
+  const tourTarget = (step: number): string => (step === 1 ? 'verdict' : step === 2 ? 'ligne' : 'comparer')
   // An unreadable step is dropped from the address at once; a tour that cannot apply (the answer arrived and it is « none », or everyone has stopped) is dropped once the answer is known.
   useEffect(() => {
     if (tourRaw !== null && (tourStep === 0 || (answered && !tourAvailable))) setParam('visite', null)
@@ -365,7 +350,7 @@ export function useResultsPage() {
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, ...(refine.length > 0 || accuracy.total > 0 ? [{ id: 'preciser', label: rc.nav.preciser, concept: 'precision' as const }] : []), { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }]
+      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }]
       : view === 'decide'
         ? [{ id: 'essayer', label: rc.nav.essayer, concept: 'essayer' as const }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, concept: 'rrq' as const }] : []), { id: 'ordre', label: rc.nav.ordre, concept: 'ordre' as const }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav, concept: 'fonte' as const }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav, concept: 'reer' as const }] : [])]
         : [
@@ -467,10 +452,6 @@ export function useResultsPage() {
     levers,
     unconfirmed,
     firstSearchesIn,
-    impact,
-    gc,
-    factName,
-    movers,
     confidenceRange,
     tour,
     setTour,
@@ -496,7 +477,6 @@ export function useResultsPage() {
     saveAge,
     spend,
     care,
-    refine,
     navLinks,
     essai,
     essaiKeys,

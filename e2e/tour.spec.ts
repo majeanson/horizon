@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, seedProfile } from './seed'
 
-// « VISITE GUIDÉE ». A chip on the answer card opens a four-step walk through the reader's OWN answer (`?visite=1..4`): a bar docked at the foot of Résultats
+// « VISITE GUIDÉE ». A chip on the answer card opens a three-step walk through the reader's OWN answer (`?visite=1..3`): a bar docked at the foot of Résultats
 // says what each section means with their numbers, and each step scrolls to its section — below the pinned chrome, not under it. The address keeps the step
 // (reload resumes it), « Fermer » drops the key, the buttons are real and reached by Tab, and a household that has already stopped working is not offered it.
 // (lib/useResultsPage.ts holds the state, components/results/TourBar.tsx the bar, lib/tourCopy.ts the words.)
@@ -9,8 +9,8 @@ import { EXAMPLE, seedProfile } from './seed'
 async function openAnswer(page: Page, path = '/resultats') {
   await page.goto(path)
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
-  // `#preciser` lands once the figures' impact has been worked out: the last section of the answer view.
-  await expect(page.locator('#preciser')).toBeAttached({ timeout: 30_000 })
+  // `#annee` is the last section of the answer view (lazy).
+  await expect(page.locator('#annee')).toBeAttached({ timeout: 30_000 })
   await expect(page.locator('.chart__plot').first()).toBeVisible({ timeout: 30_000 })
 }
 
@@ -44,14 +44,14 @@ test.describe('golden couple', () => {
     await expect(page).toHaveURL(/visite=1/)
     await expect(bar(page)).toBeVisible()
     await expect(bar(page)).toContainText(`Votre réponse : ${age}`)
-    await expect(bar(page)).toContainText('1 de 4')
+    await expect(bar(page)).toContainText('1 de 3')
     await expectLandedBelowChrome(page, '#verdict')
 
     const next = bar(page).getByRole('button', { name: 'Suivant' })
     await next.click()
     await expect(page).toHaveURL(/visite=2/)
     await expect(bar(page)).toContainText('La ligne de votre plan')
-    await expect(bar(page)).toContainText('2 de 4')
+    await expect(bar(page)).toContainText('2 de 3')
     await expectLandedBelowChrome(page, '#ligne')
 
     await next.click()
@@ -59,11 +59,7 @@ test.describe('golden couple', () => {
     await expect(bar(page)).toContainText('Comparer')
     await expectLandedBelowChrome(page, '#comparer')
 
-    await next.click()
-    await expect(page).toHaveURL(/visite=4/)
-    await expect(bar(page)).toContainText('4 de 4')
-    await expect(bar(page)).toContainText('Précision')
-    await expectLandedBelowChrome(page, '#preciser')
+    // the last step finishes
     await expect(bar(page).getByRole('button', { name: 'Terminer' })).toBeVisible()
   })
 
@@ -87,7 +83,7 @@ test.describe('golden couple', () => {
 
   test('a reload of ?visite=3 resumes at step 3, on its section', async ({ page }) => {
     await openAnswer(page, '/resultats?visite=3')
-    await expect(bar(page)).toContainText('3 de 4')
+    await expect(bar(page)).toContainText('3 de 3')
     await expectLandedBelowChrome(page, '#comparer')
   })
 

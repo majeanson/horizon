@@ -5,6 +5,7 @@ import { SHEET_COPY } from '../../lib/sheetCopy'
 import type { SheetModel } from '../../lib/sheetModel'
 import { sheetView, type StatView } from '../../lib/sheetView'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
 import { Fold } from '../Fold'
 import { Cluster } from '../Layout'
 import { SectionHeader, SectionLevel } from '../SectionHeader'
@@ -132,6 +133,7 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
             <ul className="sheet__movers">
               {v.sharpen.items.map((m) => (
                 <li key={m.key} className="surface sheet__mover">
+                  <ConceptPip id={m.concept} size="sm" />
                   <Link className="sheet__mover-name info-note__link" to={m.to}>
                     {m.name}
                   </Link>
@@ -139,6 +141,16 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
                 </li>
               ))}
             </ul>
+          )}
+          {v.sharpen.absent.length > 0 && (
+            <>
+              <p className="verdict__range-title">{v.sharpen.absentTitle}</p>
+              <ul className="refine__list">
+                {v.sharpen.absent.map((text) => (
+                  <li key={text}>{text}</li>
+                ))}
+              </ul>
+            </>
           )}
         </section>
       )}

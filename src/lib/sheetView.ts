@@ -2,6 +2,7 @@ import type { Lang } from '../i18n.ts'
 import { PRESET_KEYS } from '../engine/assumptionPresets.ts'
 import type { FactKind } from './facts.ts'
 import { formatPct, formatYearAge } from './format.ts'
+import { FACT_CONCEPT, type ConceptId } from './concepts.ts'
 import { GUIDE_COPY } from './guideCopy.ts'
 import { formatMoney } from './money.ts'
 import { MAX_AGE } from './resultsModel.ts'
@@ -63,6 +64,8 @@ export interface RoomView {
 }
 
 export interface MoverView {
+  /** The pip of the kind of figure it is (lib/concepts.ts). */
+  concept: ConceptId
   key: string
   name: string
   swingText: string
@@ -79,7 +82,7 @@ export interface SheetView {
   howToRead: string
   holdings: { title: string; empty: string; groups: HoldingGroupView[]; roomTitle: string; rooms: RoomView[]; tags: string[] }
   /** Null while the profile has gaps (the sheet asks to start instead). */
-  sharpen: { title: string; intro: string; status: SharpenStatus; note: string; items: MoverView[] } | null
+  sharpen: { title: string; intro: string; status: SharpenStatus; note: string; items: MoverView[]; absentTitle: string; absent: string[] } | null
   accuracy: { text: string; confirmed: number; total: number }
   toProfile: string
   toResults: string
@@ -165,7 +168,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
 
   const guide = GUIDE_COPY[lang]
   const factName = (owner: string, kind: FactKind): string => `${guide.kind[kind]} — ${owner === 'household' ? guide.guide.householdOwner : guide.guide.owner(nameOf(owner))}`
-  const items: MoverView[] = model.sharpen.movers.map((m) => ({ key: m.fact.id, name: factName(m.fact.owner, m.fact.kind), swingText: words.sharpen.swing(m.years), to: profilFact(m.fact.id) }))
+  const items: MoverView[] = model.sharpen.movers.map((m) => ({ key: m.fact.id, concept: FACT_CONCEPT[m.fact.kind], name: factName(m.fact.owner, m.fact.kind), swingText: words.sharpen.swing(m.years), to: profilFact(m.fact.id) }))
   const remainingText = model.sharpen.remaining > 0 ? words.sharpen.remaining(model.sharpen.remaining) : words.sharpen.allDone
   const sharpenNote =
     model.sharpen.status === 'pending' ? words.sharpen.pending : model.sharpen.status === 'none' ? remainingText : items.length === 0 ? words.sharpen.noMover : remainingText
@@ -182,7 +185,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
     ],
     howToRead: words.howToRead,
     holdings: { title: words.slots.title, empty: words.slots.empty, groups: holdingGroups, roomTitle: words.slots.roomTitle, rooms, tags },
-    sharpen: model.gaps.length > 0 ? null : { title: words.sharpen.title, intro: words.sharpen.intro, status: model.sharpen.status, note: sharpenNote, items },
+    sharpen: model.gaps.length > 0 ? null : { title: words.sharpen.title, intro: words.sharpen.intro, status: model.sharpen.status, note: sharpenNote, items, absentTitle: words.sharpen.absentTitle, absent: model.sharpen.absent.map((k) => words.sharpen.absent[k]) },
     accuracy: { text: accuracyText, confirmed: model.accuracy.confirmed, total: model.accuracy.total },
     toProfile: words.toProfile,
     toResults: words.toResults,

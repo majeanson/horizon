@@ -14,7 +14,7 @@ test.describe('golden couple', () => {
 
   test('the chip copies a link with three parameters, and the link opens on a profile-free browser as the same age', async ({ page, browser }) => {
     await page.goto('/resultats')
-    await expect(page.locator('#preciser')).toBeAttached({ timeout: 30_000 })
+    await expect(page.locator('#comparer')).toBeAttached({ timeout: 30_000 })
     const age = (await page.locator('.verdict__age').first().textContent())!.match(/\d+/)![0]
 
     await page.getByRole('button', { name: 'Partager ce scénario' }).click()

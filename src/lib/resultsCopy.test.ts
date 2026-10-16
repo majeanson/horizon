@@ -64,18 +64,9 @@ describe('the results-page copy, in both languages', () => {
     expect(en.headline.confidenceRangeOpen(58, 70, 3, 20)).toContain('possibly no age before 70')
   })
 
-  it('frames each « Préciser » figure as how much confirming it narrows the answer', () => {
-    expect(fr.refine.swing(1)).toBe('resserre la réponse d’environ 1 an')
-    expect(fr.refine.swing(3)).toBe('resserre la réponse d’environ 3 ans')
-    expect(en.refine.swing(1)).toBe('narrows the answer by about 1 year')
-    expect(en.refine.swing(3)).toBe('narrows the answer by about 3 years')
-  })
-
   it('never hard-codes the engine’s nudge size: it arrives as an argument', () => {
     const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'resultsCopy.ts'), 'utf8')
     expect(src).not.toMatch(/15[\s\u00a0\u202f]*%/)
-    expect(fr.refine.movesHint('X')).toContain('X')
-    expect(en.refine.movesHint('X')).toContain('X')
   })
 
   it('has the Décider pruning words, translated: the line that says what a closed strategy means for this household stays a sentence', () => {

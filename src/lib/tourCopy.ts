@@ -12,7 +12,7 @@ export interface TourCopy {
   /** On the last step, « Suivant » has nowhere to go: it finishes. */
   done: string
   close: string
-  /** « 2 de 4 ». */
+  /** « 2 de 3 ». */
   step: (n: string, total: string) => string
   /** 1 — the answer restated. `answer` is the formatted age (null when everyone can already stop); `range` the formatted range, or null when every figure is confirmed. */
   verdict: (answer: string | null, range: string | null) => string
@@ -26,10 +26,6 @@ export interface TourCopy {
   /** …when only one departure is compared. */
   compareOne: string
   /** 4 — how many figures are confirmed and which one, confirmed, would narrow the answer most (`gain` is the Préciser section's own phrase). */
-  precision: (confirmed: string, total: string, name: string, gain: string) => string
-  precisionAll: string
-  precisionNone: (confirmed: string, total: string) => string
-  precisionWait: (confirmed: string, total: string) => string
 }
 
 export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
@@ -49,10 +45,6 @@ export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
     timeline: (endYear) => `La ligne de votre plan : le travail, puis les années sur le nid, puis les rentes, jusqu’à la fin du plan en ${endYear}.`,
     compare: (low, high, horizonAge, worthLow, worthHigh) => `Comparer : de « ${low} » à « ${high} ». À ${horizonAge} ans, il reste ${worthLow} avec le premier départ, ${worthHigh} avec le second.`,
     compareOne: 'Un seul départ est comparé pour l’instant. Ajoutez-en un autre pour voir ce que change l’âge de départ.',
-    precision: (confirmed, total, name, gain) => `Précision : ${confirmed} sur ${total} chiffres confirmés. Le plus utile à confirmer : ${name}, qui ${gain}.`,
-    precisionAll: 'Précision : tous vos chiffres sont confirmés par vos documents. Il n’y a rien d’autre à préciser.',
-    precisionNone: (confirmed, total) => `Précision : ${confirmed} sur ${total} chiffres confirmés. Aucun des autres ne déplacerait beaucoup la réponse.`,
-    precisionWait: (confirmed, total) => `Précision : ${confirmed} sur ${total} chiffres confirmés. Le calcul de ce qui compte le plus est en cours.`,
   },
   en: {
     open: 'Guided tour',
@@ -70,9 +62,5 @@ export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
     timeline: (endYear) => `Your plan in one line: working, then the years on the nest, then the pensions, to the end of the plan in ${endYear}.`,
     compare: (low, high, horizonAge, worthLow, worthHigh) => `Comparing: from “${low}” to “${high}”. At age ${horizonAge}, ${worthLow} is left with the first departure, ${worthHigh} with the second.`,
     compareOne: 'Only one departure is compared for now. Add another to see what the departure age changes.',
-    precision: (confirmed, total, name, gain) => `Precision: ${confirmed} of ${total} figures confirmed. The most useful to confirm: ${name}, which ${gain}.`,
-    precisionAll: 'Precision: every figure is confirmed by your documents. There is nothing else to pin down.',
-    precisionNone: (confirmed, total) => `Precision: ${confirmed} of ${total} figures confirmed. None of the others would move the answer much.`,
-    precisionWait: (confirmed, total) => `Precision: ${confirmed} of ${total} figures confirmed. What matters most is still being worked out.`,
   },
 }

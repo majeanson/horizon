@@ -78,7 +78,8 @@ const BUDGETS: Record<string, Budget> = {
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
-  'Résultats — Réponse': { controls: 47, words: 695 },
+  // 47 → 43 controls, 695 → 603 words (2026-10-16, the ratchet FALLS): « Préciser le calcul » left the answer for Ma fiche, which already ranked the same figures (the bar, the ranked list and the three « still missing » lines moved there; the answer card keeps its range line and a link to the sheet). The tour is three steps.
+  'Résultats — Réponse': { controls: 43, words: 603 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   'Résultats — Décider': { controls: 48, words: 823 },
@@ -101,8 +102,8 @@ const ROUTES: readonly Route[] = [
   ['Profil (form)', '/profil?form=1', '.page-head__title', EXAMPLE],
   ['Hypothèses', '/hypotheses', '.page-head__title', EXAMPLE],
   ['Fiche', '/fiche', '.sheet--serious', EXAMPLE],
-  // `#preciser` appears once the factImpact movers have landed: the last section the answer view adds.
-  ['Résultats — Réponse', '/resultats?v=answer', '#verdict', EXAMPLE, '#preciser'],
+  // `#annee` is the last section the answer view adds (lazy).
+  ['Résultats — Réponse', '/resultats?v=answer', '#verdict', EXAMPLE, '#annee'],
   ['Résultats — Décider', '/resultats?v=decide', '.results-section, #verdict', EXAMPLE],
   ['Résultats — Preuve', '/resultats?v=proof', '.results-section, #verdict', EXAMPLE],
 ]

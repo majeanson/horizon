@@ -45,7 +45,7 @@ test('Résultats: the map of Preuve and of Décider lists the sections in the or
   for (const [view, ids] of [
     ['proof', ['solidite', 'donnees-calcul', 'tableau', 'precision', 'parametres']],
     ['decide', ['essayer', 'rentes', 'ordre', 'fonte', 'equilibre']],
-    ['answer', ['verdict', 'comparer', 'preciser', 'annee']],
+    ['answer', ['verdict', 'comparer', 'annee']],
   ] as const) {
     await page.goto(`/resultats?v=${view}`)
     await page.locator('.results-section, #verdict').first().waitFor({ timeout: 30_000 })

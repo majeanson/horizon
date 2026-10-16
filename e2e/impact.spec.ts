@@ -1,16 +1,17 @@
 import { expect, test } from '@playwright/test'
 import { savedProfile, seedProfile } from './seed'
 
-// « Les chiffres qui déplaceraient le plus la réponse » — the unconfirmed figures ranked by how far the answer moves, each with a
+// « Ce qui préciserait la réponse » (Ma fiche) — the unconfirmed figures ranked by how far the answer moves, each with a
 // door to its own field on Profil.
 
-test('the results page ranks the unconfirmed figures, and each one opens its own field, lit, on Profil', async ({ page }) => {
+test('Ma fiche ranks the unconfirmed figures, and each one opens its own field, lit, on Profil', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/resultats')
-  await expect(page.getByText('Les chiffres qui déplaceraient le plus la réponse')).toBeVisible({ timeout: 60_000 })
-  const find = page.locator('.refine__moves').getByRole('link')
+  await page.goto('/fiche')
+  await expect(page.getByText('Ce qui préciserait la réponse')).toBeVisible({ timeout: 60_000 })
+  const find = page.locator('.sheet__movers').getByRole('link')
+  await expect(find.first()).toBeVisible({ timeout: 60_000 })
   expect(await find.count()).toBeGreaterThan(0)
-  await expect(page.locator('.refine__moves').getByText(/resserre la réponse d’environ \d+ ans?/).first()).toBeVisible()
+  await expect(page.locator('.sheet__movers').getByText(/jusqu’à \d+ ans?/).first()).toBeVisible()
 
   await find.first().click()
   await expect(page.getByRole('heading', { name: 'Profil', level: 1 })).toBeVisible()

@@ -64,7 +64,7 @@ test('the page’s own scrolling never hides the chrome: a programmatic scroll, 
   await page.locator('#root').evaluate((el) => el.scrollTo({ top: 1400 }))
   await page.waitForTimeout(400)
   expect(await away(page)).toBeNull()
-  await page.locator('.results-page .section-nav').getByRole('button', { name: 'Préciser' }).click()
+  await page.locator('.results-page .section-nav').getByRole('button', { name: 'Comparer' }).click()
   await page.waitForTimeout(1500)
   expect(await away(page)).toBeNull()
   expect(await there(page, '.results-pin')).toBe(true)

@@ -13,7 +13,6 @@ import { SubTabs } from '../../SubTabs'
 import { useParamChoice } from '../../../lib/useParamChoice'
 
 import { Skeleton } from '../../Skeleton'
-import { NUDGE } from '../../../engine/factImpact'
 import { agesLedger } from '../../../engine/ledger'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
@@ -25,16 +24,14 @@ import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 import { ShareChip } from '../ShareChip'
 import { Cascade } from '../../Cascade'
-import { ConceptPip } from '../../ConceptPip'
 import { useChangePulse } from '../../../lib/useChangePulse'
-import { FACT_CONCEPT } from '../../../lib/concepts'
 
 // « À faire cette année » rides with the care copy, outside the page's own chunk.
 const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m.YearSection })))
 
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AnswerView({ m }: { m: ResultsModel }) {
-  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, impact, factName, movers, confidenceRange, setTour, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, refine, sentenceBefore, sentenceAfter, pct, money } = m
+  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, confidenceRange, setTour, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, sentenceBefore, sentenceAfter, pct, money } = m
   // Three ways of comparing, one on screen at a time: departure ages (the chips, the cards, the chart), each person's own earliest age (a couple) and the saved plans (when there are some).
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
@@ -56,6 +53,10 @@ export function AnswerView({ m }: { m: ResultsModel }) {
       {confidenceText}{' '}
       <Link className="info-note__link" to="/profil">
         {rc.headline.confidenceLink}
+      </Link>
+      {' · '}
+      <Link className="info-note__link" to="/fiche">
+        {rc.headline.confidenceSheet}
       </Link>
     </p>
   )
@@ -102,7 +103,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   <p className="verdict__note">{rc.headline.tryThis}</p>
                   <Cluster>
                     <Chip icon="caret-down-bold" onClick={() => goTo('decide', 'depenser')}>{rc.headline.trySpend}</Chip>
-                    <Chip to="/hypotheses">{rc.refine.toAssumptions}</Chip>
+                    <Chip to="/hypotheses">{rc.headline.toAssumptions}</Chip>
                     <Chip onClick={() => goTo('proof', 'donnees-calcul')}>{rc.headline.tryLedger}</Chip>
                   </Cluster>
                 </>
@@ -265,55 +266,6 @@ export function AnswerView({ m }: { m: ResultsModel }) {
               </div>
             )}
           </section>
-
-          {/* The refinement loop: how much of the answer stands on the person's own documents, and the figures that would sharpen it — one block, not two. */}
-          {(refine.length > 0 || movers.length > 0) && (
-            <div id="preciser" className="surface results-section refine" aria-label={rc.refine.title}>
-              <SectionHeader title={rc.refine.title} subtitle={refine.length === 0 ? undefined : headline.kind === 'none' && !retiredGlance ? rc.refine.hintNone : rc.refine.hint} concept="precision" />
-              {/* How much of the profile stands on documents, at a glance: the same count the headline says in words. */}
-              {accuracy.total > 0 && (
-                <div className="refine__gauge">
-                  <div className="refine__meter" role="meter" aria-valuemin={0} aria-valuemax={accuracy.total} aria-valuenow={accuracy.confirmed} aria-label={rc.headline.confidence(accuracy.confirmed, accuracy.total)}>
-                    <span className="refine__meter-fill" style={{ width: `${(100 * accuracy.confirmed) / accuracy.total}%` }} />
-                  </div>
-                  {/* the count beside the bar: an empty bar alone read as a divider (the meter's own name says it in words) */}
-                  <span key={`${accuracy.confirmed}/${accuracy.total}`} className="refine__meter-count mono" aria-hidden="true">
-                    {accuracy.confirmed}/{accuracy.total}
-                  </span>
-                </div>
-              )}
-              {movers.length > 0 && (
-                <div className="refine__moves">
-                  <p className="verdict__range-title">{rc.refine.moves}</p>
-                  {/* The figure's name IS the door to its field: one identical « Le trouver » chip per row said the same thing four times. */}
-                  <ul className="refine__list">
-                    {movers.map((f) => (
-                      <li key={f.id}>
-                        <ConceptPip id={FACT_CONCEPT[f.kind]} size="sm" />
-                        <Link className="info-note__link" to={`/profil?fact=${encodeURIComponent(f.id)}`}>
-                          {factName(f.id)}
-                        </Link>{' '}
-                        <span className="mono">{rc.refine.swing(impact!.swings[f.id].years)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="verdict__note">{rc.refine.movesHint(pct(NUDGE))}</p>
-                </div>
-              )}
-              {refine.length > 0 && (
-                <>
-                  <ul className="refine__list">
-                    {refine.map((k) => (
-                      <li key={k}>{rc.refine[k]}</li>
-                    ))}
-                  </ul>
-                  <Cluster>
-                    <Chip to="/profil">{rc.refine.toProfile}</Chip>
-                  </Cluster>
-                </>
-              )}
-            </div>
-          )}
 
           <Suspense fallback={null}>
             <YearSection m={m} />

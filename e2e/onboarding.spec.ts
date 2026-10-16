@@ -101,7 +101,7 @@ test('walking through for one person: each answer is saved as typed, and the ans
   await expect(page.getByText(/Vous pouvez (prendre votre retraite|déjà prendre)/)).toBeVisible()
   // …and the answer opens ON the answer: nothing scrolled it out of sight
   await expect(page.locator('.verdict__line')).toBeInViewport()
-  await expect(page.locator('.refine')).toContainText('Préciser le calcul')
+  await expect(page.locator('.refine__confidence')).toContainText('Voir ce qui préciserait la réponse')
 })
 
 test('the answer forms under the question as soon as it can be computed: absent on the landing and while a figure is missing, present once income and spending are typed, and it never takes the focus', async ({ page }) => {

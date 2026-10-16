@@ -33,14 +33,6 @@ test('three views; « Décider » holds the levers, then the what-ifs one at a t
   await expect(page.locator('#solidite')).toHaveCount(0)
 })
 
-test('on the answer, the comparison and its chart come before « Préciser le calcul »', async ({ page }) => {
-  await page.goto('/resultats')
-  await expect(page.locator('#preciser')).toBeVisible({ timeout: 30_000 })
-  const compare = (await page.locator('#comparer').boundingBox())!
-  const refine = (await page.locator('#preciser').boundingBox())!
-  expect(compare.y).toBeLessThan(refine.y)
-})
-
 test('the answer carries no « Comment lire cette page ? » chip: the guide to the whole app is on the home page', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })

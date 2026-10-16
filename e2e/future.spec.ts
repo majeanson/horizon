@@ -63,7 +63,7 @@ test('« L’ajouter à mes événements » writes the care as a dated expense a
   await expect(page.locator('#soins')).toContainText('déjà dans vos événements')
 })
 
-test('« À faire cette année » names the change that gains most once the searches are in, and does not repeat « Préciser »', async ({ page }) => {
+test('« À faire cette année » names the change that gains most once the searches are in, and does not repeat the ranking of Ma fiche', async ({ page }) => {
   await page.goto('/resultats')
   const year = page.locator('#annee')
   await expect(year).not.toContainText('Calcul en cours', { timeout: 60_000 })

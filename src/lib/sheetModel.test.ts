@@ -155,6 +155,22 @@ describe('the sheet of a household', { timeout: 120_000 }, () => {
     expect(m.sharpen.movers.some((x) => x.fact.id === open[0].id)).toBe(false) // a swing of nothing is not worth a line
   })
 
+  it('names what the profile plainly lacks — a statement, balances, working spending — and nothing for a complete one', () => {
+    const p = profileOf('average')
+    const a = assumptionsOf(p, TODAY)
+    const bare = structuredClone(p)
+    for (const person of bare.household.persons) {
+      person.salaryToday = 90_000
+      person.earningsHistory = {}
+      person.accounts.rrsp.balance = 0
+      person.accounts.tfsa.balance = 0
+      person.accounts.nonReg.balance = 0
+    }
+    bare.household.spending.workingToday = 0
+    expect(sheetModel(bare, assumptionsOf(bare, TODAY), 60, undefined).sharpen.absent).toEqual(['statement', 'accounts', 'spendingWork'])
+    expect(sheetModel(p, a, 60, undefined).sharpen.absent).not.toContain('accounts')
+  })
+
   it('says the ranking is pending until it is in, and has nothing to rank for a profile with gaps or a household already retired', () => {
     const p = profileOf('average')
     expect(sheetModel(p, assumptionsOf(p, TODAY), 60, undefined).sharpen.status).toBe('pending')
