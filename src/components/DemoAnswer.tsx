@@ -81,7 +81,9 @@ export function DemoAnswer() {
               <>
                 <span className="verdict__lead">{before}</span>
                 <span className="verdict__big">
-                  <strong className="verdict__age">{rc.headline.ageText(got!.headline.age!)}</strong>
+                  <strong key={got!.headline.age} className="verdict__age">
+                    {rc.headline.ageText(got!.headline.age!)}
+                  </strong>
                   {after}
                 </span>
               </>

@@ -70,7 +70,10 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   <>
                     <span className="verdict__lead">{sentenceBefore}</span>
                     <span className="verdict__big">
-                      <strong className="verdict__age">{rc.headline.ageText(headline.age!)}</strong>
+                      {/* Keyed on the age: it settles into place (styles/motion.css) only when the answer moves. */}
+                      <strong key={headline.age} className="verdict__age">
+                        {rc.headline.ageText(headline.age!)}
+                      </strong>
                       {sentenceAfter}
                     </span>
                   </>
@@ -267,7 +270,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                     <span className="refine__meter-fill" style={{ width: `${(100 * accuracy.confirmed) / accuracy.total}%` }} />
                   </div>
                   {/* the count beside the bar: an empty bar alone read as a divider (the meter's own name says it in words) */}
-                  <span className="refine__meter-count mono" aria-hidden="true">
+                  <span key={`${accuracy.confirmed}/${accuracy.total}`} className="refine__meter-count mono" aria-hidden="true">
                     {accuracy.confirmed}/{accuracy.total}
                   </span>
                 </div>

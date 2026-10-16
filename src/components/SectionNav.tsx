@@ -71,7 +71,8 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
             <Chip current={inView === l.id} concept={l.concept} onClick={() => scrollToSection(l.id)}>
               {l.label}
               {l.progress && l.progress.total > 0 && (
-                <span className={'section-nav__progress' + (l.progress.done === l.progress.total ? ' is-done' : '')} aria-hidden="true">
+                // Keyed on the count: it settles anew (styles/motion.css) when a figure is confirmed, and the ✓ lands once the block is complete.
+                <span key={`${l.progress.done}/${l.progress.total}`} className={'section-nav__progress' + (l.progress.done === l.progress.total ? ' is-done' : '')} aria-hidden="true">
                   {l.progress.done === l.progress.total ? <Icon name="check-bold" size={14} /> : `${l.progress.done}/${l.progress.total}`}
                 </span>
               )}

@@ -34,7 +34,10 @@ export default function BarAnswer() {
     <div className={'shell__answer' + (answer.busy ? ' is-busy' : '')} role="status" aria-live="polite">
       <NavLink to="/resultats" className={({ isActive }) => 'shell__answer-link' + (isActive ? ' is-active' : '')} aria-label={copy.bar.aria(text)} title={copy.bar.aria(text)}>
         <span className="shell__answer-label">{copy.label}</span>
-        <strong className="shell__answer-age">{text}</strong>
+        {/* Keyed on the age said, not on the busy suffix: the figure settles into place (styles/motion.css) when it CHANGES, and sits still while it is being worked out again. */}
+        <strong key={said} className="shell__answer-age">
+          {text}
+        </strong>
       </NavLink>
     </div>
   )

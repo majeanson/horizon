@@ -206,6 +206,31 @@
   animation: rise-in var(--dur-slow) var(--ease-out) 160ms backwards;
 }
 
+/* ── A figure that CHANGED settles into place: the age in the bar, the verdict's age, a « 5/19 » count. The element is keyed on its value
+   (BarAnswer, AnswerView, DemoAnswer, SectionNav), so this runs when the figure moves and never on a re-render around it. A short rise, no
+   scale, no fade: a number is read the moment it lands. ─────────────────────────────────────────────────────────────────────────────── */
+@keyframes settle-in {
+  from { transform: translateY(0.3rem); }
+  to { transform: none; }
+}
+.shell__answer-age,
+.verdict__age,
+.refine__meter-count,
+.section-nav__progress {
+  display: inline-block;
+  animation: settle-in var(--dur-base) var(--ease-out);
+}
+
+/* ── A chart's plot is drawn on, left to right, the first time it appears. The library's own animation stays off (it would replay on every
+   slider step); this clips the finished picture once, at mount, and never touches the axes' text or the legend. ──────────────────────── */
+@keyframes plot-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.chart__plot {
+  animation: plot-reveal var(--dur-slow) var(--ease-out);
+}
+
 /* ── Reduced motion: none of the above ─────────────────────────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .page-body > *,
@@ -222,7 +247,12 @@
   .impact__step--on,
   .answer__big,
   .answer__note,
-  .answer__list {
+  .answer__list,
+  .shell__answer-age,
+  .verdict__age,
+  .refine__meter-count,
+  .section-nav__progress,
+  .chart__plot {
     animation: none;
   }
   .toast {
