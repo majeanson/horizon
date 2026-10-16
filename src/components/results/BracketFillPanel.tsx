@@ -4,7 +4,7 @@ import type { Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRACKET_FILL_COPY } from '../../lib/bracketFillCopy'
 import { choiceOf, tabOf } from '../../lib/bracketFillNudge'
-import { seriesFor } from '../../lib/chartData'
+import { fillBalanceSeries, fillEffect, fillIncomeSeries, fillMarkers } from '../../lib/fillView'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { setAssumptions } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
@@ -24,9 +24,6 @@ const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineC
 // three ways side by side. The household's own way is marked; the one on screen can be adopted in a tap. Computed in a worker, behind the first paint.
 
 const TABS = ['none', 'bracket1', 'oas'] as const
-
-/** Money differences under this are « the same »: a sentence about 40 $ is noise. */
-const SAME = 500
 
 // The comparison is computed ONCE by the view (DecideView needs it to decide whether the section is worth the page) and passed down: DecideView is the only caller.
 export function BracketFillPanel({ household, fill }: { household: Household; fill: Answer<FillComparison> }) {
@@ -50,27 +47,23 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
   const detail = (y: number) => formatMoney(y, lang)
   const yearTick = (year: number) => [String(year), c.age(year - birthYear)]
 
-  // What the way on screen does to the plan, against no meltdown — said before any chart.
-  const taxDiff = shown.lifetimeTax - off.lifetimeTax
-  const tfsaDiff = shown.tfsaLeft - off.tfsaLeft
-  const peakDiff = shown.peakMinimum - off.peakMinimum
+  // What the way on screen does to the plan, against no meltdown — said before any chart. The signs and the « same » threshold are decided in lib/fillView.ts; here the money is formatted.
+  const fx = fillEffect(shown, off)
   const effect =
-    shown.choice === null
+    fx === null
       ? null
       : c.effect({
-          tax: Math.abs(taxDiff) < SAME ? null : formatMoney(Math.abs(taxDiff), lang),
-          taxLess: taxDiff < 0,
-          peak: Math.max(shown.peakMinimum, off.peakMinimum) < SAME ? null : { now: formatMoney(shown.peakMinimum, lang), off: formatMoney(off.peakMinimum, lang), smaller: peakDiff <= 0 },
-          tfsa: Math.abs(tfsaDiff) < SAME ? null : { diff: formatMoney(Math.abs(tfsaDiff), lang), more: tfsaDiff >= 0 },
-          pays: Math.abs(taxDiff) < SAME ? null : taxDiff < 0,
+          tax: fx.tax === null ? null : formatMoney(fx.tax, lang),
+          taxLess: fx.taxLess,
+          peak: fx.peak === null ? null : { now: formatMoney(fx.peak.now, lang), off: formatMoney(fx.peak.off, lang), smaller: fx.peak.smaller },
+          tfsa: fx.tfsa === null ? null : { diff: formatMoney(fx.tfsa.diff, lang), more: fx.tfsa.more },
+          pays: fx.pays,
         })
 
-  // Where the income leaves the line (the pensions and the forced minimum, which nobody chooses) — said under the chart and marked on it.
-  const leftAt = shown.choice === null ? undefined : years.find((y) => y.ceiling !== null && y.income > y.ceiling + 1)
+  // Where the income leaves the line (the pensions and the forced minimum, which nobody chooses) — said under the chart and marked on it — and the two reasons it can sit BELOW the line while
+  // the RRSP is not yet used up: the RRSP is empty, or the GIS is paid (melting stops, so as not to lose it).
+  const { leftAt, emptiedAt, paused } = fillMarkers(shown, years, value.retiredFrom)
   const markers = leftAt ? [{ x: leftAt.year, label: c.markerForced, colour: 'accent' as const, named: true }] : []
-  // The two reasons income can sit BELOW the line while the RRSP is not yet used up: the RRSP is empty, or the GIS is paid (melting stops, so as not to lose it).
-  const emptiedAt = shown.choice === null ? undefined : years.find((y) => y.rrsp < 1_000)
-  const paused = shown.choice === null ? [] : years.filter((y) => y.year > value.retiredFrom && y.ceiling !== null && y.income < y.ceiling * 0.98 && y.rrsp >= 1_000 && y.gis > 0)
   const pausedFrom = paused[0]?.year
   const pausedTo = paused[paused.length - 1]?.year
 
@@ -107,10 +100,7 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
           <LineChart
-            series={[
-              { id: 'income', label: c.seriesIncome, colour: seriesFor('impot', 'mid'), concept: 'impot', points: years.map((y) => ({ x: y.year, y: y.income })) },
-              ...(shown.choice === null ? [] : [{ id: 'line', label: c.seriesLine, colour: seriesFor('tranche'), concept: 'tranche' as const, points: years.map((y) => ({ x: y.year, y: y.ceiling ?? 0 })) }]),
-            ]}
+            series={fillIncomeSeries(years, shown.choice, { income: c.seriesIncome, line: c.seriesLine })}
             markers={markers}
             yFormat={money}
             yDetail={detail}
@@ -132,10 +122,7 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
       <div className="chart-slot">
         <Suspense fallback={<Loading />}>
           <LineChart
-            series={[
-              { id: 'rrsp', label: c.seriesRrsp, colour: seriesFor('reer'), concept: 'reer', points: years.map((y) => ({ x: y.year, y: y.rrsp })) },
-              { id: 'tfsa', label: c.seriesTfsa, colour: seriesFor('celi', 'mid'), concept: 'celi', points: years.map((y) => ({ x: y.year, y: y.tfsa })) },
-            ]}
+            series={fillBalanceSeries(years, { rrsp: c.seriesRrsp, tfsa: c.seriesTfsa })}
             yFormat={money}
             yDetail={detail}
             xTitle={(year) => c.tooltip(year - birthYear, year)}

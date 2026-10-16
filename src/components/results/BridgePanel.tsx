@@ -5,11 +5,13 @@ import { leversFor, profileLevers } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
+import { startMarkers } from '../../lib/chartMarks'
 import {
   SEGMENT_COLOUR,
   SEGMENT_CONCEPT,
   SEGMENTS,
   barRows,
+  bridgeLines,
   bridgeQuery,
   parseBridgeParams,
   shownPlan,
@@ -69,27 +71,10 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
   const last = rows[rows.length - 1]?.age ?? 0
   const inWindow = (age: number) => age >= first && age <= last
   // The same four lines twice: the nest over the window (what the bridge costs), and what the pensions PAY a year over the rest of the plan (what waiting buys).
-  const lines = (of: 'total' | 'guaranteed') => [
-    { id: 'selected', label: copy.selectedName, colour: 'accent' as const, key: null },
-    { id: 'asap', label: copy.strategyName.asap, colour: 'sky' as const, key: 'asap' as const },
-    { id: 'standard', label: copy.strategyName.standard, colour: 'sage' as const, key: 'standard' as const },
-    { id: 'max', label: copy.strategyName.max, colour: 'berry' as const, key: 'max' as const },
-  ].map((s) => ({
-    id: s.id,
-    label: s.label,
-    colour: s.colour,
-    points: (s.key === null ? view.selected.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total, guaranteed: r.guaranteed })) : view.strategies.find((c) => c.key === s.key)!.nest)
-      .filter((p) => (of === 'total' ? inWindow(p.age) : p.age >= first))
-      .map((p) => ({ x: p.year, y: p[of] })),
-  }))
+  const lines = (of: 'total' | 'guaranteed') => bridgeLines(view, of, { first, last }, { selected: copy.selectedName, asap: copy.strategyName.asap, standard: copy.strategyName.standard, max: copy.strategyName.max })
   const nestSeries = lines('total')
   // One marker per start age; when both pensions start the same year they share one line and one label.
-  const starts = (at: (age: number) => number) => {
-    const { rrqStartAge: q, oasStartAge: o } = params.levers
-    const mark = (x: number, label: string) => ({ x, label, colour: 'accent' as const, named: true })
-    if (q === o) return inWindow(q) ? [mark(at(q), `${copy.markerRrq} + ${copy.markerOas}`)] : []
-    return [...(inWindow(q) ? [mark(at(q), copy.markerRrq)] : []), ...(inWindow(o) ? [mark(at(o), copy.markerOas)] : [])]
-  }
+  const starts = (at: (age: number) => number) => startMarkers({ rrq: params.levers.rrqStartAge, oas: params.levers.oasStartAge }, inWindow, { rrq: copy.markerRrq, oas: copy.markerOas }, at)
   const markers = starts(yearOf)
   const barMarkers = starts((age) => age)
   // Both pictures say the year AND the age on their axis, the same way round: the bars are keyed by age, the lines by year.

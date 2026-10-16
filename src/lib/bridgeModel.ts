@@ -1,4 +1,5 @@
-import { leversFor, profileLevers, strategyKeysFor, type BridgeLevers, type BridgeSummary, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
+import { leversFor, profileLevers, strategyKeysFor, type BridgeLevers, type BridgeSummary, type BridgeView, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
+import type { ChartSeries } from '../components/charts/types.ts'
 import type { Household, PersonId } from '../engine/types.ts'
 import { SOURCE_COLOUR, SOURCE_CONCEPT } from './chartData.ts'
 import { MAX_AGE, MIN_AGE } from './resultsModel.ts'
@@ -136,4 +137,30 @@ export function sturdiest(strategies: readonly { key: StrategyKey; summary: Brid
   // A way that lasts under no scenario is not « sturdy »: say nothing rather than crown the least bad.
   if (holds(best.key) === 0) return null
   return { key: best.key, holds: holds(best.key), next: holds(second.key) }
+}
+
+/**
+ * The four lines of the bridge pictures: the plan on screen and the three ways of starting the pensions. `total` is the nest at the end of each year, over the years on screen (`first` to `last`);
+ * `guaranteed` is what the pensions pay a year without drawing on it, from `first` to the END of the plan (what waiting buys is seen over the rest of the plan).
+ */
+export function bridgeLines(
+  view: Pick<BridgeView, 'selected' | 'strategies'>,
+  of: 'total' | 'guaranteed',
+  window: { first: number; last: number },
+  labels: { selected: string; asap: string; standard: string; max: string },
+): ChartSeries[] {
+  const inWindow = (age: number) => age >= window.first && age <= window.last
+  return [
+    { id: 'selected', label: labels.selected, colour: 'accent' as const, key: null },
+    { id: 'asap', label: labels.asap, colour: 'sky' as const, key: 'asap' as const },
+    { id: 'standard', label: labels.standard, colour: 'sage' as const, key: 'standard' as const },
+    { id: 'max', label: labels.max, colour: 'berry' as const, key: 'max' as const },
+  ].map((s) => ({
+    id: s.id,
+    label: s.label,
+    colour: s.colour,
+    points: (s.key === null ? view.selected.rows.map((r) => ({ year: r.year, age: r.age, total: r.nest.total, guaranteed: r.guaranteed })) : view.strategies.find((c) => c.key === s.key)!.nest)
+      .filter((p) => (of === 'total' ? inWindow(p.age) : p.age >= window.first))
+      .map((p) => ({ x: p.year, y: p[of] })),
+  }))
 }

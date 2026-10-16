@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { agesByYear as agesOfRuns } from '../../lib/chartMarks'
 import type { AgesLedger } from '../../engine/ledger'
 import type { AgeResult, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
@@ -84,11 +85,7 @@ export function ChartPanel({
 
   const series = useMemo(() => (metric === 'detail' ? [] : chartSeries(runs, { metric, dollars, todayYear, inflation, label })), [runs, metric, dollars, todayYear, inflation, label])
   const markers = useMemo(() => retirementMarkers(household, runs, label), [household, runs, label])
-  const agesByYear = useMemo(() => {
-    const map = new Map<number, string>()
-    for (const row of runs[0]?.result.rows ?? []) map.set(row.year, Object.values(row.persons).map((p) => p.age).join(' / '))
-    return map
-  }, [runs])
+  const agesByYear = useMemo(() => agesOfRuns(runs[0]?.result.rows ?? []), [runs])
 
   // The notable moments of the plan, as doors: the chips under the chart are the real controls; a tap on the chart itself is the mouse / touch mirror.
   const rows = runs[0]?.result.rows
