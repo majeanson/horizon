@@ -226,6 +226,7 @@ test.describe('the example household', () => {
     await expect(page).toHaveURL(/ages=plan%2C65%2C55%2C56|ages=plan,65,55,56/)
 
     await page.getByRole('tab', { name: 'Preuve' }).click()
+    await page.locator('#tableau').getByRole('button', { expanded: false }).click() // Preuve is read one block at a time: open the table's
     const yearTable = page.locator('#tableau').getByRole('table').first()
     await expect(yearTable).toBeVisible()
     expect(await yearTable.getByRole('row').count()).toBeGreaterThan(40)
@@ -245,19 +246,19 @@ test.describe('the example household', () => {
     await page.goto('/profil')
     await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/85\D000/)
     await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/65\D000/)
-    await page.goto('/hypotheses')
+    await page.goto('/hypotheses?bloc=tout')
     await expect(box(page, 'Hausse des prix (inflation), par année')).toHaveValue('2,1')
   })
 
   test('the assumptions page edits the profile, and the order of withdrawals is adopted from the comparison', async ({ page }) => {
-    await page.goto('/hypotheses')
+    await page.goto('/hypotheses?bloc=tout')
     const infl = box(page, 'Hausse des prix (inflation), par année')
     await infl.fill('2,5')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.025)
     // The order has one home: the comparison on Résultats ▸ Stratégies, where a row is adopted in one tap.
     await expect(page.getByRole('button', { name: /Monter/ })).toHaveCount(0)
-    await page.goto('/resultats?v=strategies')
+    await page.goto('/resultats?v=strategies&strat=ordre')
     const row = page.getByRole('row', { name: /^Non enregistré → CELI → REER/ })
     await row.getByRole('button', { name: 'Choisir cet ordre' }).click()
     await expect.poll(async () => (await savedProfile(page)).assumptions.withdrawalOrder).toEqual(['nonReg', 'tfsa', 'rrsp'])
@@ -277,7 +278,7 @@ test.describe('data stays on this device', () => {
     expect(exported.app).toBe('horizon')
 
     // Change something, then import the file back.
-    await page.goto('/hypotheses')
+    await page.goto('/hypotheses?bloc=tout')
     const infl = box(page, 'Hausse des prix (inflation), par année')
     await infl.fill('4')
     await infl.blur()
@@ -432,7 +433,7 @@ for (const [name, width] of [['phone', 390], ['small phone', 360], ['tablet', 82
 
 test('the wage growth is said after inflation, beside Retraite Québec\'s, and a clearly higher figure says so', async ({ page }) => {
   await seedProfile(page, EXAMPLE) // the Neutre scenario: 2,1 % inflation, 2,7 % wages
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   const line = page.locator('#prix .field-row__hint').filter({ hasText: 'Après inflation' })
   await expect(line).toContainText(/Après inflation\s*:\s*\+0,6\s%\s*par année\. Retraite Québec suppose \+0,6\s%/)
   await expect(line).not.toContainText('Plus haut que son hypothèse')
@@ -448,7 +449,7 @@ test('the wage growth is said after inflation, beside Retraite Québec\'s, and a
 test('the scenario picker sets the economy, follows a hand edit, and the desktop layout caps what should not stretch', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   const picker = page.getByRole('tablist', { name: 'Choisir un scénario' })
   await picker.getByRole('tab', { name: 'Prudent' }).click()
   await expect(picker.getByRole('tab', { name: 'Prudent' })).toHaveAttribute('aria-selected', 'true')

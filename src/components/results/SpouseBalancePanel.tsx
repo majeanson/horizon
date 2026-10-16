@@ -1,23 +1,25 @@
-import type { Assumptions, Household } from '../../engine/types'
+import type { Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { formatMoney } from '../../lib/money'
 import { SPOUSE_BALANCE_COPY } from '../../lib/spouseBalanceCopy'
 import { spouseBalanceNudge } from '../../lib/spouseBalanceNudge'
-import { useSpouseBalance } from '../../lib/useSpouseBalance'
+import type { SpouseBalanceAnswer } from '../../lib/spouseBalance.worker'
+import type { Answer } from '../../lib/useOffThread'
 import { Fold } from '../Fold'
 import { Skeleton } from '../Skeleton'
 
 // « Even out the spouses' RRSPs? » — the household's plan as it is, and again with part of the larger RRSP held in the other spouse's
 // (engine/spouseBalance.ts), two rows: each person's balance, the earliest age that works, the tax over the whole plan. Read-only: moving
-// money between spouses is done at the bank, not in this app. Computed in a worker, behind the first paint.
+// money between spouses is done at the bank, not in this app. Computed in a worker, behind the first paint — by the VIEW (DecideView asks
+// once, reads the answer to decide whether the block is worth opening, and hands it here to draw).
 
 /** Money differences under this are « the same »: a sentence about 40 $ is noise. */
 const SAME = 500
 
-export function SpouseBalancePanel({ household, assumptions, age, firstAge, names }: { household: Household; assumptions: Assumptions; age: number; firstAge: number; names: readonly string[] }) {
+export function SpouseBalancePanel({ household, age, names, balance }: { household: Household; age: number; names: readonly string[]; balance: Answer<SpouseBalanceAnswer> }) {
   const { lang } = useLang()
   const c = SPOUSE_BALANCE_COPY[lang]
-  const { value, busy } = useSpouseBalance(household, assumptions, age, firstAge)
+  const { value, busy } = balance
   if (value === null) return <Skeleton count={3} />
   const r = value.balance
   const money = (n: number) => formatMoney(n, lang)

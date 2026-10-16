@@ -52,6 +52,8 @@ const KEYS: Record<string, string> = {
   debut: 'Profil (first visit): « rapide » opens the quick question path (who · birth · income · savings · spending; its last screen calls the departure age an assumption). Any other value, or no key, is the full path.',
   visite: 'Résultats › Réponse: the step (1 to 4) of the guided tour over the reader’s own answer; the key IS the tour being on. Unknown, 0 or absent is no tour (an unreadable value is dropped from the address); so is a household that has stopped working or whose answer is « none » — the key is dropped once the answer is known.',
   fact: 'Profil: one figure’s id (« self:rrspBalance »): scroll to its field and light it once, then drop the key from the address. An unknown id scrolls nowhere.',
+  bloc: 'Hypothèses, Résultats › Preuve and Profil on a phone: the block open in the page’s accordion (the page’s own block ids; « tout » opens every block, « none » closes them all). Unknown lands on the first block.',
+  strat: 'Résultats › Décider: the strategy open (rentes · ordre · fonte · equilibre; « none » is all closed). No key: the first one the household has. Unknown counts as no key.',
 }
 
 function lineOf(src: string, index: number): number {

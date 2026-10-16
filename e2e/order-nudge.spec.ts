@@ -33,7 +33,7 @@ test('the answer says when another order of drawing clearly wins, and says what 
   const said = (await nudge.innerText()).trim()
   expect(said).toContain('REER') // the order it points at, by the account names the page already uses
   // the same sentence, from the same six orders, on the strategies view
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=strategies&strat=ordre') // the strategies are read one at a time: open this one
   await expect(page.locator('#ordre .answer__note').first()).toContainText(said, { timeout: 90_000 })
 })
 

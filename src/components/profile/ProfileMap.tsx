@@ -2,13 +2,16 @@ import type { RefObject } from 'react'
 import { useT } from '../../i18n'
 import { mapProgress } from '../../lib/mapProgress'
 import { useProfile } from '../../lib/store'
+import { useAccordion } from '../Accordion'
 import { PinnedMap } from '../PinnedMap'
 import type { SectionLink } from '../SectionNav'
 
 // The map of Profil: one chip per block of the form, in the order they are on the page (a couple's profile is twenty screens on a phone and needs a « where am I »).
+// Inside the form's accordion (components/Accordion.tsx): a chip opens the block it names — closed on a phone, or a finished block folded away on a wide screen — before scrolling to it.
 export function ProfileMap({ people, withHome, withEvents, withExact, page }: { people: ReadonlyArray<{ id: string; name: string }>; withHome: boolean; withEvents: boolean; withExact: boolean; page: RefObject<HTMLElement | null> }) {
   const t = useT()
   const n = t.profile.nav
+  const acc = useAccordion()
   // Each chip says how much of its block is confirmed: where the gaps are, without scrolling the form.
   const progress = mapProgress(useProfile())
   const links: SectionLink[] = [
@@ -19,5 +22,5 @@ export function ProfileMap({ people, withHome, withEvents, withExact, page }: { 
     ...(withEvents ? [{ id: 'evenements', label: n.events, concept: 'evenements' as const }] : []),
     ...(withExact ? [{ id: 'exact', label: n.exact, concept: 'documents' as const }] : []),
   ].map((l): SectionLink => (progress[l.id] ? { ...l, progress: progress[l.id] } : l))
-  return <PinnedMap links={links} ariaLabel={n.label} page={page} />
+  return <PinnedMap links={links} ariaLabel={n.label} page={page} onPick={acc ? acc.reveal : undefined} />
 }

@@ -78,8 +78,8 @@ describe('the results-page copy, in both languages', () => {
     expect(en.refine.movesHint('X')).toContain('X')
   })
 
-  it('has the Décider pruning words, translated: the line that says what the folded section means for this household stays a sentence', () => {
-    for (const key of ['showAll', 'showLess', 'fonteSame', 'fonteFold', 'leversFold'] as const) {
+  it('has the Décider pruning words, translated: the line that says what a closed strategy means for this household stays a sentence', () => {
+    for (const key of ['showAll', 'showLess', 'fonteSame', 'ordreSame', 'equilibreSame', 'leversFold'] as const) {
       expect(fr.decide[key].trim().length, key).toBeGreaterThan(0)
       expect(en.decide[key].trim().length, key).toBeGreaterThan(0)
       expect(en.decide[key], key).not.toBe(fr.decide[key])

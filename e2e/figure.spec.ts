@@ -11,7 +11,7 @@ const TRACE_HOSTS = ['www.retraitequebec.gouv.qc.ca', 'www.canada.ca']
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('the QPP amount opens its calculation, a door to the field, and an official page', async ({ page }) => {
-  await page.goto('/resultats?v=proof')
+  await page.goto('/resultats?v=proof&bloc=donnees-calcul')
   const row = page.locator('.ledger__row').filter({ hasText: 'Début du RRQ' }).first()
   const figure = row.locator('button.figure')
   await expect(figure).toHaveAttribute('aria-expanded', 'false')
@@ -33,7 +33,7 @@ test('the QPP amount opens its calculation, a door to the field, and an official
 })
 
 test('the OAS amount opens the same way, and the note closes on a second tap', async ({ page }) => {
-  await page.goto('/resultats?v=proof')
+  await page.goto('/resultats?v=proof&bloc=donnees-calcul')
   const row = page.locator('.ledger__row').filter({ hasText: 'Début de la PSV' }).first()
   const figure = row.locator('button.figure')
   await figure.click()

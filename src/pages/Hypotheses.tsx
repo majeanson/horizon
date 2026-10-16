@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import type { AccountKind } from '../engine/types'
+import { Accordion, AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Chip } from '../components/Chip'
 import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
@@ -23,6 +24,7 @@ import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
 import { Cluster } from '../components/Layout'
 import { profileGaps } from '../lib/profileGaps'
 import { updateProfile, useProfile } from '../lib/store'
+import { useParamChoice } from '../lib/useParamChoice'
 import { HYPOTHESES_COPY } from '../lib/hypothesesCopy'
 import { realWage } from '../lib/realWage'
 import { REAL_WAGE_COPY } from '../lib/realWageCopy'
@@ -35,6 +37,10 @@ import { useNotice } from '../lib/toast'
 // then the few figures behind it, in plain words, then the two options and the path the markets take. Each change is
 // one pure profile edit (lib/profileEdit.ts). What the household SPENDS is a fact about it, not a guess about the
 // future: it lives on Profil (« Budget »), with the other facts a document confirms.
+// The seven blocks are read ONE AT A TIME (components/Accordion.tsx): the scenario open, the rest closed to their titles, « Suivant » at the foot of
+// each; the address keeps which is open (`?bloc=`, « tout » opens them all), and the map's chips open the block they name.
+
+const BLOCKS = ['scenario', 'prix', 'placements', 'marches', 'age', 'depenses', 'options'] as const
 export function Hypotheses() {
   const t = useT()
   const a = t.assumptions
@@ -48,7 +54,10 @@ export function Hypotheses() {
   const active = presetOf(assumptions)
   const m = MARKET_COPY[lang]
   const [sourcesOpen, setSourcesOpen] = useState(false)
-  const presetSummary = (key: PresetKey | 'kept') => {
+  const [bloc, setBloc] = useParamChoice<string>('bloc', [...BLOCKS, 'tout', 'none'], 'scenario')
+  const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
+  const setOpen = (next: AccordionOpen) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))
+  const presetSummary =(key: PresetKey | 'kept') => {
     const v = key === 'kept' ? kept! : ASSUMPTION_PRESETS[key]
     const pct = (x: number) => formatPct(x, lang, 1)
     return a.presets.summary(pct(v.inflation), pct(v.wageGrowth), [v.returns.rrsp, v.returns.tfsa, v.returns.nonReg].map(pct).join(' / '), v.horizonAge)
@@ -85,8 +94,10 @@ export function Hypotheses() {
   return (
     <section className="page-body" ref={page}>
       <PageHead title={a.title} subtitle={a.subtitle} />
-      <PinnedMap links={links} ariaLabel={nav.label} page={page} />
+      <PinnedMap links={links} ariaLabel={nav.label} page={page} onPick={(id) => open !== 'all' && setBloc(id)} />
+      <AccordionMode open={open} onOpen={setOpen} first="scenario" />
 
+      <Accordion ids={BLOCKS} open={open} onOpen={(id) => setBloc(id ?? 'none')}>
       <Section id="scenario" title={a.presets.title} subtitle={CARD_COPY[lang].scenario} details={a.presets.hint} concept="scenario">
         <SubTabs<PresetKey | 'custom'>
           ariaLabel={a.presets.label}
@@ -262,6 +273,7 @@ export function Hypotheses() {
         {hasSpouse(profile) && <Switch checked={assumptions.drawTogether === true} onChange={(drawTogether) => updateProfile((p) => setAssumptions(p, { drawTogether }))} label={m.together.on} hint={m.together.hint} />}
         <Switch checked={assumptions.surplusToRrsp === true} onChange={(surplusToRrsp) => updateProfile((p) => setAssumptions(p, { surplusToRrsp }))} label={m.surplus.on} hint={m.surplus.hint} />
       </Section>
+      </Accordion>
 
       {gaps.length === 0 ? (
         <NextStep to="/resultats" label={t.next.toResults}>

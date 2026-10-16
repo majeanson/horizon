@@ -75,7 +75,7 @@ test.describe('with the keyboard alone', () => {
   })
 
   test('a segmented control is a real tablist: arrow keys move and select, Home jumps back', async ({ page }) => {
-    await page.goto('/hypotheses')
+    await page.goto('/hypotheses?bloc=tout')
     const tabs = page.getByRole('tablist', { name: 'Choisir un scénario' })
     await tabs.getByRole('tab', { name: 'Neutre' }).focus()
     await page.keyboard.press('ArrowRight')

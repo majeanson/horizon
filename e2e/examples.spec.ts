@@ -18,7 +18,7 @@ async function loadExample(page: Page, name: string) {
 }
 // The ledger lives on the « Preuve » view of the results page.
 const openLedger = async (page: Page) => {
-  await page.goto('/resultats?v=proof')
+  await page.goto('/resultats?v=proof&bloc=donnees-calcul')
   await expect(page.locator('.ledger')).toBeVisible()
 }
 
@@ -93,7 +93,7 @@ test('heir: young and rich — « dès maintenant » rather than a first age tri
 
 test('average couple: the home is in the year table (the mortgage paid, the equity) and in the chart’s balances', async ({ page }) => {
   await loadExample(page, 'Couple, revenus moyens')
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   const table = page.locator('.year-table table')
   await expect(table.getByRole('columnheader', { name: 'Hypothèque payée' })).toBeVisible({ timeout: 30_000 })
   await expect(table.getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible()
@@ -115,7 +115,7 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   await expect(home.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' })).toHaveValue(/880\s?000/)
   await expect(home.getByRole('textbox', { name: 'Âge de la vente (première personne)' })).toHaveValue('58')
   // and the year table carries the home's columns
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible({ timeout: 30_000 })
 })
 

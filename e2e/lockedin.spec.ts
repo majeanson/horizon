@@ -83,14 +83,14 @@ test('the example with an RVER shows it opened, and the results carry the locked
   await expect(luc.getByRole('textbox', { name: 'Dont immobilisé', exact: true })).toHaveValue(/25\D000/)
   // Marie (the first) has none: folded
   await expect(page.locator('#person-self').getByRole('button', { name: TOGGLE })).toHaveAttribute('aria-expanded', 'false')
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'REER immobilisé' })).toBeVisible({ timeout: 30_000 })
   await page.goto('/resultats?metric=detail')
   await expect(page.locator('.chart-detail .chart__legend-item', { hasText: 'REER immobilisé' })).toBeVisible({ timeout: 30_000 })
 })
 
 test('someone without a locked part sees neither the column nor the chart segment', async ({ page }) => {
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   await expect(page.locator('.year-table table')).toBeVisible({ timeout: 30_000 })
   await expect(page.getByRole('columnheader', { name: 'REER immobilisé' })).toHaveCount(0)
   await page.goto('/resultats?metric=detail')

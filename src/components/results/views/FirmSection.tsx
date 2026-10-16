@@ -61,8 +61,11 @@ function Brief({ m }: { m: ResultsModel }) {
   )
 }
 
-/** The section of the « proof » view: « En bref » on the page, the grids one tap under it. A household that has stopped working has no age to range over: it keeps only the grids, open and with no fold. */
-export function FirmSection({ m }: { m: ResultsModel }) {
+/**
+ * The section of the « proof » view: « En bref » on the page, the grids one tap under it. A household that has stopped working has no age to range over: it keeps only the grids, open and with no fold.
+ * `bare`: the body alone — the Preuve view draws the block around it (components/Accordion.tsx, where the title and the id live).
+ */
+export function FirmSection({ m, bare }: { m: ResultsModel; bare?: boolean }) {
   const { r, rc, profile, assumptions, retiredNow, gridsOpen, setGridsOpen } = m
   const grids = (
     <>
@@ -72,23 +75,25 @@ export function FirmSection({ m }: { m: ResultsModel }) {
       </Suspense>
     </>
   )
+  const body = retiredNow ? (
+    <>
+      <p className="verdict__range-title">{r.sensitivity.title}</p>
+      {grids}
+    </>
+  ) : (
+    <>
+      <Brief m={m} />
+      <Fold id="sensibilite" open={gridsOpen} onToggle={setGridsOpen} mountOnOpen summary={rc.firm.grids}>
+        <p className="verdict__range-title">{r.sensitivity.title}</p>
+        {grids}
+      </Fold>
+    </>
+  )
+  if (bare) return body
   return (
     <div id="solidite" className="surface results-section firm" aria-label={rc.headline.firmTitle}>
       <SectionHeader title={rc.headline.firmTitle} concept="solidite" />
-      {retiredNow ? (
-        <>
-          <p className="verdict__range-title">{r.sensitivity.title}</p>
-          {grids}
-        </>
-      ) : (
-        <>
-          <Brief m={m} />
-          <Fold id="sensibilite" open={gridsOpen} onToggle={setGridsOpen} mountOnOpen summary={rc.firm.grids}>
-            <p className="verdict__range-title">{r.sensitivity.title}</p>
-            {grids}
-          </Fold>
-        </>
-      )}
+      {body}
     </div>
   )
 }

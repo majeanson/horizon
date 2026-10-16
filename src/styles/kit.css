@@ -410,3 +410,95 @@
     transition: none;
   }
 }
+
+/* ── Accordion (components/Accordion.tsx): a long page one block at a time ──────────────────────────────────────────── */
+/* The block is the house card (.profile-section .surface); its heading holds the disclosure button, full width, the caret at the far end. A closed block is
+   a slim row: the title, its pip, a ✓ when its figures are all confirmed, and one quiet line under. */
+.accordion__title {
+  width: 100%;
+}
+.accordion__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: var(--touch-target, 44px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.accordion__toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.accordion__name {
+  min-width: 0;
+}
+.accordion__toggle > svg {
+  flex: none;
+  color: var(--ink-soft);
+}
+.accordion__toggle > svg:last-child {
+  margin-left: auto;
+}
+.accordion__item.is-done .accordion__toggle > svg:nth-last-child(2) {
+  color: var(--sage-ink, var(--ink));
+}
+.accordion__item.is-closed {
+  gap: 0.15rem;
+  padding-block: 0.35rem;
+}
+.accordion__item.is-closed .section-header {
+  margin: 0;
+}
+.accordion__summary {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+.accordion__summary.is-done {
+  color: var(--sage-ink, var(--ink));
+}
+.accordion__nav {
+  justify-content: space-between;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+/* A bare block (a person's column on Profil): the cards inside it keep their own spacing; the title row is the person's. */
+.accordion__plain-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+.accordion__item.is-closed .person__title {
+  margin-bottom: 0;
+}
+/* A block of a Résultats view (a strategy, a block of Preuve) lands below what is pinned at the top: the house card's own `scroll-margin-top` (.profile-section[id], 4.5 rem)
+   would win over `.results-section`'s, and a tapped door stopped under the views row. */
+.accordion__item.results-section[id] {
+  scroll-margin-top: calc(var(--bar-h) + var(--pin-h, 7rem) + 0.75rem);
+}
+/* Side by side (860 px up) the two people's columns share six subgrid rows — the name, then the five cards — and « Suivant » is for the stacked reading, where
+   a person's block ends and the next begins: the extra row would only push the cards out of line. */
+@media (min-width: 860px) {
+  .persons--aligned > .person > .accordion__nav {
+    display: none;
+  }
+}
+/* The accordion's header stacks: the title row (the toggle, full width), then the one sentence — or the closed block's line — under it, not beside it. */
+.accordion__head {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.1rem;
+}
+.accordion__head > .section-header__sub,
+.accordion__head > .accordion__summary {
+  padding-left: calc(2rem + 0.45rem);
+}

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { Accordion, AccordionItem, AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { DisplayControls } from '../components/DisplayControls'
@@ -43,6 +44,27 @@ import { formatCompactMoney, formatMoney } from '../lib/money'
 import { getTheme, setTheme } from '../lib/theme'
 import { useNotice } from '../lib/toast'
 import '../styles/devkit.css'
+
+/** Three blocks, one open at a time or all at once; the third is « done » and folds away in the all-open shape. */
+function AccordionSpecimen() {
+  const [open, setOpen] = useState<AccordionOpen>('un')
+  return (
+    <>
+      <AccordionMode open={open} onOpen={setOpen} first="un" />
+      <Accordion ids={['un', 'deux', 'trois']} open={open} onOpen={setOpen} done={new Set(['trois'])} doneCount={new Map([['trois', 4]])}>
+        <AccordionItem id="un" title="Le scénario" subtitle="Les trois hypothèses d’un coup." concept="scenario">
+          <p className="field-row__hint">Le corps du premier bloc.</p>
+        </AccordionItem>
+        <AccordionItem id="deux" title="Les prix" subtitle="L’inflation et la hausse des salaires." concept="inflation" details="Ce que la mesure veut dire, replié sous « En savoir plus ».">
+          <p className="field-row__hint">Le corps du deuxième bloc.</p>
+        </AccordionItem>
+        <AccordionItem id="trois" title="Les placements" subtitle="Le rendement des comptes." concept="rendement">
+          <p className="field-row__hint">Le corps du troisième bloc, dont tous les chiffres sont confirmés.</p>
+        </AccordionItem>
+      </Accordion>
+    </>
+  )
+}
 
 // The living gallery of every shared primitive (/dev/kit, reachable from « Données »). A new
 // primitive that is not in this list is invisible to the next session and gets re-invented
@@ -487,6 +509,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Saisie', name: 'Switch', file: 'src/components/Switch.tsx', kw: 'interrupteur oui non réglage bascule', render: () => <SwitchSpecimen /> },
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
+    { cat: 'Affichage', name: 'Accordion', file: 'src/components/Accordion.tsx', exports: ['Accordion', 'AccordionItem', 'AccordionMode'], kw: 'accordéon un bloc à la fois suivant précédent replier blocs terminés', render: () => <AccordionSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
     { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelpSpecimen /> },

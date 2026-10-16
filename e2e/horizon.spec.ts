@@ -8,7 +8,7 @@ import { EXAMPLE, savedProfile, seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('each person has their own horizon age: Alex set to 80 is saved on him alone, and a chip gives him the scenario’s back', async ({ page }) => {
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   const alex = page.getByRole('textbox', { name: /^Alex vit jusqu’à l’âge de/ })
   await expect(alex).toHaveValue('95') // the scenario's, until he has one of his own
   await alex.fill('80')
@@ -24,7 +24,7 @@ test('each person has their own horizon age: Alex set to 80 is saved on him alon
 })
 
 test('the survivor’s spending share is a couple’s setting, saved as a fraction', async ({ page }) => {
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   const share = page.getByRole('textbox', { name: /^Dépenses de la personne qui reste/ })
   await expect(share).toHaveValue(/^70/)
   await share.fill('60')
@@ -33,12 +33,12 @@ test('the survivor’s spending share is a couple’s setting, saved as a fracti
 })
 
 test('with Alex at 80 the plan still ends with Camille: the last year of the table is hers alone', async ({ page }) => {
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   const alex = page.getByRole('textbox', { name: /^Alex vit jusqu’à l’âge de/ })
   await alex.fill('80')
   await alex.blur()
   await expect.poll(async () => (await savedProfile(page)).household.persons[1].horizonAge).toBe(80)
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   const rows = page.locator('#tableau .year-table tbody tr')
   await expect(rows.first()).toBeVisible({ timeout: 30_000 }) // worked out in a worker
   // Camille (1978) reaches 95 in 2073; Alex (1981) is gone after 2061 — the last row names one age only.

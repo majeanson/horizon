@@ -55,6 +55,12 @@ export type Essai = 'save' | 'spend' | 'care'
 /** Which what-if a section id of the page belongs to (the ids stay the page's anchors; a link to one opens it). */
 const ESSAI_OF: Readonly<Record<string, Essai>> = { epargner: 'save', depenser: 'spend', soins: 'care' }
 
+/** The strategies of « Décider », read one at a time (components/Accordion.tsx; the address keeps which, `?strat=`): the pensions · the order · the melting · the balance. */
+export const STRATS = ['rentes', 'ordre', 'fonte', 'equilibre'] as const
+export type Strat = (typeof STRATS)[number]
+/** The blocks of « Preuve », the same way (`?bloc=`). */
+export const PROOF_BLOCKS = ['solidite', 'donnees-calcul', 'tableau', 'precision', 'parametres'] as const
+
 export const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
 
 /** The ages offered as one-tap comparisons: the answer's own, the three milestones, and whatever is already chosen. */
@@ -152,6 +158,10 @@ export function useResultsPage() {
   // « Solidité »: the scenarios and a hard market are on the page; the 3 × 3 grids behind them open on request (a household that has stopped working has no age to range over: only the grids, open). The address keeps it (`?solidite=grids`).
   const gridsOpen = retiredNow || params.get('solidite') === 'grids'
   const setGridsOpen = (open: boolean) => setParam('solidite', open ? 'grids' : null)
+  // The strategy open on « Décider » (`?strat=`; « none » is all closed; no key — undefined — lets the view open its first one). A link to one opens it (goTo below).
+  const rawStrat = params.get('strat')
+  const strat: Strat | null | undefined = rawStrat === null ? undefined : rawStrat === 'none' ? null : STRATS.find((k) => k === rawStrat)
+  const setStrat = (next: Strat | null) => setParam('strat', next ?? 'none')
   // A what-if that came from one of its own keys is written down at once: when that key goes (« L'ajouter à mes événements » clears `?care=`), the reader stays where they are.
   useEffect(() => {
     if (view === 'decide' && essai !== null && rawEssai !== essai) setParam('essai', essai)
@@ -176,11 +186,22 @@ export function useResultsPage() {
   }
   useEffect(() => () => landing.current(), [])
   const scrollTo = (id: string) => scrollToSection(id)
+  // A chip of the section map opens the block it names (the strategies and the proof's blocks are accordions: components/Accordion.tsx) before the map scrolls to it.
+  const openBlock = (id: string) => {
+    if (view === 'decide' && (STRATS as readonly string[]).includes(id)) setStrat(id as Strat)
+    if (view === 'proof' && (PROOF_BLOCKS as readonly string[]).includes(id)) setParam('bloc', id)
+  }
   const goTo = (target: View, wantedId: string) => {
     // The what-ifs and the 3 × 3 grids are folds that open on request: open the one the link names first (its body does not exist until then), then land on it.
     const wanted = target === 'decide' ? ESSAI_OF[wantedId] : undefined
     if (wanted !== undefined && wanted !== essai) setEssai(wanted)
     if (target === 'proof' && wantedId === 'sensibilite' && !gridsOpen) setGridsOpen(true)
+    // The strategies and the proof's blocks are accordions: the block a link names opens first (its body does not exist until then), then the landing.
+    if (target === 'decide' && (STRATS as readonly string[]).includes(wantedId)) setStrat(wantedId as Strat)
+    if (target === 'proof') {
+      const block = wantedId === 'sensibilite' ? 'solidite' : wantedId
+      if ((PROOF_BLOCKS as readonly string[]).includes(block)) setParam('bloc', block)
+    }
     if (target === view) return void land(wantedId)
     pendingScroll.current = wantedId
     setParam('v', target === 'answer' ? null : target)
@@ -434,7 +455,10 @@ export function useResultsPage() {
     rawView,
     pendingScroll,
     scrollTo,
+    openBlock,
     goTo,
+    strat,
+    setStrat,
     legacyQ,
     compareRef,
     headline,

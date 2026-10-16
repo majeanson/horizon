@@ -13,7 +13,7 @@ test('keep a plan, change the profile, open the plan again: the figures come bac
   await expect(page.getByText('C’est ce que vous voyez maintenant')).toBeVisible()
   await expect.poll(async () => (await savedProfile(page)).plans.length).toBe(1)
 
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   await page.getByRole('tab', { name: 'Mauvais départ' }).click()
   await expect.poll(async () => (await savedProfile(page)).assumptions.marketPath.preset).toBe('badStart')
 

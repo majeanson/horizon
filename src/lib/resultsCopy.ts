@@ -59,7 +59,9 @@ const FR_RESULTS = {
     showLess: 'Réduire',
     /** « Fonte du REER », when no way of melting clearly beats the household's own: the line stays, the detail folds. */
     fonteSame: 'Pour vous, remplir la tranche change peu : aucune façon de fondre le REER ne fait nettement mieux que la vôtre.',
-    fonteFold: 'Voir le détail quand même',
+    /** The same for the order of drawing and the balance of the two RRSPs: nothing clearly beats the household's own; the block closes to this line. */
+    ordreSame: 'Pour vous, l’ordre change peu : aucun autre ordre de retrait ne fait nettement mieux que le vôtre.',
+    equilibreSame: 'Pour vous, équilibrer change peu : déplacer une part du REER le plus gros ne ferait pas nettement mieux.',
     /** The levers that move nothing for this household, under the ranked ones. */
     leversFold: 'Les leviers qui changent peu pour vous',
   },
@@ -297,7 +299,8 @@ const EN_RESULTS: typeof FR_RESULTS = {
     showAll: 'Show everything',
     showLess: 'Show less',
     fonteSame: 'For you, filling the bracket changes little: no way of melting the RRSP clearly does better than yours.',
-    fonteFold: 'See the detail anyway',
+    ordreSame: 'For you, the order changes little: no other order of drawing clearly does better than yours.',
+    equilibreSame: 'For you, evening out changes little: moving part of the larger RRSP would not clearly do better.',
     leversFold: 'The changes that matter little for you',
   },
   lifeEnd: (gone: string, yearAge: string, other: string, viewingGone: boolean) => viewingGone ? `The plan runs to ${yearAge} for ${gone}: after that year ${gone}’s bars stop and the savings pass to ${other}.` : `After ${yearAge} the plan ends for ${gone} and the savings are added to ${other}’s: the jump in the bars is intended, not an error.`,

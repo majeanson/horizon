@@ -60,7 +60,7 @@ test('Résultats: the map of Preuve and of Décider lists the sections in the or
 })
 
 test('Hypothèses: the market path stands right under the returns it shapes', async ({ page }) => {
-  await page.goto('/hypotheses')
+  await page.goto('/hypotheses?bloc=tout')
   await page.locator('.profile-section').first().waitFor({ timeout: 30_000 })
   const titles = await page.locator('.profile-section').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))
   expect(titles.indexOf('Le parcours des marchés')).toBe(titles.indexOf('Ce que rapportent vos placements') + 1)

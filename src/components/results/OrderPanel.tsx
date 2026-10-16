@@ -1,10 +1,11 @@
-import type { AccountKind, Assumptions, Household } from '../../engine/types'
+import type { AccountKind } from '../../engine/types'
+import type { WithdrawalOrders } from '../../engine/withdrawalOrders'
 import { useLang, useT } from '../../i18n'
 import { formatMoney } from '../../lib/money'
 import { setAssumptions } from '../../lib/profileEdit'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { updateProfile } from '../../lib/store'
-import { useWithdrawalOrders } from '../../lib/useWithdrawalOrders'
+import type { Answer } from '../../lib/useOffThread'
 import { Chip } from '../Chip'
 import { ConceptPip } from '../ConceptPip'
 import { ACCOUNT_CONCEPT } from '../../lib/concepts'
@@ -12,15 +13,16 @@ import { Skeleton } from '../Skeleton'
 
 // « In which order should I draw my accounts? » — the household's plan under each of the six orders (engine/withdrawalOrders.ts),
 // one row each: the earliest age that works, the tax paid over the whole plan, and what is left. The household's own order is
-// marked; the one that comes out ahead can be adopted in a tap. Computed in a worker, behind the first paint.
+// marked; the one that comes out ahead can be adopted in a tap. Computed in a worker, behind the first paint — by the VIEW
+// (DecideView asks once, reads the answer to decide whether the block is worth opening, and hands it here to draw).
 
-export function OrderPanel({ household, assumptions, age, firstAge }: { household: Household; assumptions: Assumptions; age: number; firstAge: number }) {
+export function OrderPanel({ orders }: { orders: Answer<WithdrawalOrders> }) {
   const t = useT()
   const { lang } = useLang()
   const o = RESULTS_COPY[lang].orders
   const a = t.assumptions
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
-  const { value, busy } = useWithdrawalOrders(household, assumptions, age, firstAge)
+  const { value, busy } = orders
   if (value === null) return <Skeleton count={4} />
   const own = value.outcomes[value.current]
   const best = value.outcomes[value.best]

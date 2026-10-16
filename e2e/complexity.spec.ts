@@ -56,7 +56,9 @@ const BUDGETS: Record<string, Budget> = {
   // that had none (FieldHelp.tsx; its words load on first open and count only then), the one sentence under every card title, and the map's « 3/7 » counts.
     // controls 361 → 362, words 2093 → 2096 (2026-10-15): the foot line « Bâti par marc.portal » on every page — one link, three words (the same +1 / +3 on each route below).
   // 362 → 360, 2096 → 2094 (2026-10-15): the top bar, and the answer strip pinned over the form is gone (the age is in the bar).
-  'Profil (form)': { controls: 360, words: 2094 },
+  // 360 → 370, 2094 → 2100 (2026-10-15): the accordion (components/Accordion.tsx) — each block's title is now a button, and a « Suivant » closes every block of the form: a conscious trade for
+  // the one-block-at-a-time reading on a phone, whose first paint holds ONE block (the budget here is the wide screen's, where every block is open).
+  'Profil (form)': { controls: 370, words: 2100 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,

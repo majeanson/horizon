@@ -1,6 +1,10 @@
 import type { FillComparison } from '../engine/bracketFillCompare.ts'
 import type { LeverResult } from '../engine/levers.ts'
+import type { SpouseBalance } from '../engine/spouseBalance.ts'
+import type { WithdrawalOrders } from '../engine/withdrawalOrders.ts'
 import { fillNudge } from './bracketFillNudge.ts'
+import { orderNudge } from './orderNudge.ts'
+import { spouseBalanceNudge } from './spouseBalanceNudge.ts'
 
 // « DOES THIS MOVE MY HOUSEHOLD? » — the pure decisions behind what Décider shows folded. A section whose machinery changes nothing for THIS household
 // presents as its heading, one line saying so, and a closed fold; nothing is removed. Every rule here is conservative the same way: a search that has not
@@ -18,6 +22,24 @@ export function fonteRelevant(fill: FillComparison | null): boolean {
   if (fill === null) return true
   if (fillNudge(fill) !== null) return true
   return fill.best !== fill.current && fill.outcomes[fill.best].choice === null
+}
+
+/**
+ * « Dans quel ordre puiser ? » is relevant when the six orders have not answered yet, or when another order clearly beats the household's own — the same bar as the
+ * sentence on the answer (lib/orderNudge.ts): a gap a person would act on. The ranking marks an order « en tête » at a lower bar (1 % of the tax or 500 $); under
+ * the sentence's bar the table would only say that the household's own order is as good as any, which is what the closed block's line says.
+ */
+export function orderRelevant(orders: WithdrawalOrders | null): boolean {
+  return orders === null || orderNudge(orders) !== null
+}
+
+/**
+ * « Équilibrer les REER » is relevant when evening out the two RRSPs clearly pays (lib/spouseBalanceNudge.ts). `null` here is an ANSWER — one person, no RRSP,
+ * two level ones, or nothing that can move (lib/useSpouseBalance.ts boxes it) — and says the section has nothing to tell this household; a search still running
+ * is the caller's `value === null`, never passed here.
+ */
+export function balanceRelevant(balance: SpouseBalance | null): boolean {
+  return spouseBalanceNudge(balance) !== null
 }
 
 /**

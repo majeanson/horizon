@@ -1,60 +1,63 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense } from 'react'
+import { Accordion, AccordionItem, AccordionMode, type AccordionOpen } from '../../Accordion'
 import { FirmSection } from './FirmSection'
 import { LedgerPanel } from '../LedgerPanel'
 import { ParamsPanel } from '../ParamsPanel'
-import { Fold } from '../../Fold'
-import { SectionHeader } from '../../SectionHeader'
 import { YearTables } from '../YearTables'
 import { Skeleton } from '../../Skeleton'
 import { LEDGER_COPY } from '../../../lib/ledgerCopy'
 import { ACCURACY_COPY } from '../../../lib/accuracyCopy'
-import type { ResultsModel } from '../../../lib/useResultsPage'
+import { useParamChoice } from '../../../lib/useParamChoice'
+import { PROOF_BLOCKS, type ResultsModel } from '../../../lib/useResultsPage'
 
 const AccuracyNote = lazy(() => import('../AccuracyNote').then((m) => ({ default: m.AccuracyNote })))
 
 // The « proof » view of the results page (« Preuve ») — how far to trust the answer, and everything behind it, in the order a doubting reader asks: how firm is it · which figures set it (and the
 // calculation of each) · the year-by-year table · what the calculation was checked against and what it simplifies · the official figures it reads. Read-only: a figure is changed on Profil or
 // Hypothèses, and the ledger links there. It reads the page's state through the one model object (lib/useResultsPage.ts).
+// Five blocks, read ONE AT A TIME (components/Accordion.tsx): the address keeps which (`?bloc=`, « tout » opens them all), and a link to one — the answer's « Voir la sensibilité », the
+// accuracy note's « Voir les chiffres officiels » — opens it before landing on it.
 export function ProofView({ m }: { m: ResultsModel }) {
   const { lang, r, rc, profile, year, dollars, assumptions, births, runs, runsPending, scrollTo, names, label } = m
-  // The official figures open when the accuracy note sends the reader to them.
-  const [paramsOpen, setParamsOpen] = useState(false)
+  const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'solidite')
+  const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
+  const setOpen = (next: AccordionOpen) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))
   return (
     <>
       <section className="arc" aria-label={rc.tabs.proof}>
-        {/* How firm the answer is — the three scenarios and a hard market in brief, the grids of what moves it one tap under. */}
-        <FirmSection m={m} />
+        <AccordionMode open={open} onOpen={setOpen} first="solidite" />
+        <Accordion ids={PROOF_BLOCKS} open={open} onOpen={setOpen}>
+          {/* How firm the answer is — the three scenarios and a hard market in brief, the grids of what moves it one tap under. */}
+          <AccordionItem id="solidite" title={rc.headline.firmTitle} concept="solidite" className="results-section firm">
+            <FirmSection m={m} bare />
+          </AccordionItem>
 
-        <section id="donnees-calcul" className="results-section" aria-label={LEDGER_COPY[lang].title}>
-          <SectionHeader title={LEDGER_COPY[lang].title} concept="documents" />
-          <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
-        </section>
+          <AccordionItem id="donnees-calcul" title={LEDGER_COPY[lang].title} concept="documents" className="results-section">
+            <LedgerPanel household={profile.household} assumptions={assumptions} names={names} />
+          </AccordionItem>
 
-        <section id="tableau" className="results-section" aria-label={r.table.title}>
-          <SectionHeader title={r.table.title} concept="annee" />
-          {runsPending && <Skeleton count={6} />}
-          <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={assumptions} livesAlone={profile.household.livesAlone} births={births} />
-        </section>
+          <AccordionItem id="tableau" title={r.table.title} concept="annee" className="results-section">
+            {runsPending && <Skeleton count={6} />}
+            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={assumptions} livesAlone={profile.household.livesAlone} births={births} />
+          </AccordionItem>
 
-        {/* What the calculation was checked against and what it simplifies: after the figures it was checked on. */}
-        <section id="precision" className="results-section" aria-label={ACCURACY_COPY[lang].title}>
-          <SectionHeader title={ACCURACY_COPY[lang].title} concept="precision" />
-          <Suspense fallback={<Skeleton count={4} />}>
-            <AccuracyNote
-              onSeeFigures={() => {
-                setParamsOpen(true)
-                requestAnimationFrame(() => scrollTo('parametres'))
-              }}
-            />
-          </Suspense>
-        </section>
+          {/* What the calculation was checked against and what it simplifies: after the figures it was checked on. */}
+          <AccordionItem id="precision" title={ACCURACY_COPY[lang].title} concept="precision" className="results-section">
+            <Suspense fallback={<Skeleton count={4} />}>
+              <AccuracyNote
+                onSeeFigures={() => {
+                  setBloc('parametres')
+                  requestAnimationFrame(() => scrollTo('parametres'))
+                }}
+              />
+            </Suspense>
+          </AccordionItem>
 
-        {/* The official figures the engine reads: a reference, a hundred rows long — one tap away, never in the way. */}
-        <section id="parametres" className="results-section" aria-label={r.params.title}>
-          <Fold open={paramsOpen} onToggle={setParamsOpen} mountOnOpen summary={r.params.title}>
+          {/* The official figures the engine reads: a reference, a hundred rows long — its own block, mounted only when opened. */}
+          <AccordionItem id="parametres" title={r.params.title} className="results-section">
             <ParamsPanel />
-          </Fold>
-        </section>
+          </AccordionItem>
+        </Accordion>
       </section>
     </>
   )

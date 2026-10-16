@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('the check view opens on its accuracy note: what is checked, what is simplified, and the files that list everything', async ({ page }) => {
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=precision')
   const note = page.locator('#precision')
   await expect(note).toContainText('À quel point est-ce précis ?')
   await expect(note).toContainText('Ce qui est vérifié')
@@ -24,14 +24,14 @@ test('the check view opens on its accuracy note: what is checked, what is simpli
 })
 
 test('« Voir les pages officielles » goes to the figures with their pages', async ({ page }) => {
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=precision')
   await page.locator('#precision').getByRole('button', { name: /Voir les pages officielles/ }).click()
   await expect(page.locator('#parametres')).toBeInViewport()
 })
 
 test('in English the note and its links speak English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=precision')
   const note = page.locator('#precision')
   await expect(note).toContainText('How accurate is this?')
   await expect(note).toContainText('What is simplified, and said')

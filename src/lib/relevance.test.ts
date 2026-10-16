@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { fillComparison, type FillComparison, type FillOutcome } from '../engine/bracketFillCompare.ts'
 import { EXAMPLES } from '../engine/golden/examples.ts'
-import { LEVER_MIN_DOLLARS, fonteRelevant, leverPruned } from './relevance.ts'
+import type { SpouseBalance } from '../engine/spouseBalance.ts'
+import type { OrderOutcome, WithdrawalOrders } from '../engine/withdrawalOrders.ts'
+import { LEVER_MIN_DOLLARS, balanceRelevant, fonteRelevant, leverPruned, orderRelevant } from './relevance.ts'
 
 /** What the engine answered for the golden couple when this was written (run, not assumed): its own way is already the best. */
 const GOLDEN_RELEVANT = false
@@ -42,6 +44,53 @@ describe('fonteRelevant — « Fonte du REER » is worth the page only when melt
 
   it('the golden couple lands where the engine puts it', () => {
     expect(fonteRelevant(run('golden'))).toBe(GOLDEN_RELEVANT)
+  })
+})
+
+const order = (earliestOk: number | null, lifetimeTax: number): OrderOutcome => ({ order: ['nonReg', 'rrsp', 'tfsa'], earliestOk, ok: true, firstShortfallYear: null, lifetimeTax, worthToday: 1_000_000 })
+const orders = (outcomes: OrderOutcome[], current: number, best: number): WithdrawalOrders => ({ age: 60, outcomes, current, best })
+
+describe('orderRelevant — « Dans quel ordre puiser ? » is worth the page only when another order clearly wins', () => {
+  it('an unanswered search is never pruned', () => {
+    expect(orderRelevant(null)).toBe(true)
+  })
+
+  it('an order that retires earlier, or saves tax worth a sentence, is relevant', () => {
+    expect(orderRelevant(orders([order(60, 100_000), order(58, 100_000)], 0, 1))).toBe(true)
+    expect(orderRelevant(orders([order(60, 1_000_000), order(60, 900_000)], 0, 1))).toBe(true)
+  })
+
+  it('the household’s own order being the best, or another ahead by a gap not worth a sentence, is not', () => {
+    expect(orderRelevant(orders([order(60, 100_000), order(60, 100_000)], 0, 0))).toBe(false)
+    expect(orderRelevant(orders([order(60, 100_000), order(60, 98_000)], 0, 1))).toBe(false) // the ranking's « en tête », under the sentence's bar
+  })
+})
+
+const balance = (moved: number, current: { earliestOk: number | null; lifetimeTax: number }, balanced: { earliestOk: number | null; lifetimeTax: number }): SpouseBalance => ({
+  age: 60,
+  share: 0.8,
+  from: 'self',
+  to: 'spouse',
+  moved,
+  current: { rrsp: [400_000, 100_000], ...current },
+  balanced: { rrsp: [250_000, 250_000], ...balanced },
+  taxSaved: current.lifetimeTax - balanced.lifetimeTax,
+  yearsEarlier: current.earliestOk !== null && balanced.earliestOk !== null ? Math.max(0, current.earliestOk - balanced.earliestOk) : 0,
+})
+
+describe('balanceRelevant — « Équilibrer les REER » is worth the page only when evening out clearly pays', () => {
+  it('nothing to even out — one person, level RRSPs, nothing that can move — is an answer, and not relevant', () => {
+    expect(balanceRelevant(null)).toBe(false)
+    expect(balanceRelevant(balance(0, { earliestOk: 60, lifetimeTax: 100_000 }, { earliestOk: 60, lifetimeTax: 100_000 }))).toBe(false)
+  })
+
+  it('an evened-out plan that retires earlier, or saves tax worth a sentence, is relevant', () => {
+    expect(balanceRelevant(balance(100_000, { earliestOk: 60, lifetimeTax: 100_000 }, { earliestOk: 58, lifetimeTax: 100_000 }))).toBe(true)
+    expect(balanceRelevant(balance(100_000, { earliestOk: 60, lifetimeTax: 1_000_000 }, { earliestOk: 60, lifetimeTax: 900_000 }))).toBe(true)
+  })
+
+  it('a gap not worth a sentence is not', () => {
+    expect(balanceRelevant(balance(100_000, { earliestOk: 60, lifetimeTax: 100_000 }, { earliestOk: 60, lifetimeTax: 98_000 }))).toBe(false)
   })
 })
 

@@ -3,8 +3,9 @@ import { SectionNav, type SectionLink } from './SectionNav'
 
 // The map of a LONG PAGE (Profil, Hypothèses): one chip per block, in the order they are on the page, pinned under the top bar. Its height is MEASURED, not
 // guessed: the chips wrap on a narrow screen, so the page's `--map-h` follows the map's real height (a tapped block stops below it — styles/revamp.css). Like
-// everything pinned at the top it slides away while the reader scrolls down (lib/useHeadroom.ts).
-export function PinnedMap({ links, ariaLabel, page }: { links: readonly SectionLink[]; ariaLabel: string; page: RefObject<HTMLElement | null> }) {
+// everything pinned at the top it slides away while the reader scrolls down (lib/useHeadroom.ts). On a page that reads its blocks one at a time
+// (components/Accordion.tsx), `onPick` opens the block a chip names before the map scrolls to it.
+export function PinnedMap({ links, ariaLabel, page, onPick }: { links: readonly SectionLink[]; ariaLabel: string; page: RefObject<HTMLElement | null>; onPick?: (id: string) => void }) {
   useEffect(() => {
     const root = page.current
     if (!root) return
@@ -19,7 +20,7 @@ export function PinnedMap({ links, ariaLabel, page }: { links: readonly SectionL
   }, [page])
   return (
     <div className="pinned-map">
-      <SectionNav links={links} ariaLabel={ariaLabel} />
+      <SectionNav links={links} ariaLabel={ariaLabel} onPick={onPick} />
     </div>
   )
 }

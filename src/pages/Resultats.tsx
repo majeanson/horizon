@@ -70,7 +70,7 @@ export function Resultats() {
           ]}
         />
       </div>
-      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} />}
+      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} />}
 
 
       {/* 1 — what you asked: the answer, compared and dated, what would sharpen it, and what the plan points at. */}

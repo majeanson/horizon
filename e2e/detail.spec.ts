@@ -75,7 +75,7 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['de
 }
 
 test('the year-by-year table is ONE table; the scenario is chosen in its header and the export follows', async ({ page }) => {
-  await page.goto('/resultats?v=verify&ages=plan,60,65')
+  await page.goto('/resultats?v=verify&bloc=tableau&ages=plan,60,65')
   const block = page.locator('.year-table')
   await expect(block.locator('table')).toHaveCount(1, { timeout: 30_000 })
   const tabs = block.locator('.table-chooser').getByRole('tab')
@@ -92,7 +92,7 @@ test('the year-by-year table is ONE table; the scenario is chosen in its header 
 
 test('what a table shows lives in the address: a link opens on the same set, the default writes nothing', async ({ page }) => {
   // The retirement age of the year-by-year table.
-  await page.goto('/resultats?v=verify&ages=plan,60,65&table=65')
+  await page.goto('/resultats?v=verify&bloc=tableau&ages=plan,60,65&table=65')
   const title = page.locator('.year-table .year-table__title')
   await expect(title).toContainText('65 ans', { timeout: 30_000 })
   await page.locator('.year-table .table-chooser').getByRole('tab', { name: '60 ans', exact: true }).click()
@@ -117,7 +117,8 @@ test('two people on the Profil: sections start at the same height, the colour fo
   const columns = page.locator('.persons--aligned > .person')
   await expect(columns).toHaveCount(2)
   const tops = async (col: number) => columns.nth(col).locator(':scope > .profile-section').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top + (document.getElementById('root')?.scrollTop ?? 0))))
-  expect(await tops(0)).toEqual(await tops(1))
+  // Polled: the cards rise into place over the first half-second (styles/motion.css), and a read taken mid-rise sees the two columns a pixel apart.
+  await expect.poll(async () => JSON.stringify(await tops(0)) === JSON.stringify(await tops(1))).toBe(true)
   expect((await tops(0)).length).toBe(5)
   // The colour is the rounded left edge of every card, and the two people's differ.
   const edge = (col: number) => columns.nth(col).locator(':scope > .profile-section').evaluateAll((els) => els.map((e) => getComputedStyle(e).borderLeftColor))

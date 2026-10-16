@@ -78,7 +78,7 @@ test('another comparison — typed in the « Autre âge » box — adds a line a
 })
 
 test('the year-by-year table says which dollars it holds, and its last net worth is the card’s figure', async ({ page }) => {
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   const tables = page.locator('#tableau')
   await expect(tables.locator('.year-table__unit')).toContainText('Dollars d’aujourd’hui.')
   // The « Mon plan » table's last row ends on the same number the scenario card prints (today's dollars, both).
@@ -87,7 +87,7 @@ test('the year-by-year table says which dollars it holds, and its last net worth
   await page.goto('/resultats')
   await expect(page.locator('.scenario').first()).toContainText(`Valeur nette à la fin du plan : ${worth}`)
   // An old link with the year's dollars still opens them, and says so.
-  await page.goto('/resultats?v=verify&dollars=nominal')
+  await page.goto('/resultats?v=verify&bloc=tableau&dollars=nominal')
   await expect(tables.locator('.year-table__unit')).toContainText('Dollars de l’année.')
 })
 
@@ -151,8 +151,7 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
 // French page and an English reader to the English one, write numbers the way each language does, and say plainly when the
 // agency publishes a page in one language only.
 test('« Paramètres utilisés » follows the reader\'s language: the page, the number, and an honest label when there is no edition', async ({ page }) => {
-  await page.goto('/resultats?v=proof')
-  await page.locator('#parametres summary').click() // the official figures are a fold: a reference, one tap away
+  await page.goto('/resultats?v=proof&bloc=parametres') // the official figures are the last block of Preuve, read one block at a time: the address opens it
   const row = (name: RegExp) => page.getByRole('row', { name })
 
   // French reader: the French edition, « 1 507,65 », and a French-only page needs no label.
@@ -161,8 +160,7 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
   await expect(row(/quebec\.creditRate/)).not.toContainText('page en anglais seulement')
   await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTFR_/)
 
-  await switchLanguage(page, 'en')
-  await page.locator('#parametres summary').click() // the page came back in English, with its fold closed again
+  await switchLanguage(page, 'en') // the page comes back in English at the same address, the block still open
 
   // English reader: the English edition, « 1,507.65 », the English parameters PDF, and an honest label on the fiche that
   // exists in French only.

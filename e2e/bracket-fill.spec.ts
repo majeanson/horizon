@@ -48,7 +48,7 @@ test('the three ways are tabs, the table sets them side by side, and one tap mak
 test('on a phone the panel fits the screen: no sideways scroll but the table’s own', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
   await seedProfile(page, melter() as never)
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/resultats?v=strategies&strat=fonte') // the strategies are read one at a time: the address opens this one
   await page.locator('#fonte').scrollIntoViewIfNeeded()
   await expect(page.locator('#fonte tbody tr')).toHaveCount(3, { timeout: 90_000 })
   const overflow = await page.evaluate(() => document.getElementById('root')!.scrollWidth - document.getElementById('root')!.clientWidth)

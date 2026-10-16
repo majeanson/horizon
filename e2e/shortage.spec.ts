@@ -7,7 +7,7 @@ test('a plan that falls short says when the money runs out and what the red rows
   const p = structuredClone(EXAMPLE) as SeedProfile & { household: { spending: { retiredToday: number } } }
   p.household.spending.retiredToday = 400_000
   await seedProfile(page, p)
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   const line = page.locator('.year-table__short')
   await expect(line).toBeVisible({ timeout: 60_000 })
   await expect(line).toContainText(/L’argent manque dès 20\d\d \(\d\d \/ \d\d ans\)/)
@@ -19,7 +19,7 @@ test('a plan that falls short says when the money runs out and what the red rows
 
 test('a plan that lasts has nothing to explain', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?v=verify&bloc=tableau')
   await expect(page.locator('.year-table').first()).toBeVisible({ timeout: 60_000 })
   await expect(page.locator('.year-table__short')).toHaveCount(0)
 })
