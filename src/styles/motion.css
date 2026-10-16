@@ -158,6 +158,22 @@ a.welcome__card:active,
   animation: fold-open var(--dur-base) var(--ease-out);
 }
 
+/* ── An accordion block opens (components/Accordion.tsx mounts its body on open): the body and the « Précédent / Suivant » foot slide into place like a fold's,
+   and the caret that now points up turns over to get there. Transform only: scrollToSection lands on the block's own top, which does not move. ───────────── */
+@keyframes caret-flip {
+  from { transform: rotate(-180deg); }
+  to { transform: none; }
+}
+.accordion__item.is-open > .profile-section__body,
+.accordion__item.is-open > .accordion__plain-body,
+.accordion__item.is-open > .accordion__nav,
+.accordion__item.is-open > .fold {
+  animation: fold-open var(--dur-base) var(--ease-out);
+}
+.accordion__item.is-open .accordion__toggle > svg:last-child {
+  animation: caret-flip var(--dur-base) var(--ease-out);
+}
+
 /* ── Dialogs: the scrim eases in, the dialog rises out of it ────────────────────────────────────────────────────────────────────────── */
 @keyframes scrim-in {
   from { opacity: 0; }
@@ -259,6 +275,11 @@ a.welcome__card:active,
   .subtabs__opt.is-on,
   .shell__tab.is-on > svg,
   .fold[open] > .fold__body,
+  .accordion__item.is-open > .profile-section__body,
+  .accordion__item.is-open > .accordion__plain-body,
+  .accordion__item.is-open > .accordion__nav,
+  .accordion__item.is-open > .fold,
+  .accordion__item.is-open .accordion__toggle > svg:last-child,
   .kit-modal__backdrop,
   .confirm-backdrop,
   .kit-modal,
