@@ -654,10 +654,12 @@ textarea.input {
    the rows/cards are about to take, so the first paint is the right size and
    nothing jumps under a thumb already moving toward it.
 
-   NO SHIMMER, NO PULSE — deliberately. A shimmering placeholder performs, and this
-   app's stance is that a screen may not ask for attention it hasn't earned
-   (NFR-CALM). Opacity alone says "something is coming". Generalized from the
-   board's own ghost tiles, which now ride this family instead of a private copy. */
+   It used to be NO SHIMMER, NO PULSE (NFR-CALM: a screen may not ask for attention it
+   hasn't earned). Marc asked for the placeholder to breathe (2026-10-16), so it now
+   carries ONE slow, low-contrast sweep of the accent wash (styles/motion.css) — a
+   transform on a pseudo-element, never an opacity pulse on the blocks, off under
+   reduced motion, and it exists only while something is actually loading.
+   Generalized from the board's own ghost tiles, which ride this family. */
 .skeleton {
   display: grid;
   gap: var(--space-3, 12px);

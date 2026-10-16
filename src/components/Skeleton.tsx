@@ -8,10 +8,11 @@ import { useT } from '../i18n'
 // Generalized from the board's own ghost tiles (`.board-skeleton`, 5c64b3e), which
 // proved the idea on the one surface that most needed it and then stayed there.
 //
-// CALM, and that is a real constraint here: **no shimmer, no pulse, no animation of
-// any kind.** A shimmering placeholder is an attention-grabber, and this app's whole
-// stance is that a screen may not ask for attention it hasn't earned (NFR-CALM). A
-// quiet block at 55% opacity says "something is coming" without performing.
+// CALM, and that is a real constraint here: the one movement is a slow, soft sweep of
+// the accent wash across the blocks (styles/motion.css, a transform on a pseudo-element,
+// off under reduced motion) — Marc asked for it on 2026-10-16, where it used to be
+// « no shimmer, no pulse » (NFR-CALM). Never a pulse of the blocks' own opacity, never
+// fast, never on a surface that is not actually loading.
 //
 // WHEN NOT TO USE IT. A skeleton is a promise about shape. If the surface has no
 // predictable shape — a form scene, cook mode, a single record — that promise is a

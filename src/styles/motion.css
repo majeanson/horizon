@@ -519,6 +519,43 @@ a.welcome__card:active,
   animation: pip-pop var(--dur-slow) var(--ease-soft) backwards;
 }
 
+/* ── A placeholder breathes: one slow, soft sweep of the accent wash across each block (components/Skeleton.tsx) ─────────────────────────────────────────
+   The sweep is a pseudo-element moved by transform inside the block (clipped to its rounded shape), so the block itself never changes opacity or size; it is slow enough
+   (~2 s a pass) to read as « something is coming », not as an alarm. */
+@keyframes skeleton-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+.skeleton__block {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton__block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 0%, transparent 32%, color-mix(in srgb, var(--accent) 16%, transparent) 50%, transparent 68%, transparent 100%);
+  animation: skeleton-sweep 2.1s var(--ease-out) infinite;
+}
+
+/* ── More inputs: a paste box takes the same focus glow as a text box; a checkbox pops when it is ticked ─────────────────────────────────────────────────── */
+textarea.input {
+  transition:
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) ease;
+}
+textarea.input:focus {
+  box-shadow: 0 0 0 0.3rem color-mix(in srgb, var(--accent) 22%, transparent);
+}
+@keyframes box-tick {
+  0% { transform: scale(0.8); }
+  60% { transform: scale(1.14); }
+  100% { transform: none; }
+}
+.docs-item__check input:checked {
+  animation: box-tick var(--dur-base) var(--ease-soft);
+}
+
 /* ── Reduced motion: none of the above ─────────────────────────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .page-body > *,
@@ -556,6 +593,8 @@ a.welcome__card:active,
   .accordion__item.is-just-done .accordion__toggle .pip,
   .accordion__item.is-just-done .accordion__toggle > svg:first-of-type,
   .section-nav__progress.is-done > svg,
+  .skeleton__block::after,
+  .docs-item__check input:checked,
   .edit-field--invalid .edit-field__box,
   .edit-field--saved .edit-field__box,
   .edit-field__icon-btn > svg {
@@ -565,6 +604,7 @@ a.welcome__card:active,
     animation: none;
   }
   .pip,
+  textarea.input,
   .subtabs__thumb.is-ready,
   .fact-btn,
   .edit-field__box,
