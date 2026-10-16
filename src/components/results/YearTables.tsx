@@ -10,7 +10,7 @@ import { formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { useNotice } from '../../lib/toast'
 import { useParamChoice } from '../../lib/useParamChoice'
-import { yearCsv } from '../../lib/yearCsv'
+import { csvLabel, yearCsv } from '../../lib/yearCsv'
 import { yearTableModel } from '../../lib/yearTable'
 import { Chip } from '../Chip'
 import { TableChooser } from '../TableChooser'
@@ -67,7 +67,7 @@ export function YearTables({
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
     const a = document.createElement('a')
     a.href = url
-    a.download = out.csvFile(label(selection).replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, ''))
+    a.download = out.csvFile(csvLabel(label(selection)))
     a.click()
     URL.revokeObjectURL(url)
     notice(out.csvDone)

@@ -80,7 +80,6 @@ export function fillComparison(h: Household, a: Assumptions, firstAge = MIN_TRY_
   const age = h.persons[0].retirementAge
   const retiredFrom = Math.min(...h.persons.map((p) => p.birth.year + p.retirementAge))
   const real = (year: number) => Math.pow(1 + a.inflation, year - a.today.year)
-  const lead = h.persons[0].id
   const outcomes: FillOutcome[] = FILL_CHOICES.map((choice) => {
     const withFill: Assumptions = { ...a, bracketFill: choice }
     const earliestOk = retireAt(h, withFill, { from: firstAge, to: lastAge, stopAtFirstOk: true }).earliestOk
@@ -98,7 +97,8 @@ export function fillComparison(h: Household, a: Assumptions, firstAge = MIN_TRY_
       peakMinimum = Math.max(peakMinimum, minimum)
       return {
         year: row.year,
-        age: row.persons[lead]?.age ?? 0,
+        // the first person's age that year by their birth year, NOT from their row: they are not in the rows after their last year, and a couple whose first person is the older ends on a 0
+        age: row.year - h.persons[0].birth.year,
         income: Math.max(...people.map((p) => p?.netIncome ?? 0)) / f,
         ceiling: choice === null ? null : fillCeiling(choice, paramsFor(row.year, { inflation: a.inflation, wageGrowth: a.wageGrowth })) / f,
         rrspDrawn: people.reduce((s, p) => s + (p ? p.withdrawals.rrsp + p.rrifMinimum : 0), 0) / f,

@@ -2,6 +2,15 @@ import type { AgeResult } from '../engine/types'
 import type { Lang } from '../i18n'
 import { yearTableModel } from './yearTable'
 
+/**
+ * A scenario's name as the part of a file name: letters and digits kept (accents too), every run of anything else one hyphen, none at either end — « Retirer à 60 ans (tous) » is
+ * `Retirer-à-60-ans-tous`. Nothing a file system refuses can be in it (\ / : * ? " < > |), a long name is cut, and a name with nothing in it is « plan », not a file called `…-.csv`.
+ */
+export function csvLabel(label: string): string {
+  const slug = label.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 60).replace(/-$/, '')
+  return slug === '' ? 'plan' : slug
+}
+
 // The per-year table as a spreadsheet file, for an advisor or a spouse who wants the numbers in a cell, not on a
 // screen. Whole dollars, no thousands separators and no currency sign — a spreadsheet reads a bare integer in any locale
 // — and the field separator follows the language's spreadsheet (« ; » in French, where « , » is the decimal mark).
