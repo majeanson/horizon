@@ -89,7 +89,18 @@ export function DecideView({ m }: { m: ResultsModel }) {
         <section id="essayer" className="results-section" aria-label={rc.decide.tryTitle}>
           <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} concept="essayer" />
           {anyPruned && (
-            <Chip onClick={() => setTout(showAll ? 'off' : '1')}>{showAll ? rc.decide.showLess : rc.decide.showAll}</Chip>
+            <Chip
+              onClick={() => {
+                const open = !showAll
+                setTout(open ? '1' : 'off')
+                // What this opens may be far down the page: for most households no lever is quiet, so the only thing that unfolds is « Fonte du REER »,
+                // five screens under this chip on a phone — a tap that changes nothing in sight read as a tap that did nothing (2026-10-15). Land on
+                // the first thing it opened; closing never moves the page.
+                if (open && quiet.length === 0) m.scrollTo('fonte')
+              }}
+            >
+              {showAll ? rc.decide.showLess : rc.decide.showAll}
+            </Chip>
           )}
           {!retiredNow && (
             <div id="ajuster" className="surface">

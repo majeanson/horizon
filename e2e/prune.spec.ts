@@ -40,6 +40,24 @@ test('the golden couple: « Fonte du REER » is a heading, one line and a closed
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 30_000 })
 })
 
+test('on a phone, « Tout montrer » lands on what it opened: for the golden couple no lever is quiet, so that is « Fonte du REER », screens below the chip', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await seedProfile(page)
+  await page.goto('/resultats?v=decide')
+  const chip = page.getByRole('button', { name: 'Tout montrer' })
+  await expect(chip).toBeVisible({ timeout: 90_000 })
+  const section = page.locator('#fonte')
+  const top = () => section.evaluate((el) => el.getBoundingClientRect().top)
+  expect(await top(), 'the section is below the window before the tap').toBeGreaterThan(844)
+  await chip.click()
+  await expect(page).toHaveURL(/tout=1/)
+  await expect.poll(top, { message: 'the section this opened is on screen' }).toBeLessThan(844 * 0.5)
+  await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })
+  // the way back folds it again and does not move the page
+  await page.getByRole('button', { name: 'Réduire' }).click()
+  await expect(page).not.toHaveURL(/tout=/)
+})
+
 test('?tout=1 opens everything: the full panel, no verdict line, and the chip offers the way back', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page)
