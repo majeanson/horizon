@@ -24,7 +24,9 @@ import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/r
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 import { ShareChip } from '../ShareChip'
+import { Cascade } from '../../Cascade'
 import { ConceptPip } from '../../ConceptPip'
+import { useChangePulse } from '../../../lib/useChangePulse'
 import { FACT_CONCEPT } from '../../../lib/concepts'
 
 // « À faire cette année » rides with the care copy, outside the page's own chunk.
@@ -37,6 +39,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
   const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
+  // A ring around the big age when it MOVES (not on arrival): sage if earlier, accent if later. The age itself arrives digit by digit (Cascade).
+  const pulse = useChangePulse(headline.age ?? null)
   // While figures are estimates, the computed range replaces the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
   // When each pension starts, for the chart's moments (from the settled profile, like the runs it sits beside).
   const ledger = useMemo(() => agesLedger(slow.household, slowAssumptions), [slow, slowAssumptions])
@@ -71,9 +75,12 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                     <span className="verdict__lead">{sentenceBefore}</span>
                     <span className="verdict__big">
                       {/* Keyed on the age: it settles into place (styles/motion.css) only when the answer moves. */}
-                      <strong key={headline.age} className="verdict__age">
-                        {rc.headline.ageText(headline.age!)}
-                      </strong>
+                      <span className="verdict__age-wrap">
+                        <strong key={headline.age} className="verdict__age">
+                          <Cascade>{rc.headline.ageText(headline.age!)}</Cascade>
+                        </strong>
+                        {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir ?? undefined} aria-hidden="true" />}
+                      </span>
                       {sentenceAfter}
                     </span>
                   </>

@@ -1239,15 +1239,17 @@
   -webkit-appearance: none;
   appearance: none;
 }
+/* The track fills with the accent up to the thumb (--p, 0 → 1, set by Slider.tsx): how far along the range you are reads without the number. The thumb's centre travels
+   inside half a thumb each side, so the fill ends under its middle. Fill and track are both decoration — the figure beside the label is the value. */
 .slider__input::-webkit-slider-runnable-track {
   height: 0.6rem;
   border-radius: 999px;
-  background: var(--line);
+  background: linear-gradient(to right, var(--accent) calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--p, 0)), var(--line) 0);
 }
 .slider__input::-moz-range-track {
   height: 0.6rem;
   border-radius: 999px;
-  background: var(--line);
+  background: linear-gradient(to right, var(--accent) calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--p, 0)), var(--line) 0);
 }
 .slider__input::-webkit-slider-thumb {
   -webkit-appearance: none;

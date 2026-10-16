@@ -39,6 +39,8 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // library is ever swapped, that is a one-folder change: components/charts/, chartBoundary.test.ts.)
 // 347 → 369 KB raw (108 KB gzip) on 2026-10-06: the stacked bar chart of « Mes années 60 à 70 » brings the library's
 // bar and composed-chart parts into the same lazy chunk.
+// 372 → 384 KB raw on 2026-10-16 (measured 381,5 KB, 111 KB gzip): the line chart stands its first series on a soft wash of its colour
+// (components/charts/LineChart.tsx), which brings the library's Area and its curve parts into the same lazy chunk. It is a picture the reader's own plan sits on, not a figure.
 // The results page: 150 → 156 KB raw on 2026-10-08 (measured 151,7 KB). It now carries the « Détail » chart (sources, accounts, the three
 // hypotheses), one table per choice (TableChooser), the home and locked-in REER columns, the confidence note and the mortgage-aware
 // tables — most of it text the person reads, not a library. The cap sits just above today's size, so growth fails here.
@@ -49,7 +51,7 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 // 167 → 88 KB raw on 2026-10-11 (measured 80,4 KB): the strategies and the « Vérifier » views ride their own chunks (lazy: only the one a reader opens is fetched), so the page's own chunk is the answer's alone. The ceiling falls with it, so the next view that creeps back in is seen.
 // 166 → 167 KB raw on 2026-10-11 (measured 166,3 KB): the note that says why one person's bars are empty for years (chartData.idleStretch and its two sentences).
 const LAZY_CAPS = [
-  { re: /^charts-[^.]*\.js$/, cap: 372 * KB },
+  { re: /^charts-[^.]*\.js$/, cap: 384 * KB },
   { re: /^Resultats-[^.]*\.js$/, cap: 88 * KB },
 ]
 

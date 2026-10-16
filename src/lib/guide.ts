@@ -22,10 +22,10 @@ const subscribe = (l: () => void) => {
 }
 export const useGuided = (): string | null => useSyncExternalStore(subscribe, getGuided, getGuided)
 
-/** Where the page's own pinned chrome ends: the lowest edge of the top bar and of the strips pinned under it (the map, the views). The scroller is #root. */
+/** Where the page's own pinned chrome ends: the lowest edge of the top bar and of the pinned stack under it (the map, the views). The scroller is #root. */
 function pinnedBottom(): number {
   let bottom = 0
-  for (const el of document.querySelectorAll<HTMLElement>('.shell__bar, .section-nav, .results-pin')) {
+  for (const el of document.querySelectorAll<HTMLElement>('.shell__bar, .pin-stack')) {
     const r = el.getBoundingClientRect()
     const pos = getComputedStyle(el).position
     if ((pos === 'sticky' || pos === 'fixed') && r.height > 0 && r.top < 240 && r.bottom > bottom) bottom = r.bottom

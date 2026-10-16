@@ -134,11 +134,40 @@ test('in a tab nothing is stamped and nothing changes: the bars select as they a
   expect(await page.locator('.shell__bar').evaluate((el) => getComputedStyle(el).userSelect)).not.toBe('none')
 })
 
-test('in a tab the bottom tabs just change the page: no transition is asked for, and the bars have no layer of their own', async ({ page }) => {
-  await countViewTransitions(page)
+test('in a tab the tabs slide the page too — forward along Profil → Résultats → Hypothèses, back the other way — and the bars hold a layer only while it runs', async ({ page }) => {
+  // Records, at the moment each transition starts, which way the shell said it goes (html[data-vt]).
+  await page.addInitScript(() => {
+    const w = window as unknown as { __kinds: string[] }
+    w.__kinds = []
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
+    const original = doc.startViewTransition?.bind(document)
+    if (original) doc.startViewTransition = (cb: () => void) => (w.__kinds.push(document.documentElement.getAttribute('data-vt') ?? ''), original(cb))
+  })
+  const kinds = () => page.evaluate(() => (window as unknown as { __kinds: string[] }).__kinds)
   await page.goto('/profil')
-  await page.locator('.shell__nav').getByRole('link', { name: 'Résultats' }).click()
-  await expect(page).toHaveURL(/\/resultats/)
-  expect(await page.evaluate(() => (window as unknown as { __vt: number }).__vt)).toBe(0)
+  const nav = page.locator('.shell__nav')
+  await nav.getByRole('link', { name: 'Résultats' }).click()
+  await expect(page).toHaveURL((u) => u.pathname === '/resultats')
+  await nav.getByRole('link', { name: 'Hypothèses' }).click()
+  await expect(page).toHaveURL((u) => u.pathname === '/hypotheses')
+  await nav.getByRole('link', { name: 'Profil' }).click()
+  await expect(page).toHaveURL((u) => u.pathname === '/profil')
+  await page.getByRole('link', { name: 'Glossaire' }).first().click()
+  await expect(page).toHaveURL((u) => u.pathname === '/glossaire')
+  expect(await kinds()).toEqual(['forward', 'forward', 'back', 'fade'])
+  // At rest: no stamp, no layer.
+  await expect(page.locator('html')).not.toHaveAttribute('data-vt', /.*/)
   expect(await page.locator('.shell__bar').evaluate((el) => getComputedStyle(el).viewTransitionName)).toBe('none')
+})
+
+test.describe('reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  test('a tab change is only a change: no transition is asked for', async ({ page }) => {
+    await countViewTransitions(page)
+    await page.goto('/profil')
+    await page.locator('.shell__nav').getByRole('link', { name: 'Résultats' }).click()
+    await expect(page).toHaveURL((u) => u.pathname === '/resultats')
+    expect(await page.evaluate(() => (window as unknown as { __vt: number }).__vt)).toBe(0)
+  })
 })

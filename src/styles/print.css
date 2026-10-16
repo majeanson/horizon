@@ -37,12 +37,19 @@
   .shell__nav,
   .skip-link,
   .section-nav,
+  .pin-stack:not(:has(.results-pin)),
   .toast-region,
   .no-print,
   .next {
     display: none !important;
   }
   /* The pinned views + map: the map is gone above; what is left (the views) flows like any other block. */
+  .pin-stack {
+    position: static;
+    margin: 0;
+    border: 0;
+    transform: none !important;
+  }
   .results-pin {
     position: static;
     margin: 0;
@@ -235,5 +242,12 @@
     width: 6rem;
     padding-left: 0.6rem;
     color: #333333;
+  }
+}
+
+/* The reading-progress line along the top of the screen (styles/motion.css) is not part of a plan on paper. */
+@media print {
+  .shell::before {
+    display: none !important;
   }
 }

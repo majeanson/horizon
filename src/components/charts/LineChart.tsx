@@ -1,4 +1,5 @@
-import { CartesianGrid, Line, LineChart as RLineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useId } from 'react'
+import { Area, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { SERIES_CSS } from './palette'
 import { TwoLineTick } from './tick'
 import type { ChartSeries, LineChartProps } from './types'
@@ -10,6 +11,9 @@ import { ConceptPip } from '../ConceptPip'
 //
 // It is a PICTURE: role="img" with an accessible name, and the per-year table next to it carries the same
 // numbers as text. Colours are CSS variables (`var(--sky-deep)`), so day, night and high contrast all follow.
+//
+// The first series — the reader's own plan — stands on a soft wash of its colour (a gradient that fades to nothing at the axis): it gives the eye a body to read the
+// height of, and the dashed comparison lines above or beside it stay lines. The wash is decoration (it carries no figure, the tooltip skips it).
 
 const COLOUR = SERIES_CSS
 
@@ -38,6 +42,8 @@ function tapped(label: string | number | undefined, onXTap: (x: number) => void)
 
 export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300, onXTap }: LineChartProps) {
   const data = merge(series)
+  const washId = 'wash' + useId().replace(/[^a-zA-Z0-9]/g, '')
+  const lead = series[0]
   // A two-line tick (the year, then the age) wants more room under the plot than the library's one-line default.
   const bottom = xTick ? 18 : 4
   return (
@@ -55,7 +61,15 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, m
         <ResponsiveContainer width="100%" height="100%">
           {/* accessibilityLayer is OFF on purpose: it makes the SVG focusable, and the plot is aria-hidden (a picture — its
               text is the per-year table), so a focusable node inside it is an axe « aria-hidden-focus » violation. */}
-          <RLineChart data={data} margin={{ top: 8, right: 12, bottom, left: 0 }} accessibilityLayer={false} onClick={onXTap ? (state) => tapped(state.activeLabel, onXTap) : undefined}>
+          <ComposedChart data={data} margin={{ top: 8, right: 12, bottom, left: 0 }} accessibilityLayer={false} onClick={onXTap ? (state) => tapped(state.activeLabel, onXTap) : undefined}>
+            {lead && (
+              <defs>
+                <linearGradient id={washId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" style={{ stopColor: COLOUR[lead.colour], stopOpacity: 0.26 }} />
+                  <stop offset="100%" style={{ stopColor: COLOUR[lead.colour], stopOpacity: 0 }} />
+                </linearGradient>
+              </defs>
+            )}
             <CartesianGrid stroke="var(--hairline)" vertical={false} />
             <XAxis
               dataKey="x"
@@ -69,7 +83,7 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, m
             />
             <YAxis width={64} tickLine={false} axisLine={false} tick={{ fill: 'var(--ink-soft)', fontSize: '0.78rem' }} tickFormatter={(y: number) => yFormat(y)} />
             <Tooltip
-              cursor={{ stroke: 'var(--ink-faint)', strokeDasharray: '3 3' }}
+              cursor={{ stroke: 'var(--ink-soft)', strokeWidth: 1.5, strokeDasharray: '3 3' }}
               content={({ active, label, payload }) =>
                 active && payload && payload.length > 0 ? (
                   <div className="chart-tip">
@@ -96,13 +110,14 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, m
                 label={m.named ? { value: m.label, position: 'insideTopRight', fill: 'var(--ink-soft)', fontSize: '0.78rem' } : undefined}
               />
             ))}
+            {lead && <Area type="monotone" dataKey={lead.id} stroke="none" fill={`url(#${washId})`} tooltipType="none" activeDot={false} isAnimationActive={false} legendType="none" />}
             {series.map((s, i) => (
               // Colour is never the ONLY difference between lines: from the second series on,
               // each wears its own dash pattern, so « 60 vs 65 » survives colour-blindness and
               // greyscale print at zero cost. The first (the reader's own plan) stays solid.
-              <Line key={s.id} type="monotone" dataKey={s.id} stroke={COLOUR[s.colour]} strokeWidth={2.5} strokeDasharray={DASHES[i % DASHES.length]} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
+              <Line key={s.id} type="monotone" dataKey={s.id} stroke={COLOUR[s.colour]} strokeWidth={2.5} strokeDasharray={DASHES[i % DASHES.length]} dot={false} activeDot={{ r: 5, stroke: 'var(--card)', strokeWidth: 2 }} isAnimationActive={false} />
             ))}
-          </RLineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </figure>

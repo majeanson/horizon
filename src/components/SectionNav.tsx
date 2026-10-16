@@ -29,9 +29,12 @@ export function SectionNav({
   links,
   ariaLabel,
   onPick,
+  celebrate,
 }: {
   links: readonly SectionLink[]
   ariaLabel: string
+  /** The page's first answer on this device: the chips' pips pop one after another, once (styles/motion.css). Decoration only. */
+  celebrate?: boolean
   /** Called with the section's id BEFORE the scroll: a page whose blocks open one at a time (an accordion) opens the one the chip names, so the landing finds it open. */
   onPick?: (id: string) => void
 }) {
@@ -69,7 +72,7 @@ export function SectionNav({
   }, [inView])
 
   return (
-    <nav ref={nav} className="section-nav" aria-label={ariaLabel}>
+    <nav ref={nav} className={'section-nav' + (celebrate ? ' is-celebrating' : '')} aria-label={ariaLabel}>
       <Rail>
         {links.map((l) => (
           <Fragment key={l.id}>

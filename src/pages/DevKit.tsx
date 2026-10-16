@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Accordion, AccordionItem, AccordionMode, type AccordionOpen } from '../components/Accordion'
+import { Cascade } from '../components/Cascade'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { DisplayControls } from '../components/DisplayControls'
@@ -384,11 +385,35 @@ function ConfirmSpecimen() {
 
 // Motion (styles/motion.css) is CSS, not a component: this specimen re-mounts a small page so its entrances can be watched again, and lines up the
 // things that move under a hand — a chip, a tab, a button, a switch, a fold, a gauge — with the rule they all follow written beside them.
+/** Cascade: the digits of a figure rise into place one after another — the text is whole at once; a new text replays it. */
+function CascadeSpecimen() {
+  const [n, setN] = useState(1507.65)
+  const { lang } = useLang()
+  return (
+    <div style={{ display: 'grid', gap: '0.6rem' }}>
+      <p className="answer__big">
+        <Cascade>{'Il faudrait mettre de côté ' + formatMoney(n, lang) + ' de plus par année.'}</Cascade>
+      </p>
+      <Cluster>
+        <Chip onClick={() => setN((x) => Math.round((x * 1.37 + 211) * 100) / 100)}>Un autre chiffre</Chip>
+      </Cluster>
+    </div>
+  )
+}
+
 function MotionSpecimen() {
   const [take, setTake] = useState(0)
   const [on, setOn] = useState(true)
   const [tab, setTab] = useState<'a' | 'b'>('a')
   const [sw, setSw] = useState(true)
+  const [amount, setAmount] = useState(15000)
+  const [age, setAge] = useState(62)
+  const [pulse, setPulse] = useState({ count: 0, dir: 'earlier' as 'earlier' | 'later' })
+  const [answer, setAnswer] = useState(62)
+  const move = (to: number) => {
+    setPulse((p) => ({ count: p.count + 1, dir: to < answer ? 'earlier' : 'later' }))
+    setAnswer(to)
+  }
   return (
     <div style={{ display: 'grid', gap: '1rem' }}>
       <Cluster>
@@ -426,6 +451,29 @@ function MotionSpecimen() {
         <Fold summary="Un repli qui s’ouvre">
           <p className="field-row__hint">Son corps glisse en place au lieu d’apparaître.</p>
         </Fold>
+        <FieldRow label="Une case de chiffre" infoId="tfsaRoom" hint="Flèches haut / bas : un pas qui suit la taille du chiffre (Maj : dix pas). Échap redonne le chiffre gardé. Un texte refusé tremble une fois et la case rougit ; un chiffre gardé s’entoure de vert un instant.">
+          {(a) => <NumberField kind="money" value={amount} onChange={setAmount} min={0} max={5000000} id={a.id} ariaDescribedBy={a.describedBy} />}
+        </FieldRow>
+        <Slider label="Un curseur" value={age} min={55} max={70} valueText={(v) => v + ' ans'} onCommit={setAge} marks={[{ value: 60, label: '60' }, { value: 65, label: '65' }]} />
+        <div style={{ display: 'grid', gap: '0.6rem' }}>
+          <p className="verdict__line">
+            <span className="verdict__big">
+              <span className="verdict__age-wrap">
+                <strong key={answer} className="verdict__age">
+                  <Cascade>{answer + ' ans'}</Cascade>
+                </strong>
+                {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir} aria-hidden="true" />}
+              </span>
+            </span>
+          </p>
+          <Cluster>
+            <Chip onClick={() => move(Math.max(55, answer - 2))}>Plus tôt (anneau vert)</Chip>
+            <Chip onClick={() => move(Math.min(70, answer + 2))}>Plus tard (anneau doré)</Chip>
+          </Cluster>
+        </div>
+        <EmptyState tone="calm" icon="chart-line-up-bold">
+          Une page vide porte une image de ce qui viendra.
+        </EmptyState>
       </div>
     </div>
   )
@@ -538,7 +586,27 @@ function ENTRIES(): Entry[] {
         </>
       ),
     },
-    { cat: 'Affichage', name: 'EmptyState', file: 'src/components/EmptyState.tsx', kw: 'vide rien', render: () => <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState> },
+    {
+      cat: 'Affichage',
+      name: 'EmptyState',
+      file: 'src/components/EmptyState.tsx',
+      kw: 'vide rien icône',
+      render: () => (
+        <>
+          <EmptyState tone="calm">Rien à montrer pour l’instant.</EmptyState>
+          <EmptyState tone="calm" icon="chart-line-up-bold">
+            Avec une image : « pas encore », pas « cassé ».
+          </EmptyState>
+        </>
+      ),
+    },
+    {
+      cat: 'Affichage',
+      name: 'Cascade',
+      file: 'src/components/Cascade.tsx',
+      kw: 'chiffres arrivée animation réponse nombre',
+      render: () => <CascadeSpecimen />,
+    },
     { cat: 'Affichage', name: 'Gloss', file: 'src/components/Gloss.tsx', exports: ['Gloss', 'glossed'], kw: 'glossaire sigle abréviation lien explication', render: () => <p><Gloss>Votre rente du RRQ et la PSV commencent à l’âge choisi ; le REER et le CELI s’ajoutent.</Gloss></p> },
     { cat: 'Affichage', name: 'EstFlag', file: 'src/components/EstFlag.tsx', kw: 'estimé confirmer chiffre dépenses marque lien', render: () => <p>Dépenses à la retraite : 54 000 $ <EstFlag fact="household:spendingRetired" /></p> },
     { cat: 'Affichage', name: 'Figure', file: 'src/components/Figure.tsx', kw: 'chiffre calculé d’où vient formule source provenance trace rente pension', render: () => <Figure trace={FIGURE_SPECIMEN} after="par mois, en dollars d’aujourd’hui" /> },

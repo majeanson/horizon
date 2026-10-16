@@ -2,7 +2,6 @@ import { BRACKET_FILL_COPY } from './bracketFillCopy'
 import { SPOUSE_BALANCE_COPY } from './spouseBalanceCopy'
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { usePinOffset } from './pinOffset'
 import { retirementState } from '../engine/ledger'
 import { useLang, useT } from '../i18n'
 import type { ChartMetric, Dollars } from './chartData'
@@ -70,7 +69,6 @@ export function milestoneAges(earliest: number | null, selections: readonly Sele
 }
 
 export function useResultsPage() {
-  const pinned = usePinOffset()
   const printing = usePrinting()
   const notice = useNotice()
   const vintage = useMemo(paramsVintage, [])
@@ -409,7 +407,6 @@ export function useResultsPage() {
 
 
   return {
-    pinned,
     printing,
     notice,
     vintage,

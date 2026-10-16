@@ -245,6 +245,14 @@
   /* Night text on the dark card/paper: warn 5.14/5.68, success 5.78/6.38 (the day values are 3.6 and 4.1 here). */
   --warn: #e0724e;
   --success: #88a36f;
+
+  /* Night ELEVATION. Day's shadows are warm-brown offsets on cream; on the dark stock they vanish, and a card read as a flat patch of slightly lighter ground. After dark a raised
+     surface says so the way a lit edge does: a one-pixel highlight along its top edge (inset, so it takes no room) and a soft black shadow that actually shows. The three steps keep
+     day's order — a card, a lifted card, a dialog — so every `box-shadow: var(--shadow-*)` in the app follows with no rule of its own. */
+  --shadow-sm: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 2px 5px rgb(0 0 0 / 0.32);
+  --shadow-md: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 4px 12px rgb(0 0 0 / 0.38);
+  --shadow-lg: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 10px 26px rgb(0 0 0 / 0.46);
+  --shadow-press: inset 0 1px 2px rgb(0 0 0 / 0.4);
 }
 
 /* --- Accessibility profile (#36) ----------------------------------------- */
@@ -752,6 +760,27 @@ textarea.input {
 .subtabs__opt.is-on {
   background: var(--accent);
   color: var(--accent-ink);
+}
+/* The chosen fill as ONE glide-able piece (components/SubTabs.tsx): while the row has measured it, the chosen tab hands its fill to `.subtabs__thumb`, which sits behind the labels
+   and is moved (transform) and sized to the chosen tab. The label keeps its own colour; the fill is the same accent either way. */
+.subtabs {
+  position: relative;
+}
+.subtabs__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  pointer-events: none;
+}
+.subtabs[data-thumb] > .subtabs__opt {
+  position: relative;
+  z-index: 1;
+}
+.subtabs[data-thumb] > .subtabs__opt.is-on {
+  background: transparent;
 }
 /* Mouse affordance for an overflowing pill row. `.subtabs` hides its scrollbar, and a
    mouse wheel only emits deltaY — which no browser maps onto a horizontal scroller —

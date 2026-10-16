@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ConceptPip } from './ConceptPip'
 import { Icon, InlineIcon, type IconName } from './Icon'
 import type { ConceptId } from '../lib/concepts'
@@ -76,6 +76,32 @@ export function SubTabs<K extends string>({
     // `overflowing` gates toView, so re-run once the row has measured itself.
   }, [value, overflowing, toView, tablistRef])
 
+  // The chosen tab's fill is ONE piece that glides from tab to tab (`.subtabs__thumb`, styles/core.css + motion.css) instead of each tab painting its own: measured from the
+  // chosen tab, re-measured when the row or a tab changes size (a label that grows, the text-size setting). Until it is measured — or when the tab has no box — the tab paints
+  // its own fill, so the choice is never invisible. It is only moved after its first paint, so it never slides in from nowhere.
+  const [thumb, setThumb] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
+  const [thumbReady, setThumbReady] = useState(false)
+  useLayoutEffect(() => {
+    const list = tablistRef.current
+    if (!list) return
+    const measure = () => {
+      const on = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+      if (!on || on.offsetWidth === 0) return setThumb(null)
+      const next = { x: on.offsetLeft, y: on.offsetTop, w: on.offsetWidth, h: on.offsetHeight }
+      setThumb((t) => (t && t.x === next.x && t.y === next.y && t.w === next.w && t.h === next.h ? t : next))
+    }
+    measure()
+    const watch = new ResizeObserver(measure)
+    watch.observe(list)
+    list.querySelectorAll('[role="tab"]').forEach((tab) => watch.observe(tab))
+    return () => watch.disconnect()
+  }, [value, options, tablistRef])
+  useEffect(() => {
+    if (!thumb || thumbReady) return
+    const frame = requestAnimationFrame(() => setThumbReady(true))
+    return () => cancelAnimationFrame(frame)
+  }, [thumb, thumbReady])
+
   // WAI-ARIA tablist keyboard nav: the tablist is ONE tab stop (roving tabindex — only the
   // selected tab is tabbable), and ←/→/Home/End move + select (automatic activation, fine
   // here — the panels are cheap in-page switches).
@@ -117,7 +143,8 @@ export function SubTabs<K extends string>({
   return (
     <div className="subtabs-row">
       {arrow(-1)}
-      <div ref={tablistRef} className={group} role="tablist" aria-label={ariaLabel} onKeyDown={onKeyDown}>
+      <div ref={tablistRef} className={group} role="tablist" aria-label={ariaLabel} onKeyDown={onKeyDown} data-thumb={thumb ? '' : undefined}>
+        {thumb && <span className={'subtabs__thumb' + (thumbReady ? ' is-ready' : '')} aria-hidden="true" style={{ transform: `translate(${thumb.x}px, ${thumb.y}px)`, width: thumb.w, height: thumb.h }} />}
         {options.map((o) => (
           <button
             key={o.key}

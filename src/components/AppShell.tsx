@@ -65,15 +65,18 @@ function RouteChange() {
 export function AppShell() {
   const t = useT()
   const navigate = useNavigate()
-  // An installed app changes page with a short cross-fade (lib/pageTransition.ts, a chunk of its own that a tab in a browser never loads). A plain tap only:
-  // a modified click keeps the ordinary navigation, and so does a chunk that fails to load.
-  const changePage = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
-    // « Installed » is what public/theme-bootstrap.js stamped on <html> before first paint (the same answer as lib/standalone.ts): no hook to carry in the shell.
-    if (!document.documentElement.hasAttribute('data-standalone') || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-    e.preventDefault()
-    void import('../lib/pageTransition').then((m) => m.changePage(to, navigate), () => navigate(to))
-  }
   const { pathname } = useLocation()
+  // Every link of the shell changes page with a short slide (lib/pageTransition.ts, a chunk of its own, fetched once the page is idle so the first tap does not wait for it).
+  // A plain tap only: a modified click keeps the ordinary navigation, and so does a chunk that fails to load.
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 1500))
+    idle(() => void import('../lib/pageTransition'))
+  }, [])
+  const changePage = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+    e.preventDefault()
+    void import('../lib/pageTransition').then((m) => m.changePage(to, navigate, pathname), () => navigate(to))
+  }
   const notice = useNotice()
   // A deploy while the page is OPEN and VISIBLE: registerSw never reloads under a reader; it raises
   // this event instead, and the shell offers the reload as a one-line notice with a button.
@@ -111,7 +114,7 @@ export function AppShell() {
       </a>
       <RouteChange />
       <header className="shell__bar">
-        <NavLink to="/" end className="shell__brand">
+        <NavLink to="/" end className="shell__brand" onClick={(e) => changePage(e, '/')}>
           {t.appName}
         </NavLink>
         {/* Silent until there is an answer; its chunk arrives after the bar has painted, so the bar never waits for it. */}
@@ -119,15 +122,15 @@ export function AppShell() {
           <BarAnswer />
         </Suspense>
         <div className="shell__actions">
-          <NavLink to="/fiche" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled shell__sheet' + (isActive ? ' is-active' : '')} aria-label={t.nav.sheet} title={t.nav.sheet}>
+          <NavLink to="/fiche" onClick={(e) => changePage(e, '/fiche')} className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled shell__sheet' + (isActive ? ' is-active' : '')} aria-label={t.nav.sheet} title={t.nav.sheet}>
             <Icon name="identification-card-bold" size={20} />
             <span className="btn__label" aria-hidden="true">{t.nav.sheetShort}</span>
           </NavLink>
-          <NavLink to="/glossaire" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled' + (isActive ? ' is-active' : '')} aria-label={t.nav.glossary} title={t.nav.glossary}>
+          <NavLink to="/glossaire" onClick={(e) => changePage(e, '/glossaire')} className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled' + (isActive ? ' is-active' : '')} aria-label={t.nav.glossary} title={t.nav.glossary}>
             <Icon name="book-open-text-bold" size={20} />
             <span className="btn__label" aria-hidden="true">{t.nav.glossaryShort}</span>
           </NavLink>
-          <NavLink to="/donnees" className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled' + (isActive ? ' is-active' : '')} aria-label={t.nav.data} title={t.nav.data}>
+          <NavLink to="/donnees" onClick={(e) => changePage(e, '/donnees')} className={({ isActive }) => 'btn btn--icon btn--ghost btn--labeled' + (isActive ? ' is-active' : '')} aria-label={t.nav.data} title={t.nav.data}>
             <Icon name="gear-six-bold" size={20} />
             <span className="btn__label" aria-hidden="true">{t.nav.dataShort}</span>
           </NavLink>
@@ -135,7 +138,7 @@ export function AppShell() {
       </header>
       <nav className="shell__nav" aria-label={t.nav.label}>
         {TABS.map((tab) => (
-          // Installed: a short cross-fade between pages, the bars holding still (changePage above, styles/phone.css); in a tab the page just changes.
+          // A short slide between pages, the bars holding still (changePage above, styles/phone.css).
           <NavLink key={tab.to} to={tab.to} end onClick={(e) => changePage(e, tab.to)} className={({ isActive }) => 'shell__tab' + (isActive ? ' is-on' : '')}>
             <Icon name={tab.icon} size={22} />
             <span>{t.nav[tab.key]}</span>

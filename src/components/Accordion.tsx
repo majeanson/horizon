@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLang, useT } from '../i18n'
 import { ACCORDION_COPY } from '../lib/accordionCopy'
 import { FAMILY_HUE, type ConceptId, type Family } from '../lib/concepts'
@@ -108,6 +108,18 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
   const t = useT()
   const { lang } = useLang()
   const acc = useContext(AccordionContext)
+  // A block whose figures have JUST all been confirmed celebrates once (its pip and ✓ pop, styles/motion.css): seen as a false → true change, never on arrival.
+  const doneNow = acc?.done.has(id) ?? false
+  const wasDone = useRef(doneNow)
+  const [justDone, setJustDone] = useState(false)
+  useEffect(() => {
+    const became = doneNow && !wasDone.current
+    wasDone.current = doneNow
+    if (!became) return setJustDone(false)
+    setJustDone(true)
+    const timer = setTimeout(() => setJustDone(false), 1400)
+    return () => clearTimeout(timer)
+  }, [doneNow])
   const Heading = useContext(SectionLevel) === 3 ? 'h3' : 'h2'
   const classes = (plain ? '' : 'profile-section surface') + (family ? ` fam-rule fam--${FAMILY_HUE[family]}` : '') + (className ? ` ${className}` : '')
   const pip = concept ? <ConceptPip id={concept} /> : icon && <Icon name={icon} size={18} />
@@ -183,7 +195,7 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
     </Cluster>
   )
   return (
-    <section id={id} className={classes + ' accordion__item' + (isOpen ? ' is-open' : ' is-closed') + (isDone ? ' is-done' : '')} aria-label={title}>
+    <section id={id} className={classes + ' accordion__item' + (isOpen ? ' is-open' : ' is-closed') + (isDone ? ' is-done' : '') + (justDone ? ' is-just-done' : '')} aria-label={title}>
       <div className={(plain ? '' : 'section-header ') + 'accordion__head'}>
         <Heading className={(plain ? 'person__title' : 'section-header__title') + ' accordion__title'}>
           <button type="button" className="accordion__toggle" aria-expanded={isOpen} aria-controls={plain ? id : `${id}-body`} onClick={toggle}>

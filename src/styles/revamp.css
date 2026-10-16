@@ -38,12 +38,8 @@
 }
 
 /* ── Résultats: one scroll, a sticky map of its sections ─────────────────── */
-/* The nav rides under the sticky top bar (--bar-h, same offset as the desktop nav rail) and
-   stays above the content it scrolls past; a tapped section stops below both. */
+/* The map is a plain row. What makes it ride under the sticky top bar is the PinStack it sits in (components/PinStack.tsx, « The pinned stack » below): a tapped section stops below both. */
 .section-nav {
-  position: sticky;
-  top: var(--bar-h);
-  z-index: 15;
   margin: 0 calc(-1 * var(--gutter));
   padding: 0.35rem var(--gutter);
   background: var(--paper);
@@ -58,7 +54,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  /* clear of the top bar AND whatever is pinned under it: usePinOffset measures --pin-h (the fallback is the wide layout) */
+  /* clear of the top bar AND whatever is pinned under it: the PinStack measures --pin-h (components/PinStack.tsx) (the fallback is the wide layout) */
   scroll-margin-top: calc(var(--bar-h) + var(--pin-h, 7rem) + 0.75rem);
   min-width: 0;
 }
@@ -193,34 +189,13 @@
   border-radius: var(--radius-md);
 }
 
-/* ── Résultats: the views (and, from 860 px, the section map) pinned under the top bar ─────────────────────────────── */
-/* The three views ride under the top bar at every width, so a reader deep in the table can still switch view. The map of
-   the open view pins under them only where there is room: on a phone it would take a quarter of the screen, so it scrolls
-   away with the page. Both offsets are MEASURED (lib/pinOffset.ts sets --tabs-h and --pin-h) and never typed in rem. */
+/* ── Résultats: the views row ───────────────────────────────────────────────────────────────────────────────────────── */
+/* The three views and the map of the open view ride under the top bar at every width (the PinStack they sit in), so a reader deep in the table can still switch view. */
 .results-pin {
-  position: sticky;
-  top: var(--bar-h);
-  z-index: 15;
   margin: 0 calc(-1 * var(--gutter));
   padding: 0.35rem var(--gutter);
   background: var(--paper);
   border-bottom: 1px solid var(--line);
-}
-.results-page .section-nav {
-  position: static;
-}
-/* On a phone the map sits right under the pinned views: two rows, each with its hairline and its padding, before the answer. One rule between them is the pin's. */
-@media (max-width: 859.98px) {
-  .results-page .section-nav {
-    border-bottom: 0;
-    padding-top: 0.1rem;
-  }
-}
-@media (min-width: 860px) {
-  .results-page .section-nav {
-    position: sticky;
-    top: calc(var(--bar-h) + var(--tabs-h, 3.5rem));
-  }
 }
 
 /* ── Résultats: the chart's « Détail » view — the same shape for one person or two ─────────────────────── */
@@ -1601,14 +1576,7 @@
 }
 
 /* ── Profil: a pinned map of the form ─────────────────────────────────────────────────────────────────────────── */
-/* The map sticks under the top bar; a tapped block stops below both (PinnedMap measures the map into --map-h). */
-/* The wrapper must not box the map: a sticky child only travels inside its parent. */
-.pinned-map {
-  display: contents;
-}
-.pinned-map .section-nav {
-  top: var(--bar-h);
-}
+/* The map is in a PinStack under the top bar; a tapped block stops below both (the stack measures itself into --map-h). */
 .page-body:has(.pinned-map) .profile-section[id],
 .page-body:has(.pinned-map) .person[id],
 .page-body:has(.pinned-map) .profile-section[id] {
@@ -1627,40 +1595,57 @@
   min-width: 0;
 }
 
-/* ── Headroom: everything pinned at the top slides away while the reader scrolls down, and returns on the first move up ───────────────────────────────────────────────────────── */
-/* lib/useHeadroom.ts puts `data-away` on the shell. The elements stay where they are in the flow (a sticky box keeps its place), so nothing below moves; they are carried up out of the
-   window AS ONE BLOCK: every pinned row travels the SAME distance (the bar's height plus room for the two rows that can stack under it at the largest text size), so the rows keep their
-   places against each other on the way out and back — a block rolling up under the top edge. Each used to travel its own height plus twelve rem, so a short row fell behind a tall one
-   half-way, and the rule reached every `.section-nav`, including Résultats' map on a phone, which is NOT pinned there (it scrolls with the page): it was carried off too, leaving a hole
-   in the page, and crossed the views row on its way back (IMG_6800, 2026-10-15). Only what is actually pinned moves. A KEY focusing something inside one brings it back, so the keyboard
-   can still reach it: `:has(:focus-visible)`, not `:focus-within` — a mouse click or a tap on a tab or a chip leaves the focus on it too, and that used to pin the row for good (the
-   reader clicked a view, scrolled down, and the tabs stayed). */
+/* ── The pinned stack, and its roll-up ──────────────────────────────────────────────────────────────────────────────────────────────
+   ONE standard for everything pinned under the top bar (components/PinStack.tsx): a page puts its pinned rows — the views' tabs, the sections' map, a glossary's chips — in a single
+   `.pin-stack`, which is the only sticky box; the rows inside are plain. Row after row of separate sticky boxes drifted (a row that scrolled with the page slid under a pinned one,
+   half a row showed through; two rows travelled different distances on the way out). One box has one stuck place, one z-order, one way out. */
+.pin-stack {
+  position: sticky;
+  top: var(--bar-h);
+  z-index: 15;
+  margin: 0 calc(-1 * var(--gutter));
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.pin-stack > .results-pin,
+.pin-stack > .section-nav {
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+/* The map sits right under the views: the two rows read as one, so the second takes less top room. */
+.pin-stack > * + .section-nav {
+  padding-top: 0.1rem;
+}
+.pin-stack.pinned-map {
+  z-index: 13;
+}
+/* Headroom (lib/useHeadroom.ts puts `data-away` on the shell): scroll down and the top bar and the stack ROLL UP together, like a blind drawn into the top edge of the screen — and unroll
+   at the first move up. Both are hinged on the SAME line, the top of the window (the stack's hinge sits one bar's height above its own top edge), turned about it by the same angle and carried
+   by the same easing, so they stay one piece the whole way: nothing falls behind, nothing crosses. Edge-on at the end, and the back face is never drawn. The stack's own place in the flow never
+   changes (a sticky box keeps its seat), so nothing below moves. A KEY focusing something inside brings its box back, so the keyboard can still reach it: `:has(:focus-visible)`, not
+   `:focus-within` — a mouse click or a tap on a tab or a chip leaves the focus on it too, and that used to pin the row for good. */
 :root {
-  --headroom-away: translateY(calc(-1 * var(--bar-h) - 14rem));
+  --roll-away: perspective(52rem) rotateX(-96deg);
 }
 .shell__bar,
-.results-pin,
-.section-nav {
-  transition: transform 0.22s ease;
+.pin-stack {
+  transition: transform 0.36s cubic-bezier(0.45, 0, 0.2, 1);
+  backface-visibility: hidden;
 }
-/* EVERY map is carried away — a `.section-nav` is sticky by its own rule, on whatever page renders one (Profil's and Hypothèses' pinned map, Résultats',
-   the Glossaire's: the Glossaire's stayed put because it was not on a list, 2026-10-15). The one that is NOT pinned stays: Résultats' map on a phone is
-   static and scrolls with the page (revamp.css:209) — carried off, it left a hole. */
+.shell__bar {
+  transform-origin: 50% 0;
+}
+.pin-stack {
+  transform-origin: 50% calc(-1 * var(--bar-h));
+}
 .shell[data-away] .shell__bar,
-.shell[data-away] .results-pin,
-.shell[data-away] .section-nav {
-  transform: var(--headroom-away);
+.shell[data-away] .pin-stack {
+  transform: var(--roll-away);
   pointer-events: none;
 }
-@media (max-width: 859.98px) {
-  .shell[data-away] .results-page .section-nav {
-    transform: none;
-    pointer-events: auto;
-  }
-}
 .shell[data-away] .shell__bar:has(:focus-visible),
-.shell[data-away] .results-pin:has(:focus-visible),
-.shell[data-away] .section-nav:has(:focus-visible) {
+.shell[data-away] .pin-stack:has(:focus-visible) {
   transform: none;
   pointer-events: auto;
 }
@@ -1677,18 +1662,14 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .shell__bar,
-  .results-pin,
-  .section-nav,
+  .pin-stack,
   .shell__nav {
     transition: none;
   }
 }
 /* …and Profil's map stays away while the figure guide is open (the guide card, the answer and the bar are enough to have on screen). */
-.pinned-map .section-nav {
-  z-index: 13;
-}
-.page-body:has(.guide-bar) .pinned-map .section-nav {
-  transform: translateY(-110%);
+.page-body:has(.guide-bar) .pin-stack.pinned-map {
+  transform: var(--roll-away);
   pointer-events: none;
 }
 

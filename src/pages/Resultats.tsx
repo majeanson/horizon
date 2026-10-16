@@ -1,15 +1,17 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
+import { PinStack } from '../components/PinStack'
 import { PrintPlan } from '../components/results/PrintPlan'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
-import { StatusMessage } from '../components/StatusMessage'
+import { EmptyState } from '../components/EmptyState'
 import { AnswerView } from '../components/results/views/AnswerView'
 import { Skeleton } from '../components/Skeleton'
+import { firstAnswerSeen, markFirstAnswerSeen } from '../lib/firstAnswer'
 import { useResultsPage } from '../lib/useResultsPage'
 
 // The two other views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
@@ -28,14 +30,27 @@ const TourBar = lazy(() => import('../components/results/TourBar').then((m) => (
 // bookmarked.
 export function Resultats() {
   const m = useResultsPage()
-  const { pinned, printing, t, r, rc, gaps, setParam, answerPending, view, navLinks, copySummary } = m
+  const { printing, t, r, rc, gaps, setParam, answerPending, view, navLinks, copySummary } = m
+  // The first answer this device has seen: the map's pips pop one after another for a moment, once (components/SectionNav.tsx `celebrate`).
+  const [firstRun] = useState(() => !firstAnswerSeen())
+  const [celebrate, setCelebrate] = useState(false)
+  const answered = gaps.length === 0 && !answerPending && view === 'answer'
+  useEffect(() => {
+    if (!firstRun || !answered) return
+    markFirstAnswerSeen()
+    setCelebrate(true)
+    const timer = setTimeout(() => setCelebrate(false), 2800)
+    return () => clearTimeout(timer)
+  }, [firstRun, answered])
 
   if (gaps.length > 0) {
     return (
       <section className="page-body">
         <PageHead title={r.title} />
         <div className="surface results-gaps">
-          <StatusMessage tone="info">{r.gaps.lead}</StatusMessage>
+          <EmptyState tone="calm" icon="chart-line-up-bold">
+            {r.gaps.lead}
+          </EmptyState>
           <ul>
             {gaps.map((g) => (
               <li key={g}>{r.gaps[g]}</li>
@@ -50,14 +65,15 @@ export function Resultats() {
   }
 
   return (
-    <section className="page-body results-page" ref={pinned}>
+    <section className="page-body results-page">
       {/* On paper the plan is ONE short page, the same whichever view is open (components/results/PrintPlan.tsx): it replaces the page while the browser prints. */}
       {printing ? (
         <PrintPlan m={m} />
       ) : (
         <>
       <PageHead title={r.title} />
-      {/* The three views stay pinned under the top bar while the page scrolls; the map of the open view pins under them from 860 px (usePinOffset measures both). */}
+      {/* The three views and the map of the open view are ONE pinned stack under the top bar (components/PinStack.tsx): one box that rolls away with the bar and comes back with it. */}
+      <PinStack>
       <div className="results-pin">
         <SubTabs
           ariaLabel={rc.tabs.label}
@@ -70,7 +86,8 @@ export function Resultats() {
           ]}
         />
       </div>
-      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} />}
+      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} celebrate={celebrate} />}
+      </PinStack>
 
 
       {/* 1 — what you asked: the answer, compared and dated, what would sharpen it, and what the plan points at. */}

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
-import { readNumber, showNumber, type NumberKind } from '../lib/numberInput'
+import { readNumber, showNumber, stepped, type NumberKind } from '../lib/numberInput'
 import { EditField } from './EditField'
 import { StatusMessage } from './StatusMessage'
 
@@ -16,6 +16,10 @@ import { StatusMessage } from './StatusMessage'
 //   int      a whole number (an age)                     unit from the `unit` prop
 //
 // `min` / `max` are in the STORED unit (a fraction for percent).
+//
+// The keyboard helps a figure along: Escape gives back the stored text (and drops a refusal), ↑ / ↓ step the figure by what suits its size and commit at
+// once (Shift ten steps; lib/numberInput.ts `stepped`), and a kept change rings the box once in the success hue (`saved`, styles/motion.css). The phone's return
+// key reads « OK », and the browser's autofill and spell-check stay off a number.
 //
 // Focus makes typing easy: the box's text is selected whole, so the first digit REPLACES it — a plain 0 (the default of every optional
 // amount) never ends up as « 0150 ». (Emptying a zero on focus was tried: the clear ✕ appears with the first digit and shifts the tab order.)
@@ -57,6 +61,15 @@ export function NumberField(props: NumberFieldProps) {
   const [error, setError] = useState<string | null>(null)
   const typing = useRef(false)
   const errorId = useId()
+  // A kept change rings the box for a beat. A counter, not a flag: two commits in a row each ring (the class is dropped between them by the timer's reset).
+  const [saved, setSaved] = useState(false)
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(savedTimer.current), [])
+  const ring = () => {
+    clearTimeout(savedTimer.current)
+    setSaved(true)
+    savedTimer.current = setTimeout(() => setSaved(false), 900)
+  }
 
   // Follow the stored value (an import, a reset, another field's edit) unless the person is mid-typing.
   useEffect(() => {
@@ -94,8 +107,32 @@ export function NumberField(props: NumberFieldProps) {
     if (n < lo - 1e-9 || n > hi + 1e-9) return setError(rangeMessage())
     setError(null)
     setText(showNumber(n, kind, lang))
-    if (n !== value) onChange(n)
+    if (n !== value) {
+      onChange(n)
+      ring()
+    }
   }
+
+  // ↑ / ↓: step from what is in the box when it reads as a number (else from the stored figure), keep the result at once.
+  const arrow = (dir: 1 | -1, fast: boolean) => {
+    const typed = text.trim() ? readNumber(text, kind, lo < 0) : null
+    const next = stepped(typed ?? value, kind, dir, fast, lo, hi)
+    typing.current = false
+    setError(null)
+    setText(showNumber(next, kind, lang))
+    if (next !== value) {
+      onChange(next)
+      ring()
+    }
+  }
+
+  // Escape: back to the stored text. Only offered while there is something to give back, so an Escape on a clean box still reaches a dialog around it.
+  const revert = () => {
+    typing.current = false
+    setError(null)
+    setText(showNumber(value, kind, lang))
+  }
+  const dirty = error !== null || text !== showNumber(value, kind, lang)
 
   const adornment = unit ?? DEFAULT_UNIT[kind]
   return (
@@ -120,6 +157,12 @@ export function NumberField(props: NumberFieldProps) {
         placeholder={placeholder}
         disabled={disabled}
         autoFocus={autoFocus}
+        invalid={error !== null}
+        saved={saved && error === null}
+        onEscape={dirty ? revert : undefined}
+        onArrow={disabled ? undefined : arrow}
+        enterKeyHint="done"
+        plain
         boxActions={adornment ? <span className="num-unit mono" aria-hidden="true">{adornment}</span> : undefined}
       />
       {error && (

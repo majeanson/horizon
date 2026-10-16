@@ -50,3 +50,34 @@ export function readNumber(text: string, kind: NumberKind, negative: boolean): n
     }
   }
 }
+
+/** What one ↑ / ↓ press moves a number box by: a whole year or age; a tenth of a point of percent; a tenth of a year of service; and for money a
+ *  step that follows the figure's size (a tenth of its leading power of ten: 812 → 10, 15 000 → 1 000, 400 000 → 10 000), so the key is useful at any scale. */
+export function stepFor(value: number | null, kind: NumberKind): number {
+  switch (kind) {
+    case 'year':
+    case 'int':
+      return 1
+    case 'percent':
+      return 0.001
+    case 'decimal':
+      return 0.1
+    case 'money': {
+      const v = Math.abs(value ?? 0)
+      return v < 10 ? 1 : 10 ** (Math.floor(Math.log10(v)) - 1)
+    }
+  }
+}
+
+const PLACES: Record<NumberKind, number> = { money: 2, percent: 6, decimal: 4, year: 0, int: 0 }
+
+/** The number after one ↑ (dir 1) or ↓ (dir -1): it lands on the step's grid (15 340 → 16 000, then 15 000 the other way), a held Shift moves ten steps,
+ *  and it never leaves [lo, hi]. Pure, so the arithmetic is tested without a browser. */
+export function stepped(value: number | null, kind: NumberKind, dir: 1 | -1, fast: boolean, lo: number, hi: number): number {
+  const base = value ?? 0
+  const step = stepFor(base, kind) * (fast ? 10 : 1)
+  const q = Math.round((base / step) * 1e6) / 1e6
+  const next = (dir > 0 ? Math.floor(q) + 1 : Math.ceil(q) - 1) * step
+  const clamped = Math.min(hi, Math.max(lo, next))
+  return Number(clamped.toFixed(PLACES[kind]))
+}

@@ -86,18 +86,49 @@ summary {
 }
 
 /* ── Changing page, as an app does ───────────────────────────────────────────────────────────────────────────────────────────
-   Only when the app is installed (the tabs ask the browser for a view transition then; in a tab they do not): the page cross-fades in about a tenth of a
-   second while the two bars hold still, so the chrome never blinks. Reduced motion: no animation at all, the page just changes. */
-[data-standalone] .shell__bar {
+   Every link of the shell asks the browser for a view transition (lib/pageTransition.ts): the page slides about a rem and fades in about a fifth of a second, the way the tabs are
+   ordered — Profil → Résultats → Hypothèses arrive from the right, the other way from the left, any other move is a plain fade — while the two bars hold still on a layer of
+   their own. At rest nothing carries a transition name: `html[data-vt]` is set for the length of a transition, and an installed app keeps the layers always (its own spec pins that).
+   The transition overlay never takes a tap (a spec that clicks again straight away must reach the page). Reduced motion: no animation at all, the page just changes. */
+[data-standalone] .shell__bar,
+[data-vt] .shell__bar {
   view-transition-name: shell-bar;
 }
-[data-standalone] .shell__nav {
+[data-standalone] .shell__nav,
+[data-vt] .shell__nav {
   view-transition-name: shell-nav;
+}
+::view-transition {
+  pointer-events: none;
 }
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 140ms;
+  animation-duration: 190ms;
   animation-timing-function: ease-out;
+}
+@keyframes vt-out-left {
+  to { opacity: 0; transform: translateX(-1.1rem); }
+}
+@keyframes vt-out-right {
+  to { opacity: 0; transform: translateX(1.1rem); }
+}
+@keyframes vt-in-right {
+  from { opacity: 0; transform: translateX(1.1rem); }
+}
+@keyframes vt-in-left {
+  from { opacity: 0; transform: translateX(-1.1rem); }
+}
+html[data-vt='forward']::view-transition-old(root) {
+  animation-name: vt-out-left;
+}
+html[data-vt='forward']::view-transition-new(root) {
+  animation-name: vt-in-right;
+}
+html[data-vt='back']::view-transition-old(root) {
+  animation-name: vt-out-right;
+}
+html[data-vt='back']::view-transition-new(root) {
+  animation-name: vt-in-left;
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),

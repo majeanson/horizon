@@ -14,6 +14,7 @@ import { useCareEarliest } from '../../lib/useCareEarliest'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Fold } from '../Fold'
+import { Cascade } from '../Cascade'
 import { Skeleton } from '../Skeleton'
 import { Slider } from '../Slider'
 
@@ -114,7 +115,7 @@ export function CareView({
         <Skeleton count={3} />
       ) : (
         <>
-          <p className="answer__big">{earliestLine}</p>
+          <p className="answer__big"><Cascade>{earliestLine ?? ''}</Cascade></p>
           {a.ok ? <p className="answer__note">{c.holds(a.age)}</p> : <p className="answer__note">{c.short(a.age, a.firstShortfallYear === null ? '' : formatYearAge(a.firstShortfallYear, births, lang))}</p>}
           {!a.ok && a.unmet >= 1 && <p className="answer__note">{c.unmet(formatCompactMoney(a.unmet, lang))}</p>}
           {/* What is left at the horizon says something only while the plan holds; once it runs out it floors near nothing whatever the care costs. */}

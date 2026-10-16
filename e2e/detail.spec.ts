@@ -30,7 +30,7 @@ test('« Détail » shows where the money comes from, where it goes and what the
 })
 
 // How much is pinned depends on the room: the views everywhere, the section map only from 860 px up. A tapped section
-// must stop BELOW whatever is pinned — measured, not guessed (lib/pinOffset.ts).
+// must stop BELOW whatever is pinned — measured, not guessed (components/PinStack.tsx).
 for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['desktop', 1280, 720, true]] as const) {
   test(`${name}: the views are pinned${mapPinned ? ' with the section map' : ', the map scrolls away'}, and a tapped section stops below them`, async ({ page }) => {
     await page.setViewportSize({ width, height })

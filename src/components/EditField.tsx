@@ -49,6 +49,18 @@ export interface EditFieldProps {
   autoFocus?: boolean
   /** Disables the whole field (input + buttons). */
   disabled?: boolean
+  /** The text is refused (the host shows why, tied by ariaDescribedBy): `aria-invalid`, a clay border and one small shake as it turns on. */
+  invalid?: boolean
+  /** The host has just kept what was typed: the box rings once in the success hue (a beat, then gone). Decoration — the value itself is the confirmation. */
+  saved?: boolean
+  /** Escape in the box: the host gives the text back as it was. */
+  onEscape?: () => void
+  /** ↑ / ↓ in the box (`fast` with Shift held): the host steps the figure. Not for a multiline field. */
+  onArrow?: (dir: 1 | -1, fast: boolean) => void
+  /** The label of the phone keyboard's return key (« OK » for a number box that commits on Enter). */
+  enterKeyHint?: 'done' | 'go' | 'next' | 'search' | 'send'
+  /** Keep the browser's autofill and spell-check off a figure or a code. */
+  plain?: boolean
   maxLength?: number
   /** Render a textarea instead of an input. Enter then inserts a newline (no submit). */
   multiline?: boolean
@@ -89,6 +101,12 @@ export function EditField({
   inputMode,
   autoFocus,
   disabled,
+  invalid,
+  saved,
+  onEscape,
+  onArrow,
+  enterKeyHint,
+  plain,
   maxLength,
   multiline,
   rows,
@@ -124,6 +142,18 @@ export function EditField({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Mid-IME-composition Enter confirms the composition, not the field.
     if (e.nativeEvent.isComposing || e.keyCode === 229) return
+    if (!multiline) {
+      if (e.key === 'Escape' && onEscape) {
+        e.preventDefault()
+        onEscape()
+        return
+      }
+      if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && onArrow && !disabled) {
+        e.preventDefault()
+        onArrow(e.key === 'ArrowUp' ? 1 : -1, e.shiftKey)
+        return
+      }
+    }
     if (isForm || multiline) return
     if (e.key === 'Enter') {
       e.preventDefault()
@@ -153,7 +183,7 @@ export function EditField({
   // A LABELED submit is what makes a row a composer rather than a bare field — and the one
   // thing that can squeeze the text off the line. The modifier lets fields.css give it its
   // own full-width line under a narrow container. An icon-only ✓ never gets it.
-  const rootClass = 'edit-field' + (submitLabel ? ' edit-field--cta' : '') + (className ? ` ${className}` : '')
+  const rootClass = 'edit-field' + (submitLabel ? ' edit-field--cta' : '') + (invalid ? ' edit-field--invalid' : '') + (saved ? ' edit-field--saved' : '') + (className ? ` ${className}` : '')
   const common = {
     id,
     className: 'input edit-field__input',
@@ -177,6 +207,11 @@ export function EditField({
     // and an aria-label would silence that label (« Année de naissance » read as « ex. 1975 » to a screen reader).
     'aria-label': ariaLabel ?? (id ? undefined : placeholder),
     'aria-describedby': ariaDescribedBy,
+    'aria-invalid': invalid || undefined,
+    enterKeyHint,
+    autoComplete: plain ? 'off' : undefined,
+    autoCapitalize: plain ? 'off' : undefined,
+    spellCheck: plain ? false : undefined,
     autoFocus,
     disabled,
     maxLength,

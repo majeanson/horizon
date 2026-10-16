@@ -5,6 +5,7 @@ import { formatMoney } from '../../lib/money'
 import { useSavingsNeeded } from '../../lib/useSavingsNeeded'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { Cascade } from '../Cascade'
 import { Skeleton } from '../Skeleton'
 
 // « How much should I put aside to retire at X? » One age to choose, one number back: the yearly amount to move from
@@ -47,17 +48,17 @@ export function SaveView({
         <Skeleton count={2} />
       ) : answer.extraPerYear === null ? (
         <>
-          <p className="answer__big answer__big--short">{q.unreachable(age)}</p>
+          <p className="answer__big answer__big--short"><Cascade>{q.unreachable(age)}</Cascade></p>
           <p className="answer__note">{q.unreachableWhy}</p>
         </>
       ) : answer.extraPerYear === 0 ? (
         <>
-          <p className="answer__big">{q.nothing(age)}</p>
+          <p className="answer__big"><Cascade>{q.nothing(age)}</Cascade></p>
           <p className="answer__note">{q.nothingWhy}</p>
         </>
       ) : (
         <>
-          <p className="answer__big">{q.amount(formatMoney(answer.extraPerYear, lang))}</p>
+          <p className="answer__big"><Cascade>{q.amount(formatMoney(answer.extraPerYear, lang))}</Cascade></p>
           <p className="answer__note">{q.perMonth(formatMoney(answer.extraPerYear / 12, lang))}</p>
           <p className="answer__note">{q.why(age)}</p>
         </>

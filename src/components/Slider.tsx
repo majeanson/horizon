@@ -56,6 +56,12 @@ export function Slider({
   const t = useT()
   const [local, setLocal] = useState(value)
   const dragging = useRef(false)
+  // Counts the values KEPT (a let-go, a ± tap, a chip): the figure beside the label settles into place on each, never on every step of a drag.
+  const [kept, setKept] = useState(0)
+  const commit = (v: number) => {
+    setKept((k) => k + 1)
+    onCommit(v)
+  }
 
   // Follow the stored value (an import, another control's edit) unless the thumb is being held.
   useEffect(() => {
@@ -70,7 +76,7 @@ export function Slider({
   const end = () => {
     if (!dragging.current) return
     dragging.current = false
-    if (local !== value) onCommit(local)
+    if (local !== value) commit(local)
   }
   // The exact step: one tap is a whole gesture, so it commits at once.
   const nudge = (direction: -1 | 1) => {
@@ -78,7 +84,7 @@ export function Slider({
     if (next === local) return
     setLocal(next)
     onPreview?.(next)
-    onCommit(next)
+    commit(next)
   }
   const at = (v: number) => (max === min ? 0 : (v - min) / (max - min))
   // Marks that sit close together (prudent 2,5 · neutre 2,1 · audacieux 2,0) would print on top of each other: each one
@@ -93,7 +99,7 @@ export function Slider({
   const apply = (v: number) => {
     setLocal(v)
     onPreview?.(v)
-    if (v !== value) onCommit(v)
+    if (v !== value) commit(v)
   }
 
   return (
@@ -102,7 +108,7 @@ export function Slider({
         <label className="field-row__label" htmlFor={id}>
           {label}
         </label>
-        <output className="slider__value mono" htmlFor={id}>
+        <output key={kept} className="slider__value mono" htmlFor={id}>
           {valueText(local)}
         </output>
       </div>
@@ -110,7 +116,7 @@ export function Slider({
         <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.less} : ${label}`} disabled={local <= min} onClick={() => nudge(-1)}>
           <Icon name="minus-bold" size={18} />
         </button>
-        <div className="slider__track" style={{ ['--lines' as string]: depth }}>
+        <div className="slider__track" style={{ ['--lines' as string]: depth, ['--p' as string]: at(local) }}>
           <input
             id={id}
             className="slider__input"

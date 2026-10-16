@@ -1,8 +1,10 @@
 import { useEffect, type RefObject } from 'react'
 
-// HEADROOM — the pinned chrome (the top bar, the views' tabs, the sections' map) is for FINDING and CHANGING things, not for reading beside: pinned all the
-// time, on a phone, it left a third of the screen to the page. It slides away while the reader scrolls DOWN and comes back at the first move UP (and at the top, and when a key
-// focuses something inside it). The bottom navigation stays: it is where the thumb is.
+// HEADROOM — the pinned chrome (the top bar, and the page's PinStack: the views' tabs, the sections' map) is for FINDING and CHANGING things, not for reading beside: pinned all the
+// time, on a phone, it left a third of the screen to the page. It rolls up into the top edge — bar and stack together, as one piece — while the reader scrolls DOWN and unrolls at the first
+// move UP (and at the top, and when a key focuses something inside it). The bottom navigation stays: it is where the thumb is.
+//
+// It only rolls once the stack is STUCK under the bar: before that the stack is still travelling up with the page, and a roll hinged on the top of the window would tear it from the bar.
 //
 // Only the READER'S scrolling counts. The page scrolls by itself too — a tap on a map chip, the figure guide, a deep link — and that must never hide the chrome the reader just
 // used. So a scroll counts only when a gesture made it: a finger dragging (and the momentum that follows it), the wheel, or a key that scrolls. A tap has no drag; Enter on a chip is not a
@@ -29,13 +31,21 @@ export function useHeadroom(shell: RefObject<HTMLElement | null>): void {
     const onKey = (e: KeyboardEvent) => {
       if (SCROLL_KEYS.has(e.key) && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) mark()
     }
+    const stuck = () => {
+      const stack = el.querySelector<HTMLElement>('.pin-stack')
+      if (!stack) return true
+      const bar = el.querySelector<HTMLElement>('.shell__bar')
+      return stack.getBoundingClientRect().top <= (bar ? bar.getBoundingClientRect().height : 0) + 2
+    }
     const onScroll = () => {
       const y = root.scrollTop
       const dy = y - last
       last = y
       if (y < TOP) return el.removeAttribute('data-away')
       if (Date.now() - gesture > MOMENTUM_MS) return
-      if (dy > MOVE) el.setAttribute('data-away', '')
+      if (dy > MOVE) {
+        if (stuck()) el.setAttribute('data-away', '')
+      }
       else if (dy < -MOVE) el.removeAttribute('data-away')
     }
     root.addEventListener('wheel', mark, { passive: true })

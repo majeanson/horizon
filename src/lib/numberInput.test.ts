@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readNumber, showNumber, type NumberKind } from './numberInput.ts'
+import { readNumber, showNumber, stepFor, stepped, type NumberKind } from './numberInput.ts'
 
 const nbsp = (s: string) => s.replace(new RegExp('[' + String.fromCharCode(0xa0, 0x202f) + ']', 'g'), ' ')
 
@@ -61,5 +61,39 @@ describe('showing a stored number', () => {
 
   it('nothing shows as an empty box', () => {
     expect(showNumber(null, 'money', 'fr')).toBe('')
+  })
+})
+
+describe('the arrow keys on a number box', () => {
+  const INF = Number.POSITIVE_INFINITY
+
+  it('a year or an age moves by one, ten with Shift', () => {
+    expect(stepped(65, 'int', 1, false, 0, 120)).toBe(66)
+    expect(stepped(65, 'int', -1, false, 0, 120)).toBe(64)
+    expect(stepped(1978, 'year', 1, true, 1900, 2100)).toBe(1980) // Shift lands on the next decade
+  })
+
+  it('money follows the size of the figure and lands on its grid', () => {
+    expect(stepFor(812, 'money')).toBe(10)
+    expect(stepFor(15000, 'money')).toBe(1000)
+    expect(stepFor(400000, 'money')).toBe(10000)
+    expect(stepFor(0, 'money')).toBe(1)
+    expect(stepped(15340, 'money', 1, false, 0, INF)).toBe(16000)
+    expect(stepped(15340, 'money', -1, false, 0, INF)).toBe(15000)
+    expect(stepped(16000, 'money', -1, false, 0, INF)).toBe(15000)
+    expect(stepped(null, 'money', 1, false, 0, INF)).toBe(1)
+  })
+
+  it('a percent moves by a tenth of a point, with no float dust', () => {
+    expect(stepped(0.0525, 'percent', 1, false, -INF, INF)).toBe(0.053)
+    expect(stepped(0.05, 'percent', 1, false, -INF, INF)).toBe(0.051)
+    expect(stepped(0.05, 'percent', -1, false, -INF, INF)).toBe(0.049)
+  })
+
+  it('never leaves its range — down to zero for money, up to the cap for an age', () => {
+    expect(stepped(0, 'money', -1, false, 0, INF)).toBe(0)
+    expect(stepped(120, 'int', 1, false, 0, 120)).toBe(120)
+    expect(stepped(0.07, 'percent', 1, true, 0, 0.1)).toBe(0.08)
+    expect(stepped(0.095, 'percent', 1, true, 0, 0.1)).toBe(0.1)
   })
 })

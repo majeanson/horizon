@@ -10,6 +10,7 @@ import { useSpendEarliest } from '../../lib/useSpendEarliest'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Fold } from '../Fold'
+import { Cascade } from '../Cascade'
 import { Skeleton } from '../Skeleton'
 import { Slider } from '../Slider'
 
@@ -94,9 +95,9 @@ export function SpendView({
       ) : age === undefined ? (
         <Skeleton count={2} />
       ) : age === null ? (
-        <p className="answer__big answer__big--short">{q.none(money(spend), maxAge)}</p>
+        <p className="answer__big answer__big--short"><Cascade>{q.none(money(spend), maxAge)}</Cascade></p>
       ) : (
-        <p className="answer__big">{rightNow ? q.now(money(spend)) : q.at(money(spend), age)}</p>
+        <p className="answer__big"><Cascade>{rightNow ? q.now(money(spend)) : q.at(money(spend), age)}</Cascade></p>
       )}
       <p className="answer__note">{q.perMonth(money(spend / 12))}</p>
       {!isCurrent && (

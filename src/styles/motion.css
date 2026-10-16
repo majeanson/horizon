@@ -127,6 +127,17 @@ a.welcome__card:active,
   100% { transform: none; }
 }
 
+/* ── The chosen tab's fill glides to the next (components/SubTabs.tsx `.subtabs__thumb`): transform and size on one decoration piece, only after its first paint ─────────── */
+.subtabs__thumb.is-ready {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    width var(--dur-base) var(--ease-out),
+    height var(--dur-base) var(--ease-out);
+}
+.subtabs[data-thumb] > .subtabs__opt.is-on {
+  animation: none;
+}
+
 /* ── The bottom bar / rail: the open tab's pill fills in and its icon bobs up ──────────────────────────────────────────────────────────── */
 .shell__tab > svg {
   transition:
@@ -250,7 +261,6 @@ a.welcome__card:active,
   to { transform: none; }
 }
 .shell__answer-age,
-.verdict__age,
 .refine__meter-count,
 .section-nav__progress {
   display: inline-block;
@@ -265,6 +275,248 @@ a.welcome__card:active,
 }
 .chart__plot {
   animation: plot-reveal var(--dur-slow) var(--ease-out);
+}
+
+/* ── A text box answers the hand: the focus ring grows in, a refused text shakes once, a kept figure rings once, the clear ✕ pops in ──────────────────────── */
+.edit-field__box {
+  transition:
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) ease;
+}
+.edit-field__box:focus-within {
+  box-shadow: 0 0 0 0.3rem color-mix(in srgb, var(--accent) 22%, transparent);
+}
+@keyframes field-shake {
+  0%, 100% { transform: none; }
+  22% { transform: translateX(-0.3rem); }
+  48% { transform: translateX(0.26rem); }
+  72% { transform: translateX(-0.14rem); }
+}
+.edit-field--invalid .edit-field__box {
+  animation: field-shake 320ms var(--ease-out);
+}
+@keyframes field-saved {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 60%, transparent); }
+  to { box-shadow: 0 0 0 0.5rem color-mix(in srgb, var(--success) 0%, transparent); }
+}
+.edit-field--saved .edit-field__box {
+  animation: field-saved 700ms var(--ease-out);
+}
+@keyframes icon-pop {
+  from { transform: scale(0.5); }
+  to { transform: none; }
+}
+.edit-field__icon-btn > svg {
+  animation: icon-pop var(--dur-base) var(--ease-soft);
+}
+
+/* ── The slider's thumb grows a halo under a finger or a key, and the figure it sets settles into place; the switch's knob stretches under a thumb and springs across ──── */
+.slider__input::-webkit-slider-thumb {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+.slider__input::-moz-range-thumb {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+.slider__input:active::-webkit-slider-thumb,
+.slider__input:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 1px var(--ink),
+    0 0 0 0.45rem color-mix(in srgb, var(--accent) 38%, transparent);
+}
+.slider__input:active::-moz-range-thumb,
+.slider__input:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 0 0 1px var(--ink),
+    0 0 0 0.45rem color-mix(in srgb, var(--accent) 38%, transparent);
+}
+.slider__value {
+  display: inline-block;
+  animation: settle-in var(--dur-base) var(--ease-out);
+}
+.switch__knob {
+  transition:
+    transform var(--dur-base) var(--ease-soft),
+    width var(--dur-fast) var(--ease-out);
+}
+.switch:active:not(:disabled) .switch__knob {
+  width: 1.65rem;
+}
+.switch.is-on:active:not(:disabled) .switch__knob {
+  transform: translateX(0.85rem);
+}
+
+/* ── Confirming a figure: the tick DRAWS itself and the mark rings once in sage; when a block's last figure is confirmed its pip and ✓ pop ────────────────────────
+   The tick is drawn only for the tap that confirms (FactToggle swaps in an svg path of length 1 then); a figure that arrives confirmed shows the plain icon. The path's resting
+   state is fully drawn, so a skipped animation (reduced motion) leaves the tick whole. */
+@keyframes tick-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes confirm-ring {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sage-deep) 55%, transparent); }
+  to { box-shadow: 0 0 0 0.55rem color-mix(in srgb, var(--sage-deep) 0%, transparent); }
+}
+@keyframes mark-fill {
+  from { transform: scale(0.7); }
+  to { transform: none; }
+}
+@keyframes check-pop {
+  0% { transform: scale(0.3) rotate(-30deg); }
+  100% { transform: none; }
+}
+@keyframes pip-celebrate {
+  0% { transform: none; box-shadow: 0 0 0 0 color-mix(in srgb, var(--fam-deep) 40%, transparent); }
+  38% { transform: scale(1.2) rotate(-8deg); box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--fam-deep) 22%, transparent); }
+  100% { transform: none; box-shadow: 0 0 0 1rem color-mix(in srgb, var(--fam-deep) 0%, transparent); }
+}
+.fact-btn {
+  transition:
+    background var(--dur-base) ease,
+    border-color var(--dur-base) ease,
+    color var(--dur-base) ease;
+}
+.fact-btn__tick path {
+  stroke-dasharray: 1;
+}
+.fact-btn.is-fresh .fact-btn__tick path {
+  animation: tick-draw 320ms var(--ease-out) 90ms backwards;
+}
+.fact-btn.is-fresh .fact-btn__mark {
+  animation:
+    mark-fill var(--dur-base) var(--ease-soft),
+    confirm-ring 640ms var(--ease-out);
+}
+.accordion__item.is-just-done .accordion__toggle .pip {
+  animation: pip-celebrate 900ms var(--ease-soft);
+}
+.accordion__item.is-just-done .accordion__toggle > svg:first-of-type,
+.section-nav__progress.is-done > svg {
+  animation: check-pop 520ms var(--ease-soft);
+}
+
+/* ── The answer MOVED / ARRIVES ────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   · A ring spreads from the age when it changes to another real age (components/BarAnswer.tsx, AnswerView: `useChangePulse`): sage if earlier, accent if later. Box-shadow only.
+   · A figure's digits rise into place one after another (components/Cascade.tsx): the text is whole from the first frame; each digit is only moved.
+   · The very first answer this device sees: the results map's pips pop in a wave (SectionNav `celebrate`), once. */
+@keyframes answer-ring {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pulse) 70%, transparent); }
+  to { box-shadow: 0 0 0 0.7rem color-mix(in srgb, var(--pulse) 0%, transparent); }
+}
+.answer-pulse {
+  --pulse: var(--accent);
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: answer-ring 900ms var(--ease-out);
+}
+.answer-pulse[data-dir='earlier'] {
+  --pulse: var(--sage-deep);
+}
+.shell__answer-link {
+  position: relative;
+}
+.verdict__age-wrap {
+  position: relative;
+  display: inline-block;
+}
+.verdict__age-wrap > .answer-pulse {
+  inset: -0.05em -0.18em;
+  border-radius: 0.28em;
+}
+@keyframes digit-rise {
+  from { transform: translateY(0.55em); }
+  to { transform: none; }
+}
+.cascade__n {
+  white-space: nowrap;
+}
+.cascade__d {
+  display: inline-block;
+  animation: digit-rise var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: calc(60ms + var(--i, 0) * 55ms);
+}
+@keyframes pip-wave {
+  0% { transform: scale(0.45) rotate(-14deg); }
+  55% { transform: scale(1.3) rotate(-8deg); box-shadow: 0 0 0 0.35rem color-mix(in srgb, var(--fam-deep) 24%, transparent); }
+  100% { transform: none; box-shadow: 0 0 0 0.7rem color-mix(in srgb, var(--fam-deep) 0%, transparent); }
+}
+.section-nav.is-celebrating .chip .pip {
+  animation: pip-wave 760ms var(--ease-soft) backwards;
+}
+.section-nav.is-celebrating .chip:nth-of-type(1) .pip {
+  animation-delay: 230ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(2) .pip {
+  animation-delay: 340ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(3) .pip {
+  animation-delay: 450ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(4) .pip {
+  animation-delay: 560ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(5) .pip {
+  animation-delay: 670ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(6) .pip {
+  animation-delay: 780ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(7) .pip {
+  animation-delay: 890ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(8) .pip {
+  animation-delay: 1000ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(9) .pip {
+  animation-delay: 1110ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(10) .pip {
+  animation-delay: 1220ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(11) .pip {
+  animation-delay: 1330ms;
+}
+.section-nav.is-celebrating .chip:nth-of-type(12) .pip {
+  animation-delay: 1440ms;
+}
+
+/* ── Where you are on a long page: a thin line along the very top of the screen fills as the page is read ───────────────────────────────────────
+   Driven by the page's own scroll (#root is the one scroller: it names its timeline, the line — a fixed pseudo-element of the shell — reads it), so there is no script and no
+   listener. It stays on screen when the bars slide away. A browser without scroll-driven animations simply has no line; a page that does not scroll has no range, so none either. */
+@supports (animation-timeline: scroll()) {
+  #root {
+    scroll-timeline: --page block;
+  }
+  @keyframes page-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  .shell::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    z-index: 40;
+    background: linear-gradient(90deg, var(--accent), var(--marigold-deep, var(--accent)));
+    transform-origin: left center;
+    transform: scaleX(0);
+    animation: page-progress linear both;
+    animation-timeline: --page;
+    pointer-events: none;
+  }
+  :dir(rtl) .shell::before {
+    transform-origin: right center;
+  }
+}
+
+/* An empty page's glyph pops in like a pip. */
+.empty-state__mark {
+  animation: pip-pop var(--dur-slow) var(--ease-soft) backwards;
 }
 
 /* ── Reduced motion: none of the above ─────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -293,13 +545,30 @@ a.welcome__card:active,
   .verdict__age,
   .refine__meter-count,
   .section-nav__progress,
-  .chart__plot {
+  .chart__plot,
+  .slider__value,
+  .empty-state__mark,
+  .answer-pulse,
+  .cascade__d,
+  .section-nav.is-celebrating .chip .pip,
+  .fact-btn__tick path,
+  .fact-btn.is-fresh .fact-btn__mark,
+  .accordion__item.is-just-done .accordion__toggle .pip,
+  .accordion__item.is-just-done .accordion__toggle > svg:first-of-type,
+  .section-nav__progress.is-done > svg,
+  .edit-field--invalid .edit-field__box,
+  .edit-field--saved .edit-field__box,
+  .edit-field__icon-btn > svg {
     animation: none;
   }
   .toast {
     animation: none;
   }
   .pip,
+  .subtabs__thumb.is-ready,
+  .fact-btn,
+  .edit-field__box,
+  .switch__knob,
   .chip,
   .subtabs__opt,
   .btn,
@@ -308,6 +577,13 @@ a.welcome__card:active,
   .refine__meter-fill,
   a.welcome__card,
   .welcome__door {
+    transition: none;
+  }
+  /* A vendor pseudo-element in a list would void the whole rule in the other engine: one rule each. */
+  .slider__input::-webkit-slider-thumb {
+    transition: none;
+  }
+  .slider__input::-moz-range-thumb {
     transition: none;
   }
   a.welcome__card:hover,

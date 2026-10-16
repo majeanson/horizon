@@ -19,6 +19,7 @@ import {
   GLOSSARY_TERM_CONCEPT,
 } from '../lib/concepts'
 import { PageHead } from '../components/PageHead'
+import { PinStack } from '../components/PinStack'
 import { SectionNav } from '../components/SectionNav'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
@@ -64,7 +65,9 @@ export function Glossaire() {
     <section className="page-body">
       <PageHead title={g.title} subtitle={g.subtitle} />
       <p className="glossary__intro">{g.intro}</p>
-      <SectionNav ariaLabel={g.nav} links={links} />
+      <PinStack>
+        <SectionNav ariaLabel={g.nav} links={links} />
+      </PinStack>
       <Section title={g.legend.title} subtitle={g.legend.intro}>
         <ul className="pip-legend">
           {FAMILIES.map((family) => (

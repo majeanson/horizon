@@ -14,6 +14,7 @@ import { useNotice } from '../lib/toast'
 import { today } from '../lib/today'
 import { useAnswer } from '../lib/useAnswer'
 import { WELCOME_COPY } from '../lib/welcomeCopy'
+import { Cascade } from './Cascade'
 import { Chip } from './Chip'
 import { Cluster } from './Layout'
 import { Skeleton } from './Skeleton'
@@ -82,7 +83,7 @@ export function DemoAnswer() {
                 <span className="verdict__lead">{before}</span>
                 <span className="verdict__big">
                   <strong key={got!.headline.age} className="verdict__age">
-                    {rc.headline.ageText(got!.headline.age!)}
+                    <Cascade>{rc.headline.ageText(got!.headline.age!)}</Cascade>
                   </strong>
                   {after}
                 </span>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLang } from '../i18n'
 import { GUIDE_COPY } from '../lib/guideCopy'
 import { toggleFact } from '../lib/profileEdit'
@@ -13,17 +14,29 @@ export default function FactToggle({ id, label, line = false }: { id: string; la
   const { lang } = useLang()
   const c = GUIDE_COPY[lang]
   const confirmed = useProfile().confirmed.includes(id)
+  // A tap that CONFIRMS draws the tick on (styles/motion.css); a figure that arrives already confirmed just shows it. Reset by the next tap, never by a timer.
+  const [fresh, setFresh] = useState(false)
   const button = (
     <button
       type="button"
-      className={'fact-btn' + (confirmed ? ' is-on' : '')}
+      className={'fact-btn' + (confirmed ? ' is-on' : '') + (confirmed && fresh ? ' is-fresh' : '')}
       aria-pressed={confirmed}
       aria-label={confirmed ? c.fact.confirmed(label) : c.fact.estimated(label)}
       title={confirmed ? c.fact.confirmedShort : c.fact.estimatedShort}
-      onClick={() => updateProfile((p) => toggleFact(p, id))}
+      onClick={() => {
+        setFresh(!confirmed)
+        updateProfile((p) => toggleFact(p, id))
+      }}
     >
       <span className="fact-btn__mark" aria-hidden="true">
-        {confirmed && <Icon name="check-bold" size={12} />}
+        {confirmed &&
+          (fresh ? (
+            <svg className="fact-btn__tick" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+              <path d="M2 6.4 4.9 9.2 10 3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" pathLength="1" />
+            </svg>
+          ) : (
+            <Icon name="check-bold" size={12} />
+          ))}
       </span>
       <span className="fact-btn__word" aria-hidden="true">
         {confirmed ? c.panel.legendConfirmed : c.panel.legendEstimated}
