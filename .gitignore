@@ -23,3 +23,7 @@ test-results/
 docs/*.25t
 # a profile exported from the app
 horizon-*.json
+
+# Stryker (npm run stryker): scratch copies and its incremental cache
+.stryker-tmp/
+reports/

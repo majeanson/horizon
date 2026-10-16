@@ -35,6 +35,25 @@ describe('the ceilings', () => {
     expect(ceilingOf('bracket1', 2036)).toBeGreaterThan(ceilingOf('bracket1', 2026)) // prices move the line
   })
 
+  // Found by Stryker (npm run stryker -- src/engine/bracketFill.ts): in 2026 Québec's first bracket ends BELOW the federal one, so « the lower of the two » was only ever checked in one direction, and a
+  // line that read the federal top as unbounded passed every test. The figures are made up here, one government lower at a time, so each direction is held.
+  describe('the lower of the two tops, whichever government has it', () => {
+    const P = paramsFor(2026, { inflation: 0.02, wageGrowth: 0.03 })
+    const withTops = (federal: number | null, quebec: number | null) => ({
+      ...P,
+      federal: { ...P.federal, brackets: [{ ...P.federal.brackets[0], upTo: federal }, ...P.federal.brackets.slice(1)] },
+      quebec: { ...P.quebec, brackets: [{ ...P.quebec.brackets[0], upTo: quebec }, ...P.quebec.brackets.slice(1)] },
+    })
+
+    it('the federal top lower: the federal top', () => expect(fillCeiling('bracket1', withTops(40_000, 54_345))).toBe(40_000))
+    it('the Québec top lower: the Québec top', () => expect(fillCeiling('bracket1', withTops(58_523, 45_000))).toBe(45_000))
+    it('the same top: that top', () => expect(fillCeiling('bracket1', withTops(50_000, 50_000))).toBe(50_000))
+    it('one government with no top to its first bracket: the other’s', () => {
+      expect(fillCeiling('bracket1', withTops(null, 54_345))).toBe(54_345)
+      expect(fillCeiling('bracket1', withTops(58_523, null))).toBe(58_523)
+    })
+    it('the OAS line does not look at the brackets at all', () => expect(fillCeiling('oas', withTops(1, 1))).toBe(P.oas.recoveryThreshold))
+  })
 })
 
 describe('a retiree with a big RRSP and no pension yet', () => {

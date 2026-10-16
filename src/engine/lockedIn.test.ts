@@ -143,3 +143,21 @@ describe('the helpers', () => {
     expect(unlocksAt65(70, 0, MGA, RULES)).toBe(false)
   })
 })
+
+// Found by Stryker (npm run stryker -- src/engine/accounts.ts): the tests stood on both sides of the 40 %-of-the-ceiling line but never ON it, so « at most » and « less than » were the same to them. Retraite
+// Québec says a locked part « does not exceed » 40 % of the MGA may be refunded: the line itself unlocks. (The other survivors of that run were equivalent mutants — nonRegWithdraw's early return for
+// « nothing to take » returns the very values the long path computes for it — and are left as they are.)
+describe('the unlock line, exactly', () => {
+  const LINE = RULES.lifUnlockShareOfMga * MGA
+
+  it('a locked part of exactly 40 % of the MGA unlocks; a cent more does not; a cent less does', () => {
+    expect(unlocksAt65(65, LINE, MGA, RULES)).toBe(true)
+    expect(unlocksAt65(65, LINE + 0.01, MGA, RULES)).toBe(false)
+    expect(unlocksAt65(65, LINE - 0.01, MGA, RULES)).toBe(true)
+  })
+
+  it('and only from 65 to the day: 64 never, 65 on the line', () => {
+    expect(unlocksAt65(64, LINE, MGA, RULES)).toBe(false)
+    expect(unlocksAt65(65, LINE, MGA, RULES)).toBe(true)
+  })
+})
