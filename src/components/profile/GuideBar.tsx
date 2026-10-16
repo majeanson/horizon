@@ -1,10 +1,11 @@
 import { Fragment, useEffect } from 'react'
 import { useLang, useT } from '../../i18n'
-import { accuracyOf, factsOf } from '../../lib/facts'
+import { accuracyOf, blockOfFact, factsOf } from '../../lib/facts'
 import { bringIntoView, setGuided } from '../../lib/guide'
 import { GUIDE_COPY } from '../../lib/guideCopy'
 import { setFacts } from '../../lib/profileEdit'
 import { updateProfile, useProfile } from '../../lib/store'
+import { useAccordion } from '../Accordion'
 import { Chip } from '../Chip'
 import { Icon } from '../Icon'
 
@@ -19,6 +20,7 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
   const c = GUIDE_COPY[lang]
   const profile = useProfile()
   const facts = factsOf(profile)
+  const accordion = useAccordion()
   const finished = at >= ids.length
   const fact = finished ? null : (facts.find((f) => f.id === ids[at]) ?? null)
 
@@ -29,7 +31,11 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
       return
     }
     setGuided(fact.id)
+    // The form is an accordion: open the block the figure lives in first (a phone shows one at a time; a finished block folds on a wide screen).
+    const block = blockOfFact(profile, fact.id)
+    if (block !== null) accordion?.reveal(block)
     bringIntoView(fact.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fact?.id])
   useEffect(() => () => setGuided(null), [])
   // A figure that stopped applying while the guide was on it (its account was emptied…) is skipped.

@@ -20,7 +20,7 @@ import { SubTabs } from '../components/SubTabs'
 import { SectionLevel } from '../components/SectionHeader'
 import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
-import { accuracyOf, factsOf } from '../lib/facts'
+import { accuracyOf, blockOfFact } from '../lib/facts'
 import { bringIntoView, setGuided } from '../lib/guide'
 import { GUIDE_COPY } from '../lib/guideCopy'
 import { mapProgress } from '../lib/mapProgress'
@@ -50,14 +50,6 @@ const SituationCard = lazy(() => import('../components/profile/SituationCard'))
 // block is open, except a finished one (every figure confirmed), which folds to its title and « n chiffres confirmés » until tapped; « Suivant » at
 // the foot of each block walks to the next. On a PHONE — twenty screens for a couple — one block is open at a time (the address keeps which, `?bloc=`;
 // « Tout ouvrir » gives the whole form back), and a chip of the map opens the block it names.
-
-/** The block of the form a figure lives in (a deep link from Résultats names a figure, `?fact=`). */
-function blockOfFact(profile: Profile, factId: string): string | null {
-  const f = factsOf(profile).find((x) => x.id === factId)
-  if (!f) return null
-  if (f.owner !== 'household') return `person-${f.owner}`
-  return f.doc === 'home' ? 'maison' : 'budget'
-}
 
 export function Profil() {
   const t = useT()

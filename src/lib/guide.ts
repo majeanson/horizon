@@ -52,7 +52,13 @@ function place(id: string, correcting: boolean): void {
 
 export function bringIntoView(id: string): void {
   for (const t of settling) clearTimeout(t)
-  place(id, false)
+  // The field's block may have JUST been opened (the accordion mounts a block's body on open): wait a few frames for the field to exist before the first scroll.
+  let frames = 0
+  const first = () => {
+    if (document.querySelector(`[data-fact="${id}"]`) === null && ++frames < 40) return void requestAnimationFrame(first)
+    place(id, false)
+  }
+  first()
   // Once the chrome has settled, put the figure back where it belongs — unless the reader has taken the scroll in hand.
   settling = [900, 2200].map((ms) => setTimeout(() => place(id, true), ms))
   const release = () => {

@@ -122,3 +122,11 @@ export function accuracyOf(p: Profile): Accuracy {
   }
   return { confirmed: facts.filter((f) => f.confirmed).length, total: facts.length, byDoc }
 }
+
+/** The block of Profil's form a figure lives in (the accordion's ids: `person-<id>`, `maison`, `budget`) — a deep link and the step-by-step guide open it before they scroll. */
+export function blockOfFact(p: Profile, factId: string): string | null {
+  const f = factsOf(p).find((x) => x.id === factId)
+  if (!f) return null
+  if (f.owner !== 'household') return `person-${f.owner}`
+  return f.doc === 'home' ? 'maison' : 'budget'
+}
