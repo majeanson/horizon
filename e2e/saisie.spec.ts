@@ -180,7 +180,7 @@ for (const [step, label] of [['tax', 'CRA screen'], ['rrq', 'relevé table']] as
     expect(form.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(' ')}`), 'form look').toEqual([])
     await page.getByRole('tab', { name: 'Comme sur le document' }).click()
     await expect(page.locator('.facsimile').first()).toBeVisible()
-    await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
+    await page.evaluate(() => Promise.race([Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))), new Promise((r) => setTimeout(r, 5000))]))
     const doc = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze()
     expect(doc.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(' ')}`), 'facsimile look').toEqual([])
   })

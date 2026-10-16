@@ -236,7 +236,7 @@ test.describe('complexity ratchet', () => {
       // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
       // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).
       await expect(page.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 30_000 })
-      await page.evaluate(() => Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))))
+      await page.evaluate(() => Promise.race([Promise.all(document.getAnimations().map((x) => x.finished.catch(() => undefined))), new Promise((r) => setTimeout(r, 5000))]))
       await page.evaluate(() => document.getElementById('root')?.scrollTo({ top: 0 }))
 
       const measured = await settledCount(page, label)
