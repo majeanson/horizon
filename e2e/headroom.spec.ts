@@ -16,6 +16,9 @@ for (const [name, size, path, pinned] of [
   ['desktop', { width: 1280, height: 800 }, '/resultats', ['.shell__bar', '.results-pin', '.results-page .section-nav']],
   ['desktop', { width: 1280, height: 800 }, '/profil', ['.shell__bar', '.pinned-map .section-nav']],
   ['phone', { width: 390, height: 844 }, '/hypotheses', ['.shell__bar', '.pinned-map .section-nav']],
+  // The Glossaire's map is a plain sticky `.section-nav`: it stayed pinned while everything else rolled up (2026-10-15).
+  ['phone', { width: 390, height: 844 }, '/glossaire', ['.shell__bar', '.section-nav']],
+  ['desktop', { width: 1280, height: 800 }, '/glossaire', ['.shell__bar', '.section-nav']],
 ] as const) {
   test(`${name} ${path}: scrolling down clears every pinned row, scrolling up brings them all back`, async ({ page }) => {
     await page.setViewportSize(size)

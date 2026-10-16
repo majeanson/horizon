@@ -1632,20 +1632,22 @@
 }
 .shell__bar,
 .results-pin,
-.pinned-map .section-nav,
-.results-page .section-nav {
+.section-nav {
   transition: transform 0.22s ease;
 }
+/* EVERY map is carried away — a `.section-nav` is sticky by its own rule, on whatever page renders one (Profil's and Hypothèses' pinned map, Résultats',
+   the Glossaire's: the Glossaire's stayed put because it was not on a list, 2026-10-15). The one that is NOT pinned stays: Résultats' map on a phone is
+   static and scrolls with the page (revamp.css:209) — carried off, it left a hole. */
 .shell[data-away] .shell__bar,
 .shell[data-away] .results-pin,
-.shell[data-away] .pinned-map .section-nav {
+.shell[data-away] .section-nav {
   transform: var(--headroom-away);
   pointer-events: none;
 }
-@media (min-width: 860px) {
+@media (max-width: 859.98px) {
   .shell[data-away] .results-page .section-nav {
-    transform: var(--headroom-away);
-    pointer-events: none;
+    transform: none;
+    pointer-events: auto;
   }
 }
 .shell[data-away] .shell__bar:has(:focus-visible),
@@ -1668,8 +1670,7 @@
 @media (prefers-reduced-motion: reduce) {
   .shell__bar,
   .results-pin,
-  .pinned-map .section-nav,
-  .results-page .section-nav,
+  .section-nav,
   .shell__nav {
     transition: none;
   }
