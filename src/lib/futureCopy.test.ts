@@ -32,7 +32,8 @@ function texts(c: FutureCopy): [string, string][] {
     ['care.refNote', c.care.refNote(2026, '2 242 $')],
     ...Object.entries(c.care.refs).map(([k, v]): [string, string] => [`care.refs.${k}`, v]),
   )
-  for (const [k, v] of Object.entries(c.year)) out.push([`year.${k}`, v])
+  for (const [k, v] of Object.entries(c.year)) if (typeof v === 'string') out.push([`year.${k}`, v])
+  out.push(['year.moreTitle.2', c.year.moreTitle(2)], ['year.moreTitle.4', c.year.moreTitle(4)])
   return out
 }
 
@@ -56,6 +57,14 @@ describe('the « Préparer l’avenir » copy, in both languages', () => {
     expect(en.care.later(en.care.yearsOf(1), 60, 59)).toContain('1 year later')
     expect(fr.care.none(95)).toContain('95')
     expect(fr.care.short(59, '2051')).toContain('2051')
+  })
+
+  it('counts the decisions it points at — a couple with a pension still ahead has four doors, not « deux »', () => {
+    expect(fr.year.moreTitle(1)).toBe('Une décision à regarder')
+    expect(fr.year.moreTitle(2)).toBe('Deux décisions à regarder')
+    expect(fr.year.moreTitle(4)).toBe('Quatre décisions à regarder')
+    expect(en.year.moreTitle(3)).toBe('Three decisions to look at')
+    expect(fr.year.hint).not.toMatch(/deux/)
   })
 })
 

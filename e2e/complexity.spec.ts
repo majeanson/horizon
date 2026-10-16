@@ -41,7 +41,8 @@ const BUDGETS: Record<string, Budget> = {
   'Profil (first visit, onboarding)': { controls: 15, words: 77 },
   // 30 → 21 controls, 261 → 186 words (2026-10-15, the ratchet FALLS): the same reading card, gone from the page.
   // 21 → 19, 186 → 184 (2026-10-15): the top bar, and the answer strip the page carried for a ready profile (its « Voir » link and its range line) is gone with it.
-  'Accueil (with a plan)': { controls: 19, words: 184 },
+  // 19 → 22, 184 → 218 (2026-10-15): not growth — the count now WAITS for the drip question (three buttons, a sentence), which an earlier count read before it landed.
+  'Accueil (with a plan)': { controls: 22, words: 218 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
   // count only once opened): the CRA's January 1 figure less this year's deposits.
@@ -220,6 +221,9 @@ test.describe('complexity ratchet', () => {
       // The answer in the top bar (components/BarAnswer.tsx) is a lazy chunk and a worker's answer: on a route with a plan it lands a moment after the page, and a
       // count taken before it would read one control and four words fewer than a visit sees (it did, once: the same route measured 18 and 19 in two runs).
       if (seed === EXAMPLE) await page.locator('.shell__answer-link').waitFor({ timeout: 30_000 })
+      // The front door's one question (components/DripQuestion.tsx) lands after an IDLE search of every unconfirmed figure: on CI's slower runner it was in the count, locally it
+      // was not (19 here, 22 there, 2026-10-15). A visit sees it; the count waits for it.
+      if (label === 'Accueil (with a plan)') await page.locator('.drip').waitFor({ timeout: 60_000 })
       // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
       // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).
       await expect(page.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 30_000 })

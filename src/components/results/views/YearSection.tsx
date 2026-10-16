@@ -109,6 +109,8 @@ export function YearSection({ m }: { m: ResultsModel }) {
   const rc = RESULTS_COPY[lang]
   const { retiredNow, bestLever: lever, state, goTo } = m
   const isCouple = m.profile.household.persons.length > 1
+  // The doors below, counted as they are drawn: the order and the melting always, the balance for a couple, the pensions while a start is still ahead.
+  const decisions = 2 + (isCouple ? 1 : 0) + (state.pensionsOpen ? 1 : 0)
   return (
     <section id="annee" className="results-section" aria-label={f.year.title}>
       <SectionHeader title={f.year.title} subtitle={f.year.hint} concept="annee" />
@@ -125,7 +127,7 @@ export function YearSection({ m }: { m: ResultsModel }) {
           </div>
         )}
         <div className="verdict__range">
-          <p className="verdict__range-title">{f.year.moreTitle}</p>
+          <p className="verdict__range-title">{f.year.moreTitle(decisions)}</p>
           <OrderNudgeLine m={m} />
           <FillNudgeLine m={m} />
           {isCouple && <BalanceNudgeLine m={m} />}

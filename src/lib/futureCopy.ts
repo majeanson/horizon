@@ -50,7 +50,8 @@ export interface FutureCopy {
     leverTitle: string
     leverNone: string
     leverPending: string
-    moreTitle: string
+    /** « Deux / Trois / Quatre décisions à regarder »: the doors under it are counted live (a couple has one more, a pension still ahead another). */
+    moreTitle: (n: number) => string
     pensions: string
   }
 }
@@ -89,11 +90,11 @@ const FR: FutureCopy = {
   },
   year: {
     title: 'À faire cette année',
-    hint: 'Ce que votre plan désigne, pas des conseils : le changement qui avance le plus l’âge, et les deux décisions qui ont leur propre page.',
+    hint: 'Ce que votre plan désigne, pas des conseils : le changement qui avance le plus l’âge, et les décisions qui ont leur propre page.',
     leverTitle: 'Le changement qui avance le plus',
     leverNone: 'Aucun des changements essayés n’avance l’âge de votre réponse.',
     leverPending: 'Calcul en cours…',
-    moreTitle: 'Deux décisions à regarder',
+    moreTitle: (n) => `${['Une', 'Deux', 'Trois', 'Quatre'][n - 1] ?? String(n)} décision${n > 1 ? 's' : ''} à regarder`,
     pensions: 'Quand commencer la RRQ et la PSV ?',
   },
 }
@@ -132,11 +133,11 @@ const EN: FutureCopy = {
   },
   year: {
     title: 'To do this year',
-    hint: 'What your plan points at, not advice: the change that brings the age forward most, and the two decisions that have their own page.',
+    hint: 'What your plan points at, not advice: the change that brings the age forward most, and the decisions that have their own page.',
     leverTitle: 'The change that brings the age forward most',
     leverNone: 'None of the changes tried brings your answer’s age forward.',
     leverPending: 'Working it out…',
-    moreTitle: 'Two decisions to look at',
+    moreTitle: (n) => `${['One', 'Two', 'Three', 'Four'][n - 1] ?? String(n)} decision${n > 1 ? 's' : ''} to look at`,
     pensions: 'When should I start the QPP and the OAS?',
   },
 }
