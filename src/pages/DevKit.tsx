@@ -360,6 +360,55 @@ function ConfirmSpecimen() {
   )
 }
 
+// Motion (styles/motion.css) is CSS, not a component: this specimen re-mounts a small page so its entrances can be watched again, and lines up the
+// things that move under a hand — a chip, a tab, a button, a switch, a fold, a gauge — with the rule they all follow written beside them.
+function MotionSpecimen() {
+  const [take, setTake] = useState(0)
+  const [on, setOn] = useState(true)
+  const [tab, setTab] = useState<'a' | 'b'>('a')
+  const [sw, setSw] = useState(true)
+  return (
+    <div style={{ display: 'grid', gap: '1rem' }}>
+      <Cluster>
+        <button type="button" className="btn btn--sm" onClick={() => setTake((t) => t + 1)}>
+          Rejouer les entrées
+        </button>
+        <p className="field-row__hint" style={{ margin: 0 }}>
+          Transformations seulement : un texte ne naît jamais transparent, un bouton ou un chiffre se pose sans rebondir, et tout s’éteint sous « réduire les animations ».
+        </p>
+      </Cluster>
+      <div key={take} className="page-body">
+        <div className="surface" style={{ padding: '0.9rem 1.1rem' }}>
+          <SectionHeader concept="rrq" title="Une carte arrive" subtitle="Elle monte en place ; sa pastille éclot dans la teinte de sa famille, et grandit sous la souris." />
+        </div>
+        <Cluster>
+          <Chip selected={on} onClick={() => setOn((x) => !x)} concept="reer">
+            bascule
+          </Chip>
+          <Chip onClick={() => {}} concept="maison">
+            action
+          </Chip>
+          <button type="button" className="btn btn--primary btn--sm">
+            Bouton
+          </button>
+        </Cluster>
+        <SubTabs ariaLabel="Mouvement — onglets" value={tab} onSelect={setTab} options={[{ key: 'a', label: 'Moi', concept: 'personne' }, { key: 'b', label: 'Nous', concept: 'famille' }]} />
+        <Switch checked={sw} onChange={setSw} label="Un interrupteur" />
+        <div className="refine__gauge">
+          <div className="refine__meter">
+            <span className="refine__meter-fill" style={{ width: '62%' }} />
+          </div>
+          <span className="refine__meter-count">5 / 8</span>
+        </div>
+        <ImpactMeter level="typical" tilt="middle" ends={['Très bas', 'Très élevé']} levelLabel="Typique" tiltLabel="Le marqueur se pose sur sa marche" whyTitle="Pourquoi ça compte :" />
+        <Fold summary="Un repli qui s’ouvre">
+          <p className="field-row__hint">Son corps glisse en place au lieu d’apparaître.</p>
+        </Fold>
+      </div>
+    </div>
+  )
+}
+
 function ENTRIES(): Entry[] {
   return [
     {
@@ -405,6 +454,7 @@ function ENTRIES(): Entry[] {
         </Rail>
       ),
     },
+    { cat: 'Fondations', name: 'Mouvement (CSS)', file: 'src/styles/motion.css', kw: 'animation transition mouvement entrée survol pression réduire les animations', render: () => <MotionSpecimen /> },
     { cat: 'Saisie', name: 'EditField', file: 'src/components/EditField.tsx', kw: 'champ texte saisie input', render: () => <EditFieldSpecimen /> },
     { cat: 'Saisie', name: 'Slider', file: 'src/components/Slider.tsx', kw: 'curseur glissière âge plage', render: () => <SliderSpecimen /> },
     { cat: 'Saisie', name: 'NumberField', file: 'src/components/NumberField.tsx', kw: 'nombre montant pourcentage année âge saisie', render: () => <NumberFieldSpecimen /> },

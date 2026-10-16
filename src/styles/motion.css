@@ -1,0 +1,253 @@
+/* Motion — the small movements that make the app feel alive. Last in the cascade, appended only, and purely additive: nothing here changes a size,
+   a colour or a layout, so the guards that read the rest of the stylesheet are unaffected.
+
+   Rules of the house:
+   - TRANSFORM and box-shadow only for entrances. Text never fades from transparent: a contrast check (or a reader) that lands mid-movement still sees
+     full-contrast ink (see « bridge__updating » in horizon.css, which learned this the hard way).
+   - Money tool: things SETTLE (--ease-out). The one overshoot (--ease-soft) is kept for small round things — a concept's pip, a switch — never a button or a number.
+   - Everything is switched off at the bottom for a reader who asked for no motion, and `animation-fill-mode: backwards` means a skipped animation
+     leaves the element exactly where the static stylesheet put it. */
+
+/* ── A page arrives: its blocks rise into place, one after another, in the first half-second only ────────────────────────────────────────── */
+@keyframes rise-in {
+  from { transform: translateY(0.6rem); }
+  to { transform: none; }
+}
+.page-body > * {
+  animation: rise-in var(--dur-slow) var(--ease-out) backwards;
+}
+.page-body > :nth-child(2) { animation-delay: 40ms; }
+.page-body > :nth-child(3) { animation-delay: 80ms; }
+.page-body > :nth-child(4) { animation-delay: 120ms; }
+.page-body > :nth-child(5) { animation-delay: 160ms; }
+.page-body > :nth-child(n + 6) { animation-delay: 200ms; }
+
+/* ── A concept's pip pops in, in its family's hue; a hovered card or chip nudges it ───────────────────────────────────────────────────── */
+@keyframes pip-pop {
+  0% { transform: scale(0.55) rotate(-12deg); }
+  100% { transform: none; }
+}
+.pip {
+  animation: pip-pop var(--dur-slow) var(--ease-soft) backwards;
+  transition:
+    transform var(--dur-base) var(--ease-soft),
+    box-shadow var(--dur-base) ease;
+}
+.profile-section:hover > .section-header .pip,
+.profile-section:hover .section-header__main > .pip,
+.chip:hover .pip,
+.subtabs__opt:hover .pip {
+  transform: scale(1.1) rotate(-6deg);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--fam-deep) 45%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--fam-deep) 14%, transparent);
+}
+
+/* A card of the Glossaire: the family's rule down its edge grows a little when the card is under the pointer. */
+.profile-section.fam-rule {
+  transition: border-inline-start-width var(--dur-fast) var(--ease-out);
+}
+.profile-section.fam-rule:hover {
+  border-inline-start-width: 7px;
+}
+
+/* ── Chips, tabs and buttons: they lift to meet a hand and press back into the page ────────────────────────────────────────────────────── */
+.chip,
+.subtabs__opt {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background var(--dur-base) ease,
+    color var(--dur-base) ease,
+    border-color var(--dur-base) ease,
+    box-shadow var(--dur-fast) ease;
+}
+@media (hover: hover) {
+  .chip:hover:not(:disabled),
+  .subtabs__opt:hover:not(.is-on):not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .btn--primary:hover:not(:disabled) {
+    box-shadow: var(--shadow-lg);
+  }
+}
+.chip:active:not(:disabled),
+.subtabs__opt:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+.btn:active:not(:disabled) {
+  transform: translate(1px, 1px) scale(0.98);
+}
+
+/* The chosen chip says so with a ring of the accent that spreads out and fades — NEVER with a scale: a chip is a 44 px thumb target and a
+   spec measures it the moment the page paints (profile.spec « every control a thumb must hit »); a transform would make it 41 px for a quarter
+   of a second. A chosen tab sits inside a scrolling track that clips a ring, so it brightens for a beat instead. Both leave geometry alone. */
+@keyframes chosen-ring {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  to { box-shadow: 0 0 0 0.6rem color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+@keyframes chosen-lift {
+  from { filter: brightness(1.14); }
+  to { filter: none; }
+}
+.chip.is-on {
+  animation: chosen-ring var(--dur-slow) var(--ease-out);
+}
+.subtabs__opt.is-on {
+  animation: chosen-lift var(--dur-base) ease-out;
+}
+/* The one place a « land » may scale: the impact meter's marker, a decoration (aria-hidden) nobody taps or measures. */
+@keyframes chosen-land {
+  0% { transform: scale(0.94); }
+  60% { transform: scale(1.03); }
+  100% { transform: none; }
+}
+
+/* ── The bottom bar / rail: the open tab's pill fills in and its icon bobs up ──────────────────────────────────────────────────────────── */
+.shell__tab > svg {
+  transition:
+    background var(--dur-base) ease,
+    transform var(--dur-base) var(--ease-soft);
+}
+.shell__tab:active > svg {
+  transform: scale(0.92);
+}
+@keyframes tab-bob {
+  0% { transform: translateY(3px) scale(0.9); }
+  100% { transform: none; }
+}
+.shell__tab.is-on > svg {
+  animation: tab-bob var(--dur-base) var(--ease-soft);
+}
+@media (hover: hover) {
+  .shell__tab:not(.is-on):hover > svg {
+    background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+  }
+}
+
+/* ── A fold opens: its body slides down into place instead of appearing ────────────────────────────────────────────────────────────────── */
+@keyframes fold-open {
+  from { transform: translateY(-0.35rem); }
+  to { transform: none; }
+}
+.fold[open] > .fold__body {
+  animation: fold-open var(--dur-base) var(--ease-out);
+}
+
+/* ── Dialogs: the scrim eases in, the dialog rises out of it ────────────────────────────────────────────────────────────────────────── */
+@keyframes scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes dialog-rise {
+  from { transform: translateY(0.8rem) scale(0.97); }
+  to { transform: none; }
+}
+@keyframes confirm-rise {
+  /* .confirm is centred with a transform of its own — the animation has to carry it. */
+  from { transform: translate(-50%, calc(-50% + 0.8rem)) scale(0.97); }
+  to { transform: translate(-50%, -50%); }
+}
+.kit-modal__backdrop,
+.confirm-backdrop {
+  animation: scrim-in var(--dur-base) ease-out;
+}
+.kit-modal {
+  animation: dialog-rise var(--dur-base) var(--ease-out);
+}
+/* A full-screen dialog (the reading offer, « Combien de temps avez-vous ? ») IS the screen: it does not rise out of anything, and its specs
+   measure it edge to edge the moment it opens. Its scrim still fades. */
+.kit-modal--full {
+  animation: none;
+}
+.confirm {
+  animation: confirm-rise var(--dur-base) var(--ease-out);
+}
+
+/* ── The toast also rises (the opacity fade in horizon.css stays) ──────────────────────────────────────────────────────────────────── */
+@keyframes toast-rise {
+  from { transform: translateY(0.6rem); }
+  to { transform: none; }
+}
+.toast {
+  animation:
+    toast-in var(--dur-base) var(--ease-out),
+    toast-rise var(--dur-base) var(--ease-out);
+}
+
+/* ── Gauges fill rather than jump ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
+@keyframes gauge-grow {
+  from { transform: scaleX(0); }
+  to { transform: none; }
+}
+.refine__meter-fill {
+  transform-origin: left center;
+  animation: gauge-grow var(--dur-slow) var(--ease-out) backwards;
+  transition: width var(--dur-slow) var(--ease-out);
+}
+:dir(rtl) .refine__meter-fill {
+  transform-origin: right center;
+}
+/* The impact meter's ONE marker lands on its step (the other four are the track). */
+.impact__step--on {
+  animation: chosen-land var(--dur-base) var(--ease-out) 120ms backwards;
+}
+
+/* ── The answer: the big figure settles in, then its note ──────────────────────────────────────────────────────────────────────────── */
+.answer__big {
+  animation: rise-in var(--dur-slow) var(--ease-out) 80ms backwards;
+}
+.answer__note,
+.answer__list {
+  animation: rise-in var(--dur-slow) var(--ease-out) 160ms backwards;
+}
+
+/* ── Reduced motion: none of the above ─────────────────────────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .page-body > *,
+  .pip,
+  .chip.is-on,
+  .subtabs__opt.is-on,
+  .shell__tab.is-on > svg,
+  .fold[open] > .fold__body,
+  .kit-modal__backdrop,
+  .confirm-backdrop,
+  .kit-modal,
+  .confirm,
+  .refine__meter-fill,
+  .impact__step--on,
+  .answer__big,
+  .answer__note,
+  .answer__list {
+    animation: none;
+  }
+  .toast {
+    animation: none;
+  }
+  .pip,
+  .chip,
+  .subtabs__opt,
+  .btn,
+  .shell__tab > svg,
+  .profile-section.fam-rule,
+  .refine__meter-fill {
+    transition: none;
+  }
+  /* The same selectors as the hover / press rules above, so they win on order and not lose on specificity. */
+  .chip:hover:not(:disabled),
+  .chip:active:not(:disabled),
+  .subtabs__opt:hover:not(.is-on):not(:disabled),
+  .subtabs__opt:active:not(:disabled),
+  .btn:hover:not(:disabled),
+  .btn:active:not(:disabled),
+  .shell__tab:active > svg,
+  .profile-section:hover .pip,
+  .chip:hover .pip,
+  .subtabs__opt:hover .pip {
+    transform: none;
+  }
+}

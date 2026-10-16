@@ -41,8 +41,8 @@ test('a larger hit area is not a larger look: the link keeps its size', async ({
 test('Résultats on a phone gives the answer the height of its own title: the heading stays for a screen reader and for paper', async ({ page }) => {
   await page.goto('/resultats')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 30_000 })
-  const top = (await page.locator('#verdict').boundingBox())!.y
-  expect(top, 'the answer card starts in the top quarter of the screen').toBeLessThan(844 * 0.27)
+  // Polled, not read once: the card rises into place over the first half-second (styles/motion.css), and at its first frame it sits 0.6 rem lower than it will.
+  await expect.poll(async () => (await page.locator('#verdict').boundingBox())?.y ?? Infinity, { message: 'the answer card starts in the top quarter of the screen' }).toBeLessThan(844 * 0.27)
   // still there for assistive technology
   await expect(page.getByRole('heading', { level: 1, name: 'Résultats' })).toHaveCount(1)
   expect((await page.locator('.results-page > .page-head').boundingBox())!.height).toBeLessThanOrEqual(2)

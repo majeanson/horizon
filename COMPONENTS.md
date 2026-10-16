@@ -48,6 +48,7 @@ Providers live in `src/main.tsx` (Lang → Toast → Confirm → Router → Erro
 | **Icon** · InlineIcon | `src/components/Icon.tsx` | The Phosphor glyphs. `IconName` is derived from the registry (`src/lib/pipIcons.ts`), so a typo is a compile error, not a blank. Add a glyph = one entry there. |
 | **Cluster** | `src/components/Layout.tsx` | A wrap-safe flex row — drops to the next line instead of overflowing. The default for any row of buttons or chips. Never a hand-rolled `display:flex`. |
 | **Rail** | `src/components/Layout.tsx` | A one-line row that scrolls sideways (wheel-mapped via `useHScroll`, focusable only while it overflows). For sequences that must stay inline. |
+| **Mouvement** | `src/styles/motion.css` | The app's motion, in CSS alone and last in the cascade: entrances (a page's blocks rise in turn, a concept's pip pops in its family's hue, a dialog rises out of its scrim, a gauge fills), hovers and presses (chips, tabs and buttons lift and settle; a pip grows under the hand), a fold's body sliding in. Transform-only — text never fades in from transparent, so a contrast check mid-movement still sees ink; buttons and figures settle without a bounce (`--ease-out`), only small round things overshoot (`--ease-soft`); the whole layer is off under `prefers-reduced-motion`. Uses the `--dur-*` / `--ease-*` tokens of `core.css`; never a duration retyped. |
 
 ### Inputs
 

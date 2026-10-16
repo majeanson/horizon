@@ -20,5 +20,7 @@
 @import './styles/phone.css';
 /* Concept pips: a concept's glyph in its family's hue (components/ConceptPip.tsx). Last, so a family's tokens win. */
 @import './styles/pips.css';
+/* Motion: entrances, hovers and presses — transform-only, off under prefers-reduced-motion. Last, so it layers on everything above. */
+@import './styles/motion.css';
 /* The dev-only component gallery (/dev/kit) is NOT imported here: pages/DevKit.tsx imports
    its own stylesheet as a side effect, so the shell never pays for it. */
