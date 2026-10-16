@@ -19,8 +19,10 @@ export function TourBar({ m }: { m: ResultsModel }) {
   }, [tour])
 
   return (
-    <div className="tour-bar" role="region" aria-label={c.label}>
-      <p className="tour-bar__text" aria-live="polite">
+    // `--p` is how far along the tour is (0 → 1): a thin meter along the bar's top edge, decoration beside the words « 2 / 3 ».
+    <div className="tour-bar" role="region" aria-label={c.label} style={{ ['--p' as string]: tour / TOUR_STEPS }}>
+      {/* Keyed on the step: its sentence settles into place (styles/motion.css) instead of swapping in place. */}
+      <p key={tour} className="tour-bar__text" aria-live="polite">
         {sentence(m)}
       </p>
       <div className="tour-bar__actions">

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { Fragment, useEffect } from 'react'
 import { useLang, useT } from '../../i18n'
 import { accuracyOf, factsOf } from '../../lib/facts'
 import { bringIntoView, setGuided } from '../../lib/guide'
@@ -48,7 +48,8 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
   const acc = accuracyOf(profile)
 
   return (
-    <aside className="guide-bar" role="region" aria-label={c.guide.label} aria-live="polite">
+    // `--p` is how far along the figures the guide is (0 → 1): a thin meter along the card's top edge (styles/revamp.css), decoration beside the words « 3 / 19 ».
+    <aside className="guide-bar" role="region" aria-label={c.guide.label} aria-live="polite" style={{ ['--p' as string]: finished ? 1 : at / Math.max(1, ids.length) }}>
       {finished || fact === null ? (
         <>
           <p className="guide-bar__title">{c.guide.finished}</p>
@@ -58,7 +59,8 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
           </div>
         </>
       ) : (
-        <>
+        // Keyed on the figure: each step's words settle into place (styles/motion.css) instead of swapping under the reader's eye.
+        <Fragment key={fact.id}>
           {/* One line says where the guide is and lets it be closed; the figure's name is the heading; the paper and where to read the figure on it are ONE paragraph. The card is a strip at the foot of the screen,
               not a page: the figure it is asking about stays in view above it (lib/guide.ts). */}
           <div className="guide-bar__head">
@@ -101,7 +103,7 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
             </Chip>
             <Chip onClick={() => setAt(at + 1)}>{fact.confirmed ? c.guide.next : c.guide.skip}</Chip>
           </div>
-        </>
+        </Fragment>
       )}
     </aside>
   )

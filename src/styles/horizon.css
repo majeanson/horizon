@@ -905,8 +905,10 @@
   width: 100%;
 }
 .chart-tip {
-  padding: 0.5rem 0.7rem;
+  min-width: 11rem;
+  padding: 0.5rem 0.7rem 0.55rem;
   border: 1px solid var(--line-strong);
+  border-inline-start: 4px solid var(--accent);
   border-radius: var(--radius-md);
   background: var(--card);
   color: var(--ink);
@@ -919,11 +921,21 @@
   font-size: var(--text-xs);
   color: var(--ink-soft);
 }
+/* A row reads as a small table: the series' dot, its name, and its figure pushed to the right edge so the figures line up under one another. */
 .chart-tip__row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 0.4rem;
   margin: 0;
+}
+.chart-tip__row > strong {
+  justify-self: end;
+  padding-inline-start: 0.6rem;
+  font-variant-numeric: tabular-nums;
+}
+.chart-tip__row + .chart-tip__row {
+  margin-top: 0.15rem;
 }
 
 /* ── The sensitivity grids ───────────────────────────────────────────────── */

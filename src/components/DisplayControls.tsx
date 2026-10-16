@@ -80,7 +80,8 @@ export function DisplayControls({ sizeLabels }: { sizeLabels?: Record<TextScale,
             setScaleShown(s)
             scrollBackUp(sizeRow.current)
           }}
-          options={TEXT_SCALES.map((s) => ({ key: s, label: (sizeLabels ?? d.textSizes)[s] }))}
+          // Each size is written at (about) its own size: the row is a ramp the eye reads before the words (the label stays the plain word).
+          options={TEXT_SCALES.map((s) => ({ key: s, label: <span className={'size-sample size-sample--' + s}>{(sizeLabels ?? d.textSizes)[s]}</span> }))}
         />
       </div>
     </>

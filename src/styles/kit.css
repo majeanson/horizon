@@ -521,3 +521,20 @@
 .accordion__head > .accordion__summary {
   padding-left: calc(2rem + 0.45rem);
 }
+
+/* The two destructive sections of the settings page wear a clay rule down their edge, the way the Glossaire's families wear their hue: the destructive part of a page is seen before it is read.
+   The words (« Effacer… », « Recommencer ») and the confirm dialog stay the real warning; the colour is the second cue. */
+.profile-section.section--danger {
+  border-inline-start: 5px solid var(--warn);
+}
+
+/* The text-size row is a ramp: each size is set at about its own size. */
+.size-sample--normal {
+  font-size: 0.92em;
+}
+.size-sample--large {
+  font-size: 1.04em;
+}
+.size-sample--x-large {
+  font-size: 1.18em;
+}

@@ -498,6 +498,20 @@
     bottom: 1.25rem;
   }
 }
+/* The progress meter: a thin line along the card's top edge that fills as the figures are walked (--p, set by the component). It grows with a transform, so it costs no layout. */
+.guide-bar::before,
+.tour-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--marigold-deep);
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+  transition: transform var(--dur-slow) var(--ease-out);
+  pointer-events: none;
+}
 .guide-bar__head {
   display: flex;
   align-items: center;

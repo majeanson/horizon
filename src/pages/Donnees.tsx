@@ -191,7 +191,7 @@ export function Donnees() {
 
       <InstallLine />
 
-      <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold">
+      <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold" className="section--danger">
         <Cluster>
           <button
             type="button"
@@ -209,7 +209,7 @@ export function Donnees() {
         </Cluster>
       </Section>
       {/* No icon: the core set (lib/pipIcons.ts, in the shell) has no « again » glyph and the eager entry is at its cap; the words carry it. */}
-      <Section title={fc.title} subtitle={fc.hint}>
+      <Section title={fc.title} subtitle={fc.hint} className="section--danger">
         <Cluster>
           <button type="button" className="btn btn--danger" onClick={() => void restart()}>
             {fc.button}

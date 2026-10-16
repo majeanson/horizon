@@ -20,9 +20,10 @@ export interface PersonEditor {
 // `concept` puts the idea's pip before the title; `family` also draws the family's hue as a rule down the card's edge (the Glossaire's groups).
 // The card is drawn by components/Accordion.tsx `AccordionItem`: on a page that reads its blocks one at a time (an `Accordion` around them, this
 // section's `id` among its blocks) the same card closes to its title and opens on a tap; anywhere else it is the plain card it always was.
-export function Section({ id, title, subtitle, details, icon, concept, family, children }: { id?: string; title: string; subtitle?: ReactNode; details?: ReactNode; icon?: IconName; concept?: ConceptId; family?: Family; children: ReactNode }) {
+// `className` is for a modifier of the card (the settings page's destructive sections: `section--danger`), never for layout.
+export function Section({ id, title, subtitle, details, icon, concept, family, className, children }: { id?: string; title: string; subtitle?: ReactNode; details?: ReactNode; icon?: IconName; concept?: ConceptId; family?: Family; className?: string; children: ReactNode }) {
   return (
-    <AccordionItem id={id ?? ''} title={title} subtitle={subtitle} details={details} icon={icon} concept={concept} family={family}>
+    <AccordionItem id={id ?? ''} title={title} subtitle={subtitle} details={details} icon={icon} concept={concept} family={family} className={className}>
       {children}
     </AccordionItem>
   )

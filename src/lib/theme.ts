@@ -29,7 +29,19 @@ function syncBrowserChrome(): void {
   }
 }
 
+// A change made by the reader fades the colours across the page for a third of a second (styles/motion.css « data-theme-fade ») instead of snapping: the stamp is on <html> only
+// for that long, and never for a reader who asked for no motion. The first paint (public/theme-bootstrap.js) never fades.
+let fadeTimer: ReturnType<typeof setTimeout> | undefined
+function fadeColours(): void {
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const root = document.documentElement
+  root.setAttribute('data-theme-fade', '')
+  clearTimeout(fadeTimer)
+  fadeTimer = setTimeout(() => root.removeAttribute('data-theme-fade'), 420)
+}
+
 export function setTheme(theme: Theme): void {
+  if (theme !== getTheme()) fadeColours()
   document.documentElement.setAttribute('data-theme', theme)
   syncBrowserChrome()
   try {

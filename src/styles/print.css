@@ -251,3 +251,39 @@
     display: none !important;
   }
 }
+
+/* A page of a plan carries its number (« 2 / 2 ») and the name, small, in the foot margin — a sheet pulled from a stack still says whose it is and which of how many. The margin boxes are
+   the browser's (Chromium 131+); one that does not draw them prints the same page without. Headings never end a page alone, and a paragraph never leaves one or two lines behind. */
+@page {
+  @bottom-left {
+    content: 'Horizon';
+    font-size: 8pt;
+    color: #555555;
+  }
+  @bottom-right {
+    content: counter(page) ' / ' counter(pages);
+    font-size: 8pt;
+    color: #555555;
+  }
+}
+@media print {
+  h1,
+  h2,
+  h3,
+  .print-plan__title,
+  .verdict__range-title {
+    break-after: avoid;
+  }
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+/* The solidity block's heading carries the app's big pip (an anchor in a disc): on paper its title should read like the plan's other titles, small caps and no picture. */
+@media print {
+  .print-plan .firm .section-header .pip {
+    display: none;
+  }
+}

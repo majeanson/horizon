@@ -231,3 +231,73 @@ test.describe('a figure that counts up', () => {
     })
   })
 })
+
+test.describe('the settings and the docked cards', () => {
+  test('a day / night change fades the colours for a moment and then the stamp is gone; with reduced motion it is only a change', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/donnees')
+    await page.locator('.page-head__title').waitFor()
+    await page.getByRole('tab', { name: /Nuit/ }).first().click()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
+    await expect(page.locator('html')).toHaveAttribute('data-theme-fade', '')
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme-fade', '', { timeout: 3000 })
+  })
+
+  test.describe('reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' })
+    test('a day / night change is only a change', async ({ page }) => {
+      await seedProfile(page, EXAMPLE)
+      await page.goto('/donnees')
+      await page.locator('.page-head__title').waitFor()
+      await page.getByRole('tab', { name: /Nuit/ }).first().click()
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
+      expect(await page.locator('html').getAttribute('data-theme-fade')).toBeNull()
+    })
+  })
+
+  test('the two destructive sections wear the clay rule; the text sizes are set at their own sizes, smallest to largest', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/donnees')
+    await page.locator('.page-head__title').waitFor()
+    await expect(page.locator('.profile-section.section--danger')).toHaveCount(2)
+    const sizes = await page.locator('.size-sample').evaluateAll((els) => els.map((e) => parseFloat(getComputedStyle(e).fontSize)))
+    expect(sizes).toHaveLength(3)
+    expect(sizes[0]).toBeLessThan(sizes[1])
+    expect(sizes[1]).toBeLessThan(sizes[2])
+  })
+
+  test('the tour bar and the guide card dock with a meter along their top edge that follows the step', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/resultats?visite=2')
+    const tour = page.locator('.tour-bar')
+    await expect(tour).toBeVisible({ timeout: 60_000 })
+    const meter = () => tour.evaluate((el) => Number(el.style.getPropertyValue('--p')))
+    const before = await meter()
+    expect(before).toBeGreaterThan(0)
+    expect(before).toBeLessThan(1)
+    await tour.getByRole('button', { name: 'Suivant' }).click()
+    await expect.poll(meter, { message: 'the meter moved on with the step' }).toBeGreaterThan(before)
+    await page.goto('/profil?form=1&par=document&etape=bank')
+    await page.getByRole('button', { name: 'Me guider' }).click()
+    const guide = page.locator('.guide-bar')
+    await expect(guide).toBeVisible()
+    expect(await guide.evaluate((el) => el.style.getPropertyValue('--p'))).toBe('0')
+  })
+
+  test('the chart tooltip is a small table: one row per series, its figure on the right', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/resultats')
+    const plot = page.locator('.chart-panel .chart__plot')
+    await plot.locator('.recharts-surface').waitFor()
+    await plot.scrollIntoViewIfNeeded()
+    const box = (await plot.boundingBox())!
+    await page.mouse.move(box.x + 100, box.y + 100)
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5, { steps: 8 })
+    const row = page.locator('.chart-tip__row').first()
+    await expect(row).toBeVisible()
+    const [label, figure] = await Promise.all([row.boundingBox(), row.locator('strong').boundingBox()])
+    expect(figure!.x + figure!.width, 'the figure sits at the row’s right edge').toBeGreaterThan(label!.x + label!.width - 14)
+  })
+})

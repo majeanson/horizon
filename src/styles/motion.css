@@ -570,6 +570,46 @@ textarea.input:focus {
   animation: box-tick var(--dur-base) var(--ease-soft);
 }
 
+/* ── The docked cards (the profile's guide, the results' tour) grow into place from their foot; each step's words settle in; the meter along their top edge fills ──────────────────────────
+   Both are centred with a transform of their own (translateX(-50%)), so the animation has to carry it. They scale about their BOTTOM edge, never move it: a spec (and a reader) measures
+   « above the tab bar » the moment the card appears, and a card that rises from below the line is, for a quarter of a second, below it. */
+@keyframes dock-rise {
+  from { transform: translate(-50%, 0) scale(0.93); }
+  to { transform: translate(-50%, 0) scale(1); }
+}
+.guide-bar,
+.tour-bar {
+  transform-origin: 50% 100%;
+  animation: dock-rise var(--dur-slow) var(--ease-out) backwards;
+}
+.guide-bar__title,
+.guide-bar__where,
+.tour-bar__text {
+  animation: settle-in var(--dur-base) var(--ease-out);
+}
+
+/* ── A day / night change fades the colours across the page instead of snapping (lib/theme.ts puts `data-theme-fade` on <html> for a third of a second) ─────────────────────── */
+[data-theme-fade] *,
+[data-theme-fade] *::before,
+[data-theme-fade] *::after {
+  transition:
+    background-color 0.32s ease,
+    color 0.32s ease,
+    border-color 0.32s ease,
+    fill 0.32s ease,
+    stroke 0.32s ease,
+    box-shadow 0.32s ease !important;
+}
+
+/* ── A chart's tooltip pops in under the pointer ───────────────────────────────────────────────────────────────────────────────────────────────── */
+@keyframes tip-pop {
+  from { transform: translateY(0.3rem) scale(0.96); }
+  to { transform: none; }
+}
+.chart-tip {
+  animation: tip-pop var(--dur-fast) var(--ease-out);
+}
+
 /* ── Reduced motion: none of the above ─────────────────────────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .page-body > *,
@@ -597,6 +637,12 @@ textarea.input:focus {
   .refine__meter-count,
   .section-nav__progress,
   .chart__plot,
+  .guide-bar,
+  .tour-bar,
+  .guide-bar__title,
+  .guide-bar__where,
+  .tour-bar__text,
+  .chart-tip,
   .slider__value,
   .empty-state__mark,
   .answer-pulse,
@@ -617,6 +663,8 @@ textarea.input:focus {
   .toast {
     animation: none;
   }
+  .guide-bar::before,
+  .tour-bar::before,
   .pip,
   textarea.input,
   .subtabs__thumb.is-ready,
