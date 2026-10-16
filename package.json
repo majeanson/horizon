@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:engine": "vitest run src/engine",
-    "test:fast": "vitest run --exclude \"**/node_modules/**\" --exclude \"**/{answer.props,answerTrust,orderNudge,presetEffects,savingsNeeded,sheetCopy}.test.ts\"",
+    "test:fast": "vitest run --exclude \"**/node_modules/**\" --exclude \"**/{answer.props,answerTrust,orderNudge,presetEffects,savingsNeeded,sheetCopy,probes}.test.ts\"",
     "e2e": "playwright test",
     "e2e:ci": "playwright test --workers=1 --retries=0 --forbid-only",
     "e2e:slow": "playwright test -c playwright.slow.config.ts",
