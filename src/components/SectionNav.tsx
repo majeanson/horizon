@@ -25,7 +25,16 @@ export interface SectionLink {
   arc?: string
 }
 
-export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]; ariaLabel: string }) {
+export function SectionNav({
+  links,
+  ariaLabel,
+  onPick,
+}: {
+  links: readonly SectionLink[]
+  ariaLabel: string
+  /** Called with the section's id BEFORE the scroll: a page whose blocks open one at a time (an accordion) opens the one the chip names, so the landing finds it open. */
+  onPick?: (id: string) => void
+}) {
   const [inView, setInView] = useState<string | null>(null)
   const ids = links.map((l) => l.id).join('|')
   const nav = useRef<HTMLElement>(null)
@@ -68,7 +77,14 @@ export function SectionNav({ links, ariaLabel }: { links: readonly SectionLink[]
               // Plain text, NOT aria-hidden: the grouping is wayfinding for a screen-reader user too.
               <span className="section-nav__arc mono">{l.arc}</span>
             )}
-            <Chip current={inView === l.id} concept={l.concept} onClick={() => scrollToSection(l.id)}>
+            <Chip
+              current={inView === l.id}
+              concept={l.concept}
+              onClick={() => {
+                onPick?.(l.id)
+                scrollToSection(l.id)
+              }}
+            >
               {l.label}
               {l.progress && l.progress.total > 0 && (
                 // Keyed on the count: it settles anew (styles/motion.css) when a figure is confirmed, and the ✓ lands once the block is complete.
