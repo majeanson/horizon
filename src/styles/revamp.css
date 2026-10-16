@@ -1620,20 +1620,33 @@
 }
 
 /* ── Headroom: everything pinned at the top slides away while the reader scrolls down, and returns on the first move up ───────────────────────────────────────────────────────── */
-/* lib/useHeadroom.ts puts `data-away` on the shell. The elements stay where they are in the flow (a sticky box keeps its place), so nothing below moves; they are carried up by their own
-   height plus the largest offset anything is pinned at (the three stacked rows), out of the window. A KEY focusing something inside one brings it back, so the keyboard can still reach it:
-   `:has(:focus-visible)`, not `:focus-within` — a mouse click or a tap on a tab or a chip leaves the focus on it too, and that used to pin the row for good (the reader clicked a view, scrolled
-   down, and the tabs stayed). */
+/* lib/useHeadroom.ts puts `data-away` on the shell. The elements stay where they are in the flow (a sticky box keeps its place), so nothing below moves; they are carried up out of the
+   window AS ONE BLOCK: every pinned row travels the SAME distance (the bar's height plus room for the two rows that can stack under it at the largest text size), so the rows keep their
+   places against each other on the way out and back — a block rolling up under the top edge. Each used to travel its own height plus twelve rem, so a short row fell behind a tall one
+   half-way, and the rule reached every `.section-nav`, including Résultats' map on a phone, which is NOT pinned there (it scrolls with the page): it was carried off too, leaving a hole
+   in the page, and crossed the views row on its way back (IMG_6800, 2026-10-15). Only what is actually pinned moves. A KEY focusing something inside one brings it back, so the keyboard
+   can still reach it: `:has(:focus-visible)`, not `:focus-within` — a mouse click or a tap on a tab or a chip leaves the focus on it too, and that used to pin the row for good (the
+   reader clicked a view, scrolled down, and the tabs stayed). */
+:root {
+  --headroom-away: translateY(calc(-1 * var(--bar-h) - 14rem));
+}
 .shell__bar,
 .results-pin,
-.section-nav {
+.pinned-map .section-nav,
+.results-page .section-nav {
   transition: transform 0.22s ease;
 }
 .shell[data-away] .shell__bar,
 .shell[data-away] .results-pin,
-.shell[data-away] .section-nav {
-  transform: translateY(calc(-100% - 12rem));
+.shell[data-away] .pinned-map .section-nav {
+  transform: var(--headroom-away);
   pointer-events: none;
+}
+@media (min-width: 860px) {
+  .shell[data-away] .results-page .section-nav {
+    transform: var(--headroom-away);
+    pointer-events: none;
+  }
 }
 .shell[data-away] .shell__bar:has(:focus-visible),
 .shell[data-away] .results-pin:has(:focus-visible),
@@ -1655,7 +1668,8 @@
 @media (prefers-reduced-motion: reduce) {
   .shell__bar,
   .results-pin,
-  .section-nav,
+  .pinned-map .section-nav,
+  .results-page .section-nav,
   .shell__nav {
     transition: none;
   }
