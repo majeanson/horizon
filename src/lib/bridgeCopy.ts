@@ -173,8 +173,8 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     extraDrawn: (amount) => `${amount} de plus tirés du nid entre 60 et 69 ans que le standard`,
     lessDrawn: (amount) => `${amount} de moins tirés du nid entre 60 et 69 ans que le standard`,
     sameDrawn: 'Autant tiré du nid entre 60 et 69 ans que le standard',
-    breakEvenLater: (age) => `Les rentes cumulées rattrapent le standard à ${age} ans`,
-    breakEvenEarlier: (age) => `Attendre 65 ans rattrape cette façon à ${age} ans`,
+    breakEvenLater: (age) => `Les rentes totales dépassent le standard à ${age} ans`,
+    breakEvenEarlier: (age) => `Celles du standard dépassent celles-ci à ${age} ans`,
     breakEvenNone: 'Pas de point d’équilibre avant la fin du plan',
     breakEvenSelf: 'La référence des comparaisons',
     // « L’horizon » is the verdict's own word for the plan's last year (the youngest person's 95): the age printed here is
@@ -313,8 +313,8 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     extraDrawn: (amount) => `${amount} more drawn from the nest egg at 60 to 69 than the standard`,
     lessDrawn: (amount) => `${amount} less drawn from the nest egg at 60 to 69 than the standard`,
     sameDrawn: 'As much drawn from the nest egg at 60 to 69 as the standard',
-    breakEvenLater: (age) => `Cumulative pensions catch up with the standard at ${age}`,
-    breakEvenEarlier: (age) => `Waiting until 65 catches up with this at ${age}`,
+    breakEvenLater: (age) => `Total pensions pass the standard’s at ${age}`,
+    breakEvenEarlier: (age) => `The standard’s total pensions pass this one’s at ${age}`,
     breakEvenNone: 'No break-even before the end of the plan',
     breakEvenSelf: 'The reference for the comparisons',
     verdict: (v, who = null) =>

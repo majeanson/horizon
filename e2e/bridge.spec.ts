@@ -101,7 +101,7 @@ test('a deferral digs into the nest first: the nest at 70 is lower than starting
   await openDetails(page)
   await expect(max.getByText(/de plus tirés du nid entre 60 et 69 ans que le standard/)).toBeVisible()
   await expect(std.getByText('La référence des comparaisons')).toBeVisible()
-  await expect(max.getByText(/rattrapent le standard à \d\d ans/)).toBeVisible()
+  await expect(max.getByText(/dépassent le standard à \d\d ans/)).toBeVisible()
 })
 
 test('a couple has one tab per person, each with their own ages from the profile', async ({ page }) => {

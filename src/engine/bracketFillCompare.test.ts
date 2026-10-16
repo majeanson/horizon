@@ -97,6 +97,42 @@ describe('a young couple who plan to stop at 60', () => {
   })
 })
 
+// PENSION SPLITTING MUST NOT HALVE THE FILL. The fill once read a person's income against the split held from BEFORE the draw (≈ none) while the final tax re-split it: from 65, when
+// RRIF income can be shared, every dollar counted whole against the line but was taxed half on the spouse, and the household stalled at ~60 % of the line with $700k still in the RRSP.
+describe('the fill holds the line across the age at which splitting begins', () => {
+  const person = (id: 'self' | 'spouse', salary: number, rrsp: number): Person => ({
+    id,
+    name: id,
+    birth: { year: 1992, month: 6 },
+    retirementAge: 60,
+    salaryToday: salary,
+    earningsHistory: {},
+    rrq: { startAge: 72 },
+    oas: { startAge: 72, residentSince: 2010 },
+    accounts: { rrsp: { balance: rrsp, room: 0, annualContribution: 0 }, tfsa: { balance: 40_000, room: 40_000, annualContribution: 0 }, nonReg: { balance: 0, acb: 0, annualContribution: 0 } },
+    pensions: [],
+  })
+  const h: Household = { livesAlone: false, persons: [person('self', 100_000, 1_500_000), person('spouse', 30_000, 100_000)], spending: { workingToday: 65_000, retiredToday: 45_000 } }
+  const c = fillComparison(h, A({ pensionSplitting: true }), 55)
+
+  for (const k of [1, 2] as const) {
+    it(`${k === 1 ? 'first bracket' : 'OAS line'}: while the RRSP is deep, the income of the better-off stays at the line from 61 to 69, before and after 65 (the lower bound is the regression), and not far above it`, () => {
+      const rows = c.outcomes[k].years.filter((y) => y.age >= 61 && y.age <= 69 && y.rrsp > 3 * (y.ceiling ?? 0))
+      expect(rows.some((y) => y.age >= 66)).toBe(true) // the years after 65 are in the sample: that is where it broke
+      for (const y of rows) {
+        expect(y.income).toBeGreaterThan(0.85 * y.ceiling!) // the bug sat near 0.6
+        expect(y.income).toBeLessThan(1.1 * y.ceiling!) // a spouse not yet paid OAS may sit a little over: nothing is repaid there (OAS starts at 72 in this household)
+      }
+    })
+  }
+
+  it('the OAS line leaves no recovery tax and no larger a forced minimum than the first bracket, and does not lose to doing nothing', () => {
+    expect(c.outcomes[2].recoveryTotal).toBeCloseTo(0, 0)
+    expect(c.outcomes[2].peakMinimum).toBeLessThanOrEqual(c.outcomes[1].peakMinimum + 1)
+    expect(c.outcomes[2].lifetimeTax).toBeLessThan(c.outcomes[0].lifetimeTax)
+  })
+})
+
 describe('fillAhead — the ranking rule', () => {
   it('a way with 15 % less tax is ahead even when the plan only works a year LATER at an age nobody plans (44 vs 45): the earliest age is not ranked on', () => {
     expect(fillAhead({ ok: true, lifetimeTax: 1_645_000 }, { ok: true, lifetimeTax: 1_926_000 })).toBe(true)

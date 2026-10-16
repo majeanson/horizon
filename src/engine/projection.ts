@@ -662,15 +662,39 @@ function simulateYear(
       const room = Math.max(0, fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin - base)
       if (room <= 0.005) return
       const first = evaluate(fixedSplit())
-      if (first.gis[i] > 0.005 || first.tax.persons[i].netIncomeBeforeAdjustments >= line) return
+      // The line is read AFTER the split the final tax will make: the held split was chosen before this draw existed (≈ none), so
+      // reading it would count every dollar at full value for the line yet tax half of it on the spouse, and stop at half the line.
+      const splits = a.pensionSplitting && couple
+      // With a split, what this person draws lands partly on the spouse: the spouse crossing the line stops the fill too, but only when the
+      // spouse is paid OAS (the only income the line protects) — otherwise a spouse with big pensions would stop a fill that costs them nothing.
+      const other = i === 0 ? 1 : 0
+      const netAt = () => {
+        if (!splits) return evaluate(fixedSplit()).tax.persons[i].netIncomeBeforeAdjustments
+        const nets = taxWithAllowance(incomes().persons, (p) => householdTax(p, rules, { splitting: true })).tax.persons.map((t) => t.netIncomeBeforeAdjustments)
+        return fixed[other].oas > 0 ? Math.max(nets[i], nets[other]) : nets[i]
+      }
+      if (first.gis[i] > 0.005 || netAt() >= line) return
       const incomeAt = (x: number) => {
         draw.rrsp[i] = base + x
-        return evaluate(fixedSplit()).tax.persons[i].netIncomeBeforeAdjustments
+        return netAt()
       }
       let x = room
       if (incomeAt(room) > line) {
         let lo = 0
         let hi = room
+        // The best split moves in steps, so income is not strictly rising with the draw: bisection alone can settle on a low edge.
+        // With a split, find the LARGEST coarse step that stays under the line first, and refine only above it.
+        if (splits) {
+          const steps = 24
+          for (let s = steps - 1; s >= 1; s--) {
+            if (incomeAt((room * s) / steps) <= line) {
+              lo = (room * s) / steps
+              hi = (room * (s + 1)) / steps
+              break
+            }
+            hi = (room * s) / steps
+          }
+        }
         for (let it = 0; it < 40 && hi - lo > 0.01; it++) {
           const mid = (lo + hi) / 2
           if (incomeAt(mid) <= line) lo = mid
