@@ -34,9 +34,23 @@ for (const [name, size, path, pinned] of [
     for (const sel of pinned) await expect.poll(() => gone(page, sel), { message: `${sel} slid away` }).toBe(true)
     // the bottom navigation stays: it is where the thumb is
     if (size.width < 860) expect(await there(page, '.shell__nav')).toBe(true)
-    // up: the first move brings everything back
-    await page.mouse.wheel(0, -120)
-    await expect.poll(() => away(page), { message: 'the first move up clears the flag' }).toBeNull()
+    // The 900 px scroll has STOPPED before the hand turns: on CI's slow runner it was still running when the up tick came, and the tick was folded into it —
+    // « phone /resultats » never cleared the flag, and « desktop /resultats » cleared it for one event and then the rest of the run set it again (2026-10-16).
+    const top = () => page.locator('#root').evaluate((el) => el.scrollTop)
+    await expect
+      .poll(async () => {
+        const a = await top()
+        await page.waitForTimeout(150)
+        return (await top()) === a
+      }, { message: 'the page stopped scrolling' })
+      .toBe(true)
+    // up: the first move brings everything back. The gesture is repeated until it takes, as the click test below does.
+    await expect
+      .poll(async () => {
+        await page.mouse.wheel(0, -120)
+        return away(page)
+      }, { message: 'the first move up clears the flag' })
+      .toBeNull()
     for (const sel of pinned) await expect.poll(() => there(page, sel), { message: `${sel} came back` }).toBe(true)
   })
 }
