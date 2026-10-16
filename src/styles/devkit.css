@@ -35,6 +35,11 @@
 .devkit__entry-head h3 {
   margin: 0;
 }
+/* A file path is one unbroken word (« components/charts/StackedBarChart.tsx »): at the largest text size on a phone it was 413 px wide in a 390 px page. */
+.devkit__entry-head code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .devkit__demo {
   display: flex;
   flex-direction: column;
