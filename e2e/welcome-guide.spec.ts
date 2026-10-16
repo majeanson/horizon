@@ -4,10 +4,16 @@ import { EXAMPLE, blankSeed, seedProfile } from './seed'
 // « COMMENT S'Y RETROUVER » — the guide to the whole app lives on the home page (it was a chip under the answer, about that one page): each place and what it is for, in a few lines,
 // with a link where the place is a page of its own.
 
+// the explanations are one closed fold on the home page
+const openAbout = async (page: import('@playwright/test').Page) => {
+  await page.locator('details.welcome__fold > summary').last().click()
+}
+
 for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit', EXAMPLE]] as const) {
   test(`the home page says what each place is for — ${who}`, async ({ page }) => {
     await seedProfile(page, seed)
     await page.goto('/')
+    await openAbout(page)
     const guide = page.locator('section[aria-labelledby="welcome-guide"]')
     // the guide is a fold: closed it is one line, open it is the map of the app
     await expect(guide.locator('dt').first()).toBeHidden()
@@ -29,6 +35,7 @@ for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit',
 test('a link of the guide opens the view it names', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
+  await openAbout(page)
   await page.locator('section[aria-labelledby="welcome-guide"] summary').click()
   await page.getByRole('link', { name: 'Résultats › Décider', exact: true }).click()
   await expect(page).toHaveURL(/v=decide/)
@@ -39,6 +46,7 @@ test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
+  await openAbout(page)
   await expect(page.locator('section[aria-labelledby="welcome-guide"] summary')).toContainText('Finding your way')
   await page.locator('section[aria-labelledby="welcome-guide"] summary').click()
   await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Decide', 'Results › Proof', 'Your answer', 'My sheet', 'At the top'])

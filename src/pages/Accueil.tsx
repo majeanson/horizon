@@ -24,11 +24,11 @@ import { WELCOME_COPY, type WelcomeCopy } from '../lib/welcomeCopy'
 
 // « Accueil » — the front door at `/`. Profil used to be the first thing seen, and a returning household landed on a full form.
 // This page says what Horizon is, offers ONE next step (begin, or — once the profile holds enough for an answer — see it), and keeps
-// the rest (how it works, what to know) to three short cards each. It reads the profile and writes nothing.
+// the rest (how it works, the map, what to know) in one closed fold. It reads the profile and writes nothing.
 //
 // A first visit is asked two things before the page, each a full-screen dialog shown once per device: how to READ it (components/ReadingHelp.tsx), then
 // how much TIME it has (components/TimeBudget.tsx, lib/timeBudget.ts). The time shapes the page: the matching door becomes the one « Commencer » and the
-// other two fold away; two minutes also folds the explanations. « Changer » on the line, or the settings page, reopens the question.
+// other two fold away; « Changer » on the line, or the settings page, reopens the question.
 //
 // A ready profile is asked ONE question (components/DripQuestion.tsx), from an idle search (`useFactImpact`, how far the answer moves if each
 // unconfirmed figure were off) made here, on the settled profile. Its answer is in the top bar, like on every page (components/BarAnswer.tsx).
@@ -63,7 +63,7 @@ export function Accueil() {
       ))}
     </ul>
   )
-  // The explanations — how it works, the map, what to know: in the open for a reader who has the time, one fold away for the two-minute one.
+  // The explanations — how it works, the map, what to know: ONE closed fold for everyone (they say what the doors above and the bar already say).
   const about = (
     <>
       <section aria-labelledby="welcome-steps">
@@ -170,13 +170,9 @@ export function Accueil() {
         </section>
       )}
       <InstallCard />
-      {!ready && budget === '2' ? (
-        <Fold className="surface welcome__fold" summary={tc.moreAbout}>
-          {about}
-        </Fold>
-      ) : (
-        about
-      )}
+      <Fold className="surface welcome__fold" summary={tc.moreAbout}>
+        {about}
+      </Fold>
     </section>
   )
 }

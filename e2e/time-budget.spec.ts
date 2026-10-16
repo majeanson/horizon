@@ -58,13 +58,14 @@ test('comes right after the reading dialog, full screen, with three doors; « 2 
   await expect(page.locator('.onboard')).toBeVisible()
 })
 
-test('« 15 minutes » keeps the explanations in the open and leaves a bare /profil alone; « 30 minutes et plus » sends the Profil tab to the documents', async ({ page }) => {
+test('« 15 minutes » leaves a bare /profil alone; « 30 minutes et plus » sends the Profil tab to the documents', async ({ page }) => {
   const dialog = await arrive(page)
   await dialog.getByRole('button', { name: /^15 minutes/ }).click()
   await expect(page.getByText('Votre temps : 15 minutes')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Commencer', exact: true })).toHaveAttribute('href', '/profil?debut=complet')
-  await expect(page.getByRole('heading', { name: 'Comment ça marche' })).toBeVisible()
-  await expect(page.getByText('En savoir plus sur Horizon')).toHaveCount(0)
+  // the explanations are one closed fold at every length of time
+  await expect(page.getByRole('heading', { name: 'Comment ça marche' })).toBeHidden()
+  await expect(page.getByText('En savoir plus sur Horizon')).toBeVisible()
   await page.goto('/profil')
   await expect(page).toHaveURL(/\/profil$/)
   await expect(page.locator('.onboard')).toBeVisible()
@@ -100,14 +101,14 @@ test('« Changer » reopens the question with the choice marked; « Plus tard »
   await expect(page.getByRole('group', { name: 'Temps disponible' }).getByRole('radio', { name: '30 minutes et plus' })).toBeChecked()
 })
 
-test('« Plus tard » leaves the front door as it was — the three doors, nothing folded — and the question stays away', async ({ page }) => {
+test('« Plus tard » leaves the front door as it was — the three doors, the explanations in their one fold — and the question stays away', async ({ page }) => {
   const dialog = await arrive(page)
   await dialog.getByRole('button', { name: 'Plus tard' }).click()
   await expect(dialog).toHaveCount(0)
   await expect(page.locator('.welcome__door')).toHaveCount(3)
   await expect(page.locator('.welcome__door').first()).toBeVisible()
   await expect(page.getByText('Votre temps')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Comment ça marche' })).toBeVisible()
+  await expect(page.getByText('En savoir plus sur Horizon')).toBeVisible()
   await page.reload()
   await expect(page.locator('.page-head__title')).toBeVisible()
   await expect(page.getByRole('dialog')).toHaveCount(0)
