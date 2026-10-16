@@ -269,7 +269,7 @@ test.describe('the settings and the docked cards', () => {
   test('the tour bar and the guide card dock with a meter along their top edge that follows the step', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 390, height: 844 })
-    await page.goto('/resultats?visite=2')
+    await page.goto('/resultats?visite=1')
     const tour = page.locator('.tour-bar')
     await expect(tour).toBeVisible({ timeout: 60_000 })
     const meter = () => tour.evaluate((el) => Number(el.style.getPropertyValue('--p')))

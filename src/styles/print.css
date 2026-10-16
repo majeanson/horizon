@@ -115,8 +115,7 @@
 @media print {
   .results-page a.chip,
   .verdict .chip,
-  .firm .chip,
-  .refine .chip {
+  .firm .chip {
     display: none !important;
   }
 }

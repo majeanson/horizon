@@ -167,9 +167,9 @@ export function Profil() {
             withHome={withHome}
             withEvents={withEvents}
             withExact={acc.total > 0}
+            // On a phone the blocks are read one at a time; a wide screen has room for them all, so the switch is not offered there.
+            end={!wide ? <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} first="famille" /> : undefined}
           />
-          {/* On a phone the blocks are read one at a time; a wide screen has room for them all, so the switch is not offered there. */}
-          {!wide && <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} first="famille" />}
           {/* First the household (who), then « Ma situation » (what applies to it): the questions answered here decide which sections of everything below are shown, so they come before it. */}
           <FamilySection withKids={applies(profile, yes, 'kids')} />
           {/* « Ma situation »: a few yes / no questions that decide which sections below are shown. */}

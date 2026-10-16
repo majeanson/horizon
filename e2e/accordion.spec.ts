@@ -34,7 +34,7 @@ test('Hypothèses: the scenario is open and the six others are closed titles; «
   await expect(page).toHaveURL(/bloc=none/)
   await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
   // « Tout ouvrir »: every block, the switch remembered in the address, no « Suivant » needed but still there
-  await page.getByRole('tab', { name: 'Tout ouvrir' }).click()
+  await page.getByRole('button', { name: 'Tout ouvrir' }).click()
   await expect(page).toHaveURL(/bloc=tout/)
   await expect(page.locator('.accordion__item.is-open')).toHaveCount(7)
   await page.reload()
@@ -48,7 +48,7 @@ test('Profil on a phone: one block at a time, the map opens a person, a link to 
   await expect(page.locator('#famille')).toHaveClass(/is-open/)
   await expect(page.locator('#person-self')).toHaveClass(/is-closed/)
   await expect(page.locator('#person-self').getByRole('textbox')).toHaveCount(0)
-  await expect(page.getByRole('tab', { name: 'Un bloc à la fois' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Tout ouvrir' })).toBeVisible()
   await page.getByRole('navigation', { name: 'Sections du profil' }).getByRole('button', { name: /^Camille/ }).click()
   await expect(page).toHaveURL(/bloc=person-self/)
   await expect(page.locator('#person-self')).toHaveClass(/is-open/)
@@ -64,7 +64,7 @@ test('Profil on a phone: one block at a time, the map opens a person, a link to 
   await page.goto('/profil')
   await expect(page.locator('.accordion__item.is-closed')).toHaveCount(0)
   await expect(page.locator('.accordion__item.is-open').first()).toBeVisible()
-  await expect(page.getByRole('tab', { name: 'Un bloc à la fois' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /^(Tout ouvrir|Un bloc à la fois)$/ })).toHaveCount(0)
   // « Suivant » at the foot of every block, walking the form
   await page.locator('#famille').getByRole('button', { name: 'Suivant' }).click()
   await expect(page.locator('#person-self')).toBeInViewport()
@@ -74,7 +74,7 @@ test('a finished block folds to its title and its count in the all-open shape, a
   await page.goto('/dev/kit')
   const kit = page.locator('.accordion__item')
   await expect(kit).toHaveCount(3)
-  await page.getByRole('tab', { name: 'Tout ouvrir' }).click()
+  await page.getByRole('button', { name: 'Tout ouvrir' }).click()
   await expect(page.locator('#un')).toHaveClass(/is-open/)
   await expect(page.locator('#deux')).toHaveClass(/is-open/)
   await expect(page.locator('#trois')).toHaveClass(/is-closed/)
@@ -106,3 +106,32 @@ test('Décider: the first strategy is open and the rest are closed; a door from 
   await expect(page.locator('#solidite')).toHaveClass(/is-closed/)
   await expect(page.locator('#tableau table').first()).toBeVisible({ timeout: 60_000 })
 })
+
+// ONE control for « all open / one at a time »: a small round icon at the END of the map row, the same on Hypothèses, Preuve and Profil (phone) — not a full-width switch of its own.
+for (const [name, path, map, size] of [
+  ['Hypothèses', '/hypotheses', 'Sections des hypothèses', { width: 390, height: 844 }],
+  ['Preuve', '/resultats?v=proof', 'Sections des résultats', { width: 390, height: 844 }],
+  ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }],
+  ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }],
+] as const) {
+  test(`${name}: « Tout ouvrir » is an icon at the end of the map row, and it toggles the address`, async ({ page }) => {
+    await page.setViewportSize(size)
+    await seedProfile(page, EXAMPLE)
+    await page.goto(path)
+    const nav = page.getByRole('navigation', { name: map })
+    const all = nav.getByRole('button', { name: 'Tout ouvrir' })
+    await expect(all).toBeVisible({ timeout: 30_000 })
+    // it is the LAST thing in the row and a round icon, not a tab: no visible text
+    await expect(all).toHaveText('')
+    const box = (await all.boundingBox())!
+    const rail = (await nav.locator('.rail').boundingBox())!
+    expect(box.x, 'after the chips').toBeGreaterThanOrEqual(rail.x + rail.width - 1)
+    expect(box.width).toBeLessThanOrEqual(48)
+    await all.click()
+    await expect(page).toHaveURL(/bloc=tout/)
+    await expect(nav.getByRole('button', { name: 'Un bloc à la fois' })).toBeVisible()
+    await nav.getByRole('button', { name: 'Un bloc à la fois' }).click()
+    await expect(page).not.toHaveURL(/bloc=tout/)
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(1)
+  })
+}

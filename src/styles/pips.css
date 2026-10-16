@@ -76,35 +76,6 @@
 }
 .section-nav__progress.is-done { display: inline-flex; color: var(--sage-ink); }
 
-/* « Préciser »: how much of the profile stands on documents, as a bar (the headline says it in words). Sage = confirmed, the same « done » ink as the map's tick. */
-.refine__gauge {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0 0 0.75rem;
-}
-.refine__meter-count {
-  flex: none;
-  font-size: var(--text-xs);
-  color: var(--ink-soft);
-  font-variant-numeric: tabular-nums;
-}
-.refine__meter {
-  flex: 1;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: var(--paper-deep);
-  box-shadow: inset 0 0 0 1px var(--line);
-  overflow: hidden;
-}
-.refine__meter-fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--sage-deep);
-}
-/* A ranked figure: its pip, then its name — the pip sits tight against the name it stands for. */
-.refine__moves .refine__list li > .pip { margin-inline-end: -0.4rem; }
 
 /* A phone (or the largest text on any narrow screen): the header's pip stays big, but it rides the TITLE line only, and the one sentence under the
    title takes the card's whole width — beside a 2.6 rem disc it had a ~165 px column and wrapped to three lines at « Très grand ». The text box

@@ -20,7 +20,7 @@ import { Cluster } from '../../Layout'
 import { SectionHeader } from '../../SectionHeader'
 
 // « À faire cette année » — what the plan itself points at, at the foot of the answer: the one change that gains most (tried in « Essayer »), and the two
-// decisions that have their own home on « Stratégies ». The figure to confirm first is NOT repeated here: « Préciser » just above names it.
+// decisions that have their own home on « Stratégies ». The figure to confirm first is NOT repeated here: Ma fiche ranks it.
 /**
  * One sentence when another order of drawing the accounts clearly beats the household's own (lib/orderNudge.ts) — the same six orders, the same ranking and the same sentence
  * as « Dans quel ordre puiser ? » on « Stratégies », said where the answer is read. The six orders are heavy (a search per order), so they are asked only once this block has

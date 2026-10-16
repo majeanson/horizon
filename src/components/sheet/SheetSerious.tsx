@@ -145,7 +145,7 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
           {v.sharpen.absent.length > 0 && (
             <>
               <p className="verdict__range-title">{v.sharpen.absentTitle}</p>
-              <ul className="refine__list">
+              <ul className="sheet__absent">
                 {v.sharpen.absent.map((text) => (
                   <li key={text}>{text}</li>
                 ))}

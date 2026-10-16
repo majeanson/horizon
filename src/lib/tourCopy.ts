@@ -12,20 +12,17 @@ export interface TourCopy {
   /** On the last step, « Suivant » has nowhere to go: it finishes. */
   done: string
   close: string
-  /** « 2 de 3 ». */
+  /** « 2 de 2 ». */
   step: (n: string, total: string) => string
   /** 1 — the answer restated. `answer` is the formatted age (null when everyone can already stop); `range` the formatted range, or null when every figure is confirmed. */
   verdict: (answer: string | null, range: string | null) => string
   /** …the range, closed (« entre 58 et 63 ans… ») and open (« …peut-être aucun âge avant 70 »). */
   range: (low: string, high: string) => string
   rangeOpen: (low: string, max: string) => string
-  /** 2 — the plan's line, to the year the plan ends (formatted with its ages). */
-  timeline: (endYear: string) => string
-  /** 3 — the two outermost compared departures (their labels) and what is left at the end of the plan with each. */
+  /** 2 — the two outermost compared departures (their labels) and what is left at the end of the plan with each. */
   compare: (low: string, high: string, horizonAge: string, worthLow: string, worthHigh: string) => string
   /** …when only one departure is compared. */
   compareOne: string
-  /** 4 — how many figures are confirmed and which one, confirmed, would narrow the answer most (`gain` is the Préciser section's own phrase). */
 }
 
 export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
@@ -42,7 +39,6 @@ export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
     },
     range: (low, high) => `entre ${low} et ${high} ans selon vos chiffres estimés`,
     rangeOpen: (low, max) => `entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés`,
-    timeline: (endYear) => `La ligne de votre plan : le travail, puis les années sur le nid, puis les rentes, jusqu’à la fin du plan en ${endYear}.`,
     compare: (low, high, horizonAge, worthLow, worthHigh) => `Comparer : de « ${low} » à « ${high} ». À ${horizonAge} ans, il reste ${worthLow} avec le premier départ, ${worthHigh} avec le second.`,
     compareOne: 'Un seul départ est comparé pour l’instant. Ajoutez-en un autre pour voir ce que change l’âge de départ.',
   },
@@ -59,7 +55,6 @@ export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
     },
     range: (low, high) => `between age ${low} and ${high}, depending on your estimated figures`,
     rangeOpen: (low, max) => `from age ${low} to possibly no age before ${max}, depending on your estimated figures`,
-    timeline: (endYear) => `Your plan in one line: working, then the years on the nest, then the pensions, to the end of the plan in ${endYear}.`,
     compare: (low, high, horizonAge, worthLow, worthHigh) => `Comparing: from “${low}” to “${high}”. At age ${horizonAge}, ${worthLow} is left with the first departure, ${worthHigh} with the second.`,
     compareOne: 'Only one departure is compared for now. Add another to see what the departure age changes.',
   },

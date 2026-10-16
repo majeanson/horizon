@@ -1,4 +1,4 @@
-import { type RefObject } from 'react'
+import { type ReactNode, type RefObject } from 'react'
 import { PinStack } from './PinStack'
 import { SectionNav, type SectionLink } from './SectionNav'
 
@@ -6,10 +6,10 @@ import { SectionNav, type SectionLink } from './SectionNav'
 // `--map-h`, so a tapped block stops below it — styles/revamp.css). Like everything pinned at the top it rolls up with the bar while the reader scrolls down (lib/useHeadroom.ts).
 // On a page that reads its blocks one at a time (components/Accordion.tsx), `onPick` opens the block a chip names before the map scrolls to it.
 // (`page` is the page's own element; the stack finds it by itself, the prop stays for callers that already pass it.)
-export function PinnedMap({ links, ariaLabel, onPick }: { links: readonly SectionLink[]; ariaLabel: string; page?: RefObject<HTMLElement | null>; onPick?: (id: string) => void }) {
+export function PinnedMap({ links, ariaLabel, onPick, end }: { links: readonly SectionLink[]; ariaLabel: string; page?: RefObject<HTMLElement | null>; onPick?: (id: string) => void; end?: ReactNode }) {
   return (
     <PinStack className="pinned-map">
-      <SectionNav links={links} ariaLabel={ariaLabel} onPick={onPick} />
+      <SectionNav links={links} ariaLabel={ariaLabel} onPick={onPick} end={end} />
     </PinStack>
   )
 }

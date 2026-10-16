@@ -50,6 +50,33 @@
   padding-block: 3px;
   margin-block: -3px;
 }
+/* A map row that carries a control at its end (the accordion's « tout ouvrir » icon): the chips take the room, the control keeps its own. */
+.section-nav:has(> .accordion__all) {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.section-nav:has(> .accordion__all) .rail {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.accordion__all {
+  /* a round icon at the house's touch size (the chips beside it are as tall); its glyph is small so it reads as a tool, never as a tab */
+  width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
+  border-radius: 999px;
+}
+.accordion__all-glyph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  line-height: 0;
+}
+.accordion__all-glyph > svg + svg {
+  margin-top: -0.35rem;
+}
 .results-section {
   display: flex;
   flex-direction: column;
@@ -95,8 +122,8 @@
   letter-spacing: 0.06em;
 }
 
-/* ── Résultats: « préciser le calcul » — what would refine the verdict ───── */
-.refine__list {
+/* ── Ma fiche: what the profile still lacks ──────────────────────────────── */
+.sheet__absent {
   margin: 0;
   padding-left: 1.1rem;
   display: flex;
@@ -1005,13 +1032,6 @@
   margin-left: auto;
 }
 
-/* « Les chiffres qui déplaceraient le plus la réponse »: the figure, how far it moves the answer, the way to it — on one wrapping line. */
-.refine__moves .refine__list li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 0.75rem;
-}
 
 /* A wide desktop gives the page more of the window: the two people's columns on Profil, the year-by-year tables and the strategy cards
    all had room to spare beside a 56 rem column. From 1200 px the column grows to 66 rem; below it nothing changes. */

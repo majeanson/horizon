@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { scrollToSection } from '../lib/motion'
 import { Chip } from './Chip'
 import { Icon } from './Icon'
@@ -30,6 +30,7 @@ export function SectionNav({
   ariaLabel,
   onPick,
   celebrate,
+  end,
 }: {
   links: readonly SectionLink[]
   ariaLabel: string
@@ -37,6 +38,8 @@ export function SectionNav({
   celebrate?: boolean
   /** Called with the section's id BEFORE the scroll: a page whose blocks open one at a time (an accordion) opens the one the chip names, so the landing finds it open. */
   onPick?: (id: string) => void
+  /** A small control at the end of the map row, beside the scrolling chips (the accordion's « tout ouvrir » icon). */
+  end?: ReactNode
 }) {
   const [inView, setInView] = useState<string | null>(null)
   const ids = links.map((l) => l.id).join('|')
@@ -99,6 +102,7 @@ export function SectionNav({
           </Fragment>
         ))}
       </Rail>
+      {end}
     </nav>
   )
 }

@@ -133,7 +133,7 @@ export const STRATEGY_CONCEPT: Record<StrategyKey, ConceptId> = { mine: 'stratMi
 export const ACCOUNT_CONCEPT: Record<AccountKind, ConceptId> = { rrsp: 'reer', tfsa: 'celi', nonReg: 'nonEnregistre' }
 /** The seven documents of the checklist (lib/facts.ts). */
 export const DOC_CONCEPT: Record<DocId, ConceptId> = { rrq: 'rrq', tax: 'impot', bank: 'reer', employer: 'employeur', home: 'maison', budget: 'budget', residence: 'residence' }
-/** The figures a document confirms (lib/facts.ts): the pip each wears where it is named — « Préciser », the documents' lists. */
+/** The figures a document confirms (lib/facts.ts): the pip each wears where it is named — Ma fiche's ranking, the documents' lists. */
 export const FACT_CONCEPT: Record<FactKind, ConceptId> = {
   salary: 'salaire',
   earnings: 'releve',

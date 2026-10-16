@@ -238,6 +238,10 @@ test.describe('complexity ratchet', () => {
       // The front door's one question (components/DripQuestion.tsx) lands after an IDLE search of every unconfirmed figure: on CI's slower runner it was in the count, locally it
       // was not (19 here, 22 there, 2026-10-15). A visit sees it; the count waits for it.
       if (label === 'Accueil (with a plan)') await page.locator('.drip').waitFor({ timeout: 60_000 })
+      // The two routes whose LAST block arrives from an idle search, long after the page is up (counted a beat early, the same route read 32 / 590 and 36 / 637, 603 and 604 words):
+      // the sheet's ranked figures (the example has some), and « À faire cette année » once its levers are in. A visit sees them; the count waits for them.
+      if (label === 'Fiche') await page.locator('.sheet__movers li').first().waitFor({ timeout: 60_000 })
+      if (label === 'Résultats — Réponse') await expect(page.locator('#annee')).not.toContainText('Calcul en cours', { timeout: 60_000 })
       // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
       // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).
       await expect(page.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 30_000 })

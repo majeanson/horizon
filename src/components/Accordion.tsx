@@ -10,7 +10,6 @@ import { glossed } from './Gloss'
 import { Icon, type IconName } from './Icon'
 import { Cluster } from './Layout'
 import { SectionLevel } from './SectionHeader'
-import { SubTabs } from './SubTabs'
 
 // ACCORDION — a long page read ONE BLOCK AT A TIME: every block keeps its place, its title and its pip; the open one shows its fields and, at its foot,
 // « Précédent » / « Suivant » to the neighbouring block. Which block is open is the PAGE's state (kept in the address, so a link and the back button mean
@@ -49,6 +48,15 @@ const AccordionContext = createContext<Ctx | null>(null)
 export function Accordion({ ids, open, onOpen, done, doneCount, children }: { ids: readonly string[]; open: AccordionOpen; onOpen: (id: string | null) => void; done?: ReadonlySet<string>; doneCount?: ReadonlyMap<string, number>; children: ReactNode }) {
   const [flipped, setFlipped] = useState<ReadonlySet<string>>(() => new Set())
   const doneSet = done ?? new Set<string>()
+  /** Set (not toggle) whether a block is against its default: a deep link or the guide may ask twice for the same block (React's dev double-effect does), and the second ask must leave it open. */
+  const setFlippedTo = (id: string, on: boolean) =>
+    setFlipped((prev) => {
+      if (prev.has(id) === on) return prev
+      const next = new Set(prev)
+      if (on) next.add(id)
+      else next.delete(id)
+      return next
+    })
   const flip = (id: string) =>
     setFlipped((prev) => {
       const next = new Set(prev)
@@ -59,26 +67,31 @@ export function Accordion({ ids, open, onOpen, done, doneCount, children }: { id
   const reveal = (id: string) => {
     if (!ids.includes(id)) return
     if (open === 'all') {
-      if (doneSet.has(id) !== flipped.has(id)) flip(id)
+      // open in this shape = (done) equals (flipped): ask for exactly that
+      setFlippedTo(id, doneSet.has(id))
     } else onOpen(id)
   }
   return <AccordionContext.Provider value={{ ids, open, setOpen: onOpen, done: doneSet, flipped, flip, doneCount: doneCount ?? new Map(), reveal }}>{children}</AccordionContext.Provider>
 }
 
-/** The switch between the two shapes, for a page that offers both: « Un bloc à la fois » · « Tout ouvrir ». `first` is the block that opens when leaving « all ». */
+/**
+ * The switch between the two shapes, ONE small icon button for every page that has it (Hypothèses, Preuve, Profil on a phone): « Tout ouvrir » while the blocks are read one at a time, « Un bloc
+ * à la fois » while they are all open. It sits at the end of the page's map row (`SectionNav` `end`), so it is reachable while the page scrolls and costs the page no row of its own.
+ * `first` is the block that opens when leaving « all ».
+ */
 export function AccordionMode({ open, onOpen, first }: { open: AccordionOpen; onOpen: (next: AccordionOpen) => void; first: string }) {
   const c = ACCORDION_COPY[useLang().lang]
+  const all = open === 'all'
+  const label = all ? c.oneAtATime : c.openAll
+  const caret: IconName = all ? 'caret-up-bold' : 'caret-down-bold'
   return (
-    <SubTabs
-      size="mini"
-      ariaLabel={c.modeLabel}
-      value={open === 'all' ? 'all' : 'one'}
-      onSelect={(k: 'one' | 'all') => onOpen(k === 'all' ? 'all' : first)}
-      options={[
-        { key: 'one', label: c.oneAtATime },
-        { key: 'all', label: c.openAll },
-      ]}
-    />
+    <button type="button" className="btn btn--icon btn--ghost accordion__all" aria-label={label} title={label} onClick={() => onOpen(all ? first : 'all')}>
+      {/* two stacked carets: « all of them open » / « shut but one » — no new glyph in the eager icon set */}
+      <span className="accordion__all-glyph" aria-hidden="true">
+        <Icon name={caret} size={12} />
+        <Icon name={caret} size={12} />
+      </span>
+    </button>
   )
 }
 

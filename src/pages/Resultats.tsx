@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
@@ -12,7 +13,8 @@ import { EmptyState } from '../components/EmptyState'
 import { AnswerView } from '../components/results/views/AnswerView'
 import { Skeleton } from '../components/Skeleton'
 import { firstAnswerSeen, markFirstAnswerSeen } from '../lib/firstAnswer'
-import { useResultsPage } from '../lib/useResultsPage'
+import { PROOF_BLOCKS, useResultsPage } from '../lib/useResultsPage'
+import { useParamChoice } from '../lib/useParamChoice'
 
 // The two other views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
 const DecideView = lazy(() => import('../components/results/views/DecideView').then((m) => ({ default: m.DecideView })))
@@ -86,7 +88,7 @@ export function Resultats() {
           ]}
         />
       </div>
-      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} celebrate={celebrate} />}
+      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} celebrate={celebrate} end={view === 'proof' ? <ProofMode /> : undefined} />}
       </PinStack>
 
 
@@ -127,4 +129,11 @@ export function Resultats() {
       )}
     </section>
   )
+}
+
+/** Preuve's blocks are read one at a time (`?bloc=`; « tout » opens them all): the icon at the end of the map row switches between the two. It reads the same address ProofView does. */
+function ProofMode() {
+  const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'solidite')
+  const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
+  return <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} first="solidite" />
 }

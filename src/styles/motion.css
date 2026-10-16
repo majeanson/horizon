@@ -226,19 +226,6 @@ a.welcome__card:active,
     toast-rise var(--dur-base) var(--ease-out);
 }
 
-/* ── Gauges fill rather than jump ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
-@keyframes gauge-grow {
-  from { transform: scaleX(0); }
-  to { transform: none; }
-}
-.refine__meter-fill {
-  transform-origin: left center;
-  animation: gauge-grow var(--dur-slow) var(--ease-out) backwards;
-  transition: width var(--dur-slow) var(--ease-out);
-}
-:dir(rtl) .refine__meter-fill {
-  transform-origin: right center;
-}
 /* The impact meter's ONE marker lands on its step (the other four are the track). */
 .impact__step--on {
   animation: chosen-land var(--dur-base) var(--ease-out) 120ms backwards;
@@ -261,7 +248,6 @@ a.welcome__card:active,
   to { transform: none; }
 }
 .shell__answer-age,
-.refine__meter-count,
 .section-nav__progress {
   display: inline-block;
   animation: settle-in var(--dur-base) var(--ease-out);
@@ -627,14 +613,12 @@ textarea.input:focus {
   .confirm-backdrop,
   .kit-modal,
   .confirm,
-  .refine__meter-fill,
   .impact__step--on,
   .answer__big,
   .answer__note,
   .answer__list,
   .shell__answer-age,
   .verdict__age,
-  .refine__meter-count,
   .section-nav__progress,
   .chart__plot,
   .guide-bar,
@@ -676,7 +660,6 @@ textarea.input:focus {
   .btn,
   .shell__tab > svg,
   .profile-section.fam-rule,
-  .refine__meter-fill,
   a.welcome__card,
   .welcome__door {
     transition: none;

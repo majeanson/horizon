@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Accordion, AccordionItem, AccordionMode, type AccordionOpen } from '../../Accordion'
+import { Accordion, AccordionItem, type AccordionOpen } from '../../Accordion'
 import { FirmSection } from './FirmSection'
 import { LedgerPanel } from '../LedgerPanel'
 import { ParamsPanel } from '../ParamsPanel'
@@ -25,7 +25,6 @@ export function ProofView({ m }: { m: ResultsModel }) {
   return (
     <>
       <section className="arc" aria-label={rc.tabs.proof}>
-        <AccordionMode open={open} onOpen={setOpen} first="solidite" />
         <Accordion ids={PROOF_BLOCKS} open={open} onOpen={setOpen}>
           {/* How firm the answer is — the three scenarios and a hard market in brief, the grids of what moves it one tap under. */}
           <AccordionItem id="solidite" title={rc.headline.firmTitle} concept="solidite" className="results-section firm">

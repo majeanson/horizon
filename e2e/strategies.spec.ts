@@ -62,8 +62,8 @@ test('the comparison is the first view of the pensions; the chart is one switch 
   await expect(page.getByRole('heading', { name: 'Façons de commencer vos rentes' })).toHaveCount(0)
 })
 
-test('« Votre plan en une ligne »: one bar per person, with the dates ahead, in text as well as in colour', async ({ page }) => {
-  await page.goto('/resultats')
+test('« Votre plan en une ligne » (on Ma fiche): one bar per person, with the dates ahead, in text as well as in colour', async ({ page }) => {
+  await page.goto('/fiche')
   const strip = page.locator('.timeline')
   await expect(strip).toBeVisible({ timeout: 60_000 })
   await expect(strip.getByText('Votre plan en une ligne')).toBeVisible()

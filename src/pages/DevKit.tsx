@@ -448,12 +448,6 @@ function MotionSpecimen() {
         </Cluster>
         <SubTabs ariaLabel="Mouvement — onglets" value={tab} onSelect={setTab} options={[{ key: 'a', label: 'Moi', concept: 'personne' }, { key: 'b', label: 'Nous', concept: 'famille' }]} />
         <Switch checked={sw} onChange={setSw} label="Un interrupteur" />
-        <div className="refine__gauge">
-          <div className="refine__meter">
-            <span className="refine__meter-fill" style={{ width: '62%' }} />
-          </div>
-          <span className="refine__meter-count">5 / 8</span>
-        </div>
         <ImpactMeter level="typical" tilt="middle" ends={['Très bas', 'Très élevé']} levelLabel="Typique" tiltLabel="Le marqueur se pose sur sa marche" whyTitle="Pourquoi ça compte :" />
         <Fold summary="Un repli qui s’ouvre">
           <p className="field-row__hint">Son corps glisse en place au lieu d’apparaître.</p>

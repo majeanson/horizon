@@ -42,7 +42,7 @@ import { today } from './today'
 export type View = 'answer' | 'decide' | 'proof'
 
 /** The steps of the guided tour (`?visite=`). */
-export const TOUR_STEPS = 3
+export const TOUR_STEPS = 2
 
 /** The addresses of the days when the results had four views: each lands on the view that holds its content now. */
 const LEGACY_VIEW: Readonly<Record<string, View>> = { adjust: 'decide', strategies: 'decide', future: 'decide', verify: 'proof' }
@@ -332,7 +332,7 @@ export function useResultsPage() {
   const showRange = !!impactRange && impactRange.low !== null && impactRange.low !== impactRange.high && !retiredNow && !retiredGlance && (headline.kind === 'at' || headline.kind === 'now') && accuracy.confirmed < accuracy.total
   const confidenceRange = showRange ? { low: impactRange.low!, high: impactRange.high } : null
 
-  // THE GUIDED TOUR (`?visite=1..4`): four steps over THIS reader's own answer, each scrolling to a section of the answer view. The address keeps the step, so a reload resumes it
+  // THE GUIDED TOUR (`?visite=1..2`): two steps over THIS reader's own answer, each scrolling to a section of the answer view. The address keeps the step, so a reload resumes it
   // and a link shares it; any other value is no tour. It is offered only on a real answer ('at' / 'now') for a household still working: several steps speak of departure ages, and
   // a household that has already stopped (retiredNow) or whose money never lasts (« none ») has no age to walk through. Nothing opens it by itself.
   const tourRaw = params.get('visite')
@@ -341,7 +341,7 @@ export function useResultsPage() {
   const tour = tourAvailable ? tourStep : 0
   const setTour = (step: number) => setParam('visite', step >= 1 && step <= TOUR_STEPS ? String(step) : null)
   // The section each step lands on.
-  const tourTarget = (step: number): string => (step === 1 ? 'verdict' : step === 2 ? 'ligne' : 'comparer')
+  const tourTarget = (step: number): string => (step === 1 ? 'verdict' : 'comparer')
   // An unreadable step is dropped from the address at once; a tour that cannot apply (the answer arrived and it is « none », or everyone has stopped) is dropped once the answer is known.
   useEffect(() => {
     if (tourRaw !== null && (tourStep === 0 || (answered && !tourAvailable))) setParam('visite', null)
