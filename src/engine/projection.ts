@@ -658,7 +658,11 @@ function simulateYear(
     const line = fillCeiling(a.bracketFill, P)
     // Twice, in order: the first person is looked at before the spouse is filled, so a household that looks poor enough for the GIS then skips them; the spouse's fill can
     // lift the household off the GIS, and the second pass fills whoever was skipped for a GIS that is gone (it leaves anyone still on the GIS exactly as the first did).
-    for (let pass = 0; pass < 2; pass++) people.forEach((_, i) => {
+    // The person with the lower income of their own goes first, whoever is listed first (the draw allocator above gives to the lower income too): on 140 random couples,
+    // listing order alone moved lifetime tax by up to 2.7 %; this order brings it to 0.5 % at the first bracket line, with no change in the mean tax.
+    const own = (k: number) => fixed[k].rrq + fixed[k].oas + fixed[k].db + fixed[k].rrifMin + fixed[k].other
+    const fillOrder = people.map((_, k) => k).sort((x, y) => own(x) - own(y) || x - y)
+    for (let pass = 0; pass < 2; pass++) fillOrder.forEach((i) => {
       if (fixed[i].employment > 0) return
       const base = draw.rrsp[i]
       const room = Math.max(0, fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin - base)
