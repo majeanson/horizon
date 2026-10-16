@@ -16,6 +16,7 @@ function texts(c: CashBufferCopy): [string, string][] {
     ['above', c.above('M', 'A', 'B')],
     ['basis', c.basis('L')],
     ['caveat', c.caveat],
+    ['caveatTitle', c.caveatTitle],
   ]
 }
 

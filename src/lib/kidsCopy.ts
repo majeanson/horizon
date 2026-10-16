@@ -24,6 +24,8 @@ interface KidsCopy {
     byAgeClear: string
     perYear: string
     nowHint: (amount: string) => string
+    /** The door to Ma fiche, where what a child costs is read. */
+    seeSheet: string
   }
   how: { open: string; lines: string[]; sources: string }
   qpp: { toggle: string; note: string }
@@ -68,6 +70,7 @@ const FR: KidsCopy = {
     byAgeClear: 'Retirer les montants par âge',
     perYear: 'par année',
     nowHint: (amount) => `Un enfant à la maison à son âge d’aujourd’hui : environ ${amount} par année.`,
+    seeSheet: 'Voir ce que ça coûte sur Ma fiche',
   },
   how: {
     open: 'D’où viennent ces chiffres?',
@@ -124,6 +127,7 @@ const EN: KidsCopy = {
     byAgeClear: 'Remove the amounts by age',
     perYear: 'a year',
     nowHint: (amount) => `A child at home, at today’s age: about ${amount} a year.`,
+    seeSheet: 'See what it costs on My sheet',
   },
   how: {
     open: 'Where do these figures come from?',

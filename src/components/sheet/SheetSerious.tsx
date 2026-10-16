@@ -33,7 +33,7 @@ function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
   )
 }
 
-export function SheetSerious({ model, lang, births, names, timeline }: { model: SheetModel; lang: Lang; births: readonly number[]; names: readonly string[]; timeline?: ReactNode }) {
+export function SheetSerious({ model, lang, births, names, timeline, cards }: { model: SheetModel; lang: Lang; births: readonly number[]; names: readonly string[]; timeline?: ReactNode; cards?: ReactNode }) {
   const v = sheetView(model, lang, SHEET_COPY[lang], births, names)
   return (
     <div className="sheet sheet--serious">
@@ -120,6 +120,9 @@ export function SheetSerious({ model, lang, births, names, timeline }: { model: 
           </Cluster>
         )}
       </section>
+
+      {/* What the profile says about the household, read here and not among the fields: the cash buffer, what the children cost (pages/Fiche.tsx hands them in). */}
+      {cards}
 
       {v.sharpen !== null && (
         <section className="sheet__section" aria-label={v.sharpen.title}>

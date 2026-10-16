@@ -35,7 +35,7 @@ test('the header leads to the sheet, which shows five stats, each with its figur
 test('the page reads in the order of the questions: verdict, today, once retired, what it holds, what would sharpen the answer', async ({ page }) => {
   await page.goto('/fiche')
   await settled(page)
-  await expect(page.locator('.sheet h2')).toHaveText(['Où vous en êtes', 'Aujourd’hui', 'À la retraite', 'Ce que vous détenez', 'Ce qui préciserait la réponse'])
+  await expect(page.locator('.sheet h2')).toHaveText(['Où vous en êtes', 'Aujourd’hui', 'À la retraite', 'Ce que vous détenez', 'Coussin de liquidités', 'Ce que coûte un enfant, selon Statistique Canada', 'Ce qui préciserait la réponse'])
   // the verdict holds the earliest age and the plan's sturdiness; the plan's line sits right under it
   await expect(page.locator('.sheet__section').first().locator('.sheet__stat-name')).toHaveText(['Âge le plus tôt', 'Solidité'])
   await expect(page.locator('.sheet__section').first().getByRole('link', { name: 'Voir la réponse' })).toHaveAttribute('href', '/resultats')
@@ -107,4 +107,29 @@ test('on the narrowest phones the header leaves the sheet button out, and the se
   // wide enough for it: the button is there
   await page.setViewportSize({ width: 390, height: 800 })
   await expect(page.locator('.shell__sheet')).toBeVisible()
+})
+
+// What the profile SAYS about the household — the cash buffer, what the children cost — is read on the sheet, not among the fields of Profil. The choices that act on the
+// children's cost stay on Profil, with a door to the numbers.
+test('the cash buffer and what the children cost are read on the sheet, and no longer sit among Profil’s fields', async ({ page }) => {
+  await page.goto('/fiche')
+  await settled(page)
+  const buffer = page.locator('#coussin')
+  await expect(buffer).toContainText('Coussin de liquidités')
+  await expect(buffer).toContainText(/Environ .+ mois de dépenses de retraite en liquidités/)
+  // the rule of thumb is one tap away
+  await expect(buffer.getByText('Cette zone est un repère courant')).toBeHidden()
+  await buffer.getByText('Ce que ce repère veut dire').click()
+  await expect(buffer.getByText('Cette zone est un repère courant')).toBeVisible()
+  // the golden couple has two children at home: their cost is on the sheet too
+  const kids = page.locator('#enfants')
+  await expect(kids).toContainText('Ce que coûte un enfant, selon Statistique Canada')
+  await expect(kids.locator('.kids-cost__bands li')).toHaveCount(4)
+  await expect(kids.getByText('D’où viennent ces chiffres?')).toBeVisible()
+  await expectNoHorizontalOverflow(page)
+  // Profil holds neither readout
+  await page.goto('/profil?bloc=tout')
+  await expect(page.getByRole('heading', { name: 'Coussin de liquidités' })).toHaveCount(0)
+  await expect(page.locator('.kids-cost__bands')).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Voir ce que ça coûte sur Ma fiche' })).toBeVisible()
 })

@@ -1,5 +1,4 @@
-import { CHILD_COSTS, CPI_ANNUAL } from '../../engine/params/childCosts'
-import { pageFor } from '../../engine/params/twins'
+import { Link } from 'react-router-dom'
 import { childStage } from '../../engine/lifeEvents'
 import { useLang, useT } from '../../i18n'
 import { DEFAULT_LEAVE_AGE, suggestChildCost } from '../../lib/kidsCost'
@@ -19,8 +18,6 @@ import { NumberField } from '../NumberField'
 // « Ce que coûte un enfant » — what Statistics Canada says a family like this one spends per child, by the child's age, as a SUGGESTION: an estimate, said so,
 // offered with a button and never put over a figure the person typed. It shows once there is a child at home or one still to come. The amounts by age are for a
 // child still to come (its cost is ADDED to the budget from its birth); the amount per child at home is what already sits inside the budget and drops when they leave.
-const SOURCES = [CHILD_COSTS, CPI_ANNUAL].map((x) => x.source)
-
 export function KidsCosts() {
   const { lang } = useLang()
   const t = useT()
@@ -48,16 +45,10 @@ export function KidsCosts() {
 
   return (
     <div className="kids-cost">
-      <p className="kids-cost__title">
-        <ConceptPip id="enfants" size="sm" /> <strong>{c.title}</strong> <span className="mono">({c.estimated})</span>
+      {/* The numbers themselves — what a child costs by age, what the state pays back — are READ on Ma fiche; what acts on them is chosen here. */}
+      <p className="field-row__hint">
+        <ConceptPip id="enfants" size="sm" /> <strong>{c.title}</strong> <span className="mono">({c.estimated})</span> · <Link className="info-note__link" to="/fiche">{k.cost.seeSheet}</Link>
       </p>
-      <p className="field-row__hint">{c.lead(c.families[s.family], c.levels[s.level], s.children)}</p>
-      <ul className="kids-cost__bands">
-        {s.bands.map((b, i) => (
-          <li key={c.bands[i]}>{c.bandLine(c.bands[i], money(b))}</li>
-        ))}
-      </ul>
-      {hasHome && s.perChildNow !== null && <p className="field-row__hint">{c.nowHint(money(s.perChildNow))}</p>}
       <Cluster>
         {hasFuture && !byAge && <Chip onClick={() => updateProfile((p) => patchChildSpending(p, { byAge: s.bands }))}>{c.useAll}</Chip>}
         {hasHome && s.perChildNow !== null && (cost?.perChild ?? 0) !== s.perChildNow && <Chip onClick={() => updateProfile((p) => patchChildSpending(p, { perChild: s.perChildNow! }))}>{c.useNow(money(s.perChildNow))}</Chip>}
@@ -86,14 +77,6 @@ export function KidsCosts() {
 
       {summary && (
         <div className="kids-benefits">
-          <p className="kids-cost__title">
-            <ConceptPip id="enfants" size="sm" /> <strong>{b.title}</strong> <span className="mono">({c.estimated})</span>
-          </p>
-          {summary.atHome && <p>{b.atHome(summary.atHome.children, money(Math.round(summary.atHome.cost)), money(Math.round(summary.atHome.benefit)), money(Math.round(summary.atHome.net)))}</p>}
-          {summary.planned && (
-            <p>{b.planned(String(summary.planned.born), money(Math.round(summary.planned.cost)), money(Math.round(summary.planned.benefit)), money(Math.round(summary.planned.net)), money(Math.round(summary.planned.lifetime)))}</p>
-          )}
-          <p className="field-row__hint">{b.note}</p>
           <Chip selected={counted} onClick={() => updateProfile((p) => patchKidsEffects(p, { benefits: !counted }))}>
             {b.toggle}
           </Chip>
@@ -104,7 +87,6 @@ export function KidsCosts() {
         <Chip selected={profile.household.kidsEffects?.qppExclusion ?? false} onClick={() => updateProfile((p) => patchKidsEffects(p, { qppExclusion: !(p.household.kidsEffects?.qppExclusion ?? false) }))}>
           {k.qpp.toggle}
         </Chip>
-        <p className="field-row__hint">{k.qpp.note}</p>
       </div>
 
       {hasFuture && (
@@ -144,28 +126,10 @@ export function KidsCosts() {
         </div>
       )}
 
-      {/* Where the numbers come from: what they MEAN, one tap away (the figures themselves, and the toggles that act on them, stay on the page). */}
-      <Fold summary={k.how.open}>
-        <div className="kids-cost__how">
-          <ul>
-            {k.how.lines.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-          <p className="field-row__hint">{k.how.sources}</p>
-          <ul className="kids-cost__sources">
-            {SOURCES.map((src) => {
-              const page = pageFor(src, lang)
-              return (
-                <li key={src.url}>
-                  <a className="info-note__link" href={page.url} target="_blank" rel="noopener noreferrer">
-                    {page.title}
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+      {/* What the toggles mean — one tap away; the numbers they act on are on Ma fiche. */}
+      <Fold summary={t.common.moreDetails}>
+        <p className="field-row__hint">{b.note}</p>
+        <p className="field-row__hint">{k.qpp.note}</p>
       </Fold>
     </div>
   )

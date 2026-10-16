@@ -58,27 +58,34 @@ const BUDGETS: Record<string, Budget> = {
   // 362 → 360, 2096 → 2094 (2026-10-15): the top bar, and the answer strip pinned over the form is gone (the age is in the bar).
   // 360 → 370, 2094 → 2100 (2026-10-15): the accordion (components/Accordion.tsx) — each block's title is now a button, and a « Suivant » closes every block of the form: a conscious trade for
   // the one-block-at-a-time reading on a phone, whose first paint holds ONE block (the budget here is the wide screen's, where every block is open).
-  'Profil (form)': { controls: 370, words: 2100 },
+  // 370 → 364, 2100 → 1856 (2026-10-16, the ratchet FALLS): the cash buffer and what the children cost are READ on Ma fiche now (components/sheet), not among the fields; Famille keeps
+  // the choices that act on the cost, and the toggles' notes fold under « En savoir plus ».
+  'Profil (form)': { controls: 364, words: 1856 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
   // their explanation folded under « En savoir plus »: four closed summaries added, ~80 words off the first read.
   // 71 → 69, 606 → 609 (2026-10-15): the top bar, and the answer strip pinned over the page is gone (the age is in the bar).
-  'Hypothèses': { controls: 69, words: 609 },
+  // 69 → 33, 609 → 159 (2026-10-16, the ratchet FALLS): the page is an accordion (components/Accordion.tsx) — a first visit faces the scenario open and six closed titles, not seven open blocks.
+  'Hypothèses': { controls: 33, words: 159 },
   // 29 → 28, 385 → 388 (2026-10-15): the top bar (−1 control, +3 words on a route with an answer).
-  'Fiche': { controls: 28, words: 388 },
+  // 28 → 32, 388 → 590 (2026-10-16): the two cards that left Profil — « Coussin de liquidités » and « Ce que coûtent les enfants » (four amounts, what the state pays back, a fold of sources): a conscious
+  // trade, the sheet is where the household is READ.
+  'Fiche': { controls: 32, words: 590 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
   'Résultats — Réponse': { controls: 47, words: 695 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
-  'Résultats — Décider': { controls: 50, words: 1223 },
+  // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
+  'Résultats — Décider': { controls: 48, words: 823 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
   // for the pending « … » cells, and the final page holds the prudent-gap line with its « Voir la sensibilité » chip.
   // 45 → 44, 1890 → 1893 (2026-10-15): the top bar.
-  'Résultats — Preuve': { controls: 44, words: 1893 },
+  // 44 → 31, 1893 → 158 (2026-10-16, the ratchet FALLS): the blocks of Preuve are read one at a time; the firm answer is open, the ledger, the table, the accuracy and the parameters are closed titles.
+  'Résultats — Preuve': { controls: 31, words: 158 },
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]

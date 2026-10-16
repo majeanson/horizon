@@ -2,6 +2,8 @@ import { useDeferredValue, useMemo } from 'react'
 import { answerRequest } from '../lib/answerRequest'
 import { PageHead } from '../components/PageHead'
 import { TimelineStrip } from '../components/results/TimelineStrip'
+import { CashBufferCard } from '../components/sheet/CashBufferCard'
+import { KidsCostCard } from '../components/sheet/KidsCostCard'
 import { SheetSerious } from '../components/sheet/SheetSerious'
 import { useLang, useT } from '../i18n'
 import { profileGaps } from '../lib/profileGaps'
@@ -47,6 +49,12 @@ export function Fiche() {
         lang={lang}
         births={births}
         names={names}
+        cards={
+          <>
+            <CashBufferCard profile={settled} />
+            <KidsCostCard profile={settled} />
+          </>
+        }
         timeline={gaps.length === 0 ? <TimelineStrip household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} /> : undefined}
       />
     </section>

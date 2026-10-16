@@ -25,13 +25,17 @@ test('a planned child is added with one tap, shown as « prévu », and its cost
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await expect(page.getByText(`${THIS_YEAR + 1} · prévu`)).toBeVisible()
   await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([THIS_YEAR + 1])
-  // the suggestion: two parents, medium income (155 k$), one child — Table 2's cell moved to today (× 1,259)
+  // the numbers are READ on Ma fiche; the choice that acts on them is made here, with a door to them
   await expect(page.getByText('Ce que coûte un enfant, selon Statistique Canada')).toBeVisible()
+  await page.getByRole('link', { name: 'Voir ce que ça coûte sur Ma fiche' }).click()
+  await expect(page).toHaveURL(/\/fiche/)
+  // the suggestion: two parents, medium income (155 k$), one child — Table 2's cell moved to today (× 1,259)
   // (the copy keeps a no-break space before the colon and inside the thousands: match the digits, not the spaces)
   await expect(page.getByText(/de 0 à 5 ans.+24\D600/)).toBeVisible()
   await expect(page.getByText(/de 6 à 12 ans.+26\D000/)).toBeVisible()
   await expect(page.getByText(/de 13 à 18 ans.+28\D600/)).toBeVisible()
   await expect(page.getByText(/à 19 ans et plus.+28\D400/)).toBeVisible()
+  await page.goto('/profil?form=1')
   // nothing is put in the profile until the person asks
   expect((await savedProfile(page)).household.childSpending ?? null).toBeNull()
   await page.getByRole('button', { name: 'Utiliser ces montants pour un enfant prévu' }).click()
@@ -67,6 +71,7 @@ test('past, current and planned children sit in one list, each with where it sta
   await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
   await expect(page.getByText(`${THIS_YEAR + 2} · prévu`)).toBeVisible()
   // for the child at home the suggestion is read at their age today (a 4-year-old: the 0–5 band)
+  await page.goto('/fiche')
   await expect(page.getByText(/Un enfant à la maison à son âge d’aujourd’hui.+environ/)).toBeVisible()
 })
 
@@ -95,14 +100,18 @@ test('what the state pays is said beside what a child costs; adding a child coun
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   // a first child counts the benefits (a visible switch), and the card says what they come to at this income
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects).toEqual({ benefits: true, qppExclusion: true, leave: null })
+  // what they come to at this income is read on Ma fiche
+  await page.goto('/fiche')
   await expect(page.getByText('Ce que l’État verse pour eux')).toBeVisible()
   await expect(page.getByText(/Un enfant prévu en \d{4}.+environ .+ sa première année, moins .+ d’allocations, soit .+ net/)).toBeVisible()
+  await page.goto('/profil?form=1')
   const toggle = page.getByRole('button', { name: 'Tenir compte des allocations dans le plan (estimation)' })
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
   await toggle.click()
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects).toEqual({ benefits: false, qppExclusion: true, leave: null })
   await expect(toggle).toHaveAttribute('aria-pressed', 'false')
-  // the QPP exclusion says its condition, and has its own switch
+  // the QPP exclusion says its condition (one tap under « En savoir plus »), and has its own switch
+  await page.locator('.kids-cost').getByText('En savoir plus').click()
   await expect(page.getByText(/seulement dans une année où vos gains ne dépassent pas 3.500/)).toBeVisible()
   await page.getByRole('button', { name: /Exclure du calcul de la rente du RRQ/ }).click()
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects ?? null).toBeNull()

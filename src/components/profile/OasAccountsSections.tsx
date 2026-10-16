@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { Person } from '../../engine/types'
 import type { InfoId } from '../../i18n'
 import { useLang, useT } from '../../i18n'
@@ -46,16 +46,6 @@ export function OasSection({ person, edit, withoutResidence = false }: PersonEdi
 }
 
 type Registered = 'rrsp' | 'tfsa'
-
-// Under the accounts of everyone: the months of retired spending the TFSA and the non-registered money hold (a readout, loaded on its own).
-const CashBufferLine = lazy(() => import('./CashBufferLine'))
-export function CashBufferReadout() {
-  return (
-    <Suspense fallback={null}>
-      <CashBufferLine />
-    </Suspense>
-  )
-}
 
 function Group({ title, concept, children }: { title: string; concept: ConceptId; children: ReactNode }) {
   return (

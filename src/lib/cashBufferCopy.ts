@@ -1,4 +1,4 @@
-// The words of the cash-buffer line on Profil (components/profile/CashBufferLine.tsx). Like bracketFillCopy.ts they live outside the
+// The words of the cash-buffer card on Ma fiche (components/sheet/CashBufferCard.tsx). Like bracketFillCopy.ts they live outside the
 // eager dictionaries (a bundle-budget reason), so cashBufferCopy.test.ts does the parity job: both languages, none empty, none left in the
 // other language, and no figure typed into a sentence (the months, the band and the dollars all arrive as arguments).
 // French punctuation: U+00A0 before « : », U+202F before « ; ? ! % $ » and inside « … » (frenchSpacing.test.ts).
@@ -15,6 +15,8 @@ export interface CashBufferCopy {
   basis: (liquid: string) => string
   /** The band is a rule of thumb, not an official figure. */
   caveat: string
+  /** The fold that holds it. */
+  caveatTitle: string
 }
 
 const FR: CashBufferCopy = {
@@ -25,6 +27,7 @@ const FR: CashBufferCopy = {
   above: (months, min, max) => `Environ ${months} mois de dépenses de retraite en liquidités, au-delà de la zone de ${min} à ${max} mois souvent visée : le surplus pourrait travailler ailleurs.`,
   basis: (liquid) => `Compté : le CELI et les comptes non enregistrés des deux conjoints (${liquid}). Le REER n’est pas compté, car il est imposable au retrait.`,
   caveat: 'Cette zone est un repère courant, pas un chiffre officiel. Elle n’entre dans aucun calcul du plan.',
+  caveatTitle: 'Ce que ce repère veut dire',
 }
 
 const EN: CashBufferCopy = {
@@ -35,6 +38,7 @@ const EN: CashBufferCopy = {
   above: (months, min, max) => `About ${months} months of retirement spending held in liquid accounts, above the ${min} to ${max} months often aimed for: the surplus could work elsewhere.`,
   basis: (liquid) => `Counted: both spouses’ TFSA and non-registered accounts (${liquid}). The RRSP is not counted, because it is taxable when withdrawn.`,
   caveat: 'This range is a common rule of thumb, not an official figure. It enters no calculation of the plan.',
+  caveatTitle: 'What this range means',
 }
 
 export const CASH_BUFFER_COPY = { fr: FR, en: EN }

@@ -21,7 +21,7 @@ async function hitsAt(link: Locator, dx: number, dy: number): Promise<boolean> {
 }
 
 test('the answer in the bar, the brand and a sigle in a hint can be tapped from 20 px above and below their text', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout') // every block open: a sigle sits in a hint of the first one that has one
   await page.locator('.shell__answer-link').waitFor()
   for (const selector of ['.shell__answer-link', '.shell__brand', 'main a.gloss:visible']) {
     const link = page.locator(selector)
@@ -33,7 +33,7 @@ test('the answer in the bar, the brand and a sigle in a hint can be tapped from 
 })
 
 test('a larger hit area is not a larger look: the link keeps its size', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout') // every block open: a sigle sits in a hint of the first one that has one
   const gloss = (await page.locator('main a.gloss:visible').first().boundingBox())!
   expect(gloss.height).toBeLessThan(30)
 })
@@ -59,7 +59,7 @@ test('a wide screen keeps the title of Résultats where it was', async ({ page }
 })
 
 test('Profil: the two ways to fill it are ONE switch under the title, on one line, not two stacked pills', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout') // every block open: a sigle sits in a hint of the first one that has one
   const tabs = page.getByRole('tablist', { name: 'Façon de remplir le profil' }).getByRole('tab')
   await expect(tabs).toHaveText(['Par sujet', 'Par document'])
   const tops = await tabs.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)))
