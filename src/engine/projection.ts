@@ -656,7 +656,9 @@ function simulateYear(
   // filled (the GIS is lost faster than the tax is saved — not modelled in v1), and a person already over the line is left alone.
   if (a.bracketFill) {
     const line = fillCeiling(a.bracketFill, P)
-    people.forEach((_, i) => {
+    // Twice, in order: the first person is looked at before the spouse is filled, so a household that looks poor enough for the GIS then skips them; the spouse's fill can
+    // lift the household off the GIS, and the second pass fills whoever was skipped for a GIS that is gone (it leaves anyone still on the GIS exactly as the first did).
+    for (let pass = 0; pass < 2; pass++) people.forEach((_, i) => {
       if (fixed[i].employment > 0) return
       const base = draw.rrsp[i]
       const room = Math.max(0, fixed[i].freeAvail + fixed[i].lockedAvail - fixed[i].rrifMin - base)
@@ -664,14 +666,15 @@ function simulateYear(
       const first = evaluate(fixedSplit())
       // The line is read AFTER the split the final tax will make: the held split was chosen before this draw existed (≈ none), so
       // reading it would count every dollar at full value for the line yet tax half of it on the spouse, and stop at half the line.
+      // It is read on THIS person's own income — and, for the OAS line only, on a spouse who is paid OAS too: that line's promise is that nothing is repaid, and what one
+      // draws lands partly on the other. For the first-bracket line the spouse is not a second stop: on 269 random couples that rule (or « either spouse ») stalled the fill
+      // for whoever has pensions of their own, and cost more tax on every count.
       const splits = a.pensionSplitting && couple
-      // With a split, what this person draws lands partly on the spouse: the spouse crossing the line stops the fill too, but only when the
-      // spouse is paid OAS (the only income the line protects) — otherwise a spouse with big pensions would stop a fill that costs them nothing.
-      const other = i === 0 ? 1 : 0
+      const spouse = i === 0 ? 1 : 0
       const netAt = () => {
         if (!splits) return evaluate(fixedSplit()).tax.persons[i].netIncomeBeforeAdjustments
         const nets = taxWithAllowance(incomes().persons, (p) => householdTax(p, rules, { splitting: true })).tax.persons.map((t) => t.netIncomeBeforeAdjustments)
-        return fixed[other].oas > 0 ? Math.max(nets[i], nets[other]) : nets[i]
+        return a.bracketFill === 'oas' && fixed[spouse].oas > 0 ? Math.max(nets[i], nets[spouse]) : nets[i]
       }
       if (first.gis[i] > 0.005 || netAt() >= line) return
       const incomeAt = (x: number) => {

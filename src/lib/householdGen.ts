@@ -213,3 +213,23 @@ export function describeCase(c: Pick<GenCase, 'seed' | 'index'>, household: Hous
   return `seed ${c.seed}, case ${c.index} — reproduce with genCases(${c.seed}, ${c.index + 1})[${c.index}]\n${JSON.stringify(household)}`
 }
 
+
+/**
+ * Run a property over many cases. `problems` returns what is wrong with one (empty when nothing is). The first failing case is shrunk to the smallest household that still has a
+ * problem, and reported with its seed and index; null when every case is clean. A shrunk household the property throws on is not kept (a cut that breaks the setup proves nothing).
+ */
+export function checkCases(list: readonly GenCase[], problems: (c: GenCase) => string[]): string | null {
+  for (const c of list) {
+    if (problems(c).length === 0) continue
+    const stillWrong = (household: Household) => {
+      try {
+        return problems({ ...c, household }).length > 0
+      } catch {
+        return false
+      }
+    }
+    const small = shrinkHousehold(c.household, stillWrong)
+    return `${describeCase(c, small)}\n${problems({ ...c, household: small }).slice(0, 6).join('\n')}`
+  }
+  return null
+}

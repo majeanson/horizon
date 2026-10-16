@@ -38,7 +38,7 @@ describe('a person who was filled up to the line is not above it (every example,
             // (A spouse's own pensions, or a draw the year NEEDED whatever the fill did, can put anyone above it: that is not the fill's doing.)
             if (extra <= 1 || p.employment > 0 || p.oas <= 0 || (base[i].persons[pid]?.netIncome ?? Infinity) > line) continue
             // 2 % for the split's own 5 % steps; a person on the GIS is not filled at all, so is never here.
-            expect(p.netIncome, `${id} ${kind} ${row.year} ${pid}`).toBeLessThanOrEqual(line * 1.02)
+            expect(p.netIncome, `${id} ${kind} ${row.year} ${pid}`).toBeLessThanOrEqual(line * (kind === 'oas' ? 1.02 : 1.03)) // the first-bracket line does not stop on a spouse: a split can lift one a little
           }
         })
       })

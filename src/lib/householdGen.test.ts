@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { project } from '../engine/projection.ts'
 import type { Household } from '../engine/types.ts'
-import { describeCase, genCases, shrinkHousehold } from './householdGen.ts'
+import { checkCases, describeCase, genCases, shrinkHousehold } from './householdGen.ts'
 import { violations } from './plausibility.ts'
 
 // THE GENERATOR IS ITSELF A THING THAT CAN BE WRONG. Every property proved on random households is only as good as the households: if they broke a rule of plausibility the
@@ -108,5 +108,34 @@ describe('the shrinker keeps only what still fails', () => {
     let calls = 0
     shrinkHousehold(rich, () => (calls++, true), 5)
     expect(calls).toBeLessThanOrEqual(5)
+  })
+})
+
+describe('checkCases reports the first failure, shrunk, with where to find it', () => {
+  const list = genCases(7, 30)
+
+  it('is null when nothing is wrong', () => {
+    expect(checkCases(list, () => [])).toBeNull()
+  })
+
+  it('names the seed and index, prints a household cut down to what the failure needs, and lists the problems', () => {
+    const needsPension = (c: (typeof list)[number]) => (c.household.persons.some((p) => p.pensions.length > 0) ? ['has a pension'] : [])
+    const message = checkCases(list, needsPension)!
+    const first = list.find((c) => needsPension(c).length > 0)!
+    expect(message).toContain(`seed ${first.seed}, case ${first.index}`)
+    expect(message).toContain('has a pension')
+    const shrunk = JSON.parse(message.split('\n')[1]) as Household
+    expect(shrunk.persons.length).toBe(1)
+    expect(shrunk.home).toBeUndefined()
+  })
+
+  it('does not keep a cut the property throws on', () => {
+    const throwsOnSingles = (c: (typeof list)[number]) => {
+      if (c.household.persons.length === 1) throw new Error('boom')
+      return c.household.persons.some((p) => p.pensions.length > 0) ? ['has a pension'] : []
+    }
+    const couple = list.find((c) => c.household.persons.length === 2 && c.household.persons.some((p) => p.pensions.length > 0))!
+    const message = checkCases([couple], throwsOnSingles)!
+    expect(JSON.parse(message.split('\n')[1]).persons.length).toBe(2)
   })
 })

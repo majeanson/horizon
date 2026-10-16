@@ -6,7 +6,8 @@ import { MARKET_PRESETS } from '../engine/marketPaths.ts'
 import { paramsFor } from '../engine/params/index.ts'
 import { project } from '../engine/projection.ts'
 import type { AccountKind, Assumptions, YearRow } from '../engine/types.ts'
-import { SOURCE_SEGMENTS, balanceBars, deflator, expenseBars, sourceBars } from './chartData.ts'
+import { balanceBars, deflator } from './chartData.ts'
+import { bookProblems } from './identities.ts'
 
 // THE OPTIONS MATRIX. Every setting the household can change (the way the RRSP is drawn, splitting, drawing together, the surplus to the RRSP, the order of the
 // accounts, the markets' path) changes which code runs, and the suites that hold the books and the pictures to their identities were each run with the example's OWN settings
@@ -34,9 +35,6 @@ const VARIANTS: Variant[] = [
   { name: 'fill OAS + together + splitting + RRSP first', over: { bracketFill: 'oas', drawTogether: true, pensionSplitting: true, withdrawalOrder: ['rrsp', 'nonReg', 'tfsa'] } },
   { name: 'fill first bracket + bad start + surplus to RRSP', over: { bracketFill: 'bracket1', surplusToRrsp: true, marketPath: { preset: 'badStart', custom: [0.15, 0.15, 0.12, -0.25, -0.05, 0.05] } } },
 ]
-const OUT = ['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved'] as const
-const NEED = ['living', 'children', 'events', 'mortgage', 'tax', 'unmet'] as const
-const sum = (o: Record<string, number>, keys: readonly string[]) => keys.reduce((s, k) => s + o[k], 0)
 const scale = (a: Assumptions) => ({ dollars: 'nominal' as const, todayYear: a.today.year, inflation: a.inflation })
 
 describe('every setting, every example: the books and the two flow charts hold', { timeout: 300_000 }, () => {
@@ -46,34 +44,7 @@ describe('every setting, every example: the books and the two flow charts hold',
         const { household, assumptions } = EXAMPLES[id]
         const a: Assumptions = { ...assumptions, ...v.over }
         const rows = project(household, a)
-        const s = scale(a)
-        const sources = sourceBars(rows, null, s)
-        const spent = expenseBars(rows, s)
-        const balances = balanceBars(rows, null, s)
-        rows.forEach((row, i) => {
-          const where = `${id} · ${v.name} · ${row.year}`
-          // what comes in is what goes out, and the dashed need line is the budget plus tax
-          expect(sum(sources[i], SOURCE_SEGMENTS), where).toBeCloseTo(sum(spent[i], OUT), 1)
-          expect(sources[i].need, where).toBeCloseTo(sum(spent[i], NEED), 1)
-          // nothing is NaN, nothing is owed to nobody
-          for (const p of Object.values(row.persons)) {
-            if (!p) continue
-            for (const x of [p.netIncome, p.federalTax, p.quebecTax, p.oasRecovery, p.rrifMinimum, p.gis, p.withdrawals.rrsp, p.withdrawals.tfsa, p.withdrawals.nonReg, p.balancesEnd.rrsp, p.balancesEnd.tfsa, p.balancesEnd.nonReg]) expect(Number.isFinite(x), where).toBe(true)
-            expect(p.withdrawals.rrsp + 0.005, where).toBeGreaterThanOrEqual(p.rrifMinimum)
-            expect(p.balancesEnd.rrsp, where).toBeGreaterThanOrEqual(-0.005)
-            expect(p.balancesEnd.tfsa, where).toBeGreaterThanOrEqual(-0.005)
-            expect(p.balancesEnd.nonReg, where).toBeGreaterThanOrEqual(-0.005)
-            expect(p.gis, where).toBeGreaterThanOrEqual(0)
-            expect(p.oasRecovery, where).toBeGreaterThanOrEqual(0)
-          }
-          expect(row.household.shortfall, where).toBeGreaterThanOrEqual(0)
-          expect(row.household.tax, where).toBeGreaterThanOrEqual(0)
-          // the accounts the chart stacks are the net worth the row reports (the home is the only thing the bars add)
-          const stacked = balances[i].rrsp + balances[i].rrspLocked + balances[i].tfsa + balances[i].nonReg
-          expect(stacked, where).toBeCloseTo(row.household.netWorthEnd, 0)
-        })
-        // years run one after another
-        rows.forEach((r, i) => i > 0 && expect(r.year - rows[i - 1].year, `${id} · ${v.name}`).toBe(1))
+        expect(bookProblems(rows, a).map((p) => `${id} · ${v.name} · ${p}`)).toEqual([])
       }
     })
   }
