@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:engine": "vitest run src/engine",
-    "test:fast": "vitest run --exclude \"**/node_modules/**\" --exclude \"**/{answer.props,answerTrust,orderNudge,presetEffects,savingsNeeded,sheetCopy,probes}.test.ts\"",
+    "test:fast": "vitest run --exclude \"**/node_modules/**\" --exclude \"**/{answer.props,answerTrust,orderNudge,presetEffects,savingsNeeded,sheetCopy,probes,perfBudget,schemaExtremes}.test.ts\"",
     "coverage": "vitest run --config vitest.coverage.config.ts --coverage.enabled",
     "mutate": "node scripts/mutate.mjs",
     "stryker": "node scripts/stryker.mjs",
