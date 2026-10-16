@@ -6,7 +6,8 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: true,
-    include: ['{src,worker}/**/*.test.ts', 'scripts/**/*.test.mjs'],
+    // `.test.tsx` runs too: a component or a hook is tested through @testing-library/react (src/lib/reactTooling.test.tsx pins that the pipeline works).
+    include: ['{src,worker}/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs'],
     exclude: ['**/node_modules/**'],
     // The engine's earliest-age searches run a few seconds each; on a busy box or CI's runner the 5 s default tipped them over (levers, plansCompare, spendModel, the examples).
     // A wrong answer still fails at once; only a slow one waits.

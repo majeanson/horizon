@@ -1,10 +1,10 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_HOUSEHOLD, GOLDEN_TODAY } from '../engine/golden/household.fixture.ts'
-import { paramsFor } from '../engine/params/index.ts'
-import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from '../engine/params/rrqHistory.ts'
+
+import { violations } from './plausibility.ts'
 import type { Household } from '../engine/types.ts'
 import { EXAMPLE_IDS } from '../engine/golden/examples.ts'
 import { exampleProfile } from './example.ts'
@@ -21,104 +21,10 @@ import { exampleProfile } from './example.ts'
 // excuse fails (the lists only shrink). A canary pins the detector against a household built to break every rule.
 
 const TODAY = GOLDEN_TODAY
-const P = paramsFor(TODAY.year, { inflation: 0.02, wageGrowth: 0.03 })
-
-/** The ceiling a relevé counts a year's earnings up to: the additional one from 2024, the MGA before. */
-const ceiling = (year: number): number | undefined => RRQ_YAMPE_HISTORY.value[year] ?? RRQ_MGA_HISTORY.value[year]
-
-function violations(h: Household, children: readonly number[] = []): string[] {
-  const out: string[] = []
-  const add = (rule: string, who: string, why: string) => out.push(`${rule}: ${who} — ${why}`)
-  const age = (birthYear: number) => TODAY.year - birthYear
-
-  if (h.persons.length === 2 && h.livesAlone) add('couple-lives-alone', 'household', 'two adults cannot live alone')
-  if (h.persons.length === 2) {
-    const gap = Math.abs(h.persons[0].birth.year - h.persons[1].birth.year)
-    if (gap > 20) add('age-gap', 'household', `${gap} years between the spouses`)
-  }
-
-  for (const p of h.persons) {
-    const who = p.id
-    const a = age(p.birth.year)
-    if (a < 18 || a > 100) add('age', who, `${a} years old`)
-    if (p.retirementAge < 18 || p.retirementAge > 75) add('retirement-age', who, `retires at ${p.retirementAge}`)
-    if (p.rrq.startAge < 60 || p.rrq.startAge > 72) add('rrq-start', who, `QPP at ${p.rrq.startAge}`)
-    if (p.oas.startAge < 65 || p.oas.startAge > 70) add('oas-start', who, `OAS at ${p.oas.startAge}`)
-    if (p.oas.residentSince < p.birth.year + 18) add('residence', who, `resident since ${p.oas.residentSince}, before turning 18`)
-    if (p.oas.residentSince > TODAY.year) add('residence', who, `resident since ${p.oas.residentSince}, in the future`)
-
-    // The earnings history is the relevé's: past years only, from the 18th birthday, never above that year's ceiling.
-    const years = Object.keys(p.earningsHistory).map(Number)
-    for (const y of years) {
-      const e = p.earningsHistory[y]
-      if (y < p.birth.year + 18) add('earnings-year', who, `${y} is before the 18th birthday`)
-      if (y >= TODAY.year) add('earnings-year', who, `${y} has not ended`)
-      if (e < 0) add('earnings-negative', who, `${y}: ${e}`)
-      const c = ceiling(y)
-      if (c !== undefined && e > c) add('earnings-over-ceiling', who, `${y}: ${e} is above that year's ceiling ${c}`)
-    }
-    const working = p.salaryToday > 0 && p.retirementAge > a
-    if (working && years.length > 0) {
-      const last = Math.max(...years)
-      const e = p.earningsHistory[last]
-      const cap = ceiling(last) ?? Infinity
-      const expected = Math.min(p.salaryToday, cap)
-      if (last < TODAY.year - 2) add('earnings-stale', who, `the history ends in ${last}`)
-      else if (e < 0.85 * expected) add('earnings-vs-salary', who, `${last} earned ${e} against a salary of ${p.salaryToday} today (ceiling ${cap})`)
-      else if (e > 1.15 * p.salaryToday) add('earnings-vs-salary', who, `${last} earned ${e}, well above today's ${p.salaryToday}`)
-    }
-
-    const { rrsp, tfsa, nonReg } = p.accounts
-    for (const [name, balance] of [['rrsp', rrsp.balance], ['tfsa', tfsa.balance], ['nonReg', nonReg.balance]] as const) {
-      if (balance < 0) add('balance-negative', who, `${name} ${balance}`)
-    }
-    if (tfsa.room > P.accounts.tfsaCumulativeSince2009) add('tfsa-room', who, `${tfsa.room} of room is more than every limit since 2009 added together (${P.accounts.tfsaCumulativeSince2009})`)
-    if (tfsa.annualContribution > P.accounts.tfsaLimit) add('tfsa-contribution', who, `${tfsa.annualContribution} a year is above the ${P.accounts.tfsaLimit} limit`)
-    if (rrsp.annualContribution > P.accounts.rrspLimit) add('rrsp-contribution', who, `${rrsp.annualContribution} a year is above the ${P.accounts.rrspLimit} limit`)
-    if (p.salaryToday > 0 && rrsp.annualContribution > P.accounts.rrspRate * p.salaryToday + rrsp.room) {
-      add('rrsp-contribution', who, `${rrsp.annualContribution} a year is more than 18 % of the salary plus all the room`)
-    }
-    if ((rrsp.lockedIn ?? 0) > rrsp.balance) add('rrsp-locked', who, `${rrsp.lockedIn} locked in is more than the whole REER balance ${rrsp.balance}`)
-    const earnedEver = years.reduce((s, y) => s + p.earningsHistory[y], 0) + p.salaryToday
-    if (rrsp.room > P.accounts.rrspRate * earnedEver) add('rrsp-room', who, `${rrsp.room} of room is more than 18 % of everything ever earned`)
-    if (nonReg.acb < 0 || nonReg.acb > Math.max(2 * nonReg.balance, 1000)) add('nonreg-acb', who, `cost base ${nonReg.acb} against a balance of ${nonReg.balance}`)
-
-    for (const d of p.pensions) {
-      if (d.inPay) continue
-      if (d.serviceYearsToDate > a - 18) add('db-service', who, `${d.serviceYearsToDate} years of service at ${a}`)
-      const toRetirement = Math.max(0, p.retirementAge - a)
-      if (d.maxServiceYears !== null && d.serviceYearsToDate + toRetirement * d.serviceRatePerYear > d.maxServiceYears + 20) add('db-service', who, 'more service than the plan allows even for a full career')
-      if (d.startAge < d.earliestAge) add('db-start', who, `starts at ${d.startAge}, before the earliest age ${d.earliestAge}`)
-    }
-  }
-
-  const gross = h.persons.reduce((s, p) => s + (p.retirementAge > age(p.birth.year) ? p.salaryToday : 0), 0)
-  const saved = h.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
-  if (gross > 0 && h.spending.workingToday + saved > 0.95 * gross) add('spending-vs-income', 'household', `spends ${h.spending.workingToday} and saves ${saved} on ${gross} gross`)
-  if (h.spending.workingToday > 0 && (h.spending.retiredToday > 1.05 * h.spending.workingToday || h.spending.retiredToday < 0.5 * h.spending.workingToday)) {
-    // Retirement spends about the same or less (the children are gone, the commute and the saving stop); a retired figure more
-    // than 5 % above the working one is a household nobody described (the old golden couple: 88 000 working, 100 000 retired, with
-    // two children still at home).
-    add('retired-spending', 'household', `${h.spending.retiredToday} retired against ${h.spending.workingToday} working`)
-  }
-
-  const oldestParent = Math.min(...h.persons.map((p) => p.birth.year))
-  for (const c of children) {
-    if (c > TODAY.year) {
-      // A child still TO COME is a stated plan, not a mistake — when the household says what it costs, is due within ten years, and the younger parent is
-      // not past 45 by then. Without a stated cost it is a birth year nobody accounted for.
-      const youngest = Math.max(...h.persons.map((p) => p.birth.year))
-      if (!h.childSpending) add('child', 'household', `born in ${c}, in the future, with no cost stated`)
-      else if (c > TODAY.year + 10) add('child', 'household', `born in ${c}, more than ten years ahead`)
-      else if (c - youngest > 45) add('child', 'household', `born in ${c}, when the younger parent would be ${c - youngest}`)
-    }
-    if (c < oldestParent + 14) add('child', 'household', `born in ${c}, before the oldest parent turned 14`)
-  }
-  return out
-}
-
 const dir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures')
-const FIXTURES = [1, 2, 3, 4, 5].map((v) => {
+// EVERY version on disk (it read v1 to v5 only, so v6 to v25 were never held to anything): the set is discovered, not listed, so a new fixture is held the day it is added.
+const VERSIONS = readdirSync(dir).map((n) => /^profile\.v(\d+)\.json$/.exec(n)?.[1]).filter((v): v is string => v !== undefined).map(Number).sort((a, b) => a - b)
+const FIXTURES = VERSIONS.map((v) => {
   const j = JSON.parse(readFileSync(join(dir, `profile.v${v}.json`), 'utf8')) as { household: Household; children: number[] }
   return { name: `profile.v${v}.json`, household: j.household, children: j.children ?? [] }
 })
