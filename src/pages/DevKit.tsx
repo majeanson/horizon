@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Accordion, AccordionItem, AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Cascade } from '../components/Cascade'
+import { CountUp } from '../components/CountUp'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { DisplayControls } from '../components/DisplayControls'
@@ -394,6 +395,12 @@ function CascadeSpecimen() {
       <p className="answer__big">
         <Cascade>{'Il faudrait mettre de côté ' + formatMoney(n, lang) + ' de plus par année.'}</Cascade>
       </p>
+      <p className="answer__big">
+        <CountUp>{'À ' + formatMoney(n, lang) + ' par année : dès 52 ans.'}</CountUp>
+      </p>
+      <p className="field-row__hint" style={{ margin: 0 }}>
+        Premier : les chiffres montent en place. Second : le montant compte jusqu’à sa valeur (et, à un autre chiffre, depuis l’ancien) ; l’âge à côté ne bouge jamais, et le texte est entier dans la page dès la première image.
+      </p>
       <Cluster>
         <Chip onClick={() => setN((x) => Math.round((x * 1.37 + 211) * 100) / 100)}>Un autre chiffre</Chip>
       </Cluster>
@@ -605,6 +612,13 @@ function ENTRIES(): Entry[] {
       name: 'Cascade',
       file: 'src/components/Cascade.tsx',
       kw: 'chiffres arrivée animation réponse nombre',
+      render: () => <CascadeSpecimen />,
+    },
+    {
+      cat: 'Affichage',
+      name: 'CountUp',
+      file: 'src/components/CountUp.tsx',
+      kw: 'montant compte jusqu’à chiffre argent animation réponse',
       render: () => <CascadeSpecimen />,
     },
     { cat: 'Affichage', name: 'Gloss', file: 'src/components/Gloss.tsx', exports: ['Gloss', 'glossed'], kw: 'glossaire sigle abréviation lien explication', render: () => <p><Gloss>Votre rente du RRQ et la PSV commencent à l’âge choisi ; le REER et le CELI s’ajoutent.</Gloss></p> },

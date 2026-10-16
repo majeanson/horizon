@@ -173,6 +173,13 @@
   gap: 0.4rem;
 }
 
+/* A paste box a file is being dragged over (components/profile/BankImport.tsx): a dashed accent frame says « drop it here ». Colour is never the only cue: the dashes change the border's shape. */
+.input.is-dropping {
+  border-style: dashed;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 /* A refused text (EditField `invalid`, with NumberField's reason under the box): the border turns clay, not only the words under it — a reader looking at the
    box, not the line, still sees which one. The words carry the meaning (aria-invalid + the described-by reason); the colour is the second cue. */
 .edit-field--invalid .edit-field__box {

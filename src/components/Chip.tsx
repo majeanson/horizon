@@ -1,4 +1,4 @@
-import type { CSSProperties, MouseEvent, ReactNode } from 'react'
+import type { CSSProperties, KeyboardEvent, MouseEvent, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ConceptPip } from './ConceptPip'
 import { InlineIcon, type IconName } from './Icon'
@@ -41,6 +41,21 @@ import type { ConceptId } from '../lib/concepts'
 //
 // `onRemove` is the removable tag-pill: the chip is itself the remove button and
 // grows a trailing ✕ (it is an action, so no `aria-pressed` there either).
+// The arrow keys inside a choose-one set: ← ↑ and → ↓ move to the neighbouring radio chip of the same row and choose it (a radio group's own keyboard, which a row of buttons
+// otherwise lacks — Tab visits every chip, the arrows walk the set). Tab stops are untouched.
+function radioArrows(e: KeyboardEvent<HTMLButtonElement>): void {
+  const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown'
+  if (!forward && e.key !== 'ArrowLeft' && e.key !== 'ArrowUp') return
+  const row = e.currentTarget.parentElement
+  const radios = row ? Array.from(row.querySelectorAll<HTMLButtonElement>(':scope > [role="radio"]:not(:disabled)')) : []
+  const at = radios.indexOf(e.currentTarget)
+  if (at < 0 || radios.length < 2) return
+  e.preventDefault()
+  const next = radios[(at + (forward ? 1 : -1) + radios.length) % radios.length]
+  next.focus()
+  next.click()
+}
+
 export function Chip({
   children,
   selected,
@@ -141,6 +156,7 @@ export function Chip({
       aria-label={ariaLabel ?? (onRemove ? removeLabel : undefined)}
       title={title}
       disabled={disabled}
+      onKeyDown={radio && selected !== undefined && !onRemove ? radioArrows : undefined}
     >
       {body}
     </button>

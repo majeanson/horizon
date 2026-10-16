@@ -147,3 +147,87 @@ test.describe('the page chrome', () => {
     expect(await scale()).toBeLessThan(0.7)
   })
 })
+
+test.describe('more inputs', () => {
+  test('a choose-one set walks with the arrow keys: → chooses the next chip, ← the one before, and it wraps', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/profil')
+    await page.locator('.page-head__title').waitFor()
+    const group = page.getByRole('radiogroup').first()
+    await group.scrollIntoViewIfNeeded()
+    const radios = group.getByRole('radio')
+    const checked = async () => radios.evaluateAll((els) => els.map((e) => e.getAttribute('aria-checked')))
+    const before = await checked()
+    const at = before.indexOf('true')
+    await radios.nth(at).focus()
+    await radios.nth(at).press('ArrowRight')
+    const after = await checked()
+    expect(after.indexOf('true')).toBe((at + 1) % before.length)
+    await radios.nth((at + 1) % before.length).press('ArrowLeft')
+    expect((await checked()).indexOf('true')).toBe(at)
+  })
+
+  test('a file dropped on the bank paste box is read, and the box shows it is a drop target while the file is over it', async ({ page }) => {
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/profil?form=1')
+    await page.locator('.page-head__title').waitFor()
+    const fold = page.locator('details.fold', { hasText: 'Importer un relevé de banque' })
+    await fold.locator('summary').click()
+    const box = fold.getByRole('textbox', { name: 'Opérations copiées du relevé' })
+    const csv = ['Date;Description;Catégorie;Montant', '2025-01-28;IGA;Épicerie;-500,00', '2025-02-28;IGA;Épicerie;-500,00'].join('\n')
+    await box.evaluate((el, text) => {
+      const data = new DataTransfer()
+      data.items.add(new File([text], 'releve.csv', { type: 'text/csv' }))
+      el.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: data }))
+    }, csv)
+    await expect(box).toHaveClass(/is-dropping/)
+    await box.evaluate((el, text) => {
+      const data = new DataTransfer()
+      data.items.add(new File([text], 'releve.csv', { type: 'text/csv' }))
+      el.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: data }))
+    }, csv)
+    await expect(fold.getByRole('status')).toContainText('opérations lues')
+    await expect(box).not.toHaveClass(/is-dropping/)
+  })
+})
+
+test.describe('a figure that counts up', () => {
+  const url = '/resultats?v=decide&essai=spend&spend=40000'
+  // Records every value the count draws, from the first frame.
+  const watch = (page: import('@playwright/test').Page) =>
+    page.addInitScript(() => {
+      const w = window as unknown as { __live: string[] }
+      w.__live = []
+      new MutationObserver((ms) => {
+        for (const m of ms) if ((m.target as Element).classList?.contains('countup')) w.__live.push((m.target as Element).getAttribute('data-live') ?? '')
+      }).observe(document, { subtree: true, attributes: true, attributeFilter: ['data-live'] })
+    })
+
+  test('the sentence is whole in the page at once, and the amount is drawn climbing to it; the age beside it never moves', async ({ page }) => {
+    await watch(page)
+    await seedProfile(page, EXAMPLE)
+    await page.goto(url)
+    const text = page.locator('.countup__text').first()
+    await expect(text).toContainText(/par année\s*:\s*dès\s*\d+\s*ans/, { timeout: 60_000 })
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __live: string[] }).__live.filter(Boolean).length)).toBeGreaterThan(3)
+    const frames = await page.evaluate(() => (window as unknown as { __live: string[] }).__live.filter(Boolean))
+    const age = (s: string) => /dès\s(\d+)\sans/.exec(s)?.[1]
+    expect(new Set(frames.map(age)).size, 'the age is the same in every frame').toBe(1)
+    expect(frames[0]).toMatch(/^À\s0\s\$/)
+    await expect(page.locator('.countup').first()).not.toHaveClass(/is-counting/, { timeout: 5000 })
+    expect((await text.textContent())?.replace(/\s/g, ' ')).toMatch(/^À 40 000 \$ par année/)
+  })
+
+  test.describe('reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' })
+    test('nothing is drawn: the figure is simply there', async ({ page }) => {
+      await watch(page)
+      await seedProfile(page, EXAMPLE)
+      await page.goto(url)
+      await expect(page.locator('.countup__text').first()).toContainText(/par année/, { timeout: 60_000 })
+      await page.waitForTimeout(1000)
+      expect(await page.evaluate(() => (window as unknown as { __live: string[] }).__live.filter(Boolean).length)).toBe(0)
+    })
+  })
+})

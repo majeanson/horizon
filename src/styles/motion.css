@@ -519,6 +519,20 @@ a.welcome__card:active,
   animation: pip-pop var(--dur-slow) var(--ease-soft) backwards;
 }
 
+/* ── A money figure counts up (components/CountUp.tsx): the real text stays in the DOM, hidden for the length of the count, and the counting sentence is drawn over it ─────────────────── */
+.countup {
+  position: relative;
+  display: block;
+}
+.countup.is-counting > .countup__text {
+  visibility: hidden;
+}
+.countup.is-counting::after {
+  content: attr(data-live);
+  position: absolute;
+  inset: 0;
+}
+
 /* ── A placeholder breathes: one slow, soft sweep of the accent wash across each block (components/Skeleton.tsx) ─────────────────────────────────────────
    The sweep is a pseudo-element moved by transform inside the block (clipped to its rounded shape), so the block itself never changes opacity or size; it is slow enough
    (~2 s a pass) to read as « something is coming », not as an alarm. */

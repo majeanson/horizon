@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react'
+import { useMemo, useState, type ChangeEvent, type DragEvent } from 'react'
 import { useLang } from '../../i18n'
 import { readBank, summarize, totalOf } from '../../lib/bankImport'
 import { BANK_IMPORT_COPY } from '../../lib/bankImportCopy'
@@ -34,10 +34,19 @@ export function BankImport() {
     setText(next)
     setToggled({})
   }
+  const readFiles = async (files: File[]) => load((await Promise.all(files.map((f) => f.text()))).join('\n'))
   const onFiles = async (e: ChangeEvent<HTMLInputElement>) => {
-    const files = [...(e.target.files ?? [])]
-    load((await Promise.all(files.map((f) => f.text()))).join('\n'))
+    await readFiles([...(e.target.files ?? [])])
     e.target.value = ''
+  }
+  // A file can also be DROPPED on the paste box (a mouse's way of « open a file »): the box rings while one is over it. Only a drag that carries files counts.
+  const [dropping, setDropping] = useState(false)
+  const carriesFiles = (e: DragEvent) => Array.from(e.dataTransfer.types).includes('Files')
+  const onDrop = async (e: DragEvent) => {
+    if (!carriesFiles(e)) return
+    e.preventDefault()
+    setDropping(false)
+    await readFiles([...e.dataTransfer.files])
   }
   const apply = () => {
     updateProfile((p) => setFact(setSpending(p, { workingToday: Math.round(total) }), factId('household', 'spendingWorking'), true))
@@ -52,7 +61,18 @@ export function BankImport() {
         <span>{c.file} </span>
         <input type="file" accept=".csv,.tsv,.txt,text/csv,text/plain,text/tab-separated-values" multiple onChange={onFiles} />
       </label>
-      <textarea className="input" rows={5} value={text} placeholder={c.placeholder} aria-label={c.label} onChange={(e) => load(e.target.value)} spellCheck={false} />
+      <textarea
+        className={'input' + (dropping ? ' is-dropping' : '')}
+        onDragOver={(e) => {
+          if (carriesFiles(e)) {
+            e.preventDefault()
+            setDropping(true)
+          }
+        }}
+        onDragLeave={() => setDropping(false)}
+        onDrop={onDrop}
+        rows={5}
+        value={text} placeholder={c.placeholder} aria-label={c.label} onChange={(e) => load(e.target.value)} spellCheck={false} />
       {text.trim() !== '' && summary === null && <StatusMessage tone="info">{c.nothing}</StatusMessage>}
       {summary !== null && (
         <div role="status">
