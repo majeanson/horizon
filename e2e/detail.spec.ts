@@ -29,9 +29,9 @@ test('« Détail » shows where the money comes from, where it goes and what the
   await expect(chart.getByRole('heading', { name: /hypothèses/ })).toHaveCount(0)
 })
 
-// How much is pinned depends on the room: the views everywhere, the section map only from 860 px up. A tapped section
+// The views AND the section map are one pinned stack at every width (it rolls away with the bar while the reader scrolls down, so a phone only carries it on the way back up). A tapped section
 // must stop BELOW whatever is pinned — measured, not guessed (components/PinStack.tsx).
-for (const [name, width, height, mapPinned] of [['phone', 390, 844, false], ['desktop', 1280, 720, true]] as const) {
+for (const [name, width, height, mapPinned] of [['phone', 390, 844, true], ['desktop', 1280, 720, true]] as const) {
   test(`${name}: the views are pinned${mapPinned ? ' with the section map' : ', the map scrolls away'}, and a tapped section stops below them`, async ({ page }) => {
     await page.setViewportSize({ width, height })
     await page.goto('/resultats')

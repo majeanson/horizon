@@ -88,12 +88,18 @@ export function LineChart({ series, yFormat, yDetail = yFormat, xTitle, xTick, m
                 active && payload && payload.length > 0 ? (
                   <div className="chart-tip">
                     <p className="chart-tip__title">{xTitle(Number(label))}</p>
-                    {payload.map((p) => (
-                      <p key={String(p.dataKey)} className="chart-tip__row">
-                        <span className="chart__swatch" style={{ background: String(p.color) }} />
-                        {series.find((s) => s.id === p.dataKey)?.label}: <strong>{yDetail(Number(p.value))}</strong>
-                      </p>
-                    ))}
+                    {/* One row per SERIES: the wash under the first one is a second graphical item on the same data key, and would list it twice. The swatch is the series' own colour. */}
+                    {payload
+                      .filter((p, i) => payload.findIndex((q) => q.dataKey === p.dataKey) === i)
+                      .map((p) => {
+                        const s = series.find((x) => x.id === p.dataKey)
+                        return (
+                          <p key={String(p.dataKey)} className="chart-tip__row">
+                            <span className="chart__swatch" style={{ background: s ? COLOUR[s.colour] : String(p.color) }} />
+                            {s?.label}: <strong>{yDetail(Number(p.value))}</strong>
+                          </p>
+                        )
+                      })}
                   </div>
                 ) : null
               }
