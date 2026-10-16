@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n.ts'
+import type { ConceptId } from './concepts.ts'
 import type { TimeBudget } from './timeBudget.ts'
 
 // THE WORDS OF THE FRONT DOOR (« Accueil », the page at `/`): what Horizon is, one button to begin, and three short things worth
@@ -13,7 +14,8 @@ export interface WelcomeCopy {
   seeAnswer: string
   editProfile: string
   stepsTitle: string
-  steps: { title: string; text: string; to: string }[]
+  /** The three steps, each a card that is a door: its concept's pip leads the title (the same pip the page it opens wears). */
+  steps: { title: string; text: string; to: string; concept: ConceptId }[]
   /** « Comment s'y retrouver »: the whole app in a few lines — each place, and what it is for. */
   guideTitle: string
   guide: { name: string; text: string; to: string | null }[]
@@ -37,9 +39,9 @@ const FR: WelcomeCopy = {
   editProfile: 'Modifier mon profil',
   stepsTitle: 'Comment ça marche',
   steps: [
-    { title: 'Vos chiffres', text: 'Quelques questions simples : votre âge, votre revenu, votre épargne, vos dépenses. Vous pouvez compléter plus tard.', to: '/profil' },
-    { title: 'Vos hypothèses', text: 'Facultatif. Le scénario Neutre est déjà choisi ; changez-le pour essayer un autre avenir.', to: '/hypotheses' },
-    { title: 'Votre réponse', text: 'L’âge le plus tôt où l’argent dure, en graphique et année par année, avec ce que ça donne à 60 ans et à 65 ans.', to: '/resultats' },
+    { title: 'Vos chiffres', text: 'Quelques questions simples : votre âge, votre revenu, votre épargne, vos dépenses. Vous pouvez compléter plus tard.', to: '/profil', concept: 'personne' },
+    { title: 'Vos hypothèses', text: 'Facultatif. Le scénario Neutre est déjà choisi ; changez-le pour essayer un autre avenir.', to: '/hypotheses', concept: 'hypotheses' },
+    { title: 'Votre réponse', text: 'L’âge le plus tôt où l’argent dure, en graphique et année par année, avec ce que ça donne à 60 ans et à 65 ans.', to: '/resultats', concept: 'reponse' },
   ],
   guideTitle: 'Comment s’y retrouver',
   guide: [
@@ -88,9 +90,9 @@ const EN: WelcomeCopy = {
   editProfile: 'Edit my profile',
   stepsTitle: 'How it works',
   steps: [
-    { title: 'Your figures', text: 'A few simple questions: your age, income, savings and spending. You can finish later.', to: '/profil' },
-    { title: 'Your assumptions', text: 'Optional. The Neutral scenario is already chosen; change it to try another future.', to: '/hypotheses' },
-    { title: 'Your answer', text: 'The earliest age the money lasts, as a chart and year by year, with what it looks like at 60 and at 65.', to: '/resultats' },
+    { title: 'Your figures', text: 'A few simple questions: your age, income, savings and spending. You can finish later.', to: '/profil', concept: 'personne' },
+    { title: 'Your assumptions', text: 'Optional. The Neutral scenario is already chosen; change it to try another future.', to: '/hypotheses', concept: 'hypotheses' },
+    { title: 'Your answer', text: 'The earliest age the money lasts, as a chart and year by year, with what it looks like at 60 and at 65.', to: '/resultats', concept: 'reponse' },
   ],
   guideTitle: 'Finding your way',
   guide: [

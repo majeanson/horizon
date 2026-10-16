@@ -1,6 +1,7 @@
 import { Fragment, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Chip } from '../components/Chip'
+import { ConceptPip } from '../components/ConceptPip'
 import { Fold } from '../components/Fold'
 import { InstallCard } from '../components/install/InstallHint'
 import { DemoAnswer } from '../components/DemoAnswer'
@@ -70,12 +71,16 @@ export function Accueil() {
           {c.stepsTitle}
         </h2>
         <ol className="welcome__cards">
+          {/* Each step is ONE door (the same shape as the doors below): the whole card opens the page, its concept's pip leads the title — no underlined word to find. */}
           {c.steps.map((s) => (
-            <li key={s.title} className="surface welcome__card">
-              <h3 className="welcome__card-title">
-                <Link to={s.to}>{s.title}</Link>
-              </h3>
-              <p>{s.text}</p>
+            <li key={s.title}>
+              <Link className="surface welcome__card" to={s.to}>
+                <h3 className="welcome__card-title">
+                  <ConceptPip id={s.concept} size="sm" />
+                  {s.title}
+                </h3>
+                <p>{s.text}</p>
+              </Link>
             </li>
           ))}
         </ol>

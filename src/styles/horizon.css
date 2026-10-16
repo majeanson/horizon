@@ -155,6 +155,16 @@
   outline: 2px solid var(--focus-ring);
   outline-offset: -4px;
 }
+/* A tablet (600 px to the desktop rail): three tabs spread over the whole width sat 300 px apart, each a stretch for a thumb. The bar keeps its
+   height and centres them, each a hand's width. */
+@media (min-width: 600px) and (max-width: 859.98px) {
+  .shell__nav {
+    justify-content: center;
+  }
+  .shell__tab {
+    flex: 0 1 11rem;
+  }
+}
 .shell__main {
   min-width: 0;
   width: 100%;

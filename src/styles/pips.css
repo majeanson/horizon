@@ -26,6 +26,9 @@
 .pip--md { width: 2.6rem; height: 2.6rem; }
 .pip--lg { width: 3.2rem; height: 3.2rem; }
 .pip > svg { width: 82%; height: 82%; }
+/* At night the washes were the brightest patches on a dark card, so every pip sat ON the page: a quarter of the card mixed in sets the disc into it.
+   The glyph's contrast only rises — the `-deep` tier is lighter than the wash at night, and the wash gets darker. */
+:root[data-theme='night'] .pip { background: color-mix(in srgb, var(--fam-wash) 75%, var(--card)); }
 
 /* In a chip or a tab the pip is as tall as the control lets it be and no taller: the negative block margin takes its extra height back out of the
    layout, so the button keeps its size (44 px touch target) and the picture fills the space it already had. */

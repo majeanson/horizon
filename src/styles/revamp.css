@@ -209,6 +209,13 @@
 .results-page .section-nav {
   position: static;
 }
+/* On a phone the map sits right under the pinned views: two rows, each with its hairline and its padding, before the answer. One rule between them is the pin's. */
+@media (max-width: 859.98px) {
+  .results-page .section-nav {
+    border-bottom: 0;
+    padding-top: 0.1rem;
+  }
+}
 @media (min-width: 860px) {
   .results-page .section-nav {
     position: sticky;
@@ -1523,9 +1530,10 @@
 .welcome__go { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .welcome__title { margin: 0 0 var(--space-2, 0.5rem); font-size: var(--text-lg, 1.2rem); }
 .welcome__cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3, 0.75rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
-.welcome__card { display: grid; gap: 0.4rem; align-content: start; padding: 1rem 1.1rem; }
+/* A step card is a link (the whole card opens the page, like a door below); a « Bon à savoir » card is a list item with a link inside. Same box either way. */
+.welcome__card { display: grid; gap: 0.4rem; align-content: start; height: 100%; padding: 1rem 1.1rem; color: inherit; text-decoration: none; }
 .welcome__card p { margin: 0; color: var(--ink-soft); }
-.welcome__card-title { margin: 0; font-size: var(--text-md, 1rem); }
+.welcome__card-title { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: var(--text-md, 1rem); }
 
 /* The first visit's demo card (components/DemoAnswer.tsx) and the three doors in. The answer's own type is the verdict's (.verdict__line / __big / __age). */
 .demo { display: grid; gap: 0.6rem; padding: 1rem 1.2rem; }
