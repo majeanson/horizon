@@ -162,6 +162,7 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
   await expect(row(/quebec\.bpa/).getByRole('link')).toHaveAttribute('href', /AUTFR_/)
 
   await switchLanguage(page, 'en')
+  await page.locator('#parametres summary').click() // the page came back in English, with its fold closed again
 
   // English reader: the English edition, « 1,507.65 », the English parameters PDF, and an honest label on the fiche that
   // exists in French only.

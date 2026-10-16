@@ -29,13 +29,19 @@ type Budget = { controls: number; words: number }
 // Résultats — Preuve, 2026-10-13 (idea 3, the Figure): controls 37 → 43 — the four Figure buttons on the golden couple's two pension rows (QPP and OAS, one each
 // per person), the two EstFlag links on the spending rows, and one glossary link another session added to the average-rate sentence. Words 1959 → 1859 (the
 // ratchet FALLS): the old calculation lines under the pensions folded into the figures' notes, which are hidden until asked for — one home per figure.
+// THE TOP BAR, 2026-10-15 (components/BarAnswer.tsx): the language and theme buttons left the bar for the settings page (−2 controls, −1 word « EN » on every route), and the
+// answer's age took their place on every route that HAS an answer (+1 link, +4 words « Votre réponse 60 ans »): first-visit routes fall by 2 controls and a word; routes with a
+// plan fall by one control and RISE by three words. The strip that was pinned under the bar on Profil and Hypothèses is gone (Accueil with a plan: −3 controls, −6 words).
 const BUDGETS: Record<string, Budget> = {
   // 34 → 28 controls, 372 → 309 words (2026-10-15, the ratchet FALLS): the reading card is a one-time dialog now (closed here), its subtitle is gone, and the demo
   // card's three early-retirement households (+3 chips) cost less than what left. The time question (components/TimeBudget.tsx) is a dialog too, put off here.
-  'Accueil (first visit)': { controls: 28, words: 309 },
-  'Profil (first visit, onboarding)': { controls: 17, words: 78 },
+  // 28 → 26, 309 → 308 (2026-10-15): the top bar, see above.
+  'Accueil (first visit)': { controls: 26, words: 308 },
+  // 17 → 15, 78 → 77 (2026-10-15): the top bar.
+  'Profil (first visit, onboarding)': { controls: 15, words: 77 },
   // 30 → 21 controls, 261 → 186 words (2026-10-15, the ratchet FALLS): the same reading card, gone from the page.
-  'Accueil (with a plan)': { controls: 21, words: 186 },
+  // 21 → 19, 186 → 184 (2026-10-15): the top bar, and the answer strip the page carried for a ready profile (its « Voir » link and its range line) is gone with it.
+  'Accueil (with a plan)': { controls: 19, words: 184 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
   // count only once opened): the CRA's January 1 figure less this year's deposits.
@@ -48,22 +54,28 @@ const BUDGETS: Record<string, Budget> = {
   // controls 329 → 361, words 2001 → 2093 (2026-10-15): every field has its ⓘ (Marc: « inputs with (i) ») — « À propos de ce champ » on the fifty-odd rows
   // that had none (FieldHelp.tsx; its words load on first open and count only then), the one sentence under every card title, and the map's « 3/7 » counts.
     // controls 361 → 362, words 2093 → 2096 (2026-10-15): the foot line « Bâti par marc.portal » on every page — one link, three words (the same +1 / +3 on each route below).
-  'Profil (form)': { controls: 362, words: 2096 },
+  // 362 → 360, 2096 → 2094 (2026-10-15): the top bar, and the answer strip pinned over the form is gone (the age is in the bar).
+  'Profil (form)': { controls: 360, words: 2094 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
   // their explanation folded under « En savoir plus »: four closed summaries added, ~80 words off the first read.
-  'Hypothèses': { controls: 71, words: 606 },
-  'Fiche': { controls: 29, words: 385 },
+  // 71 → 69, 606 → 609 (2026-10-15): the top bar, and the answer strip pinned over the page is gone (the age is in the bar).
+  'Hypothèses': { controls: 69, words: 609 },
+  // 29 → 28, 385 → 388 (2026-10-15): the top bar (−1 control, +3 words on a route with an answer).
+  'Fiche': { controls: 28, words: 388 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
-  'Résultats — Réponse': { controls: 48, words: 692 },
-  'Résultats — Décider': { controls: 51, words: 1220 },
+  // 48 → 47, 692 → 695 (2026-10-15): the top bar.
+  'Résultats — Réponse': { controls: 47, words: 695 },
+  // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
+  'Résultats — Décider': { controls: 50, words: 1223 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
   // for the pending « … » cells, and the final page holds the prudent-gap line with its « Voir la sensibilité » chip.
-  'Résultats — Preuve': { controls: 45, words: 1890 },
+  // 45 → 44, 1890 → 1893 (2026-10-15): the top bar.
+  'Résultats — Preuve': { controls: 44, words: 1893 },
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]
@@ -205,6 +217,9 @@ test.describe('complexity ratchet', () => {
       await page.locator(ready).first().waitFor({ timeout: 30_000 })
       if (sentinel) await page.locator(sentinel).first().waitFor({ state: 'attached', timeout: 30_000 })
       await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 30_000 })
+      // The answer in the top bar (components/BarAnswer.tsx) is a lazy chunk and a worker's answer: on a route with a plan it lands a moment after the page, and a
+      // count taken before it would read one control and four words fewer than a visit sees (it did, once: the same route measured 18 and 19 in two runs).
+      if (seed === EXAMPLE) await page.locator('.shell__answer-link').waitFor({ timeout: 30_000 })
       // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
       // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).
       await expect(page.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 30_000 })

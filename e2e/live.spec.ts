@@ -12,8 +12,8 @@ test.describe('the answer in the bar', () => {
     await seedProfile(page)
     await page.goto('/profil?form=1')
     await expect(bar(page)).toContainText('60 ans', { timeout: 30_000 })
-    // (the link's name is the aria-label, « Votre réponse : 60 ans. Voir les résultats » — with the French no-break space before the colon)
-    const link = bar(page).getByRole('link', { name: /Votre réponse : 60 ans/ })
+    // (the link's name is the aria-label, « Votre réponse : 60 ans. Voir les résultats »; the accessible name normalises the French no-break space, so the regex skips the colon)
+    const link = bar(page).getByRole('link', { name: /Votre réponse.*60 ans\. Voir les résultats/ })
     await expect(link).toHaveAttribute('href', '/resultats')
 
     const spend = page.getByRole('textbox', { name: 'Dépenses par année, une fois tout le monde à la retraite', exact: true })

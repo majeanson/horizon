@@ -169,14 +169,18 @@ test('the gallery stays accessible with its dialog open', async ({ page }) => {
 test('the whole shell is reachable by keyboard, in a sensible order', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.goto('/profil')
+  await page.locator('.shell__answer-link').waitFor({ timeout: 30_000 }) // the answer in the bar lands a moment after the page (a lazy chunk, a worker)
   const order: string[] = []
   for (let i = 0; i < 11; i++) {
     await page.keyboard.press('Tab')
     order.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.textContent?.trim().slice(0, 24) ?? ''))
   }
-  // The skip link first — the whole point of one — then the top bar (name, language, theme, the sheet, the glossary, the settings gear), then the three destinations.
-  expect(order.slice(0, 7)).toEqual(['Aller au contenu', 'Horizon', 'EN', '', 'Fiche', 'Glossaire', 'Réglages'])
-  expect(order.slice(7, 10)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
+  // The skip link first — the whole point of one — then the top bar (the name, the answer's age, the sheet, the glossary, the settings gear), then the three destinations.
+  // (The language and theme buttons left the bar for the settings page; the answer pill took their place, components/BarAnswer.tsx.)
+  expect(order.slice(0, 2)).toEqual(['Aller au contenu', 'Horizon'])
+  expect(order[2]).toMatch(/^Votre réponse\d+ ans$/) // the label and the age, two spans with no space between their texts
+  expect(order.slice(3, 6)).toEqual(['Fiche', 'Glossaire', 'Réglages'])
+  expect(order.slice(6, 9)).toEqual(['Profil', 'Résultats', 'Hypothèses'])
 })
 
 // The page's outline is part of its accessibility tree (heading navigation in a screen reader, and the
