@@ -1481,3 +1481,33 @@ button.welcome__door {
   font-weight: 400;
   color: var(--ink-soft);
 }
+
+/* « Les dates de votre plan » (components/results/PlanCalendar.tsx): one row a year — the year with its ages, and what it brings. */
+.plan-calendar {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.plan-calendar__year {
+  display: grid;
+  gap: 0.15rem;
+}
+.plan-calendar__when {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.plan-calendar__events {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0 0 0 1rem;
+}
+@media (min-width: 640px) {
+  .plan-calendar__year {
+    grid-template-columns: 13rem 1fr;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+}

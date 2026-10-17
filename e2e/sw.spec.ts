@@ -220,6 +220,8 @@ test('offline, every page « Imprimer… » offers is made from the cache: its c
   await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
 
   for (const [button, selector] of [
+    [/Le calendrier/, '.print-kind--calendar .plan-calendar__year'],
+    [/Le dépliant/, '.print-leaflet__panel'],
     [/Année par année/, '.print-kind--years .year-table table'],
     [/Les sources/, '.print-sources tbody tr'],
     [/Le plan en une page/, '.print-plan .timeline'],

@@ -133,3 +133,21 @@ test('the cash buffer and what the children cost are read on the sheet, and no l
   await expect(page.locator('.kids-cost__bands')).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Voir ce que ça coûte sur Ma fiche' })).toBeVisible()
 })
+
+test('« Les dates de votre plan » is one tap under the plan’s line, one row a year with the ages, and says what the profile says', async ({ page }) => {
+  await page.goto('/fiche')
+  await settled(page)
+  const fold = page.locator('.plan-calendar-fold')
+  await expect(fold).toBeVisible()
+  await expect(fold.locator('.plan-calendar')).toBeHidden() // closed until asked for
+  await fold.locator('summary').click()
+  const rows = fold.locator('.plan-calendar__year')
+  expect(await rows.count()).toBeGreaterThan(3)
+  // the example couple: both retire at 60 (born 1978 and 1981 → 2038 and 2043 by their own ages), and the year says both ages
+  await expect(fold.getByText('Retraite — Camille')).toBeVisible()
+  await expect(fold.locator('.plan-calendar__when').first()).toContainText('ans')
+  // the years run in order
+  const years = (await fold.locator('.plan-calendar__when').allTextContents()).map((t) => Number(t.match(/\d{4}/)![0]))
+  expect(years).toEqual([...years].sort((a, b) => a - b))
+  await expectNoHorizontalOverflow(page)
+})

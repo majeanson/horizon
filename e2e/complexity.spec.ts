@@ -76,7 +76,9 @@ const BUDGETS: Record<string, Budget> = {
   // trade, the sheet is where the household is READ.
   // 32 → 36 controls, 590 → 637 words (2026-10-16): the same 36 / 637 on 5d1b62d, BEFORE the polish round, so it is the sheet's own content (the two READ cards counted once settled), not the shared chrome;
   // the 32 / 590 above was measured before the cards had all landed. The counted list is in the failure message if it needs a ratchet back down.
-  'Fiche': { controls: 36, words: 637 },
+  // 36 → 37 controls, 637 → 642 words (2026-10-17, Phase 16 slice 3): « Les dates de votre plan » — ONE closed fold under the plan's line (its list opens only when asked for): the calendar of every date
+  // the profile announces, which the line draws only as stretches. One summary, five words; the list itself is not on the first screen.
+  'Fiche': { controls: 37, words: 642 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.

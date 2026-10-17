@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo } from 'react'
 import { answerRequest } from '../lib/answerRequest'
 import { PageHead } from '../components/PageHead'
+import { PlanCalendar } from '../components/results/PlanCalendar'
 import { TimelineStrip } from '../components/results/TimelineStrip'
 import { CashBufferCard } from '../components/sheet/CashBufferCard'
 import { KidsCostCard } from '../components/sheet/KidsCostCard'
@@ -55,7 +56,14 @@ export function Fiche() {
             <KidsCostCard profile={settled} />
           </>
         }
-        timeline={gaps.length === 0 ? <TimelineStrip household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} /> : undefined}
+        timeline={
+          gaps.length === 0 ? (
+            <>
+              <TimelineStrip household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
+              <PlanCalendar household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
+            </>
+          ) : undefined
+        }
       />
     </section>
   )

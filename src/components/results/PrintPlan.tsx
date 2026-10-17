@@ -1,9 +1,8 @@
 import { worthAtHorizon } from '../../lib/resultsModel'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { FirmPrint } from './views/FirmSection'
-import { PrintFoot, PrintHead } from './PrintFrame'
+import { PrintComfort, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
 import { TimelineStrip } from './TimelineStrip'
-import { EstFlag } from '../EstFlag'
 import { formatPct, formatYearAge } from '../../lib/format'
 import { factsOf } from '../../lib/facts'
 import { factValue, type FactValue } from '../../lib/factValue'
@@ -15,36 +14,14 @@ import { formatMoney } from '../../lib/money'
 // app, under « Vérifier »), where they can be searched; on paper they were ten pages nobody read. It is shown instead of the page while the browser prints (lib/usePrinting.ts), text only —
 // no chart to load, nothing that can still be on its way when the browser takes its snapshot.
 export function PrintPlan({ m }: { m: ResultsModel }) {
-  const { t, lang, r, rc, mc, profile, names, year, assumptions, births, at, retiredNow, retiredGlance, headline, activePreset, comfort, stop, runs, dollars, money, pct, label, sentenceBefore, sentenceAfter } = m
+  const { t, lang, r, rc, profile, names, year, assumptions, births, at, retiredGlance, headline, activePreset, stop, runs, dollars, money, pct, label } = m
   const returns = [assumptions.returns.rrsp, assumptions.returns.tfsa, assumptions.returns.nonReg].map((x) => formatPct(x, lang, 1)).join(' / ')
   return (
     <div className="print-plan">
       <PrintHead m={m} title={rc.out.printTitle} />
 
       <section className="print-plan__answer" aria-label={r.title}>
-        <p className="print-plan__line">
-          {sentenceAfter === undefined ? (
-            sentenceBefore
-          ) : (
-            <>
-              {sentenceBefore}
-              <strong className="print-plan__age">{rc.headline.ageText(headline.age!)}</strong>
-              {sentenceAfter}
-            </>
-          )}
-        </p>
-        {retiredGlance ? (
-          <p>
-            {retiredGlance.now.ok ? rc.headline.holds(assumptions.horizonAge) : rc.headline.runsOut(at(retiredGlance.now.firstShortfallYear! - 1))}{' '}
-            {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
-          </p>
-        ) : (
-          headline.kind !== 'none' && (
-            <p>
-              {rc.headline.holds(assumptions.horizonAge)} {activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}
-            </p>
-          )
-        )}
+        <PrintSentence m={m} />
         {!retiredGlance && headline.kind !== 'none' && stop !== null && (
           <>
             <p className="print-plan__title">{rc.questions.stop.title}</p>
@@ -58,11 +35,7 @@ export function PrintPlan({ m }: { m: ResultsModel }) {
             </ul>
           </>
         )}
-        {headline.age !== null && !retiredNow && comfort !== undefined && (
-          <p>
-            {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note} <EstFlag fact="household:spendingRetired" />
-          </p>
-        )}
+        <PrintComfort m={m} />
       </section>
 
       <section className="print-plan__block" aria-label={rc.out.assumptions}>

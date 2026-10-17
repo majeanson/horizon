@@ -2,7 +2,7 @@
 // the one-page plan, as it always did. The choice is made a moment before `window.print()` and read when `beforeprint` mounts the paper page (lib/usePrinting.ts), so it lives
 // here, outside React: it is not a screen state, it is the ticket for one print. `usePrinting` hands it back on `afterprint`.
 
-export const PRINT_KINDS = ['summary', 'years', 'sources'] as const
+export const PRINT_KINDS = ['summary', 'calendar', 'leaflet', 'years', 'sources'] as const
 export type PrintKind = (typeof PRINT_KINDS)[number]
 
 let chosen: PrintKind = 'summary'

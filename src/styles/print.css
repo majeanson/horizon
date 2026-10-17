@@ -336,3 +336,52 @@
     overflow-wrap: anywhere;
   }
 }
+
+/* The calendar and the leaflet (components/results/PrintKinds.tsx). The calendar is a plain list on a portrait page, a year to a row. The leaflet is a landscape page in three panels — a
+   fold in thirds — the head and the foot across all of them; a panel never splits across the fold. */
+@page leaflet {
+  size: letter landscape;
+  margin: 10mm 12mm;
+}
+@media print {
+  .print-kind--leaflet {
+    page: leaflet;
+  }
+  .print-leaflet {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .print-leaflet__panel {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    padding: 0 6mm;
+    break-inside: avoid;
+    border-left: 1px dashed #999999;
+  }
+  .print-leaflet__panel:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .print-leaflet__panel:last-child {
+    padding-right: 0;
+  }
+  .print-leaflet .print-plan__line {
+    font-size: 12pt;
+  }
+  .print-leaflet .print-plan__age {
+    font-size: 30pt;
+  }
+  .plan-calendar {
+    gap: 0.3rem;
+    font-size: 9.5pt;
+  }
+  .plan-calendar__year {
+    display: block;
+    break-inside: avoid;
+  }
+  .plan-calendar__events {
+    padding-left: 1rem;
+  }
+}

@@ -90,7 +90,7 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
 
   // the year by year: a table, under its own heading, and none of the one-page plan
   let dialog = await open()
-  await expect(dialog.locator('.print-menu button')).toHaveCount(3)
+  await expect(dialog.locator('.print-menu button')).toHaveCount(5)
   const years = dialog.getByRole('button', { name: /Année par année/ })
   await expect(years).toBeEnabled({ timeout: 60_000 })
   await years.click()
@@ -101,6 +101,19 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
   await expect(page.locator('.print-plan')).toHaveCount(0)
   await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible()
+
+  // the calendar and the leaflet: the plan's dates, one row a year; the leaflet adds the answer and the assumptions in three panels
+  dialog = await open()
+  await dialog.getByRole('button', { name: /Le calendrier/ }).click()
+  await expect(page.locator('.print-kind--calendar').getByText('Horizon — le calendrier du plan')).toBeVisible()
+  expect(await page.locator('.print-kind--calendar .plan-calendar__year').count()).toBeGreaterThan(3)
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+  dialog = await open()
+  await dialog.getByRole('button', { name: /Le dépliant/ }).click()
+  await expect(page.locator('.print-leaflet__panel')).toHaveCount(3)
+  await expect(page.locator('.print-leaflet').getByText(/Vous pouvez prendre votre retraite/)).toBeVisible()
+  await expect(page.locator('.print-leaflet .plan-calendar__year').first()).toBeVisible()
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
 
   // the sources: every cited figure, each with its official page
   dialog = await open()
@@ -148,6 +161,8 @@ const mediaBox = (pdf: Buffer): number[] => {
   return m ? m.slice(1).map(Number) : []
 }
 for (const [kind, button, heading, orientation, maxPages] of [
+  ['calendar', /Le calendrier/, 'Horizon — le calendrier du plan', 'portrait', 2],
+  ['leaflet', /Le dépliant/, 'Horizon — mon plan en un dépliant', 'landscape', 1],
   ['years', /Année par année/, 'Horizon — année par année', 'landscape', 5],
   ['sources', /Les sources/, 'Horizon — les sources des chiffres', 'portrait', 14],
 ] as const) {

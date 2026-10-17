@@ -1,12 +1,56 @@
+import { PLAN_CALENDAR_COPY } from '../../lib/planCalendarCopy'
 import { PRINT_MENU_COPY } from '../../lib/printMenuCopy'
 import type { ResultsModel } from '../../lib/useResultsPage'
-import { PrintFoot, PrintHead } from './PrintFrame'
+import { formatPct } from '../../lib/format'
+import { PlanCalendarList } from './PlanCalendar'
+import { PrintComfort, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
 import { PARAM_LABELS } from '../../lib/paramLabels'
 import { knownYears, paramRows } from '../../lib/paramsView'
 import { YearTables } from './YearTables'
 
 // The pages « Imprimer » can put on paper besides the one-page plan (components/results/PrintPlan.tsx). They ride a chunk of their own: the menu fetches it before it asks the browser
 // to print (PrintMenu.tsx), because the browser takes its snapshot the moment `beforeprint` returns and nothing may still be on its way. Text and tables only — no chart.
+
+/** The dates of the plan, year by year, each year with the ages it brings (lib/planCalendar.ts: the profile's own dates, nothing calculated). */
+export function PrintCalendar({ m }: { m: ResultsModel }) {
+  const { lang, profile, names, year, assumptions } = m
+  return (
+    <div className="print-plan print-kind print-kind--calendar">
+      <PrintHead m={m} title={PRINT_MENU_COPY[lang].headings.calendar} />
+      <PlanCalendarList household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
+      <PrintFoot m={m} />
+    </div>
+  )
+}
+
+/** A landscape page to fold in three: the answer, the calendar, the assumptions — what a household puts on the fridge or hands a spouse. */
+export function PrintLeaflet({ m }: { m: ResultsModel }) {
+  const { lang, rc, t, profile, names, year, assumptions, activePreset } = m
+  const returns = [assumptions.returns.rrsp, assumptions.returns.tfsa, assumptions.returns.nonReg].map((x) => formatPct(x, lang, 1)).join(' / ')
+  return (
+    <div className="print-plan print-kind print-kind--leaflet">
+      <PrintHead m={m} title={PRINT_MENU_COPY[lang].headings.leaflet} />
+      <div className="print-leaflet">
+        <section className="print-leaflet__panel" aria-label={rc.tabs.answer}>
+          <PrintSentence m={m} />
+          <PrintComfort m={m} />
+        </section>
+        <section className="print-leaflet__panel" aria-label={PLAN_CALENDAR_COPY[lang].title}>
+          <p className="print-plan__title">{PLAN_CALENDAR_COPY[lang].title}</p>
+          <PlanCalendarList household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
+        </section>
+        <section className="print-leaflet__panel" aria-label={rc.out.assumptions}>
+          <p className="print-plan__title">{rc.out.assumptions}</p>
+          <p>
+            {activePreset ? t.assumptions.presets[activePreset] : t.assumptions.presets.custom} · {t.assumptions.presets.summary(formatPct(assumptions.inflation, lang, 1), formatPct(assumptions.wageGrowth, lang, 1), returns, assumptions.horizonAge)}
+          </p>
+          <p>{rc.out.printFoot}</p>
+        </section>
+      </div>
+      <PrintFoot m={m} />
+    </div>
+  )
+}
 
 /** The year-by-year table of the age chosen on screen (`?table=`), in the dollars shown, on a landscape page: a table of eight columns does not fit a portrait one. */
 export function PrintYears({ m }: { m: ResultsModel }) {

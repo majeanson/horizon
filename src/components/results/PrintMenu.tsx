@@ -8,7 +8,7 @@ import { Chip } from '../Chip'
 import { Modal } from '../Modal'
 import { PrintPlan } from './PrintPlan'
 
-// « Imprimer… » — ONE chip that lists the pages a household can put on paper (lib/printKind.ts): the plan on one page, the year-by-year table, the sources. Choosing one closes the
+// « Imprimer… » — ONE chip that lists the pages a household can put on paper (lib/printKind.ts): the plan on one page, its calendar, a leaflet to fold, the year-by-year table, the sources. Choosing one closes the
 // list, remembers the choice for the one print that follows, and asks the browser to print; the browser's own Ctrl+P still prints the plan. Everything stays on the device.
 //
 // The pages other than the plan ride a chunk of their own (PrintKinds.tsx). The menu FETCHES it before it prints: `beforeprint` mounts the paper page at once and the browser
@@ -20,6 +20,8 @@ const loadKinds = async () => (kinds ??= await import('./PrintKinds'))
 /** The paper page of the print in progress: the kind the menu chose, or the one-page plan. */
 export function PrintKindView({ m }: { m: ResultsModel }) {
   const kind = currentPrintKind()
+  if (kind === 'calendar' && kinds) return <kinds.PrintCalendar m={m} />
+  if (kind === 'leaflet' && kinds) return <kinds.PrintLeaflet m={m} />
   if (kind === 'years' && kinds) return <kinds.PrintYears m={m} />
   if (kind === 'sources' && kinds) return <kinds.PrintSources m={m} />
   return <PrintPlan m={m} />
