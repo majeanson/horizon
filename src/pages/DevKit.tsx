@@ -25,6 +25,7 @@ import { Icon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Modal } from '../components/Modal'
 import { NumberField } from '../components/NumberField'
+import { NumberSlider } from '../components/NumberSlider'
 import { Slider } from '../components/Slider'
 import { PageHead } from '../components/PageHead'
 import { Cluster, Rail } from '../components/Layout'
@@ -140,6 +141,31 @@ function SliderSpecimen() {
     <>
       <Slider label="Début de la rente" value={age} min={60} max={72} valueText={(v) => `${v} ans`} onPreview={setSeen} onCommit={setAge} marks={[60, 65, 70].map((v) => ({ value: v, label: String(v) }))} info={(v) => <p className="field-row__hint">{v < 65 ? 'Avant 65 ans : la rente est réduite.' : v === 65 ? 'À 65 ans : le montant de référence.' : 'Après 65 ans : la rente est majorée.'}</p>} />
       <p className="field-row__hint">En mouvement : {seen} · enregistré : {age}</p>
+    </>
+  )
+}
+
+function NumberSliderSpecimen() {
+  const [rate, setRate] = useState(0.021)
+  const [age, setAge] = useState(65)
+  return (
+    <>
+      <NumberSlider
+        kind="percent"
+        label="Hausse des prix"
+        min={-0.02}
+        max={0.08}
+        step={0.001}
+        value={rate}
+        onChange={setRate}
+        hint="Les trois repères appliquent leur valeur d'un geste."
+        marks={[
+          { value: 0.025, label: 'Prudent', tone: 'prudent' },
+          { value: 0.021, label: 'Neutre', tone: 'neutral' },
+          { value: 0.02, label: 'Audacieux', tone: 'bold' },
+        ]}
+      />
+      <NumberSlider kind="int" label="Début de la rente" min={60} max={72} step={1} value={age} onChange={setAge} marks={[60, 65, 70].map((value) => ({ value, label: String(value) }))} />
     </>
   )
 }
@@ -528,6 +554,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Fondations', name: 'Mouvement (CSS)', file: 'src/styles/motion.css', kw: 'animation transition mouvement entrée survol pression réduire les animations', render: () => <MotionSpecimen /> },
     { cat: 'Saisie', name: 'EditField', file: 'src/components/EditField.tsx', kw: 'champ texte saisie input', render: () => <EditFieldSpecimen /> },
     { cat: 'Saisie', name: 'Slider', file: 'src/components/Slider.tsx', kw: 'curseur glissière âge plage', render: () => <SliderSpecimen /> },
+    { cat: 'Saisie', name: 'NumberSlider', file: 'src/components/NumberSlider.tsx', kw: 'curseur taux pourcentage âge repères prudent neutre audacieux', render: () => <NumberSliderSpecimen /> },
     { cat: 'Saisie', name: 'NumberField', file: 'src/components/NumberField.tsx', kw: 'nombre montant pourcentage année âge saisie', render: () => <NumberFieldSpecimen /> },
     { cat: 'Saisie', name: 'FieldRow', file: 'src/components/FieldRow.tsx', kw: 'champ étiquette indice libellé', render: () => <FieldRowSpecimen /> },
     {

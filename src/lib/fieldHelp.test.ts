@@ -35,7 +35,10 @@ function scan(): { total: number; stray: Map<string, number>; used: Set<string> 
     const src = readFileSync(f, 'utf8')
     const tags = openTags(blankComments(src), 'FieldRow')
     total += tags.length
-    for (const tag of tags) for (const m of tag.matchAll(/\bhelp="([A-Za-z0-9]+)"/g)) used.add(m[1])
+    // A NumberSlider carries the same ⓘ on its own label line, so its `help` is a use too.
+    const sliders = openTags(blankComments(src), 'NumberSlider')
+    total += sliders.length
+    for (const tag of [...tags, ...sliders]) for (const m of tag.matchAll(/\bhelp="([A-Za-z0-9]+)"/g)) used.add(m[1])
     const n = bare(src).length
     if (n > 0) stray.set(relative(srcDir, f).split(sep).join('/'), n)
   }

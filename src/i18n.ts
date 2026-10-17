@@ -82,6 +82,8 @@ export const FR = {
     invalid: 'Entrez un nombre.',
     range: (min: string, max: string) => `Entre ${min} et ${max}.`,
     years: 'ans',
+    exact: 'Saisir le chiffre exact',
+    exactClose: 'Revenir au curseur',
     infoWhere: 'Où le trouver',
     infoLabel: 'Libellé exact',
     infoOpen: 'Ouvrir la page officielle',

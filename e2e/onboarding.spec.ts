@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, PROFILE_KEY, blankSeed, openSituation, savedProfile, seedProfile } from './seed'
+import { exactBox } from './slider'
 
 // THE FIRST VISIT: one question per screen, information by information. A blank form is a wall; the first landing asks who, born when,
 // earning what, saving what, which employer plan, wanting to stop when, spending what, owning what — each with its one line of why —
@@ -12,7 +13,8 @@ const back = (page: Page) => page.getByRole('button', { name: 'Précédent', exa
 const progress = (page: Page) => page.locator('.onboard__step')
 const box = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })
 const fill = async (page: Page, name: string, value: string) => {
-  const f = box(page, name)
+  // A bounded figure (the retirement age) is a slider; its box is one tap away.
+  const f = (await page.getByRole('slider', { name, exact: true }).count()) > 0 ? await exactBox(page, name, true) : box(page, name)
   await f.fill(value)
   await f.press('Enter')
 }
@@ -144,8 +146,8 @@ test('a couple adds a person’s questions in the same order, and the progress c
   await next(page)
   // the retirement ages: one box each
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('À quel âge pensez-vous arrêter de travailler ?')
-  await expect(box(page, 'Vous')).toBeVisible()
-  await expect(box(page, 'Votre partenaire')).toBeVisible()
+  await expect(page.getByRole('slider', { name: 'Vous', exact: true })).toBeVisible()
+  await expect(page.getByRole('slider', { name: 'Votre partenaire', exact: true })).toBeVisible()
   await expect.poll(async () => (await savedProfile(page)).household.persons[1]?.salaryToday).toBe(60_000)
   const p = await savedProfile(page)
   expect(p.household.persons.map((x: { id: string }) => x.id)).toEqual(['self', 'spouse'])

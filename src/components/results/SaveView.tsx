@@ -1,10 +1,9 @@
 import type { Assumptions, Household } from '../../engine/types'
-import { useLang, useT } from '../../i18n'
+import { useLang } from '../../i18n'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { formatMoney } from '../../lib/money'
 import { useSavingsNeeded } from '../../lib/useSavingsNeeded'
-import { FieldRow } from '../FieldRow'
-import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { Cascade } from '../Cascade'
 import { CountUp } from '../CountUp'
 import { Skeleton } from '../Skeleton'
@@ -27,7 +26,6 @@ export function SaveView({
   minAge: number
   maxAge: number
 }) {
-  const t = useT()
   const { lang } = useLang()
   const q = RESULTS_COPY[lang].questions.save
   // The old answer stays on screen at full strength while a new age computes: each keystroke used
@@ -37,9 +35,7 @@ export function SaveView({
   const saving = household.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
   return (
     <div className="surface answer" aria-live={busy ? 'off' : 'polite'} aria-busy={busy}>
-      <FieldRow label={q.age} help="saveTargetAge">
-        {(w) => <NumberField kind="int" min={minAge} max={maxAge} unit={t.fields.years} value={age} onChange={onAge} id={w.id} />}
-      </FieldRow>
+      <NumberSlider kind="int" label={q.age} help="saveTargetAge" min={minAge} max={maxAge} step={1} value={age} onChange={onAge} />
       {busy && answer !== null && (
         <p className="bridge__updating" role="status">
           {q.updating}

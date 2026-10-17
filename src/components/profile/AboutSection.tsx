@@ -5,6 +5,7 @@ import { setBirthYear } from '../../lib/profileEdit'
 import { EditField } from '../EditField'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { PartTimeFields } from './PartTimeFields'
 import { Section, type PersonEditor } from './shared'
 
@@ -36,11 +37,7 @@ export function AboutSection({ person, edit, withoutSalary = false, withoutPartT
         {(w) => <NumberField kind="money" max={1e8} value={person.salaryToday} onChange={(salaryToday) => edit((x) => ({ ...x, salaryToday }))} id={w.id} ariaDescribedBy={w.describedBy} />}
       </FieldRow>
       )}
-      <FieldRow label={a.retirementAge} help="retirementAge" hint={a.retirementHint}>
-        {(w) => (
-          <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
-        )}
-      </FieldRow>
+      <NumberSlider kind="int" label={a.retirementAge} help="retirementAge" hint={a.retirementHint} min={40} max={75} bounds={[18, 80]} step={1} value={person.retirementAge} onChange={(retirementAge) => edit((x) => ({ ...x, retirementAge }))} marks={[55,60,65,70].map((value) => ({ value, label: String(value) }))} />
       {!withoutPartTime && <PartTimeFields person={person} edit={edit} />}
     </Section>
   )

@@ -22,6 +22,7 @@ import { LiveAnswer } from './LiveAnswer'
 import { SituationQuestions } from './profile/SituationCard'
 import { FieldRow } from './FieldRow'
 import { NumberField } from './NumberField'
+import { NumberSlider } from './NumberSlider'
 
 // THE FIRST VISIT: one question per screen. A blank form is a wall; this asks for what a first answer needs, in the order a person
 // thinks of it — who, born when, earns what, saves what, has a pension where, wants to stop when, spends what, owns what — each with
@@ -280,9 +281,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
       body = (
         <>
           {[self, ...(spouse ? [spouse] : [])].map((p, i) => (
-            <FieldRow key={p.id} label={i === 0 ? c.retire.you : c.retire.spouse} help="retirementAge">
-              {(w) => <NumberField kind="int" min={18} max={80} unit={t.fields.years} value={p.retirementAge} onChange={(retirementAge) => edit(p.id, (x) => ({ ...x, retirementAge }))} id={w.id} autoFocus={focus && i === 0} />}
-            </FieldRow>
+            <NumberSlider key={p.id} kind="int" label={i === 0 ? c.retire.you : c.retire.spouse} help="retirementAge" min={40} max={75} bounds={[18, 80]} step={1} value={p.retirementAge} onChange={(retirementAge) => edit(p.id, (x) => ({ ...x, retirementAge }))} marks={[55, 60, 65, 70].map((value) => ({ value, label: String(value) }))} />
           ))}
         </>
       )

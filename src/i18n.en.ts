@@ -66,6 +66,8 @@ export const EN: typeof FR = {
     invalid: 'Enter a number.',
     range: (min: string, max: string) => `Between ${min} and ${max}.`,
     years: 'years',
+    exact: 'Type the exact figure',
+    exactClose: 'Back to the slider',
     infoWhere: 'Where to find it',
     infoLabel: 'Exact wording',
     infoOpen: 'Open the official page',

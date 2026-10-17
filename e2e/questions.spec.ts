@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, seedProfile } from './seed'
+import { exactBox } from './slider'
 
 // The three questions, one page: the verdict answers « Quand prendre ma retraite ? », and « Combien épargner ? » and
 // « Quand arrêter de travailler ? » are always-visible sections below it. An old `?q=` link scrolls to its section
@@ -57,7 +58,7 @@ test('« Combien épargner ? » says nothing more at an age that already works, 
 test('typing an age in « Combien épargner ? » recomputes the answer and keeps it in the address', async ({ page }) => {
   await page.goto('/resultats?v=adjust&age=60')
   await expect(page.getByText('Rien de plus : à 60 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
-  const box = page.getByRole('textbox', { name: 'Partir à (âge)' })
+  const box = await exactBox(page, 'Partir à (âge)')
   await box.fill('58')
   await box.press('Enter')
   await expect(page).toHaveURL(/age=58/)

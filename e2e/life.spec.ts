@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, savedProfile, seedProfile, showAllSections, type SeedProfile } from './seed'
+import { exactBox } from './slider'
 
 // A life beyond the budget (schema v16): what a child costs until they leave, work kept after retirement, dated events and income, and
 // spending that slows with age. The unit tests pin the engine; this pins that a PERSON can drive each one and that it reaches the answer.
@@ -31,7 +32,7 @@ test.describe('on Profil', () => {
     await expect(first.getByRole('radio', { name: 'Je m’arrête complètement' })).toBeChecked()
     await first.getByRole('radio', { name: 'Je continue de travailler' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.persons[0].partTime).toEqual({ share: 0.4, untilAge: 63 })
-    const until = first.getByRole('textbox', { name: 'Jusqu’à (âge)' })
+    const until = await exactBox(first, 'Jusqu’à (âge)')
     await until.fill('65')
     await until.press('Enter')
     await expect.poll(async () => (await savedProfile(page)).household.persons[0].partTime?.untilAge).toBe(65)

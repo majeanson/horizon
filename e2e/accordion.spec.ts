@@ -21,7 +21,7 @@ test('Hypothèses: the scenario is open and the six others are closed titles; «
   await expect(page).toHaveURL(/bloc=prix/)
   await expect(page.locator('#prix')).toHaveClass(/is-open/)
   await expect(page.locator('#scenario')).toHaveClass(/is-closed/)
-  await expect(page.locator('#prix').getByRole('textbox')).toHaveCount(2)
+  await expect(page.locator('#prix').getByRole('slider')).toHaveCount(2)
   // « Précédent » goes back
   await page.locator('#prix').getByRole('button', { name: 'Précédent' }).click()
   await expect(page.locator('#scenario')).toHaveClass(/is-open/)

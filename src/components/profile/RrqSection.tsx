@@ -15,6 +15,7 @@ import { Chip } from '../Chip'
 import { FieldInfo } from '../FieldInfo'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { SectionHeader } from '../SectionHeader'
 import { StatusMessage } from '../StatusMessage'
 import { PasteEarnings } from './PasteEarnings'
@@ -54,11 +55,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
 
   return (
     <Section title={r.title} subtitle={CARD_COPY[lang].rrq} concept="rrq">
-      <FieldRow label={r.startAge} infoId="rrqStartAge" hint={r.startHint}>
-        {(w) => (
-          <NumberField kind="int" min={60} max={72} unit={t.fields.years} value={person.rrq.startAge} onChange={(startAge) => edit((x) => ({ ...x, rrq: { ...x.rrq, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />
-        )}
-      </FieldRow>
+      <NumberSlider kind="int" label={r.startAge} infoId="rrqStartAge" hint={r.startHint} min={60} max={72} step={1} value={person.rrq.startAge} onChange={(startAge) => edit((x) => ({ ...x, rrq: { ...x.rrq, startAge } }))} marks={[60,65,70].map((value) => ({ value, label: String(value) }))} />
 
       {/* The relevé's own « Montant actuel » at 60 and at 65 — the facsimile of « Par document » edits the same two fields. They are a CHECK against the
           engine, never an input (engine/types.ts), so no fact is confirmed here and the projection never reads them. */}

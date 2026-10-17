@@ -17,6 +17,7 @@ import { Chip, ChipGroup } from '../Chip'
 import { EditField } from '../EditField'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { Cluster } from '../Layout'
 import { StatusMessage } from '../StatusMessage'
 import { Section } from './shared'
@@ -130,7 +131,6 @@ export function FamilySection({ withKids = true }: { /** The children and what e
 // What a child costs, and WHERE it sits: inside the annual budget already, or on top of it. A spending question, so it rides inside the Budget card (BudgetSection),
 // right after the two budgets it qualifies — asked only of someone who said there are children (« Ma situation »).
 export function ChildCosts({ withKids = true }: { withKids?: boolean }) {
-  const t = useT()
   const { lang } = useLang()
   const lc = LIFE_COPY[lang].children
   const kc = KIDS_COPY[lang]
@@ -183,11 +183,7 @@ export function ChildCosts({ withKids = true }: { withKids?: boolean }) {
           </FieldRow>
           {cost && (
             <>
-              <FieldRow label={lc.leaves} help="childLeaves" hint={lc.leavesHint}>
-                {(w) => (
-                  <NumberField kind="int" min={16} max={35} unit={t.fields.years} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => patchChildSpending(p, { untilAge }))} id={w.id} ariaDescribedBy={w.describedBy} />
-                )}
-              </FieldRow>
+              <NumberSlider kind="int" label={lc.leaves} help="childLeaves" hint={lc.leavesHint} min={16} max={35} step={1} value={cost.untilAge} onChange={(untilAge) => updateProfile((p) => patchChildSpending(p, { untilAge }))} />
               {/* what leaving home takes out of the budget: only said when a flat amount per child at home is stated (the amounts by age are for a child still to come) */}
               {heavy && (
                 <>

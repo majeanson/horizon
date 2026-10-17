@@ -10,6 +10,7 @@ import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { StatusMessage } from '../StatusMessage'
 import { HOME_COPY } from '../../lib/homeCopy'
 import { LevelSlot } from './LevelSlot'
@@ -56,9 +57,7 @@ export function HomeSection() {
           </FieldRow>
           {home.mortgage.balance > 0 && (
             <>
-              <FieldRow label={h.rate} help="mortgageRate" hint={h.rateHint}>
-                {(w) => <NumberField kind="percent" min={0} max={0.25} value={home.mortgage.rate} onChange={(rate) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, rate } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
-              </FieldRow>
+              <NumberSlider kind="percent" label={h.rate} help="mortgageRate" hint={h.rateHint} min={0} max={0.1} bounds={[0, 0.25]} step={0.0005} digits={2} value={home.mortgage.rate} onChange={(rate) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, rate } })))} />
               <MortgageTerms home={home} label={h.payment} />
               {/* What the payment means: the day the cost stops — or, plainly, that it never does. */}
               {payoff === 'never' ? (
@@ -78,9 +77,7 @@ export function HomeSection() {
           </Chip>
           {home.sale !== null && (
             <>
-              <FieldRow label={h.sellAge} help="homeSellAge" hint={h.sellHint}>
-                {(w) => <NumberField kind="int" min={40} max={100} unit={t.fields.years} value={home.sale!.age} onChange={(age) => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: { ...x.sale!, age } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
-              </FieldRow>
+              <NumberSlider kind="int" label={h.sellAge} help="homeSellAge" hint={h.sellHint} min={55} max={95} bounds={[40, 100]} step={1} value={home.sale!.age} onChange={(age) => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: { ...x.sale!, age } })))} />
               <FieldRow label={h.replacement} help="homeReplacement" hint={h.replacementHint}>
                 {(w) => <NumberField kind="money" max={1e8} value={home.sale!.replacementCost} onChange={(replacementCost) => updateProfile((p) => updateHome(p, (x) => ({ ...x, sale: { ...x.sale!, replacementCost } })))} id={w.id} ariaDescribedBy={w.describedBy} />}
               </FieldRow>

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, savedProfile, seedProfile, type SeedProfile } from './seed'
+import { exactBox } from './slider'
 
 // The mortgage's terms: the payment typed in the unit the statement uses, a renewal said in words, and the reminder about what owning costs.
 
@@ -34,8 +35,9 @@ test('a renewal is said in words: the payment that keeps the date, or the date t
   await page.goto('/profil?form=1')
   const section = page.locator('.profile-section').filter({ has: page.getByRole('heading', { name: 'Résidence principale' }) })
   await section.getByRole('button', { name: 'Le taux sera renégocié à l’échéance du terme' }).click()
-  await box(page, 'Nouveau taux (annuel)').fill('5,5')
-  await box(page, 'Nouveau taux (annuel)').blur()
+  const renewal = await exactBox(page, 'Nouveau taux (annuel)', true)
+  await renewal.fill('5,5')
+  await renewal.blur()
   await expect(section.getByText(/Votre paiement passerait à environ .* par mois dès \d{4}/)).toBeVisible()
   await section.getByRole('radio', { name: 'Garder mon paiement (la date de fin bouge)' }).click()
   await expect(section.getByText(/Le prêt serait payé en \d{4}, au lieu de \d{4} sans renouvellement/)).toBeVisible()

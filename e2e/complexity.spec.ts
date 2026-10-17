@@ -61,7 +61,9 @@ const BUDGETS: Record<string, Budget> = {
   // 370 → 364, 2100 → 1856 (2026-10-16, the ratchet FALLS): the cash buffer and what the children cost are READ on Ma fiche now (components/sheet), not among the fields; Famille keeps
   // the choices that act on the cost, and the toggles' notes fold under « En savoir plus ».
   // 364 → 365 controls, 1856 → 1845 words (2026-10-16): « Rendre mon profil exact » keeps its bar and « n sur N » in view and folds the legend and the hint under one summary (+1 control, −11 words).
-  'Profil (form)': { controls: 365, words: 1845 },
+  // 365 → 403 controls, 1845 → 2032 words (2026-10-16, a conscious RISE — Marc: “inputs that could be better on mobile”): the bounded figures (ages, rates, shares) are sliders now
+  // (components/NumberSlider.tsx): a thumb, a − and a + each, and a « Saisir le chiffre exact » chip that gives the typed box back. Fewer keyboards on a phone, more stops on a wide screen.
+  'Profil (form)': { controls: 403, words: 2032 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,

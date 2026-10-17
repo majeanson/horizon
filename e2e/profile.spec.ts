@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
 import { EXAMPLE_IDS } from '../src/engine/golden/examples'
 import { EXAMPLE, blankSeed, savedProfile, seedProfile, showAllSections, switchLanguage } from './seed'
+import { exactBox } from './slider'
 
 // The profile, end to end in a real browser: what is typed is what is saved, what is saved is what comes back, and
 // every number has its ⓘ. The unit tests pin the logic; this pins that a PERSON can drive it.
@@ -58,7 +59,7 @@ test.describe('a blank profile', () => {
 
   test('an out-of-range text is refused with its reason, kept on screen, and not saved', async ({ page }) => {
     await page.goto('/profil?form=1')
-    const age = box(page, 'Âge de retraite visé')
+    const age = await exactBox(page, 'Âge de retraite visé', true)
     await age.fill('12')
     await age.blur()
     await expect(page.getByRole('alert').filter({ hasText: 'Entre 18 et 80' })).toBeVisible()
@@ -247,12 +248,12 @@ test.describe('the example household', () => {
     await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/85\D000/)
     await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/65\D000/)
     await page.goto('/hypotheses?bloc=tout')
-    await expect(box(page, 'Hausse des prix (inflation), par année')).toHaveValue('2,1')
+    await expect(await exactBox(page, 'Hausse des prix (inflation), par année', true)).toHaveValue('2,1')
   })
 
   test('the assumptions page edits the profile, and the order of withdrawals is adopted from the comparison', async ({ page }) => {
     await page.goto('/hypotheses?bloc=tout')
-    const infl = box(page, 'Hausse des prix (inflation), par année')
+    const infl = await exactBox(page, 'Hausse des prix (inflation), par année', true)
     await infl.fill('2,5')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.025)
@@ -279,7 +280,7 @@ test.describe('data stays on this device', () => {
 
     // Change something, then import the file back.
     await page.goto('/hypotheses?bloc=tout')
-    const infl = box(page, 'Hausse des prix (inflation), par année')
+    const infl = await exactBox(page, 'Hausse des prix (inflation), par année', true)
     await infl.fill('4')
     await infl.blur()
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.04)
@@ -437,7 +438,7 @@ test('the wage growth is said after inflation, beside Retraite Québec\'s, and a
   const line = page.locator('#prix .field-row__hint').filter({ hasText: 'Après inflation' })
   await expect(line).toContainText(/Après inflation\s*:\s*\+0,6\s%\s*par année\. Retraite Québec suppose \+0,6\s%/)
   await expect(line).not.toContainText('Plus haut que son hypothèse')
-  const wages = page.getByRole('textbox', { name: 'Hausse des salaires, par année' })
+  const wages = await exactBox(page, 'Hausse des salaires, par année')
   await wages.fill('4')
   await wages.press('Enter')
   await expect(line).toContainText(/\+1,9\s%\s*par année/)
@@ -455,7 +456,7 @@ test('the scenario picker sets the economy, follows a hand edit, and the desktop
   await expect(picker.getByRole('tab', { name: 'Prudent' })).toHaveAttribute('aria-selected', 'true')
   await expect.poll(async () => (await savedProfile(page)).assumptions).toMatchObject({ inflation: 0.025, wageGrowth: 0.022, horizonAge: 100, returns: { rrsp: 0.03, tfsa: 0.03, nonReg: 0.025 } })
 
-  const rrsp = page.getByRole('textbox', { name: 'REER' })
+  const rrsp = await exactBox(page, 'REER', true)
   await rrsp.fill('7')
   await rrsp.press('Enter')
   await expect(picker.getByRole('tab', { name: 'Personnalisé' })).toHaveAttribute('aria-selected', 'true')

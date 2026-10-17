@@ -17,6 +17,7 @@ import { FieldInfo } from '../FieldInfo'
 import { FieldRow } from '../FieldRow'
 import { Icon } from '../Icon'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { SectionHeader } from '../SectionHeader'
 import { Section, type PersonEditor } from './shared'
 
@@ -43,23 +44,15 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
 
       {!pension.inPay && (
         <>
-      <FieldRow label={p.accrual} help="dbAccrual" hint={p.accrualHint}>
-        {(w) => <NumberField kind="percent" min={0} max={0.1} value={pension.accrualRate} onChange={(accrualRate) => set((x) => ({ ...x, accrualRate }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
+      <NumberSlider kind="percent" label={p.accrual} help="dbAccrual" hint={p.accrualHint} min={0} max={0.1} step={0.001} value={pension.accrualRate} onChange={(accrualRate) => set((x) => ({ ...x, accrualRate }))} />
       <FieldRow label={p.maxService} help="dbMaxService">
         {(w) => (
           <NumberField kind="decimal" allowEmpty min={1} max={60} unit={t.fields.years} placeholder={p.maxServiceNone} value={pension.maxServiceYears} onChange={(maxServiceYears) => set((x) => ({ ...x, maxServiceYears }))} id={w.id} />
         )}
       </FieldRow>
-      <FieldRow label={p.averaging} help="dbAveraging" hint={p.averagingHint}>
-        {(w) => <NumberField kind="int" min={1} max={10} unit={t.fields.years} value={pension.averagingYears} onChange={(averagingYears) => set((x) => ({ ...x, averagingYears }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
-      <FieldRow label={p.earliestAge} help="dbEarliestAge" hint={p.earliestAgeHint}>
-        {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.earliestAge} onChange={(earliestAge) => set((x) => ({ ...x, earliestAge }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
-      <FieldRow label={p.unreducedAge} help="dbUnreducedAge" hint={p.unreducedAgeHint}>
-        {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.unreduced.age} onChange={(age) => set((x) => ({ ...x, unreduced: { ...x.unreduced, age } }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
+      <NumberSlider kind="int" label={p.averaging} help="dbAveraging" hint={p.averagingHint} min={1} max={10} step={1} value={pension.averagingYears} onChange={(averagingYears) => set((x) => ({ ...x, averagingYears }))} />
+      <NumberSlider kind="int" label={p.earliestAge} help="dbEarliestAge" hint={p.earliestAgeHint} min={45} max={75} step={1} value={pension.earliestAge} onChange={(earliestAge) => set((x) => ({ ...x, earliestAge }))} />
+      <NumberSlider kind="int" label={p.unreducedAge} help="dbUnreducedAge" hint={p.unreducedAgeHint} min={45} max={75} step={1} value={pension.unreduced.age} onChange={(age) => set((x) => ({ ...x, unreduced: { ...x.unreduced, age } }))} />
       <FieldRow label={p.unreducedService} help="dbUnreducedService" hint={p.unreducedServiceHint}>
         {(w) => (
           <NumberField kind="decimal" allowEmpty min={1} max={60} unit={t.fields.years} value={pension.unreduced.serviceYears} onChange={(serviceYears) => set((x) => ({ ...x, unreduced: { ...x.unreduced, serviceYears } }))} id={w.id} ariaDescribedBy={w.describedBy} />
@@ -71,17 +64,11 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
       </Chip>
       {pension.unreduced.factor && (
         <>
-          <FieldRow label={p.factorMinAge} help="dbFactorMinAge">
-            {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.unreduced.factor!.minAge} onChange={(minAge) => set((x) => ({ ...x, unreduced: { ...x.unreduced, factor: { ...x.unreduced.factor!, minAge } } }))} id={w.id} />}
-          </FieldRow>
-          <FieldRow label={p.factorTotal} help="dbFactorTotal">
-            {(w) => <NumberField kind="int" min={50} max={120} value={pension.unreduced.factor!.total} onChange={(total) => set((x) => ({ ...x, unreduced: { ...x.unreduced, factor: { ...x.unreduced.factor!, total } } }))} id={w.id} />}
-          </FieldRow>
+          <NumberSlider kind="int" label={p.factorMinAge} help="dbFactorMinAge" min={45} max={75} step={1} value={pension.unreduced.factor!.minAge} onChange={(minAge) => set((x) => ({ ...x, unreduced: { ...x.unreduced, factor: { ...x.unreduced.factor!, minAge } } }))} />
+          <NumberSlider kind="int" label={p.factorTotal} help="dbFactorTotal" min={50} max={120} step={1} unit="" value={pension.unreduced.factor!.total} onChange={(total) => set((x) => ({ ...x, unreduced: { ...x.unreduced, factor: { ...x.unreduced.factor!, total } } }))} />
         </>
       )}
-      <FieldRow label={p.earlyReduction} help="dbEarlyReduction" hint={p.earlyReductionHint}>
-        {(w) => <NumberField kind="percent" min={0} max={0.2} value={pension.earlyReductionPerYear} onChange={(earlyReductionPerYear) => set((x) => ({ ...x, earlyReductionPerYear }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
+      <NumberSlider kind="percent" label={p.earlyReduction} help="dbEarlyReduction" hint={p.earlyReductionHint} min={0} max={0.2} step={0.0025} digits={2} value={pension.earlyReductionPerYear} onChange={(earlyReductionPerYear) => set((x) => ({ ...x, earlyReductionPerYear }))} />
 
       <Chip selected={pension.coordination !== null} expanded={pension.coordination !== null} onClick={() => set((x) => ({ ...x, coordination: x.coordination ? null : NEUTRAL.coordination }))}>
         {p.coordination}
@@ -91,12 +78,8 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
           <div className="earnings__tools">
             <FieldInfo id="dbCoordination" label={p.coordination} />
           </div>
-          <FieldRow label={p.coordinationRate} help="dbCoordinationRate">
-            {(w) => <NumberField kind="percent" min={0} max={0.05} value={pension.coordination!.rate} onChange={(rate) => set((x) => ({ ...x, coordination: { ...x.coordination!, rate } }))} id={w.id} />}
-          </FieldRow>
-          <FieldRow label={p.coordinationFromAge} help="dbCoordinationFrom">
-            {(w) => <NumberField kind="int" min={55} max={75} unit={t.fields.years} value={pension.coordination!.fromAge} onChange={(fromAge) => set((x) => ({ ...x, coordination: { ...x.coordination!, fromAge } }))} id={w.id} />}
-          </FieldRow>
+          <NumberSlider kind="percent" label={p.coordinationRate} help="dbCoordinationRate" min={0} max={0.05} step={0.001} value={pension.coordination!.rate} onChange={(rate) => set((x) => ({ ...x, coordination: { ...x.coordination!, rate } }))} />
+          <NumberSlider kind="int" label={p.coordinationFromAge} help="dbCoordinationFrom" min={55} max={75} step={1} value={pension.coordination!.fromAge} onChange={(fromAge) => set((x) => ({ ...x, coordination: { ...x.coordination!, fromAge } }))} />
           <FieldRow label={p.coordinationMaxYears} help="dbCoordinationYears">
             {(w) => <NumberField kind="decimal" min={1} max={60} unit={t.fields.years} value={pension.coordination!.maxYears} onChange={(maxYears) => set((x) => ({ ...x, coordination: { ...x.coordination!, maxYears } }))} id={w.id} />}
           </FieldRow>
@@ -108,28 +91,18 @@ function Rules({ pension, set }: { pension: DbPension; set: (change: (p: DbPensi
       </Chip>
       {pension.bridge && (
         <>
-          <FieldRow label={p.bridgeShare} help="dbBridgeShare">
-            {(w) => <NumberField kind="percent" min={0} max={1} value={pension.bridge!.share} onChange={(share) => set((x) => ({ ...x, bridge: { ...x.bridge!, share } }))} id={w.id} />}
-          </FieldRow>
-          <FieldRow label={p.bridgeUntil} help="dbBridgeUntil">
-            {(w) => <NumberField kind="int" min={55} max={75} unit={t.fields.years} value={pension.bridge!.untilAge} onChange={(untilAge) => set((x) => ({ ...x, bridge: { ...x.bridge!, untilAge } }))} id={w.id} />}
-          </FieldRow>
+          <NumberSlider kind="percent" label={p.bridgeShare} help="dbBridgeShare" min={0} max={1} step={0.05} digits={0} value={pension.bridge!.share} onChange={(share) => set((x) => ({ ...x, bridge: { ...x.bridge!, share } }))} />
+          <NumberSlider kind="int" label={p.bridgeUntil} help="dbBridgeUntil" min={55} max={75} step={1} value={pension.bridge!.untilAge} onChange={(untilAge) => set((x) => ({ ...x, bridge: { ...x.bridge!, untilAge } }))} />
         </>
       )}
 
         </>
       )}
 
-      <FieldRow label={p.indexShare} help="dbIndexShare" hint={p.indexHint}>
-        {(w) => <NumberField kind="percent" min={0} max={1} value={pension.indexation.share} onChange={(share) => set((x) => ({ ...x, indexation: { ...x.indexation, share } }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
-      <FieldRow label={p.indexMinus} help="dbIndexMinus">
-        {(w) => <NumberField kind="percent" min={0} max={0.1} value={pension.indexation.minus} onChange={(minus) => set((x) => ({ ...x, indexation: { ...x.indexation, minus } }))} id={w.id} />}
-      </FieldRow>
+      <NumberSlider kind="percent" label={p.indexShare} help="dbIndexShare" hint={p.indexHint} min={0} max={1} step={0.05} digits={0} value={pension.indexation.share} onChange={(share) => set((x) => ({ ...x, indexation: { ...x.indexation, share } }))} />
+      <NumberSlider kind="percent" label={p.indexMinus} help="dbIndexMinus" min={0} max={0.1} step={0.001} value={pension.indexation.minus} onChange={(minus) => set((x) => ({ ...x, indexation: { ...x.indexation, minus } }))} />
       {/* What the plan pays a surviving spouse (the projection pays it after the member's death). */}
-      <FieldRow label={p.survivorShare} infoId="dbSurvivorShare" hint={p.survivorShareHint}>
-        {(w) => <NumberField kind="percent" min={0} max={1} value={pension.survivorShare ?? 0} onChange={(survivorShare) => set((x) => ({ ...x, survivorShare }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-      </FieldRow>
+      <NumberSlider kind="percent" label={p.survivorShare} infoId="dbSurvivorShare" hint={p.survivorShareHint} min={0} max={1} step={0.05} digits={0} value={pension.survivorShare ?? 0} onChange={(survivorShare) => set((x) => ({ ...x, survivorShare }))} />
     </div>
   )
 }
@@ -210,9 +183,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 <FieldRow label={p.serviceRate} help="dbServiceRate">
                   {(w) => <NumberField kind="decimal" min={0} max={1} value={pension.serviceRatePerYear} onChange={(serviceRatePerYear) => set((x) => ({ ...x, serviceRatePerYear }))} id={w.id} />}
                 </FieldRow>
-                <FieldRow label={p.startAge} help="pensionStartAge" hint={pension.deferred ? p.startHint : undefined}>
-                  {(w) => <NumberField kind="int" min={45} max={75} unit={t.fields.years} value={pension.startAge} onChange={(startAge) => set((x) => ({ ...x, startAge }))} id={w.id} />}
-                </FieldRow>
+                <NumberSlider kind="int" label={p.startAge} help="pensionStartAge" hint={pension.deferred ? p.startHint : undefined} min={45} max={75} step={1} value={pension.startAge} onChange={(startAge) => set((x) => ({ ...x, startAge }))} />
               </>
             )}
             <div className="plan-card__rules">

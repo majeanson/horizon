@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE_IDS } from '../src/engine/golden/examples'
 import { slowCpu } from './seed'
+import { exactBox } from './slider'
 
 // The CI-shaped slow run (playwright.slow.config.ts) throttles every page; a spec that does not seed asks for it itself.
 test.beforeEach(({ page }) => slowCpu(page))
@@ -113,7 +114,7 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   await page.goto('/profil')
   const home = page.locator('.profile-section', { hasText: 'Résidence principale' })
   await expect(home.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' })).toHaveValue(/880\s?000/)
-  await expect(home.getByRole('textbox', { name: 'Âge de la vente (première personne)' })).toHaveValue('58')
+  await expect(await exactBox(home, 'Âge de la vente (première personne)')).toHaveValue('58')
   // and the year table carries the home's columns
   await page.goto('/resultats?v=verify&bloc=tableau')
   await expect(page.locator('.year-table table').getByRole('columnheader', { name: 'Maison, valeur nette' })).toBeVisible({ timeout: 30_000 })

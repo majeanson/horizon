@@ -2,13 +2,15 @@ import { useRef, useState } from 'react'
 import type { AccountKind } from '../engine/types'
 import { Accordion, AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Chip } from '../components/Chip'
-import { ASSUMPTION_PRESETS, presetOf, type PresetKey } from '../engine/assumptionPresets'
+import { ASSUMPTION_PRESETS, PRESET_KEYS, presetOf, type PresetKey, type PresetValues } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
 import { ImpactMeter } from '../components/ImpactMeter'
 import { NextStep } from '../components/NextStep'
 import { FieldRow } from '../components/FieldRow'
 import { Icon } from '../components/Icon'
 import { NumberField } from '../components/NumberField'
+import { NumberSlider } from '../components/NumberSlider'
+import type { SliderMark } from '../components/Slider'
 import { PageHead } from '../components/PageHead'
 import { PinnedMap } from '../components/PinnedMap'
 import { Section } from '../components/profile/shared'
@@ -69,6 +71,8 @@ export function Hypotheses() {
     const side = level === 'below' ? 'low' : level === 'above' ? 'high' : level
     return <ImpactMeter level={level} tilt={tilt} levelLabel={impact.level[level]} tiltLabel={impact.tilt[tilt]} why={impact.why[field][side]} whyTitle={impact.whyTitle} outside={impact.outside} ends={[impact.level.below, impact.level.above]} />
   }
+  /** The prudent · neutral · bold value of one assumption, as the marks on its track (a tap on a legend chip applies it). */
+  const marksOf = (pick: (v: PresetValues) => number): SliderMark[] => PRESET_KEYS.map((key) => ({ value: pick(ASSUMPTION_PRESETS[key]), label: a.presets[key], tone: key }))
   const accountName: Record<AccountKind, string> = { nonReg: a.returns.nonReg, rrsp: a.returns.rrsp, tfsa: a.returns.tfsa }
   // ONE return by default: most households hold the same mix in every account, so three boxes plus an averaged meter was
   // extra work. The three open when the rates already differ, or when asked; closing them again makes them equal.
@@ -149,13 +153,9 @@ export function Hypotheses() {
       </Section>
 
       <Section id="prix" title={a.economy.title} subtitle={CARD_COPY[lang].prices} concept="inflation">
-        <FieldRow label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint}>
-          {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-        </FieldRow>
+        <NumberSlider kind="percent" label={a.economy.inflation} infoId="inflation" hint={a.economy.inflationHint} min={-0.02} max={0.08} bounds={[-0.02, 0.15]} step={0.001} value={assumptions.inflation} onChange={(inflation) => updateProfile((p) => setAssumptions(p, { inflation }))} marks={marksOf((v) => v.inflation)} />
         {meter('inflation', assumptions.inflation)}
-        <FieldRow label={a.economy.wageGrowth} infoId="wageGrowth" hint={a.economy.wageHint}>
-          {(w) => <NumberField kind="percent" min={-0.02} max={0.15} value={assumptions.wageGrowth} onChange={(wageGrowth) => updateProfile((p) => setAssumptions(p, { wageGrowth }))} id={w.id} ariaDescribedBy={w.describedBy} />}
-        </FieldRow>
+        <NumberSlider kind="percent" label={a.economy.wageGrowth} infoId="wageGrowth" hint={a.economy.wageHint} min={-0.02} max={0.08} bounds={[-0.02, 0.15]} step={0.001} value={assumptions.wageGrowth} onChange={(wageGrowth) => updateProfile((p) => setAssumptions(p, { wageGrowth }))} marks={marksOf((v) => v.wageGrowth)} />
         <RealWageLine wageGrowth={assumptions.wageGrowth} inflation={assumptions.inflation} />
         {meter('wageGrowth', assumptions.wageGrowth)}
       </Section>
@@ -163,14 +163,10 @@ export function Hypotheses() {
       <Section id="placements" title={a.returns.title} subtitle={a.returns.hint} concept="rendement">
         {perAccount ? (
           (['rrsp', 'tfsa', 'nonReg'] as const).map((kind) => (
-            <FieldRow key={kind} label={accountName[kind]} infoId="returns">
-              {(w) => <NumberField kind="percent" min={-0.2} max={0.3} value={assumptions.returns[kind]} onChange={(v) => updateProfile((p) => setReturn(p, kind, v))} id={w.id} />}
-            </FieldRow>
+            <NumberSlider key={kind} kind="percent" label={accountName[kind]} infoId="returns" min={0} max={0.1} bounds={[-0.2, 0.3]} step={0.001} value={assumptions.returns[kind]} onChange={(v) => updateProfile((p) => setReturn(p, kind, v))} marks={marksOf((x) => x.returns[kind])} />
           ))
         ) : (
-          <FieldRow label={a.returns.all} infoId="returns">
-            {(w) => <NumberField kind="percent" min={-0.2} max={0.3} value={returns.rrsp} onChange={setAllReturns} id={w.id} />}
-          </FieldRow>
+          <NumberSlider kind="percent" label={a.returns.all} infoId="returns" min={0} max={0.1} bounds={[-0.2, 0.3]} step={0.001} value={returns.rrsp} onChange={setAllReturns} marks={marksOf((x) => x.returns.rrsp)} />
         )}
         <Chip
           expanded={perAccount}
@@ -220,20 +216,19 @@ export function Hypotheses() {
           const name = person.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
           return (
             <div key={person.id} className="horizon-person">
-              <FieldRow label={profile.household.persons.length === 1 ? a.horizon.age : a.horizon.person(name)} infoId="horizonAge" hint={own === null ? a.horizon.followHint : undefined}>
-                {(w) => (
-                  <NumberField
-                    kind="int"
-                    min={50}
-                    max={110}
-                    unit={t.fields.years}
-                    value={own ?? assumptions.horizonAge}
-                    onChange={(horizonAge) => updateProfile((p) => mapPerson(p, person.id, (x) => ({ ...x, horizonAge })))}
-                    id={w.id}
-                    ariaDescribedBy={w.describedBy}
-                  />
-                )}
-              </FieldRow>
+              <NumberSlider
+                kind="int"
+                label={profile.household.persons.length === 1 ? a.horizon.age : a.horizon.person(name)}
+                infoId="horizonAge"
+                hint={own === null ? a.horizon.followHint : undefined}
+                min={75}
+                max={105}
+                bounds={[50, 110]}
+                step={1}
+                value={own ?? assumptions.horizonAge}
+                onChange={(horizonAge) => updateProfile((p) => mapPerson(p, person.id, (x) => ({ ...x, horizonAge })))}
+                marks={marksOf((v) => v.horizonAge)}
+              />
               {own !== null && (
                 <Cluster>
                   <Chip onClick={() => updateProfile((p) => mapPerson(p, person.id, (x) => ({ ...x, horizonAge: null })))}>{a.horizon.follow(assumptions.horizonAge)}</Chip>
@@ -244,11 +239,7 @@ export function Hypotheses() {
         })}
         {meter('horizonAge', Math.max(...profile.household.persons.map((p) => p.horizonAge ?? assumptions.horizonAge)))}
         {hasSpouse(profile) && (
-          <FieldRow label={a.horizon.survivor} infoId="survivorSpending" hint={a.horizon.survivorHint}>
-            {(w) => (
-              <NumberField kind="percent" min={0.3} max={1} value={assumptions.survivorSpending ?? 0.7} onChange={(survivorSpending) => updateProfile((p) => setAssumptions(p, { survivorSpending }))} id={w.id} ariaDescribedBy={w.describedBy} />
-            )}
-          </FieldRow>
+          <NumberSlider kind="percent" label={a.horizon.survivor} infoId="survivorSpending" hint={a.horizon.survivorHint} digits={0} min={0.3} max={1} step={0.05} value={assumptions.survivorSpending ?? 0.7} onChange={(survivorSpending) => updateProfile((p) => setAssumptions(p, { survivorSpending }))} marks={[0.5, 0.7, 1].map((value) => ({ value, label: formatPct(value, lang, 0) }))} />
         )}
       </Section>
 

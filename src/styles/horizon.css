@@ -1224,6 +1224,10 @@
 .slider__value {
   font-weight: 600;
 }
+/* The ⓘ sits against the label; the value stays at the far end. */
+.slider__head .field-row__tools {
+  margin-right: auto;
+}
 /* The row: a step button each side of the track. The thumb is 1.75 rem on a 0.6 rem track (a finger finds it), and a vertical
    swipe still scrolls the page — only a sideways drag moves the value. */
 .slider__row {

@@ -10,6 +10,7 @@ import { Chip } from '../Chip'
 import { FieldRow } from '../FieldRow'
 import { Cluster } from '../Layout'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { LumpSumWhatIf } from './LumpSumWhatIf'
 
 // How the mortgage's PAYMENT is counted, and a RENEWAL. The payment is typed in the unit the statement uses (every 2 weeks, say) and kept as its monthly
@@ -64,9 +65,7 @@ export function MortgageTerms({ home, label }: { home: Home; /** The row label o
           <FieldRow label={c.renewal.year} help="renewalYear" hint={c.renewal.yearHint}>
             {(w) => <NumberField kind="year" min={now.year} max={2100} value={renewal.year} onChange={(year) => set({ renewal: { ...renewal, year } })} id={w.id} ariaDescribedBy={w.describedBy} />}
           </FieldRow>
-          <FieldRow label={c.renewal.rate} help="renewalRate">
-            {(w) => <NumberField kind="percent" min={0} max={0.25} value={renewal.rate} onChange={(rate) => set({ renewal: { ...renewal, rate } })} id={w.id} />}
-          </FieldRow>
+          <NumberSlider kind="percent" label={c.renewal.rate} help="renewalRate" min={0} max={0.1} bounds={[0, 0.25]} step={0.0005} digits={2} value={renewal.rate} onChange={(rate) => set({ renewal: { ...renewal, rate } })} />
           <Cluster role="radiogroup" aria-label={c.renewal.keepTitle}>
             <Chip radio selected={renewal.keep === 'amortization'} onClick={() => set({ renewal: { ...renewal, keep: 'amortization' } })}>
               {c.renewal.keepAmortization}

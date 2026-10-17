@@ -11,6 +11,7 @@ import { Chip } from '../Chip'
 import { ConceptPip } from '../ConceptPip'
 import { FieldRow } from '../FieldRow'
 import { NumberField } from '../NumberField'
+import { NumberSlider } from '../NumberSlider'
 import { Section, type PersonEditor } from './shared'
 import { LevelSlot } from './LevelSlot'
 import { PersonChecks } from './PersonChecks'
@@ -36,11 +37,7 @@ export function OasSection({ person, edit, withoutResidence = false }: PersonEdi
         {o.sinceBirth}
       </Chip>
       </>)}
-      <FieldRow label={o.startAge} infoId="oasStartAge" hint={o.startHint}>
-        {(w) => (
-          <NumberField kind="int" min={65} max={70} unit={t.fields.years} value={person.oas.startAge} onChange={(startAge) => edit((x) => ({ ...x, oas: { ...x.oas, startAge } }))} id={w.id} ariaDescribedBy={w.describedBy} />
-        )}
-      </FieldRow>
+      <NumberSlider kind="int" label={o.startAge} infoId="oasStartAge" hint={o.startHint} min={65} max={70} step={1} value={person.oas.startAge} onChange={(startAge) => edit((x) => ({ ...x, oas: { ...x.oas, startAge } }))} marks={[65,70].map((value) => ({ value, label: String(value) }))} />
     </Section>
   )
 }

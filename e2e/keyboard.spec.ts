@@ -65,7 +65,7 @@ test.describe('with the keyboard alone', () => {
   test('the earnings grid sits on the page: its ⓘ, the fill action, the paste action and the first year are the next stops', async ({ page }) => {
     await page.goto('/profil?form=1')
     await page.locator('.page-head__title').waitFor()
-    await tabTo(page, /Où trouver ce chiffre\s: Revenus de travail admissibles par année/)
+    await tabTo(page, /Où trouver ce chiffre\s: Revenus de travail admissibles par année/, 140) // each slider is three stops (− · track · +) plus its « Saisir » chip
     await page.keyboard.press('Tab')
     expect((await focused(page)).name).toBe('Estimer les années vides à partir du salaire actuel')
     await page.keyboard.press('Tab')

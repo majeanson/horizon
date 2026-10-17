@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, PROFILE_KEY, openSituation, savedProfile, seedProfile, showAllSections } from './seed'
+import { exactBox } from './slider'
 
 // The results page keeps its three views and the map pinned under the top bar while it scrolls, and the chart's
 // « Détail » view shows the whole picture (sources, accounts, the three sets of hypotheses), not only the net worth.
@@ -173,8 +174,9 @@ test('the home: owning one, its mortgage says when the payment stops, and it is 
   await section.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' }).fill('520000')
   await section.getByRole('textbox', { name: 'Solde de l’hypothèque' }).fill('150000')
   await section.getByRole('textbox', { name: 'Solde de l’hypothèque' }).blur() // a box commits when left: the rate and payment fields appear once there is a balance
-  await section.getByRole('textbox', { name: 'Taux de l’hypothèque (annuel)' }).fill('4,9')
-  await section.getByRole('textbox', { name: 'Taux de l’hypothèque (annuel)' }).blur()
+  const rate = await exactBox(section, 'Taux de l’hypothèque (annuel)')
+  await rate.fill('4,9')
+  await rate.blur()
   await section.getByRole('textbox', { name: 'Paiement mensuel' }).fill('1150')
   await section.getByRole('textbox', { name: 'Paiement mensuel' }).blur()
   // The payment stops on a stated date — the same year the plan's table stops charging it.
@@ -186,8 +188,9 @@ test('the home: owning one, its mortgage says when the payment stops, and it is 
   await expect(section).toContainText('ne se rembourse jamais')
   // A sale can be planned.
   await section.getByRole('button', { name: 'Vendre ou réduire à un certain âge' }).click()
-  await section.getByRole('textbox', { name: 'Âge de la vente (première personne)' }).fill('78')
-  await section.getByRole('textbox', { name: 'Âge de la vente (première personne)' }).blur()
+  const saleAge = await exactBox(section, 'Âge de la vente (première personne)')
+  await saleAge.fill('78')
+  await saleAge.blur()
   await expect.poll(async () => (await savedProfile(page)).household.home.sale).toEqual({ age: 78, replacementCost: 0 })
   // Taking the home away asks what is lost, and erases it.
   await section.getByRole('button', { name: 'Retirer la résidence' }).click()

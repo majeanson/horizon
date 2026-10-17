@@ -37,6 +37,8 @@ export function Slider({
   describedBy,
   marks,
   info,
+  tools,
+  hint,
 }: {
   label: string
   value: number
@@ -51,7 +53,12 @@ export function Slider({
   marks?: readonly SliderMark[]
   /** What to say about the live value: a band, a reason. Rendered under the track and follows the thumb. */
   info?: (v: number) => ReactNode
+  /** The ⓘ beside the label, as a FieldRow draws it. */
+  tools?: ReactNode
+  /** A quiet line under the control, tied to the input by `aria-describedby`. */
+  hint?: ReactNode
 }) {
+  const hintId = useId()
   const id = useId()
   const t = useT()
   const [local, setLocal] = useState(value)
@@ -108,6 +115,7 @@ export function Slider({
         <label className="field-row__label" htmlFor={id}>
           {label}
         </label>
+        {tools && <span className="field-row__tools">{tools}</span>}
         <output key={kept} className="slider__value mono" htmlFor={id}>
           {valueText(local)}
         </output>
@@ -126,7 +134,7 @@ export function Slider({
             step={step}
             value={local}
             aria-valuetext={valueText(local)}
-            aria-describedby={describedBy}
+            aria-describedby={[describedBy, hint ? hintId : null].filter(Boolean).join(' ') || undefined}
             onChange={(e) => move(Number(e.currentTarget.value))}
             onPointerUp={end}
             onKeyUp={end}
@@ -170,6 +178,11 @@ export function Slider({
         </div>
       )}
       {info && <div className="slider__info">{info(local)}</div>}
+      {hint && (
+        <p id={hintId} className="field-row__hint">
+          {hint}
+        </p>
+      )}
     </div>
   )
 }
