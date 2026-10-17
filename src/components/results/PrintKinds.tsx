@@ -11,6 +11,7 @@ import { LEDGER_COPY } from '../../lib/ledgerCopy'
 import { traceLines } from '../../lib/traceView'
 import { TRACE_COPY } from '../../lib/traceCopy'
 import { PrintComfort, PrintFigures, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
+import { figuresUsed } from '../../lib/figuresUsed'
 import { PARAM_LABELS } from '../../lib/paramLabels'
 import { knownYears, paramRows } from '../../lib/paramsView'
 import { YearTables } from './YearTables'
@@ -149,22 +150,25 @@ export function PrintYears({ m }: { m: ResultsModel }) {
 }
 
 /**
- * Every government figure the calculation reads, newest tax year: the figure, its value, and the official page it was read on with the address written out (a link is nothing on paper)
+ * The government figures the calculation reads for THIS household, newest tax year (the families its profile does not involve are left out and named: lib/figuresUsed.ts): the figure, its value, and the official page it was read on with the address written out (a link is nothing on paper)
  * and the day it was read. The rows are the engine's own (lib/paramsView.ts, the ones « Paramètres utilisés » shows), set as one tight table: a hundred and forty rows must not be a
  * screen's worth of padding each.
  */
 export function PrintSources({ m }: { m: ResultsModel }) {
-  const { lang, r } = m
+  const { lang, r, profile, retiredNow } = m
   const years = knownYears()
   const year = years[years.length - 1]
-  const rows = paramRows(year, lang, r.params.entries)
+  const all = paramRows(year, lang, r.params.entries)
+  const { kept: rows, left } = figuresUsed(all, { household: profile.household, retiredNow })
+  const c = PRINT_MENU_COPY[lang]
   return (
     <div className="print-plan print-kind print-kind--sources">
-      <PrintHead m={m} title={PRINT_MENU_COPY[lang].headings.sources} />
+      <PrintHead m={m} title={c.headings.sources} />
       <p className="print-plan__unit">{r.params.note}</p>
       <p className="print-plan__title">
         {r.params.year(year)} · {r.params.count(rows.length)}
       </p>
+      {left.length > 0 && <p className="print-plan__unit">{c.figuresLeft(left.map((x) => c.families[x.family]).join(', '), left.reduce((n, x) => n + x.count, 0))}</p>}
       <table className="print-figures print-sources">
         <thead>
           <tr>

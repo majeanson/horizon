@@ -53,8 +53,8 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 const LAZY_CAPS = [
   { re: /^charts-[^.]*\.js$/, cap: 384 * KB },
   { re: /^Resultats-[^.]*\.js$/, cap: 88 * KB },
-  // The paper pages « Imprimer… » adds (year by year, sources): fetched when the menu opens, precached. Measured 1,8 KB on 2026-10-17, 3,4 KB once the calendar and the leaflet joined, 9,3 KB with the proof file (the ledger and trace engines it prints) and the QR encoder (lib/qr.ts, ~3 KB) — the tables they print are the screen's own, shared with other chunks.
-  { re: /^PrintKinds-[^.]*\.js$/, cap: 10 * KB },
+  // The paper pages « Imprimer… » adds (year by year, sources): fetched when the menu opens, precached. Measured 1,8 KB on 2026-10-17, 3,4 KB once the calendar and the leaflet joined, 9,3 KB with the proof file (the ledger and trace engines it prints) and the QR encoder (lib/qr.ts, ~3 KB) — the tables they print are the screen's own, shared with other chunks. 10 → 11 KB on 2026-10-17 (measured 10,3 KB): the sources page is cut to the figures that apply to the household (lib/figuresUsed.ts) and names what it left out.
+  { re: /^PrintKinds-[^.]*\.js$/, cap: 11 * KB },
 ]
 
 // The door.

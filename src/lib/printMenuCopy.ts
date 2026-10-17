@@ -1,3 +1,4 @@
+import type { Family } from './figuresUsed'
 import type { PrintKind } from './printKind'
 
 // The words of « Imprimer »: the chip, the dialog that lists what can be put on paper, and the heading each kind of page carries. Both languages, written for a
@@ -20,6 +21,9 @@ interface PrintMenuCopy {
   /** The share link's code on the leaflet: the words under it and its accessible name. */
   qr: string
   qrAria: string
+  /** The page of the figures that apply: what it says about the rows it left out, and the name of each family left out. */
+  figuresLeft: (names: string, count: number) => string
+  families: Record<Family, string>
   /** A kind that cannot be printed yet (its numbers are still being worked out). */
   notReady: string
 }
@@ -35,7 +39,7 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
       leaflet: { name: 'Le dépliant', hint: 'Une page à plier en trois : la réponse, le calendrier et les hypothèses.' },
       dossier: { name: 'Le dossier de preuve', hint: 'Chaque chiffre du profil, le calcul de chaque rente avec vos nombres, et la page officielle de la règle.' },
       years: { name: 'Année par année', hint: 'Le tableau de l’âge choisi dans Preuve : revenus, impôt, dépenses et avoir, pour chaque année.' },
-      sources: { name: 'Les sources', hint: 'Chaque chiffre du gouvernement que le calcul lit, sa page officielle et le jour où elle a été lue.' },
+      sources: { name: 'Les sources', hint: 'Les chiffres du gouvernement qui s’appliquent à votre ménage, chacun avec sa page officielle et le jour où elle a été lue.' },
     },
     headings: {
       calendar: 'Horizon — le calendrier du plan',
@@ -47,6 +51,8 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
     dossierSources: 'Chaque autre chiffre du gouvernement que le calcul lit, avec sa page officielle, est sur la page « Les sources ».',
     qr: 'Scannez pour ouvrir ce scénario : seuls l’âge, le type de ménage et la langue sont dans le lien.',
     qrAria: 'Code QR du lien de partage de ce scénario',
+    figuresLeft: (names, count) => `Laissés de côté, parce que votre profil ne les concerne pas : ${names} (${count} chiffres). La liste complète est sur la page « Les sources ».`,
+    families: { children: 'enfants et congé parental', survivor: 'rente de survivant', couple: 'barèmes de couple', alone: 'montant pour personne vivant seule', work: 'cotisations des travailleurs' },
     notReady: 'Ce tableau se prépare encore. Réessayez dans un instant.',
   },
   en: {
@@ -59,7 +65,7 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
       leaflet: { name: 'The leaflet', hint: 'One page to fold in three: the answer, the calendar and the assumptions.' },
       dossier: { name: 'The proof file', hint: 'Every figure in the profile, the calculation of each pension with your numbers, and the official page of the rule.' },
       years: { name: 'Year by year', hint: 'The table for the age chosen in Proof: income, tax, spending and net worth for every year.' },
-      sources: { name: 'The sources', hint: 'Every government figure the calculation reads, its official page and the day it was read.' },
+      sources: { name: 'The sources', hint: 'The government figures that apply to your household, each with its official page and the day it was read.' },
     },
     headings: {
       calendar: 'Horizon — the plan’s calendar',
@@ -71,6 +77,8 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
     dossierSources: 'Every other government figure the calculation reads, with its official page, is on the “The sources” page.',
     qr: 'Scan to open this scenario: only the age, the household type and the language are in the link.',
     qrAria: 'QR code of this scenario’s share link',
+    figuresLeft: (names, count) => `Left out because your profile does not involve them: ${names} (${count} figures). The full list is on the “The sources” page.`,
+    families: { children: 'children and parental leave', survivor: 'survivor pension', couple: 'couple scales', alone: 'living-alone amount', work: 'payroll contributions' },
     notReady: 'This table is still being worked out. Try again in a moment.',
   },
 }
