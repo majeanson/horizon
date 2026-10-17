@@ -286,3 +286,53 @@
     display: none;
   }
 }
+
+/* The other pages « Imprimer… » can print (components/results/PrintKinds.tsx). The year-by-year table is eight columns wide: its page is landscape (a named page — a browser that does not know them
+   prints it portrait, narrower but whole). The sources write out the address of each official page (a link is nothing on paper), in a table as tight as a reference list. The table's own chooser is a screen control. */
+@page years {
+  size: landscape;
+}
+@media print {
+  .print-kind--years {
+    page: years;
+  }
+  .print-kind .table-chooser {
+    display: none !important;
+  }
+  .print-kind table {
+    font-size: 8.5pt;
+  }
+  .print-kind .year-table__title {
+    margin: 0.4rem 0 0.2rem;
+    font-size: 11pt;
+  }
+}
+
+@media print {
+  .print-sources {
+    table-layout: fixed;
+    font-size: 8pt;
+  }
+  .print-sources th:nth-child(1) {
+    width: 34%;
+  }
+  .print-sources th:nth-child(2) {
+    width: 14%;
+  }
+  .print-sources thead th {
+    font-weight: 700;
+  }
+  .print-sources tr {
+    break-inside: avoid;
+  }
+  .print-sources td.mono {
+    overflow-wrap: anywhere;
+  }
+  .print-sources__url,
+  .print-sources__read {
+    display: block;
+    color: #333333;
+    font-size: 7pt;
+    overflow-wrap: anywhere;
+  }
+}

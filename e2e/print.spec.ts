@@ -68,3 +68,111 @@ test('English: the printed plan speaks English', async ({ page }) => {
   await expect(plan.getByText('Assumptions used')).toBeVisible()
   await expect(plan.getByText('An estimate based on your assumptions, not financial advice.', { exact: false })).toBeVisible()
 })
+
+// « IMPRIMER… »: one chip, a short list of the pages that can go on paper. A choice prints that page and only that one; the browser's own Ctrl+P (a bare `beforeprint`) still prints the plan,
+// and a print that has ended gives the screen back. The test stands in for the print dialog: `window.print()` fires `beforeprint`, as a browser does just before it takes its snapshot.
+test('« Imprimer… » prints the page that was chosen, then the plan again by Ctrl+P', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.print = () => {
+      window.dispatchEvent(new Event('beforeprint'))
+    }
+  })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible({ timeout: 60_000 })
+
+  const open = async () => {
+    await page.getByRole('button', { name: /Imprimer…/ }).click()
+    const dialog = page.getByRole('dialog', { name: 'Imprimer' })
+    await expect(dialog).toBeVisible()
+    return dialog
+  }
+
+  // the year by year: a table, under its own heading, and none of the one-page plan
+  let dialog = await open()
+  await expect(dialog.locator('.print-menu button')).toHaveCount(3)
+  const years = dialog.getByRole('button', { name: /Année par année/ })
+  await expect(years).toBeEnabled({ timeout: 60_000 })
+  await years.click()
+  await expect(page.locator('.print-kind--years')).toBeVisible()
+  await expect(page.locator('.print-kind--years').getByText('Horizon — année par année')).toBeVisible()
+  await expect(page.locator('.print-kind--years .year-table table')).toBeVisible()
+  await expect(page.locator('.print-plan .timeline')).toHaveCount(0)
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+  await expect(page.locator('.print-plan')).toHaveCount(0)
+  await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible()
+
+  // the sources: every cited figure, each with its official page
+  dialog = await open()
+  await dialog.getByRole('button', { name: /Les sources/ }).click()
+  await expect(page.locator('.print-kind--sources').getByText('Horizon — les sources des chiffres')).toBeVisible()
+  expect(await page.locator('.print-sources tbody tr').count()).toBeGreaterThan(100)
+  // the address is written out: a link is nothing on paper
+  expect(await page.locator('.print-sources__url').first().textContent()).toMatch(/^https:\/\//)
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+
+  // the plan, chosen from the list
+  dialog = await open()
+  await dialog.getByRole('button', { name: /Le plan en une page/ }).click()
+  await expect(page.locator('.print-plan .timeline')).toBeVisible()
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+
+  // after a choice, a bare Ctrl+P is the plan again — the choice was for one print
+  dialog = await open()
+  await dialog.getByRole('button', { name: /Les sources/ }).click()
+  await expect(page.locator('.print-kind--sources')).toBeVisible()
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+  await beforePrint(page)
+  await expect(page.locator('.print-plan .timeline')).toBeVisible()
+  await expect(page.locator('.print-kind')).toHaveCount(0)
+})
+
+test('« Print… » speaks English, and its pages carry English headings', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('horizon-lang', 'en')
+    window.print = () => {
+      window.dispatchEvent(new Event('beforeprint'))
+    }
+  })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  await expect(page.getByRole('tab', { name: 'Answer' })).toBeVisible({ timeout: 60_000 })
+  await page.getByRole('button', { name: /Print…/ }).click()
+  await page.getByRole('dialog', { name: 'Print' }).getByRole('button', { name: /The sources/ }).click()
+  await expect(page.locator('.print-kind--sources').getByText('Horizon — where the figures come from')).toBeVisible()
+})
+
+// The PDFs of the other pages. The year by year is a LANDSCAPE page (a named `@page`), and neither runs away: a table is a few pages, the sources a few more.
+const mediaBox = (pdf: Buffer): number[] => {
+  const m = pdf.toString('latin1').match(/\/MediaBox\s*\[\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\]/)
+  return m ? m.slice(1).map(Number) : []
+}
+for (const [kind, button, heading, orientation, maxPages] of [
+  ['years', /Année par année/, 'Horizon — année par année', 'landscape', 5],
+  ['sources', /Les sources/, 'Horizon — les sources des chiffres', 'portrait', 14],
+] as const) {
+  test(`the PDF of the « ${kind} » page is ${orientation} and at most ${maxPages} pages`, async ({ page }) => {
+    await page.addInitScript(() => {
+      window.print = () => {
+        window.dispatchEvent(new Event('beforeprint'))
+      }
+    })
+    await seedProfile(page, EXAMPLE)
+    await page.goto('/resultats')
+    await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible({ timeout: 60_000 })
+    await page.getByRole('button', { name: /Imprimer…/ }).click()
+    const choice = page.getByRole('dialog', { name: 'Imprimer' }).getByRole('button', { name: button })
+    await expect(choice).toBeEnabled({ timeout: 60_000 })
+    await choice.click()
+    await expect(page.locator(`.print-kind--${kind}`).getByText(heading)).toBeVisible()
+    await page.emulateMedia({ media: 'print' })
+    const pdf = await page.pdf({ format: 'Letter', printBackground: true, preferCSSPageSize: true })
+    const pages = pagesOf(pdf)
+    expect(pages, `${kind}: ${pages} pages`).toBeGreaterThanOrEqual(1)
+    expect(pages, `${kind}: ${pages} pages`).toBeLessThanOrEqual(maxPages)
+    const box = mediaBox(pdf)
+    expect(box.length, 'the PDF names its page size').toBe(4)
+    const [w, h] = [box[2] - box[0], box[3] - box[1]]
+    expect(w > h, `${kind}: ${w} × ${h}`).toBe(orientation === 'landscape')
+  })
+}

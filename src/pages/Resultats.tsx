@@ -6,7 +6,7 @@ import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { PinStack } from '../components/PinStack'
-import { PrintPlan } from '../components/results/PrintPlan'
+import { PrintKindView, PrintMenu } from '../components/results/PrintMenu'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
 import { EmptyState } from '../components/EmptyState'
@@ -68,9 +68,9 @@ export function Resultats() {
 
   return (
     <section className="page-body results-page">
-      {/* On paper the plan is ONE short page, the same whichever view is open (components/results/PrintPlan.tsx): it replaces the page while the browser prints. */}
+      {/* On paper the plan is ONE short page, the same whichever view is open (components/results/PrintPlan.tsx, or the page the « Imprimer… » menu chose): it replaces the page while the browser prints. */}
       {printing ? (
-        <PrintPlan m={m} />
+        <PrintKindView m={m} />
       ) : (
         <>
       <PageHead title={r.title} />
@@ -113,9 +113,7 @@ export function Resultats() {
       {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
       <Cluster className="no-print">
         {view === 'answer' && !answerPending && gaps.length === 0 && <Chip onClick={copySummary}>{rc.out.copy}</Chip>}
-        <Chip icon="printer-bold" onClick={() => window.print()}>
-          {rc.out.print}
-        </Chip>
+        <PrintMenu m={m} />
       </Cluster>
       <NextStep to="/hypotheses" label={t.next.adjustAssumptions}>
         <p>{t.next.resultsHint}</p>

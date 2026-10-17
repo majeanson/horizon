@@ -192,3 +192,47 @@ test('offline, the saved profile is intact and the results — the chart and the
   expect(failed, 'nothing the offline app asked for failed').toEqual([])
   expect(consoleErrors).toEqual([])
 })
+
+test('offline, every page « Imprimer… » offers is made from the cache: its chunk is precached, the plan, the year by year and the sources all print', async ({ page }) => {
+  // A paper page that was still loading when the browser took its snapshot would print blank. Offline there is no « loading later »: the chunk of the extra pages must already be in the cache.
+  await page.addInitScript(() => {
+    window.print = () => {
+      window.dispatchEvent(new Event('beforeprint'))
+    }
+  })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  await waitControlled(page)
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
+
+  const consoleErrors: string[] = []
+  page.on('console', (m) => {
+    if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 200))
+  })
+  page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message.slice(0, 200)))
+  const failed: string[] = []
+  page.on('response', (r) => {
+    if (r.status() >= 400) failed.push(`${r.status()} ${new URL(r.url()).pathname}`)
+  })
+
+  await page.context().setOffline(true)
+  await page.reload()
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
+
+  for (const [button, selector] of [
+    [/Année par année/, '.print-kind--years .year-table table'],
+    [/Les sources/, '.print-sources tbody tr'],
+    [/Le plan en une page/, '.print-plan .timeline'],
+  ] as const) {
+    await page.getByRole('button', { name: /Imprimer…/ }).click()
+    const choice = page.getByRole('dialog', { name: 'Imprimer' }).getByRole('button', { name: button })
+    await expect(choice).toBeEnabled({ timeout: 60_000 })
+    await choice.click()
+    await expect(page.locator(selector).first()).toBeVisible({ timeout: 30_000 })
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+    await expect(page.locator('.print-plan')).toHaveCount(0)
+  }
+
+  expect(failed, 'nothing the offline app asked for failed').toEqual([])
+  expect(consoleErrors).toEqual([])
+})

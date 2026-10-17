@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { resetPrintKind } from './printKind'
 
 /**
  * True from the moment the browser starts to print until it is done. A part of the page that exists ONLY on paper (the year-by-year
@@ -10,7 +11,10 @@ export function usePrinting(): boolean {
   const [printing, setPrinting] = useState(false)
   useEffect(() => {
     const start = () => flushSync(() => setPrinting(true))
-    const stop = () => setPrinting(false)
+    const stop = () => {
+      resetPrintKind()
+      setPrinting(false)
+    }
     window.addEventListener('beforeprint', start)
     window.addEventListener('afterprint', stop)
     return () => {

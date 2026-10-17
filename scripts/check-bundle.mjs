@@ -53,6 +53,8 @@ const ONLINE_ONLY = [{ re: /^DevKit-/, cap: 60 * KB }]
 const LAZY_CAPS = [
   { re: /^charts-[^.]*\.js$/, cap: 384 * KB },
   { re: /^Resultats-[^.]*\.js$/, cap: 88 * KB },
+  // The paper pages « Imprimer… » adds (year by year, sources): fetched when the menu opens, precached. Measured 1,8 KB on 2026-10-17 — the tables they print are the screen's own, shared with other chunks.
+  { re: /^PrintKinds-[^.]*\.js$/, cap: 3 * KB },
 ]
 
 // The door.

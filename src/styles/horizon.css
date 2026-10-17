@@ -1456,3 +1456,28 @@ button.welcome__door {
 .welcome__fold > summary {
   font-weight: 700;
 }
+
+/* « Imprimer… » (components/results/PrintMenu.tsx): the pages that can be put on paper, one button each — the name, and under it what the page holds. */
+.print-menu {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.print-menu__item {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  justify-items: start;
+  text-align: left;
+  white-space: normal;
+}
+.print-menu__name {
+  font-weight: 700;
+}
+.print-menu__hint {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+}

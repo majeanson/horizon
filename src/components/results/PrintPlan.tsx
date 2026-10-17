@@ -1,7 +1,7 @@
-import { longDate } from '../../lib/months'
 import { worthAtHorizon } from '../../lib/resultsModel'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { FirmPrint } from './views/FirmSection'
+import { PrintFoot, PrintHead } from './PrintFrame'
 import { TimelineStrip } from './TimelineStrip'
 import { EstFlag } from '../EstFlag'
 import { formatPct, formatYearAge } from '../../lib/format'
@@ -15,17 +15,11 @@ import { formatMoney } from '../../lib/money'
 // app, under « Vérifier »), where they can be searched; on paper they were ten pages nobody read. It is shown instead of the page while the browser prints (lib/usePrinting.ts), text only —
 // no chart to load, nothing that can still be on its way when the browser takes its snapshot.
 export function PrintPlan({ m }: { m: ResultsModel }) {
-  const { t, lang, r, rc, mc, profile, names, year, month, vintage, assumptions, births, at, retiredNow, retiredGlance, headline, activePreset, comfort, stop, runs, dollars, money, pct, label, sentenceBefore, sentenceAfter } = m
-  const households = names.join(' · ')
+  const { t, lang, r, rc, mc, profile, names, year, assumptions, births, at, retiredNow, retiredGlance, headline, activePreset, comfort, stop, runs, dollars, money, pct, label, sentenceBefore, sentenceAfter } = m
   const returns = [assumptions.returns.rrsp, assumptions.returns.tfsa, assumptions.returns.nonReg].map((x) => formatPct(x, lang, 1)).join(' / ')
   return (
     <div className="print-plan">
-      <header className="print-head">
-        <p className="print-head__title">{rc.out.printTitle}</p>
-        <p>
-          {rc.out.printedOn(month, year)} · {households}
-        </p>
-      </header>
+      <PrintHead m={m} title={rc.out.printTitle} />
 
       <section className="print-plan__answer" aria-label={r.title}>
         <p className="print-plan__line">
@@ -98,9 +92,7 @@ export function PrintPlan({ m }: { m: ResultsModel }) {
 
       <FirmPrint m={m} />
 
-      <p className="print-foot">
-        {rc.out.printFoot} {rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang))}
-      </p>
+      <PrintFoot m={m} />
     </div>
   )
 }

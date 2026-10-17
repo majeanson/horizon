@@ -96,7 +96,6 @@ const FR_RESULTS = {
   },
   /** The plan leaving the device: on paper, or as a spreadsheet — no network either way. */
   out: {
-    print: 'Imprimer le plan',
     /** A plain-text summary of the answer for a message or an email: nothing leaves the device but what the reader pastes. */
     copy: 'Copier le résumé',
     copied: 'Résumé copié.',
@@ -316,7 +315,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
       'The ranking goes first to the age, then to the tax: net worth counts the RRSP at its full value, without the tax still owed on it. The minimum RRIF payment (the RRSP turned into income) is made in every case.',
   },
   out: {
-    print: 'Print the plan',
     copy: 'Copy the summary',
     copied: 'Summary copied.',
     summaryMade: (month: number, year: number) => `Summary made in ${MONTHS_EN[month - 1]} ${year}`,
