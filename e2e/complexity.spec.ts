@@ -87,7 +87,9 @@ const BUDGETS: Record<string, Budget> = {
   'Résultats — Réponse': { controls: 44, words: 592 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
-  'Résultats — Décider': { controls: 48, words: 823 },
+  // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
+  // in its own unit, and what waiting a year buys). One summary, five words; its body mounts only when opened.
+  'Résultats — Décider': { controls: 49, words: 826 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits

@@ -47,11 +47,11 @@ export const TOUR_STEPS = 2
 /** The addresses of the days when the results had four views: each lands on the view that holds its content now. */
 const LEGACY_VIEW: Readonly<Record<string, View>> = { adjust: 'decide', strategies: 'decide', future: 'decide', verify: 'proof' }
 
-/** The three what-ifs under « Décider » that open one at a time (an accordion, kept in the address): the saving · the spending · a late-life care. The ranked changes are always on the page. */
-export type Essai = 'save' | 'spend' | 'care'
+/** The what-ifs under « Décider » that open one at a time (an accordion, kept in the address): the age to aim at · the saving · the spending · a late-life care. The ranked changes are always on the page. */
+export type Essai = 'target' | 'save' | 'spend' | 'care'
 
 /** Which what-if a section id of the page belongs to (the ids stay the page's anchors; a link to one opens it). */
-const ESSAI_OF: Readonly<Record<string, Essai>> = { epargner: 'save', depenser: 'spend', soins: 'care' }
+const ESSAI_OF: Readonly<Record<string, Essai>> = { viser: 'target', epargner: 'save', depenser: 'spend', soins: 'care' }
 
 /** The strategies of « Décider », read one at a time (components/Accordion.tsx; the address keeps which, `?strat=`): the pensions · the order · the melting · the balance. */
 export const STRATS = ['rentes', 'ordre', 'fonte', 'equilibre'] as const
@@ -147,7 +147,7 @@ export function useResultsPage() {
   const view: View = rawView === 'decide' || rawView === 'proof' ? rawView : ((rawView !== null ? LEGACY_VIEW[rawView] : undefined) ?? 'answer')
   // The what-ifs of « Décider » open one at a time. The address keeps it (`?essai=`; `none` is « all closed »); an address that carries one of their own keys (an old link with `?care=`,
   // `?spend=` or `?age=`) opens the matching one; a household that has stopped working has no spending to try, so it is offered the other two.
-  const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['save', 'spend', 'care']
+  const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['target', 'save', 'spend', 'care']
   const rawEssai = params.get('essai')
   const inferred: Essai | null = params.get('care') !== null ? 'care' : params.get('spend') !== null ? 'spend' : params.get('age') !== null ? 'save' : null
   const essai: Essai | null = rawEssai === 'none' ? null : (essaiKeys.find((k) => k === rawEssai) ?? (inferred !== null && essaiKeys.includes(inferred) ? inferred : null))

@@ -27,6 +27,8 @@ export interface SweepCell {
   firstShortfallYear: number | null
   /** Everything the household owns at the end of the plan, nominal dollars. */
   netWorthAtHorizon: number
+  /** The calendar year the plan ends (the last row's), which says how far the nominal dollars above are from today's. */
+  lastYear: number
   /** Income tax and OAS recovery tax over the whole plan, nominal dollars. */
   lifetimeTax: number
   /** What could not be met even with every account empty, summed over the plan, nominal dollars (0 in a plan that works). */
@@ -75,6 +77,7 @@ export function sweepRow(h: Household, a: Assumptions, variant: Variant, options
       ok: !bad,
       firstShortfallYear: bad ? bad.year : null,
       netWorthAtHorizon: rows[rows.length - 1].household.netWorthEnd,
+      lastYear: rows[rows.length - 1].year,
       lifetimeTax: rows.reduce((sum, r) => sum + r.household.tax, 0),
       shortfallTotal: rows.reduce((sum, r) => sum + r.household.shortfall, 0),
     }

@@ -3,6 +3,7 @@ import { Accordion, AccordionItem, type AccordionOpen } from '../../Accordion'
 import { BracketFillPanel } from '../BracketFillPanel'
 import { BridgePanel } from '../BridgePanel'
 import { OrderPanel } from '../OrderPanel'
+import { ReverseView } from '../ReverseView'
 import { SaveView } from '../SaveView'
 import { SpendView } from '../SpendView'
 import { SpouseBalancePanel } from '../SpouseBalancePanel'
@@ -15,6 +16,7 @@ import { FUTURE_COPY } from '../../../lib/futureCopy'
 import { formatCompactMoney } from '../../../lib/money'
 import { MAX_AGE } from '../../../lib/resultsModel'
 import { balanceRelevant, fonteRelevant, leverPruned, orderRelevant } from '../../../lib/relevance'
+import { REVERSE_COPY } from '../../../lib/reverseCopy'
 import { SPOUSE_BALANCE_COPY } from '../../../lib/spouseBalanceCopy'
 import { useBracketFill } from '../../../lib/useBracketFill'
 import { useParamChoice } from '../../../lib/useParamChoice'
@@ -129,6 +131,14 @@ export function DecideView({ m }: { m: ResultsModel }) {
               </div>
             </div>
           )}
+          {/* The plan asked the other way round: an age to aim at, and what it would take to stop then. It shares the age (`?age=`) with « Combien épargner ? ». */}
+          {!retiredNow &&
+            tryFold(
+              'target',
+              'viser',
+              REVERSE_COPY[lang].title,
+              <ReverseView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />,
+            )}
           {tryFold(
             'save',
             'epargner',

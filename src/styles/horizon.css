@@ -1511,3 +1511,18 @@ button.welcome__door {
     gap: 0.75rem;
   }
 }
+
+/* « Arrêter à l'âge de mon choix » (components/results/ReverseView.tsx): the four changes, each its own line, and what waiting a year buys. */
+.reverse__levers {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.4rem 0;
+  padding: 0 0 0 1.1rem;
+}
+.reverse__wait {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--hairline);
+}

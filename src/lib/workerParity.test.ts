@@ -10,6 +10,8 @@ import { deathSweep } from '../engine/deathSweep.ts'
 import { EXAMPLES } from '../engine/golden/examples.ts'
 import { leverRanking } from '../engine/levers.ts'
 import { earliestEach, retireAt } from '../engine/retireAt.ts'
+import { regretAnswer } from '../engine/regret.ts'
+import { reverseTarget } from '../engine/reverse.ts'
 import { savingsNeeded } from '../engine/savingsNeeded.ts'
 import { sensitivityCells } from '../engine/simulate.ts'
 import { spouseBalance } from '../engine/spouseBalance.ts'
@@ -66,6 +68,8 @@ const CASES: Case[] = [
   },
   { name: 'factImpact', module: './factImpact.worker.ts', request: { household: S, assumptions: SA, facts: FACTS }, expected: () => [factSwings(S, SA, FACTS)] },
   { name: 'runs', module: './runs.worker.ts', request: { profile, today: TODAY, selections: ['plan', 60] }, expected: () => [runSelections(profile, TODAY, ['plan', 60])] },
+  { name: 'reverse', module: './reverse.worker.ts', request: { household: S, assumptions: SA, age: 62 }, expected: () => [{ answer: reverseTarget(S, SA, 62) }] },
+  { name: 'regret', module: './regret.worker.ts', request: { household: S, assumptions: SA }, expected: () => [{ answer: regretAnswer(S, SA) }] },
   { name: 'savingsNeeded', module: './savingsNeeded.worker.ts', request: { household: S, assumptions: SA, age: 62 }, expected: () => [{ answer: savingsNeeded(S, SA, 62) }] },
   { name: 'spendEarliest', module: './spendEarliest.worker.ts', request: { household: S, assumptions: SA, retiredToday: 30_000 }, expected: () => [spendAnswer(S, SA, 30_000)] },
   { name: 'withdrawalOrders', module: './withdrawalOrders.worker.ts', request: { household: H, assumptions: A, age, firstAge: 55 }, expected: () => [{ answer: withdrawalOrders(H, A, age, 55) }] },

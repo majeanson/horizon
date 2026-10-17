@@ -15,13 +15,13 @@ test('three views; « Décider » holds the levers, then the what-ifs one at a t
   await expect(page.getByText('Ce qui change le plus')).toBeVisible()
   // the ranked changes are on the page; the three what-ifs are folds under them, open one at a time, the choice kept in the address
   await expect(page.locator('#ajuster')).toBeVisible()
-  for (const id of ['#epargner', '#depenser', '#soins']) await expect(page.locator(id)).toBeVisible() // the fold's own row
+  for (const id of ['#viser', '#epargner', '#depenser', '#soins']) await expect(page.locator(id)).toBeVisible() // the fold's own row
   await expect(page.locator('#epargner > .fold__body')).toBeEmpty() // closed: nothing mounted, nothing computed
-  for (const [id, key] of [['#epargner', 'save'], ['#depenser', 'spend'], ['#soins', 'care']] as const) {
+  for (const [id, key] of [['#viser', 'target'], ['#epargner', 'save'], ['#depenser', 'spend'], ['#soins', 'care']] as const) {
     await page.locator(id + ' > summary').click()
     await expect(page.locator(id + ' > .fold__body')).not.toBeEmpty()
     await expect(page).toHaveURL(new RegExp('essai=' + key))
-    for (const other of ['#epargner', '#depenser', '#soins'].filter((o) => o !== id)) await expect(page.locator(other)).not.toHaveAttribute('open', '')
+    for (const other of ['#viser', '#epargner', '#depenser', '#soins'].filter((o) => o !== id)) await expect(page.locator(other)).not.toHaveAttribute('open', '')
   }
   await page.locator('#soins > summary').click() // close it: « none » is kept too
   await expect(page).toHaveURL(/essai=none/)
