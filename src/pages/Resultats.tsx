@@ -135,5 +135,5 @@ export function Resultats() {
 function ProofMode() {
   const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'solidite')
   const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
-  return <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} first="solidite" />
+  return <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} />
 }

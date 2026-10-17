@@ -53,7 +53,7 @@ function AccordionSpecimen() {
   const [open, setOpen] = useState<AccordionOpen>('un')
   return (
     <>
-      <AccordionMode open={open} onOpen={setOpen} first="un" />
+      <AccordionMode open={open} onOpen={setOpen} />
       <Accordion ids={['un', 'deux', 'trois']} open={open} onOpen={setOpen} done={new Set(['trois'])} doneCount={new Map([['trois', 4]])}>
         <AccordionItem id="un" title="Le scénario" subtitle="Les trois hypothèses d’un coup." concept="scenario">
           <p className="field-row__hint">Le corps du premier bloc.</p>

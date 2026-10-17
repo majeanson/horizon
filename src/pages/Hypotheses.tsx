@@ -98,7 +98,7 @@ export function Hypotheses() {
   return (
     <section className="page-body" ref={page}>
       <PageHead title={a.title} subtitle={a.subtitle} />
-      <PinnedMap links={links} ariaLabel={nav.label} page={page} onPick={(id) => open !== 'all' && setBloc(id)} end={<AccordionMode open={open} onOpen={setOpen} first="scenario" />} />
+      <PinnedMap links={links} ariaLabel={nav.label} page={page} onPick={(id) => open !== 'all' && setBloc(id)} end={<AccordionMode open={open} onOpen={setOpen} />} />
 
       <Accordion ids={BLOCKS} open={open} onOpen={(id) => setBloc(id ?? 'none')}>
       <Section id="scenario" title={a.presets.title} subtitle={CARD_COPY[lang].scenario} details={a.presets.hint} concept="scenario">

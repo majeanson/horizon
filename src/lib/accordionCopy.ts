@@ -6,9 +6,9 @@ import type { Lang } from '../i18n.ts'
 export interface AccordionCopy {
   previous: string
   next: string
-  /** The switch: every block open at once, or one at a time. */
+  /** The switch: every block open at once, or every block closed. */
   openAll: string
-  oneAtATime: string
+  closeAll: string
   /** A block whose figures are all confirmed, while it is closed: « 9 chiffres confirmés ». */
   done: (n: number) => string
   /** The accessible name of the switch's group. */
@@ -20,7 +20,7 @@ export const ACCORDION_COPY: Record<Lang, AccordionCopy> = {
     previous: 'Précédent',
     next: 'Suivant',
     openAll: 'Tout ouvrir',
-    oneAtATime: 'Un bloc à la fois',
+    closeAll: 'Tout fermer',
     done: (n) => (n === 1 ? '1 chiffre confirmé' : `${n} chiffres confirmés`),
     modeLabel: 'Façon d’afficher les blocs',
   },
@@ -28,7 +28,7 @@ export const ACCORDION_COPY: Record<Lang, AccordionCopy> = {
     previous: 'Previous',
     next: 'Next',
     openAll: 'Open everything',
-    oneAtATime: 'One block at a time',
+    closeAll: 'Close everything',
     done: (n) => (n === 1 ? '1 figure confirmed' : `${n} figures confirmed`),
     modeLabel: 'How the blocks are shown',
   },

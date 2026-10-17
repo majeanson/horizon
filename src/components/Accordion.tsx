@@ -75,17 +75,15 @@ export function Accordion({ ids, open, onOpen, done, doneCount, children }: { id
 }
 
 /**
- * The switch between the two shapes, ONE small icon button for every page that has it (Hypothèses, Preuve, Profil on a phone): « Tout ouvrir » while the blocks are read one at a time, « Un bloc
- * à la fois » while they are all open. It sits at the end of the page's map row (`SectionNav` `end`), so it is reachable while the page scrolls and costs the page no row of its own.
- * `first` is the block that opens when leaving « all ».
+ * The switch between the two states, ONE small icon button for every page that has it (Hypothèses, Preuve, Profil on a phone): « Tout ouvrir » while the blocks are read one at a time, « Tout fermer » while they are all open. It sits at the end of the page's map row (`SectionNav` `end`), so it is reachable while the page scrolls and costs the page no row of its own.
  */
-export function AccordionMode({ open, onOpen, first }: { open: AccordionOpen; onOpen: (next: AccordionOpen) => void; first: string }) {
+export function AccordionMode({ open, onOpen }: { open: AccordionOpen; onOpen: (next: AccordionOpen) => void }) {
   const c = ACCORDION_COPY[useLang().lang]
   const all = open === 'all'
-  const label = all ? c.oneAtATime : c.openAll
+  const label = all ? c.closeAll : c.openAll
   const caret: IconName = all ? 'caret-up-bold' : 'caret-down-bold'
   return (
-    <button type="button" className="btn btn--icon btn--ghost accordion__all" aria-label={label} title={label} onClick={() => onOpen(all ? first : 'all')}>
+    <button type="button" className="btn btn--icon btn--ghost accordion__all" aria-label={label} title={label} onClick={() => onOpen(all ? null : 'all')}>
       {/* two stacked carets: « all of them open » / « shut but one » — no new glyph in the eager icon set */}
       <span className="accordion__all-glyph" aria-hidden="true">
         <Icon name={caret} size={12} />

@@ -64,7 +64,7 @@ test('Profil on a phone: one block at a time, the map opens a person, a link to 
   await page.goto('/profil')
   await expect(page.locator('.accordion__item.is-closed')).toHaveCount(0)
   await expect(page.locator('.accordion__item.is-open').first()).toBeVisible()
-  await expect(page.getByRole('button', { name: /^(Tout ouvrir|Un bloc à la fois)$/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /^(Tout ouvrir|Tout fermer)$/ })).toHaveCount(0)
   // « Suivant » at the foot of every block, walking the form
   await page.locator('#famille').getByRole('button', { name: 'Suivant' }).click()
   await expect(page.locator('#person-self')).toBeInViewport()
@@ -114,7 +114,7 @@ for (const [name, path, map, size] of [
   ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }],
   ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }],
 ] as const) {
-  test(`${name}: « Tout ouvrir » is an icon at the end of the map row, and it toggles the address`, async ({ page }) => {
+  test(`${name}: « Tout ouvrir » is an icon at the end of the map row, and « Tout fermer » closes every card`, async ({ page }) => {
     await page.setViewportSize(size)
     await seedProfile(page, EXAMPLE)
     await page.goto(path)
@@ -129,9 +129,9 @@ for (const [name, path, map, size] of [
     expect(box.width).toBeLessThanOrEqual(48)
     await all.click()
     await expect(page).toHaveURL(/bloc=tout/)
-    await expect(nav.getByRole('button', { name: 'Un bloc à la fois' })).toBeVisible()
-    await nav.getByRole('button', { name: 'Un bloc à la fois' }).click()
+    await expect(nav.getByRole('button', { name: 'Tout fermer' })).toBeVisible()
+    await nav.getByRole('button', { name: 'Tout fermer' }).click()
     await expect(page).not.toHaveURL(/bloc=tout/)
-    await expect(page.locator('.accordion__item.is-open')).toHaveCount(1)
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0) // « Tout fermer » closes every card, the first included
   })
 }
