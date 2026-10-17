@@ -46,6 +46,14 @@ const OPENED: [string, string, (page: Page) => Promise<void>][] = [
     },
   ],
   [
+    'the markets year by year',
+    '/resultats?v=proof&bloc=solidite',
+    async (page) => {
+      await page.locator('.market-fan summary').click()
+      await expect(page.locator('.market-fan tbody tr')).toHaveCount(5, { timeout: 90_000 })
+    },
+  ],
+  [
     'the dates of the plan',
     '/fiche',
     async (page) => {

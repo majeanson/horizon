@@ -1603,3 +1603,9 @@ button.welcome__door {
   overflow-x: auto;
   contain: inline-size;
 }
+
+/* « Les marchés, année par année »: the fold's body is a grid item, and a table (nowrap cells) inside it would size the whole column; its box takes the width it is given and the table scrolls in its own. */
+.market-fan__body {
+  min-width: 0;
+  contain: inline-size;
+}

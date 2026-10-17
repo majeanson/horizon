@@ -11,6 +11,8 @@ import { ACCURACY_COPY } from '../../../lib/accuracyCopy'
 import { useParamChoice } from '../../../lib/useParamChoice'
 import { PROOF_BLOCKS, type ResultsModel } from '../../../lib/useResultsPage'
 
+// The markets year by year: the fold, its words and its five projections ride a chunk of their own, fetched when the block is read. Here and not in FirmSection, which the printed plan imports too.
+const MarketFan = lazy(() => import('../MarketFan').then((m) => ({ default: m.MarketFan })))
 const AccuracyNote = lazy(() => import('../AccuracyNote').then((m) => ({ default: m.AccuracyNote })))
 
 // The « proof » view of the results page (« Preuve ») — how far to trust the answer, and everything behind it, in the order a doubting reader asks: how firm is it · which figures set it (and the
@@ -30,6 +32,9 @@ export function ProofView({ m }: { m: ResultsModel }) {
           {/* How firm the answer is — the three scenarios and a hard market in brief, the grids of what moves it one tap under. */}
           <AccordionItem id="solidite" title={rc.headline.firmTitle} concept="solidite" className="results-section firm">
             <FirmSection m={m} bare />
+            <Suspense fallback={null}>
+              <MarketFan m={m} />
+            </Suspense>
           </AccordionItem>
 
           <AccordionItem id="donnees-calcul" title={LEDGER_COPY[lang].title} concept="documents" className="results-section">

@@ -8,6 +8,7 @@ import { earliestEach, retireAt } from '../engine/retireAt.ts'
 import { sensitivityCells } from '../engine/simulate.ts'
 import { regretAnswer } from '../engine/regret.ts'
 import { reverseTarget } from '../engine/reverse.ts'
+import { fan } from '../engine/fan.ts'
 import { spouseTiming } from '../engine/spouseTiming.ts'
 import { IDENTITY, sweep } from '../engine/sweep.ts'
 import { computeAnswer } from './answer.ts'
@@ -45,6 +46,7 @@ const BUDGETS: { name: string; measured: number; ceiling: number; run: () => unk
   { name: 'a sweep: the plan and one change, every age from 55 to 70, for a couple', measured: 690, ceiling: 8_000, n: 3, run: () => sweep(G.household, G.assumptions, [IDENTITY, { id: 'spend-less', apply: (h, a) => [{ ...h, spending: { ...h.spending, retiredToday: h.spending.retiredToday * 0.9 } }, a] }], { from: 55, to: 70 }) },
   { name: 'I want to stop at X: four searches for a couple', measured: 1410, ceiling: 15_000, n: 3, run: () => reverseTarget(G.household, G.assumptions, 55) },
   { name: 'who starts the QPP first: nine combinations, three runs each', measured: 800, ceiling: 9_000, n: 3, run: () => spouseTiming(G.household, G.assumptions) },
+  { name: 'the markets year by year: five projections of the plan, kept by year', measured: 184, ceiling: 3_000, n: 3, run: () => fan(G.household, G.assumptions) },
   { name: 'the regret curve: one sweep over the ages for a couple', measured: 520, ceiling: 6_000, n: 3, run: () => regretAnswer(G.household, G.assumptions) },
   { name: 'the whole sensitivity grid', measured: 1465, ceiling: 20_000, n: 1, run: () => [...sensitivityCells(M.household, M.assumptions)] },
 ]
