@@ -136,6 +136,9 @@ export interface BridgeFacts {
   /** The OAS's gain per month of waiting after 65 (0.006) and its most (0.36, at 70). */
   oasPerMonth: number
   oasLateMax: number
+  /** The months after the first payment during which the QPP application, and the OAS pension, can still be cancelled (6 and 6). */
+  rrqCancelMonths: number
+  oasCancelMonths: number
 }
 
 export type MatrixCell = { ok: boolean; firstShortfallAge: number | null }
@@ -343,6 +346,8 @@ export function bridgeView(h: Household, a: Assumptions, levers: BridgeLevers, w
     rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths,
     oasPerMonth: P.oas.deferralPerMonth,
     oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths,
+    rrqCancelMonths: P.rrq.cancelMonths,
+    oasCancelMonths: P.oas.cancelMonths,
   }
   return { selected, strategies, facts, matrix: withMatrix ? bridgeMatrix(h, a, levers) : null }
 }

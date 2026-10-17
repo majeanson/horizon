@@ -19,6 +19,8 @@ interface ReverseCopy {
   saveNone: string
   work: (age: number, years: number) => string
   workNone: string
+  partTime: (until: number, years: number) => string
+  partTimeNone: string
   returns: (points: string) => string
   returnsNone: (points: string) => string
   alone: string
@@ -45,6 +47,8 @@ export const REVERSE_COPY: { fr: ReverseCopy; en: ReverseCopy } = {
     saveNone: 'Épargner davantage ne suffit pas, même en y mettant toutes les dépenses du travail.',
     work: (age, years) => `Travailler jusqu’à ${age} ans (${years} ${ansFr(years)} de plus).`,
     workNone: 'Aucun âge jusqu’à 70 ans ne fait tenir le plan tel quel.',
+    partTime: (until, years) => `Garder la moitié de votre salaire jusqu’à ${until} ans (${years} ${ansFr(years)} à temps partiel).`,
+    partTimeNone: 'Garder la moitié de votre salaire jusqu’à 70 ans ne suffit pas, ou personne n’a de salaire.',
     returns: (points) => `Que chaque compte rapporte ${points} points de plus par année.`,
     returnsNone: (points) => `Même ${points} points de plus par année ne suffiraient pas.`,
     alone: 'Chaque changement est essayé seul, le reste du plan inchangé : on ne les additionne pas.',
@@ -68,6 +72,8 @@ export const REVERSE_COPY: { fr: ReverseCopy; en: ReverseCopy } = {
     saveNone: 'Saving more is not enough, even moving all of the working years’ spending.',
     work: (age, years) => `Work until ${age} (${years} ${yrsEn(years)} longer).`,
     workNone: 'No age up to 70 makes the plan hold as it stands.',
+    partTime: (until, years) => `Keep half of your pay until ${until} (${years} ${yrsEn(years)} part-time).`,
+    partTimeNone: 'Keeping half of your pay until 70 is not enough, or nobody has a salary.',
     returns: (points) => `Every account would have to earn ${points} points more a year.`,
     returnsNone: (points) => `Even ${points} points more a year would not be enough.`,
     alone: 'Each change is tried on its own, the rest of the plan left alone: they are not added together.',

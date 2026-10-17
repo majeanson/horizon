@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { EXAMPLES } from './golden/examples.ts'
 import { kneeAge, regretCurve } from './regret.ts'
-import { MAX_EXTRA_RETURN, RETURN_STEP, requiredReturn, reverseTarget, withExtraReturn } from './reverse.ts'
+import { MAX_EXTRA_RETURN, PART_TIME_SHARE, partTimeUntil, RETURN_STEP, requiredReturn, reverseTarget, withExtraReturn } from './reverse.ts'
 import { everyoneAt, retireAt, runScenario } from './retireAt.ts'
 import { withExtraSavings } from './savingsNeeded.ts'
 import { IDENTITY, sweepRow } from './sweep.ts'
@@ -47,6 +47,19 @@ describe('stopping before the earliest age that works', () => {
     expect(r.returns!).toBeGreaterThan(0)
     expect(works(G.household, withExtraReturn(G.assumptions, r.returns!), age)).toBe(true)
     expect(works(G.household, withExtraReturn(G.assumptions, r.returns! - 2 * RETURN_STEP), age)).toBe(false)
+  })
+
+  it('part-time: half the pay kept until the age stated works, and a year less does not', () => {
+    expect(r.partTime).not.toBeNull()
+    expect(r.partTime!).toBeGreaterThan(age)
+    const keep = (untilAge: number) => ({ ...G.household, persons: G.household.persons.map((p) => (p.salaryToday > 0 ? { ...p, partTime: { untilAge, share: PART_TIME_SHARE } } : p)) })
+    expect(works(keep(r.partTime!), G.assumptions, age)).toBe(true)
+    expect(works(keep(r.partTime! - 1), G.assumptions, age)).toBe(false)
+  })
+
+  it('part-time: nobody with a salary, no lever', () => {
+    const nobody = { ...G.household, persons: G.household.persons.map((p) => ({ ...p, salaryToday: 0 })) }
+    expect(partTimeUntil(nobody, G.assumptions, 55)).toBeNull()
   })
 
   it('work longer: the age stated is the first that works (the sweep says the same)', () => {

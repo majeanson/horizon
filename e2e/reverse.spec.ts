@@ -6,17 +6,18 @@ import { seedProfile } from './seed'
 
 test.beforeEach(async ({ page }) => seedProfile(page))
 
-test('an age that does not work names the four changes, each in its own unit, and what waiting buys', async ({ page }) => {
+test('an age that does not work names the five changes, each in its own unit, and what waiting buys', async ({ page }) => {
   await page.goto('/resultats?v=decide&essai=target&age=55')
   const fold = page.locator('#viser')
   await expect(fold).toHaveAttribute('open', '')
   const levers = fold.locator('.reverse__levers').first().locator('li')
-  await expect(levers).toHaveCount(4, { timeout: 90_000 })
+  await expect(levers).toHaveCount(5, { timeout: 90_000 })
   await expect(fold.getByText('Pour arrêter à 55 ans, il faudrait l’une de ces choses')).toBeVisible()
   await expect(levers.nth(0)).toContainText('par année à la retraite')
   await expect(levers.nth(1)).toContainText('de côté chaque année')
   await expect(levers.nth(2)).toContainText('Travailler jusqu’à 60 ans (5 ans de plus)')
-  await expect(levers.nth(3)).toContainText('points de plus par année')
+  await expect(levers.nth(3)).toContainText('Garder la moitié de votre salaire jusqu’à')
+  await expect(levers.nth(4)).toContainText('points de plus par année')
   await expect(fold.getByText('on ne les additionne pas')).toBeVisible()
   // waiting one more year: a few rows, and a knee sentence that names its threshold
   await expect(fold.locator('.reverse__wait li').first()).toContainText('de plus à la fin', { timeout: 90_000 })

@@ -55,6 +55,8 @@ export interface YearParams {
     earlySlope: Cited
     latePerMonth: Cited
     lateMaxMonths: Cited
+    /** The months after the FIRST payment during which a retirement pension application can still be cancelled; after them the decision is final. */
+    cancelMonths: Cited
     /** From this year a pension that starts after 65 keeps the higher of two base-plan calculations. */
     lateProtectionFrom: Cited
     careerStartAge: Cited
@@ -91,6 +93,8 @@ export interface YearParams {
     increaseAt75: Cited
     deferralPerMonth: Cited
     deferralMaxMonths: Cited
+    /** The months after the FIRST payment during which the pension can still be cancelled or delayed. */
+    cancelMonths: Cited
     startAgeMin: Cited
     startAgeMax: Cited
     /** Years of residence after 18 for a full pension. */

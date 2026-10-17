@@ -7,6 +7,7 @@ import { ReverseView } from '../ReverseView'
 import { SaveView } from '../SaveView'
 import { SpendView } from '../SpendView'
 import { SpouseBalancePanel } from '../SpouseBalancePanel'
+import { SpouseTimingFold } from '../SpouseTimingPanel'
 import { Chip } from '../../Chip'
 import { Fold } from '../../Fold'
 import { SectionHeader } from '../../SectionHeader'
@@ -169,6 +170,8 @@ export function DecideView({ m }: { m: ResultsModel }) {
           {state.pensionsOpen && (
             <AccordionItem id="rentes" title={rc.pensions.title} subtitle={rc.pensions.hint} concept="rrq" className="results-section">
               <BridgePanel household={profile.household} assumptions={assumptions} names={names} />
+              {/* A couple: the two start ages tried together, scored by the worse of both-alive and an early death. */}
+              {isCouple && <SpouseTimingFold household={profile.household} assumptions={assumptions} names={names} />}
             </AccordionItem>
           )}
           {/* The age is the answer's; when no age works, the plan's own. Never the « Combien épargner ? » box from another view. */}

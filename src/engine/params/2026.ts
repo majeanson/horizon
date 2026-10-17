@@ -59,6 +59,8 @@ const OAS_SURVIVOR = src(
   { retrieved: '2026-10-08' },
 )
 const OAS_DEFER = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/when-start.html', 'Old Age Security - When to start your retirement pension - Canada.ca')
+const OAS_RECEIVING = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/while-receiving.html', 'Old Age Security - Receiving your pension - Canada.ca', { retrieved: '2026-10-17' })
+const RRQ_RETIREMENT = src('https://www.retraitequebec.gouv.qc.ca/en/citizens/retirement-planning/applying-your-retirement-pension/retirement-pension-quebec-pension-plan', 'The retirement pension under the Québec Pension Plan', { retrieved: '2026-10-17' })
 const OAS_REPAY = src('https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/repayment.html', 'Repayment of Old Age Security pension - Canada.ca')
 const OAS_ACT = src('https://laws-lois.justice.gc.ca/eng/acts/o-9/FullText.html', 'Old Age Security Act (R.S.C., 1985, c. O-9)')
 
@@ -222,6 +224,7 @@ export const P2026 = {
     earlyBase: c(0.005, 'fixed', { ...RRQ_LEAFLET_65, note: '« Total basic monthly retirement pension × [1 − 12 × (0.5 + 0.1 × ($1367.72 / $1387.08)) / 100] »: 0.5 % per month early at the smallest pensions (stored as a fraction)…' }),
     earlySlope: c(0.001, 'fixed', { ...RRQ_LEAFLET_65, note: '…rising by 0.1 point × (base pension ÷ maximum base pension), to 0.6 % at the maximum (stored as a fraction). Not a flat 0.6 %.' }),
     latePerMonth: c(0.007, 'fixed', { ...RRQ_LEAFLET_65, note: '« increased by 0.7% for each month between the month following the person’s 65th birthday and the beginning of his or her pension, to a maximum of 58.8% ». Stored as a fraction.' }),
+    cancelMonths: c(6, 'fixed', { ...RRQ_RETIREMENT, note: '« You can cancel your Application for a Retirement Pension within six months after the first payment. After that time period, you can no longer change your decision. » (art. 139.1 of the Act respecting the Québec Pension Plan, as Retraite Québec cites it.)' }),
     lateMaxMonths: c(84, 'fixed', { ...RRQ_CALC, note: '« up to a maximum of 58.8% for a pension that begins when you turn 72 » — 84 months × 0.7 %.' }),
     lateProtectionFrom: c(2024, 'fixed', {
       ...RRQ_LEAFLET_68,
@@ -249,6 +252,7 @@ export const P2026 = {
     increaseAt75: c(0.1, 'fixed', { ...OAS_ACT, note: 's. 7.1(5): « the amount of the full monthly pension, as it is increased under subsection (1), is increased by 10% » — it multiplies the deferred amount.' }),
     deferralPerMonth: c(0.006, 'fixed', { ...OAS_DEFER, note: '« payments increase by 0.6% each month (7.2% per year), up to 36% at age 70 ». Stored as a fraction.' }),
     deferralMaxMonths: c(60, 'fixed', OAS_DEFER),
+    cancelMonths: c(6, 'fixed', { ...OAS_RECEIVING, note: '« You can cancel or delay your pension within 6 months of receiving your first payment. » The request is a letter sent by mail (the page lists what it holds).' }),
     startAgeMin: c(65, 'fixed', { ...OAS_DEFER, note: '« You can start at age 65 or as late as age 70. »' }),
     startAgeMax: c(70, 'fixed', OAS_DEFER),
     residenceYearsFull: c(40, 'fixed', { ...OAS_ACT, note: 's. 3(1): a full pension needs « an aggregate period of at least forty years » of residence after 18; s. 3(3)–(4): a partial pension is years ÷ 40, whole completed years.' }),

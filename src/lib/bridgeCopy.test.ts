@@ -16,9 +16,9 @@ const { fr, en } = BRIDGE_COPY
 
 const FACTS = (() => {
   const P = paramsFor(2026, { inflation: 0.021, wageGrowth: 0.031 })
-  return { rrqPerMonth: P.rrq.latePerMonth, rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths, oasPerMonth: P.oas.deferralPerMonth, oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths }
+  return { rrqPerMonth: P.rrq.latePerMonth, rrqLateMax: P.rrq.latePerMonth * P.rrq.lateMaxMonths, oasPerMonth: P.oas.deferralPerMonth, oasLateMax: P.oas.deferralPerMonth * P.oas.deferralMaxMonths, rrqCancelMonths: P.rrq.cancelMonths, oasCancelMonths: P.oas.cancelMonths }
 })()
-const whyArgs = (lang: 'fr' | 'en') => ({ rrqPerMonth: formatPct(FACTS.rrqPerMonth, lang, 1), rrqMax: formatPct(FACTS.rrqLateMax, lang, 1), oasPerMonth: formatPct(FACTS.oasPerMonth, lang, 1), oasMax: formatPct(FACTS.oasLateMax, lang, 0) })
+const whyArgs = (lang: 'fr' | 'en') => ({ rrqPerMonth: formatPct(FACTS.rrqPerMonth, lang, 1), rrqMax: formatPct(FACTS.rrqLateMax, lang, 1), oasPerMonth: formatPct(FACTS.oasPerMonth, lang, 1), oasMax: formatPct(FACTS.oasLateMax, lang, 0), rrqCancel: FACTS.rrqCancelMonths, oasCancel: FACTS.oasCancelMonths })
 
 const VERDICTS: Verdict[] = [
   { kind: 'holds', defers: false, horizonAge: 95 },
@@ -96,6 +96,9 @@ describe('the bridge copy, in both languages', () => {
     const norm = (t: string) => t.replace(/[  ]/g, ' ')
     const f = norm(fr.why(whyArgs('fr'))[0])
     for (const t of ['0,7 %', '58,8 %', '0,6 %', '36 %']) expect(f).toContain(t)
+    // …and the window in which a start can still be undone, from the cited pages (6 and 6), never retyped
+    expect(fr.why(whyArgs('fr')).join(' ')).toContain('dans les ' + FACTS.rrqCancelMonths + ' mois')
+    expect(en.why(whyArgs('en')).join(' ')).toContain('within ' + FACTS.rrqCancelMonths + ' months')
     const e = norm(en.why(whyArgs('en'))[0])
     for (const t of ['0.7%', '58.8%', '0.6%', '36%']) expect(e).toContain(t)
     // … and never types them: a rate retyped in the copy would drift from the params without a test noticing.

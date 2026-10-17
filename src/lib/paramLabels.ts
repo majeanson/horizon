@@ -47,6 +47,7 @@ export const PARAM_LABELS: {
     "federal.splitMaxShare":
       "Fédéral : part maximale du revenu de pension fractionnable",
     "oas.deferralMaxMonths": "PSV : nombre maximal de mois de report",
+    "oas.cancelMonths": "PSV : mois, après le premier versement, pour annuler ou reporter",
     "oas.allowanceCurve": "Allocation : courbe selon le revenu du couple (table 4)",
     "oas.allowanceCutoff": "Allocation : seuil de revenu du couple",
     "oas.allowanceMax": "Allocation : prestation mensuelle maximale",
@@ -164,6 +165,7 @@ export const PARAM_LABELS: {
       "RRQ : taux de remplacement du premier régime supplémentaire",
     "rrq.indexation": "RRQ : indexation annuelle des rentes",
     "rrq.lateMaxMonths": "RRQ : nombre maximal de mois de report",
+    "rrq.cancelMonths": "RRQ : mois, après le premier versement, pour annuler la demande",
     "rrq.latePerMonth": "RRQ : bonification par mois après 65 ans",
     "rrq.lateProtectionFrom":
       "RRQ : première année de la rente de base protégée au report",
@@ -226,6 +228,7 @@ export const PARAM_LABELS: {
     "federal.splitMaxShare":
       "Federal maximum share of pension income that can be split",
     "oas.deferralMaxMonths": "OAS maximum months of deferral",
+    "oas.cancelMonths": "OAS months after the first payment to cancel or delay",
     "oas.allowanceCurve": "Allowance: curve by the couple's income (table 4)",
     "oas.allowanceCutoff": "Allowance: the couple's income cut-off",
     "oas.allowanceMax": "Allowance: maximum monthly amount",
@@ -326,6 +329,7 @@ export const PARAM_LABELS: {
     "rrq.firstReplacement": "QPP first additional plan replacement rate",
     "rrq.indexation": "QPP annual pension indexation",
     "rrq.lateMaxMonths": "QPP maximum months of deferral",
+    "rrq.cancelMonths": "QPP months after the first payment to cancel the application",
     "rrq.latePerMonth": "QPP increase per month after 65",
     "rrq.lateProtectionFrom":
       "QPP first year the base pension is protected on late start",

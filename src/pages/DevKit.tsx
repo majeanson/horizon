@@ -37,6 +37,7 @@ import { ImpactMeter } from '../components/ImpactMeter'
 import { Skeleton } from '../components/Skeleton'
 import { StatusMessage } from '../components/StatusMessage'
 import { Fold } from '../components/Fold'
+import { HeatGrid } from '../components/HeatGrid'
 import { SubTabs } from '../components/SubTabs'
 import { Switch } from '../components/Switch'
 import { TableChooser } from '../components/TableChooser'
@@ -256,6 +257,22 @@ function LineChartSpecimen() {
         height={240}
       />
     </Suspense>
+  )
+}
+
+function HeatGridSpecimen() {
+  return (
+    <HeatGrid
+      caption="Ce qui reste à la fin, au pire"
+      corner="Première personne"
+      rows={['à 60 ans', 'à 65 ans', 'à 70 ans']}
+      cols={['à 60 ans', 'à 65 ans', 'à 70 ans']}
+      cells={[
+        [{ text: '114 k$', heat: 0.1 }, { text: '283 k$', heat: 0.6 }, { text: '297 k$', heat: 0.65 }],
+        [{ text: '102 k$', heat: 0.05 }, { text: '285 k$', heat: 0.62, mark: 'votre choix' }, { text: '392 k$', heat: 1, mark: 'le meilleur' }],
+        [{ text: 'manque', fail: true }, { text: '206 k$', heat: 0.45 }, { text: '310 k$', heat: 0.7 }],
+      ]}
+    />
   )
 }
 
@@ -583,6 +600,7 @@ function ENTRIES(): Entry[] {
     },
     { cat: 'Saisie', name: 'Chip', file: 'src/components/Chip.tsx', exports: ['Chip', 'ChipGroup'], kw: 'pastille filtre bascule', render: () => <ChipSpecimen /> },
     { cat: 'Saisie', name: 'Switch', file: 'src/components/Switch.tsx', kw: 'interrupteur oui non réglage bascule', render: () => <SwitchSpecimen /> },
+    { cat: 'Affichage', name: 'HeatGrid', file: 'src/components/HeatGrid.tsx', kw: 'grille tableau couleur chaleur meilleur trois par trois comparer', render: () => <HeatGridSpecimen /> },
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
     { cat: 'Affichage', name: 'Accordion', file: 'src/components/Accordion.tsx', exports: ['Accordion', 'AccordionItem', 'AccordionMode'], kw: 'accordéon un bloc à la fois suivant précédent replier blocs terminés', render: () => <AccordionSpecimen /> },

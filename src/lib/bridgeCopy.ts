@@ -95,7 +95,7 @@ export interface BridgeCopy {
   whyCostNone: string
   whyGis: (gis: string, recovery: string) => string
   /** The cited rates, already formatted for the reader's language. */
-  why: (f: { rrqPerMonth: string; rrqMax: string; oasPerMonth: string; oasMax: string }) => string[]
+  why: (f: { rrqPerMonth: string; rrqMax: string; oasPerMonth: string; oasMax: string; rrqCancel: number; oasCancel: number }) => string[]
   caveatTitle: string
   caveats: string[]
   /** On each card: the same way of starting under each of the three scenarios, one mark per scenario. */
@@ -230,6 +230,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     whyGis: (gis, recovery) => `Sur tout le plan : ${gis} de Supplément de revenu garanti reçu et ${recovery} de PSV repris par l’impôt de récupération.`,
     why: (f) => [
       `Une rente reportée est plus élevée toute la vie et suit les prix : le RRQ gagne ${f.rrqPerMonth} par mois après 65 ans (jusqu’à ${f.rrqMax} de plus à 72 ans), la PSV ${f.oasPerMonth} par mois (jusqu’à ${f.oasMax} de plus à 70 ans).`,
+      `Un départ se défait, mais pas longtemps : le RRQ peut être annulé dans les ${f.rrqCancel} mois suivant le premier versement, la PSV dans les ${f.oasCancel} mois. Passé ce délai, le choix est final. Attendre, lui, ne ferme aucune porte.`,
       'Les années du pont sont payées par le nid : plus il est gros au départ, plus le report est possible. Un nid qui s’épuise avant 70 ans ne peut pas le porter.',
       'Le Supplément de revenu garanti se perd avec un revenu plus élevé : reporter la PSV reporte aussi le SRG qui l’accompagne. Au-delà d’un certain revenu, la PSV est reprise en partie par l’impôt de récupération.',
       'Retirer du REER/FERR pendant le pont peut baisser l’impôt plus tard : les retraits sont faits à un taux plus bas qu’avec toutes les rentes en plus.',
@@ -368,6 +369,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     whyGis: (gis, recovery) => `Over the whole plan: ${gis} of Guaranteed Income Supplement received and ${recovery} of OAS taken back by the recovery tax.`,
     why: (f) => [
       `A deferred pension is larger for life and follows prices: the QPP gains ${f.rrqPerMonth} a month after 65 (up to ${f.rrqMax} more at 72), the OAS ${f.oasPerMonth} a month (up to ${f.oasMax} more at 70).`,
+      `A start can be undone, but not for long: the QPP application can be cancelled within ${f.rrqCancel} months of the first payment, the OAS within ${f.oasCancel} months. After that the choice is final. Waiting closes no door.`,
       'The bridge years are paid by the nest egg: the bigger it is at the start, the more feasible deferring is. A nest egg that runs out before 70 cannot carry it.',
       'The Guaranteed Income Supplement falls with income: deferring the OAS also defers the GIS that goes with it. Above a certain income part of the OAS is taken back by the recovery tax.',
       'Drawing on the RRSP/RRIF during the bridge can lower tax later: the withdrawals are taxed at a lower rate than with every pension on top.',

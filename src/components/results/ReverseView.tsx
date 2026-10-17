@@ -60,6 +60,7 @@ export function ReverseView({
             <li>{r.spend.max === null ? c.spendNone : c.spend(money(r.spend.current), money(r.spend.max), formatPct(1 - r.spend.max / r.spend.current, lang, 0))}</li>
             <li>{r.save === null ? c.saveNone : c.save(money(r.save), money(r.save / 12))}</li>
             <li>{r.earliest === null ? c.workNone : c.work(r.earliest, r.earliest - age)}</li>
+            <li>{r.partTime === null ? c.partTimeNone : c.partTime(r.partTime, r.partTime - age)}</li>
             <li>{r.returns === null ? c.returnsNone(formatDecimal(MAX_EXTRA_RETURN * 100, lang, 0)) : c.returns(formatDecimal(r.returns * 100, lang, 1))}</li>
           </ul>
           <p className="answer__note">{c.alone}</p>
