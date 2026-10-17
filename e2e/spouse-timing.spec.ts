@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { expectNoHorizontalOverflow } from './overflow'
 import { seedProfile } from './seed'
 
 // « QUI DEVRAIT COMMENCER SA RENTE DU RRQ EN PREMIER » — a couple's two start ages tried together, three by three, each scored by its worst case. A fold under « Quand commencer mes rentes ? »,
@@ -47,4 +48,12 @@ test('in English the grid speaks English', async ({ page }) => {
   await fold.locator('summary').click()
   await expect(fold.locator('.heat tbody td')).toHaveCount(9, { timeout: 90_000 })
   await expect(fold.getByText('Only the QPP start changes')).toBeVisible()
+})
+
+test('on a phone the grid scrolls inside its own box and the page does not run off the screen', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 })
+  const fold = await open(page)
+  await fold.locator('summary').click()
+  await expect(fold.locator('.heat tbody td')).toHaveCount(9, { timeout: 90_000 })
+  await expectNoHorizontalOverflow(page)
 })

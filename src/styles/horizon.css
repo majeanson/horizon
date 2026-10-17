@@ -1558,6 +1558,9 @@ button.welcome__door {
   background: color-mix(in srgb, var(--sage) calc(var(--heat, 0) * 60%), var(--card));
   color: var(--ink);
 }
+.heat--cost .heat__cell {
+  background: color-mix(in srgb, var(--terracotta) calc(var(--heat, 0) * 55%), var(--card));
+}
 .heat__cell.is-fail {
   background: repeating-linear-gradient(135deg, var(--terracotta-wash) 0 6px, var(--card) 6px 12px);
   color: var(--terracotta-ink);
@@ -1580,7 +1583,10 @@ button.welcome__door {
     background: none;
     border: 1px solid #bbbbbb;
   }
-  .heat__cell.is-fail {
+  .heat--cost .heat__cell {
+  background: color-mix(in srgb, var(--terracotta) calc(var(--heat, 0) * 55%), var(--card));
+}
+.heat__cell.is-fail {
     background: none;
     border-style: dashed;
   }
@@ -1588,4 +1594,12 @@ button.welcome__door {
     outline: 0;
     border: 2px solid #000000;
   }
+}
+
+/* A HeatGrid never sets the width of what holds it: its table scrolls inside its own box (the table is wider than a phone), and the box's intrinsic width is nought for its parents — a
+   fold or an accordion item whose content were sized by the table would run the paragraphs beside it off the right edge. */
+.heat {
+  max-width: 100%;
+  overflow-x: auto;
+  contain: inline-size;
 }

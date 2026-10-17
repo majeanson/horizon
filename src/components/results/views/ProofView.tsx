@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Accordion, AccordionItem, type AccordionOpen } from '../../Accordion'
 import { FirmSection } from './FirmSection'
 import { LedgerPanel } from '../LedgerPanel'
+import { MarginalWeather } from '../MarginalWeather'
 import { ParamsPanel } from '../ParamsPanel'
 import { YearTables } from '../YearTables'
 import { Skeleton } from '../../Skeleton'
@@ -38,6 +39,8 @@ export function ProofView({ m }: { m: ResultsModel }) {
           <AccordionItem id="tableau" title={r.table.title} concept="annee" className="results-section">
             {runsPending && <Skeleton count={6} />}
             <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={assumptions} livesAlone={profile.household.livesAlone} births={births} />
+            {/* What the next RRSP dollar costs at every retired age: a calendar of ages, one fold, read off the same rows. */}
+            {!runsPending && <MarginalWeather m={m} />}
           </AccordionItem>
 
           {/* What the calculation was checked against and what it simplifies: after the figures it was checked on. */}
