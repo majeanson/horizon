@@ -22,6 +22,7 @@ export function PrintKindView({ m }: { m: ResultsModel }) {
   const kind = currentPrintKind()
   if (kind === 'calendar' && kinds) return <kinds.PrintCalendar m={m} />
   if (kind === 'leaflet' && kinds) return <kinds.PrintLeaflet m={m} />
+  if (kind === 'dossier' && kinds) return <kinds.PrintDossier m={m} />
   if (kind === 'years' && kinds) return <kinds.PrintYears m={m} />
   if (kind === 'sources' && kinds) return <kinds.PrintSources m={m} />
   return <PrintPlan m={m} />

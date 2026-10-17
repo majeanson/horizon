@@ -1,5 +1,9 @@
 import { longDate } from '../../lib/months'
 import { EstFlag } from '../EstFlag'
+import { factsOf } from '../../lib/facts'
+import { factValue, type FactValue } from '../../lib/factValue'
+import { GUIDE_COPY } from '../../lib/guideCopy'
+import { formatMoney } from '../../lib/money'
 import type { ResultsModel } from '../../lib/useResultsPage'
 
 // The head and the foot every printed page carries, whichever kind it is (lib/printKind.ts): what it is, whose it is and when it was made — and, at the foot, that it is an
@@ -67,5 +71,38 @@ export function PrintComfort({ m }: { m: ResultsModel }) {
       {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}{' '}
       <EstFlag fact="household:spendingRetired" />
     </p>
+  )
+}
+
+// « Les chiffres du profil » — the dossier half of the printed plan: every figure the answer stands on, as the profile holds it, and whether a document
+// confirms it. What a planner checks first, against the household's own papers; one short table, never the year-by-year.
+export function PrintFigures({ m }: { m: ResultsModel }) {
+  const { lang, rc, profile, t } = m
+  const c = rc.out.figures
+  const gc = GUIDE_COPY[lang]
+  const facts = factsOf(profile)
+  if (facts.length === 0) return null
+  const who = (owner: string) =>
+    owner === 'household' ? gc.guide.householdOwner : gc.guide.owner(profile.household.persons.find((p) => p.id === owner)?.name.trim() || (owner === 'self' ? t.profile.self : t.profile.spouse))
+  const value = (v: FactValue) =>
+    v.kind === 'money' ? formatMoney(v.amount, lang) : v.kind === 'years' ? c.years(v.count) : v.kind === 'since' ? c.since(v.year) : c.plans(v.count)
+  return (
+    <section className="print-plan__block" aria-label={c.title}>
+      <p className="print-plan__title">{c.title}</p>
+      <p className="print-plan__unit">{c.intro}</p>
+      <table className="print-figures">
+        <tbody>
+          {facts.map((f) => (
+            <tr key={f.id}>
+              <th scope="row">
+                {gc.kind[f.kind]} — {who(f.owner)}
+              </th>
+              <td className="mono">{value(factValue(profile, f))}</td>
+              <td>{f.confirmed ? c.confirmed : c.estimated}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
   )
 }

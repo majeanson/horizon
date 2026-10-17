@@ -385,3 +385,34 @@
     padding-left: 1rem;
   }
 }
+
+/* The proof file (components/results/PrintKinds.tsx): one block a pension, each with its calculation and its source — a figure never splits across a page. */
+@media print {
+  .print-dossier__figure {
+    break-inside: avoid;
+    margin-bottom: 0.45rem;
+  }
+  .print-dossier__figure p {
+    margin: 0.1rem 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* The leaflet's share code: a square a phone can read from a fridge door, with its words under it. */
+@media print {
+  .print-leaflet__qr {
+    display: grid;
+    justify-items: start;
+    gap: 0.3rem;
+    margin: 0.4rem 0 0;
+    break-inside: avoid;
+  }
+  .print-leaflet__qr svg {
+    width: 38mm;
+    height: 38mm;
+  }
+  .print-leaflet__qr figcaption {
+    font-size: 8pt;
+    max-width: 60mm;
+  }
+}

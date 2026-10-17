@@ -1,13 +1,9 @@
 import { worthAtHorizon } from '../../lib/resultsModel'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { FirmPrint } from './views/FirmSection'
-import { PrintComfort, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
+import { PrintComfort, PrintFigures, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
 import { TimelineStrip } from './TimelineStrip'
 import { formatPct, formatYearAge } from '../../lib/format'
-import { factsOf } from '../../lib/facts'
-import { factValue, type FactValue } from '../../lib/factValue'
-import { GUIDE_COPY } from '../../lib/guideCopy'
-import { formatMoney } from '../../lib/money'
 
 // THE PRINTED PLAN — one short page (two at most), the same whichever view is open: what the household asked, what the answer is, in dates, what it can spend, the assumptions it stands on, the
 // plan in one line, the ages that were compared and how firm the answer is. NOT the year-by-year table, NOT the 140 cited figures, NOT the other views: they stay on the screen (and in the
@@ -67,38 +63,5 @@ export function PrintPlan({ m }: { m: ResultsModel }) {
 
       <PrintFoot m={m} />
     </div>
-  )
-}
-
-// « Les chiffres du profil » — the dossier half of the printed plan: every figure the answer stands on, as the profile holds it, and whether a document
-// confirms it. What a planner checks first, against the household's own papers; one short table, never the year-by-year.
-function PrintFigures({ m }: { m: ResultsModel }) {
-  const { lang, rc, profile, t } = m
-  const c = rc.out.figures
-  const gc = GUIDE_COPY[lang]
-  const facts = factsOf(profile)
-  if (facts.length === 0) return null
-  const who = (owner: string) =>
-    owner === 'household' ? gc.guide.householdOwner : gc.guide.owner(profile.household.persons.find((p) => p.id === owner)?.name.trim() || (owner === 'self' ? t.profile.self : t.profile.spouse))
-  const value = (v: FactValue) =>
-    v.kind === 'money' ? formatMoney(v.amount, lang) : v.kind === 'years' ? c.years(v.count) : v.kind === 'since' ? c.since(v.year) : c.plans(v.count)
-  return (
-    <section className="print-plan__block" aria-label={c.title}>
-      <p className="print-plan__title">{c.title}</p>
-      <p className="print-plan__unit">{c.intro}</p>
-      <table className="print-figures">
-        <tbody>
-          {facts.map((f) => (
-            <tr key={f.id}>
-              <th scope="row">
-                {gc.kind[f.kind]} — {who(f.owner)}
-              </th>
-              <td className="mono">{value(factValue(profile, f))}</td>
-              <td>{f.confirmed ? c.confirmed : c.estimated}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
   )
 }

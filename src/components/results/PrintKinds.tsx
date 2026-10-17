@@ -1,9 +1,16 @@
 import { PLAN_CALENDAR_COPY } from '../../lib/planCalendarCopy'
+import { qrMatrix, qrPath } from '../../lib/qr'
+import { shareUrl } from '../../lib/shareLink'
 import { PRINT_MENU_COPY } from '../../lib/printMenuCopy'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { formatPct } from '../../lib/format'
 import { PlanCalendarList } from './PlanCalendar'
-import { PrintComfort, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
+import { agesLedger } from '../../engine/ledger'
+import { oasTrace, rrqTrace } from '../../engine/trace'
+import { LEDGER_COPY } from '../../lib/ledgerCopy'
+import { traceLines } from '../../lib/traceView'
+import { TRACE_COPY } from '../../lib/traceCopy'
+import { PrintComfort, PrintFigures, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
 import { PARAM_LABELS } from '../../lib/paramLabels'
 import { knownYears, paramRows } from '../../lib/paramsView'
 import { YearTables } from './YearTables'
@@ -20,6 +27,32 @@ export function PrintCalendar({ m }: { m: ResultsModel }) {
       <PlanCalendarList household={profile.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
       <PrintFoot m={m} />
     </div>
+  )
+}
+
+/**
+ * The share link as a code a phone can scan (lib/qr.ts): the same three parameters as the « Partager » chip — an age, a household type and a language, never a figure from the profile —
+ * so the leaflet handed to a spouse or an advisor opens the same scenario. Nothing when there is no age to share (nothing works, or the household is already retired).
+ */
+function ShareQr({ m }: { m: ResultsModel }) {
+  const { lang, headline, retiredNow, profile } = m
+  if (headline.age === null || retiredNow) return null
+  const c = PRINT_MENU_COPY[lang]
+  const url = shareUrl(window.location.origin, { age: headline.age, home: profile.household.persons.length > 1 ? 'couple' : 'seul', lang })
+  let code: { d: string; size: number }
+  try {
+    code = qrPath(qrMatrix(url))
+  } catch {
+    return null // an address too long for the code (a very long host): the leaflet prints without it
+  }
+  return (
+    <figure className="print-leaflet__qr">
+      <svg viewBox={`0 0 ${code.size} ${code.size}`} role="img" aria-label={c.qrAria} shapeRendering="crispEdges">
+        <rect width={code.size} height={code.size} fill="#ffffff" />
+        <path d={code.d} fill="#000000" />
+      </svg>
+      <figcaption>{c.qr}</figcaption>
+    </figure>
   )
 }
 
@@ -44,9 +77,60 @@ export function PrintLeaflet({ m }: { m: ResultsModel }) {
           <p>
             {activePreset ? t.assumptions.presets[activePreset] : t.assumptions.presets.custom} · {t.assumptions.presets.summary(formatPct(assumptions.inflation, lang, 1), formatPct(assumptions.wageGrowth, lang, 1), returns, assumptions.horizonAge)}
           </p>
-          <p>{rc.out.printFoot}</p>
+          <ShareQr m={m} />
         </section>
       </div>
+      <PrintFoot m={m} />
+    </div>
+  )
+}
+
+/**
+ * The proof file: what a planner or an advisor checks against the household's own papers. The figures of the profile (confirmed or estimated), then each pension's calculation as the
+ * ledger makes it — the formula with this household's numbers, what it rests on, the official page of the rule with its address written out — and the assumptions. The sources of
+ * every other government figure are the next kind (« Les sources »): this page points there instead of printing a hundred and forty rows again.
+ */
+export function PrintDossier({ m }: { m: ResultsModel }) {
+  const { lang, profile, names, assumptions, t, activePreset } = m
+  const c = TRACE_COPY[lang]
+  const l = LEDGER_COPY[lang]
+  const returns = [assumptions.returns.rrsp, assumptions.returns.tfsa, assumptions.returns.nonReg].map((x) => formatPct(x, lang, 1)).join(' / ')
+  const colon = lang === 'fr' ? ' :' : ':'
+  const ledger = agesLedger(profile.household, assumptions)
+  return (
+    <div className="print-plan print-kind print-kind--dossier">
+      <PrintHead m={m} title={PRINT_MENU_COPY[lang].headings.dossier} />
+      <PrintFigures m={m} />
+      {ledger.map((entry, i) => (
+        <section key={entry.id} className="print-plan__block print-dossier__person" aria-label={l.person(names[i] ?? '')}>
+          <p className="print-plan__title">{l.person(names[i] ?? '')}</p>
+          {[traceLines(rrqTrace(entry), lang), traceLines(oasTrace(entry), lang)].map((v) => (
+            <div key={v.label} className="print-dossier__figure">
+              <p>
+                <strong>{v.label}</strong> — {v.shown}
+              </p>
+              <p>{v.formula}</p>
+              {v.inputs.length > 0 && (
+                <p className="print-plan__unit">
+                  {c.inputsTitle}{colon} {v.inputs.map((x) => (x.value === '' ? x.label : `${x.label} ${x.value}`)).join(' · ')}
+                </p>
+              )}
+              {v.source && (
+                <p className="print-plan__unit">
+                  {c.sourceTitle}{colon} {v.source.title} — {v.source.url}
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
+      ))}
+      <section className="print-plan__block" aria-label={m.rc.out.assumptions}>
+        <p className="print-plan__title">{m.rc.out.assumptions}</p>
+        <p>
+          {activePreset ? t.assumptions.presets[activePreset] : t.assumptions.presets.custom} · {t.assumptions.presets.summary(formatPct(assumptions.inflation, lang, 1), formatPct(assumptions.wageGrowth, lang, 1), returns, assumptions.horizonAge)}
+        </p>
+      </section>
+      <p className="print-plan__unit">{PRINT_MENU_COPY[lang].dossierSources}</p>
       <PrintFoot m={m} />
     </div>
   )

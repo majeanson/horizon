@@ -90,7 +90,7 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
 
   // the year by year: a table, under its own heading, and none of the one-page plan
   let dialog = await open()
-  await expect(dialog.locator('.print-menu button')).toHaveCount(5)
+  await expect(dialog.locator('.print-menu button')).toHaveCount(6)
   const years = dialog.getByRole('button', { name: /Année par année/ })
   await expect(years).toBeEnabled({ timeout: 60_000 })
   await years.click()
@@ -113,6 +113,20 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
   await expect(page.locator('.print-leaflet__panel')).toHaveCount(3)
   await expect(page.locator('.print-leaflet').getByText(/Vous pouvez prendre votre retraite/)).toBeVisible()
   await expect(page.locator('.print-leaflet .plan-calendar__year').first()).toBeVisible()
+  // the share link as a code a phone can scan: a drawn square with its words, and no figure of the profile in what it says
+  await expect(page.locator('.print-leaflet__qr svg[role="img"]')).toBeVisible()
+  await expect(page.locator('.print-leaflet__qr figcaption')).toContainText('Scannez pour ouvrir ce scénario')
+  expect(await page.locator('.print-leaflet__qr path').getAttribute('d')).toMatch(/^M\d+ \d+h\d+v1h-\d+z/)
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+
+  // the proof file: the profile's figures, each pension's calculation with its official page written out
+  dialog = await open()
+  await dialog.getByRole('button', { name: /Le dossier de preuve/ }).click()
+  const dossier = page.locator('.print-kind--dossier')
+  await expect(dossier.getByText('Horizon — le dossier de preuve')).toBeVisible()
+  await expect(dossier.locator('.print-figures tbody tr').first()).toBeVisible()
+  expect(await dossier.locator('.print-dossier__figure').count()).toBeGreaterThanOrEqual(4) // the RRQ and the PSV of two people
+  await expect(dossier.locator('.print-dossier__figure').first()).toContainText('https://')
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
 
   // the sources: every cited figure, each with its official page
@@ -163,6 +177,7 @@ const mediaBox = (pdf: Buffer): number[] => {
 for (const [kind, button, heading, orientation, maxPages] of [
   ['calendar', /Le calendrier/, 'Horizon — le calendrier du plan', 'portrait', 2],
   ['leaflet', /Le dépliant/, 'Horizon — mon plan en un dépliant', 'landscape', 1],
+  ['dossier', /Le dossier de preuve/, 'Horizon — le dossier de preuve', 'portrait', 3],
   ['years', /Année par année/, 'Horizon — année par année', 'landscape', 5],
   ['sources', /Les sources/, 'Horizon — les sources des chiffres', 'portrait', 14],
 ] as const) {
