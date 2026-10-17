@@ -57,6 +57,7 @@ function Body({ m }: { m: ResultsModel }) {
       />
       <p className="answer__note">{flat ? c.flat(pct(lo)) : `${c.lowest(pct(lo), summary.lowest.age)} ${c.highest(pct(hi), summary.highest.age)}`}</p>
       <p className="field-row__hint">{c.parts}</p>
+      {lo < 0.01 && <p className="field-row__hint">{c.zero}</p>}
       <p className="field-row__hint">{c.who}</p>
     </div>
   )

@@ -15,6 +15,8 @@ interface MarginalWeatherCopy {
   highest: (rate: string, age: number) => string
   flat: (rate: string) => string
   parts: string
+  /** Why a rate can read nought while the household pays tax: the pension credit on the first RRSP dollars. Shown only when some year reads under one per cent. */
+  zero: string
   who: string
   none: string
 }
@@ -32,6 +34,7 @@ export const MARGINAL_WEATHER_COPY: { fr: MarginalWeatherCopy; en: MarginalWeath
     highest: (rate, age) => `Le plus haut — ${rate}, vers ${age} ans.`,
     flat: (rate) => `Le taux ne bouge presque pas : ${rate} presque partout.`,
     parts: 'Le taux additionne l’impôt, la récupération de la PSV et le supplément de revenu garanti perdu.',
+    zero: 'Un taux de 0 % ne veut pas dire sans impôt : le premier petit montant tiré du REER ou du FERR donne droit au crédit pour revenu de pension, qui efface l’impôt sur ce montant.',
     who: 'C’est le dollar tiré du REER de la personne qui a le moins de revenu cette année-là. Seules les années où plus personne ne travaille sont lues.',
     none: 'Aucune année de retraite complète à lire : quelqu’un travaille encore jusqu’à la fin du plan.',
   },
@@ -47,6 +50,7 @@ export const MARGINAL_WEATHER_COPY: { fr: MarginalWeatherCopy; en: MarginalWeath
     highest: (rate, age) => `The highest — ${rate}, around ${age}.`,
     flat: (rate) => `The rate barely moves: ${rate} almost everywhere.`,
     parts: 'The rate adds income tax, the OAS recovery tax and the Guaranteed Income Supplement lost.',
+    zero: 'A rate of 0% does not mean no tax: the first small amount drawn from the RRSP or RRIF earns the pension income credit, which wipes out the tax on that amount.',
     who: 'It is the dollar drawn from the RRSP of whoever has the lower income that year. Only years when nobody works any more are read.',
     none: 'No full retirement year to read: someone still works until the end of the plan.',
   },
