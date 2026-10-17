@@ -83,7 +83,7 @@ export function FirmSection({ m, bare }: { m: ResultsModel; bare?: boolean }) {
   ) : (
     <>
       <Brief m={m} />
-      <Fold id="sensibilite" open={gridsOpen} onToggle={setGridsOpen} mountOnOpen summary={rc.firm.grids}>
+      <Fold id="sensibilite" concept="scenario" open={gridsOpen} onToggle={setGridsOpen} mountOnOpen summary={rc.firm.grids}>
         <p className="verdict__range-title">{r.sensitivity.title}</p>
         {grids}
       </Fold>

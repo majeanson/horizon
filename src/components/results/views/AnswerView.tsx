@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { Accordion, AccordionItem, type AccordionOpen } from '../../Accordion'
 import { Chip } from '../../Chip'
 import { Cluster, Rail } from '../../Layout'
 import { NumberField } from '../../NumberField'
@@ -8,9 +9,9 @@ import { LevelRange } from '../LevelRange'
 import { EarliestEachPanel } from '../EarliestEachPanel'
 import { PlansCompare } from '../PlansCompare'
 import { Fold } from '../../Fold'
-import { SectionHeader } from '../../SectionHeader'
 import { SubTabs } from '../../SubTabs'
 import { useParamChoice } from '../../../lib/useParamChoice'
+import { ANSWER_BLOCKS } from '../../../lib/useResultsPage'
 
 import { Skeleton } from '../../Skeleton'
 import { agesLedger } from '../../../engine/ledger'
@@ -22,6 +23,8 @@ import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
+import { AnswerGlance } from '../AnswerGlance'
+import { CARDS_COPY } from '../../../lib/cardsCopy'
 import { ShareChip } from '../ShareChip'
 import { Cascade } from '../../Cascade'
 import { useChangePulse } from '../../../lib/useChangePulse'
@@ -36,6 +39,10 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
   const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
+  // The two cards under the answer, every one open unless the address says otherwise (`?cartes=none` closes them, a card's name keeps just that one open): the same « Tout ouvrir / Tout fermer » as every other page.
+  const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'none'], 'all')
+  const cardsOpen: AccordionOpen = cartes === 'all' ? 'all' : cartes === 'none' ? null : cartes
+  const cc = CARDS_COPY[lang]
   // A ring around the big age when it MOVES (not on arrival): sage if earlier, accent if later. The age itself arrives digit by digit (Cascade).
   const pulse = useChangePulse(headline.age ?? null)
   // While figures are estimates, the computed range replaces the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
@@ -87,6 +94,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   </>
                 )}
               </p>
+              <AnswerGlance m={m} />
               {retiredGlance ? (
                 <>
                   <p className="verdict__note">
@@ -165,8 +173,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
 
           {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
               is ONE section: the same runs, seen as cards, as a picture, and per person. */}
-          <section id="comparer" className="results-section" aria-label={r.compare.label}>
-            <SectionHeader title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} concept="depart" />
+          <Accordion ids={ANSWER_BLOCKS} open={cardsOpen} onOpen={(id) => setCartes(id ?? 'none')}>
+          <AccordionItem id="comparer" title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} summary={cc.closed.comparer} concept="depart" nav={false} className="results-section">
             {compareKeys.length > 1 && (
               <SubTabs
                 size="mini"
@@ -271,11 +279,12 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 <PlansCompare profile={slow} enabled={answered && firstSearchesIn} />
               </div>
             )}
-          </section>
+          </AccordionItem>
 
           <Suspense fallback={null}>
             <YearSection m={m} />
           </Suspense>
+          </Accordion>
         </section>
     </>
   )

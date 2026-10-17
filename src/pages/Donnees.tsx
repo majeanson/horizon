@@ -8,6 +8,8 @@ import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
 import { Fold } from '../components/Fold'
+import { PrintChip } from '../components/PrintChip'
+import { PRINT_MENU_COPY } from '../lib/printMenuCopy'
 import { DisplayControls } from '../components/DisplayControls'
 import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
@@ -128,6 +130,11 @@ export function Donnees() {
           <button type="button" className="btn btn--primary" onClick={download}>
             {d.export.button}
           </button>
+        </Cluster>
+      </Section>
+      <Section title={PRINT_MENU_COPY[lang].section.title} subtitle={PRINT_MENU_COPY[lang].section.hint} icon="printer-bold">
+        <Cluster>
+          <PrintChip />
         </Cluster>
       </Section>
       <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">

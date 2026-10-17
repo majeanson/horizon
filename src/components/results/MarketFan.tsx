@@ -26,7 +26,7 @@ export function MarketFan({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
   const [open, setOpen] = useState(false)
   return (
-    <Fold summary={MARKET_FAN_COPY[lang].title} className="market-fan" open={open} onToggle={setOpen} mountOnOpen>
+    <Fold summary={MARKET_FAN_COPY[lang].title} className="market-fan" concept="marches" open={open} onToggle={setOpen} mountOnOpen>
       <Body m={m} />
     </Fold>
   )

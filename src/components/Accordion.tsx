@@ -110,12 +110,14 @@ export interface AccordionItemProps {
   summary?: ReactNode
   /** Not a card: the block is a bare region (a person's column on Profil, whose cards are inside it) with its own title style. */
   plain?: boolean
+  /** « Précédent » / « Suivant » at the foot of the open block (default). Off for a set of cards that are not a walk (Réponse's, the what-ifs), where the map and « Tout ouvrir » already do the job. */
+  nav?: boolean
   className?: string
   children: ReactNode
 }
 
 /** One block. Outside an accordion (or with an id the accordion does not list) it is the plain card every section of the app sits in. */
-export function AccordionItem({ id, title, subtitle, details, icon, concept, family, summary, plain, className, children }: AccordionItemProps) {
+export function AccordionItem({ id, title, subtitle, details, icon, concept, family, summary, plain, nav: withNav = true, className, children }: AccordionItemProps) {
   const t = useT()
   const { lang } = useLang()
   const acc = useContext(AccordionContext)
@@ -191,7 +193,7 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
       {children}
     </div>
   )
-  const nav = (prev !== null || next !== null) && (
+  const nav = withNav && (prev !== null || next !== null) && (
     <Cluster className="accordion__nav">
       {prev !== null && (
         <Chip icon="caret-left-bold" onClick={() => show(prev)}>

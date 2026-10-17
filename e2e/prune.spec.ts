@@ -33,7 +33,7 @@ test('the golden couple: « Fonte du REER » is a closed block with its title an
   await expect(section.getByRole('heading').first()).toBeVisible()
   await expect(section.getByRole('button', { expanded: false })).toHaveCount(1)
   await expect(section.getByRole('tab')).toHaveCount(0) // the machinery is not mounted until the block opens
-  await expect(page.getByRole('button', { name: 'Tout montrer' })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Sections des résultats' }).getByRole('button', { name: 'Tout ouvrir' })).toBeVisible()
   // the block opens on a tap of its title, and the full panel is there; the address keeps it
   await section.getByRole('button', { expanded: false }).click()
   await expect(page).toHaveURL(/strat=fonte/)
@@ -41,24 +41,27 @@ test('the golden couple: « Fonte du REER » is a closed block with its title an
   await expect(section.getByText(SAME, { exact: false })).toHaveCount(0) // the line is for the closed block
 })
 
-test('on a phone, « Tout montrer » lands on what it opened: for the golden couple no lever is quiet, so that is the first strategy that changed little, screens below the chip', async ({ page }) => {
+test('« Tout ouvrir » (the icon at the end of the map row) opens every what-if and every strategy, the ones that changed little too; « Tout fermer » puts them away', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page)
   await page.goto('/resultats?v=decide')
-  const chip = page.getByRole('button', { name: 'Tout montrer' })
-  await expect(chip).toBeVisible({ timeout: 90_000 })
-  const section = page.locator('#fonte')
-  const top = () => section.evaluate((el) => el.getBoundingClientRect().top)
-  expect(await top(), 'the section is below the window before the tap').toBeGreaterThan(844)
-  await chip.click()
+  const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
+  const all = nav.getByRole('button', { name: 'Tout ouvrir' })
+  await expect(all).toBeVisible({ timeout: 90_000 })
+  await all.click()
   await expect(page).toHaveURL(/tout=1/)
+  await expect(page).toHaveURL(/essai=all/)
+  const section = page.locator('#fonte')
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })
-  // the way back closes it again and does not move the page
-  await page.getByRole('button', { name: 'Réduire' }).click()
+  await expect(page.locator('.try-fold.is-open')).toHaveCount(4)
+  await nav.getByRole('button', { name: 'Tout fermer' }).click()
   await expect(page).not.toHaveURL(/tout=/)
+  await expect(page).not.toHaveURL(/essai=all/)
+  await expect(page.locator('.try-fold.is-open')).toHaveCount(0)
+  await expect(page.locator('#fonte')).toHaveClass(/is-closed/)
 })
 
-test('?tout=1 opens everything: every strategy open, no verdict line, and the chip offers the way back', async ({ page }) => {
+test('?tout=1 opens everything: every strategy open, no verdict line, and the map row offers the way back', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page)
   await page.goto('/resultats?v=decide&tout=1')
@@ -67,12 +70,12 @@ test('?tout=1 opens everything: every strategy open, no verdict line, and the ch
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })
   await expect(section.getByText(SAME, { exact: false })).toHaveCount(0)
   await expect(page.locator('#ordre table')).toBeVisible({ timeout: 90_000 })
-  await page.getByRole('button', { name: 'Réduire' }).click()
+  await page.getByRole('navigation', { name: 'Sections des résultats' }).getByRole('button', { name: 'Tout fermer' }).click()
   await expect(page).not.toHaveURL(/tout=/)
   await expect(section.getByText(SAME, { exact: false })).toBeVisible({ timeout: 30_000 })
 })
 
-test('a household built for the habit sees the whole panel once the block is open, with no line about it, and no chip is offered for it', async ({ page }) => {
+test('a household built for the habit sees the whole panel once the block is open, with no line about it', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page, melter() as never)
   await page.goto('/resultats?v=decide&strat=fonte')

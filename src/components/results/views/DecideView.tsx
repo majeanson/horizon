@@ -10,6 +10,8 @@ import { SpouseBalancePanel } from '../SpouseBalancePanel'
 import { SpouseTimingFold } from '../SpouseTimingPanel'
 import { Chip } from '../../Chip'
 import { Fold } from '../../Fold'
+import { CARDS_COPY } from '../../../lib/cardsCopy'
+import type { ConceptId } from '../../../lib/concepts'
 import { SectionHeader } from '../../SectionHeader'
 import { Skeleton } from '../../Skeleton'
 import { BRACKET_FILL_COPY } from '../../../lib/bracketFillCopy'
@@ -29,6 +31,15 @@ import type { LeverId } from '../../../engine/levers'
 type LeverRow = { id: LeverId; earliest: number | null; yearsGained: number | null; endGain: number | null }
 const LEVER_PLACEHOLDERS: LeverRow[] = (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null, endGain: null }))
 
+/** The four what-ifs under « Essayer un changement »: the card's id (the address of its anchor), the `?essai=` key it answers to and the pip it wears. */
+const WHAT_IF = {
+  viser: { essai: 'target', concept: 'depart' },
+  epargner: { essai: 'save', concept: 'nid' },
+  depenser: { essai: 'spend', concept: 'depenses' },
+  soins: { essai: 'care', concept: 'coussin' },
+} as const satisfies Record<string, { essai: Essai; concept: ConceptId }>
+type WhatIf = keyof typeof WHAT_IF
+
 const CareSection = lazy(() => import('./CareSection').then((m) => ({ default: m.CareSection })))
 
 // The « decide » view of the results page (« Décider ») — what to DO about the answer, in two steps on one flat page, no switch inside it:
@@ -38,18 +49,19 @@ const CareSection = lazy(() => import('./CareSection').then((m) => ({ default: m
 //       TIME (components/Accordion.tsx; the address keeps which, `?strat=`). A strategy that changes little for this household (lib/relevance.ts) closes to its title and one line saying so.
 // None of it edits an assumption (those live on Hypothèses) or a fact (Profil): a try is a try, and what is kept is said where it is kept. It reads the page's state through the one model object (lib/useResultsPage.ts).
 export function DecideView({ m }: { m: ResultsModel }) {
-  const { lang, rc, profile, state, retiredNow, assumptions, setParam, firstAge, earliest, nowOk, lc, levers, saveAge, spend, essai, setEssai, names } = m
+  const { lang, rc, profile, state, retiredNow, assumptions, setParam, firstAge, earliest, nowOk, lc, levers, saveAge, spend, essai, essaiAll, setEssai, names } = m
   const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
   const bf = BRACKET_FILL_COPY[lang]
   const sb = SPOUSE_BALANCE_COPY[lang]
-  // One what-if: a fold open when the address says so. The body is mounted only then, so a closed one costs no projection.
-  const tryFold = (key: Essai, id: string, title: string, body: ReactNode) => (
-    <Fold id={id} className="results-section try-fold" open={essai === key} onToggle={(open) => setEssai(open ? key : null)} mountOnOpen summary={title}>
+  // One what-if: a card, open when the address says so (`?essai=`, or every one with `?essai=all`). The body is mounted only then, so a closed one costs no projection.
+  const cc = CARDS_COPY[lang].closed
+  const tryFold = (id: WhatIf, title: string, body: ReactNode) => (
+    <AccordionItem id={id} title={title} summary={cc[id]} concept={WHAT_IF[id].concept} nav={false} className="results-section try-fold">
       {body}
-    </Fold>
+    </AccordionItem>
   )
   // WHAT CHANGES LITTLE FOR THIS HOUSEHOLD FOLDS, never disappears (lib/relevance.ts). A search that has not answered prunes nothing, and `?tout=1` opens everything.
-  const [tout, setTout] = useParamChoice('tout', ['off', '1'] as const, 'off')
+  const [tout] = useParamChoice('tout', ['off', '1'] as const, 'off')
   const showAll = tout === '1'
   // The ONE comparison behind each strategy, asked here: the view reads it to decide whether the block is worth opening, and the panel draws it.
   const isCouple = profile.household.persons.length > 1
@@ -62,11 +74,12 @@ export function DecideView({ m }: { m: ResultsModel }) {
   const rows: LeverRow[] = levers?.levers ?? LEVER_PLACEHOLDERS
   // The top lever always stays out; the ones that move neither the age nor the nest go under one fold at the end of the list.
   const quiet = levers === undefined ? [] : rows.filter((l, i) => i > 0 && leverPruned(l))
-  const anyPruned = fontePruned || ordrePruned || equilibrePruned || (!retiredNow && quiet.length > 0)
   // The strategies this household has (no pensions block once every start is behind it, no balance for one person), one open at a time: the address's, else the first.
   const stratIds: Strat[] = STRATS.filter((s) => (s === 'rentes' ? state.pensionsOpen : s === 'equilibre' ? isCouple : true))
   const stratOpen: AccordionOpen = showAll ? 'all' : m.strat === undefined ? (stratIds[0] ?? null) : m.strat !== null && stratIds.includes(m.strat) ? m.strat : null
-  const firstPruned = stratIds.find((s) => (s === 'ordre' && ordrePruned) || (s === 'fonte' && fontePruned) || (s === 'equilibre' && equilibrePruned)) ?? null
+  // The what-ifs this household has, and which are open: every one under « Tout ouvrir » (`?essai=all`), else the address's.
+  const whatIfIds = (Object.keys(WHAT_IF) as WhatIf[]).filter((id) => !retiredNow || id === 'epargner' || id === 'soins')
+  const whatIfOpen: AccordionOpen = essaiAll ? 'all' : essai === null ? null : (whatIfIds.find((id) => WHAT_IF[id].essai === essai) ?? null)
   const leverRow = (l: LeverRow) => (
     <li key={l.id} className="levers__item">
       {/* The name is the door: a ranked change nobody can act on is a rumour. Two open their what-if just below; the other two live where they are set. */}
@@ -103,20 +116,6 @@ export function DecideView({ m }: { m: ResultsModel }) {
       <section className="arc" aria-label={rc.tabs.decide}>
         <section id="essayer" className="results-section" aria-label={rc.decide.tryTitle}>
           <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} concept="essayer" />
-          {anyPruned && (
-            <Chip
-              onClick={() => {
-                const open = !showAll
-                setTout(open ? '1' : 'off')
-                // What this opens may be far down the page: for most households no lever is quiet, so the only thing that unfolds is a strategy that
-                // changed little, screens under this chip on a phone — a tap that changes nothing in sight read as a tap that did nothing (2026-10-15).
-                // Land on the first thing it opened; closing never moves the page.
-                if (open && quiet.length === 0 && firstPruned !== null) m.scrollTo(firstPruned)
-              }}
-            >
-              {showAll ? rc.decide.showLess : rc.decide.showAll}
-            </Chip>
-          )}
           {!retiredNow && (
             <div id="ajuster" className="surface">
               {/* The changes a household could make, each tried alone and ranked by the years it gains. */}
@@ -133,39 +132,37 @@ export function DecideView({ m }: { m: ResultsModel }) {
             </div>
           )}
           {/* The plan asked the other way round: an age to aim at, and what it would take to stop then. It shares the age (`?age=`) with « Combien épargner ? ». */}
+          <Accordion ids={whatIfIds} open={whatIfOpen} onOpen={(id) => setEssai(id === null ? null : WHAT_IF[id as WhatIf].essai)}>
           {!retiredNow &&
             tryFold(
-              'target',
               'viser',
               REVERSE_COPY[lang].title,
               <ReverseView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />,
             )}
           {tryFold(
-            'save',
             'epargner',
             rc.questions.tabs.save,
             <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />,
           )}
           {!retiredNow &&
             tryFold(
-              'spend',
               'depenser',
               rc.questions.tabs.spend,
               <SpendView household={profile.household} assumptions={assumptions} spend={spend} onSpend={(v) => setParam('spend', v === null ? null : String(v))} earliest={earliest} now={nowOk} maxAge={MAX_AGE} />,
             )}
           {/* The one what-if about LIFE rather than the plan: the last years costing more (a care). */}
           {tryFold(
-            'care',
             'soins',
             FUTURE_COPY[lang].care.title,
             <Suspense fallback={<Skeleton count={3} />}>
               <CareSection m={m} />
             </Suspense>,
           )}
+          </Accordion>
         </section>
 
         {/* The strategies, one open at a time. A strategy pruned on an ANSWERED search (nothing worth a sentence for this household) closes to its title and
-            the line that says so; its machinery mounts only when opened. « Tout montrer » opens every block, pruned or not. */}
+            the line that says so; its machinery mounts only when opened. « Tout ouvrir » (the map row) opens every block, pruned or not. */}
         <Accordion ids={stratIds} open={stratOpen} onOpen={(id) => m.setStrat(id as Strat | null)}>
           {state.pensionsOpen && (
             <AccordionItem id="rentes" title={rc.pensions.title} subtitle={rc.pensions.hint} concept="rrq" className="results-section">

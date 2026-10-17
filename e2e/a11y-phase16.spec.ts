@@ -63,9 +63,8 @@ const OPENED: [string, string, (page: Page) => Promise<void>][] = [
   ],
   [
     'the print dialog',
-    '/resultats',
+    '/fiche',
     async (page) => {
-      await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible({ timeout: 60_000 })
       await page.getByRole('button', { name: /Imprimer…/ }).click()
       await expect(page.getByRole('dialog', { name: 'Imprimer' })).toBeVisible()
     },

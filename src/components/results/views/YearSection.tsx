@@ -17,7 +17,8 @@ import { useWithdrawalOrders } from '../../../lib/useWithdrawalOrders'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 import { Chip } from '../../Chip'
 import { Cluster } from '../../Layout'
-import { SectionHeader } from '../../SectionHeader'
+import { AccordionItem } from '../../Accordion'
+import { CARDS_COPY } from '../../../lib/cardsCopy'
 
 // « À faire cette année » — what the plan itself points at, at the foot of the answer: the one change that gains most (tried in « Essayer »), and the two
 // decisions that have their own home on « Stratégies ». The figure to confirm first is NOT repeated here: Ma fiche ranks it.
@@ -112,8 +113,7 @@ export function YearSection({ m }: { m: ResultsModel }) {
   // The doors below, counted as they are drawn: the order and the melting always, the balance for a couple, the pensions while a start is still ahead.
   const decisions = 2 + (isCouple ? 1 : 0) + (state.pensionsOpen ? 1 : 0)
   return (
-    <section id="annee" className="results-section" aria-label={f.year.title}>
-      <SectionHeader title={f.year.title} subtitle={f.year.hint} concept="annee" />
+    <AccordionItem id="annee" title={f.year.title} subtitle={f.year.hint} summary={CARDS_COPY[lang].closed.annee} concept="annee" nav={false} className="results-section">
       <div className="surface future-year">
         {!retiredNow && (
           <div className="verdict__range">
@@ -151,6 +151,6 @@ export function YearSection({ m }: { m: ResultsModel }) {
           </Cluster>
         </div>
       </div>
-    </section>
+    </AccordionItem>
   )
 }

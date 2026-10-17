@@ -1,6 +1,8 @@
 import { useDeferredValue, useMemo } from 'react'
 import { answerRequest } from '../lib/answerRequest'
+import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
+import { PrintChip } from '../components/PrintChip'
 import { PlanCalendar } from '../components/results/PlanCalendar'
 import { TimelineStrip } from '../components/results/TimelineStrip'
 import { CashBufferCard } from '../components/sheet/CashBufferCard'
@@ -65,6 +67,9 @@ export function Fiche() {
           ) : undefined
         }
       />
+      <Cluster className="no-print">
+        <PrintChip />
+      </Cluster>
     </section>
   )
 }

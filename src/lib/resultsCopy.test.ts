@@ -70,7 +70,7 @@ describe('the results-page copy, in both languages', () => {
   })
 
   it('has the Décider pruning words, translated: the line that says what a closed strategy means for this household stays a sentence', () => {
-    for (const key of ['showAll', 'showLess', 'fonteSame', 'ordreSame', 'equilibreSame', 'leversFold'] as const) {
+    for (const key of ['fonteSame', 'ordreSame', 'equilibreSame', 'leversFold'] as const) {
       expect(fr.decide[key].trim().length, key).toBeGreaterThan(0)
       expect(en.decide[key].trim().length, key).toBeGreaterThan(0)
       expect(en.decide[key], key).not.toBe(fr.decide[key])

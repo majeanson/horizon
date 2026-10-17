@@ -26,6 +26,9 @@ interface PrintMenuCopy {
   families: Record<Family, string>
   /** A kind that cannot be printed yet (its numbers are still being worked out). */
   notReady: string
+  /** The list's note when the profile does not yet hold enough to print, and the settings section that holds the chip. */
+  needsProfile: string
+  section: { title: string; hint: string }
 }
 
 export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
@@ -54,6 +57,8 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
     figuresLeft: (names, count) => `Laissés de côté, parce que votre profil ne les concerne pas : ${names} (${count} chiffres). La liste complète est sur la page « Les sources ».`,
     families: { children: 'enfants et congé parental', survivor: 'rente de survivant', couple: 'barèmes de couple', alone: 'montant pour personne vivant seule', work: 'cotisations des travailleurs' },
     notReady: 'Ce tableau se prépare encore. Réessayez dans un instant.',
+    needsProfile: 'Il manque encore des chiffres dans le profil : rien à imprimer pour l’instant.',
+    section: { title: 'Imprimer', hint: 'Le plan en une page, le calendrier, un dépliant, le dossier de preuve, le tableau année par année ou les sources. Tout se passe sur cet appareil.' },
   },
   en: {
     button: 'Print…',
@@ -80,5 +85,7 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
     figuresLeft: (names, count) => `Left out because your profile does not involve them: ${names} (${count} figures). The full list is on the “The sources” page.`,
     families: { children: 'children and parental leave', survivor: 'survivor pension', couple: 'couple scales', alone: 'living-alone amount', work: 'payroll contributions' },
     notReady: 'This table is still being worked out. Try again in a moment.',
+    needsProfile: 'The profile is still missing figures: nothing to print yet.',
+    section: { title: 'Print', hint: 'The plan on one page, the calendar, a leaflet, the proof file, the year-by-year table or the sources. It all happens on this device.' },
   },
 }

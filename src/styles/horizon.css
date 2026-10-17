@@ -1609,3 +1609,75 @@ button.welcome__door {
   min-width: 0;
   contain: inline-size;
 }
+
+/* « En un coup d’œil » under the sentence of the answer: three quiet tiles (components/results/AnswerGlance.tsx). Wraps on a phone; never a wide row. */
+.glance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2, 0.5rem);
+  margin: var(--space-3, 0.75rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+/* Two and one on a phone (the margin tile has the longest line), three across from a tablet up. */
+.glance__tile:last-child {
+  grid-column: 1 / -1;
+}
+@media (min-width: 40rem) {
+  .glance {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .glance__tile:last-child {
+    grid-column: auto;
+  }
+}
+.glance__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md, 0.75rem);
+  background: var(--surface-2, var(--surface));
+}
+.glance__name {
+  color: var(--ink-soft);
+  font-size: var(--text-xs, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.glance__value {
+  font-family: var(--display);
+  font-size: var(--text-lg, 1.15rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.glance__value.is-short {
+  color: var(--warn);
+}
+.glance__sub {
+  color: var(--ink-soft);
+  font-size: var(--text-xs, 0.75rem);
+}
+
+/* A fold that is a card (components/Fold.tsx `concept`): the tools a reader opens on purpose — the markets drawn five ways, the calendar, the weather of one more RRSP dollar, the two start ages together. */
+.fold--card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 0.75rem 1rem;
+}
+.fold--card > summary {
+  color: var(--ink);
+  font-weight: 600;
+}
+.fold__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  vertical-align: middle;
+}
+.fold--card[open] > summary {
+  margin-bottom: 0.5rem;
+}

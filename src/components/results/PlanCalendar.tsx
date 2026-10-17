@@ -36,7 +36,7 @@ export function PlanCalendar(props: { household: Household; names: readonly stri
   const { lang } = useLang()
   const c = PLAN_CALENDAR_COPY[lang]
   return (
-    <Fold summary={c.title} className="plan-calendar-fold">
+    <Fold summary={c.title} className="plan-calendar-fold" concept="annee">
       <p className="field-row__hint">{c.hint}</p>
       <PlanCalendarList {...props} />
     </Fold>

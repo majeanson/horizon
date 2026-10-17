@@ -55,8 +55,6 @@ const FR_RESULTS = {
     tryTitle: 'Essayer un changement',
     tryHint: 'Chaque essai se fait sur votre plan tel qu’il est ; rien n’est enregistré. Ouvrez-en un à la fois.',
     /** What changes little for this household is folded, never removed: one chip opens everything, the same chip closes it again. */
-    showAll: 'Tout montrer',
-    showLess: 'Réduire',
     /** « Fonte du REER », when no way of melting clearly beats the household's own: the line stays, the detail folds. */
     fonteSame: 'Pour vous, remplir la tranche change peu : aucune façon de fondre le REER ne fait nettement mieux que la vôtre.',
     /** The same for the order of drawing and the balance of the two RRSPs: nothing clearly beats the household's own; the block closes to this line. */
@@ -281,8 +279,6 @@ const EN_RESULTS: typeof FR_RESULTS = {
   decide: {
     tryTitle: 'Try a change',
     tryHint: 'Each try runs on your plan as it stands; nothing is saved. Open one at a time.',
-    showAll: 'Show everything',
-    showLess: 'Show less',
     fonteSame: 'For you, filling the bracket changes little: no way of melting the RRSP clearly does better than yours.',
     ordreSame: 'For you, the order changes little: no other order of drawing clearly does better than yours.',
     equilibreSame: 'For you, evening out changes little: moving part of the larger RRSP would not clearly do better.',

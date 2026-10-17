@@ -16,7 +16,7 @@ export function SpouseTimingFold(props: { household: Household; assumptions: Ass
   const { lang } = useLang()
   const [open, setOpen] = useState(false)
   return (
-    <Fold summary={SPOUSE_TIMING_COPY[lang].title} className="spouse-timing" open={open} onToggle={setOpen} mountOnOpen>
+    <Fold summary={SPOUSE_TIMING_COPY[lang].title} className="spouse-timing" concept="depart" open={open} onToggle={setOpen} mountOnOpen>
       <SpouseTimingPanel {...props} />
     </Fold>
   )

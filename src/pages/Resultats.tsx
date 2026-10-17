@@ -6,14 +6,14 @@ import { Cluster } from '../components/Layout'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
 import { PinStack } from '../components/PinStack'
-import { PrintKindView, PrintMenu } from '../components/results/PrintMenu'
+import { PrintKindView, usePrintRequest } from '../components/results/PrintMenu'
 import { SectionNav } from '../components/SectionNav'
 import { SubTabs } from '../components/SubTabs'
 import { EmptyState } from '../components/EmptyState'
 import { AnswerView } from '../components/results/views/AnswerView'
 import { Skeleton } from '../components/Skeleton'
 import { firstAnswerSeen, markFirstAnswerSeen } from '../lib/firstAnswer'
-import { PROOF_BLOCKS, useResultsPage } from '../lib/useResultsPage'
+import { ANSWER_BLOCKS, PROOF_BLOCKS, useResultsPage, type ResultsModel } from '../lib/useResultsPage'
 import { useParamChoice } from '../lib/useParamChoice'
 
 // The two other views ride their own chunks: only the one a reader opens is fetched (the answer is what the page opens with). The service worker precaches both.
@@ -32,6 +32,7 @@ const TourBar = lazy(() => import('../components/results/TourBar').then((m) => (
 // bookmarked.
 export function Resultats() {
   const m = useResultsPage()
+  usePrintRequest(m)
   const { printing, t, r, rc, gaps, setParam, answerPending, view, navLinks, copySummary } = m
   // The first answer this device has seen: the map's pips pop one after another for a moment, once (components/SectionNav.tsx `celebrate`).
   const [firstRun] = useState(() => !firstAnswerSeen())
@@ -88,7 +89,7 @@ export function Resultats() {
           ]}
         />
       </div>
-      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} celebrate={celebrate} end={view === 'proof' ? <ProofMode /> : undefined} />}
+      {navLinks.length > 0 && <SectionNav links={navLinks} ariaLabel={rc.nav.label} onPick={m.openBlock} celebrate={celebrate} end={view === 'proof' ? <ProofMode /> : view === 'decide' ? <DecideMode m={m} /> : <AnswerMode />} />}
       </PinStack>
 
 
@@ -110,11 +111,12 @@ export function Resultats() {
       )}
 
 
-      {/* Paper is how a plan leaves the device without a network: print.css already makes the page a clean flow. */}
-      <Cluster className="no-print">
-        {view === 'answer' && !answerPending && gaps.length === 0 && <Chip onClick={copySummary}>{rc.out.copy}</Chip>}
-        <PrintMenu m={m} />
-      </Cluster>
+      {/* Paper is how a plan leaves the device without a network: « Imprimer… » lives on Ma fiche and in the settings (components/PrintChip.tsx); print.css already makes the page a clean flow. */}
+      {view === 'answer' && !answerPending && gaps.length === 0 && (
+        <Cluster className="no-print">
+          <Chip onClick={copySummary}>{rc.out.copy}</Chip>
+        </Cluster>
+      )}
       <NextStep to="/hypotheses" label={t.next.adjustAssumptions}>
         <p>{t.next.resultsHint}</p>
       </NextStep>
@@ -126,6 +128,34 @@ export function Resultats() {
         </>
       )}
     </section>
+  )
+}
+
+/** « Tout ouvrir / Tout fermer » on Réponse: its two cards are open unless the address closed them (`?cartes=none`, or the name of the one kept open). Same icon, same place, as every page that folds. */
+function AnswerMode() {
+  const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'none'], 'all')
+  const open: AccordionOpen = cartes === 'all' ? 'all' : cartes === 'none' ? null : cartes
+  return <AccordionMode open={open} onOpen={(next) => setCartes(next === 'all' ? 'all' : (next ?? 'none'))} />
+}
+
+/** On Décider « tout » is two things the one icon turns on together: every strategy open, the ones that change little for this household too (`?tout=1`, which is what says « all »), and every what-if card (`?essai=all`). Closing puts both away. */
+function DecideMode({ m }: { m: ResultsModel }) {
+  const [tout, setTout] = useParamChoice('tout', ['off', '1'] as const, 'off')
+  const all = tout === '1'
+  return (
+    <AccordionMode
+      open={all ? 'all' : null}
+      onOpen={(next) => {
+        if (next === 'all') {
+          setTout('1')
+          m.setParam('essai', 'all')
+        } else {
+          setTout('off')
+          m.setStrat(null)
+          m.setEssai(null)
+        }
+      }}
+    />
   )
 }
 

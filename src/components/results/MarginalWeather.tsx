@@ -16,7 +16,7 @@ export function MarginalWeather({ m }: { m: ResultsModel }) {
   const [open, setOpen] = useState(false)
   const c = MARGINAL_WEATHER_COPY[lang]
   return (
-    <Fold summary={c.title} className="marginal-weather" open={open} onToggle={setOpen} mountOnOpen>
+    <Fold summary={c.title} className="marginal-weather" concept="annee" open={open} onToggle={setOpen} mountOnOpen>
       <Body m={m} />
     </Fold>
   )

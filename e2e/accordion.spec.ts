@@ -135,3 +135,43 @@ for (const [name, path, map, size] of [
     await expect(page.locator('.accordion__item.is-open')).toHaveCount(0) // « Tout fermer » closes every card, the first included
   })
 }
+
+// RÉPONSE AND DÉCIDER FOLD THE SAME WAY. Réponse's two cards are open until closed (`?cartes=`); Décider's what-ifs and strategies open together under the same icon (`?essai=all` + `?tout=1`). The glance under the answer's sentence sits on the page.
+test('Réponse: two cards, open by default; « Tout fermer » closes them, a map chip opens one, « Tout ouvrir » gives them back; the glance shows three tiles', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats')
+  const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
+  await expect(page.locator('.glance .glance__tile')).toHaveCount(3, { timeout: 60_000 })
+  await expect(page.locator('.glance').getByText('Marge par mois')).toBeVisible()
+  await expect(page.locator('#comparer')).toHaveClass(/is-open/)
+  await expect(page.locator('#annee')).toHaveClass(/is-open/, { timeout: 30_000 })
+  await nav.getByRole('button', { name: 'Tout fermer' }).click()
+  await expect(page).toHaveURL(/cartes=none/)
+  await expect(page.locator('.results-page .accordion__item.is-open')).toHaveCount(0)
+  // a closed card says in one line what it holds, and mounts nothing
+  await expect(page.locator('#comparer .accordion__summary')).toBeVisible()
+  await expect(page.locator('#comparer .scenarios')).toHaveCount(0)
+  await nav.getByRole('button', { name: 'Comparer' }).click()
+  await expect(page).toHaveURL(/cartes=comparer/)
+  await expect(page.locator('#comparer')).toHaveClass(/is-open/)
+  await expect(page.locator('#annee')).toHaveClass(/is-closed/)
+  await nav.getByRole('button', { name: 'Tout ouvrir' }).click()
+  await expect(page).not.toHaveURL(/cartes=/)
+  await expect(page.locator('#annee')).toHaveClass(/is-open/)
+})
+
+test('Décider: « Tout ouvrir » opens the four what-ifs and every strategy; closing one what-if leaves the rest open', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await seedProfile(page, EXAMPLE)
+  await page.goto('/resultats?v=decide')
+  const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
+  await expect(page.locator('.try-fold')).toHaveCount(4, { timeout: 60_000 })
+  await expect(page.locator('.try-fold.is-open')).toHaveCount(0)
+  await nav.getByRole('button', { name: 'Tout ouvrir' }).click()
+  await expect(page).toHaveURL(/essai=all/)
+  await expect(page.locator('.try-fold.is-open')).toHaveCount(4)
+  await page.locator('#depenser').getByRole('button', { expanded: true }).first().click()
+  await expect(page.locator('#depenser')).toHaveClass(/is-closed/)
+  await expect(page.locator('.try-fold.is-open')).toHaveCount(3)
+})

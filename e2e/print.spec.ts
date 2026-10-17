@@ -78,10 +78,11 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
     }
   })
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats')
-  await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible({ timeout: 60_000 })
+  // The chip lives on Ma fiche and in the settings: a choice goes to the results page, which prints once its numbers are in.
+  const slow = expect.configure({ timeout: 60_000 })
 
   const open = async () => {
+    await page.goto('/fiche')
     await page.getByRole('button', { name: /Imprimer…/ }).click()
     const dialog = page.getByRole('dialog', { name: 'Imprimer' })
     await expect(dialog).toBeVisible()
@@ -91,31 +92,29 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
   // the year by year: a table, under its own heading, and none of the one-page plan
   let dialog = await open()
   await expect(dialog.locator('.print-menu button')).toHaveCount(6)
-  const years = dialog.getByRole('button', { name: /Année par année/ })
-  await expect(years).toBeEnabled({ timeout: 60_000 })
-  await years.click()
-  await expect(page.locator('.print-kind--years')).toBeVisible()
-  await expect(page.locator('.print-kind--years').getByText('Horizon — année par année')).toBeVisible()
-  await expect(page.locator('.print-kind--years .year-table table')).toBeVisible()
-  await expect(page.locator('.print-plan .timeline')).toHaveCount(0)
+  await dialog.getByRole('button', { name: /Année par année/ }).click()
+  await slow(page.locator('.print-kind--years')).toBeVisible()
+  await slow(page.locator('.print-kind--years').getByText('Horizon — année par année')).toBeVisible()
+  await slow(page.locator('.print-kind--years .year-table table')).toBeVisible()
+  await slow(page.locator('.print-plan .timeline')).toHaveCount(0)
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
-  await expect(page.locator('.print-plan')).toHaveCount(0)
-  await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible()
+  await slow(page.locator('.print-plan')).toHaveCount(0)
+  await slow(page.getByRole('tab', { name: 'Réponse' })).toBeVisible()
 
   // the calendar and the leaflet: the plan's dates, one row a year; the leaflet adds the answer and the assumptions in three panels
   dialog = await open()
   await dialog.getByRole('button', { name: /Le calendrier/ }).click()
-  await expect(page.locator('.print-kind--calendar').getByText('Horizon — le calendrier du plan')).toBeVisible()
+  await slow(page.locator('.print-kind--calendar').getByText('Horizon — le calendrier du plan')).toBeVisible()
   expect(await page.locator('.print-kind--calendar .plan-calendar__year').count()).toBeGreaterThan(3)
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
   dialog = await open()
   await dialog.getByRole('button', { name: /Le dépliant/ }).click()
-  await expect(page.locator('.print-leaflet__panel')).toHaveCount(3)
-  await expect(page.locator('.print-leaflet').getByText(/Vous pouvez prendre votre retraite/)).toBeVisible()
-  await expect(page.locator('.print-leaflet .plan-calendar__year').first()).toBeVisible()
+  await slow(page.locator('.print-leaflet__panel')).toHaveCount(3)
+  await slow(page.locator('.print-leaflet').getByText(/Vous pouvez prendre votre retraite/)).toBeVisible()
+  await slow(page.locator('.print-leaflet .plan-calendar__year').first()).toBeVisible()
   // the share link as a code a phone can scan: a drawn square with its words, and no figure of the profile in what it says
-  await expect(page.locator('.print-leaflet__qr svg[role="img"]')).toBeVisible()
-  await expect(page.locator('.print-leaflet__qr figcaption')).toContainText('Scannez pour ouvrir ce scénario')
+  await slow(page.locator('.print-leaflet__qr svg[role="img"]')).toBeVisible()
+  await slow(page.locator('.print-leaflet__qr figcaption')).toContainText('Scannez pour ouvrir ce scénario')
   expect(await page.locator('.print-leaflet__qr path').getAttribute('d')).toMatch(/^M\d+ \d+h\d+v1h-\d+z/)
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
 
@@ -123,16 +122,16 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
   dialog = await open()
   await dialog.getByRole('button', { name: /Le dossier de preuve/ }).click()
   const dossier = page.locator('.print-kind--dossier')
-  await expect(dossier.getByText('Horizon — le dossier de preuve')).toBeVisible()
-  await expect(dossier.locator('.print-figures tbody tr').first()).toBeVisible()
+  await slow(dossier.getByText('Horizon — le dossier de preuve')).toBeVisible()
+  await slow(dossier.locator('.print-figures tbody tr').first()).toBeVisible()
   expect(await dossier.locator('.print-dossier__figure').count()).toBeGreaterThanOrEqual(4) // the RRQ and the PSV of two people
-  await expect(dossier.locator('.print-dossier__figure').first()).toContainText('https://')
+  await slow(dossier.locator('.print-dossier__figure').first()).toContainText('https://')
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
 
   // the sources: every cited figure, each with its official page
   dialog = await open()
   await dialog.getByRole('button', { name: /Les sources/ }).click()
-  await expect(page.locator('.print-kind--sources').getByText('Horizon — les sources des chiffres')).toBeVisible()
+  await slow(page.locator('.print-kind--sources').getByText('Horizon — les sources des chiffres')).toBeVisible()
   expect(await page.locator('.print-sources tbody tr').count()).toBeGreaterThan(100)
   // the address is written out: a link is nothing on paper
   expect(await page.locator('.print-sources__url').first().textContent()).toMatch(/^https:\/\//)
@@ -141,17 +140,17 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
   // the plan, chosen from the list
   dialog = await open()
   await dialog.getByRole('button', { name: /Le plan en une page/ }).click()
-  await expect(page.locator('.print-plan .timeline')).toBeVisible()
+  await slow(page.locator('.print-plan .timeline')).toBeVisible()
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
 
   // after a choice, a bare Ctrl+P is the plan again — the choice was for one print
   dialog = await open()
   await dialog.getByRole('button', { name: /Les sources/ }).click()
-  await expect(page.locator('.print-kind--sources')).toBeVisible()
+  await slow(page.locator('.print-kind--sources')).toBeVisible()
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
   await beforePrint(page)
-  await expect(page.locator('.print-plan .timeline')).toBeVisible()
-  await expect(page.locator('.print-kind')).toHaveCount(0)
+  await slow(page.locator('.print-plan .timeline')).toBeVisible()
+  await slow(page.locator('.print-kind')).toHaveCount(0)
 })
 
 test('« Print… » speaks English, and its pages carry English headings', async ({ page }) => {
@@ -162,11 +161,10 @@ test('« Print… » speaks English, and its pages carry English headings', asyn
     }
   })
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats')
-  await expect(page.getByRole('tab', { name: 'Answer' })).toBeVisible({ timeout: 60_000 })
+  await page.goto('/fiche')
   await page.getByRole('button', { name: /Print…/ }).click()
   await page.getByRole('dialog', { name: 'Print' }).getByRole('button', { name: /The sources/ }).click()
-  await expect(page.locator('.print-kind--sources').getByText('Horizon — where the figures come from')).toBeVisible()
+  await expect(page.locator('.print-kind--sources').getByText('Horizon — where the figures come from')).toBeVisible({ timeout: 60_000 })
 })
 
 // The PDFs of the other pages. The year by year is a LANDSCAPE page (a named `@page`), and neither runs away: a table is a few pages, the sources a few more.
@@ -188,13 +186,10 @@ for (const [kind, button, heading, orientation, maxPages] of [
       }
     })
     await seedProfile(page, EXAMPLE)
-    await page.goto('/resultats')
-    await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible({ timeout: 60_000 })
+    await page.goto('/fiche')
     await page.getByRole('button', { name: /Imprimer…/ }).click()
-    const choice = page.getByRole('dialog', { name: 'Imprimer' }).getByRole('button', { name: button })
-    await expect(choice).toBeEnabled({ timeout: 60_000 })
-    await choice.click()
-    await expect(page.locator(`.print-kind--${kind}`).getByText(heading)).toBeVisible()
+    await page.getByRole('dialog', { name: 'Imprimer' }).getByRole('button', { name: button }).click()
+    await expect(page.locator(`.print-kind--${kind}`).getByText(heading)).toBeVisible({ timeout: 60_000 })
     await page.emulateMedia({ media: 'print' })
     const pdf = await page.pdf({ format: 'Letter', printBackground: true, preferCSSPageSize: true })
     const pages = pagesOf(pdf)

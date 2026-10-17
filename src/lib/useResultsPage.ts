@@ -57,6 +57,8 @@ const ESSAI_OF: Readonly<Record<string, Essai>> = { viser: 'target', epargner: '
 export const STRATS = ['rentes', 'ordre', 'fonte', 'equilibre'] as const
 export type Strat = (typeof STRATS)[number]
 /** The blocks of « Preuve », the same way (`?bloc=`). */
+/** The two cards under the answer's sentence (`?cartes=`): the comparison of departure ages and « À faire cette année ». */
+export const ANSWER_BLOCKS = ['comparer', 'annee'] as const
 export const PROOF_BLOCKS = ['solidite', 'donnees-calcul', 'tableau', 'precision', 'parametres'] as const
 
 export const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
@@ -150,7 +152,9 @@ export function useResultsPage() {
   const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['target', 'save', 'spend', 'care']
   const rawEssai = params.get('essai')
   const inferred: Essai | null = params.get('care') !== null ? 'care' : params.get('spend') !== null ? 'spend' : params.get('age') !== null ? 'save' : null
-  const essai: Essai | null = rawEssai === 'none' ? null : (essaiKeys.find((k) => k === rawEssai) ?? (inferred !== null && essaiKeys.includes(inferred) ? inferred : null))
+  // `?essai=all`: every what-if open at once (the same « Tout ouvrir » as the other pages); the view keeps which the reader shut since.
+  const essaiAll = rawEssai === 'all'
+  const essai: Essai | null = rawEssai === 'none' || essaiAll ? null : (essaiKeys.find((k) => k === rawEssai) ?? (inferred !== null && essaiKeys.includes(inferred) ? inferred : null))
   const setEssai = (next: Essai | null) => setParam('essai', next ?? 'none')
   // « Solidité »: the scenarios and a hard market are on the page; the 3 × 3 grids behind them open on request (a household that has stopped working has no age to range over: only the grids, open). The address keeps it (`?solidite=grids`).
   const gridsOpen = retiredNow || params.get('solidite') === 'grids'
@@ -187,14 +191,20 @@ export function useResultsPage() {
   const openBlock = (id: string) => {
     if (view === 'decide' && (STRATS as readonly string[]).includes(id)) setStrat(id as Strat)
     if (view === 'proof' && (PROOF_BLOCKS as readonly string[]).includes(id)) setParam('bloc', id)
+    if (view === 'answer') openAnswerCard(id)
+  }
+  // Réponse's cards are all open unless the address closed some (`?cartes=`): a link to one opens it when it is shut, and leaves a page that has every card open as it is.
+  const openAnswerCard = (id: string) => {
+    if ((ANSWER_BLOCKS as readonly string[]).includes(id) && params.get('cartes') !== null) setParam('cartes', id)
   }
   const goTo = (target: View, wantedId: string) => {
     // The what-ifs and the 3 × 3 grids are folds that open on request: open the one the link names first (its body does not exist until then), then land on it.
     const wanted = target === 'decide' ? ESSAI_OF[wantedId] : undefined
-    if (wanted !== undefined && wanted !== essai) setEssai(wanted)
+    if (wanted !== undefined && !essaiAll && wanted !== essai) setEssai(wanted)
     if (target === 'proof' && wantedId === 'sensibilite' && !gridsOpen) setGridsOpen(true)
     // The strategies and the proof's blocks are accordions: the block a link names opens first (its body does not exist until then), then the landing.
     if (target === 'decide' && (STRATS as readonly string[]).includes(wantedId)) setStrat(wantedId as Strat)
+    if (target === 'answer') openAnswerCard(wantedId)
     if (target === 'proof') {
       const block = wantedId === 'sensibilite' ? 'solidite' : wantedId
       if ((PROOF_BLOCKS as readonly string[]).includes(block)) setParam('bloc', block)
@@ -479,6 +489,7 @@ export function useResultsPage() {
     care,
     navLinks,
     essai,
+    essaiAll,
     essaiKeys,
     setEssai,
     gridsOpen,

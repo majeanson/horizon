@@ -1,17 +1,14 @@
-import { useState } from 'react'
-import { flushSync } from 'react-dom'
-import { useLang } from '../../i18n'
-import { choosePrintKind, currentPrintKind, PRINT_KINDS, type PrintKind } from '../../lib/printKind'
-import { PRINT_MENU_COPY } from '../../lib/printMenuCopy'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { choosePrintKind, currentPrintKind, PRINT_KINDS } from '../../lib/printKind'
 import type { ResultsModel } from '../../lib/useResultsPage'
-import { Chip } from '../Chip'
-import { Modal } from '../Modal'
 import { PrintPlan } from './PrintPlan'
 
-// « Imprimer… » — ONE chip that lists the pages a household can put on paper (lib/printKind.ts): the plan on one page, its calendar, a leaflet to fold, the year-by-year table, the sources. Choosing one closes the
-// list, remembers the choice for the one print that follows, and asks the browser to print; the browser's own Ctrl+P still prints the plan. Everything stays on the device.
+// The paper side of « Imprimer… » (the chip itself is components/PrintChip.tsx, on « Ma fiche » and in the settings). A choice arrives as `?imprimer=<page>`: this hook waits until the numbers
+// that page is drawn from are in, fetches the pages other than the plan, remembers the choice for the one print that follows, asks the browser to print, and clears the address. The browser's own
+// Ctrl+P still prints the plan. Everything stays on the device.
 //
-// The pages other than the plan ride a chunk of their own (PrintKinds.tsx). The menu FETCHES it before it prints: `beforeprint` mounts the paper page at once and the browser
+// The pages other than the plan ride a chunk of their own (PrintKinds.tsx). The hook FETCHES it before it prints: `beforeprint` mounts the paper page at once and the browser
 // takes its snapshot as soon as that returns, so a page that was still loading would print as a blank. That is also why the loaded module is kept here and not behind `lazy()`.
 
 let kinds: typeof import('./PrintKinds') | null = null
@@ -28,55 +25,42 @@ export function PrintKindView({ m }: { m: ResultsModel }) {
   return <PrintPlan m={m} />
 }
 
-export function PrintMenu({ m }: { m: ResultsModel }) {
-  const { lang } = useLang()
-  const c = PRINT_MENU_COPY[lang]
-  const [open, setOpen] = useState(false)
-  const [failed, setFailed] = useState(false)
-  const ready = (kind: PrintKind) => kind !== 'years' || (!m.runsPending && m.runs.length > 0)
-  const print = async (kind: PrintKind) => {
-    if (!ready(kind)) return setFailed(true)
-    try {
-      if (kind !== 'summary') await loadKinds()
-    } catch {
-      return setFailed(true)
+/** Answers `?imprimer=<page>`: prints that page once the model can draw it, then clears the address so a reload does not print again. */
+export function usePrintRequest(m: ResultsModel): void {
+  const [params, setParams] = useSearchParams()
+  const asked = PRINT_KINDS.find((k) => k === params.get('imprimer'))
+  const raw = params.get('imprimer')
+  const ready = !m.answerPending && (asked !== 'years' || (!m.runsPending && m.runs.length > 0))
+  const gaps = m.gaps.length > 0
+  const clear = () =>
+    setParams(
+      () => {
+        const url = new URLSearchParams(window.location.search)
+        url.delete('imprimer')
+        return url
+      },
+      { replace: true },
+    )
+  useEffect(() => {
+    // An address that names no page, or a profile with nothing to print: drop the key and stay.
+    if (raw !== null && (asked === undefined || gaps)) return clear()
+    if (asked === undefined || !ready) return
+    let cancelled = false
+    void (async () => {
+      try {
+        if (asked !== 'summary') await loadKinds()
+      } catch {
+        return clear()
+      }
+      if (cancelled) return
+      choosePrintKind(asked)
+      clear()
+      // A turn of the event loop: the address is rewritten before the browser lays the page out for paper.
+      setTimeout(() => window.print(), 0)
+    })()
+    return () => {
+      cancelled = true
     }
-    flushSync(() => setOpen(false))
-    choosePrintKind(kind)
-    // A turn of the event loop: the dialog's cleanup (the page behind it is inert while it is open) runs before the browser lays the page out for paper.
-    setTimeout(() => window.print(), 0)
-  }
-  return (
-    <>
-      <Chip
-        icon="printer-bold"
-        onClick={() => {
-          setFailed(false)
-          setOpen(true)
-          // The pages are fetched while the list is read, so a choice prints at once.
-          void loadKinds().catch(() => undefined)
-        }}
-      >
-        {c.button}
-      </Chip>
-      <Modal open={open} onClose={() => setOpen(false)} title={c.title}>
-        <p className="field-row__hint">{c.lead}</p>
-        <ul className="print-menu">
-          {PRINT_KINDS.map((kind) => (
-            <li key={kind}>
-              <button type="button" className="btn print-menu__item" disabled={!ready(kind)} onClick={() => void print(kind)}>
-                <span className="print-menu__name">{c.kinds[kind].name}</span>
-                <span className="print-menu__hint">{c.kinds[kind].hint}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        {(failed || !ready('years')) && (
-          <p className="field-row__hint" role="status">
-            {c.notReady}
-          </p>
-        )}
-      </Modal>
-    </>
-  )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asked, raw, ready, gaps])
 }
