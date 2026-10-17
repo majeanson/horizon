@@ -232,20 +232,9 @@ export function useResultsPage() {
       setParam('v', 'decide')
       setParam('essai', 'save')
     }
-    const go = () => document.getElementById(legacyQ === 'save' ? 'epargner' : 'arreter')?.scrollIntoView({ block: 'start' })
-    go()
-    // The sections above stream in (workers, lazy charts) and would push the target off screen:
-    // hold the anchor while the layout settles, and give the scroll back at the reader's first move.
-    const observer = new ResizeObserver(go)
-    observer.observe(document.body)
-    const release = () => observer.disconnect()
-    const timer = setTimeout(release, 3000)
-    for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(ev, release, { once: true, passive: true })
-    return () => {
-      clearTimeout(timer)
-      release()
-      for (const ev of ['wheel', 'touchstart', 'keydown'] as const) window.removeEventListener(ev, release)
-    }
+    // The same landing as a link between views: wait for the anchor (the view is a lazy chunk), then hold it while the sections above stream in and give the scroll back at the reader's first move.
+    land(legacyQ === 'save' ? 'epargner' : 'arreter')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legacyQ, setParam])
 
   // On a phone the rail may show only its first chips: bring the ones already switched on into view, once. SIDEWAYS

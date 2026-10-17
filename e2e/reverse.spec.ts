@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => seedProfile(page))
 test('an age that does not work names the five changes, each in its own unit, and what waiting buys', async ({ page }) => {
   await page.goto('/resultats?v=decide&essai=target&age=55')
   const fold = page.locator('#viser')
-  await expect(fold).toHaveAttribute('open', '')
+  await expect(fold).toHaveClass(/is-open/)
   const levers = fold.locator('.reverse__levers').first().locator('li')
   await expect(levers).toHaveCount(5, { timeout: 90_000 })
   await expect(fold.getByText('Pour arrêter à 55 ans, il faudrait l’une de ces choses')).toBeVisible()
@@ -36,14 +36,14 @@ test('the age is the one « Combien épargner ? » reads: moving it here moves i
   await page.goto('/resultats?v=decide&essai=target&age=55')
   await expect(page.locator('#viser').getByText('Pour arrêter à 55 ans')).toBeVisible({ timeout: 90_000 })
   await expect(page).toHaveURL(/age=55/)
-  await page.locator('#viser > summary').click() // close it, open the saving
-  await page.locator('#epargner > summary').click()
+  await page.locator('#viser .accordion__toggle').click() // close it, open the saving
+  await page.locator('#epargner .accordion__toggle').click()
   await expect(page.locator('#epargner').getByText(/55/).first()).toBeVisible()
 })
 
 test('in English the fold speaks English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await page.goto('/resultats?v=decide&essai=target&age=55')
-  await expect(page.locator('#viser > summary')).toHaveText('Stop at the age I choose')
+  await expect(page.locator('#viser .accordion__name')).toHaveText('Stop at the age I choose')
   await expect(page.locator('#viser').getByText('To stop at 55, one of these would have to be true')).toBeVisible({ timeout: 90_000 })
 })

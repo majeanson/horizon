@@ -78,27 +78,32 @@ const BUDGETS: Record<string, Budget> = {
   // the 32 / 590 above was measured before the cards had all landed. The counted list is in the failure message if it needs a ratchet back down.
   // 36 → 37 controls, 637 → 642 words (2026-10-17, Phase 16 slice 3): « Les dates de votre plan » — ONE closed fold under the plan's line (its list opens only when asked for): the calendar of every date
   // the profile announces, which the line draws only as stretches. One summary, five words; the list itself is not on the first screen.
-  'Fiche': { controls: 37, words: 642 },
+  // 37 → 38 controls, 642 → 643 words (2026-10-17): « Imprimer… » moved here from the results page (one chip, its list is a closed dialog).
+  'Fiche': { controls: 38, words: 643 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
   // 47 → 43 controls, 695 → 603 words (2026-10-16, the ratchet FALLS): « Préciser le calcul » left the answer for Ma fiche, which already ranked the same figures (the bar, the ranked list and the three « still missing » lines moved there; the answer card keeps its range line and a link to the sheet). The tour is three steps.
   // 43 → 44 controls, 603 → 592 words (2026-10-16): the line saying which year's rates are used folds under « Barèmes utilisés » (one summary, one sentence fewer in view) unless the year is ahead of the rates, when it stays in view as a warning.
-  'Résultats — Réponse': { controls: 44, words: 592 },
+  // 44 → 45 controls, 592 → 557 words (2026-10-17): the two cards under the answer are accordion cards with « Tout ouvrir / Tout fermer » at the end of the map row (+1 icon, the card titles became buttons);
+  // « Imprimer… » left the page, and the glance's three tiles are text, not controls.
+  'Résultats — Réponse': { controls: 45, words: 557 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
   // in its own unit, and what waiting a year buys). One summary, five words; its body mounts only when opened.
   // 49 → 50 controls, 826 → 830 words (2026-10-17, Phase 16 slice 5): « Qui commence en premier » — ONE closed fold inside « Quand commencer mes rentes ? » (a couple only): the two QPP start ages tried
   // together, 3 × 3, scored by the worst case. Four words; the grid mounts only when opened.
-  'Résultats — Décider': { controls: 50, words: 830 },
+  // 50 → 49 controls, 830 → 871 words (2026-10-17): « Imprimer… » and the « Tout montrer » chip are gone, the same icon as every page replaces the chip (+1); the four what-ifs are cards that say in one line what they hold while closed (+41 words).
+  'Résultats — Décider': { controls: 49, words: 871 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
   // for the pending « … » cells, and the final page holds the prudent-gap line with its « Voir la sensibilité » chip.
   // 45 → 44, 1890 → 1893 (2026-10-15): the top bar.
   // 44 → 31, 1893 → 158 (2026-10-16, the ratchet FALLS): the blocks of Preuve are read one at a time; the firm answer is open, the ledger, the table, the accuracy and the parameters are closed titles.
-  'Résultats — Preuve': { controls: 31, words: 158 },
+  // 31 → 30 controls, 158 → 153 words (2026-10-17, the ratchet FALLS): « Imprimer… » left the page.
+  'Résultats — Preuve': { controls: 30, words: 153 },
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]

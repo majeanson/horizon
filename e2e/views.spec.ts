@@ -16,14 +16,14 @@ test('three views; « Décider » holds the levers, then the what-ifs one at a t
   // the ranked changes are on the page; the three what-ifs are folds under them, open one at a time, the choice kept in the address
   await expect(page.locator('#ajuster')).toBeVisible()
   for (const id of ['#viser', '#epargner', '#depenser', '#soins']) await expect(page.locator(id)).toBeVisible() // the fold's own row
-  await expect(page.locator('#epargner > .fold__body')).toBeEmpty() // closed: nothing mounted, nothing computed
+  await expect(page.locator('#epargner-body')).toHaveCount(0) // closed: nothing mounted, nothing computed
   for (const [id, key] of [['#viser', 'target'], ['#epargner', 'save'], ['#depenser', 'spend'], ['#soins', 'care']] as const) {
-    await page.locator(id + ' > summary').click()
-    await expect(page.locator(id + ' > .fold__body')).not.toBeEmpty()
+    await page.locator(id + ' .accordion__toggle').click()
+    await expect(page.locator(id + '-body')).toHaveCount(1)
     await expect(page).toHaveURL(new RegExp('essai=' + key))
-    for (const other of ['#viser', '#epargner', '#depenser', '#soins'].filter((o) => o !== id)) await expect(page.locator(other)).not.toHaveAttribute('open', '')
+    for (const other of ['#viser', '#epargner', '#depenser', '#soins'].filter((o) => o !== id)) await expect(page.locator(other)).toHaveClass(/is-closed/)
   }
-  await page.locator('#soins > summary').click() // close it: « none » is kept too
+  await page.locator('#soins .accordion__toggle').click() // close it: « none » is kept too
   await expect(page).toHaveURL(/essai=none/)
   await expect(page.locator('#solidite')).toHaveCount(0)
   await tabs.getByRole('tab', { name: 'Preuve' }).click()
@@ -45,18 +45,18 @@ test('« Décider »: a link to one of its parts opens that part by itself, and 
   await page.getByRole('button', { name: 'Et si je dépensais moins ?' }).first().click()
   await expect(page).toHaveURL(/v=decide/)
   await expect(page).toHaveURL(/essai=spend/)
-  await expect(page.locator('#depenser')).toHaveAttribute('open', '')
+  await expect(page.locator('#depenser')).toHaveClass(/is-open/)
   await expect(page.locator('#depenser')).toBeInViewport()
   // an address that names a what-if opens it
   await page.goto('/resultats?v=decide&essai=care')
-  await expect(page.locator('#soins')).toHaveAttribute('open', '')
+  await expect(page.locator('#soins')).toHaveClass(/is-open/)
   // the old keys of the three what-ifs open their own, with no `essai`
   await page.goto('/resultats?v=decide&spend=70000')
-  await expect(page.locator('#depenser')).toHaveAttribute('open', '')
+  await expect(page.locator('#depenser')).toHaveClass(/is-open/)
   await page.goto('/resultats?v=decide&age=58')
-  await expect(page.locator('#epargner')).toHaveAttribute('open', '')
+  await expect(page.locator('#epargner')).toHaveClass(/is-open/)
   await page.goto('/resultats?v=decide&care=45000,88,6')
-  await expect(page.locator('#soins')).toHaveAttribute('open', '')
+  await expect(page.locator('#soins')).toHaveClass(/is-open/)
   // the four-view addresses of before land on the view that holds their content
   await page.goto('/resultats?v=adjust')
   await expect(page).toHaveURL(/v=decide/)
@@ -67,7 +67,7 @@ test('« Décider »: a link to one of its parts opens that part by itself, and 
   // an unknown what-if is all closed; an unknown view is the answer
   await page.goto('/resultats?v=decide&essai=nope')
   await expect(page.locator('#ajuster')).toBeVisible()
-  await expect(page.locator('#epargner')).not.toHaveAttribute('open', '')
+  await expect(page.locator('#epargner')).toHaveClass(/is-closed/)
   await page.goto('/resultats?v=nope')
   await expect(page).not.toHaveURL(/v=/)
 })
