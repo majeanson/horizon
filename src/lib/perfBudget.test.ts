@@ -6,6 +6,7 @@ import { EXAMPLES } from '../engine/golden/examples.ts'
 import { project } from '../engine/projection.ts'
 import { earliestEach, retireAt } from '../engine/retireAt.ts'
 import { sensitivityCells } from '../engine/simulate.ts'
+import { IDENTITY, sweep } from '../engine/sweep.ts'
 import { computeAnswer } from './answer.ts'
 
 // TIME BUDGETS. Nothing in the suite noticed when a change made a calculation ten times slower: the heavy questions run in a worker behind the first paint, so a slow one is not a wrong one, only a page
@@ -38,6 +39,7 @@ const BUDGETS: { name: string; measured: number; ceiling: number; run: () => unk
   { name: 'the bridge view: the plan and five ways of starting the pensions', measured: 142, ceiling: 3_000, n: 3, run: () => bridgeView(G.household, G.assumptions, levers) },
   { name: 'what if one of us dies earlier: a sweep of ages and ways', measured: 712, ceiling: 9_000, n: 3, run: () => deathSweep(G.household, G.assumptions, levers) },
   { name: 'the answer of the results page', measured: 170, ceiling: 3_000, n: 3, run: () => computeAnswer({ household: M.household, assumptions: M.assumptions, firstAge: 55, youngest: 60, everyoneRetired: false }) },
+  { name: 'a sweep: the plan and one change, every age from 55 to 70, for a couple', measured: 690, ceiling: 8_000, n: 3, run: () => sweep(G.household, G.assumptions, [IDENTITY, { id: 'spend-less', apply: (h, a) => [{ ...h, spending: { ...h.spending, retiredToday: h.spending.retiredToday * 0.9 } }, a] }], { from: 55, to: 70 }) },
   { name: 'the whole sensitivity grid', measured: 1465, ceiling: 20_000, n: 1, run: () => [...sensitivityCells(M.household, M.assumptions)] },
 ]
 
