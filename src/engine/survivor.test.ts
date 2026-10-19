@@ -16,6 +16,7 @@ const rules: SurvivorRules = {
   ownPensionOffset: P.survivorOwnPensionOffset,
   flatRate45to64: P.survivorFlatRate45to64,
   flatRateUnder45: P.survivorFlatRateUnder45,
+  flatRateAge: P.survivorFlatRateAge,
 }
 const deceased = { base: 900, additionalFirst: 40, additionalSecond: 10 }
 const year = 2026
@@ -28,6 +29,13 @@ describe('the surviving spouse’s pension', () => {
   it('art. 133 — under 65, none of their own: 37,5 % of the base, the additional halves, and the flat-rate portion by age', () => {
     expect(survivorPensionMonthly({ age: 58, deceased, ownBase: null, ownStartAge: 65, year }, rules, rrq)).toBeCloseTo(0.375 * 900 + 25 + P.survivorFlatRate45to64, 2)
     expect(survivorPensionMonthly({ age: 40, deceased, ownBase: null, ownStartAge: 65, year }, rules, rrq)).toBeCloseTo(0.375 * 900 + 25 + P.survivorFlatRateUnder45, 2)
+  })
+
+  it('the flat-rate band turns at the Act’s 45 (art. 133, 2nd para.), read from the rules: 44 is under it, 45 is in it — and another age moves the turn', () => {
+    const at = (age: number, r: SurvivorRules) => survivorPensionMonthly({ age, deceased, ownBase: null, ownStartAge: 65, year }, r, rrq)
+    expect(P.survivorFlatRateAge).toBe(45)
+    expect(at(44, rules) - at(45, rules)).toBeCloseTo(P.survivorFlatRateUnder45 - P.survivorFlatRate45to64, 2)
+    expect(at(47, { ...rules, flatRateAge: 50 })).toBeCloseTo(at(40, rules), 2)
   })
 
   it('art. 136.1 — from 65 with a pension of their own: the greater of 37,5 % and (60 % − 40 % of their own), capped at the maximum less their own', () => {

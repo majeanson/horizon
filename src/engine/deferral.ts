@@ -3,7 +3,7 @@ import { paramsFor } from './params/index.ts'
 import { project } from './projection.ts'
 import { everyoneAt, retireAt } from './retireAt.ts'
 import { ampe5, rrqStart, type YearMonth } from './rrq.ts'
-import { makeRrqRules } from './rrqRules.ts'
+import { makeQppIndexation, makeRrqRules } from './rrqRules.ts'
 import type { Assumptions, Household, PersonId, Scenario, YearRow } from './types.ts'
 
 // « When should I START my pension? » — the same household run once per start age, one lever at a time.
@@ -122,10 +122,11 @@ function monthlyToday(rows: readonly YearRow[], id: PersonId, kind: Kind, deflat
  * the economy, not the choice); for the OAS, by prices. Divided by this, 70 against 65 is the rule's +42 %, not +49 % —
  * and it stays the rule's figure for a person whose 65 is already behind them (the start year, not today, is the base).
  */
-function startLevel(rows: readonly YearRow[], id: PersonId, kind: Kind, a: Assumptions, startYear: number, ampe: (year: number) => number): number {
+function startLevel(rows: readonly YearRow[], id: PersonId, kind: Kind, a: Assumptions, startYear: number, ampe: (year: number) => number, qppIndex: (from: number, to: number) => number): number {
   const full = fullRow(annual(rows, id, kind), startYear)
   if (!full) return 0
-  const atStart = full.amount / 12 / (1 + a.inflation) ** (full.year - startYear)
+  // Back to the start year by the same growth the projection applied: the QPP's observed Januaries (then inflation), the OAS's prices.
+  const atStart = full.amount / 12 / (kind === 'rrq' ? qppIndex(startYear, full.year) : (1 + a.inflation) ** (full.year - startYear))
   return kind === 'rrq' ? atStart / (ampe(startYear) / ampe(a.today.year)) : atStart / (1 + a.inflation) ** (startYear - a.today.year)
 }
 
@@ -164,6 +165,7 @@ export function deferralView(h: Household, a: Assumptions): DeferralView {
   const deflate = inflator(a)
   const rules = makeRrqRules({ inflation: a.inflation, wageGrowth: a.wageGrowth })
   const ampe = (year: number) => ampe5(year, rules)
+  const qppIndex = makeQppIndexation(a.inflation)
   const netWorthAt = (rows: readonly YearRow[], birthYear: number, age: number): number | null => {
     const row = rows.find((r) => r.year === birthYear + age)
     return row ? row.household.netWorthEnd / deflate(row.year) : null
@@ -176,7 +178,7 @@ export function deferralView(h: Household, a: Assumptions): DeferralView {
       const baselineRows = runs.get(65)!
       const baselineStart = startOf(65)
       const baselineMonthly = monthlyToday(baselineRows, p.id, kind, deflate, baselineStart.year)
-      const baselineLevel = startLevel(baselineRows, p.id, kind, a, baselineStart.year, ampe)
+      const baselineLevel = startLevel(baselineRows, p.id, kind, a, baselineStart.year, ampe, qppIndex)
       const baselineCum = cumulative(baselineRows, p.id, kind, deflate, missedPayments(baselineStart, baselineMonthly, a.today))
       return ages.map((age) => {
         const rows = runs.get(age)!
@@ -188,7 +190,7 @@ export function deferralView(h: Household, a: Assumptions): DeferralView {
           age,
           monthly,
           change: baselineMonthly > 0 ? monthly / baselineMonthly - 1 : 0,
-          versus65: baselineLevel > 0 ? startLevel(rows, p.id, kind, a, start.year, ampe) / baselineLevel - 1 : 0,
+          versus65: baselineLevel > 0 ? startLevel(rows, p.id, kind, a, start.year, ampe, qppIndex) / baselineLevel - 1 : 0,
           breakEven: breakEven(cumulative(rows, p.id, kind, deflate, missedPayments(start, monthly, a.today)), baselineCum, age, p.birth.year),
           passed: start.year < a.today.year,
           plan: { ok: !bad, firstShortfallYear: bad ? bad.year : null, netWorth85: netWorthAt(rows, p.birth.year, 85), netWorth95: netWorthAt(rows, p.birth.year, 95), earliestOk: earliest },

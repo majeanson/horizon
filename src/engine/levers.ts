@@ -1,4 +1,5 @@
 import { everyoneAt, retireAt, runScenario } from './retireAt.ts'
+import { canStartAt, type PensionKind } from './startChoice.ts'
 import type { Assumptions, Household } from './types.ts'
 
 // « WHAT MOVES THE ANSWER MOST? » — a handful of changes a household could actually make, each tried on its own against the plan as it
@@ -27,9 +28,18 @@ const CHANGES: Record<LeverId, Change> = {
   },
   // One point more a year on every account.
   returns1: (h, a) => [h, { ...a, returns: { nonReg: a.returns.nonReg + 0.01, rrsp: a.returns.rrsp + 0.01, tfsa: a.returns.tfsa + 0.01 } }],
-  // Take the QPP and the OAS at 70 instead of when they were set.
-  pensions70: (h, a) => [{ ...h, persons: h.persons.map((p) => ({ ...p, rrq: { ...p.rrq, startAge: 70 }, oas: { ...p.oas, startAge: 70 } })) }, a],
+  // Take the QPP and the OAS at 70 instead of when they were set — each pension that can still be moved there (startChoice.ts): one already
+  // paid since an earlier year, or whose 70th birthday is behind, is left as it is, never re-run as if the past could be chosen again.
+  pensions70: (h, a) => [{ ...h, persons: h.persons.map((p) => ({ ...p, rrq: { ...p.rrq, startAge: at70(p, 'rrq', a) }, oas: { ...p.oas, startAge: at70(p, 'oas', a) } })) }, a],
 }
+
+const AT = 70
+/** The start age the « at 70 » lever gives one pension: 70 when that is still a choice, the person's own age otherwise. */
+const at70 = (p: Household['persons'][number], kind: PensionKind, a: Assumptions): number => (canStartAt(kind, p.birth, p[kind].startAge, AT, a.today) ? AT : p[kind].startAge)
+
+/** A lever that would change nothing for this household (every pension already at 70, or none that can still move) is not offered at all. */
+const applies = (id: LeverId, h: Household, a: Assumptions): boolean =>
+  id !== 'pensions70' || h.persons.some((p) => (['rrq', 'oas'] as const).some((k) => at70(p, k, a) !== p[k].startAge))
 
 export interface LeverResult {
   id: LeverId
@@ -44,7 +54,10 @@ export interface LeverResult {
   endGain: number | null
 }
 
-/** The earliest age as the plan stands, and each lever's, best first (a lever that finds an age where there was none counts as the best). */
+/**
+ * The earliest age as the plan stands, and each lever's, best first (a lever that finds an age where there was none counts as the best). A
+ * lever that cannot change anything for this household is left out (« at 70 » for pensions all already paid or already at 70).
+ */
 export function leverRanking(h: Household, a: Assumptions): { base: number | null; levers: LeverResult[] } {
   const earliest = (hh: Household, aa: Assumptions) => retireAt(hh, aa, { stopAtFirstOk: true }).earliestOk
   const base = earliest(h, a)
@@ -56,7 +69,7 @@ export function leverRanking(h: Household, a: Assumptions): { base: number | nul
     return r.netWorthAtHorizon / (1 + aa.inflation) ** (last.year - aa.today.year)
   }
   const baseWorth = endWorth(h, a)
-  const levers = LEVER_IDS.map((id): LeverResult => {
+  const levers = LEVER_IDS.filter((id) => applies(id, h, a)).map((id): LeverResult => {
     const [hh, aa] = CHANGES[id](h, a)
     const e = earliest(hh, aa)
     const w = endWorth(hh, aa)

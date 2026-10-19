@@ -174,4 +174,12 @@ describe('the sturdiest way to start', () => {
     const none = matrixOf({ standard: held(false, false, false), max: held(false, false, false) })
     expect(sturdiest([row('standard', 100), row('max', 300)] as never, none)).toBeNull()
   })
+  it('a way no longer open to the person is never crowned, however well it holds: the next open one is', () => {
+    const all = matrixOf({ standard: held(true, true, true), max: held(true, true, true), asap: held(true, true, true) })
+    const asapPassed = { ...(row('asap', 900) as object), passed: true } as never
+    expect(sturdiest([row('standard', 100), row('max', 300), asapPassed] as never, all)?.key).toBe('max')
+    // with only one open way left there is nothing to compare: no crown
+    const maxPassed = { ...(row('max', 300) as object), passed: true } as never
+    expect(sturdiest([row('standard', 100), maxPassed, asapPassed] as never, all)).toBeNull()
+  })
 })

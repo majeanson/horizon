@@ -311,15 +311,28 @@ describe('the household — splitting, recovery, deductions', () => {
   })
 
   it('the transferor must be 65 or over (Québec\'s rule, applied to both returns): a 64-year-old cannot split', () => {
-    expect(splittablePension(person({ age: 64, db: 50_000 }))).toBe(0)
-    expect(splittablePension(person({ age: 65, db: 50_000, registered: 10_000 }))).toBe(60_000)
+    expect(splittablePension(person({ age: 64, db: 50_000 }), RULES)).toBe(0)
+    expect(splittablePension(person({ age: 65, db: 50_000, registered: 10_000 }), RULES)).toBe(60_000)
     const a = person({ age: 64, db: 90_000 })
     const b = person({ age: 60 })
     expect(householdTax([a, b], RULES, { splitting: true }).split).toEqual({ from: null, amount: 0 })
   })
 
+  it('the age and the 50 % are the cited rules’, not the code’s: another age or share moves them (law 2)', () => {
+    expect(RULES.quebec.splitMinAge).toBe(65)
+    expect(Math.min(RULES.federal.splitMaxShare, RULES.quebec.splitMaxShare)).toBe(0.5)
+    const at65 = person({ age: 65, db: 50_000 })
+    expect(splittablePension(at65, { ...RULES, quebec: { ...RULES.quebec, splitMinAge: 66 } })).toBe(0)
+    // A pensioner with a spouse who has nothing: the best split is the most the law allows — 50 %, or 25 % under a rule that says 25 %.
+    const rich = person({ age: 70, db: 120_000 })
+    const none = person({ age: 70 })
+    expect(householdTax([rich, none], RULES, { splitting: true }).split.amount).toBeCloseTo(60_000, 0)
+    const quarter: TaxRules = { ...RULES, quebec: { ...RULES.quebec, splitMaxShare: 0.25 } }
+    expect(householdTax([rich, none], quarter, { splitting: true }).split.amount).toBeCloseTo(30_000, 0)
+  })
+
   it('never splits the RRQ or the OAS (they are not eligible pension income)', () => {
-    expect(splittablePension(person({ age: 70, rrq: 15_000, oas: 8_000 }))).toBe(0)
+    expect(splittablePension(person({ age: 70, rrq: 15_000, oas: 8_000 }), RULES)).toBe(0)
   })
 
   it('split RRIF income earns the federal pension amount only for a recipient who is 65 or over (line 31400)', () => {

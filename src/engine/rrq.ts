@@ -53,6 +53,10 @@ export interface RrqRules {
    * `childRearingMonths`). Absent: 0, so only a year with no earnings at all qualifies.
    */
   exemption?: number
+  /** The basic exemption of a given year (600 $ in 1966 … 3 500 $ since 1996). Absent: `exemption` for every year. */
+  exemptionOf?: (year: number) => number
+  /** The BASE contribution rate of a given year, the employee's share (1,8 % in 1966 … 5,3 % in 2026). Absent: the death benefit's 500 $ test is not run. */
+  baseContributionRateOf?: (year: number) => number
   /** 0.0833 — the first additional component's replacement rate. */
   firstRate: number
   /** 0.3333 — the second additional component's replacement rate. */
@@ -134,8 +138,12 @@ export interface RrqPension {
   start: YearMonth
 }
 
-const monthIndex = (ym: YearMonth): number => ym.year * 12 + (ym.month - 1)
-const fromIndex = (i: number): YearMonth => ({ year: Math.floor(i / 12), month: (i % 12) + 1 })
+/** A month as one number (year × 12 + month − 1), so months compare and count by subtraction. The ONE convention every pension's timing uses. */
+export const monthIndex = (ym: YearMonth): number => ym.year * 12 + (ym.month - 1)
+/** The month a `monthIndex` stands for. */
+export const fromIndex = (i: number): YearMonth => ({ year: Math.floor(i / 12), month: (i % 12) + 1 })
+/** The month after the birthday month of `age`: when a pension that starts at that age is first paid (the QPP, the OAS, the Allowance). */
+export const monthAfterBirthday = (birth: YearMonth, age: number): YearMonth => fromIndex(monthIndex({ year: birth.year + age, month: birth.month }) + 1)
 
 /** The average ceiling of the five years ending with `year`. Retraite Québec does not publish a table of it; it publishes the method. */
 export function ampe5(year: number, rules: RrqRules): number {
@@ -160,6 +168,9 @@ interface MonthBlock {
   perMonth: number
   months: number
 }
+
+/** The basic exemption of `year`: its own when the rules know the years apart, else the one figure. */
+const exemptionIn = (year: number, rules: RrqRules): number => rules.exemptionOf?.(year) ?? rules.exemption ?? 0
 
 /** The sum of the best `limit` months among blocks of equal-valued months. */
 function bestMonthsSum(blocks: MonthBlock[], limit: number): number {
@@ -191,7 +202,7 @@ interface BaseResult {
 }
 
 /** The first month of the reference period: the month after the 18th birthday. */
-const careerStartIndex = (input: RrqPensionInput, rules: RrqRules): number => {
+const careerStartIndex = (input: { birth: YearMonth }, rules: RrqRules): number => {
   const eighteenth = monthIndex({ year: input.birth.year + rules.careerStartAge, month: input.birth.month }) + 1
   return rules.planStartYear === undefined ? eighteenth : Math.max(eighteenth, monthIndex({ year: rules.planStartYear, month: 1 }))
 }
@@ -210,7 +221,7 @@ function basePension(input: RrqPensionInput, rules: RrqRules, startIdx: number, 
     .map(({ year, months }) => {
       const mga = rules.mga(year)
       const earned = input.earnings[year] ?? 0
-      const out = earned <= (rules.exemption ?? 0) ? Math.min(months, input.childRearingMonths?.[year] ?? 0) : 0
+      const out = earned <= exemptionIn(year, rules) ? Math.min(months, input.childRearingMonths?.[year] ?? 0) : 0
       const kept = months - out
       const capped = Math.min(earned, (mga * months) / 12)
       const adjusted = (capped * ampe) / mga
@@ -290,7 +301,7 @@ export function adjustmentFactor(startAge: number, basePension: number, maxBase:
 
 /** The month the pension is first paid: the month after the birthday month of `startAge`. */
 export function rrqStart(birth: YearMonth, startAge: number): YearMonth {
-  return fromIndex(monthIndex({ year: birth.year + startAge, month: birth.month }) + 1)
+  return monthAfterBirthday(birth, startAge)
 }
 
 export function rrqPension(input: RrqPensionInput, rules: RrqRules): RrqPension {
@@ -332,6 +343,77 @@ export function rrqPension(input: RrqPensionInput, rules: RrqRules): RrqPension 
     maxBase,
     start,
   }
+}
+
+// ── Who a death leaves benefits to ────────────────────────────────────────────
+
+/** The thresholds of art. 107 of the Act, read from the cited params. */
+export interface QualifyingRules {
+  /** 1/3 — the share of the years of the base contributory period that must carry base contributions… */
+  share: number
+  /** 3 — …and never fewer than this many years. */
+  minYears: number
+  /** 10 — or this many years, whatever the length of the period. */
+  years: number
+  /** 500 $ — the death benefit's other way in: this much in base contributions, with no pension ever payable. */
+  minContributions: number
+}
+
+export interface DeathQualificationInput {
+  birth: YearMonth
+  earnings: Readonly<Record<number, number>>
+  childRearingMonths?: Readonly<Record<number, number>>
+  /** The month of death. */
+  death: YearMonth
+  /** The month the person's own retirement pension was first paid, or null when none was payable before the death. */
+  pensionStart: YearMonth | null
+}
+
+export interface DeathQualification {
+  /** The years wholly or partly in the base contributory period. */
+  periodYears: number
+  /** Of those, the years that carry base contributions: earnings above the year's exemption (pro-rated by the months of a partial year). */
+  contributedYears: number
+  /** The base contributions those earnings carried, each year at its own rate (the employee's share). */
+  baseContributions: number
+  /** Qualified for the surviving spouse's pension (art. 107, first paragraph) — and so for the death benefit too. */
+  survivor: boolean
+  /** Qualified for the death benefit: as for the survivor's pension, or by the last paragraph's 500 $ of base contributions. */
+  deathBenefit: boolean
+}
+
+/**
+ * Art. 107 of the Act: a contributor's death gives a surviving spouse's pension and a death benefit only if they made base contributions for
+ * at least a third of the years « comprises entièrement ou partiellement dans sa période cotisable de base » and for at least three, or for at
+ * least ten years whatever the period; for the death benefit alone, 500 $ of base contributions also do when no retirement pension was ever
+ * payable (a death after 2012). The base contributory period is art. 101's: from the 18th birthday (and never before 1966) to the earliest of
+ * the month before the retirement pension, the month before the 72nd birthday and the month of death, without the child-rearing months of a
+ * year at or under the exemption (the same months basePension takes out). NOT modelled: the third way in (a disability tax credit with a
+ * quarter of the years), as no disability is modelled anywhere.
+ */
+export function deathQualification(input: DeathQualificationInput, rules: RrqRules, q: QualifyingRules): DeathQualification {
+  const start = careerStartIndex(input, rules)
+  const ends = [monthIndex(input.death), monthIndex({ year: input.birth.year + rules.careerMaxAge, month: input.birth.month }) - 1]
+  if (input.pensionStart !== null) ends.push(monthIndex(input.pensionStart) - 1)
+  const end = Math.min(...ends)
+  let periodYears = 0
+  let contributedYears = 0
+  let baseContributions = 0
+  if (end >= start) {
+    for (const { year, months } of monthsByYear(start, end)) {
+      const earned = input.earnings[year] ?? 0
+      const exemption = (exemptionIn(year, rules) * months) / 12
+      const out = earned <= exemptionIn(year, rules) ? Math.min(months, input.childRearingMonths?.[year] ?? 0) : 0
+      if (months - out <= 0) continue
+      periodYears++
+      const band = Math.max(0, Math.min(earned, (rules.mga(year) * months) / 12) - exemption)
+      if (band > 0) contributedYears++
+      baseContributions += band * (rules.baseContributionRateOf?.(year) ?? 0)
+    }
+  }
+  const survivor = contributedYears >= q.years || (contributedYears >= q.minYears && contributedYears >= q.share * periodYears - 1e-9)
+  const byAmount = rules.baseContributionRateOf !== undefined && input.pensionStart === null && baseContributions >= q.minContributions
+  return { periodYears, contributedYears, baseContributions: roundTo(baseContributions, 0.01), survivor, deathBenefit: survivor || byAmount }
 }
 
 // ── Contributions ─────────────────────────────────────────────────────────────

@@ -181,8 +181,21 @@ describe('the cited parameters build EXACTLY the rules this file wrote by hand',
 
   it('every constant matches', () => {
     const { mga: _m, yampe: _y, ...rest } = RULES
-    const { mga: _bm, yampe: _by, ...builtRest } = built
+    const { mga: _bm, yampe: _by, exemptionOf: _e, baseContributionRateOf: _r, ...builtRest } = built
     expect(builtRest).toEqual(rest)
+  })
+
+  it('the year functions read the printed history: the exemption of each year, and the BASE rate (the printed one less the first additional plan from 2019)', () => {
+    // « Pensionable earnings and contributions »: 600 $ and 1,8 % in 1966; 3 500 $ and 4,95 % in 2010; 5,55 % printed in 2019 = 5,4 % base + 0,15 % first additional.
+    expect(built.exemptionOf!(1966)).toBe(600)
+    expect(built.exemptionOf!(1995)).toBe(3_400)
+    expect(built.exemptionOf!(2010)).toBe(3_500)
+    expect(built.exemptionOf!(2040)).toBe(3_500)
+    expect(built.baseContributionRateOf!(1966)).toBeCloseTo(0.018, 10)
+    expect(built.baseContributionRateOf!(2010)).toBeCloseTo(0.0495, 10)
+    for (const y of [2019, 2020, 2021, 2022, 2023, 2024, 2025]) expect(built.baseContributionRateOf!(y), String(y)).toBeCloseTo(0.054, 10)
+    expect(built.baseContributionRateOf!(2026)).toBeCloseTo(0.053, 10)
+    expect(built.baseContributionRateOf!(2035)).toBeCloseTo(0.053, 10)
   })
 
   it('every historical ceiling matches, and a future year is projected from 2026, not invented', () => {

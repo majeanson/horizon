@@ -1155,6 +1155,16 @@
 .bridge-card--short {
   border-top-color: var(--warn);
 }
+/* A road already behind the person (an age passed, a pension already paid): still shown for comparison, quietly. */
+.bridge-card--passed {
+  border-top-style: dashed;
+}
+.bridge-card__passed {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
 .bridge-card__line,
 .bridge-card__verdict {
   margin: 0;

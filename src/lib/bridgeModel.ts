@@ -121,9 +121,11 @@ interface Sturdiest {
  * scenarios, then the one that leaves the most at the end of the plan (the 95-year figure the card prints; the lowest nest of the
  * bridge years when the plan ends before it), then the standard way, then the person's own. It is a sturdiness, not a payout: a way
  * that leaves more at 95 has not paid more over a life (the card's « encaissé » says that). null when nothing sets one apart — every
- * way equal under every scenario and in what it leaves — or while the scenarios are still being worked out.
+ * way equal under every scenario and in what it leaves — or while the scenarios are still being worked out. A way no longer open to the
+ * person (`passed`: an age behind them, or a pension already paid) is never crowned, whatever its figures: it is not a way to start.
  */
-export function sturdiest(strategies: readonly { key: StrategyKey; summary: BridgeSummary }[], matrix: Record<StrategyKey, Record<'prudent' | 'neutral' | 'bold', { ok: boolean }>> | null): Sturdiest | null {
+export function sturdiest(all: readonly { key: StrategyKey; summary: BridgeSummary; passed?: boolean }[], matrix: Record<StrategyKey, Record<'prudent' | 'neutral' | 'bold', { ok: boolean }>> | null): Sturdiest | null {
+  const strategies = all.filter((s) => !s.passed)
   if (matrix === null || strategies.length < 2) return null
   const left = (s: BridgeSummary): number => s.netWorth95 ?? s.lowestNest?.amount ?? -1e15
   const holds = (k: StrategyKey): number => HELD_UNDER.filter((p) => matrix[k]?.[p]?.ok).length

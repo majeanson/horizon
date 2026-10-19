@@ -3,8 +3,9 @@
 // — so a household with a high income gets little of either back, and the screens say so.
 //
 // Conventions, stated because the official pages state them by month and a year of the plan is whole:
-//   · a child is « under 6 » in the years `year − born ≤ 5` and « 6 to 17 » while `year − born ≤ 17`; from the year they turn 18 they are no longer counted. The
-//     benefits stop the month of the 18th birthday, so a year-level rule slightly overstates the last year (by under a year's payment, once per child).
+//   · a child is « under 6 » in the years `year − born < 6` and « 6 to 17 » while `year − born < 18`; from the year they turn 18 they are no longer counted. The
+//     benefits stop the month of the 18th birthday, so a year-level rule slightly overstates the last year (by under a year's payment, once per child). The
+//     ages are the pages' own (`ccb.youngUnderAge`, `ccb.untilAge`, `familyAllowance.untilAge`), never typed here.
 //   · the income they read is last year's (the payments of July Y to June Y+1 follow the return for Y−1): the projection supplies it, this file only reads it.
 // Not modelled: the child disability benefit and supplement, shared custody, the Québec school-supplies supplement.
 
@@ -18,14 +19,20 @@ export interface BenefitKids {
   from6: number
 }
 
-/** The children a family is paid for in `year`, from their birth years: those not yet born and those of 18 or more count for nothing. */
-export function eligibleKids(births: readonly number[], year: number): BenefitKids {
+/** The ages that sort a child: the younger band is paid before `youngUnder`, nothing is paid from `until`. */
+export interface BenefitAges {
+  youngUnder: number
+  until: number
+}
+
+/** The children a family is paid for in `year`, from their birth years: those not yet born and those of `until` or more count for nothing. */
+export function eligibleKids(births: readonly number[], year: number, ages: BenefitAges): BenefitKids {
   let under6 = 0
   let from6 = 0
   for (const born of births) {
     const age = year - born
-    if (age < 0 || age > 17) continue
-    if (age <= 5) under6++
+    if (age < 0 || age >= ages.until) continue
+    if (age < ages.youngUnder) under6++
     else from6++
   }
   return { under6, from6 }
@@ -100,8 +107,10 @@ export function ccbRulesOf(c: PlainYear['childBenefits']['ccb']): CcbRules {
  */
 export function childBenefitsFor(h: Household, year: number, lastYearIncome: number, single: boolean, P: PlainYear['childBenefits']): number {
   if (!h.kidsEffects?.benefits) return 0
-  const kids = eligibleKids(h.children ?? [], year)
-  const n = kids.under6 + kids.from6
-  if (n === 0) return 0
+  const births = h.children ?? []
+  // Each benefit counts the children by its own page's ages (both stop at 18 today; they are read apart so that neither is assumed to be the other).
+  const kids = eligibleKids(births, year, { youngUnder: P.ccb.youngUnderAge, until: P.ccb.untilAge })
+  const n = births.filter((born) => year - born >= 0 && year - born < P.familyAllowance.untilAge).length
+  if (kids.under6 + kids.from6 + n === 0) return 0
   return Math.round((canadaChildBenefit(lastYearIncome, kids, ccbRulesOf(P.ccb)) + familyAllowance(lastYearIncome, single, n, P.familyAllowance)) * 100) / 100
 }

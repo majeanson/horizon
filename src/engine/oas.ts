@@ -1,7 +1,7 @@
 import { roundTo } from './params/project.ts'
 import type { Plain } from './params/cited.ts'
 import type { YearParams } from './params/types.ts'
-import type { YearMonth } from './rrq.ts'
+import { monthAfterBirthday, monthIndex, type YearMonth } from './rrq.ts'
 
 // Old Age Security (OAS) and the Guaranteed Income Supplement (GIS) — Service Canada.
 //
@@ -36,12 +36,9 @@ export interface OasPerson {
   residentSince: number
 }
 
-const monthIndex = (ym: YearMonth): number => ym.year * 12 + (ym.month - 1)
-
-/** The month the pension is first paid: the month after the birthday month of `startAge`. */
+/** The month the pension is first paid: the month after the birthday month of `startAge` (the same rule as the QPP's, rrq.ts). */
 export function oasStart(birth: YearMonth, startAge: number): YearMonth {
-  const i = monthIndex({ year: birth.year + startAge, month: birth.month }) + 1
-  return { year: Math.floor(i / 12), month: (i % 12) + 1 }
+  return monthAfterBirthday(birth, startAge)
 }
 
 /**
@@ -79,7 +76,7 @@ export interface OasYear {
 export function oasYear(year: number, person: OasPerson, rules: OasRules): OasYear {
   const start = oasStart(person.birth, person.startAge)
   const startIdx = monthIndex(start)
-  const idx75 = monthIndex({ year: person.birth.year + 75, month: person.birth.month }) + 1
+  const idx75 = monthIndex(monthAfterBirthday(person.birth, 75))
   const fraction = residenceFraction(person, start.year, rules)
   // Under the residence minimum there is no pension, so no month is « paid » — and the GIS, which
   // needs a pension in pay, must not be reached through `months`.
@@ -88,7 +85,7 @@ export function oasYear(year: number, person: OasPerson, rules: OasRules): OasYe
   let months = 0
   let total = 0
   for (let m = 0; m < 12; m++) {
-    const idx = year * 12 + m
+    const idx = monthIndex({ year, month: m + 1 })
     if (idx < startIdx) continue
     months++
     total += idx >= idx75 ? base * (1 + rules.increaseAt75) : base

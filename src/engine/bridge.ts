@@ -3,6 +3,7 @@ import { oasStart } from './oas.ts'
 import { paramsFor } from './params/index.ts'
 import { project } from './projection.ts'
 import { rrqStart } from './rrq.ts'
+import { canStartAt } from './startChoice.ts'
 import type { AccountKind, Assumptions, Household, PersonId, Scenario, YearRow } from './types.ts'
 
 // « Mes années 60 à 70 » — the bridge years, one year at a time.
@@ -126,6 +127,12 @@ export interface StrategyCard {
   breakEven: number | null
   /** Which of the two `breakEven` is: « later » (the strategy catches up with the standard) or « earlier » (the standard overtakes the strategy). null with `breakEven`. */
   breakEvenKind: 'later' | 'earlier' | null
+  /**
+   * True when a start age this strategy sets can no longer be chosen by someone it moves (startChoice.ts): the age is behind them, or the
+   * pension it would move has been paid since an earlier year. The card's figures are still worked out (the grid keeps its shape), but it is
+   * a road no longer open — the page shows it greyed, never as a plan to follow. Always false for the household's own ages (`mine`).
+   */
+  passed: boolean
 }
 
 /** The cited rates the copy quotes, so it never types them. */
@@ -315,6 +322,12 @@ export function breakEvenOf(option: ReadonlyMap<number, number>, baseline: Reado
   return null
 }
 
+/** Whether the start ages these levers set are still open to everyone they move (the person looked at, and with `both` everyone else). */
+function leversPassed(h: Household, a: Assumptions, l: BridgeLevers): boolean {
+  const moved = l.both ? h.persons : h.persons.filter((p) => p.id === l.id)
+  return moved.some((p) => !canStartAt('rrq', p.birth, p.rrq.startAge, l.rrqStartAge, a.today) || !canStartAt('oas', p.birth, p.oas.startAge, l.oasStartAge, a.today))
+}
+
 const sameLevers = (x: BridgeLevers, y: BridgeLevers) => x.retirementAge === y.retirementAge && x.rrqStartAge === y.rrqStartAge && x.oasStartAge === y.oasStartAge && !!x.both === !!y.both
 
 /**
@@ -340,6 +353,7 @@ export function bridgeView(h: Household, a: Assumptions, levers: BridgeLevers, w
       extraDrawn6070: run.summary.drawn6070 - base.run.summary.drawn6070,
       breakEven: broke?.age ?? null,
       breakEvenKind: broke?.kind ?? null,
+      passed: leversPassed(h, a, l),
     }
   })
 

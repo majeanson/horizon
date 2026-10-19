@@ -78,6 +78,17 @@ export interface YearParams {
     survivorOwnPensionOffset: Cited
     survivorFlatRate45to64: Cited
     survivorFlatRateUnder45: Cited
+    /** The survivor's age from which the 45–64 flat rate applies instead of the under-45 one (art. 133, 2nd para.). */
+    survivorFlatRateAge: Cited
+    /**
+     * Who is « qualified » for the surviving spouse's pension and the death benefit (art. 107): base contributions for at least this share of
+     * the years in the base contributory period AND at least `survivorQualifyingMinYears` of them — or for at least `survivorQualifyingYears`.
+     */
+    survivorQualifyingShare: Cited
+    survivorQualifyingMinYears: Cited
+    survivorQualifyingYears: Cited
+    /** The death benefit's own second way in (art. 107, last para., deaths after 2012): base contributions of at least this much, with no pension ever payable. */
+    deathBenefitMinContributions: Cited
     /** CHECK FIGURES, never inputs: the published maximum monthly surviving spouse's pension, 45–64 and 65+. */
     survivorMaxUnder65: Cited
     survivorMax65: Cited
@@ -109,6 +120,10 @@ export interface YearParams {
     /** The Allowance (the 60–64 spouse of a GIS recipient): its maximum monthly amount and its combined-income cut-off, at the quarter read. */
     allowanceMax: Cited
     allowanceCutoff: Cited
+    /** The Allowance and the Allowance for the Survivor are paid from the month after this birthday (60)… */
+    allowanceFromAge: Cited
+    /** …through the month of this one (65), when the OAS pension takes over. */
+    allowanceUntilAge: Cited
     /**
      * The shape of the Allowance and of the pensioner's GIS while the spouse receives it: breakpoints of Table 4 (combined annual
      * income → monthly dollars) at the quarter read. In another year both axes scale with `allowanceMax` (prices).
@@ -241,8 +256,14 @@ export interface YearParams {
       topFixedTwo: Cited
       topFixedThree: Cited
       topFixedFourPlus: Cited
+      /** A child is paid the « under 6 » amount before this age, the other one after it… */
+      youngUnderAge: Cited
+      /** …and nothing from this age on. */
+      untilAge: Cited
     }
     familyAllowance: {
+      /** A child counts until this age (« a dependent child under age 18 »). */
+      untilAge: Cited
       max: Cited
       min: Cited
       /** A single-parent family's addition, paid once whatever the number of children: at the maximum and at the minimum. */

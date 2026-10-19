@@ -1,5 +1,5 @@
 import { project } from './projection.ts'
-import { rrqStart } from './rrq.ts'
+import { canStartAt } from './startChoice.ts'
 import type { Assumptions, Household } from './types.ts'
 
 // « WHO SHOULD START THE QPP FIRST? » — a couple's two start ages tried together, 3 × 3, each combination held to the SAME plain test as everything else.
@@ -25,8 +25,9 @@ export interface TimingCell {
   /** The smallest of the three (the score). */
   worst: number
   /**
-   * Every person's start date is still ahead (this year or later — the same test as `StartOption.passed` in deferral.ts). A start age already behind a person
-   * can no longer be chosen: the cell is still run (the grid keeps its shape) but never offered as `best`.
+   * Every person can still take the start age (startChoice.ts `canStartAt`): it is their own, or it is still ahead (this year or later — the same year test as
+   * `StartOption.passed` in deferral.ts) and so is the start they have now. A start age already behind a person, or a move of a pension already paid since an
+   * earlier year, can no longer be chosen: the cell is still run (the grid keeps its shape) but never offered as `best`.
    */
   feasible: boolean
 }
@@ -60,7 +61,8 @@ export function timingCell(h: Household, a: Assumptions, starts: [number, number
   const first = run(set, a, { index: 0, age: dieAt(0) })
   const second = run(set, a, { index: 1, age: dieAt(1) })
   const endWorth = { bothAlive: both.endWorth, firstDies: first.endWorth, secondDies: second.endWorth }
-  const feasible = set.persons.every((p, i) => i >= 2 || rrqStart(p.birth, starts[i]).year >= a.today.year)
+  // Open only if each spouse can still take that age (startChoice.ts): not behind them, and not a move of a pension paid since an earlier year.
+  const feasible = h.persons.every((p, i) => i >= 2 || canStartAt('rrq', p.birth, p.rrq.startAge, starts[i], a.today))
   return { starts, ok: both.ok && first.ok && second.ok, endWorth, worst: Math.min(endWorth.bothAlive, endWorth.firstDies, endWorth.secondDies), feasible }
 }
 

@@ -16,6 +16,7 @@ const rules: SurvivorRules = {
   ownPensionOffset: P.survivorOwnPensionOffset,
   flatRate45to64: P.survivorFlatRate45to64,
   flatRateUnder45: P.survivorFlatRateUnder45,
+  flatRateAge: P.survivorFlatRateAge,
 }
 const deceased = { base: 900, additionalFirst: 40, additionalSecond: 10 } // 900 base, 25 of additional after the 50 % share
 const year = 2026

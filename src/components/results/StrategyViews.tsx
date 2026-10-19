@@ -125,12 +125,13 @@ function Cards({ shown, standard, pressed, copy, onPick, horizonAge, who, matrix
           const extra = s.extraDrawn6070
           const isOpen = open.has(s.key)
           return (
-            <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short')}>
+            <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short') + (s.passed ? ' bridge-card--passed' : '')}>
               {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
               <Chip radio selected={pressed.includes(s.key)} concept={STRATEGY_CONCEPT[s.key]} onClick={() => onPick(s.key)}>
                 {label(s)}
               </Chip>
               <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>
+              {s.passed && <p className="bridge-card__passed">{copy.passedNote}</p>}
               <div className="bridge-card__glance">
                 <span>
                   <span className="bridge-card__glance-label">{copy.worth95}</span>
@@ -216,7 +217,10 @@ function WideTable({ shown, standard, pressed, copy, onPick, matrix, bestKey, la
           <tr>
             <th scope="row">{copy.rowWhat}</th>
             {shown.map((s) => (
-              <td key={s.key}>{copy.strategyLine[s.key]}</td>
+              <td key={s.key}>
+                {copy.strategyLine[s.key]}
+                {s.passed && <p className="bridge-card__passed">{copy.passedNote}</p>}
+              </td>
             ))}
           </tr>
           {SCENARIOS.map((p, i) => (
@@ -303,6 +307,7 @@ function NarrowTable({ shown, pressed, copy, onPick, matrix, bestKey, label, mon
                   {label(s)}
                 </Chip>
                 <Dots k={s.key} matrix={matrix} copy={copy} />
+                {s.passed && <p className="bridge-card__passed">{copy.passedNote}</p>}
               </th>
               <td className={'mono' + (worthBest !== null && s.summary.netWorth95 === worthBest ? ' is-best' : '')}>{money(s.summary.netWorth95)}</td>
               <td className={'mono' + (nestBest !== null && s.summary.lowestNest?.amount === nestBest ? ' is-best' : '')}>{s.summary.lowestNest ? formatMoney(s.summary.lowestNest.amount, lang) : copy.noWorth}</td>

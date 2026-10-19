@@ -1,7 +1,7 @@
-import { paramsFor, knownYear, LAST_KNOWN_YEAR } from './params/index.ts'
+import { paramsFor, knownYear, LAST_KNOWN_YEAR, type PlainYear } from './params/index.ts'
 import type { Indexation } from './params/project.ts'
-import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './params/rrqHistory.ts'
-import type { RrqContributionRules, RrqRules } from './rrq.ts'
+import { RRQ_CONTRIBUTION_RATE_HISTORY, RRQ_EXEMPTION_HISTORY, RRQ_INDEXATION_HISTORY, RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './params/rrqHistory.ts'
+import { rrqContribution, type RrqContribution, type RrqContributionRules, type RrqRules } from './rrq.ts'
 
 // Builds the RRQ calculation's rules from the cited parameters. This is the seam between the data
 // (src/engine/params/) and the formulas (src/engine/rrq.ts): rrq.ts knows no figure, and the
@@ -35,6 +35,14 @@ export function makeRrqRules(indexation: Indexation): RrqRules {
     yampeCache.set(year, v)
     return v
   }
+  // The exemption and the base rate of a past year are the history tables'; a later year's are the last known year's (both are `fixed`).
+  const exemptionOf = (year: number): number => RRQ_EXEMPTION_HISTORY.value[Math.max(year, planStart)] ?? k.exemption
+  const baseContributionRateOf = (year: number): number => {
+    const printed = RRQ_CONTRIBUTION_RATE_HISTORY.value[Math.max(year, planStart)]
+    if (printed === undefined || year >= LAST_KNOWN_YEAR) return k.rateBase
+    // From 2019 the printed rate is the base rate AND the first additional one, the latter at the year's phase-in (the page's note 1).
+    return year < k.firstFrom ? printed : printed - k.rateFirst * (k.phaseIn[year] ?? 1)
+  }
 
   return {
     mga,
@@ -43,7 +51,9 @@ export function makeRrqRules(indexation: Indexation): RrqRules {
     planStartYear: planStart,
     baseRate: k.baseReplacement,
     excludedShare: k.excludedShare,
-    exemption: knownYear(LAST_KNOWN_YEAR).rrq.exemption,
+    exemption: k.exemption,
+    exemptionOf,
+    baseContributionRateOf,
     firstRate: k.firstReplacement,
     secondRate: k.secondReplacement,
     firstFrom: k.firstFrom,
@@ -61,15 +71,50 @@ export function makeRrqRules(indexation: Indexation): RrqRules {
   }
 }
 
-/** The employee's contribution rules for a year (the employer pays the same). */
-export function rrqContributionRulesFor(year: number, indexation: Indexation): RrqContributionRules {
-  const p = paramsFor(year, indexation).rrq
+/** The employee's contribution rules for a year, from that year's figures already resolved (the employer pays the same). */
+export function rrqContributionRulesOf(year: number, rrq: PlainYear['rrq']): RrqContributionRules {
   return {
-    mga: RRQ_MGA_HISTORY.value[year] ?? p.mga,
-    yampe: year < p.secondFrom ? null : (RRQ_YAMPE_HISTORY.value[year] ?? p.yampe),
-    exemption: p.exemption,
-    baseRate: p.rateBase,
-    firstRate: p.rateFirst,
-    secondRate: p.rateSecond,
+    mga: RRQ_MGA_HISTORY.value[year] ?? rrq.mga,
+    yampe: year < rrq.secondFrom ? null : (RRQ_YAMPE_HISTORY.value[year] ?? rrq.yampe),
+    exemption: rrq.exemption,
+    baseRate: rrq.rateBase,
+    firstRate: rrq.rateFirst,
+    secondRate: rrq.rateSecond,
+  }
+}
+
+/** The employee's contribution rules for a year (the employer pays the same). Resolves the year's figures: a caller that already holds them uses `rrqContributionRulesOf`. */
+export function rrqContributionRulesFor(year: number, indexation: Indexation): RrqContributionRules {
+  return rrqContributionRulesOf(year, paramsFor(year, indexation).rrq)
+}
+
+const NO_CONTRIBUTION: RrqContribution = { base: 0, additionalFirst: 0, additionalSecond: 0, total: 0 }
+
+/**
+ * A worker's QPP contribution on a year's pay, at `age` (attained in the year): nothing after the year of the 72nd birthday (art. 37.0.1,
+ * `contributionLastAge`). The ONE place the rule is applied — the projection and the take-home figure both read it, so they cannot disagree.
+ */
+export function rrqContributionAt(earnings: number, age: number, year: number, rrq: PlainYear['rrq']): RrqContribution {
+  return earnings > 0 && age <= rrq.contributionLastAge ? rrqContribution(earnings, rrqContributionRulesOf(year, rrq)) : NO_CONTRIBUTION
+}
+
+/**
+ * How much a QPP amount of `fromYear` has been raised by `toYear`: the product of every January's indexation in between (`fromYear` + 1 to
+ * `toYear`). A January Retraite Québec has published is its OBSERVED rate (the history, and the last known year's own `rrq.indexation`); any
+ * other — a future one, or one before the history begins — is the assumed inflation. 1 when `toYear` ≤ `fromYear`.
+ */
+export function makeQppIndexation(inflation: number): (fromYear: number, toYear: number) => number {
+  const known = knownYear(LAST_KNOWN_YEAR).rrq.indexation
+  const rateOf = (year: number): number => RRQ_INDEXATION_HISTORY.value[year] ?? (year === LAST_KNOWN_YEAR ? known : inflation)
+  const cache = new Map<number, number>()
+  return (fromYear, toYear) => {
+    if (toYear <= fromYear) return 1
+    const key = fromYear * 10_000 + toYear
+    const hit = cache.get(key)
+    if (hit !== undefined) return hit
+    let f = 1
+    for (let y = fromYear + 1; y <= toYear; y++) f *= 1 + rateOf(y)
+    cache.set(key, f)
+    return f
   }
 }

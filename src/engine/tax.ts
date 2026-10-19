@@ -20,7 +20,8 @@ import { quebecTax, type QuebecPersonResult, type QuebecRules } from './taxQuebe
 // the defined-benefit pension and the RRIF/RRSP withdrawals, never the RRQ or the OAS — to the other, on
 // both returns. The engine tries every 5 % step in each direction and keeps whichever gives the LOWEST
 // household total (income tax plus OAS recovery). Québec requires the transferor to be 65+ for all of it,
-// so the engine does too (the federal rule is looser for a defined-benefit pension).
+// so the engine does too (the federal rule is looser for a defined-benefit pension). The age and the 50 %
+// are the cited `quebec.splitMinAge` and `federal` / `quebec.splitMaxShare`, never typed here.
 //
 // KNOWN SIMPLIFICATIONS (ENGINE.md §2): no FSS contribution, no RAMQ drug-insurance premium, no
 // investment-income tax (the engine's non-registered return is a deferred capital gain), no other
@@ -92,14 +93,27 @@ export interface HouseholdTax {
   total: number
 }
 
-/** A person's pension income that can be split: defined-benefit + registered withdrawals, from 65. */
-export function splittablePension(p: PersonIncome): number {
-  return p.age >= 65 ? p.db + p.registered : 0
+/**
+ * A person's pension income that can be split: defined-benefit + registered withdrawals, once the transferor has reached Québec's splitting
+ * age (`quebec.splitMinAge`, 65 — the stricter of the two returns, which the engine applies to both; the federal rule is looser for a
+ * defined-benefit pension).
+ */
+export function splittablePension(p: PersonIncome, rules: Pick<TaxRules, 'quebec'>): number {
+  return p.age >= rules.quebec.splitMinAge ? p.db + p.registered : 0
 }
 
-/** Pension income that qualifies for the Québec retirement-income amount (the 65 rule applies to registered income only). */
-function eligibleQuebec(p: PersonIncome, splitIn: number, splitOut: number): number {
-  return Math.max(0, p.db + (p.age >= 65 ? p.registered : 0) + splitIn - splitOut)
+/** The most of it that can be allocated to the spouse: the smaller of the two returns' caps (50 % on both). */
+export function splitCap(p: PersonIncome, rules: Pick<TaxRules, 'federal' | 'quebec'>): number {
+  return splittablePension(p, rules) * Math.min(rules.federal.splitMaxShare, rules.quebec.splitMaxShare)
+}
+
+/**
+ * Pension income that qualifies for the Québec retirement-income amount: a defined-benefit pension at any age, registered income from the
+ * minimum age of the federal rule (`federal.pensionMinAge`, 65) — ENGINE.md §2: the engine reads Québec's amount the way TP-1.G applies it,
+ * with the federal age rule (RRIF and RRSP-annuity income under 65 qualifies only after a spouse's death, not modelled).
+ */
+function eligibleQuebec(p: PersonIncome, splitIn: number, splitOut: number, minAge: number): number {
+  return Math.max(0, p.db + (p.age >= minAge ? p.registered : 0) + splitIn - splitOut)
 }
 
 /**
@@ -135,7 +149,7 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
       netIncome,
       taxableIncome: netIncome,
       employment: p.employment,
-      eligibleRetirement: eligibleQuebec(p, splitIn, splitOut),
+      eligibleRetirement: eligibleQuebec(p, splitIn, splitOut, rules.federal.pensionMinAge),
     })),
     rules.quebec,
     rules.livesAlone ?? true,
@@ -183,10 +197,11 @@ export function householdTax(persons: readonly PersonIncome[], rules: TaxRules, 
   if (!opts.splitting || persons.length !== 2) return best
 
   const step = opts.step ?? 0.05
+  const maxShare = Math.min(rules.federal.splitMaxShare, rules.quebec.splitMaxShare)
   for (const from of [0, 1]) {
-    const eligible = splittablePension(persons[from])
+    const eligible = splittablePension(persons[from], rules)
     if (eligible <= 0) continue
-    for (let share = step; share <= 0.5 + 1e-9; share += step) {
+    for (let share = step; share <= maxShare + 1e-9; share += step) {
       const candidate = evaluate(persons, rules, { from, amount: roundTo(eligible * share, 0.01) })
       if (candidate.total < best.total - 1e-9) best = candidate
     }

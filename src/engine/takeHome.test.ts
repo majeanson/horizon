@@ -50,3 +50,17 @@ describe('what a salary leaves', () => {
     expect(takeHome(40_000, 34, 2026, idx, true)).toBeGreaterThan(takeHome(40_000, 34, 2026, idx, false))
   })
 })
+
+describe('the QPP contribution stops when the projection stops it', () => {
+  it('a worker of 73 pays none (art. 37.0.1: the year of the 72nd birthday is the last contributory one), a worker of 72 still does', () => {
+    const P = paramsFor(2026, idx)
+    const at72 = takeHome(60_000, 72, 2026, idx, false)
+    const at73 = takeHome(60_000, 73, 2026, idx, false)
+    expect(P.rrq.contributionLastAge).toBe(72)
+    expect(at73).toBeGreaterThan(at72)
+    // the whole difference is the contribution less the tax it saved — at least the contribution's after-tax cost, at most the contribution
+    const rrq = rrqContribution(60_000, rrqContributionRulesFor(2026, idx)).total
+    expect(at73 - at72).toBeLessThanOrEqual(rrq + 0.01)
+    expect(at73 - at72).toBeGreaterThan(rrq * 0.5)
+  })
+})

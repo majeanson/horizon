@@ -2,7 +2,7 @@ import { citedLeaves, plain, type Cited, type Plain } from './cited.ts'
 import { PLAN_RREGOP } from './plans.ts'
 import { resolveYear, type Indexation } from './project.ts'
 import { P2026 } from './2026.ts'
-import { RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
+import { RRQ_CONTRIBUTION_RATE_HISTORY, RRQ_EXEMPTION_HISTORY, RRQ_INDEXATION_HISTORY, RRQ_MGA_HISTORY, RRQ_YAMPE_HISTORY } from './rrqHistory.ts'
 import { CHILD_COSTS, CHILD_COST_INCOME_LEVELS, CPI_ANNUAL } from './childCosts.ts'
 import { RRSP_LIMIT_HISTORY } from './rrspHistory.ts'
 import { TFSA_LIMIT_HISTORY } from './tfsaHistory.ts'
@@ -21,6 +21,9 @@ export const KNOWN: Readonly<Record<number, YearParams>> = { 2026: P2026 }
 export const SERIES: ReadonlyArray<{ name: string; cited: Cited<unknown> }> = [
   { name: 'rrq.mgaHistory', cited: RRQ_MGA_HISTORY },
   { name: 'rrq.yampeHistory', cited: RRQ_YAMPE_HISTORY },
+  { name: 'rrq.exemptionHistory', cited: RRQ_EXEMPTION_HISTORY },
+  { name: 'rrq.contributionRateHistory', cited: RRQ_CONTRIBUTION_RATE_HISTORY },
+  { name: 'rrq.indexationHistory', cited: RRQ_INDEXATION_HISTORY },
   { name: 'accounts.tfsaLimitHistory', cited: TFSA_LIMIT_HISTORY },
   { name: 'accounts.rrspLimitHistory', cited: RRSP_LIMIT_HISTORY },
   // What a typical Canadian household holds and spends (Statistics Canada): the start of an estimate for someone who cannot read their own figures.

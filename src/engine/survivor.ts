@@ -28,6 +28,8 @@ export interface SurvivorRules {
   /** The flat-rate portion for the year, indexed (45–64, and under 45 without a dependent child). */
   flatRate45to64: number
   flatRateUnder45: number
+  /** 45 — the survivor's age from which the first of the two applies (art. 133, 2nd para.). */
+  flatRateAge: number
 }
 
 /** The deceased's three components for the month of death, unadjusted for their start age, in the dollars of the year paid. */
@@ -59,7 +61,7 @@ export function survivorPensionMonthly(input: SurvivorInput, rules: SurvivorRule
   const a = input.deceased.base
   const additional = rules.additionalShare * (input.deceased.additionalFirst + input.deceased.additionalSecond)
   const from65 = input.age >= rrq.normalAge
-  const flat = from65 ? 0 : input.age >= 45 ? rules.flatRate45to64 : rules.flatRateUnder45
+  const flat = from65 ? 0 : input.age >= rules.flatRateAge ? rules.flatRate45to64 : rules.flatRateUnder45
 
   let basePart: number
   if (input.ownBase === null) {

@@ -11,10 +11,10 @@ import { fillCeiling } from './bracketFill.ts'
 import { payrollContribution } from './payroll.ts'
 import { paramsFor, type PlainYear } from './params/index.ts'
 import { roundTo, type Indexation } from './params/project.ts'
-import { rrqContribution, rrqPension, type RrqPension, type RrqRules } from './rrq.ts'
-import { makeRrqRules, rrqContributionRulesFor } from './rrqRules.ts'
+import { deathQualification, monthAfterBirthday, monthIndex, rrqPension, type DeathQualification, type RrqPension, type RrqRules } from './rrq.ts'
+import { makeQppIndexation, makeRrqRules, rrqContributionAt } from './rrqRules.ts'
 import { survivorPensionMonthly, type DeceasedComponents } from './survivor.ts'
-import { householdTax, householdTaxWithSplit, type HouseholdTax, type PersonIncome, type Split, type TaxRules } from './tax.ts'
+import { householdTax, householdTaxWithSplit, splitCap, type HouseholdTax, type PersonIncome, type Split, type TaxRules } from './tax.ts'
 import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId, PersonYear, Scenario, YearRow } from './types.ts'
 
 // The year-by-year projection: from today to the year the LAST person reaches their horizon age, what each
@@ -32,7 +32,9 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId, 
 //   5. Balances grow by the year's return (mid-year convention); room and the RRIF age move on.
 //
 // Everything in a row is in THAT YEAR's dollars: inflation grows spending, savings and the cost-of-living
-// parameters; wage growth grows salaries.
+// parameters; wage growth grows salaries. A QPP pension is raised each January by the QPP's indexation: the OBSERVED rate of every
+// January Retraite Québec has published (a pension that began years ago is paid what it is really paid today), the assumed inflation
+// after that (rrqRules.ts `makeQppIndexation`).
 //
 // A DEATH. Each person is in the plan through the year they reach their horizon age (their own, or the scenario's) and gone
 // from the next. In a couple the first death hands everything to the survivor: the RRSP (and its locked part), the TFSA and the
@@ -41,7 +43,9 @@ import type { AccountKind, Assumptions, DbPension, Household, Person, PersonId, 
 // splitting, the GIS of a single pensioner, spending at the survivor's share (`Assumptions.survivorSpending`). The survivor
 // receives the QPP surviving spouse's pension (survivor.ts, taxed as QPP income), the share of the deceased's employer
 // pensions their plans pay a spouse, and — widowed and 60 to 64 — the Allowance for the Survivor instead of the Allowance.
-// The survivor also receives the QPP death benefit (2 500 $) once, the year after. The year of death itself is an ordinary year — which
+// The survivor also receives the QPP death benefit (2 500 $) once, the year after. Both QPP benefits are paid only when the deceased was
+// « qualified » (art. 107: base contributions in a third of the years of their contributory period and at least three, or in ten — rrq.ts
+// `deathQualification`): a spouse who never contributed leaves neither. The year of death itself is an ordinary year — which
 // is what a spousal rollover makes the final return. Not modelled, by design: a survivor under 45 with a dependent child (Horizon plans
 // the retirement of adults whose children are grown), a disabled survivor (no disability is modelled anywhere), the orphan's pension.
 
@@ -182,6 +186,7 @@ interface FixedIncome {
 export function project(h: Household, a: Assumptions, scenario: Scenario = {}): YearRow[] {
   const indexation: Indexation = { inflation: a.inflation, wageGrowth: a.wageGrowth }
   const rrqRules = makeRrqRules(indexation)
+  const qppIndex = makeQppIndexation(a.inflation)
   const people = h.persons.map((p) => resolve(p, a, scenario, rrqRules, h))
   const endYear = Math.max(...people.map((r) => r.deathYear))
 
@@ -226,7 +231,7 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
         const d = states[gone]
         const k = states[kept]
         states = [{ ...k, rrsp: k.rrsp + d.rrsp, rrspLocked: k.rrspLocked + d.rrspLocked, tfsa: k.tfsa + d.tfsa, nonReg: { balance: k.nonReg.balance + d.nonReg.balance, acb: k.nonReg.acb + d.nonReg.acb } }]
-        survivorOf = survivorship(alive[gone], rrqRules)
+        survivorOf = survivorship(alive[gone], rrqRules, paramsOf(alive[gone].deathYear).rrq)
         alive = [alive[kept]]
       }
     }
@@ -243,7 +248,7 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
     const lump = flowWindfalls(h, year) * (1 + a.inflation) ** (year - a.today.year)
     if (lump > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + lump, acb: s.nonReg.acb + lump } } : s))
     const kidsBenefit = childBenefitsFor(h, year, lastIncome, alive.length === 1, paramsOf(year).childBenefits)
-    const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, indexation, housing, returnsOf(year), rrqRules, survivorOf, kidsBenefit)
+    const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, housing, returnsOf(year), rrqRules, qppIndex, survivorOf, kidsBenefit)
     rows.push(out.row)
     states = out.next
     lastIncome = Object.values(out.row.persons).reduce((sum, t) => sum + t.netIncome, 0)
@@ -260,20 +265,31 @@ interface Housing {
 }
 const NO_HOUSING: Housing = { payment: 0, extraNeed: 0, valueEnd: 0, balanceEnd: 0 }
 
-/** What a death leaves the survivor: who died and when, and the deceased's QPP components for the month of death (art. 137), in the dollars of `baseYear`. */
+/**
+ * What a death leaves the survivor: who died and when, the deceased's QPP components for the month of death (art. 137), in the dollars of
+ * `baseYear`, and whether the deceased was qualified (art. 107) for the surviving spouse's pension and the death benefit.
+ */
 interface Survivorship {
   deceased: ResolvedPerson
   deathYear: number
   components: DeceasedComponents
   baseYear: number
+  qualified: DeathQualification
 }
 
-function survivorship(r: ResolvedPerson, rrqRules: RrqRules): Survivorship {
+function survivorship(r: ResolvedPerson, rrqRules: RrqRules, P: PlainYear['rrq']): Survivorship {
+  // A person is in the plan through their last year: the death is taken in its December.
+  const payable = r.rrq.start.year <= r.deathYear
+  const qualified = deathQualification(
+    { birth: r.p.birth, earnings: r.earnings, childRearingMonths: r.childRearingMonths, death: { year: r.deathYear, month: 12 }, pensionStart: payable ? r.rrq.start : null },
+    rrqRules,
+    { share: P.survivorQualifyingShare, minYears: P.survivorQualifyingMinYears, years: P.survivorQualifyingYears, minContributions: P.deathBenefitMinContributions },
+  )
   // A pension already payable at death: its components as computed at its start, unadjusted for the start age (art. 137 1°).
-  if (r.rrq.start.year <= r.deathYear) return { deceased: r, deathYear: r.deathYear, components: { base: r.rrq.base, additionalFirst: r.rrq.additionalFirst, additionalSecond: r.rrq.additionalSecond }, baseYear: r.rrq.start.year }
+  if (payable) return { deceased: r, deathYear: r.deathYear, components: { base: r.rrq.base, additionalFirst: r.rrq.additionalFirst, additionalSecond: r.rrq.additionalSecond }, baseYear: r.rrq.start.year, qualified }
   // Otherwise the components computed for the year of death (art. 137 2°, 137.1 b), 137.2 b)): the reference period ends with the death.
   const atDeath = rrqPension({ birth: r.p.birth, earnings: r.earnings, startAge: Math.max(18, r.deathYear - r.p.birth.year), childRearingMonths: r.childRearingMonths }, rrqRules)
-  return { deceased: r, deathYear: r.deathYear, components: { base: atDeath.base, additionalFirst: atDeath.additionalFirst, additionalSecond: atDeath.additionalSecond }, baseYear: r.deathYear }
+  return { deceased: r, deathYear: r.deathYear, components: { base: atDeath.base, additionalFirst: atDeath.additionalFirst, additionalSecond: atDeath.additionalSecond }, baseYear: r.deathYear, qualified }
 }
 
 /**
@@ -307,10 +323,10 @@ function simulateYear(
   people: ResolvedPerson[],
   states: PersonState[],
   paramsOf: (y: number) => PlainYear,
-  indexation: Indexation,
   housing: Housing,
   returns: Record<AccountKind, number>,
   rrqRules: RrqRules,
+  qppIndex: (fromYear: number, toYear: number) => number,
   survivorOf: Survivorship | null,
   kidsBenefit = 0,
 ): { row: YearRow; next: PersonState[] } {
@@ -336,15 +352,15 @@ function simulateYear(
     const working = salaryAt(r.p, year, a) * worked > 0
 
     const rrqMonths = year < r.rrq.start.year ? 0 : year === r.rrq.start.year ? 13 - r.rrq.start.month : 12
-    const rrq = year < r.rrq.start.year ? 0 : roundTo(r.rrq.monthly * rrqMonths * (1 + a.inflation) ** (year - r.rrq.start.year), 0.01)
+    const rrq = year < r.rrq.start.year ? 0 : roundTo(r.rrq.monthly * rrqMonths * qppIndex(r.rrq.start.year, year), 0.01)
 
-    // After a spouse's death: the surviving spouse's pension (survivor.ts), paid and taxed like the person's own QPP pension, and
-    // the deceased's employer pensions at the share their plans pay a spouse.
+    // After a spouse's death: the surviving spouse's pension (survivor.ts), paid and taxed like the person's own QPP pension — when the
+    // deceased was qualified for it (art. 107) — and the deceased's employer pensions at the share their plans pay a spouse.
     let survivorRrq = 0
-    if (survivorOf) {
-      const grow = (1 + a.inflation) ** (year - survivorOf.baseYear)
+    if (survivorOf && survivorOf.qualified.survivor) {
+      const grow = qppIndex(survivorOf.baseYear, year)
       const c = survivorOf.components
-      const ownBase = year < r.rrq.start.year ? null : roundTo(r.rrq.base * r.rrq.adjustment * (1 + a.inflation) ** (year - r.rrq.start.year), 0.01)
+      const ownBase = year < r.rrq.start.year ? null : roundTo(r.rrq.base * r.rrq.adjustment * qppIndex(r.rrq.start.year, year), 0.01)
       const monthly = survivorPensionMonthly(
         { age, deceased: { base: c.base * grow, additionalFirst: c.additionalFirst * grow, additionalSecond: c.additionalSecond * grow }, ownBase, ownStartAge: r.rrqStartAge, year },
         {
@@ -354,20 +370,22 @@ function simulateYear(
           ownPensionOffset: P.rrq.survivorOwnPensionOffset,
           flatRate45to64: P.rrq.survivorFlatRate45to64,
           flatRateUnder45: P.rrq.survivorFlatRateUnder45,
+          flatRateAge: P.rrq.survivorFlatRateAge,
         },
         rrqRules,
       )
       survivorRrq = roundTo(monthly * 12, 0.01)
     }
-    // The death benefit: one payment, the year after the death, taxed as the survivor's income (it is the estate's or the recipient's).
-    const deathBenefit = survivorOf && year === survivorOf.deathYear + 1 ? P.rrq.deathBenefit : 0
+    // The death benefit: one payment, the year after the death, taxed as the survivor's income (it is the estate's or the recipient's) — when the deceased qualified for it.
+    const deathBenefit = survivorOf && survivorOf.qualified.deathBenefit && year === survivorOf.deathYear + 1 ? P.rrq.deathBenefit : 0
 
     const oasY = oasYear(year, r.oas, P.oas)
     const db = sum(r.db.map((d) => dbYear(d.start, year, a.inflation))) + (survivorOf ? roundTo(survivorDb(survivorOf, year, a.inflation), 0.01) : 0)
 
     const rrifMin = year >= firstRrifYear(r.p.birth.year, P.accounts) ? rrifMinimum(ageAtJan1(year, r.p.birth.year), states[i].rrsp, P.accounts) : 0
 
-    const rrqC = paid && age <= P.rrq.contributionLastAge ? rrqContribution(employment, rrqContributionRulesFor(year, indexation)) : { base: 0, additionalFirst: 0, additionalSecond: 0, total: 0 }
+    // Through the year of the 72nd birthday only (rrqRules.ts: the same rule the take-home figure applies), from the year's figures already in hand.
+    const rrqC = rrqContributionAt(employment, age, year, P.rrq)
 
     const payrollC = paid ? payrollContribution(employment, P.payroll).total : 0
     const rppC = working ? roundTo(sum(r.p.pensions.map((d) => (d.memberContribution && !d.inPay ? memberContribution(salaryAt(r.p, year, a) * worked, worked, P.rrq.mga, d.memberContribution) : 0))), 0.01) : 0
@@ -425,16 +443,18 @@ function simulateYear(
   // ── the Allowance: the 60–64 spouse of a pensioner, from the month after the 60th birthday to the month of the 65th ──
   // Paid in the months the person is in that window, their spouse is already on the OAS, and they have the ten years of residence;
   // while it is paid, the pensioner's GIS follows the « spouse receives the Allowance » curve. The same months, seen from both sides.
+  // The window's two ages are the OAS Act's (`oas.allowanceFromAge`, `oas.allowanceUntilAge`), the months the engine's one convention (rrq.ts `monthIndex`).
+  const allowanceFrom = (birth: Person['birth']) => monthIndex(monthAfterBirthday(birth, P.oas.allowanceFromAge))
+  const allowanceTo = (birth: Person['birth']) => monthIndex({ year: birth.year + P.oas.allowanceUntilAge, month: birth.month })
   const alwMonths = people.map((r, i) => {
     if (!couple || residenceFraction(r.oas, year, P.oas) <= 0) return 0
     const j = i === 0 ? 1 : 0
-    const from = (r.p.birth.year + 60) * 12 + (r.p.birth.month - 1) + 1
-    const to = (r.p.birth.year + 65) * 12 + (r.p.birth.month - 1)
-    const spouseStart = oasStart(people[j].p.birth, people[j].oasStartAge)
-    const spouseIdx = spouseStart.year * 12 + spouseStart.month - 1
+    const from = allowanceFrom(r.p.birth)
+    const to = allowanceTo(r.p.birth)
+    const spouseIdx = monthIndex(oasStart(people[j].p.birth, people[j].oasStartAge))
     let n = 0
     for (let m = 0; m < 12; m++) {
-      const idx = year * 12 + m
+      const idx = monthIndex({ year, month: m + 1 })
       if (idx >= from && idx <= to && idx >= spouseIdx && fixed[j].oasMonths > 0) n++
     }
     return n
@@ -444,11 +464,11 @@ function simulateYear(
   const survMonths = (() => {
     if (!survivorOf || people.length !== 1 || residenceFraction(people[0].oas, year, P.oas) <= 0) return 0
     const b = people[0].p.birth
-    const from = Math.max((b.year + 60) * 12 + (b.month - 1) + 1, (survivorOf.deathYear + 1) * 12)
-    const to = (b.year + 65) * 12 + (b.month - 1)
+    const from = Math.max(allowanceFrom(b), monthIndex({ year: survivorOf.deathYear + 1, month: 1 }))
+    const to = allowanceTo(b)
     let n = 0
     for (let m = 0; m < 12; m++) {
-      const idx = year * 12 + m
+      const idx = monthIndex({ year, month: m + 1 })
       if (idx >= from && idx <= to) n++
     }
     return n
@@ -503,9 +523,8 @@ function simulateYear(
   let baseBest = a.pensionSplitting && couple ? householdTax(baseIncomes, rules, { splitting: true }).split : { from: null, amount: 0 }
   const fixedSplit = (): Split => {
     if (baseBest.from === null) return baseBest
-    const from = baseIncomes[baseBest.from]
-    const eligible = from.age >= 65 ? from.db + from.registered : 0
-    return { from: baseBest.from, amount: Math.min(baseBest.amount, eligible * 0.5) }
+    // The split chosen on the fixed incomes, never more than the law allows on the incomes as they now stand (tax.ts `splitCap`: the transferor's age and share, cited).
+    return { from: baseBest.from, amount: Math.min(baseBest.amount, splitCap(baseIncomes[baseBest.from], rules)) }
   }
 
   // ── 2b. committed savings yield to spending ───────────────────────────────────────────────────
@@ -614,8 +633,9 @@ function simulateYear(
           const take = Math.min(size, left, room[i] - draw[kind][i])
           draw[kind][i] += take
           left -= take
+          // A rough weight, only to choose WHO draws next: an RRSP dollar is all income, a non-registered one at most its taxable share of a gain.
           if (kind === 'rrsp') taxable[i] += take
-          else if (kind === 'nonReg') taxable[i] += take * 0.5
+          else if (kind === 'nonReg') taxable[i] += take * P.federal.capitalGainsInclusion
         }
       }
 

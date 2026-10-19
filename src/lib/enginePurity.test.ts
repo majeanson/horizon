@@ -46,6 +46,9 @@ const BANNED: ReadonlyArray<readonly [name: string, re: RegExp]> = [
   ['fetch', /(?<![.\w])fetch\s*\(/],
   ['XMLHttpRequest', /\bXMLHttpRequest\b/],
   ['Intl', /\bIntl\b/],
+  // Intl hidden in a convenience method: a collation or a format in the machine's own language (sourcesMd sorted its page index this way).
+  ['localeCompare', /\.localeCompare\s*\(/],
+  ['toLocale…', /\.toLocale\w*\s*\(/],
   ['Date', /\bDate\b/],
   ['Math.random', /\bMath\.random\b/],
   ['setTimeout', /\bsetTimeout\b/],
@@ -105,12 +108,14 @@ describe('law 1: the engine is pure', () => {
       `import { y } from '../../lib/format.ts'`, // 7  escapes (params/ → src/lib)
       `import { z } from './sibling'`, // 8  no .ts
       `enum Kind { A }`, // 9
-      `const updated = 1; const candidate = 2; const refetch = 3; const dateOfBirth = 4`, // clean
+      `rows.sort((a, b) => a.url.localeCompare(b.url))`, // 10
+      `const s = (1234.5).toLocaleString()`, // 11
+      `const updated = 1; const candidate = 2; const refetch = 3; const dateOfBirth = 4; const localeCompared = 5`, // clean
       `// Date and window in a comment are fine`, // clean (blanked)
     ].join('\n')
     const file = join(engineDir, 'params', 'fixture.ts')
     const lines = purityViolations(file, fixture, false).map((v) => v.line)
-    expect([...new Set(lines)].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    expect([...new Set(lines)].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
   })
 
   const files = walk(engineDir)

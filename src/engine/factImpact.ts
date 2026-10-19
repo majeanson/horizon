@@ -1,4 +1,4 @@
-import { MIN_TRY_AGE, everyoneAt, retireAt, runScenario } from './retireAt.ts'
+import { everyoneAt, retireAt, runScenario, searchRange } from './retireAt.ts'
 import type { Assumptions, Household, PersonId } from './types.ts'
 
 // « WHICH FIGURE, IF I WERE WRONG ABOUT IT, WOULD MOVE THE ANSWER MOST? » — one typed number nudged 15 % each way (the years of
@@ -32,9 +32,6 @@ export type ImpactKind = (typeof IMPACT_KINDS)[number]
 /** How far a figure is nudged each way (a share), and the years of residence. */
 export const NUDGE = 0.15
 const NUDGE_RESIDENCE_YEARS = 3
-
-/** Past the oldest age the search tries, « no age works » counts as one more year, so a figure that tips the plan over the edge ranks high. */
-const NO_AGE = 71
 
 type Owner = PersonId | 'household'
 
@@ -86,17 +83,17 @@ function nudged(h: Household, thisYear: number, owner: Owner, kind: ImpactKind, 
 }
 
 export interface FactSwing {
-  /** The earliest age that works with the figure nudged down / up (null: none up to 70). */
+  /** The earliest age that works with the figure nudged down / up (null: none up to the last age the search tries — 70, or the oldest person's age when that is later). */
   down: number | null
   up: number | null
-  /** The most the answer moves either way, in years (« no age » counts as 71). */
+  /** The most the answer moves either way, in years (« no age » counts as one year past the last age tried). */
   years: number
 }
 
 export interface UncertaintyRange {
-  /** The earliest age if EVERY listed figure were nudged 15 % the way that helps (null: none up to 70). Never later than `base`. */
+  /** The earliest age if EVERY listed figure were nudged 15 % the way that helps (null: none up to the last age tried). Never later than `base`. */
   low: number | null
-  /** The earliest age if every one were nudged 15 % the way that hurts. `null` means « maybe no age before 70 »: it stays distinct from a number so the page can say so. Never earlier than `base`. */
+  /** The earliest age if every one were nudged 15 % the way that hurts. `null` means « maybe no age up to the last one tried » (70, for anyone not yet past it): it stays distinct from a number so the page can say so. Never earlier than `base`. */
   high: number | null
 }
 
@@ -111,8 +108,11 @@ export function factSwings(
   facts: readonly { id: string; owner: Owner; kind: ImpactKind }[],
 ): { base: number | null; swings: Record<string, FactSwing>; range: UncertaintyRange | null } {
   const base = retireAt(h, a, { stopAtFirstOk: true }).earliestOk
-  const oldest = Math.max(0, ...h.persons.map((p) => a.today.year - p.birth.year))
-  const lowest = Math.max(MIN_TRY_AGE, oldest)
+  // The SAME ages retireAt tries (a nudge never changes a birth year, so the range is the household's): past the last of them, « no age works »
+  // counts as one more year — so a figure that tips the plan over the edge ranks high, and an oldest member past 70 (tried at their own age
+  // alone) is not read as « no age » for a plan that works.
+  const { from: lowest, to: highest } = searchRange(h, a)
+  const noAge = highest + 1
   const earliest = (hh: Household): number | null => {
     const works = (age: number) => runScenario(hh, a, everyoneAt(hh, age), age).ok
     if (base === null) return retireAt(hh, a, { stopAtFirstOk: true }).earliestOk
@@ -121,10 +121,10 @@ export function factSwings(
       while (age - 1 >= lowest && works(age - 1)) age--
       return age
     }
-    while (age < 70) if (works(++age)) return age
+    while (age < highest) if (works(++age)) return age
     return null
   }
-  const n = (x: number | null) => x ?? NO_AGE
+  const n = (x: number | null) => x ?? noAge
   const swings: Record<string, FactSwing> = {}
   // The household with every figure nudged the way that hurts / helps, composed one after the other (each clamp re-reads the
   // current value, so the order is safe). A figure whose two nudges land on the same age says nothing about a direction: left out.
@@ -141,8 +141,8 @@ export function factSwings(
   }
   if (facts.length === 0) return { base, swings, range: null }
   // ENFORCED, not assumed: clamps and non-monotone plans can let a composed household land on the wrong side of the answer, so the
-  // range is pinned to contain it. NO_AGE converts back to null on the way out (« none works up to 70 », the unlucky end).
-  const back = (x: number) => (x >= NO_AGE ? null : x)
+  // range is pinned to contain it. noAge converts back to null on the way out (« none works up to the last age tried », the unlucky end).
+  const back = (x: number) => (x >= noAge ? null : x)
   const low = Math.min(n(earliest(best)), n(base))
   const high = Math.max(n(earliest(worst)), n(base))
   return { base, swings, range: { low: back(low), high: back(high) } }

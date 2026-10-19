@@ -1,7 +1,8 @@
 import { deferralMultiplier, oasStart, residenceFraction } from './oas.ts'
 import { paramsFor } from './params/index.ts'
 import { project, resolve } from './projection.ts'
-import { makeRrqRules } from './rrqRules.ts'
+import { monthIndex } from './rrq.ts'
+import { makeQppIndexation, makeRrqRules } from './rrqRules.ts'
 import type { Assumptions, Household, PersonId } from './types.ts'
 
 // « Mes données » — the three ages a person sets, each with the calculation that turns it into money, so a figure on the
@@ -24,7 +25,10 @@ export interface AgesLedger {
     additionalSecond: number
     /** The multiplier the start age applies (< 1 early, > 1 late). */
     adjustment: number
-    /** The monthly pension today's dollars would buy at the start (the start year's dollars deflated by prices). */
+    /**
+     * The monthly pension in today's dollars: for a start still ahead, the start year's amount deflated by the assumed inflation; for one
+     * already begun, the amount raised by every January's OBSERVED indexation since — what the pension is paid today (the projection's figure).
+     */
     monthlyToday: number
     /** For reference: the most the plan pays TODAY for a start at the same age (the year's maximum pension at 65 × the same start-age multiplier), a month. */
     maxToday: number
@@ -53,9 +57,12 @@ function maxPensionToday(age: number, R: { maxPension65: number; earlyBase: numb
 export function agesLedger(h: Household, a: Assumptions): AgesLedger[] {
   const indexation = { inflation: a.inflation, wageGrowth: a.wageGrowth }
   const rules = makeRrqRules(indexation)
+  const qppIndex = makeQppIndexation(a.inflation)
   return h.persons.map((p) => {
     const r = resolve(p, a, {}, rules, h)
     const deflate = (year: number) => (1 + a.inflation) ** (year - a.today.year)
+    // A start in the past was raised by the Januaries that really happened; a start ahead is moved back to today by the assumed inflation.
+    const rrqToday = r.rrq.start.year < a.today.year ? r.rrq.monthly * qppIndex(r.rrq.start.year, a.today.year) : r.rrq.monthly / deflate(r.rrq.start.year)
     const oStart = oasStart(p.birth, r.oasStartAge)
     // A pension that began before today is read at TODAY's figures: the engine holds no parameters for a past year.
     const O = paramsFor(Math.max(oStart.year, a.today.year), indexation).oas
@@ -74,10 +81,11 @@ export function agesLedger(h: Household, a: Assumptions): AgesLedger[] {
         additionalFirst: r.rrq.additionalFirst,
         additionalSecond: r.rrq.additionalSecond,
         adjustment: r.rrq.adjustment,
-        monthlyToday: r.rrq.monthly / deflate(r.rrq.start.year),
+        monthlyToday: rrqToday,
         maxToday: maxPensionToday(r.rrqStartAge, paramsFor(a.today.year, indexation).rrq),
       },
-      oas: { startAge: r.oasStartAge, start: oStart, done: isPast(oStart, a.today), full: O.monthly65to74, residence, multiplier, monthly: oasMonthly, monthlyToday: oasMonthly / deflate(oStart.year) },
+      // The OAS figure is already TODAY's for a start behind (it is read at today's parameters, above): deflating it from the start year would raise it a second time.
+      oas: { startAge: r.oasStartAge, start: oStart, done: isPast(oStart, a.today), full: O.monthly65to74, residence, multiplier, monthly: oasMonthly, monthlyToday: oasMonthly / deflate(Math.max(oStart.year, a.today.year)) },
     }
   })
 }
@@ -96,8 +104,6 @@ export function planGlance(h: Household, a: Assumptions): PlanGlance {
   const last = rows[rows.length - 1]
   return { ok: !bad, firstShortfallYear: bad ? bad.year : null, netWorthEnd: last ? last.household.netWorthEnd / (1 + a.inflation) ** (last.year - a.today.year) : 0 }
 }
-
-const monthIndex = (ym: { year: number; month: number }): number => ym.year * 12 + (ym.month - 1)
 
 /** Is this month today or already behind? A start or a last pay that has happened can no longer be chosen. */
 export const isPast = (ym: { year: number; month: number }, today: { year: number; month: number }): boolean => monthIndex(ym) <= monthIndex(today)

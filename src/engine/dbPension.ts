@@ -1,7 +1,7 @@
 import { roundTo } from './params/project.ts'
 import type { Plain } from './params/cited.ts'
 import type { YearParams } from './params/types.ts'
-import type { YearMonth } from './rrq.ts'
+import { fromIndex, monthAfterBirthday, monthIndex, type YearMonth } from './rrq.ts'
 import type { DbPension } from './types.ts'
 
 // A defined-benefit employer pension: a formula, not a balance. The pension is
@@ -17,8 +17,6 @@ import type { DbPension } from './types.ts'
 // plan's own booklet. For the Québec public-sector plan (RREGOP) they are the cited parameters of
 // params/plans.ts, reproduced here against Retraite Québec's own worked examples; for any other plan the
 // person enters them. Nothing about a particular plan is written in this file.
-
-const monthIndex = (ym: YearMonth): number => ym.year * 12 + (ym.month - 1)
 
 /** The date a person leaves the employer: the month of the birthday of `retirementAge`. */
 export function leavingDate(birth: YearMonth, retirementAge: number): YearMonth {
@@ -171,11 +169,12 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
     ? p.coordination.rate * Math.min(service, p.coordination.maxYears) * Math.min(avg, averageMga(input, p.averagingYears))
     : 0
 
-  const atAge = (age: number): number => monthIndex({ year: input.birth.year + age, month: input.birth.month }) + 1
+  const atAge = (age: number): number => monthIndex(monthAfterBirthday(input.birth, age))
   // The deferred pension is coordinated from the day it starts, by the same share as the pension is reduced.
   const coordinationShown = isDeferred ? coordinationAnnual * (1 - earlyReduction) : coordinationAnnual
   const startIndex = atAge(startAge)
-  const first = daysPaidFromMonth(Math.floor(startIndex / 12), startIndex % 12)
+  const startMonth = fromIndex(startIndex)
+  const first = daysPaidFromMonth(startMonth.year, startMonth.month - 1)
   return {
     service: roundTo(service, 0.01),
     averageSalary: roundTo(avg, 0.01),
@@ -217,7 +216,7 @@ function inPayStart(p: DbPension, input: DbInput): DbStart {
     annualBeforeCoordination: annual,
     coordinationAnnual: 0,
     // A pension that began this year was paid only from its start month; one that began earlier (or has no stated start) is paid all twelve.
-    startIndex: first ? since!.year * 12 + (since!.month - 1) : input.today.year * 12,
+    startIndex: first ? monthIndex(since!) : monthIndex({ year: input.today.year, month: 1 }),
     coordinationIndex: null,
     bridgeAnnual: 0,
     bridgeEndIndex: null,
@@ -231,8 +230,8 @@ function inPayStart(p: DbPension, input: DbInput): DbStart {
 function afterAge65(p: DbPension, input: DbInput): { afterIndex: number | null; afterAnnual?: number } {
   const after = p.inPay?.after65
   if (after === undefined) return { afterIndex: null }
-  const index = monthIndex({ year: input.birth.year + 65, month: input.birth.month }) + 1
-  if (index <= input.today.year * 12 + input.today.month - 1) return { afterIndex: null }
+  const index = monthIndex(monthAfterBirthday(input.birth, 65))
+  if (index <= monthIndex(input.today)) return { afterIndex: null }
   return { afterIndex: index, afterAnnual: roundTo(after, 0.01) }
 }
 
@@ -261,7 +260,7 @@ export function dbYear(s: DbStart, year: number, inflation: number): number {
   const pension = s.annualBeforeCoordination * waiting * grown(year - startYear)
   let total = 0
   for (let m = 0; m < 12; m++) {
-    const idx = year * 12 + m
+    const idx = monthIndex({ year, month: m + 1 })
     if (idx < s.startIndex) continue
     let annual = pension
     if (s.coordinationIndex !== null && idx >= s.coordinationIndex) {

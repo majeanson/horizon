@@ -93,7 +93,13 @@ describe('the children a family is paid for', () => {
   it('counts the ones under 6 and the ones aged 6 to 17, in the year; a child still to come or already 18 counts for nothing', () => {
     const births = [2026, 2021, 2020, 2010, 2009, 2008, 2030]
     // ages 0 and 5 are under 6; 6, 16 and 17 are 6 to 17; 18 (2008) is out, and 2030 is not born yet
-    expect(eligibleKids(births, 2026)).toEqual({ under6: 2, from6: 3 })
+    const ccb = paramsFor(2026, { inflation: 0.02, wageGrowth: 0.03 }).childBenefits.ccb
+    expect(eligibleKids(births, 2026, { youngUnder: ccb.youngUnderAge, until: ccb.untilAge })).toEqual({ under6: 2, from6: 3 })
+  })
+
+  it('reads its ages from the rules it is given, not from the code: another cut-off moves the count', () => {
+    const births = [2026, 2021, 2020, 2010, 2009, 2008]
+    expect(eligibleKids(births, 2026, { youngUnder: 7, until: 17 })).toEqual({ under6: 3, from6: 1 })
   })
 })
 

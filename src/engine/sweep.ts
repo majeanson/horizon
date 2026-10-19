@@ -1,5 +1,5 @@
 import { project } from './projection.ts'
-import { everyoneAt, MIN_TRY_AGE } from './retireAt.ts'
+import { everyoneAt, searchRange } from './retireAt.ts'
 import type { Assumptions, Household, Scenario } from './types.ts'
 
 // THE SWEEP — one plain question asked many times: « for each retirement age, and for each way of changing the plan, does the money last? » The regret curve, the
@@ -56,9 +56,7 @@ export interface SweepOptions {
 
 /** The ages a sweep tries, the same range `retireAt` tries (its floor is the oldest person's age today). */
 export function sweepAges(h: Household, a: Assumptions, options: SweepOptions = {}): number[] {
-  const oldest = Math.max(0, ...h.persons.map((p) => a.today.year - p.birth.year))
-  const from = Math.max(options.from ?? MIN_TRY_AGE, oldest)
-  const to = Math.max(from, options.to ?? 70)
+  const { from, to } = searchRange(h, a, options)
   const step = Math.max(1, Math.floor(options.step ?? 1))
   const ages: number[] = []
   for (let age = from; age <= to; age += step) ages.push(age)

@@ -266,27 +266,27 @@ Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 269 345 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 274 751 $ (dollars d’aujourd’hui).
 - Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Gilles | première rente 04/2023 : (base 841,59 $ + 1ʳᵉ supp. 1,35 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 842,94 $/mois, soit 897 $ d’aujourd’hui | première pension 04/2023 : 762,50 $ × résidence 100 % × report 0,0 % = 762,50 $/mois, soit 812 $ d’aujourd’hui |
-| Francine | première rente 10/2025 : (base 773,75 $ + 1ʳᵉ supp. 21,82 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 795,57 $/mois, soit 812 $ d’aujourd’hui | première pension 10/2025 : 762,50 $ × résidence 100 % × report 0,0 % = 762,50 $/mois, soit 779 $ d’aujourd’hui |
+| Gilles | première rente 04/2023 : (base 841,59 $ + 1ʳᵉ supp. 1,35 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 842,94 $/mois, soit 921 $ d’aujourd’hui | première pension 04/2023 : 762,50 $ × résidence 100 % × report 0,0 % = 762,50 $/mois, soit 763 $ d’aujourd’hui |
+| Francine | première rente 10/2025 : (base 773,75 $ + 1ʳᵉ supp. 21,82 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 795,57 $/mois, soit 811 $ d’aujourd’hui | première pension 10/2025 : 762,50 $ × résidence 100 % × report 0,0 % = 762,50 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Gilles (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 68 | 82 000 $ | 0 $ | 34 000 $ | 20 513 $ | 18 300 $ | 0 $ | 15 354 $ | 6 152 $ | 631 958 $ | tire du nid |
-| 70 | 82 000 $ | 0 $ | 33 304 $ | 20 513 $ | 18 300 $ | 0 $ | 16 035 $ | 6 153 $ | 628 902 $ | tire du nid |
-| 75 | 82 000 $ | 0 $ | 31 627 $ | 20 513 $ | 18 986 $ | 0 $ | 22 432 $ | 11 558 $ | 592 635 $ | tire du nid |
-| 80 | 82 000 $ | 0 $ | 30 033 $ | 20 513 $ | 20 130 $ | 0 $ | 22 955 $ | 11 632 $ | 544 524 $ | tire du nid |
-| 85 | 82 000 $ | 0 $ | 28 521 $ | 20 513 $ | 20 130 $ | 0 $ | 24 548 $ | 11 680 $ | 483 660 $ | tire du nid |
-| 90 | 82 000 $ | 0 $ | 27 084 $ | 20 513 $ | 20 130 $ | 0 $ | 26 059 $ | 11 739 $ | 407 158 $ | tire du nid |
-| 95 | 82 000 $ | 0 $ | 25 720 $ | 20 513 $ | 20 130 $ | 0 $ | 27 066 $ | 10 555 $ | 313 720 $ | tire du nid |
+| 68 | 82 000 $ | 0 $ | 34 000 $ | 20 789 $ | 18 300 $ | 0 $ | 15 154 $ | 6 223 $ | 632 167 $ | tire du nid |
+| 70 | 82 000 $ | 0 $ | 33 304 $ | 20 789 $ | 18 300 $ | 0 $ | 15 851 $ | 6 222 $ | 629 544 $ | tire du nid |
+| 75 | 82 000 $ | 0 $ | 31 627 $ | 20 789 $ | 18 986 $ | 0 $ | 22 493 $ | 11 659 $ | 594 916 $ | tire du nid |
+| 80 | 82 000 $ | 0 $ | 30 033 $ | 20 789 $ | 20 130 $ | 0 $ | 22 672 $ | 11 625 $ | 548 565 $ | tire du nid |
+| 85 | 82 000 $ | 0 $ | 28 521 $ | 20 789 $ | 20 130 $ | 0 $ | 24 265 $ | 11 678 $ | 489 676 $ | tire du nid |
+| 90 | 82 000 $ | 0 $ | 27 084 $ | 20 789 $ | 20 130 $ | 0 $ | 25 724 $ | 11 727 $ | 415 407 $ | tire du nid |
+| 95 | 82 000 $ | 0 $ | 25 720 $ | 20 789 $ | 20 130 $ | 0 $ | 27 986 $ | 12 016 $ | 323 567 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2026, en dollars d’aujourd’hui
 
@@ -294,8 +294,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Gilles | 68 | 0 $ | 34 000 $ | 10 766 $ | 9 150 $ | 0 $ | 45 635 $ | 2 101 $ | 2 462 $ | 0 $ |
-| Francine | 66 | 0 $ | 0 $ | 9 747 $ | 9 150 $ | 0 $ | 29 097 $ | 168 $ | 1 420 $ | 0 $ |
+| Gilles | 68 | 0 $ | 34 000 $ | 11 052 $ | 9 150 $ | 0 $ | 45 896 $ | 2 132 $ | 2 505 $ | 0 $ |
+| Francine | 66 | 0 $ | 0 $ | 9 738 $ | 9 150 $ | 0 $ | 29 088 $ | 167 $ | 1 419 $ | 0 $ |
 
 ## newcomer — Arrivée au Canada à 30 ans
 

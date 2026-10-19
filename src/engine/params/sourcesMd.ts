@@ -201,7 +201,8 @@ export function renderSourcesMd({ years, series }: SourcesInput, lang: SourcesLa
   out.push(w.pagesLead(byUrl.size))
   out.push('')
   out.push(w.pagesHeader)
-  for (const [url, v] of [...byUrl].sort((a, b) => a[0].localeCompare(b[0]))) {
+  // By code unit, never `localeCompare`: that is Intl's collation in the machine's own language, so two machines would print the rows in two orders (engine law 1).
+  for (const [url, v] of [...byUrl].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))) {
     // The row is keyed by the page as cited; the English edition shows that page's English twin when it has one.
     const shown = lang === 'fr' ? { url, title: v.title, inReaderLanguage: true } : pageFor({ url, title: v.title }, 'en')
     const label = shown.inReaderLanguage ? '' : ` (${w.onlyIn})`
