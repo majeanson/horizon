@@ -49,7 +49,7 @@ describe('worker/shareRoutes', () => {
     expect((await get('https://x.test/og/scenario?age=62&foyer=seul', [])).status).toBe(404)
   })
 
-  it('never appends a tag the shell already carries — a shared result rewrites the front door’s card instead of showing two', () => {
+  it('never appends a tag the shell already carries — a tag the shell has is rewritten, so a preview never reads two', () => {
     const root = join(dirname(fileURLToPath(import.meta.url)), '..')
     const shell = readFileSync(join(root, 'index.html'), 'utf8')
     const worker = readFileSync(join(root, 'worker/shareRoutes.ts'), 'utf8')
@@ -58,10 +58,9 @@ describe('worker/shareRoutes', () => {
     const rewritten = [...worker.matchAll(/\.on\('meta\[(?:property|name)="([^"]+)"\]'/g)].map((m) => m[1])
     expect(appended.length, 'the reader found no appended tag: the shape changed').toBeGreaterThan(0)
     expect(appended.filter((k) => inShell.has(k))).toEqual([])
-    for (const k of ['og:image', 'og:image:alt', 'twitter:image']) {
-      expect(inShell.has(k), `${k} in index.html`).toBe(true)
-      expect(rewritten, `${k} rewritten`).toContain(k)
-    }
+    // …and the ones it rewrites are really there to rewrite (a renamed tag in index.html would leave the result's words unsaid)
+    expect(rewritten.length).toBeGreaterThan(0)
+    expect(rewritten.filter((k) => !inShell.has(k))).toEqual([])
   })
 
   it('answers five parallel requests with distinct results, each with its own card', async () => {

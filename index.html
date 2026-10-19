@@ -22,15 +22,9 @@
     <meta property="og:site_name" content="Horizon" />
     <meta property="og:locale" content="fr_CA" />
     <meta property="og:locale:alternate" content="en_CA" />
-    <!-- The card a link to the front door shows (public/og/, drawn by scripts/gen-og.ts). A crawler needs the full address. A shared result
-         (/partage, worker/shareRoutes.ts) rewrites these same tags with its own card: it never adds a second image. -->
-    <meta property="og:image" content="https://retraite.marcportal.com/og/horizon-fr.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Horizon — Quand pouvez-vous prendre votre retraite ? Vos données restent sur votre appareil. / When can you retire? Your data stays on your device." />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://retraite.marcportal.com/og/horizon-fr.png" />
+    <!-- No card image for the front door: a crawler needs a FULL address, and this file holds none (lib/noNetwork.test.ts). A shared result
+         (/partage, worker/shareRoutes.ts) adds its own card, built from the request's origin. -->
+    <meta name="twitter:card" content="summary" />
     <!-- PWA: installable, offline app shell via /sw.js (registered in src/lib/registerSw.ts,
          prod builds only). Fonts are self-hosted (@fontsource, bundled): not one request
          leaves the origin. -->
