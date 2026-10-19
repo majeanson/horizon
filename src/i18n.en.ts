@@ -452,13 +452,13 @@ export const EN: typeof FR = {
     privacy: 'Your figures never leave this device. Horizon has no account, no server and no tracking.',
     export: {
       title: 'Save a copy',
-      hint: 'A file on your device, which you keep. Nothing is sent anywhere.',
+      hint: 'A file you keep on your device, with nothing sent anywhere.',
       button: 'Download my profile',
       done: 'Profile exported',
     },
     import: {
       title: 'Restore a copy',
-      hint: 'Choose a file saved from Horizon. It replaces this device’s profile.',
+      hint: 'A file saved from Horizon, which replaces this device’s profile.',
       button: 'Choose a file',
       confirm: 'Restore this file? This device’s profile will be replaced by the file’s. You can restore the old one right after; without a saved copy, it cannot be recovered later.',
       confirmLabel: 'Restore',
@@ -476,7 +476,7 @@ export const EN: typeof FR = {
     },
     example: {
       title: 'See an example',
-      hint: 'Load a fictional household to see what an answer looks like. Nine examples to compare.',
+      hint: 'A fictional household, to see what an answer looks like.',
       confirm: (name: string) => `Load “${name}”? This device’s profile will be replaced by a fictional household. You can restore the old one right after; without a saved copy, it cannot be recovered later.`,
       confirmLabel: 'Load',
       done: 'Example loaded',
@@ -503,7 +503,7 @@ export const EN: typeof FR = {
     },
     rescue: {
       title: 'Unreadable copy',
-      hint: 'The profile this device could not read was left in place. Download it before erasing anything: a file like this can often be mended by hand.',
+      hint: 'The profile this device could not read was left here: download it before erasing anything, as it can often be mended by hand.',
       button: 'Download the unreadable copy',
       older: 'Download the previous unreadable copy',
       fileName: (i: number) => (i === 0 ? 'horizon-unreadable.json' : `horizon-unreadable-${i}.json`),
@@ -515,7 +515,7 @@ export const EN: typeof FR = {
     },
     display: {
       title: 'Display',
-      hint: 'Set for this device only. Beyond these settings, browser zoom always works.',
+      hint: 'Set for this device only, and the browser’s zoom always works on top.',
       language: 'Language',
       languages: { fr: 'Français', en: 'English' },
       theme: 'Theme',

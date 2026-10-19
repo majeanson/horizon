@@ -473,13 +473,13 @@ export const FR = {
     privacy: 'Vos chiffres ne quittent jamais cet appareil. Horizon n’a ni compte, ni serveur, ni suivi.',
     export: {
       title: 'Sauvegarder une copie',
-      hint: 'Un fichier sur votre appareil, que vous gardez. Rien n’est envoyé nulle part.',
+      hint: 'Un fichier que vous gardez sur votre appareil, sans rien envoyer nulle part.',
       button: 'Télécharger mon profil',
       done: 'Profil exporté',
     },
     import: {
       title: 'Restaurer une copie',
-      hint: 'Choisissez un fichier sauvegardé depuis Horizon. Il remplace le profil de cet appareil.',
+      hint: 'Un fichier sauvegardé depuis Horizon, qui remplace le profil de cet appareil.',
       button: 'Choisir un fichier',
       confirm: 'Restaurer ce fichier ? Le profil de cet appareil sera remplacé par celui du fichier. Vous pourrez rétablir l’ancien tout de suite après ; sans copie sauvegardée, il ne se récupère plus ensuite.',
       confirmLabel: 'Restaurer',
@@ -497,7 +497,7 @@ export const FR = {
     },
     example: {
       title: 'Voir un exemple',
-      hint: 'Chargez un ménage fictif pour voir à quoi ressemble une réponse. Neuf exemples à comparer.',
+      hint: 'Un ménage fictif, pour voir à quoi ressemble une réponse.',
       confirm: (name: string) => `Charger « ${name} » ? Le profil de cet appareil sera remplacé par un ménage fictif. Vous pourrez rétablir l’ancien tout de suite après ; sans copie sauvegardée, il ne se récupère plus ensuite.`,
       confirmLabel: 'Charger',
       done: 'Exemple chargé',
@@ -524,7 +524,7 @@ export const FR = {
     },
     rescue: {
       title: 'Copie illisible',
-      hint: 'Le profil que cet appareil n’a pas pu lire est resté sur place. Téléchargez-le avant d’effacer quoi que ce soit : un fichier de cette sorte se répare souvent à la main.',
+      hint: 'Le profil que cet appareil n’a pas pu lire est resté ici : téléchargez-le avant d’effacer quoi que ce soit, il se répare souvent à la main.',
       button: 'Télécharger la copie illisible',
       older: 'Télécharger la copie illisible précédente',
       /** One name per copy: three downloads used to collide on « -precedent ». */
@@ -537,7 +537,7 @@ export const FR = {
     },
     display: {
       title: 'Affichage',
-      hint: 'Réglé pour cet appareil seulement. Au-delà de ces réglages, le zoom du navigateur fonctionne toujours.',
+      hint: 'Réglé pour cet appareil seulement, et le zoom du navigateur fonctionne toujours en plus.',
       language: 'Langue',
       languages: { fr: 'Français', en: 'English' },
       theme: 'Thème',
