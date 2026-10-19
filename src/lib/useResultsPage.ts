@@ -357,7 +357,7 @@ export function useResultsPage() {
             { id: 'donnees-calcul', label: rc.nav.chiffres, concept: 'documents' as const },
             { id: 'tableau', label: rc.nav.tableau, concept: 'annee' as const },
             { id: 'precision', label: rc.nav.precision, concept: 'precision' as const },
-            { id: 'parametres', label: rc.nav.parametres, concept: 'hypotheses' as const },
+            { id: 'parametres', label: rc.nav.parametres, concept: 'officiel' as const },
           ]
 
   // The headline sentence with its age drawn large: the copy marks where the age sits, the page splits it there.

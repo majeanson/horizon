@@ -4,8 +4,23 @@ import type { Lang } from '../i18n.ts'
 // reader. The title of every card is the title it always had (the section's own copy); only what a closed card says lives here. Outside the eager dictionaries, like every results copy.
 
 export interface CardsCopy {
-  /** The one line under a closed card. */
-  closed: { comparer: string; annee: string; viser: string; epargner: string; depenser: string; soins: string }
+  /** The one line under a closed card — Réponse's, Décider's what-ifs and strategies, Preuve's blocks. A strategy whose verdict is in says that instead. */
+  closed: {
+    comparer: string
+    annee: string
+    viser: string
+    epargner: string
+    depenser: string
+    soins: string
+    ordre: string
+    fonte: string
+    equilibre: string
+    solidite: string
+    donneesCalcul: string
+    tableau: string
+    precision: string
+    parametres: string
+  }
   /** The glance: three tiles under the sentence of the answer. */
   glance: {
     label: string
@@ -30,6 +45,14 @@ export const CARDS_COPY: Record<Lang, CardsCopy> = {
       epargner: 'L’épargne qu’il faut chaque mois pour atteindre un âge donné.',
       depenser: 'Ce que dépenser un peu moins ferait à votre âge de départ.',
       soins: 'Des soins qui font coûter plus cher les dernières années.',
+      ordre: 'Dans quels comptes puiser d’abord, et ce que chaque ordre laisse à la fin.',
+      fonte: 'Combien tirer du REER chaque année de retraite, et l’impôt que chaque façon coûte.',
+      equilibre: 'Le plan refait avec deux REER de taille semblable, et l’impôt que ça change.',
+      solidite: 'Si la réponse tient selon les trois scénarios et les marchés.',
+      donneesCalcul: 'Chaque chiffre qui fixe la réponse, avec son calcul.',
+      tableau: 'Le plan année par année : revenus, impôts, retraits et soldes.',
+      precision: 'Contre quoi le calcul a été vérifié, et ce qu’il simplifie.',
+      parametres: 'Les montants officiels utilisés, chacun avec sa page source.',
     },
     glance: {
       label: 'En un coup d’œil',
@@ -50,6 +73,14 @@ export const CARDS_COPY: Record<Lang, CardsCopy> = {
       epargner: 'The monthly saving an age needs.',
       depenser: 'What spending a little less would do to your departure age.',
       soins: 'The last years costing more: a care.',
+      ordre: 'Which accounts to draw from first, and what each order leaves at the end.',
+      fonte: 'How much to draw from the RRSP each retired year, and the tax each way costs.',
+      equilibre: 'The plan run again with two RRSPs of similar size, and the tax it changes.',
+      solidite: 'Whether the answer holds across the three scenarios and the markets.',
+      donneesCalcul: 'Every figure that sets the answer, with its calculation.',
+      tableau: 'The plan year by year: income, tax, withdrawals and balances.',
+      precision: 'What the calculation was checked against, and what it simplifies.',
+      parametres: 'The official amounts used, each with its source page.',
     },
     glance: {
       label: 'At a glance',

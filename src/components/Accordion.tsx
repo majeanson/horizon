@@ -106,7 +106,8 @@ export interface AccordionItemProps {
   icon?: IconName
   concept?: ConceptId
   family?: Family
-  /** One line shown while the block is closed (a verdict: « pour vous, l'ordre change peu »); a done block says its count by itself. */
+  /** One line shown while the block is closed, in place of the subtitle (a verdict: « pour vous, l'ordre change peu »); a done block says its count by itself.
+   *  Left out, a closed block shows its subtitle — no block is ever a bare title. */
   summary?: ReactNode
   /** Not a card: the block is a bare region (a person's column on Profil, whose cards are inside it) with its own title style. */
   plain?: boolean
@@ -186,7 +187,8 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
     else acc.setOpen(null)
   }
   const count = acc.doneCount.get(id)
-  const closedLine = isDone && count !== undefined ? c.done(count) : summary
+  // A closed block is never a bare title: it says its count when done, its verdict (`summary`) when the page has one, else its own one sentence.
+  const closedLine = isDone && count !== undefined ? c.done(count) : (summary ?? subtitle)
   // A bare block (a person's column) has no body wrapper: its cards are its direct children, which the two-column layout of Profil relies on.
   const body = plain ? children : (
     <div id={`${id}-body`} className="profile-section__body">
@@ -219,7 +221,7 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
           </button>
         </Heading>
         {isOpen && subtitle != null && <span className="section-header__sub">{glossed(subtitle)}</span>}
-        {!isOpen && closedLine != null && <p className={'accordion__summary' + (isDone ? ' is-done' : '')}>{closedLine}</p>}
+        {!isOpen && closedLine != null && <p className={'accordion__summary' + (isDone ? ' is-done' : '')}>{glossed(closedLine)}</p>}
       </div>
       {isOpen && detailsFold}
       {isOpen && body}

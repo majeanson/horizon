@@ -172,15 +172,15 @@ export function DecideView({ m }: { m: ResultsModel }) {
             </AccordionItem>
           )}
           {/* The age is the answer's; when no age works, the plan's own. Never the « Combien épargner ? » box from another view. */}
-          <AccordionItem id="ordre" title={rc.orders.title} concept="ordre" className="results-section" summary={ordrePruned ? rc.decide.ordreSame : undefined}>
+          <AccordionItem id="ordre" title={rc.orders.title} concept="ordre" className="results-section" summary={ordrePruned ? rc.decide.ordreSame : cc.ordre}>
             <OrderPanel orders={orders} />
           </AccordionItem>
-          <AccordionItem id="fonte" title={bf.title} concept="fonte" className="results-section" summary={fontePruned ? rc.decide.fonteSame : undefined}>
+          <AccordionItem id="fonte" title={bf.title} concept="fonte" className="results-section" summary={fontePruned ? rc.decide.fonteSame : cc.fonte}>
             {panel}
           </AccordionItem>
           {/* A couple only: a one-person household has no second RRSP to even out against. */}
           {isCouple && (
-            <AccordionItem id="equilibre" title={sb.title} concept="reer" className="results-section" summary={equilibrePruned ? rc.decide.equilibreSame : undefined}>
+            <AccordionItem id="equilibre" title={sb.title} concept="reer" className="results-section" summary={equilibrePruned ? rc.decide.equilibreSame : cc.equilibre}>
               <SpouseBalancePanel household={profile.household} age={age} names={names} balance={balance} />
             </AccordionItem>
           )}

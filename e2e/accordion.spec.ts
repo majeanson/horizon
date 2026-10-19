@@ -175,3 +175,28 @@ test('Décider: « Tout ouvrir » opens the four what-ifs and every strategy; cl
   await expect(page.locator('#depenser')).toHaveClass(/is-closed/)
   await expect(page.locator('.try-fold.is-open')).toHaveCount(3)
 })
+
+// NO BARE TITLE: a closed block always says, in one line, what it holds (its verdict when the page has one, its count when it is done) — on every page that reads
+// one block at a time, a phone's Profil included. Measured with the example household, every block closed but the default one.
+for (const [where, path, width] of [
+  ['Hypothèses', '/hypotheses', 1280],
+  ['Décider', '/resultats?v=decide', 1280],
+  ['Preuve', '/resultats?v=proof', 1280],
+  ['Réponse', '/resultats?v=answer&cartes=none', 1280],
+  ['Profil on a phone', '/profil?form=1', 390],
+] as const) {
+  test(`${where}: every closed block says what it holds`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await seedProfile(page, EXAMPLE)
+    await page.goto(path)
+    const closed = page.locator('.accordion__item.is-closed')
+    await expect(closed.first()).toBeVisible({ timeout: 60_000 })
+    const n = await closed.count()
+    expect(n, 'the page has closed blocks to check').toBeGreaterThan(0)
+    for (let i = 0; i < n; i++) {
+      const block = closed.nth(i)
+      const id = await block.getAttribute('id')
+      await expect(block.locator('.accordion__summary'), `#${id}`).toHaveText(/\S{3,}/)
+    }
+  })
+}

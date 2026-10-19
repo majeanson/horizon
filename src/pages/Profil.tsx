@@ -11,6 +11,7 @@ import { PensionPlans } from '../components/profile/PensionPlans'
 import { RrqSection } from '../components/profile/RrqSection'
 import { BackupLine } from '../components/profile/BackupLine'
 import { ProfileMap } from '../components/profile/ProfileMap'
+import { CARD_COPY } from '../lib/cardCopy'
 import { ENTRY_COPY } from '../lib/entryCopy'
 import { Chip } from '../components/Chip'
 import { Loading } from '../components/Loading'
@@ -196,7 +197,7 @@ export function Profil() {
               const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
               return (
                 // Keyed by person: a removed spouse unmounts, so no typed-but-uncommitted text crosses over. A bare block (its cards are inside it), one per person.
-                <AccordionItem key={p.id} id={`person-${p.id}`} title={name} plain className={`person who who--${Math.min(i, 1)}`}>
+                <AccordionItem key={p.id} id={`person-${p.id}`} title={name} summary={CARD_COPY[lang].person} plain className={`person who who--${Math.min(i, 1)}`}>
                   <SectionLevel.Provider value={3}>
                     <PersonFields id={p.id} />
                   </SectionLevel.Provider>

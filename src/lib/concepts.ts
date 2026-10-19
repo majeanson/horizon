@@ -50,6 +50,8 @@ export const CONCEPTS = {
   indexation: c('public', 'trend-up-bold'),
   releve: c('public', 'file-text-bold'),
   mga: c('public', 'ruler-bold'),
+  // The official amounts the engine reads, each with its source page (Preuve ▸ « Paramètres utilisés », the printed « Les sources »): the State's own figures.
+  officiel: c('public', 'scroll-bold'),
   residence: c('public', 'globe-hemisphere-west-bold'),
   // ── Registered accounts and shelters — marigold ────────────────────────────────────────────────────────────────────
   reer: c('accounts', 'piggy-bank-bold'),

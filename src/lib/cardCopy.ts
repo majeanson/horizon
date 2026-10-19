@@ -10,6 +10,7 @@ import type { Lang } from '../i18n.ts'
 export type CardId =
   | 'family'
   | 'about'
+  | 'person'
   | 'rrq'
   | 'oas'
   | 'accounts'
@@ -28,6 +29,7 @@ export type CardId =
 const FR: Record<CardId, string> = {
   family: 'Qui vit avec vous : un ou une partenaire, et les enfants.',
   about: 'Qui vous êtes, et l’âge où votre salaire s’arrête.',
+  person: 'Âge, salaire, comptes, régime d’employeur, RRQ et PSV de cette personne.',
   rrq: 'La rente du Québec : quand la commencer, et les gains qui la calculent.',
   oas: 'La pension fédérale, selon vos années vécues au Canada.',
   accounts: 'Ce que vous avez déjà mis de côté, compte par compte.',
@@ -47,6 +49,7 @@ const FR: Record<CardId, string> = {
 const EN: Record<CardId, string> = {
   family: 'Who lives with you: a partner, and the children.',
   about: 'Who you are, and the age your salary stops.',
+  person: 'This person’s age, pay, accounts, employer plan, QPP and OAS.',
   rrq: 'The Québec pension: when to start it, and the earnings it is built on.',
   oas: 'The federal pension, based on your years lived in Canada.',
   accounts: 'What you have already set aside, account by account.',
