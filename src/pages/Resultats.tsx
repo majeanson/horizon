@@ -142,9 +142,11 @@ function AnswerMode() {
 function DecideMode({ m }: { m: ResultsModel }) {
   const [tout, setTout] = useParamChoice('tout', ['off', '1'] as const, 'off')
   const all = tout === '1'
+  // Anything open — the first strategy, open by default (`strat` undefined), one chosen, or a what-if — makes the icon « Tout fermer ».
+  const anyOpen = all || m.strat !== null || m.essai !== null || m.essaiAll
   return (
     <AccordionMode
-      open={all ? 'all' : null}
+      open={all ? 'all' : anyOpen ? 'some' : null}
       onOpen={(next) => {
         if (next === 'all') {
           setTout('1')

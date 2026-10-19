@@ -48,7 +48,8 @@ test('Profil on a phone: one block at a time, the map opens a person, a link to 
   await expect(page.locator('#famille')).toHaveClass(/is-open/)
   await expect(page.locator('#person-self')).toHaveClass(/is-closed/)
   await expect(page.locator('#person-self').getByRole('textbox')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Tout ouvrir' })).toBeVisible()
+  // a block is open, so the icon offers to close: « Tout fermer »
+  await expect(page.getByRole('button', { name: 'Tout fermer' })).toBeVisible()
   await page.getByRole('navigation', { name: 'Sections du profil' }).getByRole('button', { name: /^Camille/ }).click()
   await expect(page).toHaveURL(/bloc=person-self/)
   await expect(page.locator('#person-self')).toHaveClass(/is-open/)
@@ -74,6 +75,9 @@ test('a finished block folds to its title and its count in the all-open shape, a
   await page.goto('/dev/kit')
   const kit = page.locator('.accordion__item')
   await expect(kit).toHaveCount(3)
+  // the specimen opens on its first block: the icon closes first, then opens every block
+  await page.getByRole('button', { name: 'Tout fermer' }).click()
+  await expect(page.locator('#un')).toHaveClass(/is-closed/)
   await page.getByRole('button', { name: 'Tout ouvrir' }).click()
   await expect(page.locator('#un')).toHaveClass(/is-open/)
   await expect(page.locator('#deux')).toHaveClass(/is-open/)
@@ -114,25 +118,32 @@ for (const [name, path, map, size] of [
   ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }],
   ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }],
 ] as const) {
-  test(`${name}: « Tout ouvrir » is an icon at the end of the map row, and « Tout fermer » closes every card`, async ({ page }) => {
+  test(`${name}: the icon at the end of the map row closes every card while ANY is open — the first included — and opens every card once all are closed`, async ({ page }) => {
     await page.setViewportSize(size)
     await seedProfile(page, EXAMPLE)
     await page.goto(path)
     const nav = page.getByRole('navigation', { name: map })
-    const all = nav.getByRole('button', { name: 'Tout ouvrir' })
-    await expect(all).toBeVisible({ timeout: 30_000 })
+    const icon = nav.locator('.accordion__all')
+    await expect(icon).toBeVisible({ timeout: 30_000 })
     // it is the LAST thing in the row and a round icon, not a tab: no visible text
-    await expect(all).toHaveText('')
-    const box = (await all.boundingBox())!
+    await expect(icon).toHaveText('')
+    const box = (await icon.boundingBox())!
     const rail = (await nav.locator('.rail').boundingBox())!
     expect(box.x, 'after the chips').toBeGreaterThanOrEqual(rail.x + rail.width - 1)
     expect(box.width).toBeLessThanOrEqual(48)
-    await all.click()
+    // the page opens on ONE card: the icon offers to close, and a tap closes it — not the rest opened
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(1)
+    await expect(icon).toHaveAccessibleName('Tout fermer')
+    await icon.click()
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
+    // all closed: now it opens every card
+    await expect(icon).toHaveAccessibleName('Tout ouvrir')
+    await icon.click()
     await expect(page).toHaveURL(/bloc=tout/)
-    await expect(nav.getByRole('button', { name: 'Tout fermer' })).toBeVisible()
-    await nav.getByRole('button', { name: 'Tout fermer' }).click()
+    await expect(icon).toHaveAccessibleName('Tout fermer')
+    await icon.click()
     await expect(page).not.toHaveURL(/bloc=tout/)
-    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0) // « Tout fermer » closes every card, the first included
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
   })
 }
 
@@ -156,6 +167,9 @@ test('Réponse: two cards, open by default; « Tout fermer » closes them, a map
   await expect(page).toHaveURL(/cartes=comparer/)
   await expect(page.locator('#comparer')).toHaveClass(/is-open/)
   await expect(page.locator('#annee')).toHaveClass(/is-closed/)
+  // one card open: the icon closes it; all closed, it gives every card back
+  await nav.getByRole('button', { name: 'Tout fermer' }).click()
+  await expect(page).toHaveURL(/cartes=none/)
   await nav.getByRole('button', { name: 'Tout ouvrir' }).click()
   await expect(page).not.toHaveURL(/cartes=/)
   await expect(page.locator('#annee')).toHaveClass(/is-open/)
@@ -168,6 +182,8 @@ test('Décider: « Tout ouvrir » opens the four what-ifs and every strategy; cl
   const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
   await expect(page.locator('.try-fold')).toHaveCount(4, { timeout: 60_000 })
   await expect(page.locator('.try-fold.is-open')).toHaveCount(0)
+  // the first strategy is open, so the icon first closes it; then it opens everything
+  await nav.getByRole('button', { name: 'Tout fermer' }).click()
   await nav.getByRole('button', { name: 'Tout ouvrir' }).click()
   await expect(page).toHaveURL(/essai=all/)
   await expect(page.locator('.try-fold.is-open')).toHaveCount(4)

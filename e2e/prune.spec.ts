@@ -33,7 +33,7 @@ test('the golden couple: « Fonte du REER » is a closed block with its title an
   await expect(section.getByRole('heading').first()).toBeVisible()
   await expect(section.getByRole('button', { expanded: false })).toHaveCount(1)
   await expect(section.getByRole('tab')).toHaveCount(0) // the machinery is not mounted until the block opens
-  await expect(page.getByRole('navigation', { name: 'Sections des résultats' }).getByRole('button', { name: 'Tout ouvrir' })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Sections des résultats' }).locator('.accordion__all')).toBeVisible()
   // the block opens on a tap of its title, and the full panel is there; the address keeps it
   await section.getByRole('button', { expanded: false }).click()
   await expect(page).toHaveURL(/strat=fonte/)
@@ -46,8 +46,10 @@ test('« Tout ouvrir » (the icon at the end of the map row) opens every what-if
   await seedProfile(page)
   await page.goto('/resultats?v=decide')
   const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
+  // the first strategy is open: the icon closes it, then opens everything
+  await nav.getByRole('button', { name: 'Tout fermer' }).click({ timeout: 90_000 })
   const all = nav.getByRole('button', { name: 'Tout ouvrir' })
-  await expect(all).toBeVisible({ timeout: 90_000 })
+  await expect(all).toBeVisible()
   await all.click()
   await expect(page).toHaveURL(/tout=1/)
   await expect(page).toHaveURL(/essai=all/)
