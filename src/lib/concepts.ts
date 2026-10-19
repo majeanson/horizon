@@ -124,6 +124,16 @@ export const CONCEPTS = {
   precision: c('horizon', 'crosshair-bold'),
   hypotheses: c('horizon', 'sliders-horizontal-bold'),
   solidite: c('horizon', 'anchor-bold'),
+  // What the settings page does with the app itself (pages/Donnees.tsx): the household's figures are not in them, so they wear the neutral ink. Each its
+  // own glyph — the page used to borrow the assumptions' sliders for « Affichage » and one download arrow for three different acts.
+  copieIllisible: c('horizon', 'file-x-bold'),
+  sauvegarde: c('horizon', 'floppy-disk-bold'),
+  imprimer: c('horizon', 'printer-bold'),
+  restaurer: c('horizon', 'upload-simple-bold'),
+  effacer: c('horizon', 'trash-bold'),
+  repartir: c('horizon', 'arrows-clockwise-bold'),
+  affichage: c('horizon', 'text-aa-bold'),
+  installer: c('horizon', 'device-mobile-bold'),
 } as const satisfies Record<string, Concept>
 
 export type ConceptId = keyof typeof CONCEPTS

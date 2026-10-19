@@ -114,7 +114,7 @@ export function Donnees() {
 
       {/* An unreadable copy found on this device comes first: it is the one thing here that may be urgent. */}
       {copies.length > 0 && (
-        <Section title={d.rescue.title} subtitle={d.rescue.hint} icon="download-simple-bold">
+        <Section title={d.rescue.title} subtitle={d.rescue.hint} concept="copieIllisible">
           <Cluster>
             {copies.map((text, i) => (
               <button key={i} type="button" className="btn" onClick={() => saveAsFile(text, d.rescue.fileName(i))}>
@@ -125,19 +125,19 @@ export function Donnees() {
         </Section>
       )}
       {/* The copy is the whole reason this page exists: its button is the one filled button here. */}
-      <Section title={d.export.title} subtitle={d.export.hint} icon="download-simple-bold">
+      <Section title={d.export.title} subtitle={d.export.hint} concept="sauvegarde">
         <Cluster>
           <button type="button" className="btn btn--primary" onClick={download}>
             {d.export.button}
           </button>
         </Cluster>
       </Section>
-      <Section title={PRINT_MENU_COPY[lang].section.title} subtitle={PRINT_MENU_COPY[lang].section.hint} icon="printer-bold">
+      <Section title={PRINT_MENU_COPY[lang].section.title} subtitle={PRINT_MENU_COPY[lang].section.hint} concept="imprimer">
         <Cluster>
           <PrintChip />
         </Cluster>
       </Section>
-      <Section title={d.import.title} subtitle={d.import.hint} icon="upload-simple-bold">
+      <Section title={d.import.title} subtitle={d.import.hint} concept="restaurer">
         <Cluster>
           <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
             {d.import.button}
@@ -198,7 +198,7 @@ export function Donnees() {
 
       <InstallLine />
 
-      <Section title={d.clear.title} subtitle={d.clear.hint} icon="trash-bold" className="section--danger">
+      <Section title={d.clear.title} subtitle={d.clear.hint} concept="effacer" className="section--danger">
         <Cluster>
           <button
             type="button"
@@ -216,7 +216,7 @@ export function Donnees() {
         </Cluster>
       </Section>
       {/* No icon: the core set (lib/pipIcons.ts, in the shell) has no « again » glyph and the eager entry is at its cap; the words carry it. */}
-      <Section title={fc.title} subtitle={fc.hint} className="section--danger">
+      <Section title={fc.title} subtitle={fc.hint} concept="repartir" className="section--danger">
         <Cluster>
           <button type="button" className="btn btn--danger" onClick={() => void restart()}>
             {fc.button}
@@ -246,7 +246,7 @@ function DisplaySection() {
   const { lang } = useLang()
   const d = t.data.display
   return (
-    <Section title={d.title} subtitle={d.hint} icon="sliders-horizontal-bold">
+    <Section title={d.title} subtitle={d.hint} concept="affichage">
       <DisplayControls />
       <TimeBudgetRow />
       <div className="field-row">

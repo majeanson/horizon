@@ -58,7 +58,7 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
     families: { children: 'enfants et congé parental', survivor: 'rente de survivant', couple: 'barèmes de couple', alone: 'montant pour personne vivant seule', work: 'cotisations des travailleurs' },
     notReady: 'Ce tableau se prépare encore. Réessayez dans un instant.',
     needsProfile: 'Il manque encore des chiffres dans le profil : rien à imprimer pour l’instant.',
-    section: { title: 'Imprimer', hint: 'Le plan en une page, le calendrier, un dépliant, le dossier de preuve, le tableau année par année ou les sources. Tout se passe sur cet appareil.' },
+    section: { title: 'Imprimer', hint: 'Le plan en une page, le calendrier, un dépliant, le dossier de preuve, le tableau année par année ou les sources, tout fait sur cet appareil.' },
   },
   en: {
     button: 'Print…',
@@ -86,6 +86,6 @@ export const PRINT_MENU_COPY: { fr: PrintMenuCopy; en: PrintMenuCopy } = {
     families: { children: 'children and parental leave', survivor: 'survivor pension', couple: 'couple scales', alone: 'living-alone amount', work: 'payroll contributions' },
     notReady: 'This table is still being worked out. Try again in a moment.',
     needsProfile: 'The profile is still missing figures: nothing to print yet.',
-    section: { title: 'Print', hint: 'The plan on one page, the calendar, a leaflet, the proof file, the year-by-year table or the sources. It all happens on this device.' },
+    section: { title: 'Print', hint: 'The plan on one page, the calendar, a leaflet, the proof file, the year-by-year table or the sources, all made on this device.' },
   },
 }

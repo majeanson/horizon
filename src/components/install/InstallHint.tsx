@@ -36,7 +36,7 @@ export function InstallLine() {
   const c = INSTALL_COPY[lang].line
   const kind = useInstallKind()
   return (
-    <Section title={c.title} subtitle={kind === 'installed' ? c.installed : c.hint} icon="download-simple-bold">
+    <Section title={c.title} subtitle={kind === 'installed' ? c.installed : c.hint} concept="installer">
       {kind === 'native' && (
         <>
           <p className="field-row__hint">{c.native}</p>
