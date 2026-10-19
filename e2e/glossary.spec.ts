@@ -44,3 +44,11 @@ test('the glossary follows the language and the top-bar book leads to it', async
   await expect(page.getByRole('term').filter({ hasText: /^QPP/ })).toHaveCount(1)
   await expect(page.getByRole('term').filter({ hasText: /^RRQ/ })).toHaveCount(0)
 })
+
+test('every section of the page is in its map — the colours first, as on the page', async ({ page }) => {
+  await page.goto('/glossaire')
+  const map = page.getByRole('navigation', { name: 'Aller à un groupe' })
+  await expect(map.getByRole('button').first()).toHaveText('Les couleurs')
+  await map.getByRole('button', { name: 'Les couleurs' }).click()
+  await expect(page.locator('#glossaire-couleurs')).toBeInViewport()
+})

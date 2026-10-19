@@ -68,7 +68,9 @@ const BUDGETS: Record<string, Budget> = {
   // 364 → 365 controls, 1856 → 1845 words (2026-10-16): « Rendre mon profil exact » keeps its bar and « n sur N » in view and folds the legend and the hint under one summary (+1 control, −11 words).
   // 365 → 403 controls, 1845 → 2032 words (2026-10-16, a conscious RISE — Marc: “inputs that could be better on mobile”): the bounded figures (ages, rates, shares) are sliders now
   // (components/NumberSlider.tsx): a thumb, a − and a + each, and a « Saisir le chiffre exact » chip that gives the typed box back. Fewer keyboards on a phone, more stops on a wide screen.
-  'Profil (form)': { controls: 403, words: 2039 },
+  // words 2039 → 2035 (2026-10-19, the ratchet FALLS): « Ma situation » closed says its answers (shorter than the lead it replaces, now inside), and the dots' legend of
+  // « Rendre mon profil exact » is in view — it is needed to read every field's dot (+6 words).
+  'Profil (form)': { controls: 403, words: 2035 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
@@ -88,7 +90,9 @@ const BUDGETS: Record<string, Budget> = {
   // 36 → 37 controls, 637 → 642 words (2026-10-17, Phase 16 slice 3): « Les dates de votre plan » — ONE closed fold under the plan's line (its list opens only when asked for): the calendar of every date
   // the profile announces, which the line draws only as stretches. One summary, five words; the list itself is not on the first screen.
   // 37 → 38 controls, 642 → 643 words (2026-10-17): « Imprimer… » moved here from the results page (one chip, its list is a closed dialog).
-  'Fiche': { controls: 38, words: 650 },
+  // 38 → 43 controls, 650 → 667 words (2026-10-19): the sheet has its map, like every long page — a chip per section (Où vous en êtes, Aujourd’hui, À la retraite,
+  // Ce que vous détenez, Ce qui préciserait la réponse), by its own title; and its sentence moved into the page head.
+  'Fiche': { controls: 43, words: 667 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
@@ -108,7 +112,8 @@ const BUDGETS: Record<string, Budget> = {
   // together, 3 × 3, scored by the worst case. Four words; the grid mounts only when opened.
   // 50 → 49 controls, 830 → 871 words (2026-10-17): « Imprimer… » and the « Tout montrer » chip are gone, the same icon as every page replaces the chip (+1); the four what-ifs are cards that say in one line what they hold while closed (+41 words).
   // 49 → 51 controls (2026-10-19): the closed strategies say what they hold (lib/cardsCopy.ts `closed`), and « REER » in two of those lines is a glossary link, as in every subtitle.
-  'Résultats — Décider': { controls: 51, words: 891 },
+  // 51 → 52 controls, 891 → 912 words (2026-10-19): the second step is said on the page — « Choisir comment » and its one sentence over the strategies (« REER » in it a glossary link).
+  'Résultats — Décider': { controls: 52, words: 912 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits

@@ -4,11 +4,15 @@ import type { Lang } from '../../i18n'
 import { SHEET_COPY } from '../../lib/sheetCopy'
 import type { SheetModel } from '../../lib/sheetModel'
 import { sheetView, type StatView } from '../../lib/sheetView'
+import type { ConceptId } from '../../lib/concepts'
 import { Chip } from '../Chip'
 import { ConceptPip } from '../ConceptPip'
+import { EmptyState } from '../EmptyState'
 import { Fold } from '../Fold'
 import { Cluster } from '../Layout'
+import { PinStack } from '../PinStack'
 import { SectionHeader, SectionLevel } from '../SectionHeader'
+import { SectionNav } from '../SectionNav'
 import { StatBar } from './StatBar'
 
 // The household sheet: a clean page of cards. It draws the SHEET VIEW (lib/sheetView.ts) and nothing else: every figure is already text there, so this file
@@ -36,18 +40,32 @@ function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
 
 export function SheetSerious({ model, lang, births, names, timeline, cards }: { model: SheetModel; lang: Lang; births: readonly number[]; names: readonly string[]; timeline?: ReactNode; cards?: ReactNode }) {
   const v = sheetView(model, lang, SHEET_COPY[lang], births, names)
+  const groupConcept = (id: string): ConceptId => (id === 'today' ? 'budget' : 'depart')
+  // The map of the sheet, the same chips as every long page (Résultats, the glossary): each section by its own title and pip.
+  const links = [
+    { id: 'fiche-situation', label: v.verdict.title, concept: 'reponse' as const },
+    ...v.groups.map((g) => ({ id: `fiche-${g.id}`, label: g.title, concept: groupConcept(g.id) })),
+    { id: 'fiche-detenu', label: v.holdings.title, concept: 'nid' as const },
+    ...(v.sharpen !== null ? [{ id: 'fiche-preciser', label: v.sharpen.title, concept: 'precision' as const }] : []),
+  ]
   return (
     <div className="sheet sheet--serious">
+      <PinStack>
+        <SectionNav ariaLabel={SHEET_COPY[lang].nav} links={links} />
+      </PinStack>
+      {/* Not enough figures for an answer: the same empty state as the results page, and the one way on. */}
       {v.empty !== null && (
         <div className="surface sheet__empty">
-          <p>{v.empty}</p>
+          <EmptyState tone="calm" icon="identification-card-bold">
+            {v.empty}
+          </EmptyState>
           <Link className="btn btn--primary btn--sm" to="/profil">
             {v.toProfile}
           </Link>
         </div>
       )}
 
-      <section className="sheet__section" aria-label={v.verdict.title}>
+      <section id="fiche-situation" className="sheet__section" aria-label={v.verdict.title}>
         <SectionHeader title={v.verdict.title} concept="reponse" />
         <ul className="sheet__stats">
           {v.verdict.stats.map((s) => (
@@ -63,8 +81,8 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
       {timeline}
 
       {v.groups.map((g) => (
-        <section key={g.id} className="sheet__section" aria-label={g.title}>
-          <SectionHeader title={g.title} subtitle={g.hint} concept={g.id === 'today' ? 'budget' : 'depart'} />
+        <section key={g.id} id={`fiche-${g.id}`} className="sheet__section" aria-label={g.title}>
+          <SectionHeader title={g.title} subtitle={g.hint} concept={groupConcept(g.id)} />
           <ul className="sheet__stats">
             {g.stats.map((s) => (
               <StatCard key={s.id} s={s} howToRead={v.howToRead} />
@@ -73,7 +91,7 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
         </section>
       ))}
 
-      <section className="sheet__section" aria-label={v.holdings.title}>
+      <section id="fiche-detenu" className="sheet__section" aria-label={v.holdings.title}>
         <SectionHeader title={v.holdings.title} concept="nid" />
         {v.holdings.groups.length === 0 && <p className="field-row__hint">{v.holdings.empty}</p>}
         <SectionLevel.Provider value={3}>
@@ -125,7 +143,7 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
       {cards}
 
       {v.sharpen !== null && (
-        <section className="sheet__section" aria-label={v.sharpen.title}>
+        <section id="fiche-preciser" className="sheet__section" aria-label={v.sharpen.title}>
           <SectionHeader title={v.sharpen.title} subtitle={v.sharpen.intro} concept="precision" />
           <p className="field-row__hint">{v.sharpen.note}</p>
           {v.sharpen.items.length > 0 && (

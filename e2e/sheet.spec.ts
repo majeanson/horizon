@@ -151,3 +151,12 @@ test('« Les dates de votre plan » is one tap under the plan’s line, one row 
   expect(years).toEqual([...years].sort((a, b) => a - b))
   await expectNoHorizontalOverflow(page)
 })
+
+test('the sheet has its map, like every long page: each chip is a section by its own title, and a chip lands on it', async ({ page }) => {
+  await page.goto('/fiche')
+  const map = page.getByRole('navigation', { name: 'Sections de la fiche' })
+  await expect(map).toBeVisible()
+  for (const name of ['Où vous en êtes', 'Ce que vous détenez']) await expect(map.getByRole('button', { name })).toBeVisible()
+  await map.getByRole('button', { name: 'Ce que vous détenez' }).click()
+  await expect(page.locator('#fiche-detenu')).toBeInViewport()
+})

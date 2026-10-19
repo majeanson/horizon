@@ -50,6 +50,8 @@ export interface SheetWords {
   /** The sentence under the title when nothing can be said yet. */
   empty: string
   toProfile: string
+  /** The map of the sheet's sections (a screen reader's name for it). */
+  nav: string
   toResults: string
   /** The link to the sheet, on the settings page (the header has it too, where the screen is wide enough). */
   open: string
@@ -126,6 +128,7 @@ const FR: SheetWords = {
   scenarioNames: { prudent: 'Prudent', neutral: 'Neutre', bold: 'Audacieux' },
   empty: 'Entrez un revenu et vos dépenses à la retraite : la fiche se remplit avec le calcul.',
   toProfile: 'Aller au profil',
+  nav: 'Sections de la fiche',
   toResults: 'Voir la réponse',
   open: 'Ouvrir ma fiche',
 }
@@ -201,6 +204,7 @@ const EN: SheetWords = {
   scenarioNames: { prudent: 'Prudent', neutral: 'Neutral', bold: 'Bold' },
   empty: 'Enter an income and your retirement spending: the sheet fills in with the calculation.',
   toProfile: 'Go to the profile',
+  nav: 'Sections of the sheet',
   toResults: 'See the answer',
   open: 'Open my sheet',
 }

@@ -56,6 +56,8 @@ export function Glossaire() {
 
   const groupId = (id: string) => `glossaire-${id}`
   const links = [
+    // The legend of the colours comes first on the page, so it is first on the map too: every section of the page is in its map.
+    { id: groupId('couleurs'), label: g.legend.title },
     ...g.groups.map((group) => ({ id: groupId(group.id), label: group.title, concept: FAMILY_FACE[GLOSSARY_GROUP_FAMILY[group.id]] })),
     { id: groupId(g.docs.id), label: g.docs.title, concept: GLOSSARY_DOCS_CONCEPT },
     { id: groupId(g.help.id), label: g.help.title, concept: GLOSSARY_HELP_CONCEPT },
@@ -68,7 +70,7 @@ export function Glossaire() {
       <PinStack>
         <SectionNav ariaLabel={g.nav} links={links} />
       </PinStack>
-      <Section title={g.legend.title} subtitle={g.legend.intro}>
+      <Section id={groupId('couleurs')} title={g.legend.title} subtitle={g.legend.intro}>
         <ul className="pip-legend">
           {FAMILIES.map((family) => (
             <li key={family} className={`pip-legend__item fam--${FAMILY_HUE[family]}`}>

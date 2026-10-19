@@ -3,6 +3,8 @@
    on a phone before they spread on a wider screen. */
 .sheet {
   display: grid;
+  /* One column that may be narrower than its widest content: the map's one-line rail scrolls inside the screen instead of widening the page to its length. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
 }
 .sheet__empty {
