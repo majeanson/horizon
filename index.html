@@ -22,8 +22,8 @@
     <meta property="og:site_name" content="Horizon" />
     <meta property="og:locale" content="fr_CA" />
     <meta property="og:locale:alternate" content="en_CA" />
-    <!-- No card image for the front door: a crawler needs a FULL address, and this file holds none (lib/noNetwork.test.ts). A shared result
-         (/partage, worker/shareRoutes.ts) adds its own card, built from the request's origin. -->
+    <!-- The link card is not written here: a crawler needs a FULL address, and this file holds none (lib/noNetwork.test.ts). The Worker adds it
+         from the request's origin — the front door's on `/`, a shared result's on /partage (worker/shareRoutes.ts). -->
     <meta name="twitter:card" content="summary" />
     <!-- PWA: installable, offline app shell via /sw.js (registered in src/lib/registerSw.ts,
          prod builds only). Fonts are self-hosted (@fontsource, bundled): not one request

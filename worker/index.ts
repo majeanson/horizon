@@ -1,5 +1,5 @@
 import { withSecurityHeaders } from './securityHeaders'
-import { isShareRoute, shareRoute } from './shareRoutes'
+import { isShareRoute, shareRoute, withFrontDoorCard } from './shareRoutes'
 
 // The whole backend: serve the built SPA from the ASSETS binding. There is no /api — the
 // profile never leaves the browser — so this file is deliberately tiny, and the fact that it
@@ -21,6 +21,8 @@ export default {
       return shared
     }
     const res = await env.ASSETS.fetch(request)
+    // The front door carries its link card, written from the origin (worker/shareRoutes.ts `withFrontDoorCard`; `/` is in run_worker_first for this).
+    if (path === '/' && (request.method === 'GET' || request.method === 'HEAD')) return withSecurityHeaders(withFrontDoorCard(res, new URL(request.url)))
 
     // …but /assets/* is the hashed build output, never a client route, so the SPA fallback is
     // WRONG there: a stale shell asking for a previous build's chunk would get 200 + index.html

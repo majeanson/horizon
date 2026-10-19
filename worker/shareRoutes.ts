@@ -82,6 +82,34 @@ async function page(url: URL, env: AssetsEnv): Promise<Response> {
   return rewriter.transform(shell)
 }
 
+/** The front door's card, for a link to `/` (Marc, 2026-10-19: « show a small preview image »). A crawler needs the image's FULL address, and the shell may
+ *  hold none (lib/noNetwork.test.ts: index.html carries no absolute URL), so it is written here from the request's own origin — the generic card that
+ *  scripts/gen-og.ts drew (public/og/), in French, the shell's language for a reader that runs no script. A function of the address alone, like the rest. */
+export const FRONT_DOOR_CARD = '/og/horizon-fr.png'
+
+export function withFrontDoorCard(shell: Response, url: URL): Response {
+  if (!shell.ok || !(shell.headers.get('content-type') ?? '').startsWith('text/html')) return shell
+  const image = new URL(FRONT_DOOR_CARD, url.origin).href
+  return new HTMLRewriter()
+    .on('meta[name="twitter:card"]', { element: (e) => void e.setAttribute('content', 'summary_large_image') })
+    .on('head', {
+      element: (e) =>
+        void e.append(
+          [
+            tag('property', 'og:url', url.origin + '/'),
+            tag('property', 'og:image', image),
+            tag('property', 'og:image:type', 'image/png'),
+            tag('property', 'og:image:width', '1200'),
+            tag('property', 'og:image:height', '630'),
+            tag('property', 'og:image:alt', 'Horizon — Quand pouvez-vous prendre votre retraite ? Vos données restent sur votre appareil.'),
+            tag('name', 'twitter:image', image),
+          ].join(''),
+          { html: true },
+        ),
+    })
+    .transform(shell)
+}
+
 export function shareRoute(request: Request, env: AssetsEnv): Promise<Response> {
   const url = new URL(request.url)
   return url.pathname === OG_PATH ? card(url, env) : page(url, env)

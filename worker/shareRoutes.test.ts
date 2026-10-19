@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { isShareRoute, shareRoute } from './shareRoutes'
+import { FRONT_DOOR_CARD, isShareRoute, shareRoute } from './shareRoutes'
 
 // The card route, against a fake assets binding. (The page route rewrites HTML with Cloudflare's HTMLRewriter, which Node does not have: it is held by
 // a check on the running Worker (`wrangler dev`, then `curl` the address), not here.)
@@ -61,6 +61,19 @@ describe('worker/shareRoutes', () => {
     // …and the ones it rewrites are really there to rewrite (a renamed tag in index.html would leave the result's words unsaid)
     expect(rewritten.length).toBeGreaterThan(0)
     expect(rewritten.filter((k) => !inShell.has(k))).toEqual([])
+  })
+
+  it('gives the front door its card: `/` alone runs the Worker first (an exact pattern, never « /* »), and the Worker writes the card there', () => {
+    const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+    const toml = readFileSync(join(root, 'wrangler.toml'), 'utf8')
+    const first = JSON.parse(toml.match(/^run_worker_first = (\[.*\])$/m)![1]) as string[]
+    expect(first).toContain('/')
+    expect(first.filter((p) => p.includes('*')), 'a wildcard would run the Worker before every asset').toEqual([])
+    const index = readFileSync(join(root, 'worker/index.ts'), 'utf8')
+    expect(index).toMatch(/path === '\/'[^\n]*withFrontDoorCard\(/)
+    // the card it points at is a file the build ships, and the shell itself names no image (lib/noNetwork.test.ts: no absolute address in index.html)
+    expect(readFileSync(join(root, 'public', FRONT_DOOR_CARD.slice(1))).length).toBeGreaterThan(1000)
+    expect(readFileSync(join(root, 'index.html'), 'utf8')).not.toMatch(/og:image/)
   })
 
   it('answers five parallel requests with distinct results, each with its own card', async () => {

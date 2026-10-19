@@ -12,8 +12,9 @@ routes = [{ pattern = "retraite.marcportal.com", custom_domain = true }]
 [assets]
 directory = "./dist"
 binding = "ASSETS"
-# The share link's two addresses reach the Worker even on a navigation (worker/shareRoutes.ts); every other route is the assets layer's alone.
-run_worker_first = ["/partage", "/og/scenario"]
+# The share link's two addresses reach the Worker even on a navigation (worker/shareRoutes.ts), and so does the front door « / » alone (an exact
+# pattern, not « /* »): its link card is written from the request's origin (withFrontDoorCard). Every other route is the assets layer's alone.
+run_worker_first = ["/", "/partage", "/og/scenario"]
 # Unknown paths fall back to index.html so client-side routes survive a reload. (worker/index.ts
 # turns that fallback into a 404 for /assets/*, where a page is always the wrong answer.)
 not_found_handling = "single-page-application"
