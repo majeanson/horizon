@@ -67,8 +67,8 @@ const FR: SpouseBalanceCopy = {
   tax: 'Impôt sur tout le plan',
   age: (n) => `${n} ans`,
   updating: 'Mise à jour…',
-  howTitle: 'Comment lire cette page',
-  how: 'Quand l’un des partenaires a un bien plus gros REER, ses retraits sont imposés à un taux plus haut que ceux de l’autre. Cette page refait le plan avec une partie de ce REER dans celui de l’autre partenaire et compare l’impôt sur tout le plan : c’est ce que ferait un REER de conjoint, alimenté par celui qui gagne le plus.',
+  howTitle: 'Comment lire ce calcul',
+  how: 'Quand l’un des partenaires a un bien plus gros REER, ses retraits sont imposés à un taux plus haut que ceux de l’autre. Ce calcul refait le plan avec une partie de ce REER dans celui de l’autre partenaire et compare l’impôt sur tout le plan : c’est ce que ferait un REER de conjoint, alimenté par celui qui gagne le plus.',
   caveat:
     'C’est une approximation d’un REER de conjoint. Dans la réalité, c’est celui qui gagne le plus qui cotise, et il garde la déduction et ses droits de cotisation (ici, seuls les soldes changent de main). Un retrait fait dans les années civiles qui suivent une cotisation au REER de conjoint est imposé chez celui qui a cotisé, selon la règle d’attribution de l’Agence du revenu du Canada : l’avantage se joue donc surtout avant 65 ans, car le fractionnement du revenu de pension rapproche déjà les deux revenus ensuite. Un REER immobilisé ne peut pas changer de main.',
 }
@@ -102,8 +102,8 @@ const EN: SpouseBalanceCopy = {
   tax: 'Tax over the whole plan',
   age: (n) => `${n}`,
   updating: 'Updating…',
-  howTitle: 'How to read this page',
-  how: 'When one spouse has a much larger RRSP, their withdrawals are taxed at a higher rate than the other’s. This page runs the plan again with part of that RRSP held in the other spouse’s and compares the tax over the whole plan: it is what a spousal RRSP, funded by the higher earner, would do.',
+  howTitle: 'How to read this calculation',
+  how: 'When one spouse has a much larger RRSP, their withdrawals are taxed at a higher rate than the other’s. This calculation runs the plan again with part of that RRSP held in the other spouse’s and compares the tax over the whole plan: it is what a spousal RRSP, funded by the higher earner, would do.',
   caveat:
     'This is an approximation of a spousal RRSP. In real life the higher earner contributes and keeps the deduction and the contribution room (here, only the balances change hands). A withdrawal made within the calendar years that follow a spousal contribution is taxed back to the contributor, under the Canada Revenue Agency’s attribution rule: the benefit is mostly before 65, since pension income splitting already brings the two incomes closer afterwards. A locked-in RRSP cannot change hands.',
 }

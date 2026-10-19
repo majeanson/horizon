@@ -133,7 +133,7 @@ const FR: BracketFillCopy = {
   tooltip: (age, year) => `${age} ans · ${year}`,
   incomeFigure: (first, last) => `Revenu net de ${first} à ${last} ans, avec la ligne de la façon choisie`,
   balancesFigure: (first, last) => `Solde du REER et du CELI de ${first} à ${last} ans`,
-  howTitle: 'Comment lire cette page',
+  howTitle: 'Comment lire ce calcul',
   how: 'Fondre le REER, c’est payer de l’impôt un peu plus tôt, à un taux bas, pour que les retraits minimums du FERR soient plus petits plus tard. Le texte sous les onglets dit ce que la façon choisie fait à votre plan, comparée à « Sans fonte » ; le tableau les met côte à côte. Il arrive que la fonte coûte plus d’impôt : le chiffre est là pour le dire.',
   caveat:
     'La fonte déplace l’impôt vers le début du plan : elle ne fait gagner que si le REER est assez gros pour que les retraits minimums du FERR atteignent, plus tard, des tranches plus hautes. Personne n’est « fondu » tant qu’il touche le SRG, ni durant une année de travail. La ligne est un haut de tranche, pas le taux le plus bas possible : le crédit du Québec partagé entre conjoints et les crédits liés à l’âge font bouger le taux réel. Un REER restant est imposé comme un revenu au décès ; un CELI ne l’est pas.',
@@ -203,7 +203,7 @@ const EN: BracketFillCopy = {
   tooltip: (age, year) => `Age ${age} · ${year}`,
   incomeFigure: (first, last) => `Net income from age ${first} to ${last}, with the chosen way’s line`,
   balancesFigure: (first, last) => `RRSP and TFSA balances from age ${first} to ${last}`,
-  howTitle: 'How to read this page',
+  howTitle: 'How to read this calculation',
   how: 'Melting down the RRSP means paying tax a little earlier, at a low rate, so the RRIF minimums are smaller later. The text under the tabs says what the chosen way does to your plan, compared with “No meltdown”; the table sets them side by side. Sometimes the meltdown costs more tax: the figure is there to say so.',
   caveat:
     'The meltdown moves tax to the start of the plan: it only wins when the RRSP is big enough that the RRIF minimums would later reach higher brackets. Nobody is melted down while receiving the GIS, nor in a working year. The line is a bracket top, not the lowest possible rate: Québec’s credit shared between spouses and the age-related credits move the real rate. An RRSP left over is taxed as income at death; a TFSA is not.',
