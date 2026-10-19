@@ -247,7 +247,7 @@ export const EN: typeof FR = {
 
   assumptions: {
     title: 'Assumptions',
-    subtitle: 'What you suppose about the future. The Neutral scenario is already in place: nothing to change here for a first answer.',
+    subtitle: 'What you assume about the future.',
     presets: {
       title: 'Scenario',
       hint: 'A starting point for inflation, wages, returns and the plan’s end age. Change a figure and the scenario becomes “Custom”.',

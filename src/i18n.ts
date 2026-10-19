@@ -265,7 +265,7 @@ export const FR = {
 
   assumptions: {
     title: 'Hypothèses',
-    subtitle: 'Ce que vous supposez de l’avenir. Le scénario Neutre est déjà en place : rien à changer ici pour une première réponse.',
+    subtitle: 'Ce que vous supposez de l’avenir.',
     presets: {
       title: 'Scénario',
       hint: 'Un point de départ pour l’inflation, les salaires, les rendements et l’âge de fin du plan. Changez un chiffre et le scénario devient « Personnalisé ».',

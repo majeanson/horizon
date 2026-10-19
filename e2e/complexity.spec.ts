@@ -82,7 +82,8 @@ const BUDGETS: Record<string, Budget> = {
   // to the page in this commit — lowered so the slack cannot be spent.
   // words 159 → 218 (2026-10-19, a conscious RISE — Marc: « no hidden information »): a closed block is never a bare title any more (components/Accordion.tsx shows its
   // one sentence while closed), so the six closed assumptions each say what they hold.
-  'Hypothèses': { controls: 32, words: 218 },
+  // 218 → 202 words (2026-10-19, the ratchet FALLS — Marc: « Ce que vous supposez de l’avenir » is enough): the page head says one short sentence.
+  'Hypothèses': { controls: 32, words: 202 },
   // 29 → 28, 385 → 388 (2026-10-15): the top bar (−1 control, +3 words on a route with an answer).
   // 28 → 32, 388 → 590 (2026-10-16): the two cards that left Profil — « Coussin de liquidités » and « Ce que coûtent les enfants » (four amounts, what the state pays back, a fold of sources): a conscious
   // trade, the sheet is where the household is READ.
