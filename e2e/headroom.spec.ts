@@ -15,7 +15,6 @@ for (const [name, size, path, pinned] of [
   ['phone', { width: 390, height: 844 }, '/resultats', ['.shell__bar', '.results-pin']],
   ['desktop', { width: 1280, height: 800 }, '/resultats', ['.shell__bar', '.results-pin', '.results-page .section-nav']],
   ['desktop', { width: 1280, height: 800 }, '/profil', ['.shell__bar', '.pinned-map .section-nav']],
-  // Every block open: with them closed the phone page has ~880 px to scroll (2026-10-19, after the shorter heading), the edge of the 900 px wheel below — red on CI's fonts.
   ['phone', { width: 390, height: 844 }, '/hypotheses?bloc=tout', ['.shell__bar', '.pinned-map .section-nav']],
   // The Glossaire's map is a plain sticky `.section-nav`: it stayed pinned while everything else rolled up (2026-10-15).
   ['phone', { width: 390, height: 844 }, '/glossaire', ['.shell__bar', '.section-nav']],
@@ -28,7 +27,11 @@ for (const [name, size, path, pinned] of [
     await expect(page.locator('.page-head__title, #verdict').first()).toBeVisible({ timeout: 60_000 })
     await page.waitForTimeout(1500)
     for (const sel of pinned) expect(await there(page, sel), `${sel} is shown at the top`).toBe(true)
-    await page.mouse.move(size.width / 2, size.height / 2)
+    // The hand is over the page's own heading, never over a row that scrolls sideways: such a row (SubTabs, a Rail — lib/hscroll.ts) keeps a vertical
+    // wheel while it overflows, by design, and on CI's fonts the phone Hypothèses scenario row does, right under the window's centre — the page never
+    // moved and the test was red from 6dbcdfc on (2026-10-19; here the row fits, so it passed).
+    const head = (await page.locator('.page-head__title, #verdict').first().boundingBox())!
+    await page.mouse.move(head.x + Math.min(head.width / 2, 120), head.y + head.height / 2)
     // down: a hand on the wheel
     await page.mouse.wheel(0, 900)
     await expect(page.locator('.shell')).toHaveAttribute('data-away', '')
