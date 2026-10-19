@@ -74,17 +74,18 @@ export const MUTANTS = [
   },
   {
     id: 'oas-starts-in-the-birthday-month',
-    file: `${ENGINE}/oas.ts`,
-    from: 'const i = monthIndex({ year: birth.year + startAge, month: birth.month }) + 1',
-    to: 'const i = monthIndex({ year: birth.year + startAge, month: birth.month }) + 0',
+    // the OAS start is the shared « month after the birthday » rule of rrq.ts (the QPP's too)
+    file: `${ENGINE}/rrq.ts`,
+    from: 'fromIndex(monthIndex({ year: birth.year + age, month: birth.month }) + 1)',
+    to: 'fromIndex(monthIndex({ year: birth.year + age, month: birth.month }) + 0)',
     tests: [`${LIB}/edgeDates.test.ts`, `${ENGINE}/verified/oas.verified.test.ts`],
     why: 'the pension is first paid the month AFTER the birthday month',
   },
   {
     id: 'split-from-64',
     file: `${ENGINE}/tax.ts`,
-    from: 'return p.age >= 65 ? p.db + p.registered : 0',
-    to: 'return p.age >= 64 ? p.db + p.registered : 0',
+    from: 'return p.age >= rules.quebec.splitMinAge ? p.db + p.registered : 0',
+    to: 'return p.age >= rules.quebec.splitMinAge - 1 ? p.db + p.registered : 0',
     tests: [`${LIB}/edgeDates.test.ts`, `${ENGINE}/tax.props.test.ts`],
     why: 'pension income splitting begins at 65, to the year',
   },
@@ -108,8 +109,8 @@ export const MUTANTS = [
   {
     id: 'death-benefit-a-year-late',
     file: `${ENGINE}/projection.ts`,
-    from: 'survivorOf && year === survivorOf.deathYear + 1 ? P.rrq.deathBenefit : 0',
-    to: 'survivorOf && year === survivorOf.deathYear + 2 ? P.rrq.deathBenefit : 0',
+    from: 'survivorOf.qualified.deathBenefit && year === survivorOf.deathYear + 1 ? P.rrq.deathBenefit : 0',
+    to: 'survivorOf.qualified.deathBenefit && year === survivorOf.deathYear + 2 ? P.rrq.deathBenefit : 0',
     tests: [`${LIB}/survivorSweep.test.ts`, `${ENGINE}/death.test.ts`],
     why: 'the death benefit is paid once, in the year after the death',
   },
@@ -141,7 +142,7 @@ export const MUTANTS = [
   {
     id: 'split-moves-the-whole-pension',
     file: `${ENGINE}/tax.ts`,
-    from: 'share <= 0.5 + 1e-9',
+    from: 'share <= maxShare + 1e-9',
     to: 'share <= 1.0 + 1e-9',
     tests: [`${ENGINE}/tax.props.test.ts`],
     why: 'splitting moves at most half of the eligible pension income',
