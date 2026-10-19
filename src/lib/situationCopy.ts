@@ -7,6 +7,11 @@ interface SituationCopy {
   lead: string
   yes: string
   no: string
+  /** The card closed says its answers: each topic in a few words, and the « oui » in one line (none: the basic sections only). */
+  short: { kids: string; home: string; events: string; pension: string; nonReg: string; abroad: string; partTime: string }
+  allNo: string
+  /** The « oui », already listed (« enfants, maison »). */
+  answered: (list: string) => string
   q: { kids: string; home: string; events: string; pension: string; nonReg: string; abroad: string; partTime: string }
   hint: { kids: string; home: string; events: string; pension: string; nonReg: string; abroad: string; partTime: string }
   /** What a « no » over typed figures would erase — said before it does. */
@@ -20,6 +25,9 @@ const FR: SituationCopy = {
   lead: 'Quelques questions simples : le formulaire ne garde que ce qui vous concerne. Changez d’avis quand vous voulez.',
   yes: 'Oui',
   no: 'Non',
+  short: { kids: 'enfants', home: 'maison', events: 'événements prévus', pension: 'régime d’employeur', nonReg: 'placements hors REER et CELI', abroad: 'années hors du Canada', partTime: 'travail après la retraite' },
+  allNo: 'Tout à « non » : seules les sections de base sont ouvertes.',
+  answered: (list) => `Oui pour : ${list}.`,
   q: {
     kids: 'Des enfants à la maison, ou un enfant prévu?',
     home: 'Propriétaire de votre résidence principale?',
@@ -56,6 +64,9 @@ const EN: SituationCopy = {
   lead: 'A few simple questions: the form keeps only what concerns you. Change your mind whenever you like.',
   yes: 'Yes',
   no: 'No',
+  short: { kids: 'children', home: 'a home', events: 'planned events', pension: 'an employer plan', nonReg: 'investments outside the RRSP and TFSA', abroad: 'years outside Canada', partTime: 'work after retiring' },
+  allNo: 'Every answer “no”: only the basic sections are open.',
+  answered: (list) => `Yes to: ${list}.`,
   q: {
     kids: 'Children at home, or a planned child?',
     home: 'Do you own your main residence?',

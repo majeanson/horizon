@@ -52,15 +52,16 @@ export default function AccuracyGuide() {
           <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={acc.total} aria-valuenow={acc.confirmed} aria-label={c.panel.count(acc.confirmed, acc.total)}>
             <span className="meter__fill" style={{ width: `${pct}%` }} />
           </div>
-          {/* The progress stays in view (the bar and « n sur N »); what the dots mean and what is left to confirm is one fold away. */}
+          {/* The progress and what the dots mean stay in view: the legend is needed to READ every field's dot, so it is never folded (components/Fold.tsx's rule). What is
+              left to confirm is one fold away. */}
           <p className="accuracy__count">
             <strong>{c.panel.count(acc.confirmed, acc.total)}</strong>
           </p>
+          <p className="accuracy__legend">
+            <span className="fact-dot is-on" aria-hidden="true" /> {c.panel.legendConfirmed}
+            <span className="fact-dot" aria-hidden="true" /> {c.panel.legendEstimated}
+          </p>
           <Fold summary={t.common.moreDetails}>
-            <p className="accuracy__legend">
-              <span className="fact-dot is-on" aria-hidden="true" /> {c.panel.legendConfirmed}
-              <span className="fact-dot" aria-hidden="true" /> {c.panel.legendEstimated}
-            </p>
             <p className="field-row__hint">{acc.confirmed === 0 ? c.panel.none : acc.confirmed === acc.total ? c.panel.allDone : c.panel.estimatedNote(acc.total - acc.confirmed)}</p>
           </Fold>
         </div>

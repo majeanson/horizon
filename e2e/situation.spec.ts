@@ -179,3 +179,20 @@ test('money outside the REER and the CELI: no question answered, no fields; a «
   await page.waitForFunction(() => JSON.parse(localStorage.getItem('horizon-profile')!).household.persons[0].accounts.nonReg.balance === 0)
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('horizon-profile')!).household.persons[0].accounts.nonReg)).toEqual({ balance: 0, acb: 0, annualContribution: 0 })
 })
+
+test('closed, the card says its answers — what decides which sections exist is never hidden', async ({ page }) => {
+  await seedProfile(page, simple())
+  await page.goto('/profil?form=1')
+  const summary = page.locator('#situation > summary')
+  // every answer « non »: said, with what it means for the form
+  await expect(summary).toContainText('Ma situation')
+  await expect(summary).toContainText('seules les sections de base sont ouvertes')
+  await openSituation(page)
+  await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
+  await question(page, /Propriétaire/).getByRole('radio', { name: 'Oui' }).click()
+  await summary.click()
+  await expect(page.locator('#situation')).not.toHaveAttribute('open', /.*/)
+  // closed again: the « oui » are listed, in the questions' order
+  await expect(summary).toContainText('Oui pour')
+  await expect(summary).toContainText('maison, régime d’employeur')
+})

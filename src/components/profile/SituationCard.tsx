@@ -88,6 +88,11 @@ export function SituationQuestions({ householdTopics = HOUSEHOLD_TOPICS, personT
 export default function SituationCard() {
   const { lang } = useLang()
   const c = SITUATION_COPY[lang]
+  const profile = useProfile()
+  const yes = useYes()
+  // What the answers ARE, said on the closed card: they decide which sections the form shows, so a section that is not there is never a mystery.
+  const people = profile.household.persons.map((p) => p.id)
+  const on = [...HOUSEHOLD_TOPICS.filter((topic) => applies(profile, yes, topic)), ...PERSON_TOPICS.filter((topic) => people.some((id) => applies(profile, yes, topic, id)))]
   return (
     // A fold, closed: these answers are set once (the first-visit path asks the same questions) and a returning reader is here for the figures below — a long list of yes / no ahead of them was the first thing on the page.
     <Fold
@@ -95,10 +100,11 @@ export default function SituationCard() {
       className="surface"
       summary={
         <>
-          <strong>{c.title}</strong> — {c.lead}
+          <strong>{c.title}</strong> — {on.length === 0 ? c.allNo : c.answered(on.map((topic) => c.short[topic]).join(', '))}
         </>
       }
     >
+      <p className="field-row__hint">{c.lead}</p>
       <SituationQuestions />
       <p className="field-row__hint">{c.hidden}</p>
     </Fold>
