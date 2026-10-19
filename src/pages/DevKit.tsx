@@ -618,7 +618,7 @@ function ENTRIES(): Entry[] {
     },
     { cat: 'Graphiques', name: 'LineChart', file: 'src/components/charts/LineChart.tsx', exports: ['LineChart'], kw: 'graphique courbe ligne série recharts', render: () => <LineChartSpecimen /> },
     { cat: 'Graphiques', name: 'StackedBarChart', file: 'src/components/charts/StackedBarChart.tsx', exports: ['StackedBarChart'], kw: 'graphique barres empilées sources revenus recharts', render: () => <StackedBarChartSpecimen /> },
-    { cat: 'Affichage', name: 'PageHead', file: 'src/components/PageHead.tsx', kw: 'titre page h1 en-tête', render: () => <PageHead title="Résultats" subtitle="Le titre unique d’une page, et une ligne discrète dessous." /> },
+    { cat: 'Affichage', name: 'PageHead', file: 'src/components/PageHead.tsx', kw: 'titre page h1 en-tête', render: () => <PageHead specimen title="Résultats" subtitle="Le titre unique d’une page, et une ligne discrète dessous." /> },
     {
       cat: 'Affichage',
       name: 'ImpactMeter',

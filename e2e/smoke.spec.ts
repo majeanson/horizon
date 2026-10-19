@@ -162,3 +162,11 @@ test('the front door offers three ways in: « Commencer », then « 15 minutes �
   await expect(page).toHaveURL(/\/profil\?debut=complet$/)
   await expect(page.locator('.onboard')).toBeVisible()
 })
+
+test('the component gallery has ONE <h1> and keeps its own tab title — the PageHead specimen is an <h2> that names nothing', async ({ page }) => {
+  await page.goto('/dev/kit')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Galerie des composants')
+  await expect(page.locator('.page-head__title').filter({ hasText: 'Résultats' })).toHaveJSProperty('tagName', 'H2')
+  await expect(page).not.toHaveTitle(/^Résultats/)
+})
