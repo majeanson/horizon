@@ -76,7 +76,8 @@ test('« Je ne sais pas » under one figure fills that figure only, and goes awa
 test('the where-from line names the official tables, in the reader\'s language', async ({ page }) => {
   await seedProfile(page, blankWithSalary())
   await page.goto('/profil?form=1')
-  await page.getByRole('button', { name: 'D’où viennent ces chiffres?' }).click()
+  // a Fold, the one disclosure: its summary opens it
+  await page.locator('summary', { hasText: 'D’où viennent ces chiffres' }).first().click()
   await expect(page.getByRole('link', { name: /Actifs et dettes détenus selon le type de famille économique/ })).toHaveAttribute('href', /statcan\.gc\.ca\/t1\/tbl1\/fr\/tv\.action\?pid=1110001601/)
   await expect(page.getByRole('link', { name: /Dépenses des ménages selon le type de ménage/ })).toBeVisible()
   await expect(page.locator('.levels-table')).toContainText('Modeste')

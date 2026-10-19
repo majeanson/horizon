@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME } from '../../engine/params/typical'
 import { useLang } from '../../i18n'
 import { pageFor } from '../../engine/params/twins'
@@ -10,6 +9,7 @@ import type { Profile } from '../../lib/schema'
 import { replaceProfile, updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
+import { Fold } from '../Fold'
 import { Cluster } from '../Layout'
 import { StatusMessage } from '../StatusMessage'
 
@@ -27,7 +27,6 @@ export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone
   const c = LEVELS_COPY[lang]
   const profile = useProfile()
   const now = today()
-  const [showHow, setShowHow] = useState(false)
   const current = levelOf(profile, now.year)
   const basis = useBasis()
 
@@ -88,10 +87,7 @@ export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone
           {done.before !== null && <Chip onClick={undo}>{c.undo}</Chip>}
         </Cluster>
       )}
-      <Chip expanded={showHow} onClick={() => setShowHow((v) => !v)}>
-        {c.how.open}
-      </Chip>
-      {showHow && (
+      <Fold summary={c.how.open}>
         <div className="levels-how">
           <ul>
             {c.how.lines.map((line) => (
@@ -140,7 +136,7 @@ export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone
             })}
           </ul>
         </div>
-      )}
+      </Fold>
     </>
   )
 }

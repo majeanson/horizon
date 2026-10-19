@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { AccountKind } from '../engine/types'
 import { Accordion, AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Chip } from '../components/Chip'
+import { Fold } from '../components/Fold'
 import { ASSUMPTION_PRESETS, PRESET_KEYS, presetOf, type PresetKey, type PresetValues } from '../engine/assumptionPresets'
 import { impactOf, type ImpactField } from '../engine/assumptionImpact'
 import { ImpactMeter } from '../components/ImpactMeter'
@@ -55,7 +56,6 @@ export function Hypotheses() {
   const kept = profile.customScenario
   const active = presetOf(assumptions)
   const m = MARKET_COPY[lang]
-  const [sourcesOpen, setSourcesOpen] = useState(false)
   const [bloc, setBloc] = useParamChoice<string>('bloc', [...BLOCKS, 'tout', 'none'], 'scenario')
   const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
   const setOpen = (next: AccordionOpen) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))
@@ -130,11 +130,8 @@ export function Hypotheses() {
         {/* What « Personnalisé » holds while a ready-made scenario is on: the figures can be seen before going back to them. */}
         {active !== null && kept !== null && <p className="field-row__hint">{a.presets.keptSummary(presetSummary('kept'))}</p>}
         <div className="preset-sources">
-          {/* Folded by default: the provenance is for whoever asks, not for everyone who lands here. */}
-          <Chip expanded={sourcesOpen} onClick={() => setSourcesOpen((o) => !o)}>
-            {a.presets.sourceTitle}
-          </Chip>
-          {sourcesOpen && (
+          {/* Folded by default: the provenance is for whoever asks, not for everyone who lands here — the one disclosure, a Fold, like every other. */}
+          <Fold summary={a.presets.sourceTitle}>
             <>
               <StatusMessage tone="info">{a.presets.source}</StatusMessage>
               <ul className="info-links">
@@ -148,7 +145,7 @@ export function Hypotheses() {
                 ))}
               </ul>
             </>
-          )}
+          </Fold>
         </div>
       </Section>
 
