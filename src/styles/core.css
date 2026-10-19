@@ -1,17 +1,21 @@
-/* Horizon — single design-token stylesheet (Babillard's « Pip » tokens, kept as is). No framework, no CSS-in-JS.
-   Day palette = :root; night = :root[data-theme='night'].
+/* Horizon — the single design-token stylesheet. No framework, no CSS-in-JS. Day = :root; night = :root[data-theme='night'];
+   high contrast = [data-contrast='high'] on either.
 
-   Design system: PIP — a warm risograph / cut-paper family planner. Paper-cream
-   grounds, a marigold-led earthy palette (sage = done, sky = calm, berry = play,
-   terracotta = food), chunky-friendly Baloo 2 headlines, Caveat handwriting for
-   toddler delight, and soft offset "printed" shadows — never a glow-lift. This
-   is the look that's pretty to a parent AND friendly to a toddler, while the
-   calm tenets keep it from tipping into dopamine: no streaks/points, deterministic
-   acknowledgments (NFR-CALM-2), opacity/transform-only reveals, no nags.
+   THE LOOK: a sun on the horizon, printed on warm paper. Horizon answers one serious question — when can this household stop working — for
+   people who may not read figures for a living, so the page should feel like a calm, well-made paper document, not a dashboard:
+     • paper-cream grounds and soft OFFSET "printed" shadows, never a glow or a lift — a figure sits on the page, it does not float;
+     • MARIGOLD is the sun of the mark (components/BrandMark.tsx) and the colour of acting: the primary button, the chosen chip, the answer's accent;
+     • five riso inks, each a FAMILY of the concept registry (lib/concepts.ts, `FAMILY_HUE`), so a colour always means the same kind of money:
+       sage = what the State pays (QPP, OAS), marigold = the registered accounts, sky = the household and what it owns, berry = work and the
+       employer, terracotta = money that leaves (tax, spending); the neutral ink is the plan's horizon itself;
+     • Baloo 2 for the headings and the big age (round, sturdy, readable large), Hanken Grotesk for every sentence and figure (--display / --sans,
+       styles/fonts.css, self-hosted: no request leaves the origin);
+     • calm by rule: no streaks, points or badges, no nags, opacity / transform-only motion (styles/motion.css), and every reveal skippable.
+   Each ink has `-deep` (a mark on paper), `-wash` (a tinted ground) and `-ink` (text on that ground, 4.5:1 measured) — the comments beside the
+   tokens keep the measured ratios; a token changed is re-measured, and the axe suite runs every route in day, night and high contrast.
 
-   Token names below preserve Babillard's existing semantic vars (--accent,
-   --surface, --line…) so every component keeps working, and ADD the full Pip
-   palette so new surfaces can use it directly.
+   (The palette came from Babillard's « Pip » design system; the semantic names --accent, --surface, --line… are kept so every primitive
+   reads the same tokens.)
 
    CLASS NAMING (CSS-5) — for NEW CSS, use BEM: `.block`, `.block__element`,
    `.block--modifier` / `.block__element--modifier`. State flips that aren't a
@@ -23,7 +27,7 @@
    `.badge` class. */
 
 :root {
-  /* ---- Pip brand palette (riso inks on warm paper) ---- */
+  /* ---- The palette: riso inks on warm paper ---- */
   --paper: #fbf3e4;
   --paper-deep: #f4e8d2;
   --card: #fffcf5;
@@ -69,7 +73,7 @@
   --sky-ink: #426d82; /* 4.53:1 */
   --berry-ink: #8f4f75; /* 4.54:1 */
 
-  /* ---- Babillard-compat semantic aliases (map onto Pip) ---- */
+  /* ---- Semantic aliases (what the primitives read), mapped onto the inks ---- */
   --paper-2: var(--paper-deep);
   --surface: var(--card);
   --line: #e8dac0;
@@ -188,9 +192,8 @@
   --dur-slow: 420ms;
 }
 
-/* Night: the wall tablet dims after dark (A5). Pip is a daytime palette; here we
-   sink it onto warm-dark stock, keep the inks (they read fine bright on dark),
-   and darken the washes so colour-coded tiles still hold. */
+/* Night: the same printed page after sunset — warm-dark stock instead of cream, the inks kept (they read bright on dark), the washes darkened so
+   a family's tinted ground still holds, and the mark turns from marigold-deep to marigold. */
 :root[data-theme='night'] {
   /* The NATIVE chrome follows the palette too: without this, the desktop scrollbar on
      #root and the overscroll glow stayed light-scheme over the dark paper. (.input
@@ -263,9 +266,8 @@
    surfaces, so every component inherits it for free.
 
    High contrast: deepen the inks and firm up the hairlines so text + dividers
-   read from across the room (and for low vision). Kept on-palette — this is
-   "sharper Pip", not a stark black-on-white theme that would break the warm,
-   calm look. Day rides the light palette; night gets its own brighter inks. */
+   read for low vision. Kept on-palette — the same printed page, sharper — not
+   a stark black-on-white theme that would break the warm, calm look. Day rides the light palette; night gets its own brighter inks. */
 :root[data-contrast='high']:not([data-theme='night']) {
   --card: #fffdf7;
   --ink: #16120c;
@@ -283,7 +285,7 @@
 }
 
 /* OS-level contrast preference (bmad/08 A-10): someone who asked their DEVICE for
-   more contrast gets the same "sharper Pip" bump without finding the Réglages
+   more contrast gets the same sharper page without finding the Réglages
    toggle. Only when no explicit in-app choice was made (no data-contrast
    attribute) — the app toggle, once touched, wins either way. Same token values
    as the blocks above; keep the two in sync. */
@@ -453,8 +455,8 @@ h3 {
 a {
   color: inherit;
 }
-/* Bare buttons (icon-tile cards, today-hero / bigtile, setup choices, profile
-   faces, cat-pick, the toddler tiles) must follow the theme ink — NOT the UA
+/* Bare buttons (a card that is a button, a chart's tap target, a fold's own
+   controls) must follow the theme ink — NOT the UA
    `ButtonText` system colour, which stays dark and turns their label dark-on-dark
    in night mode. Class-styled buttons that set their own colour (.btn--primary,
    active .subtabs__opt / .operator__tab, .tdl-start…) still win on specificity. */
