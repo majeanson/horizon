@@ -29,8 +29,8 @@ test('swapping the household swaps the story and the answer', async ({ page }) =
   await expect(card(page).getByRole('radio', { name: 'Une personne, petit revenu' })).toBeChecked()
   await expect(card(page)).toContainText('Hélène')
   await expect(answer).not.toHaveText(before, { timeout: 60_000 })
-  // six households, three of which stop early (the house sold, the high earners, the planned life): an early answer is shown reachable
-  await expect(card(page).getByRole('radio')).toHaveCount(6)
+  // seven households, four of which stop early (before 50 on a good income and low spending, the house sold, the high earners, the planned life)
+  await expect(card(page).getByRole('radio')).toHaveCount(7)
   await card(page).getByRole('radio', { name: 'Couple, vendre la maison' }).click()
   await expect(card(page)).toContainText('58 ans')
 })
@@ -74,4 +74,13 @@ test('on a phone the demo card and the doors fit the screen', async ({ page }) =
   await page.goto('/')
   await expect(card(page)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('the showcase has a couple that retires before 50 — a good income and spending kept low — second, right after the average couple', async ({ page }) => {
+  await page.goto('/')
+  const radios = card(page).getByRole('radio')
+  await expect(radios.nth(1)).toHaveText(/Couple, retraite avant 50 ans/)
+  await radios.nth(1).click()
+  await expect(card(page)).toContainText('Juliette')
+  await expect(card(page).locator('.verdict__age')).toHaveText(/4\d ans/, { timeout: 60_000 })
 })
