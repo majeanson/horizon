@@ -108,12 +108,14 @@ export function splitCap(p: PersonIncome, rules: Pick<TaxRules, 'federal' | 'que
 }
 
 /**
- * Pension income that qualifies for the Québec retirement-income amount: a defined-benefit pension at any age, registered income from the
- * minimum age of the federal rule (`federal.pensionMinAge`, 65) — ENGINE.md §2: the engine reads Québec's amount the way TP-1.G applies it,
- * with the federal age rule (RRIF and RRSP-annuity income under 65 qualifies only after a spouse's death, not modelled).
+ * Pension income that qualifies for the Québec retirement-income amount — AT ANY AGE: a defined-benefit pension and registered income alike.
+ * Québec has no age gate here, unlike the federal line 31400: TP-1.G (2025), line 361, « Si vous ou votre conjoint(e) … avez inscrit un
+ * montant à la ligne 122 ou 123 de la déclaration, vous pouvez inscrire un montant pour revenus de retraite », and line 122 holds « les sommes
+ * reçues d'un fonds enregistré de revenu de retraite (FERR) »; the Taxation Act, art. 752.0.8 a) iii, the same. A draw is read as a RRIF payment,
+ * as the federal credit reads it (a lump-sum RRSP withdrawal is line 154, code 06, and would earn neither — ENGINE.md §2).
  */
-function eligibleQuebec(p: PersonIncome, splitIn: number, splitOut: number, minAge: number): number {
-  return Math.max(0, p.db + (p.age >= minAge ? p.registered : 0) + splitIn - splitOut)
+function eligibleQuebec(p: PersonIncome, splitIn: number, splitOut: number): number {
+  return Math.max(0, p.db + p.registered + splitIn - splitOut)
 }
 
 /**
@@ -149,7 +151,7 @@ function evaluate(persons: readonly PersonIncome[], rules: TaxRules, split: Spli
       netIncome,
       taxableIncome: netIncome,
       employment: p.employment,
-      eligibleRetirement: eligibleQuebec(p, splitIn, splitOut, rules.federal.pensionMinAge),
+      eligibleRetirement: eligibleQuebec(p, splitIn, splitOut),
     })),
     rules.quebec,
     rules.livesAlone ?? true,

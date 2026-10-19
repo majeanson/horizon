@@ -5,8 +5,8 @@ import { between, cases, range } from './testGrid.ts'
 
 // A SECOND, NAIVE CALCULATION. The verified suites check the engine against published examples; the property suites check what must hold of it. This is the third kind: an oracle written
 // the plain way from the cited parameters alone (a loop over the brackets, one credit, the abatement), sharing NO code with taxFederal.ts / taxQuebec.ts / tax.ts, compared with
-// the engine over many incomes. The household is the simplest that has any tax at all: one adult under 65, whose only income is an RRSP withdrawal (no pay, so no payroll premium,
-// no deduction for workers; under 65, so no age or pension credit; not living alone, so no living-alone amount): all that is left of the credits is the basic personal amount.
+// the engine over many incomes. The household is the simplest that has any tax at all: one adult under 65, whose only income is ordinary income with no credit of its own (`other`: no pay, so no payroll premium,
+// no deduction for workers; not pension income — a RRIF draw earns Québec's retirement-income amount at any age; under 65, so no age credit; not living alone): all that is left of the credits is the basic personal amount.
 // Where the engine and the oracle part ways, one of them has misread a rule — the finding is the disagreement, wherever it sits.
 
 const P = knownYear(2026)
@@ -14,7 +14,7 @@ const RULES: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, live
 const person = (over: Partial<PersonIncome>): PersonIncome => ({
   age: 50, employment: 0, rrq: 0, oas: 0, db: 0, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, payrollPremiums: 0, rrspDeduction: 0, ...over,
 })
-const engine = (x: number, age = 50) => householdTax([person({ registered: x, age })], RULES).persons[0]
+const engine = (x: number, age = 50) => householdTax([person({ other: x, age })], RULES).persons[0]
 
 type Bracket = { upTo: number | null; rate: number }
 /** Tax on `x` by walking the brackets, slice by slice. */

@@ -240,8 +240,8 @@ describe('Québec — DERIVED worked examples (exact arithmetic from the officia
 describe('the two returns together — marginal rates', () => {
   // A $1 000 step: tax is rounded to the cent, so a $1 step would measure rounding, not the rate.
   const marginal = (income: number, age = 50) => {
-    const a = householdTax([person({ age, registered: income })], RULES).total
-    const b = householdTax([person({ age, registered: income + 1_000 })], RULES).total
+    const a = householdTax([person({ age, other: income })], RULES).total
+    const b = householdTax([person({ age, other: income + 1_000 })], RULES).total
     return (b - a) / 1_000
   }
 
@@ -275,11 +275,21 @@ describe('the household — splitting, recovery, deductions', () => {
     expect(ded.incomeTax).toBeLessThan(base.incomeTax)
   })
 
+  it('Québec’s retirement-income amount has no age gate: a RRIF draw at 55 earns it (TP-1.G 2025, lines 122 and 361), the federal pension amount does not (line 31400: 65)', () => {
+    // « Si vous ou votre conjoint(e) au 31 décembre 2025 avez inscrit un montant à la ligne 122 ou 123 … vous pouvez inscrire un montant pour revenus
+    // de retraite », and line 122 holds « les sommes reçues d’un fonds enregistré de revenu de retraite (FERR) ». 40 000 $ at 55, under the reduction
+    // threshold (42 955 $): the lesser of 3 541 $ and 1,25 × 40 000 $, at 14 % = 495,74 $ less Québec tax than the same income with no credit of its own.
+    const rrif = householdTax([person({ age: 55, registered: 40_000 })], RULES).persons[0]
+    const plain = householdTax([person({ age: 55, other: 40_000 })], RULES).persons[0]
+    expect(plain.quebec.tax - rrif.quebec.tax).toBeCloseTo(Math.min(RULES.quebec.retirementIncomeAmount, 1.25 * 40_000) * 0.14, 2)
+    expect(rrif.federal.tax).toBe(plain.federal.tax)
+  })
+
   it('only the TAXABLE HALF of a capital gain is income', () => {
     const gain = householdTax([person({ capitalGains: 20_000 })], RULES).persons[0]
     expect(gain.income).toBe(10_000)
-    const registered = householdTax([person({ registered: 10_000 })], RULES).persons[0]
-    expect(gain.incomeTax).toBe(registered.incomeTax) // under 65: neither earns a pension credit
+    const registered = householdTax([person({ other: 10_000 })], RULES).persons[0]
+    expect(gain.incomeTax).toBe(registered.incomeTax) // ordinary income with no credit of its own (a RRIF draw would earn Québec's retirement-income amount)
   })
 
   it('a couple, one with a 80 000 $ RRIF and one with none: splitting moves up to half and cuts the household\'s tax a great deal', () => {

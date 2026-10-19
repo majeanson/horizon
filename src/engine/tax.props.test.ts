@@ -184,9 +184,9 @@ describe('tax properties — splitting', () => {
 })
 
 describe('tax properties — what is the same, and what is not', () => {
-  it('a gain is taxed as half its size of ordinary income (under 65, where neither earns a pension credit)', () => {
+  it('a gain is taxed as half its size of ordinary income (income with no credit of its own: a RRIF draw would earn Québec’s retirement-income amount at any age)', () => {
     for (const g of range(2_000, 100_000, 6_000)) {
-      expect(householdTax([{ ...blank(50), capitalGains: g }], RULES).total).toBe(householdTax([{ ...blank(50), registered: g / 2 }], RULES).total)
+      expect(householdTax([{ ...blank(50), capitalGains: g }], RULES).total).toBe(householdTax([{ ...blank(50), other: g / 2 }], RULES).total)
     }
   })
 
