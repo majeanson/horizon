@@ -36,11 +36,27 @@
   border-bottom: 1px solid var(--line);
 }
 .shell__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--display);
   font-weight: 800;
   font-size: var(--text-lg);
   letter-spacing: -0.01em;
   text-decoration: none;
+}
+/* The sun on the horizon (components/BrandMark.tsx): the marigold of the answer, deep on the cream paper, bright on the night one. A drawing beside
+   the written name, so a mark and not text — and in high contrast it takes the ink, like every other accent there. */
+.brand-mark {
+  display: inline-flex;
+  flex: none;
+  color: var(--marigold-deep);
+}
+:root[data-theme='night'] .brand-mark {
+  color: var(--marigold);
+}
+:root[data-contrast='high'] .brand-mark {
+  color: currentColor;
 }
 .shell__actions {
   display: flex;
@@ -1393,8 +1409,12 @@
   gap: 0.35rem;
 }
 
-/* ── The foot of every page: who built it ─────────────────────────────────────────────────────────────────────── */
+/* ── The foot of every page: the promise, then who built it ─────────────────────────────────────────────────────── */
 .shell__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
   margin: 2rem 0 0;
   font-size: 0.85rem;
   color: var(--ink-soft);

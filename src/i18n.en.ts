@@ -5,7 +5,6 @@ import type { FR } from './i18n'
 
 export const EN: typeof FR = {
   appName: 'Horizon',
-  tagline: 'When can you retire?',
 
   next: {
     toResults: 'See my result',
@@ -22,6 +21,7 @@ export const EN: typeof FR = {
     save: 'Save',
     close: 'Close',
     builtBy: 'Built by',
+    staysHere: 'Your figures never leave this device.',
     howToRead: 'How to read',
     moreDetails: 'More details',
     less: 'Less',

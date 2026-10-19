@@ -61,18 +61,15 @@ async function page(url: URL, env: AssetsEnv): Promise<Response> {
     .on('meta[property="og:title"]', content(c.ogTitle(share.age)))
     .on('meta[property="og:description"]', content(c.ogDescription(share.home)))
     .on('meta[property="og:locale"]', content(share.lang === 'en' ? 'en_CA' : 'fr_CA'))
-    .on('meta[name="twitter:card"]', content('summary_large_image'))
+    // The shell already carries the front door's card (index.html: its image, type, size and alt): THIS result's card takes its place, never a second one.
+    .on('meta[property="og:image"]', content(image))
+    .on('meta[property="og:image:alt"]', content(c.ogAlt(share.age, share.home)))
+    .on('meta[name="twitter:image"]', content(image))
     .on('head', {
       element: (e) =>
         void e.append(
           [
             tag('property', 'og:url', shareUrl(url.origin, share)),
-            tag('property', 'og:image', image),
-            tag('property', 'og:image:type', 'image/png'),
-            tag('property', 'og:image:width', '1200'),
-            tag('property', 'og:image:height', '630'),
-            tag('property', 'og:image:alt', c.ogAlt(share.age, share.home)),
-            tag('name', 'twitter:image', image),
             // One page per age, household and language: a search engine has no reason to list them.
             tag('name', 'robots', 'noindex'),
           ].join(''),

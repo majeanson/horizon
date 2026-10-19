@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { isShareRoute, shareRoute } from './shareRoutes'
 
@@ -44,6 +47,21 @@ describe('worker/shareRoutes', () => {
 
   it('is a 404, not the SPA shell served as an image, when no card exists at all', async () => {
     expect((await get('https://x.test/og/scenario?age=62&foyer=seul', [])).status).toBe(404)
+  })
+
+  it('never appends a tag the shell already carries — a shared result rewrites the front door’s card instead of showing two', () => {
+    const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+    const shell = readFileSync(join(root, 'index.html'), 'utf8')
+    const worker = readFileSync(join(root, 'worker/shareRoutes.ts'), 'utf8')
+    const inShell = new Set([...shell.matchAll(/<meta (?:property|name)="([^"]+)"/g)].map((m) => m[1]))
+    const appended = [...worker.matchAll(/tag\('(?:property|name)', '([^']+)'/g)].map((m) => m[1])
+    const rewritten = [...worker.matchAll(/\.on\('meta\[(?:property|name)="([^"]+)"\]'/g)].map((m) => m[1])
+    expect(appended.length, 'the reader found no appended tag: the shape changed').toBeGreaterThan(0)
+    expect(appended.filter((k) => inShell.has(k))).toEqual([])
+    for (const k of ['og:image', 'og:image:alt', 'twitter:image']) {
+      expect(inShell.has(k), `${k} in index.html`).toBe(true)
+      expect(rewritten, `${k} rewritten`).toContain(k)
+    }
   })
 
   it('answers five parallel requests with distinct results, each with its own card', async () => {

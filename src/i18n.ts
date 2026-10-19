@@ -21,7 +21,6 @@ export interface InfoEntry {
 
 export const FR = {
   appName: 'Horizon',
-  tagline: 'Quand pouvez-vous prendre votre retraite ?',
 
   next: {
     toResults: 'Voir mon résultat',
@@ -38,6 +37,8 @@ export const FR = {
     save: 'Enregistrer',
     close: 'Fermer',
     builtBy: 'Bâti par',
+    /** The foot of every page, after who built it: the promise, said where it is always seen. */
+    staysHere: 'Vos chiffres ne quittent jamais cet appareil.',
     howToRead: 'Comment lire',
     moreDetails: 'En savoir plus',
     less: 'Moins',

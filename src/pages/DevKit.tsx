@@ -6,6 +6,7 @@ import { CountUp } from '../components/CountUp'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { DisplayControls } from '../components/DisplayControls'
+import { BrandMark } from '../components/BrandMark'
 import { ReadingHelp } from '../components/ReadingHelp'
 import { TimeBudget } from '../components/TimeBudget'
 import type { TimeBudget as TimeBudgetValue } from '../lib/timeBudget'
@@ -608,6 +609,19 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
     { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelpSpecimen /> },
     { cat: 'Affichage', name: 'TimeBudget', file: 'src/components/TimeBudget.tsx', kw: 'temps minutes accueil première visite façon de commencer porte', render: () => <TimeBudgetSpecimen /> },
+    {
+      cat: 'Affichage',
+      name: 'BrandMark',
+      file: 'src/components/BrandMark.tsx',
+      kw: 'marque logo soleil horizon nom barre accueil',
+      render: () => (
+        <Cluster>
+          <BrandMark size={20} />
+          <BrandMark />
+          <BrandMark size={48} />
+        </Cluster>
+      ),
+    },
     { cat: 'Affichage', name: 'ConceptPip', file: 'src/components/ConceptPip.tsx', exports: ['ConceptPip', 'FamilyPip'], kw: 'pastille concept icône couleur famille glossaire', render: () => <ConceptPipSpecimen /> },
     {
       cat: 'Affichage',

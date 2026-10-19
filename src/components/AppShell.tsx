@@ -6,6 +6,7 @@ import { saveCopy } from '../lib/saveCopy'
 import { isPreview } from '../lib/preview'
 import { snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
 import { useNotice } from '../lib/toast'
+import { BrandMark } from './BrandMark'
 import { Icon, type IconName } from './Icon'
 import { Skeleton } from './Skeleton'
 import { StatusMessage } from './StatusMessage'
@@ -115,6 +116,7 @@ export function AppShell() {
       <RouteChange />
       <header className="shell__bar">
         <NavLink to="/" end className="shell__brand" onClick={(e) => changePage(e, '/')}>
+          <BrandMark />
           {t.appName}
         </NavLink>
         {/* Silent until there is an answer; its chunk arrives after the bar has painted, so the bar never waits for it. */}
@@ -179,12 +181,15 @@ export function AppShell() {
             <Outlet />
           )}
         </Suspense>
-        {/* One quiet line at the foot of every page: who built it, as a plain link. It leaves the app, so it opens nothing of the profile. */}
+        {/* One quiet line at the foot of every page: the promise, then who built it as a plain link. The link leaves the app, so it opens nothing of the profile. */}
         <p className="shell__foot">
-          {t.common.builtBy}{' '}
-          <a href="https://marcportal.com" rel="noopener">
-            marc.portal
-          </a>
+          <span>{t.common.staysHere}</span>
+          <span>
+            {t.common.builtBy}{' '}
+            <a href="https://marcportal.com" rel="noopener">
+              marc.portal
+            </a>
+          </span>
         </p>
       </main>
     </div>
