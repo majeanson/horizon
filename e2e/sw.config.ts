@@ -41,8 +41,8 @@ export default defineConfig({
     navigationTimeout: 20_000,
     actionTimeout: 15_000,
     timezoneId: 'America/Toronto',
-    // The front door's one-time full-screen reading offer is « already seen » (lib/readingHelp.ts), so it does not stand over the offline checks.
-    storageState: { cookies: [], origins: [{ origin: `http://127.0.0.1:${PORT}`, localStorage: [{ name: 'horizon-reading-help', value: 'done' }, { name: 'horizon-time', value: 'later' }, { name: 'horizon-first-answer', value: 'done' }] }] },
+    // The first answer's one-time flourish (lib/firstAnswer.ts) is « already seen », so it does not move under the offline checks.
+    storageState: { cookies: [], origins: [{ origin: `http://127.0.0.1:${PORT}`, localStorage: [{ name: 'horizon-first-answer', value: 'done' }] }] },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

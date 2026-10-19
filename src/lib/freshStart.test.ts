@@ -6,10 +6,9 @@ import { readScanned, sourceFiles } from './buildGuardScan.ts'
 import { exampleProfile } from './example.ts'
 import { KEPT_ON_FRESH_START, freshStart, profileLooksReal } from './freshStart.ts'
 import { FRESH_START_COPY } from './freshStartCopy.ts'
-import { markReadingHelpDone, readingHelpDone } from './readingHelp.ts'
 import { defaultProfile } from './schema.ts'
 import { getProfile, replaceProfile } from './store.ts'
-import { setTimeBudget, timeBudgetAsked } from './timeBudget.ts'
+import { getTimeBudget, setTimeBudget } from './timeBudget.ts'
 import { today } from './today.ts'
 
 // « REPARTIR À NEUF »: the device as a first visit finds it — every key but the language, the in-memory copies with them — and the question of whether
@@ -55,9 +54,8 @@ describe('whether a profile looks like somebody’s', () => {
 })
 
 describe('the fresh start', () => {
-  it('forgets everything on the device but the language, resets what is held in memory, and the two first-visit questions come back', () => {
+  it('forgets everything on the device but the language, resets what is held in memory, and the time once chosen with it', () => {
     replaceProfile(exampleProfile('golden'))
-    markReadingHelpDone()
     setTimeBudget('2')
     setContrast('high')
     setTextScale('x-large')
@@ -65,13 +63,12 @@ describe('the fresh start', () => {
     localStorage.setItem('horizon-situation', '["kids"]')
     localStorage.setItem('horizon-install', 'later')
     sessionStorage.setItem('horizon-drip-later', '1')
-    expect(horizonKeys(localStorage).length).toBeGreaterThanOrEqual(6)
+    expect(horizonKeys(localStorage).length).toBeGreaterThanOrEqual(5)
 
     freshStart()
 
     expect(getProfile()).toEqual(defaultProfile(today()))
-    expect(readingHelpDone()).toBe(false)
-    expect(timeBudgetAsked()).toBe(false)
+    expect(getTimeBudget()).toBeNull()
     expect(getContrast()).toBe('normal')
     expect(getTextScale()).toBe('normal')
     expect(document.documentElement.getAttribute('data-theme')).toMatch(/^(day|night)$/)

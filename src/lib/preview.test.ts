@@ -43,3 +43,17 @@ describe('the portfolio preview', () => {
     expect(localStorage.getItem(KEY)).not.toBeNull()
   })
 })
+
+describe('inside a frame', () => {
+  afterEach(() => vi.restoreAllMocks())
+  it('is told apart from a top-level visit — and a top that cannot even be compared counts as framed', async () => {
+    const { preview } = await freshStore('')
+    expect(preview.framed()).toBe(false)
+    vi.spyOn(window, 'top', 'get').mockReturnValue({} as Window)
+    expect(preview.framed()).toBe(true)
+    vi.spyOn(window, 'top', 'get').mockImplementation(() => {
+      throw new Error('cross-origin')
+    })
+    expect(preview.framed()).toBe(true)
+  })
+})

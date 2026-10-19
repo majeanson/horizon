@@ -30,7 +30,7 @@ test.describe('golden couple', () => {
     expect(link.replace(/^https?:\/\/[^/]+/, '')).toMatch(/^\/partage\?age=\d{2}&foyer=(seul|couple)&l=(fr|en)$/)
 
     // A fresh context: no profile, no storage — what the spouse sees.
-    const fresh = await browser.newContext({ storageState: { cookies: [], origins: [{ origin: url.origin, localStorage: [{ name: 'horizon-reading-help', value: 'done' }, { name: 'horizon-time', value: 'later' }] }] } })
+    const fresh = await browser.newContext({ storageState: { cookies: [], origins: [] } })
     const other = await fresh.newPage()
     await other.goto(url.pathname + url.search)
     await expect(other.getByRole('heading', { level: 1, name: 'Un scénario partagé' })).toBeVisible()
@@ -47,11 +47,12 @@ test.describe('golden couple', () => {
     await expect(page.getByRole('link', { name: 'Faire mon calcul' })).toBeVisible()
   })
 
-  test('the foot of every page credits the builder with a plain link', async ({ page }) => {
-    for (const path of ['/', '/profil', '/resultats', '/hypotheses']) {
+  test('the foot of every page says the promise and credits the builder with a plain link', async ({ page }) => {
+    for (const path of ['/', '/profil', '/resultats', '/hypotheses', '/fiche', '/glossaire', '/donnees']) {
       await page.goto(path)
-      const link = page.getByRole('link', { name: 'marc.portal', exact: true })
-      await expect(link, path).toHaveAttribute('href', 'https://marcportal.com')
+      const foot = page.locator('.shell__foot')
+      await expect(foot, path).toContainText('Vos chiffres ne quittent jamais cet appareil.')
+      await expect(foot.getByRole('link', { name: 'marc.portal', exact: true }), path).toHaveAttribute('href', 'https://marcportal.com')
     }
   })
 })

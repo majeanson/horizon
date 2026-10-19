@@ -6,8 +6,8 @@ import { clearProfile } from './store.ts'
 import { setTheme } from './theme.ts'
 
 // « REPARTIR À NEUF » (pages/Donnees.tsx): the device as a first visit finds it. Everything Horizon keeps here goes — the profile and its unreadable
-// copies, the backup stamps, the two one-time questions (the reading dialog, « Combien de temps avez-vous ? »), the display choices, the checklist's
-// ticks, « Ma situation »'s answers, where the typing stopped, the install card's « plus tard » — and the front door asks its two questions again.
+// copies, the backup stamps, the time once chosen (« Combien de temps avez-vous ? »), the display choices, the checklist's
+// ticks, « Ma situation »'s answers, where the typing stopped, the install card's « plus tard » — and the front door is a first visit's again.
 // ONE thing stays: the language. It is how the person reads the page, not something they did in it, and flipping it under the confirm they just
 // answered would be a jolt.
 //

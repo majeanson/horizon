@@ -23,11 +23,10 @@ export default defineConfig({
     navigationTimeout: 20_000,
     actionTimeout: 15_000,
     timezoneId: 'America/Toronto',
-    // The front door's two one-time full-screen questions — the reading offer (lib/readingHelp.ts) and « Combien de temps avez-vous ? » (lib/timeBudget.ts, put off) — are
-    // « already seen » for every spec but their own (reading-help.spec.ts and time-budget.spec.ts clear this) — and so is the first answer's flourish (lib/firstAnswer.ts; polish.spec.ts clears it).
+    // The first answer's one-time flourish (lib/firstAnswer.ts) is « already seen » for every spec but its own (polish.spec.ts clears it).
     storageState: {
       cookies: [],
-      origins: [{ origin: 'http://127.0.0.1:5173', localStorage: [{ name: 'horizon-reading-help', value: 'done' }, { name: 'horizon-time', value: 'later' }, { name: 'horizon-first-answer', value: 'done' }] }],
+      origins: [{ origin: 'http://127.0.0.1:5173', localStorage: [{ name: 'horizon-first-answer', value: 'done' }] }],
     },
   },
   projects: [

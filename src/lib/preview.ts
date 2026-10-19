@@ -14,3 +14,13 @@ const detected = (() => {
 })()
 
 export const isPreview = (): boolean => detected
+
+/** Inside a frame (the portfolio's live preview at marcportal.com, worker/securityHeaders.ts)? The page is shown as finished there: a one-time flourish is
+ *  for a person's own first visit (lib/firstAnswer.ts). Comparing the two windows is allowed across origins; anything that throws is taken as framed. */
+export function framed(): boolean {
+  try {
+    return typeof window !== 'undefined' && window.self !== window.top
+  } catch {
+    return true
+  }
+}

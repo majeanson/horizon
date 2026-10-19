@@ -1,41 +1,41 @@
 import { Fragment, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Chip } from '../components/Chip'
+import { BrandMark } from '../components/BrandMark'
 import { ConceptPip } from '../components/ConceptPip'
 import { Fold } from '../components/Fold'
+import { Icon } from '../components/Icon'
 import { InstallCard } from '../components/install/InstallHint'
 import { DemoAnswer } from '../components/DemoAnswer'
 import { DripQuestion } from '../components/DripQuestion'
 import { PageHead } from '../components/PageHead'
-import { ReadingHelp } from '../components/ReadingHelp'
-import { TimeBudget } from '../components/TimeBudget'
+import { WelcomeDialog } from '../components/WelcomeDialog'
 import { useLang } from '../i18n'
 import { answerRequest } from '../lib/answerRequest'
 import { factsOf } from '../lib/facts'
+import { scrollToSection } from '../lib/motion'
 import { profileGaps } from '../lib/profileGaps'
-import { readingHelpDone } from '../lib/readingHelp'
 import { useProfile } from '../lib/store'
-import { setTimeBudget, timeBudgetAsked, useTimeBudget } from '../lib/timeBudget'
-import { TIME_BUDGET_COPY } from '../lib/timeBudgetCopy'
+import { setTimeBudget, useTimeBudget } from '../lib/timeBudget'
 import { today } from '../lib/today'
 import { useFactImpact } from '../lib/useFactImpact'
 import { useSettled } from '../lib/useSettled'
-import { WELCOME_COPY, type WelcomeCopy } from '../lib/welcomeCopy'
+import { WELCOME_COPY } from '../lib/welcomeCopy'
 
-// « Accueil » — the front door at `/`. Profil used to be the first thing seen, and a returning household landed on a full form.
-// This page says what Horizon is, offers ONE next step (begin, or — once the profile holds enough for an answer — see it), and keeps
-// the rest (how it works, the map, what to know) in one closed fold. It reads the profile and writes nothing.
+// « Accueil » — the front door at `/`. It says what Horizon is BEFORE it asks anything: nothing opens by itself.
 //
-// A first visit is asked two things before the page, each a full-screen dialog shown once per device: how to READ it (components/ReadingHelp.tsx), then
-// how much TIME it has (components/TimeBudget.tsx, lib/timeBudget.ts). The time shapes the page: the matching door becomes the one « Commencer » and the
-// other two fold away; « Changer » on the line, or the settings page, reopens the question.
+// A first visit (no answer yet) meets the hero — the mark, the question, what Horizon does and the two promises it keeps (nothing leaves the
+// device; every government figure is cited) — then an example answer working (components/DemoAnswer.tsx). « Commencer » opens the one dialog
+// (components/WelcomeDialog.tsx): how much time there is, each answer a door into its own path, and how to read the page.
 //
 // A ready profile is asked ONE question (components/DripQuestion.tsx), from an idle search (`useFactImpact`, how far the answer moves if each
-// unconfirmed figure were off) made here, on the settled profile. Its answer is in the top bar, like on every page (components/BarAnswer.tsx).
+// unconfirmed figure were off) made here, on the settled profile, and offered its answer and its profile. Its answer is in the top bar, like on every
+// page (components/BarAnswer.tsx).
+//
+// For everyone, two folds side by side at the foot, neither inside the other: how it works, and where things are. The page reads the profile; it
+// writes only the time budget a door keeps.
 export function Accueil() {
   const { lang } = useLang()
   const c = WELCOME_COPY[lang]
-  const tc = TIME_BUDGET_COPY[lang]
   const profile = useProfile()
   const ready = profileGaps(profile).length === 0
   const slow = useSettled(profile)
@@ -45,49 +45,79 @@ export function Accueil() {
   const asking = profileGaps(slow).length === 0 && !request.everyoneRetired
   const unconfirmed = useMemo(() => factsOf(slow).filter((f) => !f.confirmed).map((f) => ({ id: f.id, owner: f.owner, kind: f.kind })), [slow])
   const impact = useFactImpact(slow.household, request.assumptions, unconfirmed, asking)
-  // The time question waits for the reading dialog, opens once, and again on « Changer ». Closing it without a choice puts it off for good; closing it
-  // with a choice already made (reopened, then ✕) keeps that choice.
-  const [readingAway, setReadingAway] = useState(readingHelpDone)
-  const [timeOpen, setTimeOpen] = useState(() => !timeBudgetAsked())
+  const [starting, setStarting] = useState(false)
   const budget = useTimeBudget()
-  const chosen = budget === null ? null : (c.doors.find((d) => d.budget === budget) ?? null)
-  const doorList = (doors: WelcomeCopy['doors']) => (
-    <ul className="welcome__doors">
-      {doors.map((d) => (
-        <li key={d.to}>
-          <Link className="welcome__door surface" to={d.to}>
-            <span className="welcome__door-label">{d.label}</span>
-            <span className="welcome__door-hint">{d.hint}</span>
+
+  return (
+    <section className="page-body welcome">
+      {ready ? (
+        <PageHead title={c.title} subtitle={c.subtitle} />
+      ) : (
+        <div className="welcome__hero">
+          <BrandMark size={56} />
+          <PageHead title={c.title} subtitle={c.subtitle} />
+          <ul className="welcome__promises">
+            {c.promises.map((p) => (
+              <li key={p}>
+                <Icon name="check-bold" size={18} />
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="welcome__go">
+            <button type="button" className="btn btn--primary" onClick={() => setStarting(true)}>
+              {c.begin}
+            </button>
+            <button type="button" className="btn btn--ghost" onClick={() => scrollToSection('demo')}>
+              {c.example}
+            </button>
+          </div>
+        </div>
+      )}
+      <WelcomeDialog
+        open={starting}
+        value={budget}
+        onChoose={(b) => {
+          setTimeBudget(b)
+          setStarting(false)
+        }}
+        onClose={() => setStarting(false)}
+      />
+      {ready && asking && <DripQuestion impact={impact} facts={unconfirmed} />}
+      {ready ? (
+        <div className="welcome__go">
+          <Link className="btn btn--primary" to="/resultats">
+            {c.seeAnswer}
           </Link>
-        </li>
-      ))}
-    </ul>
-  )
-  // The explanations — how it works, the map, what to know: ONE closed fold for everyone (they say what the doors above and the bar already say).
-  const about = (
-    <>
+          <Link className="btn btn--ghost" to="/profil">
+            {c.editProfile}
+          </Link>
+        </div>
+      ) : (
+        <DemoAnswer />
+      )}
+      <InstallCard />
       <section aria-labelledby="welcome-steps">
-        <h2 id="welcome-steps" className="welcome__title">
-          {c.stepsTitle}
-        </h2>
-        <ol className="welcome__cards">
-          {/* Each step is ONE door (the same shape as the doors below): the whole card opens the page, its concept's pip leads the title — no underlined word to find. */}
-          {c.steps.map((s) => (
-            <li key={s.title}>
-              <Link className="surface welcome__card" to={s.to}>
-                <h3 className="welcome__card-title">
-                  <ConceptPip id={s.concept} size="sm" />
-                  {s.title}
-                </h3>
-                <p>{s.text}</p>
-              </Link>
-            </li>
-          ))}
-        </ol>
+        <Fold className="surface welcome__fold" summary={<h2 id="welcome-steps">{c.stepsTitle}</h2>}>
+          <ol className="welcome__cards">
+            {/* Each step is ONE door: the whole card opens the page, its concept's pip leads the title — no underlined word to find. */}
+            {c.steps.map((s) => (
+              <li key={s.title}>
+                <Link className="surface welcome__card" to={s.to}>
+                  <h3 className="welcome__card-title">
+                    <ConceptPip id={s.concept} size="sm" />
+                    {s.title}
+                  </h3>
+                  <p>{s.text}</p>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </Fold>
       </section>
       <section aria-labelledby="welcome-guide">
         {/* The map of the app: a reference, one tap away — the tabs and the buttons in the bar already say where things are. */}
-        <Fold className="surface" summary={<span id="welcome-guide">{c.guideTitle}</span>}>
+        <Fold className="surface welcome__fold" summary={<h2 id="welcome-guide">{c.guideTitle}</h2>}>
           <dl className="welcome__guide">
             {c.guide.map((g) => (
               <Fragment key={g.name}>
@@ -98,81 +128,6 @@ export function Accueil() {
           </dl>
         </Fold>
       </section>
-      <section aria-labelledby="welcome-know">
-        <h2 id="welcome-know" className="welcome__title">
-          {c.goodToKnow}
-        </h2>
-        <ul className="welcome__cards">
-          {c.facts.map((f) => (
-            <li key={f.to} className="surface welcome__card">
-              <h3 className="welcome__card-title">{f.title}</h3>
-              <p>{f.text}</p>
-              <Link className="info-note__link" to={f.to}>
-                {f.link}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </>
-  )
-  return (
-    <section className="page-body welcome">
-      <PageHead title={c.title} subtitle={c.subtitle} />
-      <ReadingHelp onDone={() => setReadingAway(true)} />
-      <TimeBudget
-        open={!ready && readingAway && timeOpen}
-        value={budget}
-        onChoose={(b) => {
-          setTimeBudget(b)
-          setTimeOpen(false)
-        }}
-        onClose={() => {
-          if (budget === null) setTimeBudget(null)
-          setTimeOpen(false)
-        }}
-      />
-      {ready && asking && <DripQuestion impact={impact} facts={unconfirmed} />}
-      {/* The chosen time, the door it opens as the one big button, and the way to change one's mind — before anything else on the page. */}
-      {!ready && chosen && (
-        <div className="welcome__time surface">
-          <p className="welcome__time-head">
-            <span>{tc.yours(tc.options[chosen.budget].label)}</span>
-            <Chip onClick={() => setTimeOpen(true)}>{tc.change}</Chip>
-          </p>
-          <p className="welcome__door-hint">{chosen.hint}</p>
-          <Link className="btn btn--primary" to={chosen.to}>
-            {tc.start}
-          </Link>
-        </div>
-      )}
-      {/* A blank first visit sees the product working (a real answer for an example household), then the doors in, by effort. */}
-      {!ready && <DemoAnswer />}
-      {ready ? (
-        <div className="welcome__go">
-          <Link className="btn btn--primary" to="/resultats">
-            {c.seeAnswer}
-          </Link>
-          <Link className="btn btn--ghost" to="/profil">
-            {c.editProfile}
-          </Link>
-        </div>
-      ) : chosen ? (
-        <Fold className="surface welcome__fold" summary={tc.otherWays}>
-          {doorList(c.doors.filter((d) => d !== chosen))}
-        </Fold>
-      ) : (
-        <section aria-labelledby="welcome-doors">
-          <h2 id="welcome-doors" className="welcome__title">
-            {c.doorsTitle}
-          </h2>
-          {doorList(c.doors)}
-        </section>
-      )}
-      <InstallCard />
-      <Fold className="surface welcome__fold" summary={tc.moreAbout}>
-        {about}
-      </Fold>
     </section>
   )
 }

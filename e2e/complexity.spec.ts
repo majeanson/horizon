@@ -38,13 +38,16 @@ const BUDGETS: Record<string, Budget> = {
   // 34 → 28 controls, 372 → 309 words (2026-10-15, the ratchet FALLS): the reading card is a one-time dialog now (closed here), its subtitle is gone, and the demo
   // card's three early-retirement households (+3 chips) cost less than what left. The time question (components/TimeBudget.tsx) is a dialog too, put off here.
   // 28 → 26, 309 → 308 (2026-10-15): the top bar, see above.
-  'Accueil (first visit)': { controls: 26, words: 315 },
+  // 26 → 20 controls, 315 → 164 words (2026-10-19, the ratchet FALLS): the front door is a hero now — the question, what Horizon does and its two promises IN VIEW, one
+  // « Commencer » and one « Voir un exemple » — and the three doors moved into the dialog « Commencer » opens (closed here); « how it works » and the map are two closed folds.
+  'Accueil (first visit)': { controls: 20, words: 164 },
   // 17 → 15, 78 → 77 (2026-10-15): the top bar.
   'Profil (first visit, onboarding)': { controls: 15, words: 84 },
   // 30 → 21 controls, 261 → 186 words (2026-10-15, the ratchet FALLS): the same reading card, gone from the page.
   // 21 → 19, 186 → 184 (2026-10-15): the top bar, and the answer strip the page carried for a ready profile (its « Voir » link and its range line) is gone with it.
   // 19 → 22, 184 → 218 (2026-10-15): not growth — the count now WAITS for the drip question (three buttons, a sentence), which an earlier count read before it landed.
-  'Accueil (with a plan)': { controls: 22, words: 225 },
+  // 22 → 17, 225 → 90 (2026-10-19, the ratchet FALLS): « Bon à savoir » is gone — its two promises are the hero's and the foot line's, its documents tip the dialog's last door.
+  'Accueil (with a plan)': { controls: 17, words: 90 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
   // count only once opened): the CRA's January 1 figure less this year's deposits.
@@ -72,7 +75,9 @@ const BUDGETS: Record<string, Budget> = {
   // their explanation folded under « En savoir plus »: four closed summaries added, ~80 words off the first read.
   // 71 → 69, 606 → 609 (2026-10-15): the top bar, and the answer strip pinned over the page is gone (the age is in the bar).
   // 69 → 33, 609 → 159 (2026-10-16, the ratchet FALLS): the page is an accordion (components/Accordion.tsx) — a first visit faces the scenario open and six closed titles, not seven open blocks.
-  'Hypothèses': { controls: 33, words: 166 },
+  // 33 → 32 controls, 166 → 159 words (2026-10-19, the ratchet FALLS): measured one control and seven words lighter than its budget (the foot line included) with no change
+  // to the page in this commit — lowered so the slack cannot be spent.
+  'Hypothèses': { controls: 32, words: 159 },
   // 29 → 28, 385 → 388 (2026-10-15): the top bar (−1 control, +3 words on a route with an answer).
   // 28 → 32, 388 → 590 (2026-10-16): the two cards that left Profil — « Coussin de liquidités » and « Ce que coûtent les enfants » (four amounts, what the state pays back, a fold of sources): a conscious
   // trade, the sheet is where the household is READ.

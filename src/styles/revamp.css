@@ -1971,7 +1971,8 @@
     display: none;
   }
 }
-/* The reading offer is a FULL-SCREEN dialog, once per device: it fills the screen (no backdrop margin, no rounded card), its content a centred column. */
+/* A FULL-SCREEN dialog (the front door's, components/WelcomeDialog.tsx): it fills the screen (no backdrop margin, no rounded card), its content a centred
+   column — centred only while it FITS: taller than the screen, it starts at the top (`safe`), or its title would sit above the first scroll position, out of reach. */
 .kit-modal__backdrop:has(> .kit-modal--full) { padding: 0; background: var(--paper); }
 .kit-modal--full {
   width: 100%;
@@ -1982,10 +1983,10 @@
   box-shadow: none;
   display: grid;
   justify-items: center;
-  align-content: center;
+  align-content: start;
+  align-content: safe center;
   gap: 0.9rem;
   padding: 3.5rem 1rem 2rem;
 }
 .kit-modal--full > :not(.kit-modal__close) { width: min(100%, 38rem); margin: 0; }
 .kit-modal--full .kit-modal__title { padding-right: 0; font-size: var(--text-xl, 1.5rem); }
-.reading-help p { margin: 0; }

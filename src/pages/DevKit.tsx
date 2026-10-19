@@ -7,9 +7,8 @@ import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { DisplayControls } from '../components/DisplayControls'
 import { BrandMark } from '../components/BrandMark'
-import { ReadingHelp } from '../components/ReadingHelp'
-import { TimeBudget } from '../components/TimeBudget'
-import type { TimeBudget as TimeBudgetValue } from '../lib/timeBudget'
+import { WelcomeDialog } from '../components/WelcomeDialog'
+import type { TimeBudget } from '../lib/timeBudget'
 import { CONCEPTS, FAMILIES, FAMILY_HUE, type ConceptId } from '../lib/concepts'
 import { DripQuestion } from '../components/DripQuestion'
 import { DemoAnswer } from '../components/DemoAnswer'
@@ -295,29 +294,17 @@ function TableChooserSpecimen() {
   )
 }
 
-// ReadingHelp is a full-screen dialog: the kit opens it on demand (controlled), so it never covers the page it is judged on.
-function ReadingHelpSpecimen() {
+// WelcomeDialog is full screen: the kit opens it on demand, its choice kept in the kit's own state — never written to the device. (A door is a link:
+// choosing one leaves the kit for its path, as it does on the front door.)
+function WelcomeDialogSpecimen() {
   const [open, setOpen] = useState(false)
+  const [value, setValue] = useState<TimeBudget | null>('15')
   return (
     <>
       <button type="button" className="btn" onClick={() => setOpen(true)}>
         Ouvrir
       </button>
-      <ReadingHelp open={open} onClose={() => setOpen(false)} />
-    </>
-  )
-}
-
-// TimeBudget is a full-screen dialog too: opened on demand, its choice kept in the kit's own state — never written to the device.
-function TimeBudgetSpecimen() {
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState<TimeBudgetValue | null>(null)
-  return (
-    <>
-      <button type="button" className="btn" onClick={() => setOpen(true)}>
-        Ouvrir
-      </button>
-      <TimeBudget
+      <WelcomeDialog
         open={open}
         value={value}
         onChoose={(b) => {
@@ -607,8 +594,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'Accordion', file: 'src/components/Accordion.tsx', exports: ['Accordion', 'AccordionItem', 'AccordionMode'], kw: 'accordéon un bloc à la fois suivant précédent replier blocs terminés', render: () => <AccordionSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
-    { cat: 'Affichage', name: 'ReadingHelp', file: 'src/components/ReadingHelp.tsx', kw: 'lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <ReadingHelpSpecimen /> },
-    { cat: 'Affichage', name: 'TimeBudget', file: 'src/components/TimeBudget.tsx', kw: 'temps minutes accueil première visite façon de commencer porte', render: () => <TimeBudgetSpecimen /> },
+    { cat: 'Affichage', name: 'WelcomeDialog', file: 'src/components/WelcomeDialog.tsx', kw: 'commencer temps minutes porte lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <WelcomeDialogSpecimen /> },
     {
       cat: 'Affichage',
       name: 'BrandMark',

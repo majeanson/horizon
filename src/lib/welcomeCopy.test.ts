@@ -34,28 +34,32 @@ describe('the home page guide', () => {
   })
 })
 
-// THE THREE DOORS and the demo card: each door is translated, says something, and leads to a route the app has; the quick door carries the address key Profil reads.
-describe('the front door doors and demo card', () => {
+// THE HERO, its dialog and the demo card. The hero says what Horizon does and keeps its two promises in view — that nothing leaves the device and that
+// every government figure is cited — in both languages, each line said in a single sentence.
+describe('the front door hero, dialog and demo card', () => {
   const { fr, en } = WELCOME_COPY
-  it('has three doors, in the same order, to the same places, in both languages', () => {
-    expect(fr.doors.length).toBe(3)
-    expect(en.doors.map((d) => d.to)).toEqual(fr.doors.map((d) => d.to))
-    for (const [i, d] of fr.doors.entries()) {
-      expect(d.label.length, `${i} label`).toBeGreaterThan(5)
-      expect(d.hint.length, `${i} hint`).toBeGreaterThan(20)
-      expect(en.doors[i].label, `${i} label translated`).not.toBe(d.label)
-      expect(en.doors[i].hint, `${i} hint translated`).not.toBe(d.hint)
+  it('says three things in the hero, the same three in both languages, one sentence each', () => {
+    expect(fr.promises.length).toBe(3)
+    expect(en.promises.length).toBe(fr.promises.length)
+    for (const [i, p] of fr.promises.entries()) {
+      expect(p.length, `${i}`).toBeGreaterThan(20)
+      expect(p.length, `${i} fits a line or two`).toBeLessThanOrEqual(110)
+      expect(p.match(/[.!?]/g) ?? [], `${i} one sentence`).toHaveLength(1)
+      expect(en.promises[i], `${i} translated`).not.toBe(p)
     }
-    expect(fr.doorsTitle).not.toBe(en.doorsTitle)
   })
-  it('leads each door to a route the app has, the quick one with its key and the document one to the checklist', () => {
-    for (const d of [...fr.doors, ...en.doors]) expect(ROUTES.has(new URL(d.to, 'https://horizon.test').pathname), d.to).toBe(true)
-    const [quick, full, docs] = fr.doors.map((d) => new URL(d.to, 'https://horizon.test'))
-    expect(quick.searchParams.get('debut')).toBe('rapide')
-    // The full questions are what a bare /profil opens; the door still NAMES them, so a reader who chose two minutes on the front door (lib/timeBudget.ts) and then picks this door is not sent back to the quick path.
-    expect(full.searchParams.get('debut')).toBe('complet')
-    expect(docs.searchParams.get('par')).toBe('document')
-    expect(docs.searchParams.get('etape')).toBe('gather')
+  it('keeps both promises in view: nothing leaves the device, and the figures are cited', () => {
+    expect(fr.promises.join(' ')).toMatch(/appareil/)
+    expect(fr.promises.join(' ')).toMatch(/officielle/)
+    expect(en.promises.join(' ')).toMatch(/device/)
+    expect(en.promises.join(' ')).toMatch(/official/)
+  })
+  it('translates the two buttons and the dialog', () => {
+    for (const k of ['begin', 'example'] as const) expect(en[k], k).not.toBe(fr[k])
+    for (const k of ['title', 'lead'] as const) {
+      expect(fr.dialog[k].length, k).toBeGreaterThan(8)
+      expect(en.dialog[k], k).not.toBe(fr.dialog[k])
+    }
   })
   it('translates the demo card, line by line', () => {
     for (const key of ['title', 'pick', 'frame', 'try'] as const) {

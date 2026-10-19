@@ -59,7 +59,7 @@ export function DemoAnswer() {
   }
 
   return (
-    <section className="demo surface" aria-labelledby="demo-title">
+    <section id="demo" className="demo surface" aria-labelledby="demo-title">
       <h2 id="demo-title" className="welcome__title">
         {c.demo.title}
       </h2>

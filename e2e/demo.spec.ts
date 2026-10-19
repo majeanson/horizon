@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, PROFILE_KEY, blankSeed, savedProfile, seedProfile } from './seed'
 
-// LA PREUVE DE LA PREMIÈRE VISITE — a blank household sees the product working (a real answer for an example household, framed as not theirs)
-// and three doors in, by effort. The demo card loads its household exactly as Données does, and asks first only when something is already typed.
+// LA PREUVE DE LA PREMIÈRE VISITE — a blank household sees the product working (a real answer for an example household, framed as not theirs) under
+// the hero (front-door.spec.ts holds the hero and its doors). The demo card loads its household exactly as Données does, and asks first only when
+// something is already typed.
 
 test.beforeEach(async ({ page }) => seedProfile(page, blankSeed()))
 
@@ -57,27 +58,6 @@ test('with something already typed, loading the example asks first — and « An
   await dialog.getByRole('button', { name: 'Annuler' }).click()
   await expect(page).toHaveURL(/\/$/)
   expect((await savedProfile(page)).household.persons[0].salaryToday).toBe(50_000)
-})
-
-test('three doors, by effort, each to its own place', async ({ page }) => {
-  await page.goto('/')
-  const door = (name: RegExp) => page.getByRole('link', { name })
-  await expect(door(/J’ai 2 minutes/)).toHaveAttribute('href', '/profil?debut=rapide')
-  await expect(door(/Je prends le temps \(≈ 15 minutes\)/)).toHaveAttribute('href', '/profil?debut=complet')
-  await expect(door(/J’ai mes documents en main/)).toHaveAttribute('href', '/profil?form=1&par=document&etape=gather')
-  // each door says in one line what it is
-  await expect(page.locator('.welcome__door-hint')).toHaveCount(3)
-  await door(/J’ai 2 minutes/).click()
-  await expect(page).toHaveURL(/\/profil\?debut=rapide/)
-  await expect(page.locator('.onboard')).toBeVisible()
-  await page.goto('/')
-  await door(/J’ai mes documents en main/).click()
-  await expect(page).toHaveURL(/par=document/)
-  await expect(page.locator('#person-self, .onboard')).toHaveCount(0)
-  await page.goto('/')
-  await door(/Je prends le temps/).click()
-  await expect(page).toHaveURL(/\/profil\?debut=complet$/)
-  await expect(page.locator('.onboard')).toBeVisible()
 })
 
 test('a ready household sees neither the demo nor the doors', async ({ page }) => {

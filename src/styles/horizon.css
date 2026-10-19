@@ -1430,51 +1430,85 @@
   }
 }
 
-/* ── « Combien de temps avez-vous ? » (components/TimeBudget.tsx) and the line it leaves on the front door ───────────── */
-/* The dialog's three doors are the front door's own `.welcome__door` card, as a BUTTON: stacked on a phone, side by side when the screen allows. */
-button.welcome__door {
-  width: 100%;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
+/* ── The front door: its one dialog (components/WelcomeDialog.tsx) and its hero (pages/Accueil.tsx) ──────────────────────────────── */
+/* The dialog's three doors are the front door's own `.welcome__door` card, as a link; the answer already given is marked. */
 .welcome__door.is-on {
   border-color: var(--accent, currentColor);
   box-shadow: inset 0 0 0 1px var(--accent, currentColor);
 }
-/* …and stacked at every width here: three choices read top-down (side by side they went 2 + 1 in the dialog's column). */
-.time-budget .welcome__doors {
+/* Stacked at every width in the dialog: three choices read top-down (side by side they went 2 + 1 in the dialog's column). */
+.welcome-dialog .welcome__doors {
   margin-top: 0.5rem;
   grid-template-columns: 1fr;
 }
-.welcome__time {
+.welcome-dialog p {
+  margin: 0;
+}
+/* The dialog's first line: the mark, and that nothing is lost by stopping. */
+.welcome-dialog__lead {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink-soft);
+}
+.welcome-dialog__part {
   display: grid;
   gap: 0.5rem;
-  padding: 0.9rem 1.1rem;
 }
-.welcome__time-head {
+
+/* The hero of a first visit: the mark, the question, what Horizon does and its two promises, and the two buttons — the whole of « why am I here » before
+   anything else on the page. Plain paper, no card: it is the page's own voice, not one tool among others. */
+.welcome__hero {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  justify-items: start;
+  padding-block: 0.5rem 0.75rem;
+}
+.welcome__hero .page-head__title {
+  font-size: clamp(var(--text-xl), 6.5vw, var(--text-2xl));
+  line-height: 1.15;
+}
+.welcome__promises {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+  max-width: 40rem;
+}
+.welcome__promises li {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
-  margin: 0;
-  font-weight: 700;
+  align-items: flex-start;
 }
-.welcome__time .welcome__door-hint {
-  margin: 0;
+/* The mark sits on the FIRST line of a promise that wraps, not in the middle of its block. */
+.welcome__promises li > svg {
+  flex: none;
+  margin-top: 0.2em;
+  color: var(--sage-ink);
 }
-/* The one big button fills a phone's width; on a wider screen it keeps its own. */
-.welcome__time .btn--primary {
-  justify-content: center;
+:root[data-contrast='high'] .welcome__promises li > svg {
+  color: currentColor;
 }
-@media (min-width: 640px) {
-  .welcome__time .btn--primary {
-    justify-self: start;
+/* The two buttons fill a phone's width, one under the other; on a wider screen they keep their own. */
+@media (max-width: 479px) {
+  .welcome__hero .welcome__go {
+    display: grid;
+    width: 100%;
+  }
+  .welcome__hero .welcome__go .btn {
+    justify-content: center;
   }
 }
+
+/* The two folds at the foot of the front door: each summary IS a heading (screen readers list them), drawn as the summary line it replaces. */
 .welcome__fold > summary {
   font-weight: 700;
+}
+.welcome__fold > summary h2 {
+  display: inline;
+  margin: 0;
+  font: inherit;
 }
 
 /* « Imprimer… » (components/results/PrintMenu.tsx): the pages that can be put on paper, one button each — the name, and under it what the page holds. */
