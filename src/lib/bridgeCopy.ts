@@ -238,7 +238,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     caveatTitle: 'Ce que ces chiffres ne disent pas',
     caveats: [
       'Une durée de vie : le point d’équilibre est un pari sur la longévité, pas une certitude.',
-      'Le décès du conjoint ou de la conjointe : la rente de survivant n’est pas calculée ici.',
+      'Le décès de votre partenaire : la rente de survivant n’est pas calculée ici.',
       'Des marchés qui tournent mal au mauvais moment, et des dépenses qui changent avec l’âge : les scénarios Prudent, Neutre et Audacieux donnent une fourchette, pas une prévision.',
     ],
     marksTitle: 'Selon le scénario',

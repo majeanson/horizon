@@ -25,7 +25,7 @@ const FR: CashBufferCopy = {
   below: (months, min, max) => `Environ ${months} mois de dépenses de retraite en liquidités, sous la zone de ${min} à ${max} mois souvent visée.`,
   within: (months, min, max) => `Environ ${months} mois de dépenses de retraite en liquidités, dans la zone de ${min} à ${max} mois souvent visée.`,
   above: (months, min, max) => `Environ ${months} mois de dépenses de retraite en liquidités, au-delà de la zone de ${min} à ${max} mois souvent visée : le surplus pourrait travailler ailleurs.`,
-  basis: (liquid) => `Compté : le CELI et les comptes non enregistrés des deux conjoints (${liquid}). Le REER n’est pas compté, car il est imposable au retrait.`,
+  basis: (liquid) => `Compté : le CELI et les comptes non enregistrés des deux partenaires (${liquid}). Le REER n’est pas compté, car il est imposable au retrait.`,
   caveat: 'Cette zone est un repère courant, pas un chiffre officiel. Elle n’entre dans aucun calcul du plan.',
   caveatTitle: 'Ce que ce repère veut dire',
 }

@@ -7,7 +7,7 @@ export const EN: typeof FR = {
   appName: 'Horizon',
 
   next: {
-    toResults: 'See my result',
+    toResults: 'See my answer',
     toProfile: 'Complete my profile',
     adjustAssumptions: 'Adjust my assumptions',
     profileReady: 'Your profile is complete enough for an answer. You can make it exact afterwards, document by document.',
@@ -491,8 +491,8 @@ export const EN: typeof FR = {
     },
     issue: {
       unavailable: 'This browser does not keep data (private browsing?). Export your profile before closing the page.',
-      unreadable: 'The saved profile was unreadable. A copy is kept on this device (Data page: “Unreadable copy”), and a blank profile was loaded.',
-      newer: 'The saved profile comes from a newer version of Horizon, so it could not be read here. A copy is kept on this device (Data page: “Unreadable copy”), and a blank profile was loaded.',
+      unreadable: 'The saved profile was unreadable. A copy is kept on this device (Backup and settings page: “Unreadable copy”), and a blank profile was loaded.',
+      newer: 'The saved profile comes from a newer version of Horizon, so it could not be read here. A copy is kept on this device (Backup and settings page: “Unreadable copy”), and a blank profile was loaded.',
       unsaved: 'A figure is outside the allowed limits: the profile was not saved. Correct the figure concerned.',
       conflict: 'Another tab saved while you were typing: its version was taken, and your last change was not kept.',
     },

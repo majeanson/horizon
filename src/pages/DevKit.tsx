@@ -376,7 +376,7 @@ function ChipSpecimen() {
 
 function SwitchSpecimen() {
   const [on, setOn] = useState(true)
-  return <Switch checked={on} onChange={setOn} label="Répartir au mieux entre conjoints" hint="Un réglage oui / non : le bouton glisse, l’état est dit en mots." />
+  return <Switch checked={on} onChange={setOn} label="Répartir au mieux entre partenaires" hint="Un réglage oui / non : le bouton glisse, l’état est dit en mots." />
 }
 
 function ModalSpecimen() {
@@ -582,7 +582,7 @@ function ENTRIES(): Entry[] {
       render: () => (
         <div className="field-row__control">
           <span>Un âge que la personne choisit</span>
-          <FieldHelp id="retirementAge" label="Âge de la retraite" />
+          <FieldHelp id="retirementAge" label="Âge de retraite visé" />
         </div>
       ),
     },
@@ -673,7 +673,7 @@ function ENTRIES(): Entry[] {
       kw: 'question chiffre estimé préciser accueil',
       render: () => <DripQuestion facts={[{ id: 'self:salary', owner: 'self', kind: 'salary' }]} impact={{ base: 60, swings: { 'self:salary': { down: 57, up: 63, years: 3 } }, range: null }} />,
     },
-    { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/resultats" label="Voir mon résultat"><p>Votre profil est assez complet pour une réponse.</p></NextStep> },
+    { cat: 'Affichage', name: 'NextStep', file: 'src/components/NextStep.tsx', kw: 'suivant prochaine étape action', render: () => <NextStep to="/resultats" label="Voir ma réponse"><p>Votre profil est assez complet pour une réponse.</p></NextStep> },
     {
       cat: 'Feedback',
       name: 'StatusMessage',

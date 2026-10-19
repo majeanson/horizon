@@ -23,7 +23,7 @@ export const FR = {
   appName: 'Horizon',
 
   next: {
-    toResults: 'Voir mon résultat',
+    toResults: 'Voir ma réponse',
     toProfile: 'Compléter mon profil',
     adjustAssumptions: 'Ajuster mes hypothèses',
     profileReady: 'Votre profil est assez complet pour une réponse. Vous pourrez le préciser ensuite, document par document.',
@@ -253,7 +253,7 @@ export const FR = {
     indexShare: 'Part de l’inflation accordée',
     indexMinus: 'Ou inflation moins',
     survivorShare: 'Part versée au conjoint survivant',
-    survivorShareHint: 'À votre décès, la part de votre rente que le régime verse à votre conjoint, sa vie durant. RREGOP : 50 %, ou 60 % contre une rente réduite de 2 %.',
+    survivorShareHint: 'À votre décès, la part de votre rente que le régime verse à votre partenaire, sa vie durant. RREGOP : 50 %, ou 60 % contre une rente réduite de 2 %.',
     indexHint: 'La rente augmente chaque année du plus élevé des deux : cette part de l’inflation, ou l’inflation moins ce montant.',
     summary: (rate: string, service: string, age: number) => `${rate} par année × ${service} ans · dès ${age} ans`,
     unnamed: 'Régime sans nom',
@@ -355,7 +355,7 @@ export const FR = {
     },
     options: { title: 'Options' },
     splitting: {
-      on: 'Partager les rentes entre conjoints',
+      on: 'Partager les rentes entre partenaires',
       hint: 'À partir de 65 ans, une personne peut attribuer jusqu’à la moitié de sa rente d’employeur et de ses retraits de REER à l’autre : l’impôt du couple baisse.',
     },
   },
@@ -512,8 +512,8 @@ export const FR = {
     },
     issue: {
       unavailable: 'Ce navigateur ne conserve pas les données (navigation privée ?). Exportez votre profil avant de fermer la page.',
-      unreadable: 'Le profil enregistré était illisible. Une copie en est gardée sur cet appareil (page Données : « Copie illisible »), et un profil vierge a été chargé.',
-      newer: 'Le profil enregistré vient d’une version plus récente d’Horizon : il n’a pas pu être lu ici. Une copie en est gardée sur cet appareil (page Données : « Copie illisible »), et un profil vierge a été chargé.',
+      unreadable: 'Le profil enregistré était illisible. Une copie en est gardée sur cet appareil (page Sauvegarde et réglages : « Copie illisible »), et un profil vierge a été chargé.',
+      newer: 'Le profil enregistré vient d’une version plus récente d’Horizon : il n’a pas pu être lu ici. Une copie en est gardée sur cet appareil (page Sauvegarde et réglages : « Copie illisible »), et un profil vierge a été chargé.',
       unsaved: 'Un chiffre dépasse les limites permises : le profil n’a pas été enregistré. Corrigez le chiffre en cause.',
       conflict: 'Un autre onglet a enregistré pendant votre saisie : sa version a été reprise, et votre dernière modification n’a pas été conservée.',
     },
@@ -699,7 +699,7 @@ export const FR = {
       where: 'Le livret ou la page de votre régime. Pour le RREGOP, la page « En cas de décès, qu’est-ce que le RREGOP prévoit pour vos proches ? » de Retraite Québec.',
       label: '50 % de votre rente',
       url: 'https://www.retraitequebec.gouv.qc.ca/fr/savoir-faire-pousser-ble/fonction-publique-sante-et-services-sociaux-et-education/cas-deces-est-que-rregop-prevoit-proches',
-      note: 'Au RREGOP, la part est de 50 %, ou de 60 % si vous acceptez une rente réduite de 2 %. Un décès avant 65 ans : la réduction prévue à 65 ans s’applique quand même au conjoint.',
+      note: 'Au RREGOP, la part est de 50 %, ou de 60 % si vous acceptez une rente réduite de 2 %. Un décès avant 65 ans : la réduction prévue à 65 ans s’applique quand même à la personne qui reste.',
     },
   } satisfies Record<string, InfoEntry>,
 }

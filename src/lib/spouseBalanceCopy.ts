@@ -1,4 +1,4 @@
-// The words of « Égaliser les REER des conjoints » (Résultats › Décider). Like bracketFillCopy.ts, they live outside the eager dictionaries (a bundle-budget reason),
+// The words of « Égaliser les REER des partenaires » (Résultats › Décider). Like bracketFillCopy.ts, they live outside the eager dictionaries (a bundle-budget reason),
 // so spouseBalanceCopy.test.ts does the parity job for them: every text in both languages, none empty, none left in the other language, and no cited rate, threshold or
 // year-count typed into a sentence (every figure comes from the engine, formatted by the page). The French signs that bind to a word hold a narrow no-break space (U+202F),
 // written as an escape here (frenchSpacing.test.ts).
@@ -39,14 +39,14 @@ export interface SpouseBalanceCopy {
 }
 
 const FR: SpouseBalanceCopy = {
-  title: 'Égaliser les REER des conjoints ?',
+  title: 'Égaliser les REER des partenaires ?',
   hint: (age) =>
-    `Votre plan, retraite à ${age} ans, refait avec une partie du plus gros REER dans celui de l’autre conjoint, jusqu’à ce que les deux soient à peu près égaux. Les retraits sont recalculés année par année avec l’impôt, le fractionnement du revenu de pension, la RRQ, la PSV et le SRG.`,
-  nav: 'REER des conjoints',
+    `Votre plan, retraite à ${age} ans, refait avec une partie du plus gros REER dans celui de l’autre partenaire, jusqu’à ce que les deux soient à peu près égaux. Les retraits sont recalculés année par année avec l’impôt, le fractionnement du revenu de pension, la RRQ, la PSV et le SRG.`,
+  nav: 'REER des partenaires',
   level: 'Les deux REER sont déjà de taille semblable, ou ce qui pourrait changer de main est immobilisé : égaliser n’y changerait presque rien.',
   better: (moved, saved, balancedAge, ownAge) => {
     const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
-    const lead = `Avec ${moved} du plus gros REER dans celui de l’autre conjoint, `
+    const lead = `Avec ${moved} du plus gros REER dans celui de l’autre partenaire, `
     if (balancedAge !== null && (ownAge === null || balancedAge < ownAge)) {
       return `${lead}le ménage pourrait prendre sa retraite ${ownAge === null ? `à ${balancedAge} ans, alors que le partage actuel ne dure à aucun âge` : `${years(ownAge - balancedAge)} plus tôt`}.`
     }
@@ -55,9 +55,9 @@ const FR: SpouseBalanceCopy = {
   nudge: (moved, saved, balancedAge, ownAge) => {
     const years = (n: number) => `${n} ${n > 1 ? 'ans' : 'an'}`
     if (balancedAge !== null && (ownAge === null || balancedAge < ownAge)) {
-      return `Égaliser les REER des conjoints (${moved} à déplacer) permettrait de prendre sa retraite ${ownAge === null ? `à ${balancedAge} ans, alors que le plan actuel ne dure à aucun âge` : `${years(ownAge - balancedAge)} plus tôt`}.`
+      return `Égaliser les REER des partenaires (${moved} à déplacer) permettrait de prendre sa retraite ${ownAge === null ? `à ${balancedAge} ans, alors que le plan actuel ne dure à aucun âge` : `${years(ownAge - balancedAge)} plus tôt`}.`
     }
-    return `Égaliser les REER des conjoints (${moved} à déplacer) coûterait environ ${saved} d’impôt de moins sur tout le plan (en dollars d’aujourd’hui).`
+    return `Égaliser les REER des partenaires (${moved} à déplacer) coûterait environ ${saved} d’impôt de moins sur tout le plan (en dollars d’aujourd’hui).`
   },
   effect: (e) => `Par rapport au partage actuel : ${e.tax === null ? 'à peu près le même impôt' : `${e.tax} d’impôt de ${e.less ? 'moins' : 'plus'}`} sur tout le plan. L’écart est trop petit pour valoir une démarche.`,
   plan: 'Partage des REER',
@@ -68,7 +68,7 @@ const FR: SpouseBalanceCopy = {
   age: (n) => `${n} ans`,
   updating: 'Mise à jour…',
   howTitle: 'Comment lire cette page',
-  how: 'Quand l’un des conjoints a un bien plus gros REER, ses retraits sont imposés à un taux plus haut que ceux de l’autre. Cette page refait le plan avec une partie de ce REER dans celui de l’autre conjoint et compare l’impôt sur tout le plan : c’est ce que ferait un REER de conjoint, alimenté par celui qui gagne le plus.',
+  how: 'Quand l’un des partenaires a un bien plus gros REER, ses retraits sont imposés à un taux plus haut que ceux de l’autre. Cette page refait le plan avec une partie de ce REER dans celui de l’autre partenaire et compare l’impôt sur tout le plan : c’est ce que ferait un REER de conjoint, alimenté par celui qui gagne le plus.',
   caveat:
     'C’est une approximation d’un REER de conjoint. Dans la réalité, c’est celui qui gagne le plus qui cotise, et il garde la déduction et ses droits de cotisation (ici, seuls les soldes changent de main). Un retrait fait dans les années civiles qui suivent une cotisation au REER de conjoint est imposé chez celui qui a cotisé, selon la règle d’attribution de l’Agence du revenu du Canada : l’avantage se joue donc surtout avant 65 ans, car le fractionnement du revenu de pension rapproche déjà les deux revenus ensuite. Un REER immobilisé ne peut pas changer de main.',
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SPOUSE_BALANCE_COPY, type SpouseBalanceCopy } from './spouseBalanceCopy.ts'
 
-// The words of « Égaliser les REER des conjoints » live outside the eager dictionaries (spouseBalanceCopy.ts), so the dictionary parity test does not see them. This one does the same
+// The words of « Égaliser les REER des partenaires » live outside the eager dictionaries (spouseBalanceCopy.ts), so the dictionary parity test does not see them. This one does the same
 // job for them: every text present in both languages, none empty, none left in the other language, and no rate, threshold or count of years typed into a sentence (they come from the engine).
 
 const { fr, en } = SPOUSE_BALANCE_COPY
