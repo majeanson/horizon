@@ -50,6 +50,8 @@ const FR_RESULTS = {
   /** Under one person's « d'où vient l'argent » bars: a stretch of years with no bar is not missing data — it says who pays then. */
   idle: (name: string, from: string, to: string) => `Entre ${from} et ${to}, rien ne vient de ${name} : le ménage vit alors des comptes et des revenus de l’autre personne. Des barres vides ici sont normales.`,
   tabs: { label: 'Vues des résultats', answer: 'Réponse', decide: 'Décider', proof: 'Preuve' },
+  /** The one sentence under the page's title: its three views, in words (on a phone the title and this line are kept for screen readers and paper only). */
+  subtitle: 'Votre réponse, ce que vous pourriez changer, et la preuve derrière chaque chiffre.',
   /** « Décider »: the two steps of the view. */
   decide: {
     tryTitle: 'Essayer un changement',
@@ -276,6 +278,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   idle: (name: string, from: string, to: string) => `From${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', decide: 'Decide', proof: 'Proof' },
+  subtitle: 'Your answer, what you could change, and the proof behind every figure.',
   decide: {
     tryTitle: 'Try a change',
     tryHint: 'Each try runs on your plan as it stands; nothing is saved. Open one at a time.',

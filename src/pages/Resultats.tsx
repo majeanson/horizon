@@ -49,7 +49,7 @@ export function Resultats() {
   if (gaps.length > 0) {
     return (
       <section className="page-body">
-        <PageHead title={r.title} />
+        <PageHead title={r.title} subtitle={m.rc.subtitle} />
         <div className="surface results-gaps">
           <EmptyState tone="calm" icon="chart-line-up-bold">
             {r.gaps.lead}
@@ -74,7 +74,7 @@ export function Resultats() {
         <PrintKindView m={m} />
       ) : (
         <>
-      <PageHead title={r.title} />
+      <PageHead title={r.title} subtitle={m.rc.subtitle} />
       {/* The three views and the map of the open view are ONE pinned stack under the top bar (components/PinStack.tsx): one box that rolls away with the bar and comes back with it. */}
       <PinStack>
       <div className="results-pin">

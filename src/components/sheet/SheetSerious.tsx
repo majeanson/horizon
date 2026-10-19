@@ -38,7 +38,6 @@ export function SheetSerious({ model, lang, births, names, timeline, cards }: { 
   const v = sheetView(model, lang, SHEET_COPY[lang], births, names)
   return (
     <div className="sheet sheet--serious">
-      <p className="page-head__sub">{v.intro}</p>
       {v.empty !== null && (
         <div className="surface sheet__empty">
           <p>{v.empty}</p>

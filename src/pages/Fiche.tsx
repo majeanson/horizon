@@ -46,7 +46,7 @@ export function Fiche() {
 
   return (
     <section className="page-body">
-      <PageHead title={words.title} />
+      <PageHead title={words.title} subtitle={words.intro} />
       <SheetSerious
         model={model}
         lang={lang}

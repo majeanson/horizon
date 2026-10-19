@@ -74,7 +74,6 @@ export interface MoverView {
 
 export interface SheetView {
   title: string
-  intro: string
   empty: string | null
   /** The headline: the earliest age and how sturdy the plan is, with what the whole sheet stands on. */
   verdict: { title: string; stats: StatView[]; accuracy: string; toResults: string }
@@ -176,7 +175,6 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
   const accuracyText = words.accuracy(model.accuracy.confirmed, model.accuracy.total)
   return {
     title: words.title,
-    intro: words.intro,
     empty: model.gaps.length > 0 ? words.empty : null,
     verdict: { title: words.verdict.title, stats: [statView('runway'), statView('resilience')], accuracy: accuracyText, toResults: words.toResults },
     groups: [

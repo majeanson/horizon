@@ -95,8 +95,10 @@ const BUDGETS: Record<string, Budget> = {
   // 47 → 43 controls, 695 → 603 words (2026-10-16, the ratchet FALLS): « Préciser le calcul » left the answer for Ma fiche, which already ranked the same figures (the bar, the ranked list and the three « still missing » lines moved there; the answer card keeps its range line and a link to the sheet). The tour is three steps.
   // 43 → 44 controls, 603 → 592 words (2026-10-16): the line saying which year's rates are used folds under « Barèmes utilisés » (one summary, one sentence fewer in view) unless the year is ahead of the rates, when it stays in view as a warning.
   // 44 → 45 controls, 592 → 557 words (2026-10-17): the two cards under the answer are accordion cards with « Tout ouvrir / Tout fermer » at the end of the map row (+1 icon, the card titles became buttons);
+  // words 564 → 577 (2026-10-19): the page's one sentence under its title (« Votre réponse, ce que vous pourriez changer, et la preuve derrière chaque chiffre. »), on a wide
+  // screen; a phone keeps the head for screen readers and paper only. The same +13 on Décider and Preuve.
   // « Imprimer… » left the page, and the glance's three tiles are text, not controls.
-  'Résultats — Réponse': { controls: 45, words: 564 },
+  'Résultats — Réponse': { controls: 45, words: 577 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
@@ -105,7 +107,7 @@ const BUDGETS: Record<string, Budget> = {
   // together, 3 × 3, scored by the worst case. Four words; the grid mounts only when opened.
   // 50 → 49 controls, 830 → 871 words (2026-10-17): « Imprimer… » and the « Tout montrer » chip are gone, the same icon as every page replaces the chip (+1); the four what-ifs are cards that say in one line what they hold while closed (+41 words).
   // 49 → 51 controls (2026-10-19): the closed strategies say what they hold (lib/cardsCopy.ts `closed`), and « REER » in two of those lines is a glossary link, as in every subtitle.
-  'Résultats — Décider': { controls: 51, words: 878 },
+  'Résultats — Décider': { controls: 51, words: 891 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
@@ -114,7 +116,7 @@ const BUDGETS: Record<string, Budget> = {
   // 44 → 31, 1893 → 158 (2026-10-16, the ratchet FALLS): the blocks of Preuve are read one at a time; the firm answer is open, the ledger, the table, the accuracy and the parameters are closed titles.
   // 31 → 30 controls, 158 → 153 words (2026-10-17, the ratchet FALLS): « Imprimer… » left the page.
   // words 160 → 200 (2026-10-19, a conscious RISE — « no hidden information »): the four closed blocks of Preuve were bare titles; each says in one line what it holds.
-  'Résultats — Preuve': { controls: 30, words: 200 },
+  'Résultats — Preuve': { controls: 30, words: 213 },
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]
