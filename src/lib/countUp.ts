@@ -38,9 +38,10 @@ export function countedFigures(text: string): number[] {
   return out
 }
 
-/** `text` with each counted figure `p` (0 → 1) of the way from `from[i]` (0 when absent) to its own value. At p = 1 the text itself. */
+/** `text` with each counted figure `p` (0 → 1) of the way from `from[i]` (0 when absent) to its own value. At p = 1 the text itself; below 0, the start — never a figure outside its two ends. */
 export function countFrame(text: string, from: readonly number[] | null, p: number, lang: Lang): string {
   if (p >= 1) return text
+  p = Math.max(0, p)
   let counted = 0
   return text
     .split(NUMBER)

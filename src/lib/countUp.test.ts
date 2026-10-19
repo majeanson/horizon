@@ -24,6 +24,12 @@ describe('the frames between', () => {
     expect(nbsp(countFrame('12 000 $', [10000], 0.5, 'fr'))).toBe('11 000 $')
   })
 
+  it('never draws a figure outside its two ends — a progress below zero is the start (a frame stamped before the count began, on a slow machine: « À -18 $ » on CI)', () => {
+    const text = 'À 40 000 $ par année : dès 52 ans.'
+    expect(nbsp(countFrame(text, null, -0.004, 'fr'))).toBe('À 0 $ par année : dès 52 ans.')
+    expect(nbsp(countFrame('12 000 $', [10000], -0.5, 'fr'))).toBe('10 000 $')
+  })
+
   it('keeps the cents of a figure that has them, in either language', () => {
     expect(nbsp(countFrame('1 000,50 $', null, 0.5, 'fr'))).toBe('500,25 $')
     expect(countFrame('$1,000.50', null, 0.5, 'en')).toBe('$500.25')

@@ -27,7 +27,8 @@ export function CountUp({ children }: { children: string }) {
     const start = performance.now()
     let frame = 0
     const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / DURATION)
+      // A frame's timestamp is when the FRAME began, which can be a moment before `start` was read: clamped at 0, or the eased count dips below its start.
+      const t = Math.min(1, Math.max(0, (now - start) / DURATION))
       if (t >= 1) {
         last.current = to
         return setLive(null)
