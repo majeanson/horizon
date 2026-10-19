@@ -41,6 +41,7 @@ export default defineConfig({
     navigationTimeout: 20_000,
     actionTimeout: 15_000,
     timezoneId: 'America/Toronto',
+    locale: 'fr-CA', // the first visit follows the browser's language (lib/firstLanguage.ts); these checks read the French
     // The first answer's one-time flourish (lib/firstAnswer.ts) is « already seen », so it does not move under the offline checks.
     storageState: { cookies: [], origins: [{ origin: `http://127.0.0.1:${PORT}`, localStorage: [{ name: 'horizon-first-answer', value: 'done' }] }] },
   },

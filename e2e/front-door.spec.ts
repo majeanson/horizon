@@ -158,6 +158,22 @@ test('English: the hero, the dialog and its doors speak English', async ({ page 
   await expect(dialog.getByRole('heading', { name: 'Easier to read?' })).toBeVisible()
 })
 
+test.describe('a browser in English', () => {
+  test.use({ locale: 'en-US' })
+  test('opens a first visit in English, before the first paint and after; a choice made in the app then wins', async ({ page }) => {
+    await seedProfile(page, blankSeed())
+    await page.goto('/')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('When can you retire?')
+    await page.getByRole('button', { name: 'Get started', exact: true }).click()
+    await page.getByRole('dialog').getByRole('tab', { name: 'Français' }).click()
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('retraite')
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'fr')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('retraite')
+  })
+})
+
 test('the sizes are said in percent on the settings page and in words in the dialog', async ({ page }) => {
   await page.goto('/donnees')
   await expect(page.getByRole('tab', { name: '115 %' })).toBeVisible()

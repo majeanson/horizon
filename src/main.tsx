@@ -8,19 +8,20 @@ import { LangContext, type Lang } from './i18n'
 import { ToastProvider } from './lib/toast'
 import { ConfirmProvider } from './lib/confirm'
 import { applyDocumentLang } from './lib/documentLang'
+import { firstLanguage } from './lib/firstLanguage'
 import { registerSw } from './lib/registerSw'
 import './styles.css'
 
 const LANG_KEY = 'horizon-lang'
 
 function initialLang(): Lang {
+  let saved: string | null = null
   try {
-    const saved = localStorage.getItem(LANG_KEY)
-    if (saved === 'fr' || saved === 'en') return saved
+    saved = localStorage.getItem(LANG_KEY)
   } catch {
-    /* storage blocked — fall through to the default */
+    /* storage blocked — the browser's languages decide */
   }
-  return 'fr'
+  return firstLanguage(saved, navigator.languages?.length ? navigator.languages : [navigator.language ?? ''])
 }
 
 function Root() {

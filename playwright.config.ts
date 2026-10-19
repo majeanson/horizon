@@ -23,6 +23,9 @@ export default defineConfig({
     navigationTimeout: 20_000,
     actionTimeout: 15_000,
     timezoneId: 'America/Toronto',
+    // A Québec reader's browser: the first visit follows the browser's language (lib/firstLanguage.ts), and the specs read the French. A spec about
+    // another browser sets its own (front-door.spec.ts).
+    locale: 'fr-CA',
     // The first answer's one-time flourish (lib/firstAnswer.ts) is « already seen » for every spec but its own (polish.spec.ts clears it).
     storageState: {
       cookies: [],

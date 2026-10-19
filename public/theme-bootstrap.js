@@ -22,11 +22,24 @@
     // stale key must fall back to the base size, never paint at a size no CSS rule defines.
     var ts = localStorage.getItem('horizon-text-scale')
     if (ts === 'large' || ts === 'x-large') root.setAttribute('data-text-scale', ts)
-    var lang = localStorage.getItem('horizon-lang')
-    if (lang === 'en') root.setAttribute('lang', 'en')
   } catch (e) {
     /* no saved profile — the base presentation shows */
   }
+  // The language (src/lib/firstLanguage.ts, the same rule — firstLanguage.test.ts runs this script against its cases): the saved choice, else the
+  // browser's first French or English tag, else French.
+  var saved = null
+  try {
+    saved = localStorage.getItem('horizon-lang')
+  } catch (e) {
+    /* storage blocked: the browser decides */
+  }
+  var lang = saved === 'fr' || saved === 'en' ? saved : null
+  var tags = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']
+  for (var t = 0; t < tags.length && lang === null; t++) {
+    var base = String(tags[t]).toLowerCase().split('-')[0]
+    if (base === 'fr' || base === 'en') lang = base
+  }
+  root.setAttribute('lang', lang || 'fr')
   // Installed (home screen, own window) or in a tab? The same three display modes lib/standalone.ts reads, plus iOS's navigator.standalone: stamped before
   // first paint so styles/phone.css can dress the app without waiting for a script.
   try {
