@@ -200,3 +200,15 @@ test('the home: owning one, its mortgage says when the payment stops, and it is 
   await expect(section).toHaveCount(0)
   await expect(page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Non' })).toBeChecked()
 })
+
+test('« D’où vient l’argent » is one tap from the map: the chip opens Comparer, its ages view and the chart’s « Détail », then lands on the bars', async ({ page }) => {
+  await seedProfile(page)
+  // the worst start: the cards closed and another way of comparing on screen
+  await page.goto('/resultats?cartes=none&cv=each')
+  const map = page.getByRole('navigation', { name: 'Sections des résultats' })
+  await map.getByRole('button', { name: 'D’où vient l’argent' }).click()
+  await expect(page).toHaveURL(/metric=detail/)
+  await expect(page).not.toHaveURL(/cv=/)
+  await expect(page.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('#graphique')).toBeInViewport({ timeout: 10_000 })
+})

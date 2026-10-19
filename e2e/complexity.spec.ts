@@ -40,7 +40,8 @@ const BUDGETS: Record<string, Budget> = {
   // 28 → 26, 309 → 308 (2026-10-15): the top bar, see above.
   // 26 → 20 controls, 315 → 164 words (2026-10-19, the ratchet FALLS): the front door is a hero now — the question, what Horizon does and its two promises IN VIEW, one
   // « Commencer » and one « Voir un exemple » — and the three doors moved into the dialog « Commencer » opens (closed here); « how it works » and the map are two closed folds.
-  'Accueil (first visit)': { controls: 20, words: 164 },
+  // 20 → 21 controls, 164 → 169 words (2026-10-19, Marc: the showcase must show retiring early is reachable): « Couple, retraite avant 50 ans » joins the demo's chips.
+  'Accueil (first visit)': { controls: 21, words: 169 },
   // 17 → 15, 78 → 77 (2026-10-15): the top bar.
   'Profil (first visit, onboarding)': { controls: 15, words: 84 },
   // 30 → 21 controls, 261 → 186 words (2026-10-15, the ratchet FALLS): the same reading card, gone from the page.
@@ -99,12 +100,13 @@ const BUDGETS: Record<string, Budget> = {
   // 47 → 43 controls, 695 → 603 words (2026-10-16, the ratchet FALLS): « Préciser le calcul » left the answer for Ma fiche, which already ranked the same figures (the bar, the ranked list and the three « still missing » lines moved there; the answer card keeps its range line and a link to the sheet). The tour is three steps.
   // 43 → 44 controls, 603 → 592 words (2026-10-16): the line saying which year's rates are used folds under « Barèmes utilisés » (one summary, one sentence fewer in view) unless the year is ahead of the rates, when it stays in view as a warning.
   // 44 → 45 controls, 592 → 557 words (2026-10-17): the two cards under the answer are accordion cards with « Tout ouvrir / Tout fermer » at the end of the map row (+1 icon, the card titles became buttons);
+  // « Imprimer… » left the page, and the glance's three tiles are text, not controls.
   // words 564 → 577 (2026-10-19): the page's one sentence under its title (« Votre réponse, ce que vous pourriez changer, et la preuve derrière chaque chiffre. »), on a wide
   // screen; a phone keeps the head for screen readers and paper only. The same +13 on Décider and Preuve.
   // words 577 → 581 (2026-10-19): the engine fixes of 2f89409 move the scenario range sentence under the answer (four more words in its figures) — measured, not new copy.
   // words 581 → 583 (2026-10-19): the answer card's own heading, « La réponse », for a screen reader's list of headings (`.sr-only`: the counter reads clipped text, a reader does not see it).
-  // « Imprimer… » left the page, and the glance's three tiles are text, not controls.
-  'Résultats — Réponse': { controls: 45, words: 583 },
+  // 45 → 46 controls, 583 → 586 words (2026-10-19): « D’où vient l’argent » in the map — the bar charts were three taps deep (Comparer ▸ the chart ▸ « Détail »).
+  'Résultats — Réponse': { controls: 46, words: 586 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each

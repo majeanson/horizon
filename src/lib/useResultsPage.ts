@@ -192,6 +192,14 @@ export function useResultsPage() {
     if (view === 'decide' && (STRATS as readonly string[]).includes(id)) setStrat(id as Strat)
     if (view === 'proof' && (PROOF_BLOCKS as readonly string[]).includes(id)) setParam('bloc', id)
     if (view === 'answer') openAnswerCard(id)
+    // « D’où vient l’argent »: the bar charts are the « Détail » of the chart inside Comparer (ages view). The chip opens all three, then lands once
+    // the panel exists — three taps deep is one tap from the map.
+    if (view === 'answer' && id === 'graphique') {
+      openAnswerCard('comparer')
+      setParam('cv', null)
+      setParam('metric', 'detail')
+      scrollToSectionWhenThere('graphique')
+    }
   }
   // Réponse's cards are all open unless the address closed some (`?cartes=`): a link to one opens it when it is shut, and leaves a page that has every card open as it is.
   const openAnswerCard = (id: string) => {
@@ -349,7 +357,7 @@ export function useResultsPage() {
   // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }]
+      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, { id: 'graphique', label: rc.nav.argent, concept: 'dollars' as const }, { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }]
       : view === 'decide'
         ? [{ id: 'essayer', label: rc.nav.essayer, concept: 'essayer' as const }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, concept: 'rrq' as const }] : []), { id: 'ordre', label: rc.nav.ordre, concept: 'ordre' as const }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav, concept: 'fonte' as const }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav, concept: 'reer' as const }] : [])]
         : [

@@ -106,7 +106,7 @@ export function ChartPanel({
   const xTick = (x: number) => [String(x), agesByYear.get(x) ?? '']
 
   return (
-    <section className="chart-panel surface" aria-label={c.title}>
+    <section id="graphique" className="chart-panel surface" aria-label={c.title}>
       <div className="chart-panel__controls">
         <SubTabs
           size="mini"
