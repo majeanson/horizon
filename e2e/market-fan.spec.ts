@@ -41,3 +41,15 @@ test('on a phone the page does not run off the screen', async ({ page }) => {
   await expect(page.locator('.market-fan tbody tr')).toHaveCount(5, { timeout: 60_000 })
   await expectNoHorizontalOverflow(page)
 })
+
+test('open or closed is in the address: a tap writes « marches=1 », and a link with it opens the fold', async ({ page }) => {
+  await page.goto('/resultats?v=proof&bloc=solidite')
+  const fold = page.locator('.market-fan')
+  await expect(fold).toBeVisible({ timeout: 60_000 })
+  await fold.locator('summary').click()
+  await expect(page).toHaveURL(/marches=1/)
+  await page.goto('/resultats?v=proof&bloc=solidite&marches=1')
+  await expect(page.locator('.market-fan tbody tr')).toHaveCount(5, { timeout: 60_000 })
+  await page.locator('.market-fan summary').click()
+  await expect(page).not.toHaveURL(/marches=/)
+})

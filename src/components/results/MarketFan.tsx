@@ -1,4 +1,5 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
+import { useParamChoice } from '../../lib/useParamChoice'
 import type { FanId } from '../../engine/fan'
 import { useLang } from '../../i18n'
 import type { SeriesColour } from '../charts'
@@ -24,9 +25,10 @@ const COLOUR: Record<FanId, SeriesColour> = { average: 'accent', lower: 'berry',
 
 export function MarketFan({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
-  const [open, setOpen] = useState(false)
+  // Open or not is in the address (`?marches=1`), like every controlled fold: a link to the markets opens them.
+  const [fold, setFold] = useParamChoice('marches', ['0', '1'] as const, '0')
   return (
-    <Fold summary={MARKET_FAN_COPY[lang].title} className="market-fan" concept="marches" open={open} onToggle={setOpen} mountOnOpen>
+    <Fold summary={MARKET_FAN_COPY[lang].title} className="market-fan" concept="marches" open={fold === '1'} onToggle={(o) => setFold(o ? '1' : '0')} mountOnOpen>
       <Body m={m} />
     </Fold>
   )

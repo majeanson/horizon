@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import { EARLY_DEATH_AGE, START_AGES, type SpouseTiming } from '../../engine/spouseTiming'
 import type { Assumptions, Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { SPOUSE_TIMING_COPY } from '../../lib/spouseTimingCopy'
+import { useParamChoice } from '../../lib/useParamChoice'
 import { useSpouseTiming } from '../../lib/useSpouseTiming'
 import { Fold } from '../Fold'
 import { HeatGrid, type HeatCellData } from '../HeatGrid'
@@ -14,9 +14,10 @@ import { Skeleton } from '../Skeleton'
 
 export function SpouseTimingFold(props: { household: Household; assumptions: Assumptions; names: readonly string[] }) {
   const { lang } = useLang()
-  const [open, setOpen] = useState(false)
+  // Open or not is in the address (`?qui=1`), like every controlled fold: a link to the grid opens it.
+  const [fold, setFold] = useParamChoice('qui', ['0', '1'] as const, '0')
   return (
-    <Fold summary={SPOUSE_TIMING_COPY[lang].title} className="spouse-timing" concept="depart" open={open} onToggle={setOpen} mountOnOpen>
+    <Fold summary={SPOUSE_TIMING_COPY[lang].title} className="spouse-timing" concept="depart" open={fold === '1'} onToggle={(o) => setFold(o ? '1' : '0')} mountOnOpen>
       <SpouseTimingPanel {...props} />
     </Fold>
   )

@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useParamChoice } from '../../lib/useParamChoice'
 import { useLang } from '../../i18n'
 import { formatPct } from '../../lib/format'
 import { marginalWeather, weatherSummary } from '../../lib/marginalWeather'
@@ -13,10 +14,11 @@ import { HeatGrid, type HeatCellData } from '../HeatGrid'
 
 export function MarginalWeather({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
-  const [open, setOpen] = useState(false)
+  // Open or not is in the address (`?cout=1`), like every controlled fold: a link to the strip opens it.
+  const [fold, setFold] = useParamChoice('cout', ['0', '1'] as const, '0')
   const c = MARGINAL_WEATHER_COPY[lang]
   return (
-    <Fold summary={c.title} className="marginal-weather" concept="annee" open={open} onToggle={setOpen} mountOnOpen>
+    <Fold summary={c.title} className="marginal-weather" concept="annee" open={fold === '1'} onToggle={(o) => setFold(o ? '1' : '0')} mountOnOpen>
       <Body m={m} />
     </Fold>
   )
