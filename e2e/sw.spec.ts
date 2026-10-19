@@ -218,7 +218,6 @@ test('offline, every page « Imprimer… » offers is made from the cache: its c
   await page.context().setOffline(true)
   await page.reload()
   await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
-
   for (const [button, selector] of [
     [/Le calendrier/, '.print-kind--calendar .plan-calendar__year'],
     [/Le dépliant/, '.print-leaflet__panel'],
@@ -227,6 +226,8 @@ test('offline, every page « Imprimer… » offers is made from the cache: its c
     [/Les sources/, '.print-sources tbody tr'],
     [/Le plan en une page/, '.print-plan .timeline'],
   ] as const) {
+    // « Imprimer… » lives on Ma fiche since 2026-10-17 (a choice goes to the results page, which prints): reached offline, from the cache, each time.
+    await page.goto('/fiche')
     await page.getByRole('button', { name: /Imprimer…/ }).click()
     const choice = page.getByRole('dialog', { name: 'Imprimer' }).getByRole('button', { name: button })
     await expect(choice).toBeEnabled({ timeout: 60_000 })
