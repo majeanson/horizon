@@ -102,7 +102,7 @@ export const CONCEPTS = {
   depart: c('horizon', 'flag-bold'),
   finPlan: c('horizon', 'flag-checkered-bold'),
   dollars: c('horizon', 'currency-dollar-bold'),
-  rendement: c('horizon', 'chart-line-up-bold'),
+  rendement: c('horizon', 'coins-bold'),
   inflation: c('horizon', 'thermometer-bold'),
   documents: c('horizon', 'files-bold'),
   aide: c('horizon', 'question-bold'),
