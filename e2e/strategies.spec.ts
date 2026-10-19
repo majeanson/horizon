@@ -105,3 +105,12 @@ test('a phone gets the compact table: ages as bare numbers, amounts in k and M',
   await expect(panel.getByText('Colonnes : l’âge au décès.', { exact: false })).toBeVisible()
   await expect(panel.locator('tbody td').first()).toContainText(/\d+ k|\d+ M/)
 })
+
+test('Décider says its two steps on the page: « Essayer un changement », then « Choisir comment » over the strategies', async ({ page }) => {
+  await seedProfile(page)
+  await page.goto('/resultats?v=decide')
+  const steps = page.locator('.arc > .results-section > .section-header .section-header__title')
+  await expect(steps).toHaveText(['Essayer un changement', 'Choisir comment'])
+  // the strategies are inside the second step
+  await expect(page.locator('#choisir #ordre')).toHaveCount(1)
+})

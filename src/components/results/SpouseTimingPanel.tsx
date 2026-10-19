@@ -31,7 +31,9 @@ function SpouseTimingPanel({ household, assumptions, names }: { household: House
   if (timing === null) return null
   const [first, second] = [names[0] ?? '', names[1] ?? '']
   const same = (s: readonly [number, number], t: readonly [number, number] | null) => t !== null && s[0] === t[0] && s[1] === t[1]
-  const working = timing.cells.filter((x) => x.ok)
+  // The wash ranks the combinations that can still be chosen: one whose start age is already behind a person (engine `feasible`) is shown with its figure, unwashed and
+  // marked, so it neither stretches the scale nor reads as an option.
+  const working = timing.cells.filter((x) => x.ok && x.feasible)
   const lo = Math.min(...working.map((x) => x.worst))
   const hi = Math.max(...working.map((x) => x.worst))
   const rows: HeatCellData[][] = START_AGES.map((a) =>
@@ -39,8 +41,9 @@ function SpouseTimingPanel({ household, assumptions, names }: { household: House
       const cell = timing.cells.find((x) => x.starts[0] === a && x.starts[1] === b)!
       const isBest = same(cell.starts, timing.best)
       const isCurrent = same(cell.starts, timing.current.starts)
-      const mark = isBest && isCurrent ? c.bestIsCurrent : isBest ? c.best : isCurrent ? c.current : undefined
+      const mark = isBest && isCurrent ? c.bestIsCurrent : isBest ? c.best : isCurrent ? c.current : cell.feasible ? undefined : c.past
       if (!cell.ok) return { text: c.fails, fail: true, mark, title: formatMoney(cell.worst, lang) }
+      if (!cell.feasible) return { text: formatCompactMoney(cell.worst, lang), mark, title: `${formatMoney(cell.worst, lang)} — ${c.past}` }
       return { text: formatCompactMoney(cell.worst, lang), heat: hi > lo ? (cell.worst - lo) / (hi - lo) : 1, mark, title: formatMoney(cell.worst, lang) }
     }),
   )

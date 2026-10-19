@@ -161,8 +161,11 @@ export function DecideView({ m }: { m: ResultsModel }) {
           </Accordion>
         </section>
 
-        {/* The strategies, one open at a time. A strategy pruned on an ANSWERED search (nothing worth a sentence for this household) closes to its title and
-            the line that says so; its machinery mounts only when opened. « Tout ouvrir » (the map row) opens every block, pruned or not. */}
+        {/* The strategies, one open at a time, under their own heading — the second step is said on the page, not only in this comment. A strategy pruned on an ANSWERED
+            search (nothing worth a sentence for this household) closes to its title and the line that says so; its machinery mounts only when opened. « Tout ouvrir »
+            (the map row) opens every block, pruned or not. */}
+        <section id="choisir" className="results-section" aria-label={rc.decide.chooseTitle}>
+        <SectionHeader title={rc.decide.chooseTitle} subtitle={rc.decide.chooseHint} concept="decider" />
         <Accordion ids={stratIds} open={stratOpen} onOpen={(id) => m.setStrat(id as Strat | null)}>
           {state.pensionsOpen && (
             <AccordionItem id="rentes" title={rc.pensions.title} subtitle={rc.pensions.hint} concept="rrq" className="results-section">
@@ -185,6 +188,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
             </AccordionItem>
           )}
         </Accordion>
+        </section>
       </section>
     </>
   )

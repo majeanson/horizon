@@ -12,6 +12,8 @@ interface SpouseTimingCopy {
   best: string
   current: string
   bestIsCurrent: string
+  /** Under a combination whose start age is already behind one of them (engine `feasible`): run, shown, never offered. */
+  past: string
   /** The read of the grid. */
   /** Each argument is a header already said (`start`): « Camille, à 65 ans ». */
   bestLine: (first: string, second: string) => string
@@ -36,6 +38,7 @@ export const SPOUSE_TIMING_COPY: { fr: SpouseTimingCopy; en: SpouseTimingCopy } 
     best: 'le meilleur',
     current: 'votre choix',
     bestIsCurrent: 'votre choix, le meilleur',
+    past: 'âge déjà passé',
     bestLine: (first, second) => `Le meilleur choix pour vous deux — ${first} ; ${second}.`,
     sameLine: 'Votre choix actuel est déjà le meilleur de ces neuf.',
     noneLine: 'Aucune de ces neuf combinaisons ne tient dans les trois cas.',
@@ -56,6 +59,7 @@ export const SPOUSE_TIMING_COPY: { fr: SpouseTimingCopy; en: SpouseTimingCopy } 
     best: 'the best',
     current: 'your choice',
     bestIsCurrent: 'your choice, the best',
+    past: 'age already past',
     bestLine: (first, second) => `The best choice for the two of you — ${first}; ${second}.`,
     sameLine: 'Your current choice is already the best of these nine.',
     noneLine: 'None of these nine combinations lasts in all three cases.',
