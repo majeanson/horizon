@@ -1,4 +1,5 @@
 import { project } from './projection.ts'
+import { rrqStart } from './rrq.ts'
 import type { Assumptions, Household } from './types.ts'
 
 // « WHO SHOULD START THE QPP FIRST? » — a couple's two start ages tried together, 3 × 3, each combination held to the SAME plain test as everything else.
@@ -23,6 +24,11 @@ export interface TimingCell {
   endWorth: { bothAlive: number; firstDies: number; secondDies: number }
   /** The smallest of the three (the score). */
   worst: number
+  /**
+   * Every person's start date is still ahead (this year or later — the same test as `StartOption.passed` in deferral.ts). A start age already behind a person
+   * can no longer be chosen: the cell is still run (the grid keeps its shape) but never offered as `best`.
+   */
+  feasible: boolean
 }
 
 export interface SpouseTiming {
@@ -30,7 +36,7 @@ export interface SpouseTiming {
   cells: TimingCell[]
   /** The household's own start ages, run the same way. */
   current: TimingCell
-  /** The combination with the highest worst case among those that work in all three runs; null when none does. */
+  /** The combination with the highest worst case among the OPEN ones (`feasible`) that work in all three runs; else the household's own if it works; null when none does. */
   best: [number, number] | null
 }
 
@@ -45,12 +51,17 @@ function run(h: Household, a: Assumptions, dies?: { index: number; age: number }
 /** One combination of start ages, three runs. */
 export function timingCell(h: Household, a: Assumptions, starts: [number, number]): TimingCell {
   const set: Household = { ...h, persons: h.persons.map((p, i) => (i < 2 ? { ...p, rrq: { ...p.rrq, startAge: starts[i] } } : p)) }
-  const dieAt = (i: number) => Math.max(EARLY_DEATH_AGE, a.today.year - set.persons[i].birth.year + 1)
+  // An age stated here, but never past the person's own plan: a horizon of 70 dies at 70, it does not live on to 75.
+  const dieAt = (i: number) => {
+    const p = set.persons[i]
+    return Math.min(a.horizonForAll ?? p.horizonAge ?? a.horizonAge, Math.max(EARLY_DEATH_AGE, a.today.year - p.birth.year + 1))
+  }
   const both = run(set, a)
   const first = run(set, a, { index: 0, age: dieAt(0) })
   const second = run(set, a, { index: 1, age: dieAt(1) })
   const endWorth = { bothAlive: both.endWorth, firstDies: first.endWorth, secondDies: second.endWorth }
-  return { starts, ok: both.ok && first.ok && second.ok, endWorth, worst: Math.min(endWorth.bothAlive, endWorth.firstDies, endWorth.secondDies) }
+  const feasible = set.persons.every((p, i) => i >= 2 || rrqStart(p.birth, starts[i]).year >= a.today.year)
+  return { starts, ok: both.ok && first.ok && second.ok, endWorth, worst: Math.min(endWorth.bothAlive, endWorth.firstDies, endWorth.secondDies), feasible }
 }
 
 /** The grid for a couple; null for anyone else (a household of one has nobody to order). */
@@ -58,7 +69,9 @@ export function spouseTiming(h: Household, a: Assumptions): SpouseTiming | null 
   if (h.persons.length !== 2) return null
   const cells: TimingCell[] = []
   for (const sa of START_AGES) for (const sb of START_AGES) cells.push(timingCell(h, a, [sa, sb]))
-  const working = cells.filter((c) => c.ok)
+  const current = timingCell(h, a, [h.persons[0].rrq.startAge, h.persons[1].rrq.startAge])
+  const working = cells.filter((c) => c.ok && c.feasible)
   const top = working.reduce<TimingCell | null>((best, c) => (best === null || c.worst > best.worst ? c : best), null)
-  return { cells, current: timingCell(h, a, [h.persons[0].rrq.startAge, h.persons[1].rrq.startAge]), best: top === null ? null : top.starts }
+  // When no open combination works, the household's own (already chosen, possibly started) one is the only honest answer — if it works.
+  return { cells, current, best: top !== null ? top.starts : current.ok ? current.starts : null }
 }

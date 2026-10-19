@@ -54,7 +54,7 @@ export function agesLedger(h: Household, a: Assumptions): AgesLedger[] {
   const indexation = { inflation: a.inflation, wageGrowth: a.wageGrowth }
   const rules = makeRrqRules(indexation)
   return h.persons.map((p) => {
-    const r = resolve(p, a, {}, rules)
+    const r = resolve(p, a, {}, rules, h)
     const deflate = (year: number) => (1 + a.inflation) ** (year - a.today.year)
     const oStart = oasStart(p.birth, r.oasStartAge)
     // A pension that began before today is read at TODAY's figures: the engine holds no parameters for a past year.

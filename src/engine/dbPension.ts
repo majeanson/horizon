@@ -152,12 +152,14 @@ export function dbStart(p: DbPension, input: DbInput): DbStart {
   const formulaAnnual = p.accrualRate * service * avg
 
   // The reduction counts the YEARS (to the month) between the start and the earliest date the member could have been paid in full.
-  const startAge = Math.max(p.startAge, p.earliestAge)
+  // The pension cannot start before the employer is left (a `retirementAge` later than the typed start age would otherwise pay
+  // pension AND full salary together): the start is held back to the leaving date, and the reduction follows the real start.
+  const leavingAge = yearsBetween(input.birth, input.leaving)
+  const startAge = Math.max(p.startAge, p.earliestAge, leavingAge)
   const unreduced = unreducedAge(p, service)
   // A member who LEAVES before being eligible for any pension has a deferred pension: the reduction counts the years from the
   // start to the plan's `deferred.toAge` (65 for RREGOP), not to the unreduced age. Eligible = old enough for the earliest
   // (reduced) pension, or holding the service that pays one at any age.
-  const leavingAge = yearsBetween(input.birth, input.leaving)
   const eligibleAtLeaving = leavingAge >= p.earliestAge || (p.unreduced.serviceYears !== null && service >= p.unreduced.serviceYears)
   const isDeferred = p.deferred !== undefined && !eligibleAtLeaving
   const reduceToAge = isDeferred ? p.deferred!.toAge : unreduced
@@ -285,10 +287,14 @@ export function pensionAdjustment(
   salary: number,
   accruing: boolean,
   rules: Plain<YearParams>['accounts'],
+  /** The service held at the start of the year, per pension. When given, service past the plan's maximum earns no benefit (the credit is cut to what is left). */
+  serviceAtStart?: (p: DbPension) => number,
 ): number {
   if (!accruing) return 0
-  return pensions.reduce(
-    (sum, p) => p.inPay ? sum : sum + Math.max(0, rules.pensionAdjustmentFactor * p.accrualRate * p.serviceRatePerYear * salary - rules.pensionAdjustmentOffset),
-    0,
-  )
+  return pensions.reduce((sum, p) => {
+    if (p.inPay) return sum
+    const credit =
+      serviceAtStart && p.maxServiceYears !== null ? Math.min(p.serviceRatePerYear, Math.max(0, p.maxServiceYears - serviceAtStart(p))) : p.serviceRatePerYear
+    return sum + Math.max(0, rules.pensionAdjustmentFactor * p.accrualRate * credit * salary - rules.pensionAdjustmentOffset)
+  }, 0)
 }

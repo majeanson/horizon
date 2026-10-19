@@ -6,6 +6,7 @@ import { paramsFor } from './params/index.ts'
 import { payrollContribution } from './payroll.ts'
 import { project } from './projection.ts'
 import { rregopPension } from './presets.ts'
+import { makeRrqRules } from './rrqRules.ts'
 import { householdTax } from './tax.ts'
 import { between, cases, intBetween } from './testGrid.ts'
 import type { Household, Person, PersonId, YearRow } from './types.ts'
@@ -148,8 +149,12 @@ describe('projection — a household living on pensions alone, checked against t
       birth: solo.birth,
       leaving: { year: 2026, month: 6 },
       today: A.today,
-      salaryAt: (y) => solo.salaryToday * (1 + A.wageGrowth) ** (Math.min(y, 2026) - A.today.year),
-      mgaAt: () => 10 ** 9,
+      // The years of the averaging window that fall before today are frozen at the salary typed (salaryToday), not deflated back at the wage growth:
+      // the old expectation (exponent Math.min(y, 2026) - today.year, negative before today) pinned the deflated average (40 616 $ in 2027 instead of 42 809 $).
+      salaryAt: (y) => solo.salaryToday * (1 + A.wageGrowth) ** (Math.max(A.today.year, Math.min(y, 2026)) - A.today.year),
+      // The real MGA: with the salary no longer deflated the average (70 000 $) exceeds the average MGA of the window, so the coordination
+      // (from 65, the 2029 row) is capped by the MGA — a stand-in of 10^9 hid that.
+      mgaAt: makeRrqRules({ inflation: A.inflation, wageGrowth: A.wageGrowth }).mga,
     })
     for (const r of rows.filter((x) => x.year >= 2027 && x.year <= 2030)) {
       expect(r.persons.self!.db, `${r.year}`).toBeCloseTo(dbYear(start, r.year, A.inflation), 2)

@@ -336,7 +336,7 @@ export interface PersonYear {
   /** The QPP death benefit, inside rrq: the single payment received the year after a spouse's death, 0 in every other year. */
   deathBenefit: number
   oas: number
-  /** The Allowance: paid to the 60–64 spouse of a pensioner on the GIS, taxable, income-tested (nothing once the couple's income is over the cut-off). */
+  /** The Allowance (and the Allowance for the Survivor): paid to the 60–64 spouse of a pensioner on the GIS, or to a widowed 60–64, NON-taxable (Canada.ca lines 14600 / 25000), income-tested (nothing once the income is over the cut-off). */
   allowance: number
   /** Tax-free, income-tested; paid only to a pensioner. */
   gis: number
@@ -350,7 +350,7 @@ export interface PersonYear {
   payrollContribution: number
   /** The member's own employer-pension-plan contributions out of this year's pay. */
   pensionContribution: number
-  /** Income from a dated `income` flow (rent…), taxed as ordinary income when the flow says so. Present only in a year that has some. */
+  /** Income from a dated `income` flow (rent…), taxed as ordinary income when the flow says so, PLUS the QPIP leave pay and — on the first person only — the child benefits (CCB, Allocation famille). Present only in a year that has some. */
   otherIncome?: number
   /** Net income (line 23600): what the tax and the credits read. */
   netIncome: number

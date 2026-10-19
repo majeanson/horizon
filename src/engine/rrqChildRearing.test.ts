@@ -17,8 +17,9 @@ const earnings = (zero: readonly number[]): Record<number, number> => {
   for (let y = 2012; y <= 2054; y++) out[y] = zero.includes(y) ? 0 : 60_000
   return out
 }
-const SMALL = [2024, 2025, 2026, 2027, 2028, 2029]
-const SMALL_MONTHS: Record<number, number> = { 2024: 5, 2025: 12, 2026: 12, 2027: 12, 2028: 12, 2029: 12, 2030: 6 }
+// A child born in 2024 gives 83 months over eight years (5, six years of 12, then 6); the parent earns nothing in 2024–2031.
+const SMALL = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031]
+const SMALL_MONTHS: Record<number, number> = { 2024: 5, 2025: 12, 2026: 12, 2027: 12, 2028: 12, 2029: 12, 2030: 12, 2031: 6 }
 const pension = (e: Record<number, number>, childRearingMonths?: Record<number, number>) => rrqPension({ birth: BIRTH, earnings: e, startAge: 65, childRearingMonths }, RULES)
 
 describe('the pension', () => {
@@ -78,12 +79,12 @@ describe('the months a household\'s children give a parent', () => {
     expect(childRearingMonths(lower, undefined)).toBeUndefined()
   })
 
-  it('one child: 5 months in the year of birth (after the birth month), 12 in each of the five next, 6 in the year it turns 7 — 71 in all', () => {
+  it('one child: 5 months in the year of birth (after the birth month), 12 in each of the six next, 6 in the year it turns 7 — 83 in all (it was 71: the exclusion ended a year early)', () => {
     const m = childRearingMonths(lower, household([2020], true))!
     expect(m[2020]).toBe(5)
-    for (let y = 2021; y <= 2025; y++) expect(m[y]).toBe(12)
-    expect(m[2026]).toBe(6)
-    expect(Object.values(m).reduce((s, x) => s + x, 0)).toBe(71)
+    for (let y = 2021; y <= 2026; y++) expect(m[y]).toBe(12)
+    expect(m[2027]).toBe(6)
+    expect(Object.values(m).reduce((s, x) => s + x, 0)).toBe(83)
   })
 
   it('the benefit is paid to ONE parent, the lower earner: the other has none', () => {

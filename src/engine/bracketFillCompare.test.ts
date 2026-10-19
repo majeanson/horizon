@@ -46,6 +46,19 @@ describe('fillComparison', () => {
     expect(c.outcomes[c.best].choice).not.toBeNull()
   })
 
+  it('rrspDrawn is the RRSP the projection took out, in today’s dollars: the forced minimum is already inside it, not added a second time', () => {
+    const rows = project(h, A())
+    const real = (year: number) => Math.pow(1.02, year - 2026)
+    for (const y of c.outcomes[0].years) {
+      const row = rows.find((r) => r.year === y.year)
+      if (!row) continue
+      expect(y.rrspDrawn, String(y.year)).toBeCloseTo(row.persons.self!.withdrawals.rrsp / real(y.year), 2)
+    }
+    // with 2,5 M$ in the RRSP the minimum is the whole draw at the peak, so a double count would show as twice the minimum
+    const peak = c.outcomes[0].years.reduce((m, y) => (y.minimum > m.minimum ? y : m))
+    expect(peak.rrspDrawn).toBeCloseTo(peak.minimum, 2)
+  })
+
   it('the ceiling of a year is null for no melting and a positive line otherwise, in today’s dollars', () => {
     expect(c.outcomes[0].years.every((y) => y.ceiling === null)).toBe(true)
     expect(c.outcomes[1].years.every((y) => y.ceiling !== null && y.ceiling > 0)).toBe(true)

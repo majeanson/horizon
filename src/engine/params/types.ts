@@ -61,6 +61,8 @@ export interface YearParams {
     lateProtectionFrom: Cited
     careerStartAge: Cited
     careerMaxAge: Cited
+    /** The last age (the calendar year of the birthday) in which a worker still contributes: art. 37.0.1 makes the year of the 72nd birthday contributory. */
+    contributionLastAge: Cited
     normalAge: Cited
     earliestAge: Cited
     latestAge: Cited

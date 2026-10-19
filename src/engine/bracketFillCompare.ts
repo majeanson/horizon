@@ -101,7 +101,7 @@ export function fillComparison(h: Household, a: Assumptions, firstAge = MIN_TRY_
         age: row.year - h.persons[0].birth.year,
         income: Math.max(...people.map((p) => p?.netIncome ?? 0)) / f,
         ceiling: choice === null ? null : fillCeiling(choice, paramsFor(row.year, { inflation: a.inflation, wageGrowth: a.wageGrowth })) / f,
-        rrspDrawn: people.reduce((s, p) => s + (p ? p.withdrawals.rrsp + p.rrifMinimum : 0), 0) / f,
+        rrspDrawn: people.reduce((s, p) => s + (p ? p.withdrawals.rrsp : 0), 0) / f,
         minimum,
         rrsp: people.reduce((s, p) => s + (p?.balancesEnd.rrsp ?? 0), 0) / f,
         tfsa: people.reduce((s, p) => s + (p?.balancesEnd.tfsa ?? 0), 0) / f,

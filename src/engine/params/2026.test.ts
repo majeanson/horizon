@@ -63,6 +63,7 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'rrq.lateProtectionFrom': [2024, LEAFLET_68],
   'rrq.careerStartAge': [18, LEAFLET_65],
   'rrq.careerMaxAge': [72, LEAFLET_65],
+  'rrq.contributionLastAge': [72, QPP_ACT],
   'rrq.normalAge': [65, CALC],
   'rrq.earliestAge': [60, CALC],
   'rrq.latestAge': [72, CALC],

@@ -76,3 +76,31 @@ describe('who it is for', () => {
     expect(h).toEqual(G.household)
   })
 })
+
+describe('start ages already behind the person (regression)', () => {
+  // The first person, born 1962, is 64 in 2026: a QPP start at 60 began in 2022, so it can no longer be chosen. The grid still lists the cell (the UI finds cells by `starts`)
+  // but marks it, and `best` is chosen among the cells still open.
+  const older = {
+    ...G.household,
+    persons: G.household.persons.map((p, i) => (i === 0 ? { ...p, birth: { year: 1962, month: 3 }, retirementAge: 64, rrq: { ...p.rrq, startAge: 65 } } : p)),
+  }
+  const O = spouseTiming(older, G.assumptions)!
+
+  it('keeps the nine cells in the same order and marks the ones whose start date is already past', () => {
+    expect(O.cells.map((c) => c.starts)).toEqual(START_AGES.flatMap((a) => START_AGES.map((b) => [a, b])))
+    for (const c of O.cells) expect(c.feasible, `${c.starts}`).toBe(c.starts[0] !== 60)
+  })
+
+  it('never picks a combination that can no longer be chosen', () => {
+    if (O.best === null) return
+    expect(O.cells.find((c) => c.starts[0] === O.best![0] && c.starts[1] === O.best![1])!.feasible).toBe(true)
+  })
+})
+
+describe('the early death stays inside the person\'s own plan (regression)', () => {
+  it('a spouse whose horizon is 70 does not live to 75 in the « second dies » run: it is the plain both-alive run', () => {
+    const short = { ...G.household, persons: G.household.persons.map((p, i) => (i === 1 ? { ...p, horizonAge: 70 } : p)) }
+    const c = timingCell(short, G.assumptions, [65, 65])
+    expect(c.endWorth.secondDies).toBeCloseTo(c.endWorth.bothAlive, 4)
+  })
+})

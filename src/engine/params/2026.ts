@@ -231,6 +231,7 @@ export const P2026 = {
       note: '« the basic retirement pension under the base plan corresponds to the highest result between two calculations » — at the actual start, and at 65 and 1 month moved forward by the growth of AMPE 5 (since 1 January 2024).',
     }),
     careerStartAge: c(18, 'fixed', { ...RRQ_LEAFLET_65, note: 'The reference period « begins on the first day of the month following the person’s 18th birthday ».' }),
+    contributionLastAge: c(72, 'fixed', { ...QPP_ACT, note: 'Art. 37.0.1: contributions are due up to the year of the worker’s 72nd birthday, that year included (the year the worker turns 72 is contributory; the next is not). Cited by article from the PDF edition.' }),
     careerMaxAge: c(72, 'fixed', { ...RRQ_LEAFLET_65, note: '…and ends no later than « the month of the person’s 72nd birthday ».' }),
     normalAge: c(65, 'fixed', { ...RRQ_CALC, note: '« As of age 65, you can receive 100% of your retirement pension ».' }),
     earliestAge: c(60, 'fixed', { ...RRQ_CALC, note: '« you can apply for a lower pension as of age 60 ».' }),

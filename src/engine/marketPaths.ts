@@ -3,7 +3,7 @@ import type { MarketPath } from './types.ts'
 // THE PATH THE MARKETS TAKE. A plan that assumes « 4,5 % a year, every year » says nothing about the ORDER of the years, and for
 // someone who starts drawing the savings the order is most of the risk: a crash in the first years of retirement does what the same
 // crash twenty years on does not. A market path is a list of yearly returns, counted from the FIRST RETIREMENT YEAR (so it follows the
-// retirement age being tried, not the calendar): index 0 is the first year anyone in the household is retired. A year with no entry — or
+// retirement age being tried, not the calendar): index 0 is the first year anyone in the household is retired — or this year, when someone has already left (a stress path is a risk still ahead, never one already used up in the past). A year with no entry — or
 // an entry left empty — earns each account's own average return, so the default path (« lisse ») changes nothing, and a path only
 // bends the years it names.
 //

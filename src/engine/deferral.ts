@@ -21,7 +21,7 @@ import type { Assumptions, Household, PersonId, Scenario, YearRow } from './type
 //
 // What it does NOT say: it assumes a life as long as the plan's horizon (a break-even is a longevity bet, which is the
 // point), it counts the pension before tax and without the GIS (deferring the OAS defers the GIS that goes with it),
-// and it does not model a survivor's pension. The page says so beside the numbers.
+// and it leaves the survivor's pension and the death benefit out of the « own » pension compared (no start age changes them). The page says so beside the numbers.
 
 /** The QPP and OAS start ages compared. The OAS cannot start before 65 nor after 70; the QPP between 60 and 72. */
 export const RRQ_START_AGES = [60, 65, 70, 72] as const
@@ -87,9 +87,15 @@ type Kind = 'rrq' | 'oas'
 
 const inflator = (a: Assumptions) => (year: number) => (1 + a.inflation) ** (year - a.today.year)
 
-/** One person's pension for each year, nominal, from a projection. */
+/**
+ * One person's OWN pension for each year, nominal, from a projection. The QPP row also carries the surviving spouse's pension and the death benefit after a
+ * spouse's death: neither depends on the start age being compared, so both come out.
+ */
 const annual = (rows: readonly YearRow[], id: PersonId, kind: Kind): { year: number; amount: number }[] =>
-  rows.map((r) => ({ year: r.year, amount: r.persons[id]?.[kind] ?? 0 }))
+  rows.map((r) => {
+    const p = r.persons[id]
+    return { year: r.year, amount: p === undefined ? 0 : kind === 'rrq' ? p.rrq - p.survivorPension - p.deathBenefit : p.oas }
+  })
 
 /** The row of the first FULL calendar year of a pension that began in `startYear`: today's own row when it began earlier (that year is whole), else the year after the start (the start year is partial). A plan that ends within a year of the start falls back to the first paying row. */
 function fullRow(years: readonly { year: number; amount: number }[], startYear: number): { year: number; amount: number } | null {

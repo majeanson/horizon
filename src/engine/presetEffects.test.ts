@@ -209,8 +209,9 @@ describe('the verdict under each set', () => {
   // against the golden household so the three preset ages cannot drift unnoticed.
   const presetEarliest = () => Object.fromEntries(PRESET_KEYS.map((p) => [p, retireAt(H, withPreset(GOLDEN_ASSUMPTIONS, p), { stopAtFirstOk: true }).earliestOk]))
 
-  it('golden household snapshot: prudent 64 · neutral 60 · bold 58 — a 6-year spread is the expected size of the difference', () => {
-    expect(presetEarliest()).toEqual({ prudent: 64, neutral: 60, bold: 58 })
+  // Prudent moved 64 -> 65: the golden pension's typed start age is 60, and retiring later no longer pays it alongside the full salary (it starts at the leaving date).
+  it('golden household snapshot: prudent 65 · neutral 60 · bold 58 — a 6-year spread is the expected size of the difference', () => {
+    expect(presetEarliest()).toEqual({ prudent: 65, neutral: 60, bold: 58 })
   })
 
   it('a verdict is the first age with no shortfall, and the years after a failing age fail at or before the horizon', () => {

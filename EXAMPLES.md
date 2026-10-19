@@ -461,15 +461,15 @@ Résidence principale : valeur 470 000 $, hypothèque 215 000 $ à 4,9 % (1
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 493 003 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 520 126 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 57 ans.
 
 ### Le calcul des rentes
 
 | Personne | RRQ | PSV |
 | --- | --- | --- |
-| Élise | première rente 04/2054 : (base 2 856,96 $ + 1ʳᵉ supp. 670,71 $ + 2ᵉ supp. 316,14 $) × ajustement 100,0 % = 3 843,81 $/mois, soit 2 148 $ d’aujourd’hui | première pension 04/2054 : 1 364,46 $ × résidence 100 % × report 0,0 % = 1 364,46 $/mois, soit 763 $ d’aujourd’hui |
-| Thomas | première rente 10/2052 : (base 2 545,81 $ + 1ʳᵉ supp. 582,34 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 3 128,15 $/mois, soit 1 822 $ d’aujourd’hui | première pension 10/2052 : 1 308,91 $ × résidence 100 % × report 0,0 % = 1 308,91 $/mois, soit 763 $ d’aujourd’hui |
+| Élise | première rente 04/2054 : (base 2 893,61 $ + 1ʳᵉ supp. 711,15 $ + 2ᵉ supp. 287,16 $) × ajustement 100,0 % = 3 891,92 $/mois, soit 2 175 $ d’aujourd’hui | première pension 04/2054 : 1 364,46 $ × résidence 100 % × report 0,0 % = 1 364,46 $/mois, soit 763 $ d’aujourd’hui |
+| Thomas | première rente 10/2052 : (base 2 521,86 $ + 1ʳᵉ supp. 574,38 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 3 096,24 $/mois, soit 1 804 $ d’aujourd’hui | première pension 10/2052 : 1 308,91 $ × résidence 100 % × report 0,0 % = 1 308,91 $/mois, soit 763 $ d’aujourd’hui |
 
 ### Année par année — Élise (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 
@@ -481,13 +481,13 @@ Résidence principale : valeur 470 000 $, hypothèque 215 000 $ à 4,9 % (1
 | 50 | 101 696 $ | 177 445 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 969 $ | 602 859 $ | couvert |
 | 55 | 89 500 $ | 182 483 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 36 779 $ | 856 085 $ | couvert |
 | 60 | 78 000 $ | 30 209 $ | 0 $ | 0 $ | 0 $ | 0 $ | 64 507 $ | 14 427 $ | 796 160 $ | tire du nid |
-| 65 | 72 000 $ | 0 $ | 0 $ | 40 569 $ | 16 013 $ | 0 $ | 24 165 $ | 8 061 $ | 631 674 $ | tire du nid |
-| 70 | 70 567 $ | 0 $ | 0 $ | 46 877 $ | 18 300 $ | 0 $ | 13 543 $ | 7 513 $ | 632 759 $ | tire du nid |
-| 75 | 67 109 $ | 0 $ | 0 $ | 46 877 $ | 19 901 $ | 0 $ | 6 599 $ | 6 023 $ | 660 312 $ | tire du nid |
-| 80 | 63 820 $ | 0 $ | 0 $ | 46 877 $ | 20 130 $ | 0 $ | 2 293 $ | 5 480 $ | 721 351 $ | tire du nid |
-| 85 | 105 692 $ | 0 $ | 0 $ | 46 877 $ | 20 130 $ | 0 $ | 44 109 $ | 5 423 $ | 659 660 $ | tire du nid |
-| 90 | 102 717 $ | 0 $ | 0 $ | 46 877 $ | 20 130 $ | 0 $ | 41 134 $ | 5 423 $ | 514 097 $ | tire du nid |
-| 95 | 39 202 $ | 0 $ | 0 $ | 33 199 $ | 10 065 $ | 0 $ | 545 $ | 4 608 $ | 493 003 $ | tire du nid |
+| 65 | 72 000 $ | 0 $ | 0 $ | 41 219 $ | 16 013 $ | 0 $ | 23 515 $ | 8 061 $ | 632 338 $ | tire du nid |
+| 70 | 70 567 $ | 0 $ | 0 $ | 47 743 $ | 18 300 $ | 0 $ | 12 676 $ | 7 513 $ | 638 150 $ | tire du nid |
+| 75 | 67 109 $ | 0 $ | 0 $ | 47 743 $ | 19 901 $ | 0 $ | 5 832 $ | 6 052 $ | 671 020 $ | tire du nid |
+| 80 | 63 820 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 3 025 $ | 5 805 $ | 736 909 $ | tire du nid |
+| 85 | 105 692 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 43 487 $ | 5 669 $ | 676 154 $ | tire du nid |
+| 90 | 102 717 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 40 513 $ | 5 669 $ | 535 953 $ | tire du nid |
+| 95 | 39 202 $ | 0 $ | 0 $ | 33 558 $ | 10 065 $ | 0 $ | 288 $ | 4 709 $ | 520 126 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2053, en dollars d’aujourd’hui
 
@@ -525,7 +525,7 @@ Résidence principale : valeur 590 000 $, hypothèque 410 000 $ à 4,9 % (2
 | Personne | RRQ | PSV |
 | --- | --- | --- |
 | Olivier | première rente 07/2053 : (base 3 027,50 $ + 1ʳᵉ supp. 742,80 $ + 2ᵉ supp. 358,53 $) × ajustement 100,0 % = 4 128,83 $/mois, soit 2 356 $ d’aujourd’hui | première pension 07/2053 : 1 336,40 $ × résidence 100 % × report 0,0 % = 1 336,40 $/mois, soit 763 $ d’aujourd’hui |
-| Léa | première rente 03/2055 : (base 1 540,91 $ + 1ʳᵉ supp. 293,90 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 834,81 $/mois, soit 1 004 $ d’aujourd’hui | première pension 03/2055 : 1 393,11 $ × résidence 100 % × report 0,0 % = 1 393,11 $/mois, soit 762 $ d’aujourd’hui |
+| Léa | première rente 03/2055 : (base 1 529,69 $ + 1ʳᵉ supp. 286,99 $ + 2ᵉ supp. 0,00 $) × ajustement 100,0 % = 1 816,68 $/mois, soit 994 $ d’aujourd’hui | première pension 03/2055 : 1 393,11 $ × résidence 100 % × report 0,0 % = 1 393,11 $/mois, soit 762 $ d’aujourd’hui |
 
 ### Année par année — Olivier (dollars d’aujourd’hui ; le ménage entier ; un an sur cinq)
 

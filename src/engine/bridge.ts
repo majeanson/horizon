@@ -22,8 +22,8 @@ import type { AccountKind, Assumptions, Household, PersonId, Scenario, YearRow }
 // `both` is set (a couple's sixth strategy, « both defer to 70 »), which gives the other person the same QPP and OAS start ages.
 // Everything is in today's dollars: a nest of 400 000 $ in 2050 means 400 000 $ of today's buying power.
 //
-// What it does NOT say: a break-even is a bet on how long a life lasts; the model has no survivor's pension (a spouse
-// who outlives the other keeps no extra), no markets that go wrong in a particular order, and no change of spending
+// What it does NOT say: a break-even is a bet on how long a life lasts; the survivor's pension and the death benefit
+// a widow receives are in the plan's rows (`survivor`) but not in the « own » pension a start age is judged on; no markets that go wrong in a particular order, and no change of spending
 // with age. The page says so beside the numbers.
 
 export type StrategyKey = 'mine' | 'asap' | 'standard' | 'max' | 'bridge' | 'both'
@@ -196,6 +196,8 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
   const nestParts = Object.fromEntries(KINDS.map((k) => [k, pick((p) => p.balancesEnd[k])])) as Record<AccountKind, number>
   const guaranteed = pick((p) => p.db + p.rrq + p.oas + p.gis + p.allowance)
   const drawn = sum(KINDS.map((k) => draws[k]))
+  const me = r.persons[id]
+  const ownRrq = me === undefined ? 0 : me.rrq - me.survivorPension - me.deathBenefit
   const shortfall = r.household.shortfall / d
   return {
     year: r.year,
@@ -209,8 +211,9 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
     oas: pick((p) => p.oas),
     // The income-tested supplements together: the GIS, and the Allowance a 60–64 spouse gets beside it.
     gis: pick((p) => p.gis + p.allowance),
-    ownPension: ((r.persons[id]?.rrq ?? 0) + (r.persons[id]?.oas ?? 0)) / d,
-    ownRrq: (r.persons[id]?.rrq ?? 0) / d,
+    // The person's OWN QPP: `rrq` also carries the surviving spouse's pension and the death benefit after a death (shown apart in `survivor`); neither is the start age's doing.
+    ownPension: (ownRrq + (r.persons[id]?.oas ?? 0)) / d,
+    ownRrq: ownRrq / d,
     survivor: pick((p) => p.survivorPension),
     ownOas: (r.persons[id]?.oas ?? 0) / d,
     guaranteed,

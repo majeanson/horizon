@@ -55,9 +55,13 @@ describe('the Allowance in the projection', () => {
     expect(row(2029).persons.self!.gis / 12).toBeLessThan(gisWithAllowanceSpouseMonthly(row(2029).persons.self!.rrq, oasOf(2029)) + 0.01)
   })
 
-  it('it is taxable income for her, and it is not counted when the GIS and the Allowance itself are worked out', () => {
+  it('it is NOT taxable income (Canada.ca line 14600): her net income and her tax stay nil while it is paid, and it is not counted for the GIS or the Allowance itself', () => {
+    // Moved from « it is taxable income for her »: the Allowance is non-taxable (it is not on line 11300 or 11400 of the return).
+    // Lise has no taxable income in 2026 (her spending comes from the TFSA), so the Allowance must not appear in her net income or tax.
     const y = row(2026).persons.spouse!
-    expect(y.netIncome).toBeGreaterThanOrEqual(y.allowance - 0.01)
+    expect(y.allowance).toBeGreaterThan(5_000)
+    expect(y.netIncome).toBeCloseTo(0, 1)
+    expect(y.federalTax + y.quebecTax).toBeCloseTo(0, 1)
     // the same couple with Lise's Allowance made impossible (her spouse not yet on the OAS) has the same couple's income: Jean's QPP
     expect(row(2026).persons.self!.rrq).toBeGreaterThan(0)
   })

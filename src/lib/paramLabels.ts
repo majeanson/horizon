@@ -153,6 +153,7 @@ export const PARAM_LABELS: {
     "rrq.baseReplacement": "RRQ : taux de remplacement du régime de base",
     "rrq.careerMaxAge": "RRQ : âge où la carrière cotisable se termine",
     "rrq.careerStartAge": "RRQ : âge où la carrière cotisable commence",
+    "rrq.contributionLastAge": "RRQ : âge de la dernière année où l’on cotise",
     "rrq.earliestAge": "RRQ : âge de début le plus précoce",
     "rrq.earlyBase":
       "RRQ : réduction par mois avant 65 ans, pour les plus petites rentes",
@@ -318,6 +319,7 @@ export const PARAM_LABELS: {
     "rrq.baseReplacement": "QPP base-plan replacement rate",
     "rrq.careerMaxAge": "QPP age where the contributory career ends",
     "rrq.careerStartAge": "QPP age where the contributory career starts",
+    "rrq.contributionLastAge": "QPP age of the last year contributions are due",
     "rrq.earliestAge": "QPP earliest start age",
     "rrq.earlyBase":
       "QPP reduction per month before 65, for the smallest pensions",
