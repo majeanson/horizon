@@ -41,8 +41,14 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, true], ['des
     const nav = page.locator('.section-nav')
     await expect(pin).toBeVisible()
     await page.locator('#root').evaluate((el) => el.scrollTo({ top: 1500 }))
-    const pinBox = (await pin.boundingBox())!
-    await expect.poll(async () => ((await nav.boundingBox())!.y >= pinBox.y + pinBox.height - 1)).toBe(mapPinned)
+    // Both boxes read in the SAME poll: the pinned chrome slides with the bar (headroom), and a pin measured once, mid-slide, compared with a map
+    // measured later read as « not below » — on a slow runner, and every time on a busy machine.
+    await expect
+      .poll(async () => {
+        const [pinBox, navBox] = [(await pin.boundingBox())!, (await nav.boundingBox())!]
+        return navBox.y >= pinBox.y + pinBox.height - 1
+      })
+      .toBe(mapPinned)
     // Back at the top, tap « Comparer » in the map: the section stops under the pinned chrome, fully clear of it.
     await page.locator('#root').evaluate((el) => el.scrollTo({ top: 0 }))
     await expect.poll(() => page.locator('#root').evaluate((el) => el.scrollTop)).toBe(0) // the page may scroll smoothly: tap only once it is back
