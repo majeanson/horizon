@@ -71,6 +71,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
     <>
         <section className="arc" aria-label={rc.tabs.answer}>
           <div id="verdict" className={'verdict surface results-section' + (answer.busy ? ' is-busy' : '')} aria-live="polite" aria-busy={answer.busy || undefined}>
+            {/* The answer's own heading, for a screen reader's list of headings (the map chip says the same words): on screen, the big sentence under it already says it. */}
+            <h2 className="sr-only">{rc.nav.reponse}</h2>
             {answerPending ? (
               <Skeleton count={3} className="skeleton--verdict" />
             ) : (
