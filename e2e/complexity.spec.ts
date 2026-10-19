@@ -97,8 +97,9 @@ const BUDGETS: Record<string, Budget> = {
   // 44 → 45 controls, 592 → 557 words (2026-10-17): the two cards under the answer are accordion cards with « Tout ouvrir / Tout fermer » at the end of the map row (+1 icon, the card titles became buttons);
   // words 564 → 577 (2026-10-19): the page's one sentence under its title (« Votre réponse, ce que vous pourriez changer, et la preuve derrière chaque chiffre. »), on a wide
   // screen; a phone keeps the head for screen readers and paper only. The same +13 on Décider and Preuve.
+  // words 577 → 581 (2026-10-19): the engine fixes of 2f89409 move the scenario range sentence under the answer (four more words in its figures) — measured, not new copy.
   // « Imprimer… » left the page, and the glance's three tiles are text, not controls.
-  'Résultats — Réponse': { controls: 45, words: 577 },
+  'Résultats — Réponse': { controls: 45, words: 581 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
