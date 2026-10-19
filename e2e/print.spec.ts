@@ -72,6 +72,9 @@ test('English: the printed plan speaks English', async ({ page }) => {
 // « IMPRIMER… »: one chip, a short list of the pages that can go on paper. A choice prints that page and only that one; the browser's own Ctrl+P (a bare `beforeprint`) still prints the plan,
 // and a print that has ended gives the screen back. The test stands in for the print dialog: `window.print()` fires `beforeprint`, as a browser does just before it takes its snapshot.
 test('« Imprimer… » prints the page that was chosen, then the plan again by Ctrl+P', async ({ page }) => {
+  // Six kinds, each a full round trip (Ma fiche → the menu → the results page computing its plan → paper): on CI's runner the walk outgrew one test's 45 s
+  // (reproduced under `npm run e2e:slow`), not any single step.
+  test.slow()
   await page.addInitScript(() => {
     window.print = () => {
       window.dispatchEvent(new Event('beforeprint'))

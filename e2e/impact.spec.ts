@@ -7,7 +7,7 @@ import { savedProfile, seedProfile } from './seed'
 test('Ma fiche ranks the unconfirmed figures, and each one opens its own field, lit, on Profil', async ({ page }) => {
   await seedProfile(page)
   await page.goto('/fiche')
-  await expect(page.getByText('Ce qui préciserait la réponse')).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByRole('heading', { name: 'Ce qui préciserait la réponse' })).toBeVisible({ timeout: 60_000 })
   const find = page.locator('.sheet__movers').getByRole('link')
   await expect(find.first()).toBeVisible({ timeout: 60_000 })
   expect(await find.count()).toBeGreaterThan(0)
