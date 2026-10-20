@@ -206,6 +206,12 @@ const FR_RESULTS = {
       shareAll: (pct: string, year: string) => `Une fois toutes vos rentes commencées, en ${year}, elles couvrent ${pct} de vos dépenses, après impôt.`,
       coversFrom: (year: string) => `Dès ${year}, vos rentes seules, après impôt, couvrent vos dépenses.`,
       neverCovers: 'Vos rentes ne couvrent jamais seules vos dépenses : vous puisez dans l’épargne jusqu’à la fin.',
+      /** The fold under the dates: the same story as a picture, year by year. */
+      chartTitle: 'Rentes et dépenses, année par année',
+      chartHint: 'L’écart entre les deux lignes est ce que votre épargne paie chaque année.',
+      seriesPensions: 'Rentes après impôt',
+      seriesSpending: 'Dépenses',
+      figure: (from: number, to: number) => `Vos rentes après impôt et vos dépenses, chaque année de ${from} à ${to}.`,
     },
   },
   headline: {
@@ -426,6 +432,11 @@ const EN_RESULTS: typeof FR_RESULTS = {
       shareAll: (pct: string, year: string) => `Once all your pensions have started, in ${year}, they cover ${pct} of your spending, after tax.`,
       coversFrom: (year: string) => `From ${year}, your pensions alone, after tax, cover your spending.`,
       neverCovers: 'Your pensions never cover your spending on their own: you draw on savings to the end.',
+      chartTitle: 'Pensions and spending, year by year',
+      chartHint: 'The gap between the two lines is what your savings pay each year.',
+      seriesPensions: 'Pensions after tax',
+      seriesSpending: 'Spending',
+      figure: (from: number, to: number) => `Your pensions after tax and your spending, each year from ${from} to ${to}.`,
     },
   },
   headline: {

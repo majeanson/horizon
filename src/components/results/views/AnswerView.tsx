@@ -30,6 +30,8 @@ import { Cascade } from '../../Cascade'
 import { useChangePulse } from '../../../lib/useChangePulse'
 
 // « À faire cette année » rides with the care copy, outside the page's own chunk.
+// « Quand arrêter »'s chart rides with the chart library: it loads only when its fold is opened.
+const StopChart = lazy(() => import('../StopChart').then((m) => ({ default: m.StopChart })))
 const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m.YearSection })))
 
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
@@ -134,6 +136,13 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                         {stop.allStarted !== null && <li>{rc.questions.stop.shareAll(pct(stop.allStarted.share), at(stop.allStarted.year))}</li>}
                         <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
                       </ul>
+                      {stop.coverage.length > 1 && (
+                        <Fold summary={rc.questions.stop.chartTitle} mountOnOpen>
+                          <Suspense fallback={<Skeleton count={3} />}>
+                            <StopChart coverage={stop.coverage} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
+                          </Suspense>
+                        </Fold>
+                      )}
                     </div>
                   )}
                   {/* The one lever a reader reaches for first (« could we live on less? ») is a section away: a door to it, on the card. */}

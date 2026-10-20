@@ -75,6 +75,20 @@ test('« Quand arrêter » says when no pension has begun yet, and what they cov
   await expect(page.locator('#arreter')).toContainText(/Une fois toutes vos rentes commencées, en 20\d\d \(\d\d \/ \d\d ans\), elles couvrent \d+\s*% de vos dépenses, après impôt\./)
 })
 
+test('« Quand arrêter » draws the same story: a closed fold under the dates opens the pensions-and-spending chart, its two lines named', async ({ page }) => {
+  await page.goto('/resultats')
+  const stop = page.locator('#arreter')
+  await expect(stop).toContainText('En dates', { timeout: 60_000 })
+  // closed on arrival: the chart costs nothing until asked for
+  await expect(stop.getByRole('img', { name: /Vos rentes après impôt et vos dépenses, chaque année de 20\d\d à 20\d\d/ })).toHaveCount(0)
+  await stop.getByText('Rentes et dépenses, année par année').click()
+  const chart = stop.getByRole('img', { name: /Vos rentes après impôt et vos dépenses, chaque année de 20\d\d à 20\d\d/ })
+  await expect(chart).toBeVisible({ timeout: 30_000 })
+  await expect(chart).toContainText('Rentes après impôt')
+  await expect(chart).toContainText('Dépenses')
+  await expect(chart.locator('svg .recharts-line').first()).toBeAttached()
+})
+
 test('« Et si je dépensais moins ? » recomputes the age for an amount from the address, compares it with the profile’s, and can keep it', async ({ page }) => {
   await page.goto('/resultats')
   // The door on the answer card leads to the section; at the profile's own amount the answer IS the one at the top, so the

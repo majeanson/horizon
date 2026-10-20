@@ -56,6 +56,21 @@ export function chartSeries(
   }))
 }
 
+/**
+ * « Quand arrêter »'s picture (lib/stopWorking.ts `coverage`): the pensions after tax against the spending, each full year of retirement, in today's dollars or each
+ * year's. Where the first line rises to meet the second, the pensions carry the spending alone; the gap below it is what the savings pay.
+ */
+export function stopCoverageSeries(
+  coverage: readonly { year: number; pensions: number; spending: number }[],
+  options: { dollars: Dollars; todayYear: number; inflation: number; labels: { pensions: string; spending: string } },
+): ChartSeries[] {
+  const scale = (year: number) => (options.dollars === 'today' ? deflator(year, options.todayYear, options.inflation) : 1)
+  return [
+    { id: 'pensions', label: options.labels.pensions, colour: seriesFor('rrq'), concept: 'rrq', points: coverage.map((c) => ({ x: c.year, y: c.pensions / scale(c.year) })) },
+    { id: 'spending', label: options.labels.spending, colour: seriesFor('depenses'), concept: 'depenses', points: coverage.map((c) => ({ x: c.year, y: c.spending / scale(c.year) })) },
+  ]
+}
+
 /** One vertical line per scenario at the year its FIRST person stops working. */
 export function retirementMarkers(
   household: Household,

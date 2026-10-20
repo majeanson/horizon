@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { balanceBars, chartSeries, deflator, fanBasis, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
+import { balanceBars, chartSeries, deflator, fanBasis, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars, stopCoverageSeries } from './chartData.ts'
 import { runSelections } from './resultsModel.ts'
 import type { Profile } from './schema.ts'
 
@@ -116,5 +116,25 @@ describe('a stretch of years with no bar for one person', () => {
   it('keeps the longest of several', () => {
     const bars = [bar(2050, 1), bar(2051), bar(2052), bar(2053, 1), bar(2054), bar(2055), bar(2056), bar(2057, 1)]
     expect(idleStretch(bars)).toEqual({ from: 2054, to: 2056 })
+  })
+})
+
+describe('« Quand arrêter »: the pensions and the spending, in the page’s dollars', () => {
+  const coverage = [
+    { year: 2040, pensions: 30_000, spending: 50_000 },
+    { year: 2041, pensions: 52_000, spending: 51_000 },
+  ]
+  const labels = { pensions: 'P', spending: 'S' }
+  it('each year’s dollars are the figures as they are', () => {
+    const [p, sp] = stopCoverageSeries(coverage, { dollars: 'nominal', todayYear: 2026, inflation: 0.02, labels })
+    expect(p.points).toEqual([{ x: 2040, y: 30_000 }, { x: 2041, y: 52_000 }])
+    expect(sp.points).toEqual([{ x: 2040, y: 50_000 }, { x: 2041, y: 51_000 }])
+    expect([p.label, sp.label]).toEqual(['P', 'S'])
+  })
+  it('today’s dollars are each figure over the year’s deflator, both lines alike (so where they cross does not move)', () => {
+    const [p, sp] = stopCoverageSeries(coverage, { dollars: 'today', todayYear: 2026, inflation: 0.02, labels })
+    expect(p.points[0].y).toBeCloseTo(30_000 / deflator(2040, 2026, 0.02), 6)
+    expect(sp.points[1].y).toBeCloseTo(51_000 / deflator(2041, 2026, 0.02), 6)
+    expect(p.points[0].y < sp.points[0].y && p.points[1].y > sp.points[1].y).toBe(true)
   })
 })

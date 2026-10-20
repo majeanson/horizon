@@ -25,6 +25,8 @@ export interface StopWorking {
   pensionsStarted: boolean
   /** The first full year in which every pension of every person is in pay, and the share it covers then — the plan's steady state. Null when that year is `firstYear` itself (nothing to add) or lies past the horizon. */
   allStarted: { year: number; share: number } | null
+  /** Each full year of retirement, from `firstYear` to the end of the plan: the pensions after tax (never below zero) and the spending, in the dollars of each year — what « Quand arrêter » draws (lib/chartData.ts `stopCoverageSeries`). Empty when no full year is left. */
+  coverage: { year: number; pensions: number; spending: number }[]
 }
 
 const pensionsOf = (r: YearRow): number => Object.values(r.persons).reduce((s, p) => s + p.rrq + p.oas + p.gis + p.db, 0)
@@ -55,5 +57,6 @@ export function stopWorking(household: Household, assumptions: Assumptions, age:
     pensionShare: first ? shareOf(first) : 0,
     pensionsStarted: first ? pensionsOf(first) > 0 : false,
     allStarted: allRow ? { year: allRow.year, share: shareOf(allRow) } : null,
+    coverage: full.map((r) => ({ year: r.year, pensions: Math.max(0, pensionsAfterTax(r)), spending: r.household.spending })),
   }
 }

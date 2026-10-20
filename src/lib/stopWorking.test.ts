@@ -87,3 +87,26 @@ describe('the case that fooled a pre-tax comparison', () => {
     expect(s.firstYear).toBe(s.years[0].year + 1)
   })
 })
+
+describe('the chart of « Quand arrêter »: the pensions after tax against the spending, each full year of retirement', () => {
+  it('runs from the first full year to the end of the plan, with the rows’ own figures, never a negative pension', () => {
+    const s = stopWorking(H, A, 60)
+    const rows = runScenario(H, A, everyoneAt(H, 60), 60).rows
+    const lastStop = Math.max(...s.years.map((y) => y.year))
+    const full = rows.filter((r) => r.year > lastStop)
+    expect(s.coverage.map((c) => c.year)).toEqual(full.map((r) => r.year))
+    expect(s.coverage[0].year).toBe(s.firstYear)
+    for (const [i, c] of s.coverage.entries()) {
+      expect(c.spending).toBe(full[i].household.spending)
+      expect(c.pensions).toBe(Math.max(0, pensionsAfterTax(full[i])))
+      expect(c.pensions).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it('the line meets the spending first in the year the dates name: the picture and the sentence say the same thing', () => {
+    const frugal = { ...H, spending: { ...H.spending, retiredToday: 30_000 } }
+    const s = stopWorking(frugal, A, 60)
+    expect(s.pensionsCoverFrom).not.toBeNull()
+    expect(s.coverage.find((c) => c.pensions >= c.spending)?.year).toBe(s.pensionsCoverFrom)
+  })
+})
