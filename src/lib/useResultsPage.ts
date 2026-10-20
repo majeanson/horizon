@@ -228,12 +228,15 @@ export function useResultsPage() {
   }
   const pageOf = (target: View): View => (target === 'decide' ? 'decide' : 'answer')
   // A chip of the section map opens the block it names before the map scrolls to it. The proof's sections share Résultats with the answer's.
-  const openBlock = (id: string) => {
+  // It lands the section itself (`true` to the map): ONE landing at a time for the page, the map's and a door's alike.
+  const openBlock = (id: string): true => {
     const next = new URLSearchParams(window.location.search)
     opening(view === 'decide' ? 'decide' : (PROOF_BLOCKS as readonly string[]).includes(id) ? 'proof' : 'answer', id, next)
     setParams(next, { replace: true })
-    // « D’où vient l’argent »: three taps deep is one tap from the map — its panel appears only once the card, the view and the tab are open.
-    if (id === 'graphique') land('graphique')
+    // « D’où vient l’argent »: three taps deep is one tap from the map — its bars appear only once the card, the view and the tab are open, and the landing is
+    // on the bars' title: the panel's top is three rows of pickers, a phone's whole screen.
+    land(id === 'graphique' ? 'graphique-sources' : id)
+    return true
   }
   // A link to a section: open what holds it, then land — on this page, or on the other one (the section in the address's # , landed on arrival below).
   const goTo = (target: View, wantedId: string) => {

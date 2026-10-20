@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
-import { scrollToSection } from '../lib/motion'
+import { scrollToSectionWhenThere } from '../lib/motion'
 import { Chip } from './Chip'
 import { Icon } from './Icon'
 import type { Progress } from '../lib/mapProgress'
@@ -36,14 +36,19 @@ export function SectionNav({
   ariaLabel: string
   /** The page's first answer on this device: the chips' pips pop one after another, once (styles/motion.css). Decoration only. */
   celebrate?: boolean
-  /** Called with the section's id BEFORE the scroll: a page whose blocks open one at a time (an accordion) opens the one the chip names, so the landing finds it open. */
-  onPick?: (id: string) => void
+  /** Called with the section's id BEFORE the scroll: a page whose blocks open one at a time (an accordion) opens the one the chip names, so the landing finds it open.
+   *  `true`: the page has landed it itself (Résultats lands « D'où vient l'argent » on the bars' title), and the map does not land a second time. */
+  onPick?: (id: string) => boolean | void
   /** A small control at the end of the map row, beside the scrolling chips (the accordion's « tout ouvrir » icon). */
   end?: ReactNode
 }) {
   const [inView, setInView] = useState<string | null>(null)
   const ids = links.map((l) => l.id).join('|')
   const nav = useRef<HTMLElement>(null)
+  // The landing in progress: a section that is not on the page YET (a card that opens on the tap, a view still streaming in) is waited for — a bare scroll found
+  // nothing and the tap did nothing (« Essayer » on a busy phone). A new tap, or leaving the page, cancels it, so two landings never fight over the scroll.
+  const landing = useRef<() => void>(() => {})
+  useEffect(() => () => landing.current(), [])
 
   useEffect(() => {
     // The marked chip is the LAST section (in reading order) that touches the reading band — watched, not computed on scroll. A tall section still
@@ -57,11 +62,24 @@ export function SectionNav({
       },
       { rootMargin: '-15% 0px -60% 0px' },
     )
-    for (const id of order) {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
+    // A section can mount AFTER the map (a closed card opened, a lazy chart arrived — « D'où vient l'argent » after « Tout fermer »): watch each one as it appears.
+    const watched = new Set<Element>()
+    const watch = () => {
+      for (const id of order) {
+        const el = document.getElementById(id)
+        if (el && !watched.has(el)) {
+          watched.add(el)
+          observer.observe(el)
+        }
+      }
     }
-    return () => observer.disconnect()
+    watch()
+    const mounts = new MutationObserver(watch)
+    mounts.observe(document.getElementById('root') ?? document.body, { childList: true, subtree: true })
+    return () => {
+      mounts.disconnect()
+      observer.disconnect()
+    }
   }, [ids])
 
   // Keep the marked chip inside the line — SIDEWAYS INSIDE THE LINE ONLY: `scrollIntoView` would scroll every ancestor too, the page included.
@@ -87,8 +105,10 @@ export function SectionNav({
               current={inView === l.id}
               concept={l.concept}
               onClick={() => {
-                onPick?.(l.id)
-                scrollToSection(l.id)
+                landing.current()
+                landing.current = () => {}
+                if (onPick?.(l.id) === true) return
+                landing.current = scrollToSectionWhenThere(l.id)
               }}
             >
               {l.label}

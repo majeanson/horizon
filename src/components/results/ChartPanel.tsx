@@ -241,7 +241,8 @@ function DetailView({
       {/* The same heading shape for one person or two: the person (or « both »), in their colour. */}
       <h3 className={'chart-detail__who who ' + (whoIndex >= 0 ? `who--${Math.min(whoIndex, 1)}` : 'who--all')}>{whoIndex >= 0 ? (names[whoIndex] ?? '') : household.persons.length > 1 ? c.everyone : (names[0] ?? '')}</h3>
 
-      <h4 className="chart-detail__heading">{c.sourcesTitle}</h4>
+      {/* What the map's « D'où vient l'argent » lands on: the bars' own title, not the panel's top — on a phone the pickers above fill the screen. */}
+      <h4 id="graphique-sources" className="chart-detail__heading">{c.sourcesTitle}</h4>
       <p className="field-row__hint">{personId === null ? `${c.sourcesHint} ${c.needHint}` : c.sourcesHint}</p>
       {jump !== null && goneIndex >= 0 && otherIndex >= 0 && (personId === jump.goneId || personId === jump.otherId) && (
         <p className="field-row__hint">{RESULTS_COPY[lang].lifeEnd(names[goneIndex] ?? '', formatYearAge(jump.lastYear, [household.persons[goneIndex].birth.year], lang), names[otherIndex] ?? '', personId === jump.goneId)}</p>

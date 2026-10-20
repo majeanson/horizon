@@ -1150,10 +1150,6 @@
 .glossary dd p {
   margin: 0;
 }
-/* A group scrolled to by the map must not hide under the sticky bars. */
-.page-body > .profile-section[id^='glossaire-'] {
-  scroll-margin-top: 7rem;
-}
 
 /* ── The ways of starting the pensions: cards (closed) or a table, the reader's choice ─────────────────────── */
 .strategies {
@@ -2026,3 +2022,11 @@
 }
 .kit-modal--full > :not(.kit-modal__close) { width: min(100%, 38rem); margin: 0; }
 .kit-modal--full .kit-modal__title { padding-right: 0; font-size: var(--text-xl, 1.5rem); }
+
+/* ── Every landing clears the pinned chrome ───────────────────────────────────────────────────────────────────── */
+/* Anything a chip, a door or a # can land on, on a page with a PinStack, stops below the top bar AND the stack (which measures itself into --pin-h on that same
+   parent). One rule for every id, not one per class: « D'où vient l'argent » (#graphique, a chart panel), « Quand arrêter » (#arreter) and the grids (#sensibilite)
+   carried none, and a tap left their first lines under the bar on a phone (e2e/landing.spec.ts walks every map chip). */
+:has(> .pin-stack) [id] {
+  scroll-margin-top: calc(var(--bar-h) + var(--pin-h, 7rem) + 0.75rem);
+}
