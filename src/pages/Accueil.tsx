@@ -27,9 +27,9 @@ import { WELCOME_COPY } from '../lib/welcomeCopy'
 //
 // A first visit (no answer yet) meets, in this order (Marc, 2026-10-19): what Horizon is, in one sentence beside the mark; how to read the page
 // (the language, day / night, the contrast, the size of the letters — in view, never behind a tap, so nobody walks in without seeing them); then
-// the hero — the question, what Horizon does and the two promises it keeps (nothing leaves the device; every government figure is cited) — and an
-// example answer working (components/DemoAnswer.tsx). « Commencer » opens the one dialog (components/WelcomeDialog.tsx): how much time there is,
-// each answer a door into its own path.
+// « Commencer » and « Voir un exemple », on the first screen of the smallest phone (2026-10-20); then the question, what Horizon does and the two
+// promises it keeps (nothing leaves the device; every government figure is cited) — and an example answer working (components/DemoAnswer.tsx).
+// « Commencer » opens the one dialog (components/WelcomeDialog.tsx): how much time there is, each answer a door into its own path.
 //
 // A ready profile is asked ONE question (components/DripQuestion.tsx), from an idle search (`useFactImpact`, how far the answer moves if each
 // unconfirmed figure were off) made here, on the settled profile, and offered its answer and its profile. Its answer is in the top bar, like on every
@@ -70,6 +70,15 @@ export function Accueil() {
             <DisplayControls sizeLabels={rc.sizes} />
             <p className="field-row__hint">{rc.zoomTip}</p>
           </section>
+          {/* The way in sits right under the preferences, above the question (Marc, 2026-10-20): on the smallest phone it is still on the first screen. */}
+          <div className="welcome__go">
+            <button type="button" className="btn btn--primary" onClick={() => setStarting(true)}>
+              {c.begin}
+            </button>
+            <button type="button" className="btn btn--ghost" onClick={() => scrollToSection('demo')}>
+              {c.example}
+            </button>
+          </div>
           <PageHead title={c.title} />
           <ul className="welcome__promises">
             {c.promises.map((p) => (
@@ -79,14 +88,6 @@ export function Accueil() {
               </li>
             ))}
           </ul>
-          <div className="welcome__go">
-            <button type="button" className="btn btn--primary" onClick={() => setStarting(true)}>
-              {c.begin}
-            </button>
-            <button type="button" className="btn btn--ghost" onClick={() => scrollToSection('demo')}>
-              {c.example}
-            </button>
-          </div>
         </div>
       )}
       <WelcomeDialog

@@ -2,8 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, blankSeed, seedProfile } from './seed'
 
 // THE FRONT DOOR (pages/Accueil.tsx): a first visit reads, in this order and before anything covers it, what Horizon is in one sentence, how to read
-// the page (the language, day / night, the contrast, the size — in view, no tap), then the hero: the question, what it does and the two promises it
-// keeps. Nothing opens by itself. « Commencer » opens ONE full-screen dialog (components/WelcomeDialog.tsx): how much time there is, each answer a
+// the page (the language, day / night, the contrast, the size — in view, no tap), « Commencer » (on the first screen of the smallest phone), then the
+// question, what it does and the two promises it keeps. Nothing opens by itself. « Commencer » opens ONE full-screen dialog (components/WelcomeDialog.tsx): how much time there is, each answer a
 // link into its own path that also keeps the choice. The settings page keeps the same reading controls for good.
 // Every spec starts from a device that has seen nothing (the config seeds only the first answer's flourish).
 
@@ -11,7 +11,7 @@ const DIALOG = /^Par où commencer/
 const hero = (page: Page) => page.locator('.welcome__hero')
 const reading = (page: Page) => page.getByRole('region', { name: /^Lire plus confortablement/ })
 
-test('a first visit sees, in view and with nothing over it: what Horizon is, how to read it, then the question, both promises, two buttons', async ({ page }) => {
+test('a first visit sees, in view and with nothing over it: what Horizon is, how to read it, the two buttons, then the question and both promises', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, blankSeed())
   await page.goto('/')
@@ -22,12 +22,14 @@ test('a first visit sees, in view and with nothing over it: what Horizon is, how
   await expect(hero(page)).toContainText('page officielle')
   // the mark of the brand, and the first button, inside the first screen of a phone
   await expect(hero(page).locator('.brand-mark')).toBeVisible()
-  // in this order: the sentence of what it is, the reading controls, the question
+  // in this order: the sentence of what it is, the reading controls, the way in, the question
   const what = (await hero(page).locator('.welcome__what').boundingBox())!
   const read = (await reading(page).boundingBox())!
+  const go = (await hero(page).locator('.welcome__go').boundingBox())!
   const h1 = (await page.getByRole('heading', { level: 1 }).boundingBox())!
   expect(what.y + what.height).toBeLessThanOrEqual(read.y)
-  expect(read.y + read.height).toBeLessThanOrEqual(h1.y)
+  expect(read.y + read.height).toBeLessThanOrEqual(go.y)
+  expect(go.y + go.height).toBeLessThanOrEqual(h1.y)
   await expect(hero(page).locator('.welcome__what')).toContainText('Horizon calcule')
   const begin = page.getByRole('button', { name: 'Commencer', exact: true })
   const box = (await begin.boundingBox())!
@@ -40,6 +42,25 @@ test('a first visit sees, in view and with nothing over it: what Horizon is, how
   await expect(page.locator('.page-head__title')).toBeVisible()
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })
+
+// The smallest phones (2026-10-20, Marc: « Commencer » near the top): the language and day / night share a row, the zoom tip goes under 400 px, and
+// the way in is still on the first screen — at « Grand » too on a 360 × 640 phone.
+for (const [w, h, scale] of [[320, 568, 'normal'], [360, 640, 'normal'], [360, 640, 'large']] as const) {
+  test(`on a ${w} × ${h} phone at the ${scale} text size, « Commencer » is on the first screen, above the tab bar, with no sideways scroll`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h })
+    if (scale !== 'normal') await page.addInitScript((sc) => localStorage.setItem('horizon-text-scale', sc), scale)
+    await seedProfile(page, blankSeed())
+    await page.goto('/')
+    const begin = page.getByRole('button', { name: 'Commencer', exact: true })
+    await expect(begin).toBeVisible()
+    const box = (await begin.boundingBox())!
+    const tabs = (await page.getByRole('navigation', { name: 'Navigation principale' }).boundingBox())!
+    expect(box.y + box.height).toBeLessThanOrEqual(tabs.y)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    // the two shared-row controls still say what they set, to a screen reader
+    await expect(reading(page).getByRole('tablist', { name: 'Langue' })).toBeVisible()
+  })
+}
 
 test('« Voir un exemple » brings the example answer into view', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 })

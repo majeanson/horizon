@@ -1530,6 +1530,36 @@
   margin: 0;
   font-size: var(--text-sm, 0.875rem);
 }
+/* On a phone the language and day / night share ONE row, their words left to the controls (« Français English », « Jour Nuit » say what they set; the
+   SubTabs keep their accessible names): the first two rows of DisplayControls. They wrap back to two lines where both do not fit (a 320 px phone). */
+@media (max-width: 479px) {
+  .welcome__reading {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.5rem;
+  }
+  .welcome__reading > * {
+    flex: 1 1 100%;
+  }
+  .welcome__reading > .field-row:nth-of-type(-n + 2) {
+    flex: 0 1 auto;
+    display: block;
+  }
+  .welcome__reading > .field-row:nth-of-type(-n + 2) .field-row__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* The zoom tip is the one line a very narrow phone does without: the size row above it already says how to read bigger. */
+@media (max-width: 399px) {
+  .welcome__reading .field-row__hint {
+    display: none;
+  }
+}
 .welcome__promises {
   list-style: none;
   margin: 0;
