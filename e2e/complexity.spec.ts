@@ -79,7 +79,9 @@ const BUDGETS: Record<string, Budget> = {
   // words 2039 → 2035 (2026-10-19, the ratchet FALLS): « Ma situation » closed says its answers (shorter than the lead it replaces, now inside), and the dots' legend of
   // « Rendre mon profil exact » is in view — it is needed to read every field's dot (+6 words).
   // 403 → 404, 2035 → 2036 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
-  'Profil (form)': { controls: 404, words: 2036 },
+  // 404 → 406, 2036 → 2058 (2026-10-20, Marc: RREGOP « document, don't build »): the deferred pension's hint says how to enter a transfer to a CRI by hand
+  // (one sentence; « CRI » and « REER » are glossary terms, so two buttons). The golden couple's RREGOP is deferred, so this route shows it.
+  'Profil (form)': { controls: 406, words: 2058 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,

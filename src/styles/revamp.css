@@ -846,6 +846,38 @@
   grid-column: 1 / -1;
   margin-top: 0.3rem;
 }
+/* A slider's head is the same line — the label, the ⓘ against it, the value at the far end — and its ⓘ note drops under the
+   whole line the same way. As a flex row it put the open note BETWEEN the label and the value: three narrow columns, the
+   label broken a word a line (Marc, 2026-10-20, « Partir à (âge) » under « Combien épargner ? »). The value is pinned to
+   the first line so the note, which comes before it in the markup, cannot push it below. The free space is a `1fr` track:
+   the note spans it, so the note's text never sizes a column (a content-sized track under a spanning note grew to the
+   note's length on one line). */
+.slider__head {
+  display: grid;
+  grid-template-columns: minmax(0, auto) auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.15rem;
+}
+.slider__head .field-row__label {
+  grid-row: 1;
+  grid-column: 1;
+}
+.slider__head .slider__value {
+  grid-row: 1;
+  grid-column: 4;
+  white-space: nowrap;
+  padding-left: 0.6rem;
+}
+.slider__head .info-note {
+  grid-column: 1 / -1;
+  margin-top: 0.3rem;
+}
+/* The same for a block's own ⓘ beside a chip (« Remplir avec… » on the relevé): the chip keeps its place on the first
+   line while the note opens under both. */
+.earnings__tools .chip {
+  grid-row: 1;
+  grid-column: 2;
+}
 /* A chosen chip's text is the ink itself on the wash: the mixed accent read 4.1:1 there (axe, 2026-10-08). */
 .chip.is-on {
   color: var(--ink);
