@@ -226,7 +226,7 @@ export const FR = {
     service: 'Années de service pour le calcul de la rente (celles de votre relevé, au 31 décembre)',
     serviceRate: 'Service crédité par année travaillée (1 = temps plein)',
     startAge: 'Âge de début de la rente',
-    startHint: 'Si vous quittez l’emploi avant 55 ans et sans 35 années de service, c’est une rente différée : elle est réduite de 0,5 % par mois jusqu’à vos 65 ans, indexée en entier jusqu’à son début, et coordonnée avec le RRQ dès qu’elle commence.',
+    startHint: 'Si vous quittez l’emploi avant 55 ans et sans 35 années de service, c’est une rente différée : elle est réduite de 0,5 % par mois jusqu’à vos 65 ans, indexée en entier jusqu’à son début, et coordonnée avec le RRQ dès qu’elle commence. Si vous transférez plutôt sa valeur dans un CRI, retirez ce régime et ajoutez le montant de votre relevé à votre REER, dans la part immobilisée.',
     rules: 'Règles du régime',
     rulesHint: 'Préremplies pour le RREGOP d’après Retraite Québec. Pour un autre régime, recopiez-les de votre livret.',
     accrual: 'Taux d’accumulation par année de service',

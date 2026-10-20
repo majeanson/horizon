@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { FRONT_DOOR_CARD, isShareRoute, shareRoute } from './shareRoutes'
+import { ogGenericFile } from '../src/lib/shareLink.ts'
+import { frontDoorLang, isShareRoute, shareRoute } from './shareRoutes'
 
 // The card route, against a fake assets binding. (The page route rewrites HTML with Cloudflare's HTMLRewriter, which Node does not have: it is held by
 // a check on the running Worker (`wrangler dev`, then `curl` the address), not here.)
@@ -70,10 +71,37 @@ describe('worker/shareRoutes', () => {
     expect(first).toContain('/')
     expect(first.filter((p) => p.includes('*')), 'a wildcard would run the Worker before every asset').toEqual([])
     const index = readFileSync(join(root, 'worker/index.ts'), 'utf8')
-    expect(index).toMatch(/path === '\/'[^\n]*withFrontDoorCard\(/)
-    // the card it points at is a file the build ships, and the shell itself names no image (lib/noNetwork.test.ts: no absolute address in index.html)
-    expect(readFileSync(join(root, 'public', FRONT_DOOR_CARD.slice(1))).length).toBeGreaterThan(1000)
+    expect(index).toMatch(/path === '\/'[^}]*withFrontDoorCard\(res, url, frontDoorLang\(url, request\.headers\.get\('accept-language'\)\)\)/)
+    // the card it points at is a file the build ships, in each language, and the shell itself names no image (lib/noNetwork.test.ts: no absolute address in index.html)
+    for (const lang of ['fr', 'en'] as const) expect(readFileSync(join(root, 'public', ogGenericFile(lang).slice(1))).length, lang).toBeGreaterThan(1000)
     expect(readFileSync(join(root, 'index.html'), 'utf8')).not.toMatch(/og:image/)
+  })
+
+  it('gives a link preview of the front door ONE language: the link’s ?l= first, then the request’s Accept-Language, then French', () => {
+    const at = (q = '') => new URL(`https://x.test/${q}`)
+    expect(frontDoorLang(at(), null)).toBe('fr')
+    expect(frontDoorLang(at(), '')).toBe('fr')
+    expect(frontDoorLang(at('?l=en'), 'fr-CA,fr;q=0.9')).toBe('en')
+    expect(frontDoorLang(at('?l=fr'), 'en-US')).toBe('fr')
+    expect(frontDoorLang(at('?l=de'), 'en-US,en;q=0.9')).toBe('en')
+    expect(frontDoorLang(at(), 'en-CA,en;q=0.9,fr;q=0.8')).toBe('en')
+    expect(frontDoorLang(at(), 'fr-CA')).toBe('fr')
+    // the q-values rank, not the order; q=0 refuses; a language neither French nor English is passed over; « en » is not « eng » nor « french »
+    expect(frontDoorLang(at(), 'fr;q=0.5, en;q=0.8')).toBe('en')
+    expect(frontDoorLang(at(), 'en;q=0, fr;q=0.1')).toBe('fr')
+    expect(frontDoorLang(at(), 'de-DE, es;q=0.9, EN-GB;q=0.8')).toBe('en')
+    expect(frontDoorLang(at(), 'eng, *')).toBe('fr')
+  })
+
+  it('rewrites the front door’s preview tags to the one language and says the page varies by Accept-Language', () => {
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'shareRoutes.ts'), 'utf8')
+    const body = src.slice(src.indexOf('export function withFrontDoorCard'), src.indexOf('export function shareRoute'))
+    for (const t of ['og:description', 'og:locale', 'og:locale:alternate']) expect(body, t).toContain(`.on('meta[property="${t}"]'`)
+    expect(body).toContain(".on('html'")
+    expect(body).toContain('ogGenericFile(lang)')
+    expect(body).toMatch(/headers\.append\('Vary', 'Accept-Language'\)/)
+    // the search snippet stays in both languages (index.html): the front door never rewrites <meta name="description">
+    expect(body).not.toContain('meta[name="description"]')
   })
 
   it('answers five parallel requests with distinct results, each with its own card', async () => {

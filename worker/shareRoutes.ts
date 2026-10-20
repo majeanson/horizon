@@ -84,30 +84,63 @@ async function page(url: URL, env: AssetsEnv): Promise<Response> {
 
 /** The front door's card, for a link to `/` (Marc, 2026-10-19: « show a small preview image »). A crawler needs the image's FULL address, and the shell may
  *  hold none (lib/noNetwork.test.ts: index.html carries no absolute URL), so it is written here from the request's own origin — the generic card that
- *  scripts/gen-og.ts drew (public/og/), in French, the shell's language for a reader that runs no script. A function of the address alone, like the rest. */
-export const FRONT_DOOR_CARD = '/og/horizon-fr.png'
+ *  scripts/gen-og.ts drew (public/og/), `ogGenericFile` in the reader's language. A function of the address (and of the language the request asks
+ *  for), like the rest. */
+/** The front door's language for a reader that runs no script (Marc, 2026-10-20: a preview reads ONE language, not FR + EN): `?l=` when the link
+ *  names one, else the first of French or English the request accepts (by its q-values; q=0 is a refusal), else French, the shell's own. Most
+ *  chat crawlers send no Accept-Language, so a link meant for an English reader says `?l=en`. */
+export function frontDoorLang(url: URL, acceptLanguage: string | null): ShareLang {
+  const asked = url.searchParams.get('l')
+  if (asked === 'fr' || asked === 'en') return asked
+  const ranked = (acceptLanguage ?? '')
+    .split(',')
+    .map((part) => {
+      const [range, ...params] = part.trim().toLowerCase().split(';')
+      const q = params.map((p) => p.trim()).find((p) => p.startsWith('q='))
+      return { range: range.trim(), q: q === undefined ? 1 : Number(q.slice(2)) || 0 }
+    })
+    .filter((r) => r.q > 0)
+    .sort((a, b) => b.q - a.q)
+  for (const { range } of ranked) {
+    if (range === 'fr' || range.startsWith('fr-')) return 'fr'
+    if (range === 'en' || range.startsWith('en-')) return 'en'
+  }
+  return 'fr'
+}
 
-export function withFrontDoorCard(shell: Response, url: URL): Response {
+export function withFrontDoorCard(shell: Response, url: URL, lang: ShareLang): Response {
   if (!shell.ok || !(shell.headers.get('content-type') ?? '').startsWith('text/html')) return shell
-  const image = new URL(FRONT_DOOR_CARD, url.origin).href
-  return new HTMLRewriter()
-    .on('meta[name="twitter:card"]', { element: (e) => void e.setAttribute('content', 'summary_large_image') })
+  const c = SHARE_COPY[lang]
+  const image = new URL(ogGenericFile(lang), url.origin).href
+  // The address the preview names keeps the language a link asked for: a crawler that re-reads og:url must land on the same words.
+  const self = url.origin + '/' + (url.searchParams.has('l') ? `?l=${lang}` : '')
+  const content = (value: string) => ({ element: (e: Element) => void e.setAttribute('content', value) })
+  const res = new HTMLRewriter()
+    .on('html', { element: (e) => void e.setAttribute('lang', lang) })
+    // <meta name="description"> stays FR + EN: a search snippet is read by everyone, and the app narrows it once it runs (lib/documentLang.ts).
+    .on('meta[property="og:description"]', content(c.ogGenericDescription))
+    .on('meta[property="og:locale"]', content(lang === 'en' ? 'en_CA' : 'fr_CA'))
+    .on('meta[property="og:locale:alternate"]', content(lang === 'en' ? 'fr_CA' : 'en_CA'))
+    .on('meta[name="twitter:card"]', content('summary_large_image'))
     .on('head', {
       element: (e) =>
         void e.append(
           [
-            tag('property', 'og:url', url.origin + '/'),
+            tag('property', 'og:url', self),
             tag('property', 'og:image', image),
             tag('property', 'og:image:type', 'image/png'),
             tag('property', 'og:image:width', '1200'),
             tag('property', 'og:image:height', '630'),
-            tag('property', 'og:image:alt', 'Horizon — Quand pouvez-vous prendre votre retraite ? Vos données restent sur votre appareil.'),
+            tag('property', 'og:image:alt', `${c.siteName} — ${c.ogGenericDescription}`),
             tag('name', 'twitter:image', image),
           ].join(''),
           { html: true },
         ),
     })
     .transform(shell)
+  // The page now depends on Accept-Language as well as the address: a cache in between must not hand one reader's language to the other.
+  res.headers.append('Vary', 'Accept-Language')
+  return res
 }
 
 export function shareRoute(request: Request, env: AssetsEnv): Promise<Response> {
