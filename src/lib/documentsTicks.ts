@@ -6,8 +6,11 @@ import { useSyncExternalStore } from 'react'
 const KEY = 'horizon-documents-ticked'
 const listeners = new Set<() => void>()
 let cache: { raw: string | null; set: ReadonlySet<string> } | null = null
+/** What a refused write left: the browser keeps nothing, so the tick is held here until the page closes (null while storage works). */
+let memory: ReadonlySet<string> | null = null
 
 function read(): ReadonlySet<string> {
+  if (memory !== null) return memory
   let raw: string | null = null
   try {
     raw = localStorage.getItem(KEY)
@@ -29,8 +32,10 @@ function read(): ReadonlySet<string> {
 function write(next: ReadonlySet<string>): void {
   try {
     localStorage.setItem(KEY, JSON.stringify([...next]))
+    memory = null
   } catch {
-    /* nothing kept: the tick lives until the page closes */
+    // nothing kept: the tick lives until the page closes — here, since reading storage again would bring back the OLD ticks
+    memory = new Set(next)
   }
   cache = null
   listeners.forEach((l) => l())

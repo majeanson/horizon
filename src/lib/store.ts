@@ -46,17 +46,27 @@ function load(): Profile {
   }
   if (text === null) return defaultProfile(today())
   const result = readProfileJson(text)
-  if (result.ok) return result.profile
+  if (result.ok) {
+    // A named plan that could not be read was left out (migrations.ts): the profile around it loads, but the file as it was is kept like an unreadable
+    // one — the next save writes the profile WITHOUT that plan, and this copy (« Copie illisible », page Sauvegarde et réglages) is then the only place it survives.
+    if (result.droppedPlans > 0) keepUnreadable(text)
+    return result.profile
+  }
+  keepUnreadable(text)
+  issue = result.reason === 'newer' ? 'newer' : 'unreadable'
+  return defaultProfile(today())
+}
+
+/** Copy a stored file that could not be read whole to the rescue key — never erasing an earlier copy that may not have been rescued yet. */
+function keepUnreadable(text: string): void {
   try {
     // A second unreadable profile must not erase the first one's copy: that one may never have been rescued.
     const earlier = localStorage.getItem(UNREADABLE_KEY)
     if (earlier !== null && earlier !== text) localStorage.setItem(UNREADABLE_OLDER_KEY, earlier)
     localStorage.setItem(UNREADABLE_KEY, text)
   } catch {
-    /* nothing more to do: the blank profile below is still honest about it */
+    /* nothing more to do: what the page says about the profile is still honest */
   }
-  issue = result.reason === 'newer' ? 'newer' : 'unreadable'
-  return defaultProfile(today())
 }
 
 /** The unreadable profile(s) kept on this device, newest first — what « télécharger la copie illisible » hands back. */

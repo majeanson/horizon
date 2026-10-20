@@ -105,9 +105,10 @@ export function KidsCosts() {
                   ))}
                 </Cluster>
               )}
-              <FieldRow label={k.leave.weeksOf(nameOf(leave.birthParent))} help="parentalLeaveWeeks">
+              {/* One adult: the leave is theirs alone — written as such, so a share kept from a former second parent can never count against the 32 weeks. */}
+              <FieldRow label={k.leave.weeksOf(nameOf(people.length > 1 ? leave.birthParent : 'self'))} help="parentalLeaveWeeks">
                 {(w) => (
-                  <NumberField kind="int" min={0} max={32 - (people.length > 1 ? leave.otherParentWeeks : 0)} value={leave.birthParentWeeks} onChange={(birthParentWeeks) => updateProfile((p) => patchKidsEffects(p, { leave: { ...leave, birthParentWeeks } }))} id={w.id} />
+                  <NumberField kind="int" min={0} max={32 - (people.length > 1 ? leave.otherParentWeeks : 0)} value={leave.birthParentWeeks} onChange={(birthParentWeeks) => updateProfile((p) => patchKidsEffects(p, { leave: people.length > 1 ? { ...leave, birthParentWeeks } : { birthParent: 'self', birthParentWeeks, otherParentWeeks: 0 } }))} id={w.id} />
                 )}
               </FieldRow>
               {people.length > 1 && (

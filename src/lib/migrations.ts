@@ -143,7 +143,8 @@ export const MIGRATIONS: readonly ((profile: Raw) => Raw)[] = [
 ]
 
 export type ReadResult =
-  | { ok: true; profile: Profile }
+  // `droppedPlans`: the named plans the file held that could not be read and were left out (0 almost always) — the caller keeps the original when it is not.
+  | { ok: true; profile: Profile; droppedPlans: number }
   // `json`: not JSON at all · `newer`: written by a later version of the app · `invalid`: JSON, but not a valid profile.
   | { ok: false; reason: 'json' | 'newer' | 'invalid'; problems: ProfileProblem[] }
 
@@ -179,7 +180,9 @@ export function migrateProfile(raw: unknown, migrations: readonly ((profile: Raw
   }
   // A named plan is a whole profile of its own, and was saved at ITS version: bring each to today's shape the same way, so a plan kept
   // before a schema change still opens after it. A plan that cannot be read is dropped, not allowed to refuse the profile around it.
+  let droppedPlans = 0
   if (typeof current === 'object' && current !== null && !Array.isArray(current) && Array.isArray((current as Raw).plans)) {
+    const all = (current as Raw).plans as unknown[]
     const kept = ((current as Raw).plans as unknown[]).flatMap((entry) => {
       if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) return []
       const e = entry as Raw
@@ -187,8 +190,9 @@ export function migrateProfile(raw: unknown, migrations: readonly ((profile: Raw
       const inner = migrateProfile({ ...(e.profile as Raw), plans: [] }, migrations)
       return inner.ok ? [{ ...e, profile: inner.profile }] : []
     })
+    droppedPlans = all.length - kept.length
     current = { ...(current as Raw), plans: kept }
   }
   const result = validateProfile(current)
-  return result.ok ? result : { ok: false, reason: 'invalid', problems: result.problems }
+  return result.ok ? { ...result, droppedPlans } : { ok: false, reason: 'invalid', problems: result.problems }
 }

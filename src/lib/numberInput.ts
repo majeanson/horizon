@@ -53,6 +53,16 @@ export function readNumber(text: string, kind: NumberKind, negative: boolean): n
 
 /** What one ↑ / ↓ press moves a number box by: a whole year or age; a tenth of a point of percent; a tenth of a year of service; and for money a
  *  step that follows the figure's size (a tenth of its leading power of ten: 812 → 10, 15 000 → 1 000, 400 000 → 10 000), so the key is useful at any scale. */
+/**
+ * What an EMPTIED box means, for a box that does not allow empty: 0 for an amount, a decimal or a percent — « nothing » — but only when 0 is a
+ * value the box accepts; otherwise `null`: the box goes back to the figure it holds. A box whose lowest value is above 0 (a survivor's share of
+ * 30 % at least, a pension's years of coordination) must never save a 0 the profile's schema refuses — one refused figure stops every save after it.
+ */
+export function emptyValue(kind: NumberKind, lo: number, hi: number): 0 | null {
+  if (kind !== 'money' && kind !== 'decimal' && kind !== 'percent') return null
+  return lo <= 0 && hi >= 0 ? 0 : null
+}
+
 export function stepFor(value: number | null, kind: NumberKind): number {
   switch (kind) {
     case 'year':

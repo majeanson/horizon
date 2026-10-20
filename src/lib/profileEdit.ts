@@ -217,7 +217,11 @@ export function removeSpouse(p: Profile): Profile {
   const flows = (p.household.flows ?? []).filter((f) => !(f.kind === 'income' && f.owner === 'spouse')).map((f) => (f.owner === 'spouse' ? { ...f, owner: 'self' as const } : f))
   // The budget split by account has no second person to split between: the total stays, as one figure.
   const { spendingSplit: _split, ...rest } = p.household
-  return { ...p, household: { ...rest, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse'), flows }, confirmed: p.confirmed.filter((id) => !id.startsWith('spouse:')) }
+  // A parental leave has one parent now: the one who stays takes it, and the weeks the other was to take go with them — a stale share would
+  // still count against the 32 weeks (the schema refuses more), and the box that could change it is gone with the second person.
+  const leave = p.household.kidsEffects?.leave
+  const kidsEffects = leave && p.household.kidsEffects ? { ...p.household.kidsEffects, leave: { birthParent: 'self' as const, birthParentWeeks: leave.birthParent === 'self' ? leave.birthParentWeeks : leave.otherParentWeeks, otherParentWeeks: 0 } } : p.household.kidsEffects
+  return { ...p, household: { ...rest, kidsEffects, livesAlone: true, persons: p.household.persons.filter((x) => x.id !== 'spouse'), flows }, confirmed: p.confirmed.filter((id) => !id.startsWith('spouse:')) }
 }
 
 /** Whether a one-adult household lives alone (Québec's living-alone amount). A couple is unaffected. */

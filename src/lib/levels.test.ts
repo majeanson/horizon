@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { ageBandOf, applyLevel, hasOpenFigures, isOpen, levelFigure, levelOf, LEVELS, needsLevel, retiredShare, say, setFigure, spendingFigures } from './levels.ts'
 import { setFact } from './profileEdit.ts'
-import { defaultProfile } from './schema.ts'
+import { defaultProfile, validateProfile } from './schema.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
 
 // « I DO NOT KNOW MY NUMBERS »: what a level fills, what it never touches, and that the three levels are ordered.
@@ -177,5 +177,50 @@ describe('one figure from a level brings its blank contribution room with it', (
     const p = blank()
     const typed: Profile = { ...p, household: { ...p.household, persons: [{ ...p.household.persons[0], accounts: { ...p.household.persons[0].accounts, rrsp: { ...p.household.persons[0].accounts.rrsp, room: 7_777 } } }] } }
     expect(setFigure(typed, 'rrspBalance', 'self', 'average', TODAY).household.persons[0].accounts.rrsp.room).toBe(7_777)
+  })
+})
+
+describe('a level keeps the profile one the schema accepts (it goes through the same edits as typing)', () => {
+  const couple = (): Profile => {
+    const p = blank()
+    const self = p.household.persons[0]
+    return { ...p, household: { ...p.household, persons: [self, { ...self, id: 'spouse', birth: { year: 1975, month: 6 } }] } }
+  }
+
+  it('a budget split by account: the level spreads its total across the rows, so the rows add up to it and it survives a reload', () => {
+    const p = couple()
+    const split: Profile = { ...p, household: { ...p.household, spendingSplit: { rows: [{ id: 'joint', working: 0, retired: 0 }, { id: 'self', working: 0, retired: 0 }, { id: 'spouse', working: 0, retired: 0 }] } } }
+    const out = applyLevel(split, 'average', TODAY).profile
+    const s = out.household.spending
+    expect(s.workingToday).toBeGreaterThan(0)
+    const rows = out.household.spendingSplit!.rows
+    expect(rows.reduce((t, r) => t + r.working, 0)).toBeCloseTo(s.workingToday, 2)
+    expect(rows.reduce((t, r) => t + r.retired, 0)).toBeCloseTo(s.retiredToday, 2)
+    // what a reload reads: the schema rebuilds the totals from the rows — the level's budget, not 0
+    const back = validateProfile(JSON.parse(JSON.stringify(out)))
+    expect(back.ok).toBe(true)
+    if (back.ok) expect(back.profile.household.spending.workingToday).toBeCloseTo(s.workingToday, 2)
+  })
+
+  it('ONE figure from a level (« Je ne sais pas » under the working budget) is spread across the split rows too — no later step repairs it', () => {
+    const p = couple()
+    const split: Profile = { ...p, household: { ...p.household, spendingSplit: { rows: [{ id: 'joint', working: 0, retired: 0 }, { id: 'self', working: 0, retired: 0 }, { id: 'spouse', working: 0, retired: 0 }] } } }
+    const out = setFigure(split, 'spendingWorking', 'household', 'average', TODAY)
+    const total = out.household.spending.workingToday
+    expect(total).toBeGreaterThan(0)
+    expect(out.household.spendingSplit!.rows.reduce((t, r) => t + r.working, 0)).toBeCloseTo(total, 2)
+    const back = validateProfile(JSON.parse(JSON.stringify(out)))
+    expect(back.ok && back.profile.household.spending.workingToday).toBeCloseTo(total, 2)
+  })
+
+  it('an RRSP whose locked-in part was typed: a lower level brings the locked part down with the balance — never above it', () => {
+    const filled = applyLevel(blank(), 'comfortable', TODAY).profile
+    const rich = filled.household.persons[0].accounts.rrsp.balance
+    expect(rich).toBeGreaterThan(0)
+    const locked: Profile = { ...filled, household: { ...filled.household, persons: [{ ...filled.household.persons[0], accounts: { ...filled.household.persons[0].accounts, rrsp: { ...filled.household.persons[0].accounts.rrsp, lockedIn: rich } } }] } }
+    const lower = applyLevel(locked, 'modest', TODAY).profile.household.persons[0].accounts.rrsp
+    expect(lower.balance).toBeLessThan(rich)
+    expect(lower.lockedIn ?? 0).toBeLessThanOrEqual(lower.balance)
+    expect(validateProfile(JSON.parse(JSON.stringify(applyLevel(locked, 'modest', TODAY).profile))).ok).toBe(true)
   })
 })

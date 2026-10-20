@@ -49,7 +49,23 @@ function cells(rest: string): string[] {
   if (t.includes('\t')) return t.split('\t')
   if (t.includes('$')) return t.split('$')
   if (/ {2,}/.test(t)) return t.split(/ {2,}/)
-  return [t]
+  return singleSpaced(t)
+}
+
+/**
+ * Columns separated by ONE plain space (a PDF copy often gives that): « 5000 4000 » is two amounts, never 50 004 000 $. A space is also a French
+ * thousands separator, so a group of exactly three digits that follows a number is that number's thousands (« 52 300 » is one amount, « 52 300,50 »
+ * too). A no-break space (U+00A0, U+202F) is only ever a thousands separator: it never splits.
+ */
+function singleSpaced(t: string): string[] {
+  const out: string[] = []
+  for (const tok of t.split(' ').filter((x) => x !== '')) {
+    const prev = out.length - 1
+    // only onto a number grouped so far (« 52 », « 1 234 »): « 5000 300 » is two amounts, a four-digit figure has no thousands to add to
+    if (prev >= 0 && /^\d{3}([.,]\d{1,2})?$/.test(tok) && /^\d{1,3}( \d{3})*$/.test(out[prev])) out[prev] = `${out[prev]} ${tok}`
+    else out.push(tok)
+  }
+  return out
 }
 
 export function parseEarningsPaste(text: string, lastYear: number): PastedEarnings {

@@ -3,6 +3,7 @@ import { TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_AGE, TYPICAL_SPE
 import type { Household, Person } from '../engine/types.ts'
 import { estimateMissing, estimateRrspRoom, estimateTfsaRoom } from './estimates.ts'
 import { factId, type FactKind, type FactOwner } from './facts.ts'
+import { setRrspBalance, setSpending } from './profileEdit.ts'
 import type { Profile } from './schema.ts'
 
 // « I DO NOT KNOW MY NUMBERS » — a LEVEL stands in for the figures a person cannot read: modest, average or comfortable. Statistics
@@ -118,14 +119,16 @@ export function isOpen(p: Profile, kind: FactKind, owner: FactOwner, todayYear: 
   return LEVELS.some((l) => BASES.some((b) => levelFigure(p, kind, owner, l, todayYear, b) === now))
 }
 
+// A figure is put through the SAME edits a person's typing goes through (profileEdit.ts), so a level can never leave the profile in a shape the schema
+// refuses: a budget split by account is spread across its rows (the schema rebuilds the totals from them), an RRSP balance keeps its locked-in part within it.
 function put(p: Profile, kind: FactKind, owner: FactOwner, value: number): Profile {
-  if (kind === 'spendingWorking') return { ...p, household: { ...p.household, spending: { ...p.household.spending, workingToday: value } } }
-  if (kind === 'spendingRetired') return { ...p, household: { ...p.household, spending: { ...p.household.spending, retiredToday: value } } }
+  if (kind === 'spendingWorking') return setSpending(p, { workingToday: value })
+  if (kind === 'spendingRetired') return setSpending(p, { retiredToday: value })
   if (kind === 'homeValue') return p.household.home ? { ...p, household: { ...p.household, home: { ...p.household.home, value } } } : p
   const persons = p.household.persons.map((x): Person => {
     if (x.id !== owner) return x
     const a = x.accounts
-    if (kind === 'rrspBalance') return { ...x, accounts: { ...a, rrsp: { ...a.rrsp, balance: value } } }
+    if (kind === 'rrspBalance') return setRrspBalance(x, value)
     if (kind === 'tfsaBalance') return { ...x, accounts: { ...a, tfsa: { ...a.tfsa, balance: value } } }
     // The cost base follows the balance while the account has no history of its own: no gain is assumed.
     const acb = a.nonReg.acb === 0 || a.nonReg.acb === a.nonReg.balance ? value : a.nonReg.acb

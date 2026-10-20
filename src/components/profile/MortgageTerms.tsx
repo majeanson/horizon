@@ -3,6 +3,7 @@ import type { Home } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { HOME_COPY } from '../../lib/homeCopy'
 import { formatMoney } from '../../lib/money'
+import { MAX_MONTHLY_PAYMENT, maxPaymentPer } from '../../lib/mortgagePayment'
 import { updateHome } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { today } from '../../lib/today'
@@ -28,6 +29,8 @@ export function MortgageTerms({ home, label }: { home: Home; /** The row label o
   const frequency = m.frequency ?? 'monthly'
   const perYear = PAYMENTS_PER_YEAR[frequency]
   const shown = Math.round(((m.monthlyPayment * 12) / perYear) * 100) / 100
+  // The box's largest figure in ITS unit: what is typed is stored as a monthly payment (× perYear / 12), and the schema keeps no more than MAX_MONTHLY_PAYMENT a month.
+  const maxShown = maxPaymentPer(perYear)
   const set = (patch: Partial<Home['mortgage']>) => updateProfile((p) => updateHome(p, (x) => ({ ...x, mortgage: { ...x.mortgage, ...patch } })))
   const renewal = m.renewal ?? null
 
@@ -53,7 +56,7 @@ export function MortgageTerms({ home, label }: { home: Home; /** The row label o
         ))}
       </Cluster>
       <FieldRow label={label && frequency === 'monthly' ? label : c.payment[frequency]} help="mortgagePayment">
-        {(w) => <NumberField kind="money" max={1e6} value={shown} onChange={(typed) => set({ monthlyPayment: (typed * perYear) / 12 })} id={w.id} />}
+        {(w) => <NumberField kind="money" max={maxShown} value={shown} onChange={(typed) => set({ monthlyPayment: Math.min(MAX_MONTHLY_PAYMENT, (typed * perYear) / 12) })} id={w.id} />}
       </FieldRow>
       {frequency !== 'monthly' && <p className="field-row__hint">{c.equals(formatMoney(Math.round(m.monthlyPayment * 100) / 100, lang, { cents: true }))}</p>}
 

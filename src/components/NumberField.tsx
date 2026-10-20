@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
-import { readNumber, showNumber, stepped, type NumberKind } from '../lib/numberInput'
+import { emptyValue, readNumber, showNumber, stepped, type NumberKind } from '../lib/numberInput'
 import { EditField } from './EditField'
 import { StatusMessage } from './StatusMessage'
 
@@ -93,7 +93,8 @@ export function NumberField(props: NumberFieldProps) {
         if (value !== null) onChange(null)
         return
       }
-      if (kind === 'money' || kind === 'decimal' || kind === 'percent') {
+      // An emptied amount is 0 — only where 0 is allowed (lib/numberInput.ts `emptyValue`); else the box goes back to its figure, as a year's does.
+      if (emptyValue(kind, lo, hi) === 0) {
         setError(null)
         setText(showNumber(0, kind, lang))
         if (value !== 0) onChange(0)

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { BANK_IMPORT_COPY } from './bankImportCopy.ts'
-import { NOT_SPENDING, parseBankDate, readBank, summarize, totalOf, type BankRow } from './bankImport.ts'
+import { dateOrderOf, NOT_SPENDING, parseBankDate, readBank, summarize, totalOf, type BankRow } from './bankImport.ts'
 
 // A bank's export, read on the device: the columns found by name, the sign of an amount read the way that export writes it, the last twelve complete months counted by
 // category, and what is not household spending left unticked. The fixtures are made up; no real statement is committed.
@@ -166,5 +166,32 @@ describe('the words', () => {
       for (const k of ['open', 'hint', 'label', 'placeholder', 'file', 'nothing', 'tipMortgage', 'apply', 'applied'] as const) expect(typeof c[k] === 'string' ? (c[k] as string).trim() : 'x', `${lang} ${k}`).not.toBe('')
     }
     expect(BANK_IMPORT_COPY.fr.hint).not.toBe(BANK_IMPORT_COPY.en.hint)
+  })
+})
+
+describe('one file, one reading', () => {
+  it('a month-first export is read month first on EVERY row, ambiguous ones included — « 10/07 » with « 10/15 » is October 7, not July 10', () => {
+    const csv = 'Date,Description,Amount\n10/07/2026,Café,-4.50\n10/15/2026,Épicerie,-82.10\n10/03/2026,Paie,1500.00'
+    const rows = readBank(csv).rows
+    expect(rows.map((r) => [r.month, r.day])).toEqual([[10, 7], [10, 15], [10, 3]])
+    expect(dateOrderOf(['10/07/2026', '10/15/2026'])).toBe('mdy')
+  })
+
+  it('a day-first file (any first figure over 12) and a file that never says are read day first', () => {
+    expect(dateOrderOf(['07/10/2026', '13/10/2026'])).toBe('dmy')
+    expect(dateOrderOf(['07/10/2026', '08/10/2026'])).toBe('dmy')
+    expect(readBank('Date,Description,Montant\n07/10/2026,Café,-4,50\n13/10/2026,Épicerie,-82,10').rows.map((r) => [r.month, r.day])).toEqual([[10, 7], [10, 13]])
+  })
+
+  it('money out written « -$45.00 » or « 45,00- » is a minus sign: an unsigned amount in the same file is money IN', () => {
+    for (const out of ['-$45.00', '$-45.00', '45.00-']) {
+      const rows = readBank(`Date,Description,Amount\n2026-10-01,Épicerie,${out}\n2026-10-02,Remboursement,20.00`).rows
+      expect(rows.map((r) => r.amount), out).toEqual([-45, 20])
+    }
+  })
+
+  it('only the AMOUNT column says the sign: a description that looks like one (« (Réf. 4521) », « Retour 12- ») leaves unsigned amounts as money out', () => {
+    const rows = readBank('Date,Description,Amount\n2026-10-01,(Réf. 4521),4.50\n2026-10-02,Retour 12-,82.10\n2026-10-03,Café - Montréal,3.25').rows
+    expect(rows.map((r) => r.amount)).toEqual([-4.5, -82.1, -3.25])
   })
 })

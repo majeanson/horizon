@@ -65,14 +65,42 @@ const monthOf = (name: string): number | null => {
   return i < 0 ? null : (i % 12) + 1
 }
 
-/** « 2026-10-07 », « 2026/10/07 », « 07/10/2026 » (day first, as in Canadian French — unless the second figure cannot be a month), « 7 octobre 2026 », « Oct 7, 2026 ». */
-export function parseBankDate(text: string): { year: number; month: number; day: number } | null {
+/** How a file writes « 07/10/2026 »: day first (Canadian French, the default) or month first (many English exports). */
+export type DateOrder = 'dmy' | 'mdy'
+const NUMERIC_DATE = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/
+
+/**
+ * The order ONE file writes its numeric dates in, decided once from the dates that can only be read one way: a first figure above 12 is a day
+ * (day first), a second above 12 is a day (month first). A file that never says (every date ambiguous) is read day first. Never decided row by
+ * row: in a month-first export « 10/07 » (Oct 7) and « 10/15 » (Oct 15) would land in July and October.
+ */
+export function dateOrderOf(dates: readonly string[]): DateOrder {
+  let dmy = 0
+  let mdy = 0
+  for (const d of dates) {
+    const m = NUMERIC_DATE.exec(d.trim())
+    if (!m) continue
+    if (+m[1] > 12) dmy++
+    else if (+m[2] > 12) mdy++
+  }
+  return mdy > dmy ? 'mdy' : 'dmy'
+}
+
+/**
+ * « 2026-10-07 », « 2026/10/07 », « 07/10/2026 » (in the file's `order`: day first, as in Canadian French, unless the file is known to be month first),
+ * « 7 octobre 2026 », « Oct 7, 2026 ». A date the order cannot read (a 13th month) is null. Without an order, a lone date is read day first unless its
+ * second figure cannot be a month.
+ */
+export function parseBankDate(text: string, order?: DateOrder): { year: number; month: number; day: number } | null {
   const t = text.trim()
   const valid = (year: number, month: number, day: number) => (year >= 1990 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31 ? { year, month, day } : null)
   let m = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/.exec(t)
   if (m) return valid(+m[1], +m[2], +m[3])
-  m = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/.exec(t)
-  if (m) return +m[2] > 12 ? valid(+m[3], +m[1], +m[2]) : valid(+m[3], +m[2], +m[1])
+  m = NUMERIC_DATE.exec(t)
+  if (m) {
+    const monthFirst = order === undefined ? +m[2] > 12 : order === 'mdy'
+    return monthFirst ? valid(+m[3], +m[1], +m[2]) : valid(+m[3], +m[2], +m[1])
+  }
   m = /^(\d{1,2})\s+([^\s\d]+)\s+(\d{4})/.exec(t)
   if (m) return monthOf(m[2]) ? valid(+m[3], monthOf(m[2])!, +m[1]) : null
   m = /^([^\s\d]+)\.?\s+(\d{1,2}),?\s+(\d{4})/.exec(t)
@@ -111,6 +139,13 @@ function columnsOf(header: string[]): Columns | null {
   return { date, amount, debit, credit, category: find(ALIASES.category), description: find(ALIASES.description) }
 }
 
+/** Does a cell say money OUT by its sign — the very forms `signed` reads so: « -12,50 », « -$12.50 », « $-12.50 », « 12,50- », « (12,50) ». */
+function marksOut(cell: string): boolean {
+  const t = cell.trim()
+  if (!/\d/.test(t)) return false
+  return /^\$?\s*-/.test(t) || /-\s*\$?$/.test(t) || /^\(.*\)$/.test(t)
+}
+
 /** Signed dollars from a cell. « -12,50 », « (12,50) » and « 12,50- » are money out; « +12,50 » is money in; no sign at all is `unsignedSign`. */
 function signed(cell: string, unsignedSign: number): number | null {
   const t = cell.trim()
@@ -137,12 +172,15 @@ export function readBank(text: string): BankRead {
   }
   if (cols === null) return { rows: [], skipped: table.length }
   const body = table.slice(at + 1)
-  const anyMinus = body.some((r) => r.some((c) => /^\s*-\s*\d/.test(c) || /^\(.*\d.*\)$/.test(c.trim())))
+  // Read in the AMOUNT column only, and by the same forms `signed` treats as money out (a « - » in a description is not a sign).
+  const amountCol = cols.amount
+  const anyMinus = amountCol !== null && body.some((r) => marksOut(r[amountCol] ?? ''))
   const unsigned = anyMinus ? 1 : -1 // minus signs mark money out: an unsigned amount is money in; with none, an unsigned amount is money out
+  const order = dateOrderOf(body.map((r) => r[cols.date] ?? ''))
   const rows: BankRow[] = []
   let skipped = 0
   for (const r of body) {
-    const when = parseBankDate(r[cols.date] ?? '')
+    const when = parseBankDate(r[cols.date] ?? '', order)
     const description = (cols.description === null ? '' : r[cols.description] ?? '').replace(/\s+/g, ' ').trim()
     let amount: number | null = null
     if (cols.amount !== null) amount = signed(r[cols.amount] ?? '', unsigned)

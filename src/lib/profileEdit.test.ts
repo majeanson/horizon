@@ -37,6 +37,17 @@ describe('profile edits are pure, and never produce a profile the validator woul
     expect(solo.household.persons).toHaveLength(1) // the original is untouched
   })
 
+  it('removing a spouse hands the parental leave to the one who stays: their own weeks, the other share gone — never a stale share over the 32 weeks', () => {
+    const couple = addSpouse(defaultProfile(TODAY), TODAY)
+    const withLeave = (birthParent: 'self' | 'spouse'): typeof couple => ({ ...couple, household: { ...couple.household, kidsEffects: { benefits: false, qppExclusion: false, leave: { birthParent, birthParentWeeks: 20, otherParentWeeks: 12 } } } })
+    // the spouse was to give birth: what stays is MY share (12), as the one parent now
+    expect(removeSpouse(withLeave('spouse')).household.kidsEffects!.leave).toEqual({ birthParent: 'self', birthParentWeeks: 12, otherParentWeeks: 0 })
+    expect(removeSpouse(withLeave('self')).household.kidsEffects!.leave).toEqual({ birthParent: 'self', birthParentWeeks: 20, otherParentWeeks: 0 })
+    // and the one parent can then take all 32 weeks: the profile still saves
+    const solo = removeSpouse(withLeave('spouse'))
+    valid({ ...solo, household: { ...solo.household, kidsEffects: { ...solo.household.kidsEffects!, leave: { ...solo.household.kidsEffects!.leave!, birthParentWeeks: 32 } } } })
+  })
+
   it('« lives alone »: a couple never does, a person who loses their spouse does again, and the person can untick it', () => {
     const solo = defaultProfile(TODAY)
     expect(solo.household.livesAlone).toBe(true)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readNumber, showNumber, stepFor, stepped, type NumberKind } from './numberInput.ts'
+import { emptyValue, readNumber, showNumber, stepFor, stepped, type NumberKind } from './numberInput.ts'
 
 const nbsp = (s: string) => s.replace(new RegExp('[' + String.fromCharCode(0xa0, 0x202f) + ']', 'g'), ' ')
 
@@ -95,5 +95,22 @@ describe('the arrow keys on a number box', () => {
     expect(stepped(120, 'int', 1, false, 0, 120)).toBe(120)
     expect(stepped(0.07, 'percent', 1, true, 0, 0.1)).toBe(0.08)
     expect(stepped(0.095, 'percent', 1, true, 0, 0.1)).toBe(0.1)
+  })
+})
+
+describe('an emptied box', () => {
+  it('is 0 for an amount, a decimal or a percent that accepts 0', () => {
+    expect(emptyValue('money', 0, 1e6)).toBe(0)
+    expect(emptyValue('percent', Number.NEGATIVE_INFINITY, 0.25)).toBe(0)
+    expect(emptyValue('decimal', 0, 60)).toBe(0)
+  })
+  it('goes back to its figure (null) when 0 is outside the box: a survivor’s share from 30 %, years of coordination from 1 — never a 0 the schema refuses', () => {
+    expect(emptyValue('percent', 0.3, 1)).toBeNull()
+    expect(emptyValue('decimal', 1, 60)).toBeNull()
+    expect(emptyValue('money', 1, 1e6)).toBeNull()
+  })
+  it('a year or a count goes back to its figure, as it always has', () => {
+    expect(emptyValue('year', 1900, 2100)).toBeNull()
+    expect(emptyValue('int', 0, 32)).toBeNull()
   })
 })

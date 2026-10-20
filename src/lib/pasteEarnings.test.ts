@@ -72,3 +72,18 @@ describe('earningsFromPaste', () => {
     expect(earningsFromPaste(rows, 1)).toEqual({ 2019: 90 })
   })
 })
+
+describe('columns separated by single spaces (a PDF copy)', () => {
+  it('« 2019 5000 4000 » is two amounts — never 50 004 000 $', () => {
+    expect(parseEarningsPaste('2019 5000 4000', 2025).rows).toEqual([{ year: 2019, amounts: [5000, 4000] }])
+  })
+  it('a French thousands group still holds together: « 52 300 », « 52 300,50 », « 1 234 567 », and two such amounts side by side', () => {
+    expect(parseEarningsPaste('2019 52 300', 2025).rows[0].amounts).toEqual([52300])
+    expect(parseEarningsPaste('2019 52 300,50', 2025).rows[0].amounts).toEqual([52300.5])
+    expect(parseEarningsPaste('2019 1 234 567', 2025).rows[0].amounts).toEqual([1234567])
+    expect(parseEarningsPaste('2019 52 300 48 000', 2025).rows[0].amounts).toEqual([52300, 48000])
+  })
+  it('a four-digit figure takes no thousands group: « 5000 300 » is two amounts', () => {
+    expect(parseEarningsPaste('2019 5000 300', 2025).rows[0].amounts).toEqual([5000, 300])
+  })
+})
