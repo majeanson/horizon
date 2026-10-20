@@ -24,7 +24,7 @@ import { StatBar } from './StatBar'
 /** One measure: its figure, its bar, one line of what it is read from — and, folded away, what the measure means and what a full bar stands for. */
 function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
   return (
-    <li className="surface sheet__stat">
+    <li className={'surface sheet__stat sheet__stat--' + s.id}>
       <div className="sheet__stat-head">
         <p className="sheet__stat-name">{s.name}</p>
         <p className="sheet__stat-value mono">{s.valueText}</p>

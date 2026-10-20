@@ -80,6 +80,8 @@ test.describe('every SubTabs row is reachable, and the chosen option shows', () 
         await page.goto(s.path)
         await expect(page.locator('.page-head__title').first()).toBeAttached({ timeout: 60_000 })
         if (s.ready) await page.locator(s.ready).first().waitFor({ timeout: 60_000 })
+        // a panel still waiting is a ghost of itself — its tabs inert, counted as none: walk the rows once every wait has landed
+        await expect(page.locator('[data-placeholder]')).toHaveCount(0, { timeout: 60_000 })
         await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 60_000 })
         // Lazy parts draw their rows a moment later: wait until the number of rows has held for a second.
         let last = -1

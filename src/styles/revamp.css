@@ -2299,3 +2299,11 @@
   color: transparent;
   white-space: nowrap;
 }
+/* Lines held whether the words are known yet or not: on CI's fonts a placeholder sentence and the real one did not wrap alike, and the page under them moved by a line.
+   The front door's question keeps three lines; the earliest age's measure on Ma fiche keeps two. */
+.drip > p {
+  min-height: 3lh;
+}
+.sheet__stat--runway .sheet__stat-detail {
+  min-height: 2lh;
+}

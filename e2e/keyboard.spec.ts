@@ -110,6 +110,8 @@ test.describe('on every page', () => {
     test(`${path}: focus moves in reading order, always shows where it is, and no tabindex fights the order`, async ({ page }) => {
       await page.goto(path)
       await page.locator('.page-head__title').waitFor()
+      // Every wait landed first: a placeholder replaced while tabbing reorders the document under the walk (it read a stop as « backwards »)
+      await expect(page.locator('[data-placeholder]')).toHaveCount(0, { timeout: 60_000 })
       // No positive tabindex anywhere: it would pull an element out of the reading order.
       expect(await page.locator('[tabindex]:not([tabindex="0"]):not([tabindex="-1"])').count()).toBe(0)
 
