@@ -358,6 +358,8 @@ describe('the Allowance and the pensioner\'s GIS beside it, row by row against t
     expect(table.length).toBe(941)
     expect(table[0][0]).toBe(0)
     expect(Math.ceil(table[table.length - 1][1])).toBe(RULES.allowanceCutoff)
+    // The table's last band ends at 42 767,99 $: the cut-off the params cite (Table 5 of the quarterly report) is the table's own.
+    expect(Math.ceil(table[table.length - 1][1])).toBe(42_768)
     expect(table[0][3]).toBe(RULES.allowanceMax)
   })
 
@@ -413,6 +415,8 @@ describe('the Allowance for the Survivor, row by row against the official table'
     expect(table.length).toBe(1220)
     expect(table[0][0]).toBe(0)
     expect(Math.ceil(table[table.length - 1][1])).toBe(RULES.survivorAllowanceCutoff)
+    // …and the page's own words agree with the table's last band (31 151,99 $): « Your annual net income must be less than $31,152 ».
+    expect(Math.ceil(table[table.length - 1][1])).toBe(31_152)
     expect(table[0][2]).toBe(RULES.survivorAllowanceMax)
   })
 

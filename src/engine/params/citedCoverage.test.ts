@@ -31,16 +31,10 @@ const ALONE = `${OPEN}, and no test of behaviour states its value either`
 const NO_WORKED_EXAMPLE: Record<string, string> = {
   'rrq.rateSecond': OPEN,
   'rrq.survivorOwnPensionOffset': OPEN,
-  'rrq.survivorFlatRate45to64': ALONE,
-  'rrq.survivorFlatRateUnder45': ALONE,
-  'rrq.survivorMaxUnder65': ALONE,
-  'rrq.survivorMax65': ALONE,
-  'oas.allowanceCutoff': ALONE,
-  'oas.survivorAllowanceCutoff': ALONE,
   'parentalLeave.rateLow': OPEN,
-  'longTermCare.chsldPrivateRoom': `${ALONE} (an official daily rate, not a calculation: an example would be the page's own table)`,
-  'longTermCare.chsldSemiPrivateRoom': `${ALONE} (an official daily rate, not a calculation: an example would be the page's own table)`,
-  'longTermCare.chsldWard': `${ALONE} (an official daily rate, not a calculation: an example would be the page's own table)`,
+  'longTermCare.chsldPrivateRoom': `${OPEN} (an official monthly rate, not a calculation: an example would be the page's own table; lib/careModel.test.ts states each one)`,
+  'longTermCare.chsldSemiPrivateRoom': `${OPEN} (an official monthly rate, not a calculation: an example would be the page's own table; lib/careModel.test.ts states each one)`,
+  'longTermCare.chsldWard': `${OPEN} (an official monthly rate, not a calculation: an example would be the page's own table; lib/careModel.test.ts states each one)`,
   'childBenefits.ccb.maxUnder6': OPEN,
   'childBenefits.ccb.max6to17': OPEN,
   'childBenefits.ccb.threshold1': OPEN,
@@ -49,11 +43,7 @@ const NO_WORKED_EXAMPLE: Record<string, string> = {
   'childBenefits.ccb.topFixedTwo': OPEN,
   'childBenefits.ccb.topFixedThree': OPEN,
   'childBenefits.ccb.topFixedFourPlus': OPEN,
-  'childBenefits.familyAllowance.max': OPEN,
-  'childBenefits.familyAllowance.min': OPEN,
-  'childBenefits.familyAllowance.supplementMax': ALONE,
   'childBenefits.familyAllowance.reductionRate': OPEN,
-  'childBenefits.familyAllowance.thresholdSingle': OPEN,
   'accounts.lifUnlockShareOfMga': OPEN,
 }
 
@@ -73,9 +63,11 @@ describe('the cited figures and the worked examples that state them', () => {
     expect(stale, 'now stated by a worked example: delete the entry').toEqual([])
   })
 
-  it('the ratchet: at most 26 figures lack an example today, and at most 10 are held by nothing but their literal', () => {
-    expect(uncovered.length).toBeLessThanOrEqual(26)
-    expect(Object.values(NO_WORKED_EXAMPLE).filter((r) => r.startsWith(ALONE)).length).toBeLessThanOrEqual(10)
+  // 26 → 16 and 10 → 0 (2026-10-20): the survivor's flat rates and maxima (Retraite Québec's table, the third maximum predicted from two), the two Allowance cut-offs
+  // (the official tables' last band), the Allocation famille's 2026 figures (the page's own amounts); the CHSLD rates were stated by lib/careModel.test.ts all along.
+  it('the ratchet: at most 16 figures lack an example today, and none is held by nothing but its literal', () => {
+    expect(uncovered.length).toBeLessThanOrEqual(16)
+    expect(Object.values(NO_WORKED_EXAMPLE).filter((r) => r.startsWith(ALONE)).length).toBe(0)
   })
 
   it('canary: the detector finds a figure whose value is nowhere in the examples, and one whose value is', () => {
