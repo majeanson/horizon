@@ -60,7 +60,8 @@ describe('a named plan that cannot be read', () => {
     const original = withBrokenPlan()
     mem.data.set('horizon-profile', original)
     reloadProfile()
-    expect(getStorageIssue()).toBeNull()
+    // the person is TOLD (the shell's notice, data.issue.planDropped) — and it is not the « unreadable » one: the profile itself loaded
+    expect(getStorageIssue()).toBe('planDropped')
     expect(getProfile().plans.map((x) => x.name)).toEqual(['Prudent'])
     expect(unreadableCopies()).toEqual([original])
     // the next edit saves without the plan; the rescue copy is still the original, plan included
@@ -70,9 +71,18 @@ describe('a named plan that cannot be read', () => {
     expect(JSON.parse(unreadableCopies()[0]).plans).toHaveLength(2)
   })
 
-  it('a sound file keeps nothing aside', () => {
+  it('a sound file keeps nothing aside, and says nothing', () => {
     mem.data.set('horizon-profile', JSON.stringify(savePlan(defaultProfile(TODAY), 'Prudent')))
     reloadProfile()
     expect(unreadableCopies()).toEqual([])
+    expect(getStorageIssue()).toBeNull()
+  })
+
+  it('the notice outlives the first save: a save clears only the issues it resolves', () => {
+    mem.data.set('horizon-profile', withBrokenPlan())
+    reloadProfile()
+    updateProfile((p) => ({ ...p, household: { ...p.household, spending: { ...p.household.spending, workingToday: 40_000 } } }))
+    flushProfile()
+    expect(getStorageIssue()).toBe('planDropped')
   })
 })

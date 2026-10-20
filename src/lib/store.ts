@@ -26,8 +26,9 @@ const SAVE_DELAY_MS = 250
  *   newer       · the stored profile was written by a LATER version of the app; same, and the message says so
  *   unsaved     · the profile on screen would not read back (a figure outside its limits): it was NOT written
  *   conflict    · another tab saved while this one had an edit pending; the other tab's profile was taken
+ *   planDropped · the profile loaded, but a named plan in it could not be read and was left out; the file as it was is kept
  */
-export type StorageIssue = 'unavailable' | 'unreadable' | 'newer' | 'unsaved' | 'conflict' | null
+export type StorageIssue = 'unavailable' | 'unreadable' | 'newer' | 'unsaved' | 'conflict' | 'planDropped' | null
 
 let issue: StorageIssue = null
 let current: Profile = load()
@@ -49,7 +50,11 @@ function load(): Profile {
   if (result.ok) {
     // A named plan that could not be read was left out (migrations.ts): the profile around it loads, but the file as it was is kept like an unreadable
     // one — the next save writes the profile WITHOUT that plan, and this copy (« Copie illisible », page Sauvegarde et réglages) is then the only place it survives.
-    if (result.droppedPlans > 0) keepUnreadable(text)
+    // …and the person is TOLD: a plan that vanishes without a word is a plan they will not think to rescue.
+    if (result.droppedPlans > 0) {
+      keepUnreadable(text)
+      issue = 'planDropped'
+    }
     return result.profile
   }
   keepUnreadable(text)

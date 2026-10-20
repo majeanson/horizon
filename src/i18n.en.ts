@@ -493,6 +493,7 @@ export const EN: typeof FR = {
     issue: {
       unavailable: 'This browser does not keep data (private browsing?). Export your profile before closing the page.',
       unreadable: 'The saved profile was unreadable. A copy is kept on this device (Backup and settings page: “Unreadable copy”), and a blank profile was loaded.',
+      planDropped: 'An unreadable plan was left out; copy in Backup and settings.',
       newer: 'The saved profile comes from a newer version of Horizon, so it could not be read here. A copy is kept on this device (Backup and settings page: “Unreadable copy”), and a blank profile was loaded.',
       unsaved: 'A figure is outside the allowed limits: the profile was not saved. Correct the figure concerned.',
       conflict: 'Another tab saved while you were typing: its version was taken, and your last change was not kept.',

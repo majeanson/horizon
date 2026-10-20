@@ -514,6 +514,7 @@ export const FR = {
     issue: {
       unavailable: 'Ce navigateur ne conserve pas les données (navigation privée ?). Exportez votre profil avant de fermer la page.',
       unreadable: 'Le profil enregistré était illisible. Une copie en est gardée sur cet appareil (page Sauvegarde et réglages : « Copie illisible »), et un profil vierge a été chargé.',
+      planDropped: 'Un plan illisible a été retiré ; copie dans Sauvegarde et réglages.',
       newer: 'Le profil enregistré vient d’une version plus récente d’Horizon : il n’a pas pu être lu ici. Une copie en est gardée sur cet appareil (page Sauvegarde et réglages : « Copie illisible »), et un profil vierge a été chargé.',
       unsaved: 'Un chiffre dépasse les limites permises : le profil n’a pas été enregistré. Corrigez le chiffre en cause.',
       conflict: 'Un autre onglet a enregistré pendant votre saisie : sa version a été reprise, et votre dernière modification n’a pas été conservée.',
