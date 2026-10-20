@@ -54,10 +54,6 @@ function render(v: Leaf): string | null {
 
 // `module.key` → why an identical long string is right on both sides (a proper noun, a URL, an official French title that is not translated). The reason IS the entry.
 const SAME_ON_PURPOSE: Record<string, string> = {
-  // OPEN QUESTION, not a settled choice: the French copy quotes the ENGLISH labels of the CRA « My Account » screen, verbatim. A reader on the French CRA screen sees other words. Nobody has
-  // read the French screen (it sits behind a login), so the French labels are not typed here from memory; when someone reads them, translate these and delete the entries.
-  'facsimileCopy.quotes.cra.screen': 'verbatim quote of the English CRA screen; the French screen has not been read (STATE.md Phase 15)',
-  'facsimileCopy.quotes.cra.tfsa': 'verbatim quote of the English CRA screen; the French screen has not been read (STATE.md Phase 15)',
 }
 
 // `module.key` → why the FIRST argument is not allowed to be 0 (it names a month, a count that starts at one…): the edge check then starts at 1. The reason IS the entry.

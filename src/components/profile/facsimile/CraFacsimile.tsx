@@ -9,7 +9,7 @@ import type { PersonEditor } from '../shared'
 import { FacsimileFrame } from './FacsimileFrame'
 
 // The CRA account's « Savings and pension plans » screen: « RRSP deduction limit » and « TFSA contribution room — As of January 1 », in the CRA's own
-// (English) words whatever the app's language. The boxes are the form's rrspRoom / tfsaRoom. A figure TYPED here is copied off the document, so it
+// words in the reader's language (the French ones as the CRA's help pages name them — lib/facsimileCopy.ts). The boxes are the form's rrspRoom / tfsaRoom. A figure TYPED here is copied off the document, so it
 // confirms the same fact the form's ✓ would (as « Coller mon relevé » does for the earnings); a figure the reader only looks at stays as it was.
 
 function Row({ person, edit, kind, label }: PersonEditor & { kind: 'rrsp' | 'tfsa'; label: string }) {

@@ -3,15 +3,17 @@ import type { Lang } from '../i18n.ts'
 // THE WORDS OF « COMME SUR LE DOCUMENT » (the facsimile views of « Par document »). Outside the eager dictionaries: only a reader who opens the view loads them.
 //
 // Two kinds of string live here, and they follow different rules:
-//   · the QUOTES are the DOCUMENT'S OWN words, verbatim, in the document's own language — the Retraite Québec relevé is French even in the English app, the CRA
-//     account is English even in the French app — so they are byte-identical in `fr` and `en` on purpose (facsimileCopy.test.ts pins both the exact wording and
-//     that equality). The reader holds the paper: the screen must say what the paper says, or the box cannot be found.
+//   · the QUOTES are the DOCUMENT'S OWN words, verbatim, in the language the reader sees the document in. The Retraite Québec relevé is French even in the
+//     English app, so its quotes are byte-identical in `fr` and `en` on purpose. The CRA account comes in both languages, so each side quotes its own: the
+//     English screen's labels, and the French ones as the CRA's public help pages name them (« Calculer vos droits de cotisation aux CELI », « Connaître le
+//     maximum déductible au titre des REER », « Précisions sur la correspondance de l’excédent CELI », read 2026-10-20 — never from a signed-in account,
+//     Marc). facsimileCopy.test.ts pins the exact wording. The reader holds the paper: the screen must say what the paper says, or the box cannot be found.
 //   · the CHROME (the hint, the frame line, the reason a column is unused) is the app's, in the reader's language.
 
 export interface FacsimileQuotes {
   /** The relevé de participation (Retraite Québec). */
   rrq: { section: string; table: string; age60: string; age65: string; current: string; projected: string }
-  /** The CRA account, « Savings and pension plans ». */
+  /** The CRA account, « Savings and pension plans » / « Régimes d’épargne et de pension ». */
   cra: { screen: string; rrsp: string; tfsa: string }
 }
 
@@ -33,7 +35,7 @@ export interface FacsimileCopy {
 const FR: FacsimileCopy = {
   quotes: {
     rrq: { section: 'Estimation des prestations', table: 'Rente de retraite', age60: '60 ans', age65: '65 ans', current: 'Montant actuel', projected: 'Montant projeté' },
-    cra: { screen: 'Savings and pension plans', rrsp: 'RRSP deduction limit', tfsa: 'TFSA contribution room — As of January 1' },
+    cra: { screen: 'Régimes d’épargne et de pension', rrsp: 'Maximum déductible au titre des REER', tfsa: 'Droits de cotisation au CELI — En date du 1er janvier' },
   },
   rrq: {
     hint: 'Recopiez les cases de votre relevé.',
