@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLang } from '../../i18n'
 import { CARD_COPY } from '../../lib/cardCopy'
 import { estimateMissing } from '../../lib/estimates'
@@ -17,7 +17,7 @@ import { Section } from './shared'
 //   · « Estimer ce qui manque » — only the income history (from the salary) and a CELI room left at 0 (components/profile/EstimateView.tsx).
 // Everything stays « estimated », a typed figure is never replaced, and one tap takes each back. A view is offered only while it has something to fill — or until its note
 // (« 12 chiffres remplis », with the way back) has been read — and the whole section is silent when there is nothing left for either to do.
-export default function FillBlanks() {
+export default function FillBlanks({ onShown }: { onShown?: (shown: boolean) => void }) {
   const { lang } = useLang()
   const c = LEVELS_COPY[lang]
   const profile = useProfile()
@@ -27,7 +27,10 @@ export default function FillBlanks() {
   const [picked, setPicked] = useState<'level' | 'estimate' | null>(null)
   const estimate = estimateMissing(profile, now)
   const views: ('level' | 'estimate')[] = [...(needsLevel(profile, now.year) || levelDone !== null ? (['level'] as const) : []), ...(estimate.years > 0 || estimate.rooms > 0 || estimate.rrspRooms > 0 || estimateDone !== null ? (['estimate'] as const) : [])]
-  if (views.length === 0) return null
+  // Profil's accordion lists the blocks in order (« Suivant » walks them): it learns from here whether this one is on the page, which only these tables can tell.
+  const shown = views.length > 0
+  useEffect(() => onShown?.(shown), [shown, onShown])
+  if (!shown) return null
   const view = picked !== null && views.includes(picked) ? picked : views[0]
   return (
     <Section id="niveau" title={c.fill.title} subtitle={CARD_COPY[lang].levels} details={c.fill.lead} concept="estimation">

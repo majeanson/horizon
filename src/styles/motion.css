@@ -13,14 +13,20 @@
   from { transform: translateY(0.6rem); }
   to { transform: none; }
 }
-.page-body > * {
+.page-body > *,
+.skeleton-as-page-body > * {
   animation: rise-in var(--dur-slow) var(--ease-out) backwards;
 }
-.page-body > :nth-child(2) { animation-delay: 40ms; }
-.page-body > :nth-child(3) { animation-delay: 80ms; }
-.page-body > :nth-child(4) { animation-delay: 120ms; }
-.page-body > :nth-child(5) { animation-delay: 160ms; }
-.page-body > :nth-child(n + 6) { animation-delay: 200ms; }
+.page-body > :nth-child(2),
+.skeleton-as-page-body > :nth-child(2) { animation-delay: 40ms; }
+.page-body > :nth-child(3),
+.skeleton-as-page-body > :nth-child(3) { animation-delay: 80ms; }
+.page-body > :nth-child(4),
+.skeleton-as-page-body > :nth-child(4) { animation-delay: 120ms; }
+.page-body > :nth-child(5),
+.skeleton-as-page-body > :nth-child(5) { animation-delay: 160ms; }
+.page-body > :nth-child(n + 6),
+.skeleton-as-page-body > :nth-child(n + 6) { animation-delay: 200ms; }
 
 /* ── A concept's pip pops in, in its family's hue; a hovered card or chip nudges it ───────────────────────────────────────────────────── */
 @keyframes pip-pop {
@@ -87,10 +93,12 @@ a.welcome__card:active,
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
   }
-  .btn:hover:not(:disabled) {
+  .btn:hover:not(:disabled),
+.skeleton-as-btn:hover:not(:disabled) {
     transform: translateY(-1px);
   }
-  .btn--primary:hover:not(:disabled) {
+  .btn--primary:hover:not(:disabled),
+.skeleton-as-btn--primary:hover:not(:disabled) {
     box-shadow: var(--shadow-lg);
   }
 }
@@ -99,7 +107,8 @@ a.welcome__card:active,
   transform: scale(0.97);
   box-shadow: none;
 }
-.btn:active:not(:disabled) {
+.btn:active:not(:disabled),
+.skeleton-as-btn:active:not(:disabled) {
   transform: translate(1px, 1px) scale(0.98);
 }
 
@@ -232,11 +241,13 @@ a.welcome__card:active,
 }
 
 /* ── The answer: the big figure settles in, then its note ──────────────────────────────────────────────────────────────────────────── */
-.answer__big {
+.answer__big,
+.skeleton-as-answer__big {
   animation: rise-in var(--dur-slow) var(--ease-out) 80ms backwards;
 }
 .answer__note,
-.answer__list {
+.answer__list,
+.skeleton-as-answer__note {
   animation: rise-in var(--dur-slow) var(--ease-out) 160ms backwards;
 }
 
@@ -319,7 +330,8 @@ a.welcome__card:active,
     0 0 0 1px var(--ink),
     0 0 0 0.45rem color-mix(in srgb, var(--accent) 38%, transparent);
 }
-.slider__value {
+.slider__value,
+.skeleton-as-slider__value {
   display: inline-block;
   animation: settle-in var(--dur-base) var(--ease-out);
 }
@@ -641,7 +653,11 @@ textarea.input:focus {
   .docs-item__check input:checked,
   .edit-field--invalid .edit-field__box,
   .edit-field--saved .edit-field__box,
-  .edit-field__icon-btn > svg {
+  .edit-field__icon-btn > svg,
+.skeleton-as-page-body > *,
+.skeleton-as-answer__big,
+.skeleton-as-answer__note,
+.skeleton-as-slider__value {
     animation: none;
   }
   .toast {
@@ -661,7 +677,8 @@ textarea.input:focus {
   .shell__tab > svg,
   .profile-section.fam-rule,
   a.welcome__card,
-  .welcome__door {
+  .welcome__door,
+.skeleton-as-btn {
     transition: none;
   }
   /* A vendor pseudo-element in a list would void the whole rule in the other engine: one rule each. */
@@ -685,7 +702,9 @@ textarea.input:focus {
   .shell__tab:active > svg,
   .profile-section:hover .pip,
   .chip:hover .pip,
-  .subtabs__opt:hover .pip {
+  .subtabs__opt:hover .pip,
+.skeleton-as-btn:hover:not(:disabled),
+.skeleton-as-btn:active:not(:disabled) {
     transform: none;
   }
 }

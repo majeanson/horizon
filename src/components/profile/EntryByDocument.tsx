@@ -12,6 +12,7 @@ import { TaxFields } from './TaxFields'
 import type { PersonEditor } from './shared'
 import { AccordionItem } from '../Accordion'
 import { Chip } from '../Chip'
+import { ConceptPip } from '../ConceptPip'
 import { Cluster, Rail } from '../Layout'
 import { SubTabs } from '../SubTabs'
 import { DocumentsChecklist } from './DocumentsChecklist'
@@ -182,9 +183,14 @@ export default function EntryByDocument() {
         <DocumentsChecklist onNext={() => go(steps[0].id)} />
       ) : (
         <>
-      <header className="saisie__head">
+      {/* The step is a card like the blocks under it (Profil is one family of cards): its number, its pip and title, then what the document is and where each figure sits — in view, not
+          under « En savoir plus »: it is what the reader is looking at while typing. */}
+      <header className="saisie__head surface">
         <p className="field-row__hint">{c.stepOf(at + 1, total)}</p>
-        <h2 className="saisie__title">{nameOf(step)}</h2>
+        <div className="saisie__title-row">
+          <ConceptPip id={doc === null ? 'famille' : 'documents'} />
+          <h2 className="saisie__title">{nameOf(step)}</h2>
+        </div>
         {doc === null ? (
           <p>{c.youHint}</p>
         ) : (

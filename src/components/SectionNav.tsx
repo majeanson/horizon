@@ -74,10 +74,15 @@ export function SectionNav({
       }
     }
     watch()
-    const mounts = new MutationObserver(watch)
+    // At most once a frame: a profile write on Résultats re-renders dozens of nodes in bursts, and one look per frame is enough to see a section arrive.
+    let frame = 0
+    const mounts = new MutationObserver(() => {
+      if (frame === 0) frame = requestAnimationFrame(() => ((frame = 0), watch()))
+    })
     mounts.observe(document.getElementById('root') ?? document.body, { childList: true, subtree: true })
     return () => {
       mounts.disconnect()
+      cancelAnimationFrame(frame)
       observer.disconnect()
     }
   }, [ids])

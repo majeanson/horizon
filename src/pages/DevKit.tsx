@@ -698,7 +698,7 @@ function ENTRIES(): Entry[] {
         <>
           <Skeleton count={2} />
           {/* shaped: lines inside the element they stand for, in its own type */}
-          <p className="verdict__line">
+          <p className="skeleton-as-verdict__line">
             <SkeletonLines widths={[80, 35]} />
           </p>
           <Loading />
@@ -714,7 +714,7 @@ function ENTRIES(): Entry[] {
       render: () => (
         <>
           {/* ghost text, ghost chips, a slider, a chart's slot, and real components as a ghost */}
-          <p className="answer__note">
+          <p className="skeleton-as-answer__note">
             <SkeletonText>Une phrase connue, avec un chiffre de 1 234 $ encore inconnu, attend à sa propre taille.</SkeletonText>
           </p>
           <SkeletonChips labels={['Dépenser moins', 'Visite guidée']} />

@@ -297,7 +297,7 @@ function FlowSkeleton() {
       <h4 className="chart-detail__heading">
         <SkeletonLines widths={[55]} />
       </h4>
-      <p className="field-row__hint">
+      <p className="skeleton-as-field-row__hint">
         <SkeletonLines widths={[30]} />
       </p>
       <div className="chart-slot">

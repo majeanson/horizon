@@ -9,7 +9,7 @@ import type { SectionLink } from '../SectionNav'
 
 // The map of Profil: one chip per block of the form, in the order they are on the page (a couple's profile is twenty screens on a phone and needs a « where am I »).
 // Inside the form's accordion (components/Accordion.tsx): a chip opens the block it names — closed on a phone, or a finished block folded away on a wide screen — before scrolling to it.
-export function ProfileMap({ people, withHome, withEvents, withExact, page, end }: { people: ReadonlyArray<{ id: string; name: string }>; withHome: boolean; withEvents: boolean; withExact: boolean; page: RefObject<HTMLElement | null>; end?: ReactNode }) {
+export function ProfileMap({ people, withHome, withEvents, withExact, withFill = false, page, end }: { people: ReadonlyArray<{ id: string; name: string }>; withHome: boolean; withEvents: boolean; withExact: boolean; withFill?: boolean; page: RefObject<HTMLElement | null>; end?: ReactNode }) {
   const t = useT()
   const n = t.profile.nav
   const acc = useAccordion()
@@ -20,6 +20,9 @@ export function ProfileMap({ people, withHome, withEvents, withExact, page, end 
   const progress: Record<string, Progress> = { ...mapProgress(profile), exact: { done: confirmed.confirmed, total: confirmed.total } }
   const links: SectionLink[] = [
     { id: 'famille', label: n.family, concept: 'famille' as const },
+    // « Ma situation » is a block like the others, the second one: it gets its chip (its yes / no answers have no figure to count)
+    { id: 'situation', label: n.situation, concept: 'situation' as const },
+    ...(withFill ? [{ id: 'niveau', label: n.fill, concept: 'estimation' as const }] : []),
     ...people.map((p) => ({ id: `person-${p.id}`, label: p.name, concept: 'personne' as const })),
     { id: 'budget', label: n.budget, concept: 'budget' as const },
     ...(withHome ? [{ id: 'maison', label: n.home, concept: 'maison' as const }] : []),

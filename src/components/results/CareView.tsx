@@ -121,13 +121,13 @@ export function CareView({
         // the common answer (the age holds, the money lasts, what is left) in its own sentences, as ghost text
         <>
           <SkeletonStatus />
-          <p className="answer__big">
+          <p className="skeleton-as-answer__big">
             <SkeletonText>{c.same(age)}</SkeletonText>
           </p>
-          <p className="answer__note">
+          <p className="skeleton-as-answer__note">
             <SkeletonText>{c.holds(age)}</SkeletonText>
           </p>
-          <p className="answer__note">
+          <p className="skeleton-as-answer__note">
             <SkeletonText>{c.leaves(formatCompactMoney(850000, lang), formatCompactMoney(1200000, lang))}</SkeletonText>
           </p>
         </>

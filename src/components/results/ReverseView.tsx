@@ -58,16 +58,16 @@ export function ReverseView({
           <SkeletonStatus />
           {expectWorks ? (
             <>
-              <p className="answer__big">
+              <p className="skeleton-as-answer__big">
                 <SkeletonText>{c.works(age)}</SkeletonText>
               </p>
-              <p className="answer__note">
+              <p className="skeleton-as-answer__note">
                 <SkeletonText>{c.margin(money(52000))}</SkeletonText>
               </p>
             </>
           ) : (
             <>
-              <p className="answer__note">
+              <p className="skeleton-as-answer__note">
                 <SkeletonText>{c.needs(age)}</SkeletonText>
               </p>
               <ul className="skeleton__levers" aria-hidden="true">
@@ -87,7 +87,7 @@ export function ReverseView({
                   <SkeletonText>{c.returns(formatDecimal(1.5, lang, 1))}</SkeletonText>
                 </li>
               </ul>
-              <p className="answer__note">
+              <p className="skeleton-as-answer__note">
                 <SkeletonText>{c.alone}</SkeletonText>
               </p>
             </>
@@ -116,7 +116,7 @@ export function ReverseView({
         {regret === null ? (
           // its hint, its rows of years and its closing line, as ghost text
           <>
-            <p className="field-row__hint">
+            <p className="skeleton-as-field-row__hint">
               <SkeletonText>{c.waitHint}</SkeletonText>
             </p>
             <ul className="skeleton__levers" aria-hidden="true">
@@ -126,7 +126,7 @@ export function ReverseView({
                 </li>
               ))}
             </ul>
-            <p className="answer__note">
+            <p className="skeleton-as-answer__note">
               <SkeletonText>{c.waitKnee(age + 3, money(8000))}</SkeletonText>
             </p>
           </>

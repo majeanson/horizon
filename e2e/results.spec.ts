@@ -192,7 +192,8 @@ test('a couple gets each person\'s own earliest age, worked out off the page\'s 
   await expect(panel).toBeVisible()
   // One line per person, each naming who the other is held at; then the placeholder is gone.
   const lines = page.locator('.verdict__each-row, .verdict__each-list li')
-  await expect(lines).toHaveCount(2)
+  // each person's search runs off the page's thread, after the answer: under a loaded runner it is seconds, not the default five
+  await expect(lines).toHaveCount(2, { timeout: 60_000 })
   await expect(lines.first()).toContainText(/dès \d+ ans, si .* part à \d+ ans|aucun âge/)
   const compare = lines.first().getByRole('button', { name: /^Comparer .* à \d+ ans et .* à \d+ ans$/ })
   await compare.click()

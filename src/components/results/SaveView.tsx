@@ -51,23 +51,23 @@ export function SaveView({
         expectNothing ? (
           <>
             <SkeletonStatus />
-            <p className="answer__big">
+            <p className="skeleton-as-answer__big">
               <SkeletonText>{q.nothing(age)}</SkeletonText>
             </p>
-            <p className="answer__note">
+            <p className="skeleton-as-answer__note">
               <SkeletonText>{q.nothingWhy}</SkeletonText>
             </p>
           </>
         ) : (
         <>
           <SkeletonStatus />
-          <p className="answer__big">
+          <p className="skeleton-as-answer__big">
             <SkeletonText>{q.amount(formatMoney(4800, lang))}</SkeletonText>
           </p>
-          <p className="answer__note">
+          <p className="skeleton-as-answer__note">
             <SkeletonText>{q.perMonth(formatMoney(400, lang))}</SkeletonText>
           </p>
-          <p className="answer__note">
+          <p className="skeleton-as-answer__note">
             <SkeletonText>{q.why(age)}</SkeletonText>
           </p>
         </>

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import type { FillChoice, FillComparison, FillOutcome } from '../../engine/bracketFillCompare'
+import { FILL_CHOICES, type FillChoice, type FillComparison, type FillOutcome, type FillYear } from '../../engine/bracketFillCompare'
 import type { Household } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRACKET_FILL_COPY } from '../../lib/bracketFillCopy'
@@ -12,8 +12,8 @@ import type { Answer } from '../../lib/useOffThread'
 import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Fold } from '../Fold'
-import { Skeleton } from '../Skeleton'
-import { SkeletonFill } from '../SkeletonShapes'
+import { SkeletonStatus } from '../Skeleton'
+import { SkeletonFill, SkeletonGhost } from '../SkeletonShapes'
 import { SubTabs } from '../SubTabs'
 
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
@@ -31,7 +31,17 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
   const c = BRACKET_FILL_COPY[lang]
   const [tab, setTab] = useParamChoice('bf', TABS, 'bracket1')
   const { value, busy } = fill
-  if (value === null) return <Skeleton count={4} />
+  // Opened before the comparison is in (a slow phone): the panel waits as a ghost of itself with stand-in figures — its tabs, sentences, two charts' slots and
+  // table — so it opens at the height it will have (as OrderPanel does).
+  if (value === null)
+    return (
+      <>
+        <SkeletonStatus />
+        <SkeletonGhost>
+          <BracketFillPanel household={household} fill={{ value: ghostFill(household), busy: false }} />
+        </SkeletonGhost>
+      </>
+    )
   const shown = value.outcomes.find((o) => tabOf(o.choice) === tab) ?? value.outcomes[0]
   const off = value.outcomes[0]
   const own = value.outcomes[value.current]
@@ -168,4 +178,13 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
       <p className="answer__note">{c.caveat}</p>
     </div>
   )
+}
+
+/** The three ways with the same stand-in figures, over the household's own retired years: the ghost needs the panel's shape, never its answer. */
+function ghostFill(household: Household): FillComparison {
+  const p = household.persons[0]
+  const from = p.birth.year + p.retirementAge
+  const years: FillYear[] = Array.from({ length: 35 }, (_, i) => ({ year: from + i, age: p.retirementAge + i, income: 50000, ceiling: 55000, rrspDrawn: 20000, minimum: 5000, rrsp: 200000, tfsa: 100000, tax: 10000, gis: 0 }))
+  const outcome = (choice: FillChoice): FillOutcome => ({ choice, earliestOk: p.retirementAge, ok: true, firstShortfallYear: null, lifetimeTax: 400000, recoveryTotal: 0, peakMinimum: 20000, rrspLeft: 100000, tfsaLeft: 200000, years })
+  return { age: p.retirementAge, retiredFrom: from, outcomes: FILL_CHOICES.map(outcome), current: 0, best: 1 }
 }

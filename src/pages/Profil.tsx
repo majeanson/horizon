@@ -87,9 +87,11 @@ export function Profil() {
   const wide = useWide()
   const withHome = applies(profile, yes, 'home')
   const withEvents = applies(profile, yes, 'events')
+  // « Remplir ce qui manque » is a block of the accordion while it has something to fill (it says so itself: its tables ride its own chunk).
+  const [withFill, setWithFill] = useState(false)
   const blockIds = useMemo(
-    () => ['famille', 'situation', ...profile.household.persons.map((p) => `person-${p.id}`), 'budget', ...(withHome ? ['maison'] : []), ...(withEvents ? ['evenements'] : []), ...(acc.total > 0 ? ['exact'] : [])],
-    [profile.household.persons, withHome, withEvents, acc.total],
+    () => ['famille', 'situation', ...(withFill ? ['niveau'] : []), ...profile.household.persons.map((p) => `person-${p.id}`), 'budget', ...(withHome ? ['maison'] : []), ...(withEvents ? ['evenements'] : []), ...(acc.total > 0 ? ['exact'] : [])],
+    [profile.household.persons, withFill, withHome, withEvents, acc.total],
   )
   const [bloc, setBloc] = useParamChoice<string>('bloc', [...blockIds, 'tout', 'none'], 'famille')
   // Each block's count, the map's own (lib/mapProgress.ts), and the whole profile's for « Rendre mon profil exact ».
@@ -177,6 +179,7 @@ export function Profil() {
             withHome={withHome}
             withEvents={withEvents}
             withExact={acc.total > 0}
+            withFill={withFill}
             // On a phone the blocks are read one at a time; a wide screen has room for them all, so the switch is not offered there.
             end={!wide ? <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} /> : undefined}
           />
@@ -188,7 +191,7 @@ export function Profil() {
           </Suspense>
           {/* « Remplir ce qui manque »: a level of living or an estimate fills what is blank; loaded on its own (it carries the official tables). */}
           <Suspense fallback={null}>
-            <FillBlanks />
+            <FillBlanks onShown={setWithFill} />
           </Suspense>
           <div className={'persons' + (spouse ? ' persons--two persons--aligned' : '')}>
             {profile.household.persons.map((p, i) => {

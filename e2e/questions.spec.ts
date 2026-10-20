@@ -12,7 +12,8 @@ test.beforeEach(async ({ page }) => {
 
 test('the three answers: the verdict and stopping on the first view, saving and spending under « Décider »', async ({ page }) => {
   await page.goto('/resultats')
-  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
+  // the answer is worked out off the page's thread: seconds under a loaded runner, not the default five
+  await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 60_000 })
   await expect(page.locator('#epargner')).toHaveCount(0)
   await page.goto('/decider')
   // « Décider » shows the changes ranked, and each what-if as a closed fold until it is opened
@@ -24,7 +25,7 @@ test('the three answers: the verdict and stopping on the first view, saving and 
   await expect(page.locator('#depenser')).toHaveClass(/is-open/)
   await expect(page.locator('#epargner')).toHaveClass(/is-closed/)
   await page.goto('/resultats')
-  await expect(page.locator('#arreter')).toContainText('En dates')
+  await expect(page.locator('#arreter')).toContainText('En dates', { timeout: 60_000 })
   await expect(page.getByText(/Camille\s: en 20\d\d/)).toBeVisible()
 })
 
@@ -49,11 +50,13 @@ test('« Combien épargner ? » says nothing more at an age that already works, 
   await page.goto('/decider?age=60')
   await expect(page.getByText('Rien de plus : à 60 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
   await page.goto('/decider?age=58')
-  await expect(page.getByText(/de plus par année/)).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByText(/Soit environ .* par mois/)).toBeVisible()
+  // read inside the what-if: « Ce qui change le plus » above it names « Un point de rendement de plus par année » too
+  const save = page.locator('#epargner')
+  await expect(save.getByText(/de plus par année/)).toBeVisible({ timeout: 30_000 })
+  await expect(save.getByText(/Soit environ .* par mois/)).toBeVisible()
   // …and where it goes: the placement that needs the least of the three tried (engine/savingsNeeded.ts)
-  await expect(page.getByText(/^Placé dans (votre REER|votre CELI|un compte non enregistré)/)).toBeVisible()
-  await expect(page.getByText(/ont chacun été essayés/)).toBeVisible()
+  await expect(save.getByText(/^Placé dans (votre REER|votre CELI|un compte non enregistré)/)).toBeVisible()
+  await expect(save.getByText(/ont chacun été essayés/)).toBeVisible()
   await page.goto('/decider?age=50')
   await expect(page.getByText('À 50 ans, l’argent ne dure pas.')).toBeVisible({ timeout: 30_000 })
 })

@@ -100,7 +100,7 @@ export const FR = {
     subtitle: 'Vos chiffres, saisis à la main. Ils restent sur cet appareil.',
     welcome: { title: 'Pour commencer' },
     /** The page's map: one short noun per block of the form (the people's chips carry their own names). */
-    nav: { label: 'Sections du profil', family: 'Famille', budget: 'Budget', home: 'Maison', events: 'Événements', exact: 'Rendre exact' },
+    nav: { label: 'Sections du profil', family: 'Famille', situation: 'Ma situation', fill: 'À remplir', budget: 'Budget', home: 'Maison', events: 'Événements', exact: 'Rendre exact' },
     self: 'Moi',
     spouse: 'Partenaire',
     budget: {

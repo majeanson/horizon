@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react'
+import { lazy, Suspense, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Accordion, AccordionItem, type AccordionOpen } from '../../Accordion'
 import { Chip } from '../../Chip'
@@ -38,6 +38,10 @@ const StopChart = lazy(() => import('../StopChart').then((m) => ({ default: m.St
 const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m.YearSection })))
 
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
+/** The shape of the last answer this tab drew — an age, or « no age works » — so the next wait for it (the page is left and come back to; nothing caches the
+ *  answer itself) takes that shape. In memory only: it says nothing about the household that the page has not already shown. */
+let lastShape: 'at' | 'none' = 'at'
+
 export function AnswerView({ m }: { m: ResultsModel }) {
   const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, runsProfile, runsAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, confidenceRange, setTour, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, sentenceBefore, sentenceAfter, pct, money } = m
   // Three ways of comparing, one on screen at a time: departure ages (the chips, the cards, the chart), each person's own earliest age (a couple) and the saved plans (when there are some).
@@ -50,9 +54,18 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   // library is not loaded on every visit (an uncontrolled one rendered the chart hidden, and chart-structure.spec found it first on the page).
   const [datesFold, setDatesFold] = useParamChoice('dates', ['0', '1'] as const, '0')
   const cardsOpen: AccordionOpen = cartes === 'all' ? 'all' : cartes === 'none' ? null : cartes
+  // A fold's state does not outlive the card that holds it: « Tout fermer » shuts the answer's card, which unmounts « Rentes et dépenses » before its own toggle can
+  // report (a slow phone), and `?dates=1` would stay in the address — reopening the card then reopened the chart nobody asked for.
+  const verdictOpen = cartes === 'all' || cartes === 'verdict'
+  useEffect(() => {
+    if (!verdictOpen && datesFold === '1') setDatesFold('0')
+  }, [verdictOpen, datesFold, setDatesFold])
   const cc = CARDS_COPY[lang]
   // A ring around the big age when it MOVES (not on arrival): sage if earlier, accent if later. The age itself arrives digit by digit (Cascade).
   const pulse = useChangePulse(headline.age ?? null)
+  useEffect(() => {
+    if (!answerPending && !retiredNow) lastShape = headline.kind === 'none' ? 'none' : 'at'
+  }, [answerPending, retiredNow, headline.kind])
   // While figures are estimates, the computed range replaces the plain count — only on a real answer (never retired, never « none »); the big age stays the base.
   // When each pension starts, for the chart's moments (from the settled profile, like the runs it sits beside).
   const ledger = useMemo(() => agesLedger(slow.household, slowAssumptions), [slow, slowAssumptions])
@@ -169,7 +182,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
               </>
             )}
             {/* What the age can fund each month arrives a beat after the answer (its own search): its lines wait in its place, so nothing under it moves. */}
-            {(answerPending ? !retiredNow : headline.age !== null && !retiredNow) && (
+            {(answerPending ? !retiredNow && lastShape !== 'none' : headline.age !== null && !retiredNow) && (
               <p className="verdict__note">
                 {answerPending || comfort === undefined ? (
                   <SkeletonLines widths={[95, 90, 55]} />
@@ -332,44 +345,66 @@ function AnswerSpreadLine({ age, m }: { age: number; m: ResultsModel }) {
 function VerdictSkeleton({ m }: { m: ResultsModel }) {
   const { rc, lang, isCouple, names, assumptions, activePreset, t, profile, retiredNow, money, pct, year, births } = m
   const g = CARDS_COPY[lang].glance
-  const [lead, tail] = rc.headline.at(AGE_TOKEN, isCouple).split(AGE_TOKEN)
+  // a household that has stopped working is told it is retired, and whether the money lasts: no age, no glance, no dates
+  const none = !retiredNow && lastShape === 'none'
+  const [lead, tail] = (retiredNow ? rc.headline.retired(isCouple) : none ? rc.headline.none(MAX_AGE) : rc.headline.at(AGE_TOKEN, isCouple)).split(AGE_TOKEN)
   const age = profile.household.persons[0]?.retirementAge ?? 60
+  const holds = `${rc.headline.holds(assumptions.horizonAge)} ${activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}`
   const stop = rc.questions.stop
   const later = (n: number) => formatYearAge(year + n, births, lang)
   return (
     // `skeleton--verdict`: the mark of the answer still being worked out (e2e/results-on-screen.spec.ts waits on it); the placeholder's own parts carry no class a
     // reader of the answer looks for (the age is `skeleton__age`, not `verdict__age`), so nothing takes the ghost for the answer
-    <div className="skeleton--verdict">
+    <div className="skeleton--verdict" data-placeholder="">
       <SkeletonStatus />
-      <p className="verdict__line">
-        <span className="verdict__lead">
+      {tail === undefined ? (
+        <p className="skeleton-as-verdict__line">
           <SkeletonText>{lead}</SkeletonText>
-        </span>
-        <span className="verdict__big">
-          <strong className="skeleton__age">
-            <SkeletonText>{rc.headline.ageText(age)}</SkeletonText>
-          </strong>
-          <SkeletonText>{tail}</SkeletonText>
-        </span>
-      </p>
-      {!retiredNow && (
+        </p>
+      ) : (
+        <p className="skeleton-as-verdict__line">
+          <span className="verdict__lead">
+            <SkeletonText>{lead}</SkeletonText>
+          </span>
+          <span className="verdict__big">
+            <strong className="skeleton__age">
+              <SkeletonText>{rc.headline.ageText(age)}</SkeletonText>
+            </strong>
+            <SkeletonText>{tail}</SkeletonText>
+          </span>
+        </p>
+      )}
+      {retiredNow && (
+        <p className="verdict__note">
+          <SkeletonText>{holds}</SkeletonText>
+        </p>
+      )}
+      {none && (
         <>
-          <ul className="glance" aria-hidden="true">
-            <li className="glance__tile">
+          <p className="verdict__note">
+            <SkeletonText>{rc.headline.tryThis}</SkeletonText>
+          </p>
+          <SkeletonChips labels={[rc.headline.trySpend, rc.headline.toAssumptions, rc.headline.tryLedger]} />
+        </>
+      )}
+      {!retiredNow && !none && (
+        <>
+          <ul className="skeleton-as-glance" aria-hidden="true">
+            <li className="skeleton-as-glance__tile">
               <span className="glance__name">{g.start}</span>
               <strong className="glance__value">
                 <SkeletonText>{rc.headline.ageText(age)}</SkeletonText>
               </strong>
             </li>
-            <li className="glance__tile">
+            <li className="skeleton-as-glance__tile">
               <span className="glance__name">{g.lasts}</span>
               <strong className="glance__value">
                 <SkeletonText>{g.holdsTo(assumptions.horizonAge)}</SkeletonText>
               </strong>
             </li>
-            <li className="glance__tile">
+            <li className="skeleton-as-glance__tile">
               <span className="glance__name">{g.margin}</span>
-              <strong className="glance__value mono">
+              <strong className="glance__value skeleton-as-mono">
                 <SkeletonText>{'+' + money(300)}</SkeletonText>
               </strong>
               <span className="glance__sub">
@@ -378,7 +413,7 @@ function VerdictSkeleton({ m }: { m: ResultsModel }) {
             </li>
           </ul>
           <p className="verdict__note">
-            <SkeletonText>{`${rc.headline.holds(assumptions.horizonAge)} ${activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}`}</SkeletonText>
+            <SkeletonText>{holds}</SkeletonText>
           </p>
           <div className="verdict__dates" aria-hidden="true">
             <p className="verdict__range-title">{stop.title}</p>

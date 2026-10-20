@@ -439,7 +439,8 @@ html.scroll-locked #root {
 }
 /* The code face is for FIGURES and IDENTIFIERS (an amount that must hold its width, a parameter id) — never for a
    sentence. Prose in this face was the review's first visual complaint. */
-.mono {
+.mono,
+.skeleton-as-mono {
   font-family: var(--mono);
   font-size: 0.9rem;
   letter-spacing: 0.01em;
@@ -479,7 +480,8 @@ button {
     --gutter: 16px;
   }
 }
-.btn {
+.btn,
+.skeleton-as-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -503,57 +505,67 @@ button {
     box-shadow var(--dur-fast) ease,
     background var(--dur-fast) ease;
 }
-.btn:hover {
+.btn:hover,
+.skeleton-as-btn:hover {
   background: var(--paper);
 }
-.btn:active {
+.btn:active,
+.skeleton-as-btn:active {
   transform: translate(1px, 1px);
   box-shadow: var(--shadow-press);
 }
-.btn:disabled {
+.btn:disabled,
+.skeleton-as-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 /* On the dark ground a 0.45-opacity marigold still reads as a rich, tappable
    amber — desaturate + dim it further so a disabled primary (empty login/signup)
    clearly reads inert at night, matching the muted look it has in day. */
-:root[data-theme='night'] .btn:disabled {
+:root[data-theme='night'] .btn:disabled,
+:root[data-theme='night'] .skeleton-as-btn:disabled {
   opacity: 0.4;
   filter: grayscale(0.55);
 }
-.btn--primary {
+.btn--primary,
+.skeleton-as-btn--primary {
   background: var(--accent);
   color: var(--accent-ink);
   border-color: var(--accent);
   box-shadow: var(--shadow-md);
 }
-.btn--primary:hover {
+.btn--primary:hover,
+.skeleton-as-btn--primary:hover {
   background: var(--accent);
   filter: brightness(0.96);
 }
 /* Icon-only square button — a compact, symbol-only action with no text label.
    Always pair with aria-label + title (the symbol is the only cue). Keeps the
    44px thumb target and never stretches. */
-.btn--icon {
+.btn--icon,
+.skeleton-as-btn--icon {
   width: 44px;
   min-width: var(--touch-target);
   padding: 0;
   gap: 0;
   flex: 0 0 auto;
 }
-.btn--ghost {
+.btn--ghost,
+.skeleton-as-btn--ghost {
   border-color: var(--line);
   background: transparent;
   padding: 0.4rem 0.7rem;
 }
-.btn--ghost.is-active {
+.btn--ghost.is-active,
+.skeleton-as-btn--ghost.is-active {
   border-color: var(--accent);
   color: var(--accent);
 }
 /* A de-emphasised, compact button for secondary on-page actions (e.g. Liste's
    "Vider") — visually small and auto-width so it never competes with the content,
    while keeping a comfortable tap target. */
-.btn--sm {
+.btn--sm,
+.skeleton-as-btn--sm {
   min-height: 44px;
   padding: 0.3rem 0.8rem;
   font-size: var(--text-sm);
@@ -927,7 +939,8 @@ textarea.input {
 .subtabs__opt:focus-visible,
 /* .chip's shared ring lives HERE (affordance audit 2026-07-14: chips are primary
    nav yet had no focus cue). */
-.chip:focus-visible {
+.chip:focus-visible,
+.skeleton-as-btn:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }

@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, type ReactNode } from 'react'
 import { Accordion, AccordionItem, type AccordionOpen } from '../../Accordion'
 import { BracketFillPanel } from '../BracketFillPanel'
 import { BridgePanel } from '../BridgePanel'
@@ -31,6 +31,8 @@ import type { LeverId } from '../../../engine/levers'
 
 type LeverRow = { id: LeverId; earliest: number | null; yearsGained: number | null; endGain: number | null }
 const LEVER_PLACEHOLDERS: LeverRow[] = (['spend10', 'save500', 'returns1', 'pensions70'] as const).map((id) => ({ id, earliest: null, yearsGained: null, endGain: null }))
+/** The order the last ranking came out in, in this tab: the next wait for it (the page left and come back to) waits in that order. In memory only. */
+let lastLeverOrder: readonly LeverId[] | null = null
 
 /** The four what-ifs under « Essayer un changement »: the card's id (the address of its anchor), the `?essai=` key it answers to and the pip it wears. */
 const WHAT_IF = {
@@ -72,7 +74,13 @@ export function DecideView({ m }: { m: ResultsModel }) {
   const fontePruned = fill.value !== null && !fonteRelevant(fill.value)
   const ordrePruned = orders.value !== null && !orderRelevant(orders.value)
   const equilibrePruned = isCouple && balance.value !== null && !balanceRelevant(balance.value.balance)
-  const rows: LeverRow[] = levers?.levers ?? LEVER_PLACEHOLDERS
+  // The rows are keyed by their PLACE, not their change: when the ranking lands, each row's content changes where it stands and nothing moves (a ranked list keyed by
+  // change jumped its rows past each other, 141 px, on arrival). While it runs the names wait as ghosts, so no order is shown that is not the ranking's.
+  const rows: LeverRow[] =
+    levers?.levers ?? (lastLeverOrder === null ? LEVER_PLACEHOLDERS : lastLeverOrder.map((id) => LEVER_PLACEHOLDERS.find((p) => p.id === id) ?? LEVER_PLACEHOLDERS[0]))
+  useEffect(() => {
+    if (levers !== undefined) lastLeverOrder = levers.levers.map((l) => l.id)
+  }, [levers])
   // The top lever always stays out; the ones that move neither the age nor the nest go under one fold at the end of the list.
   const quiet = levers === undefined ? [] : rows.filter((l, i) => i > 0 && leverPruned(l))
   // The strategies this household has (no pensions block once every start is behind it, no balance for one person), one open at a time: the address's, else the first.
@@ -81,10 +89,12 @@ export function DecideView({ m }: { m: ResultsModel }) {
   // The what-ifs this household has, and which are open: every one under « Tout ouvrir » (`?essai=all`), else the address's.
   const whatIfIds = (Object.keys(WHAT_IF) as WhatIf[]).filter((id) => !retiredNow || id === 'epargner' || id === 'soins')
   const whatIfOpen: AccordionOpen = essaiAll ? 'all' : essai === null ? null : (whatIfIds.find((id) => WHAT_IF[id].essai === essai) ?? null)
-  const leverRow = (l: LeverRow) => (
-    <li key={l.id} className="levers__item">
+  const leverRow = (l: LeverRow, place: number) => (
+    <li key={place} className={levers === undefined ? 'skeleton-as-levers__item' : 'levers__item'}>
       {/* The name is the door: a ranked change nobody can act on is a rumour. Two open their what-if just below; the other two live where they are set. */}
-      {l.id === 'spend10' ? (
+      {levers === undefined ? (
+        <SkeletonChips labels={[lc.names[l.id]]} />
+      ) : l.id === 'spend10' ? (
         <Chip onClick={() => m.goTo('decide', 'depenser')}>{lc.names[l.id]}</Chip>
       ) : l.id === 'save500' ? (
         <Chip onClick={() => m.goTo('decide', 'epargner')}>{lc.names[l.id]}</Chip>
@@ -93,7 +103,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
       ) : (
         <Chip onClick={() => m.goTo('decide', 'rentes')}>{lc.names[l.id]}</Chip>
       )}
-      <span className="mono levers__result">
+      <span className={(levers === undefined ? 'skeleton-as-mono' : 'mono') + ' levers__result'}>
         {/* While the levers are worked out, the result waits as its two lines (the years gained, what is left at the end), so the card is already its size. */}
         {levers === undefined ? (
           <>
@@ -216,28 +226,28 @@ function CareSkeleton({ m }: { m: ResultsModel }) {
       <SkeletonStatus />
       <SliderSkeleton label={c.amount} />
       <SkeletonChips labels={Object.values(c.refs).map((name) => c.refChip(name, money(60000)))} />
-      <p className="field-row__hint">
+      <p className="skeleton-as-field-row__hint">
         <SkeletonText>{`${c.refNote(2025, money(2100))} ${c.refSource} ${c.hint.slice(0, 60)}`}</SkeletonText>
       </p>
       <SliderSkeleton label={c.fromAge} />
       <SliderSkeleton label={c.years} />
-      <p className="field-row__hint">
+      <p className="skeleton-as-field-row__hint">
         <SkeletonText>{t.common.howToRead}</SkeletonText>
       </p>
-      <p className="answer__note">
+      <p className="skeleton-as-answer__note">
         <SkeletonText>{c.starts(c.age(85))}</SkeletonText>
       </p>
-      <p className="answer__note">
+      <p className="skeleton-as-answer__note">
         <SkeletonText>{c.total(money(240000), 4)}</SkeletonText>
       </p>
-      <p className="answer__big">
+      <p className="skeleton-as-answer__big">
         <SkeletonText>{c.same(age)}</SkeletonText>
       </p>
-      <p className="answer__note">
+      <p className="skeleton-as-answer__note">
         <SkeletonText>{c.holds(age)}</SkeletonText>
       </p>
       <SkeletonChips labels={[c.keep]} />
-      <p className="answer__note">
+      <p className="skeleton-as-answer__note">
         <SkeletonText>{c.caveat}</SkeletonText>
       </p>
     </div>

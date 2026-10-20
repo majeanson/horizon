@@ -86,7 +86,8 @@ const BUDGETS: Record<string, Budget> = {
   // 406 → 410 controls, 2058 → 2048 words (2026-10-20, Marc: « lots of different types of components in one page »): every block wears ONE card head. « Rendre mon profil
   // exact » is a block like the others (its head is a button, its foot a « Précédent », and Budget's foot gains the « Suivant » to it: +3); « Ma situation » is a card that
   // says its answers closed, where « REER » and « CELI » are glossary terms (+2); the boxed meter line above the form is gone — each head and map chip says its count (−1).
-  'Profil (form)': { controls: 410, words: 2048 },
+  // 410 → 411 controls, 2048 → 2050 words (2026-10-20): « Ma situation » has its chip on the map like every other block (it was the one block a reader could only reach by « Suivant »).
+  'Profil (form)': { controls: 411, words: 2050 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,

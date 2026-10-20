@@ -42,9 +42,9 @@ export function DripQuestion({ impact, facts }: { impact: FactImpactAnswer | und
           <SkeletonLines widths={[95, 90, 45]} />
         </p>
         <div className="install-card__actions" aria-hidden="true">
-          <span className="btn btn--primary btn--sm skeleton__ghost">{c.go}</span>
-          <span className="btn btn--ghost btn--sm skeleton__ghost">{c.all}</span>
-          <span className="btn btn--ghost btn--sm skeleton__ghost">{c.later}</span>
+          <span className="skeleton-as-btn skeleton-as-btn--primary skeleton-as-btn--sm skeleton__ghost" data-placeholder="">{c.go}</span>
+          <span className="skeleton-as-btn skeleton-as-btn--ghost skeleton-as-btn--sm skeleton__ghost" data-placeholder="">{c.all}</span>
+          <span className="skeleton-as-btn skeleton-as-btn--ghost skeleton-as-btn--sm skeleton__ghost" data-placeholder="">{c.later}</span>
         </div>
       </section>
     )

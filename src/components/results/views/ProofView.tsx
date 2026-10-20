@@ -82,10 +82,10 @@ function AccuracyGhost({ lang }: { lang: Lang }) {
   return (
     <div className="surface accuracy">
       <SkeletonStatus />
-      <p className="field-row__hint">
+      <p className="skeleton-as-field-row__hint">
         <SkeletonText>{c.intro}</SkeletonText>
       </p>
-      <p className="field-row__hint">
+      <p className="skeleton-as-field-row__hint">
         <SkeletonText>{c.range('10 %')}</SkeletonText>
       </p>
       {[

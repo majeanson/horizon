@@ -11,7 +11,7 @@ import { SkeletonLines, SkeletonStatus } from './Skeleton'
 export function SkeletonFill() {
   const t = useT()
   return (
-    <div className="skeleton__fill">
+    <div className="skeleton__fill" data-placeholder="">
       <p className="sr-only" role="status">
         {t.common.loading}
       </p>
@@ -23,24 +23,24 @@ export function SkeletonFill() {
 /** A lazily-loaded `Slider` while its chunk arrives, in the slider's own classes: its real label, a value line, the two step buttons as ghosts, the track and its ends. */
 export function SliderSkeleton({ label }: { label: string }) {
   return (
-    <div className="slider">
+    <div className="slider" data-placeholder="">
       <SkeletonStatus />
       <div className="slider__head" aria-hidden="true">
-        <span className="field-row__label">{label}</span>
-        <span className="slider__value mono skeleton__value">
+        <span className="skeleton-as-field-row__label">{label}</span>
+        <span className="skeleton-as-slider__value skeleton-as-mono skeleton__value">
           <SkeletonLines widths={[100]} />
         </span>
       </div>
       <div className="slider__row" aria-hidden="true">
-        <span className="btn btn--icon btn--ghost slider__step skeleton__ghost">−</span>
+        <span className="skeleton-as-btn skeleton-as-btn--icon skeleton-as-btn--ghost slider__step skeleton__ghost">−</span>
         <div className="slider__track">
           <div className="skeleton__track">
             <span className="skeleton__block" />
           </div>
         </div>
-        <span className="btn btn--icon btn--ghost slider__step skeleton__ghost">+</span>
+        <span className="skeleton-as-btn skeleton-as-btn--icon skeleton-as-btn--ghost slider__step skeleton__ghost">+</span>
       </div>
-      <div className="slider__ends mono" aria-hidden="true">
+      <div className="slider__ends skeleton-as-mono" aria-hidden="true">
         <SkeletonLines widths={[100]} />
       </div>
     </div>
@@ -53,13 +53,13 @@ export function SliderSkeleton({ label }: { label: string }) {
 export function SkeletonText({ children }: { children: string }) {
   // The words are NOT text of the page: CSS draws them from `data-ghost` (::before), so no search, no screen reader and no test reads a placeholder for the
   // answer (one did: « Vous pouvez prendre votre retraite » was found in the ghost and its age read before there was one).
-  return <span className="skeleton__text" aria-hidden="true" data-ghost={children.replace(/\d/g, 'o')} />
+  return <span className="skeleton__text" data-placeholder="" aria-hidden="true" data-ghost={children.replace(/\d/g, 'o')} />
 }
 
 /** A row of doors (chips) waiting, each a ghost of its real label in a chip's own size and the row's own wrapping: the row is as tall as it will be. */
 export function SkeletonChips({ labels }: { labels: readonly string[] }) {
   return (
-    <Cluster className="skeleton__chip-row" aria-hidden="true">
+    <Cluster className="skeleton__chip-row" data-placeholder="" aria-hidden="true">
       {labels.map((l) => (
         <span key={l} className="skeleton__chip" data-ghost={l} />
       ))}
@@ -77,7 +77,7 @@ export function SkeletonGhost({ children }: { children: ReactNode }) {
     for (let n = walk.nextNode(); n !== null; n = walk.nextNode()) if (/\d/.test(n.nodeValue ?? '')) n.nodeValue = n.nodeValue!.replace(/\d/g, 'o')
   })
   return (
-    <div ref={box} className="skeleton__ghost-tree" inert aria-hidden="true">
+    <div ref={box} className="skeleton__ghost-tree" data-placeholder="" inert aria-hidden="true">
       {children}
     </div>
   )

@@ -237,7 +237,8 @@
   }
 }
 
-.page-body {
+.page-body,
+.skeleton-as-page-body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -329,7 +330,8 @@
   gap: 0.3rem;
   min-width: 0;
 }
-.field-row__label {
+.field-row__label,
+.skeleton-as-field-row__label {
   font-size: var(--text-sm);
   font-weight: 600;
 }
@@ -345,7 +347,8 @@
   gap: 0.3rem;
   min-width: 0;
 }
-.field-row__hint {
+.field-row__hint,
+.skeleton-as-field-row__hint {
   margin: 0;
   font-size: var(--text-xs);
   color: var(--ink-soft);
@@ -426,7 +429,8 @@
   display: grid;
   gap: 0.4rem;
 }
-.levers__item {
+.levers__item,
+.skeleton-as-levers__item {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -639,7 +643,8 @@
 .verdict {
   padding: 1rem 1.2rem;
 }
-.verdict__line {
+.verdict__line,
+.skeleton-as-verdict__line {
   margin: 0;
   font-family: var(--display);
   font-weight: 800;
@@ -820,7 +825,8 @@
    jittered while dragging), the chart tooltip's rows. */
 .bridge-card__facts,
 .slider__value,
-.chart-tip {
+.chart-tip,
+.skeleton-as-slider__value {
   font-variant-numeric: tabular-nums;
 }
 .table-wrap th,
@@ -1054,7 +1060,8 @@
   gap: 0.5rem;
   padding: 1rem 1.1rem;
 }
-.answer__big {
+.answer__big,
+.skeleton-as-answer__big {
   margin: 0;
   font-family: var(--display);
   font-size: clamp(1.25rem, 4.5vw, var(--text-xl));
@@ -1064,7 +1071,8 @@
 .answer__big--short {
   color: var(--warn);
 }
-.answer__note {
+.answer__note,
+.skeleton-as-answer__note {
   margin: 0;
   font-size: var(--text-sm);
   color: var(--ink-soft);
@@ -1248,7 +1256,8 @@
   justify-content: space-between;
   gap: 0.75rem;
 }
-.slider__value {
+.slider__value,
+.skeleton-as-slider__value {
   font-weight: 600;
 }
 /* The ⓘ sits against the label; the value stays at the far end. */
@@ -1524,10 +1533,12 @@
   column-gap: 0.75rem;
 }
 .welcome__reading .field-row__label,
-.welcome__reading .subtabs-row {
+.welcome__reading .subtabs-row,
+.welcome__reading .skeleton-as-field-row__label {
   margin: 0;
 }
-.welcome__reading .field-row__hint {
+.welcome__reading .field-row__hint,
+.welcome__reading .skeleton-as-field-row__hint {
   margin: 0;
   font-size: var(--text-sm, 0.875rem);
 }
@@ -1546,7 +1557,8 @@
     flex: 0 1 auto;
     display: block;
   }
-  .welcome__reading > .field-row:nth-of-type(-n + 2) .field-row__label {
+  .welcome__reading > .field-row:nth-of-type(-n + 2) .field-row__label,
+.welcome__reading > .field-row:nth-of-type(-n + 2) .skeleton-as-field-row__label {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -1557,7 +1569,8 @@
 }
 /* The zoom tip is the one line a very narrow phone does without: the size row above it already says how to read bigger. */
 @media (max-width: 399px) {
-  .welcome__reading .field-row__hint {
+  .welcome__reading .field-row__hint,
+.welcome__reading .skeleton-as-field-row__hint {
     display: none;
   }
 }
@@ -1589,7 +1602,8 @@
     display: grid;
     width: 100%;
   }
-  .welcome__hero .welcome__go .btn {
+  .welcome__hero .welcome__go .btn,
+.welcome__hero .welcome__go .skeleton-as-btn {
     justify-content: center;
   }
 }
@@ -1759,7 +1773,8 @@
 }
 
 /* « En un coup d’œil » under the sentence of the answer: three quiet tiles (components/results/AnswerGlance.tsx). Wraps on a phone; never a wide row. */
-.glance {
+.glance,
+.skeleton-as-glance {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2, 0.5rem);
@@ -1768,18 +1783,22 @@
   list-style: none;
 }
 /* Two and one on a phone (the margin tile has the longest line), three across from a tablet up. */
-.glance__tile:last-child {
+.glance__tile:last-child,
+.skeleton-as-glance__tile:last-child {
   grid-column: 1 / -1;
 }
 @media (min-width: 40rem) {
-  .glance {
+  .glance,
+.skeleton-as-glance {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .glance__tile:last-child {
+  .glance__tile:last-child,
+.skeleton-as-glance__tile:last-child {
     grid-column: auto;
   }
 }
-.glance__tile {
+.glance__tile,
+.skeleton-as-glance__tile {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;

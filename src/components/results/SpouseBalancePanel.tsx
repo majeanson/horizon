@@ -6,7 +6,8 @@ import { spouseBalanceNudge } from '../../lib/spouseBalanceNudge'
 import type { SpouseBalanceAnswer } from '../../lib/spouseBalance.worker'
 import type { Answer } from '../../lib/useOffThread'
 import { Fold } from '../Fold'
-import { Skeleton } from '../Skeleton'
+import { SkeletonStatus } from '../Skeleton'
+import { SkeletonGhost } from '../SkeletonShapes'
 
 // « Even out the spouses' RRSPs? » — the household's plan as it is, and again with part of the larger RRSP held in the other spouse's
 // (engine/spouseBalance.ts), two rows: each person's balance, the earliest age that works, the tax over the whole plan. Read-only: moving
@@ -20,7 +21,16 @@ export function SpouseBalancePanel({ household, age, names, balance }: { househo
   const { lang } = useLang()
   const c = SPOUSE_BALANCE_COPY[lang]
   const { value, busy } = balance
-  if (value === null) return <Skeleton count={3} />
+  // Opened before the comparison is in: the panel waits as a ghost of itself with stand-in figures (as OrderPanel does), at the height it will have.
+  if (value === null)
+    return (
+      <>
+        <SkeletonStatus />
+        <SkeletonGhost>
+          <SpouseBalancePanel household={household} age={age} names={names} balance={{ value: ghostBalance(household, age), busy: false }} />
+        </SkeletonGhost>
+      </>
+    )
   const r = value.balance
   const money = (n: number) => formatMoney(n, lang)
   const note =
@@ -76,4 +86,11 @@ export function SpouseBalancePanel({ household, age, names, balance }: { househo
       <p className="answer__note">{c.caveat}</p>
     </div>
   )
+}
+
+/** A stand-in comparison for this couple: the ghost needs the panel's shape, never its answer. */
+function ghostBalance(household: Household, age: number): SpouseBalanceAnswer {
+  const [a, b] = household.persons
+  const outcome = { rrsp: household.persons.map(() => 200000), earliestOk: age, lifetimeTax: 400000 }
+  return { balance: { age, share: 0.7, from: a.id, to: (b ?? a).id, moved: 50000, current: outcome, balanced: outcome, taxSaved: 20000, yearsEarlier: 0 } }
 }

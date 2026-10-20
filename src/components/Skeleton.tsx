@@ -41,6 +41,7 @@ export function Skeleton({
         {t.common.loading}
       </p>
       <div
+        data-placeholder=""
         className={`skeleton skeleton--${variant}` + (className ? ` ${className}` : '')}
         aria-hidden="true"
       >
@@ -63,7 +64,7 @@ export function SkeletonLines({ widths }: { widths: readonly number[] }) {
   return (
     <>
       {widths.map((w, i) => (
-        <span key={i} className="skeleton__line" aria-hidden="true" style={{ '--w': `${w}%` } as CSSProperties}>
+        <span key={i} className="skeleton__line" data-placeholder="" aria-hidden="true" style={{ '--w': `${w}%` } as CSSProperties}>
           <span className="skeleton__block" />
         </span>
       ))}
@@ -86,7 +87,7 @@ export function SkeletonStatus() {
 export function PageSkeleton({ head = true }: { head?: boolean }) {
   return (
     // a whole page sits in the page's own frame (its gutters and rhythm); a part of a page is already in it
-    <div className={'skeleton--screen' + (head ? ' page-body' : '')}>
+    <div className={'skeleton--screen' + (head ? ' skeleton-as-page-body' : '')} data-placeholder="">
       <SkeletonStatus />
       {head && (
         // the head's own TYPE under classes of its own: a page's real head is what a reader (and a test) waits for, and a placeholder never passes for it

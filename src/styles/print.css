@@ -229,7 +229,8 @@
     font-weight: normal;
     vertical-align: baseline;
   }
-  .print-figures td.mono {
+  .print-figures td.mono,
+.print-figures td.skeleton-as-mono {
     /* the body face on paper: the code face printed a size larger than the names beside it */
     font-family: inherit;
     font-size: inherit;
@@ -325,7 +326,8 @@
   .print-sources tr {
     break-inside: avoid;
   }
-  .print-sources td.mono {
+  .print-sources td.mono,
+.print-sources td.skeleton-as-mono {
     overflow-wrap: anywhere;
   }
   .print-sources__url,

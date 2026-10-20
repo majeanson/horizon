@@ -63,7 +63,8 @@ summary {
 [data-standalone] .btn,
 [data-standalone] .chip,
 [data-standalone] .subtabs,
-[data-standalone] .section-nav {
+[data-standalone] .section-nav,
+[data-standalone] .skeleton-as-btn {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
