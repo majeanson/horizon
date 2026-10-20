@@ -45,11 +45,13 @@ function OrderNudgeLine({ m }: { m: ResultsModel }) {
   const t = useT()
   const { lang } = useLang()
   const o = RESULTS_COPY[lang].orders
-  const { profile, assumptions, firstAge, earliest } = m
+  const { profile, assumptions, firstAge, earliest, answered } = m
   const { box, seen } = useSeen()
   // The same age as the table on « Stratégies »: the answer's, or the plan's own when no age works.
   const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
-  const { value } = useWithdrawalOrders(profile.household, assumptions, age, firstAge, seen)
+  // Asked only once the answer is in: before it, `earliest` is null and the age above is the plan's own, so a block scrolled into view early said a figure
+  // for the wrong age, then changed it — and differed from « Dans quel ordre puiser ? » on Décider meanwhile (order-nudge.spec, flaky 2026-10-19).
+  const { value } = useWithdrawalOrders(profile.household, assumptions, age, firstAge, seen && answered)
   const nudge = value === null ? null : orderNudge(value)
   const kinds: Record<AccountKind, string> = { nonReg: t.assumptions.returns.nonReg, rrsp: t.assumptions.returns.rrsp, tfsa: t.assumptions.returns.tfsa }
   return (
