@@ -11,7 +11,7 @@ import { useChangePulse } from '../lib/useChangePulse'
 import { useSettled } from '../lib/useSettled'
 
 // « 60 ans » IN THE TOP BAR — the answer one glance away on every page, where the language and the theme buttons used to be (both live on the
-// settings page and in the reading dialog). The SAME job as the results page (`useAnswer`: the earliest age, in a worker, from a profile that has
+// settings page and on a first visit's front door). The SAME job as the results page (`useAnswer`: the earliest age, in a worker, from a profile that has
 // rested 300 ms) and nothing else; a tap opens Résultats. Silent — absent — until the profile holds enough to mean something, and for a household
 // already retired (its answer is a plan, not an age). It replaced the strip that was pinned under the bar on Profil and Hypothèses: one row of
 // chrome less on a phone, and the age is there on every page, not two.

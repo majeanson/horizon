@@ -594,7 +594,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'Accordion', file: 'src/components/Accordion.tsx', exports: ['Accordion', 'AccordionItem', 'AccordionMode'], kw: 'accordéon un bloc à la fois suivant précédent replier blocs terminés', render: () => <AccordionSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
-    { cat: 'Affichage', name: 'WelcomeDialog', file: 'src/components/WelcomeDialog.tsx', kw: 'commencer temps minutes porte lire confortablement langue taille lettres accueil première visite accessibilité', render: () => <WelcomeDialogSpecimen /> },
+    { cat: 'Affichage', name: 'WelcomeDialog', file: 'src/components/WelcomeDialog.tsx', kw: 'commencer temps minutes porte accueil première visite', render: () => <WelcomeDialogSpecimen /> },
     {
       cat: 'Affichage',
       name: 'BrandMark',

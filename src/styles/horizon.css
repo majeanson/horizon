@@ -1478,6 +1478,58 @@
   font-size: clamp(var(--text-xl), 6.5vw, var(--text-2xl));
   line-height: 1.15;
 }
+/* First, what Horizon is — one sentence beside the mark; then how to read the page, in view, above the question (2026-10-19). */
+.welcome__what {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  max-width: 40rem;
+  font-size: var(--text-md, 1.05rem);
+}
+.welcome__what > svg {
+  flex: none;
+}
+.welcome__reading {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  max-width: 30rem;
+  padding: 0.6rem 0.9rem;
+}
+/* On a phone the four parts of a first visit sit closer, so « Commencer » clears the tab bar on the first screen. */
+@media (max-width: 479px) {
+  .welcome__hero {
+    gap: 0.5rem;
+    padding-top: 0;
+  }
+  .welcome__hero .welcome__promises {
+    gap: 0.25rem;
+  }
+  .welcome__hero .page-head__title {
+    font-size: var(--text-xl);
+  }
+}
+.welcome__reading .welcome__title {
+  margin: 0;
+  font-size: var(--text-md, 1.05rem);
+  font-weight: 600;
+}
+/* Each control on one line with its label (the label wraps first), so the four fit above the question on a phone. */
+.welcome__reading .field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.75rem;
+}
+.welcome__reading .field-row__label,
+.welcome__reading .subtabs-row {
+  margin: 0;
+}
+.welcome__reading .field-row__hint {
+  margin: 0;
+  font-size: var(--text-sm, 0.875rem);
+}
 .welcome__promises {
   list-style: none;
   margin: 0;

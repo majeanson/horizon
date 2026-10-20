@@ -6,6 +6,7 @@ import { Fold } from '../components/Fold'
 import { Icon } from '../components/Icon'
 import { InstallCard } from '../components/install/InstallHint'
 import { DemoAnswer } from '../components/DemoAnswer'
+import { DisplayControls } from '../components/DisplayControls'
 import { DripQuestion } from '../components/DripQuestion'
 import { PageHead } from '../components/PageHead'
 import { WelcomeDialog } from '../components/WelcomeDialog'
@@ -14,6 +15,7 @@ import { answerRequest } from '../lib/answerRequest'
 import { factsOf } from '../lib/facts'
 import { scrollToSection } from '../lib/motion'
 import { profileGaps } from '../lib/profileGaps'
+import { READING_HELP_COPY } from '../lib/readingHelpCopy'
 import { useProfile } from '../lib/store'
 import { setTimeBudget, useTimeBudget } from '../lib/timeBudget'
 import { today } from '../lib/today'
@@ -23,9 +25,11 @@ import { WELCOME_COPY } from '../lib/welcomeCopy'
 
 // « Accueil » — the front door at `/`. It says what Horizon is BEFORE it asks anything: nothing opens by itself.
 //
-// A first visit (no answer yet) meets the hero — the mark, the question, what Horizon does and the two promises it keeps (nothing leaves the
-// device; every government figure is cited) — then an example answer working (components/DemoAnswer.tsx). « Commencer » opens the one dialog
-// (components/WelcomeDialog.tsx): how much time there is, each answer a door into its own path, and how to read the page.
+// A first visit (no answer yet) meets, in this order (Marc, 2026-10-19): what Horizon is, in one sentence beside the mark; how to read the page
+// (the language, day / night, the contrast, the size of the letters — in view, never behind a tap, so nobody walks in without seeing them); then
+// the hero — the question, what Horizon does and the two promises it keeps (nothing leaves the device; every government figure is cited) — and an
+// example answer working (components/DemoAnswer.tsx). « Commencer » opens the one dialog (components/WelcomeDialog.tsx): how much time there is,
+// each answer a door into its own path.
 //
 // A ready profile is asked ONE question (components/DripQuestion.tsx), from an idle search (`useFactImpact`, how far the answer moves if each
 // unconfirmed figure were off) made here, on the settled profile, and offered its answer and its profile. Its answer is in the top bar, like on every
@@ -36,6 +40,7 @@ import { WELCOME_COPY } from '../lib/welcomeCopy'
 export function Accueil() {
   const { lang } = useLang()
   const c = WELCOME_COPY[lang]
+  const rc = READING_HELP_COPY[lang]
   const profile = useProfile()
   const ready = profileGaps(profile).length === 0
   const slow = useSettled(profile)
@@ -54,8 +59,18 @@ export function Accueil() {
         <PageHead title={c.title} subtitle={c.subtitle} />
       ) : (
         <div className="welcome__hero">
-          <BrandMark size={56} />
-          <PageHead title={c.title} subtitle={c.subtitle} />
+          <p className="welcome__what">
+            <BrandMark size={32} />
+            <span>{c.subtitle}</span>
+          </p>
+          <section className="surface welcome__reading" aria-labelledby="welcome-reading">
+            <p id="welcome-reading" className="welcome__title">
+              {rc.title}
+            </p>
+            <DisplayControls sizeLabels={rc.sizes} />
+            <p className="field-row__hint">{rc.zoomTip}</p>
+          </section>
+          <PageHead title={c.title} />
           <ul className="welcome__promises">
             {c.promises.map((p) => (
               <li key={p}>

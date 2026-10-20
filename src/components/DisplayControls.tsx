@@ -5,8 +5,8 @@ import { getContrast, getTextScale, setContrast, setTextScale, TEXT_SCALES, type
 import { getTheme, setTheme, type Theme } from '../lib/theme'
 
 // DisplayControls — the four ways to make the page easier to read: the language, day / night, contrast and text size. The setters write the DOM attribute (the
-// cascade does the rest) and persist to this device; local state only mirrors them so each control shows what is in force. The settings page and the front door's
-// reading dialog share it — the ONLY two places the language and the theme are set, since the top bar gave their buttons' room to the answer (components/BarAnswer.tsx).
+// cascade does the rest) and persist to this device; local state only mirrors them so each control shows what is in force. The settings page and a first visit's
+// front door share it — the ONLY two places the language and the theme are set, since the top bar gave their buttons' room to the answer (components/BarAnswer.tsx).
 // `sizeLabels` lets a surface say the sizes in words (« Grand ») where the settings page says them in percent.
 // A new text size re-flows everything: whatever the reader was looking at moves, usually out of sight. So the page — and the dialog, when this sits in one — goes back
 // to its top, where the reader can start again at the new size.

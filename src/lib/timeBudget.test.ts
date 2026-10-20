@@ -7,7 +7,7 @@ import { TIME_BUDGETS, TIME_BUDGET_KEY, TIME_BUDGET_PATH, getTimeBudget, setTime
 import { TIME_BUDGET_COPY } from './timeBudgetCopy.ts'
 
 // THE FRONT DOOR'S DIALOG (components/WelcomeDialog.tsx): « Combien de temps avez-vous ? » remembered per device, never in the profile, never a crash when
-// the storage is refused, each answer a door to its own path — and the words of its reading part.
+// the storage is refused, each answer a door to its own path — and the words of the front door's reading card.
 
 afterEach(() => {
   vi.restoreAllMocks()

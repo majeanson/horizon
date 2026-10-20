@@ -1,15 +1,17 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, blankSeed, seedProfile } from './seed'
 
-// THE FRONT DOOR (pages/Accueil.tsx): a first visit reads what Horizon is BEFORE anything covers it — the mark, the question, what it does and the
-// two promises it keeps — and nothing opens by itself. « Commencer » opens ONE full-screen dialog (components/WelcomeDialog.tsx): how much time there
-// is, each answer a link into its own path that also keeps the choice, and how to read the page. The settings page keeps the same controls for good.
+// THE FRONT DOOR (pages/Accueil.tsx): a first visit reads, in this order and before anything covers it, what Horizon is in one sentence, how to read
+// the page (the language, day / night, the contrast, the size — in view, no tap), then the hero: the question, what it does and the two promises it
+// keeps. Nothing opens by itself. « Commencer » opens ONE full-screen dialog (components/WelcomeDialog.tsx): how much time there is, each answer a
+// link into its own path that also keeps the choice. The settings page keeps the same reading controls for good.
 // Every spec starts from a device that has seen nothing (the config seeds only the first answer's flourish).
 
 const DIALOG = /^Par où commencer/
 const hero = (page: Page) => page.locator('.welcome__hero')
+const reading = (page: Page) => page.getByRole('region', { name: /^Lire plus confortablement/ })
 
-test('a first visit sees the hero, in view, with nothing over it: the question, what Horizon does, both promises, two buttons', async ({ page }) => {
+test('a first visit sees, in view and with nothing over it: what Horizon is, how to read it, then the question, both promises, two buttons', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, blankSeed())
   await page.goto('/')
@@ -20,9 +22,18 @@ test('a first visit sees the hero, in view, with nothing over it: the question, 
   await expect(hero(page)).toContainText('page officielle')
   // the mark of the brand, and the first button, inside the first screen of a phone
   await expect(hero(page).locator('.brand-mark')).toBeVisible()
+  // in this order: the sentence of what it is, the reading controls, the question
+  const what = (await hero(page).locator('.welcome__what').boundingBox())!
+  const read = (await reading(page).boundingBox())!
+  const h1 = (await page.getByRole('heading', { level: 1 }).boundingBox())!
+  expect(what.y + what.height).toBeLessThanOrEqual(read.y)
+  expect(read.y + read.height).toBeLessThanOrEqual(h1.y)
+  await expect(hero(page).locator('.welcome__what')).toContainText('Horizon calcule')
   const begin = page.getByRole('button', { name: 'Commencer', exact: true })
   const box = (await begin.boundingBox())!
-  expect(box.y + box.height).toBeLessThanOrEqual(844)
+  // the first screen ends where the tab bar begins, not at the window's edge: a button behind the bar is not in view
+  const tabs = (await page.getByRole('navigation', { name: 'Navigation principale' }).boundingBox())!
+  expect(box.y + box.height).toBeLessThanOrEqual(tabs.y)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   // and nothing came back by itself after a reload
   await page.reload()
@@ -38,7 +49,27 @@ test('« Voir un exemple » brings the example answer into view', async ({ page 
   await expect(page.getByRole('region', { name: 'Voyez à quoi ressemble une réponse' })).toBeInViewport()
 })
 
-test('« Commencer » opens one full-screen dialog: the time first, three doors stacked, then the reading controls — each change shows at once', async ({ page }) => {
+test('the reading controls on the front door: the sizes in words, and each choice applies at once', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 })
+  await seedProfile(page, blankSeed())
+  await page.goto('/')
+  const r = reading(page)
+  await r.getByRole('tab', { name: 'Grand', exact: true }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-text-scale', 'large')
+  await r.getByRole('tab', { name: 'Très grand' }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-text-scale', 'x-large')
+  await r.getByRole('tab', { name: 'Renforcé' }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-contrast', 'high')
+  await r.getByRole('tab', { name: 'Nuit' }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
+  // the language switches the page itself
+  await r.getByRole('tab', { name: 'English' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('When can you retire?')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('« Commencer » opens one full-screen dialog: the time, three doors stacked — the reading controls are not repeated in it', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 780 })
   await seedProfile(page, blankSeed())
   await page.goto('/')
@@ -57,20 +88,7 @@ test('« Commencer » opens one full-screen dialog: the time first, three doors 
   const boxes = await Promise.all([0, 1, 2].map(async (i) => (await doors.nth(i).boundingBox())!))
   expect(boxes[1].y).toBeGreaterThanOrEqual(boxes[0].y + boxes[0].height)
   expect(boxes[2].y).toBeGreaterThanOrEqual(boxes[1].y + boxes[1].height)
-  // the reading part: the sizes in words, and each choice applies at once
-  await expect(dialog.getByRole('heading', { name: /Lire plus confortablement/ })).toBeVisible()
-  await dialog.getByRole('tab', { name: 'Grand', exact: true }).click()
-  await expect(page.locator('html')).toHaveAttribute('data-text-scale', 'large')
-  await dialog.getByRole('tab', { name: 'Très grand' }).click()
-  await expect(page.locator('html')).toHaveAttribute('data-text-scale', 'x-large')
-  await dialog.getByRole('tab', { name: 'Renforcé' }).click()
-  await expect(page.locator('html')).toHaveAttribute('data-contrast', 'high')
-  await dialog.getByRole('tab', { name: 'Nuit' }).click()
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
-  // the language switches the dialog itself and the page
-  await dialog.getByRole('tab', { name: 'English' }).click()
-  await expect(page.getByRole('dialog', { name: /^Where to start/ })).toBeVisible()
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await expect(dialog.getByRole('tab')).toHaveCount(0)
 })
 
 test('each door is a link into its own path, and keeps the choice: the Profil tab then opens the same path, the dialog marks it, the settings row shows it', async ({ page }) => {
@@ -146,16 +164,16 @@ test('a household with an answer sees no hero and no « Commencer »: its answer
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })
 
-test('English: the hero, the dialog and its doors speak English', async ({ page }) => {
+test('English: the front door, its reading card, the dialog and its doors speak English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, blankSeed())
   await page.goto('/')
   await expect(hero(page)).toContainText('Everything stays on this device')
+  await expect(page.getByRole('region', { name: 'Easier to read?' })).toBeVisible()
   await page.getByRole('button', { name: 'Get started', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: /^Where to start/ })
   await expect(dialog.getByRole('heading', { name: 'How much time do you have?' })).toBeVisible()
   await expect(dialog.getByRole('link', { name: /^Two minutes/ })).toHaveAttribute('href', '/profil?debut=rapide')
-  await expect(dialog.getByRole('heading', { name: 'Easier to read?' })).toBeVisible()
 })
 
 test.describe('a browser in English', () => {
@@ -165,8 +183,7 @@ test.describe('a browser in English', () => {
     await page.goto('/')
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('When can you retire?')
-    await page.getByRole('button', { name: 'Get started', exact: true }).click()
-    await page.getByRole('dialog').getByRole('tab', { name: 'Français' }).click()
+    await page.getByRole('region', { name: 'Easier to read?' }).getByRole('tab', { name: 'Français' }).click()
     await expect(page.getByRole('heading', { level: 1 })).toContainText('retraite')
     await page.reload()
     await expect(page.locator('html')).toHaveAttribute('lang', 'fr')
@@ -174,7 +191,7 @@ test.describe('a browser in English', () => {
   })
 })
 
-test('the sizes are said in percent on the settings page and in words in the dialog', async ({ page }) => {
+test('the sizes are said in percent on the settings page and in words on the front door', async ({ page }) => {
   await page.goto('/donnees')
   await expect(page.getByRole('tab', { name: '115 %' })).toBeVisible()
   await expect(page.getByRole('tab', { name: 'Grand', exact: true })).toHaveCount(0)
