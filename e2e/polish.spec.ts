@@ -298,7 +298,12 @@ test.describe('the settings and the docked cards', () => {
     await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5, { steps: 8 })
     const row = page.locator('.chart-tip__row').first()
     await expect(row).toBeVisible()
-    const [label, figure] = await Promise.all([row.boundingBox(), row.locator('strong').boundingBox()])
-    expect(figure!.x + figure!.width, 'the figure sits at the row’s right edge').toBeGreaterThan(label!.x + label!.width - 14)
+    // Both boxes read in ONE step, in the page: two separate reads let a re-render of the tooltip between them return null (CI, c85fb4a: « reading 'x' » of null).
+    const gap = await row.evaluate((el) => {
+      const r = el.getBoundingClientRect()
+      const f = el.querySelector('strong')!.getBoundingClientRect()
+      return r.right - f.right
+    })
+    expect(gap, 'the figure sits at the row’s right edge').toBeLessThan(14)
   })
 })
