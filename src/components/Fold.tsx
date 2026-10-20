@@ -31,6 +31,7 @@ export function Fold({
   /** Controlled: the page decides. Leave out for the native, self-keeping disclosure. */
   open?: boolean
   onToggle?: (open: boolean) => void
+  /** Render the body only while open — CONTROLLED folds only (`open` given): an uncontrolled fold always renders it, hidden. */
   mountOnOpen?: boolean
   /** A card, led by this concept's pip. */
   concept?: ConceptId

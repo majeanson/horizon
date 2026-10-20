@@ -43,6 +43,9 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
   // The two cards under the answer, every one open unless the address says otherwise (`?cartes=none` closes them, a card's name keeps just that one open): the same « Tout ouvrir / Tout fermer » as every other page.
   const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'none'], 'all')
+  // « Quand arrêter »'s chart: open or not is in the address (`?dates=1`), like every controlled fold — and only a CONTROLLED fold mounts on open, so the chart
+  // library is not loaded on every visit (an uncontrolled one rendered the chart hidden, and chart-structure.spec found it first on the page).
+  const [datesFold, setDatesFold] = useParamChoice('dates', ['0', '1'] as const, '0')
   const cardsOpen: AccordionOpen = cartes === 'all' ? 'all' : cartes === 'none' ? null : cartes
   const cc = CARDS_COPY[lang]
   // A ring around the big age when it MOVES (not on arrival): sage if earlier, accent if later. The age itself arrives digit by digit (Cascade).
@@ -137,7 +140,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                         <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
                       </ul>
                       {stop.coverage.length > 1 && (
-                        <Fold summary={rc.questions.stop.chartTitle} mountOnOpen>
+                        <Fold summary={rc.questions.stop.chartTitle} open={datesFold === '1'} onToggle={(o) => setDatesFold(o ? '1' : '0')} mountOnOpen>
                           <Suspense fallback={<Skeleton count={3} />}>
                             <StopChart coverage={stop.coverage} dollars={dollars} todayYear={year} inflation={assumptions.inflation} births={births} />
                           </Suspense>

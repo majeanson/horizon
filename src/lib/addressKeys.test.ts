@@ -37,6 +37,7 @@ const KEYS: Record<string, string> = {
   bp: 'Résultats › Décider: the person looked at. Unknown is the first person.',
   bb: 'Résultats › Décider: « pour les deux » (the other person starts at the same ages). Only « 1 » counts.',
   bf: 'Résultats › Décider › Fonte du REER: the way on screen (none · bracket1 · oas). Unknown is the first bracket.',
+  dates: 'Résultats › Réponse › En dates: « 1 » opens « Rentes et dépenses, année par année » (a fold whose chart loads only while open). Anything else is closed.',
   marches: 'Résultats › Preuve › Solidité: « 1 » opens « Les marchés, année par année » (a fold whose projections run only while open). Anything else is closed.',
   cout: 'Résultats › Preuve › Année par année: « 1 » opens « Le coût d’un dollar de plus, par âge » (a fold). Anything else is closed.',
   qui: 'Résultats › Décider › Rentes: « 1 » opens « Qui commence en premier » (a couple’s fold; nine combinations run only while open). Anything else, or one person, is closed.',

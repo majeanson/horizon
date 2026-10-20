@@ -82,7 +82,10 @@ test('« Quand arrêter » draws the same story: a closed fold under the dates o
   await expect(stop).toContainText('En dates', { timeout: 60_000 })
   // closed on arrival: the chart costs nothing until asked for
   await expect(stop.getByRole('img', { name: /Vos rentes après impôt et vos dépenses, chaque année de 20\d\d à 20\d\d/ })).toHaveCount(0)
+  // closed, it is not even mounted: the chart library is not loaded for a visit that never opens it
+  await expect(page.locator('figure.chart[aria-label^="Vos rentes après impôt"]')).toHaveCount(0)
   await stop.getByText('Rentes et dépenses, année par année').click()
+  await expect(page).toHaveURL(/dates=1/)
   const chart = stop.getByRole('img', { name: /Vos rentes après impôt et vos dépenses, chaque année de 20\d\d à 20\d\d/ })
   await expect(chart).toBeVisible({ timeout: 30_000 })
   await expect(chart).toContainText('Rentes après impôt')
