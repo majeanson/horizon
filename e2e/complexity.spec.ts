@@ -120,7 +120,9 @@ const BUDGETS: Record<string, Budget> = {
   // 46 → 54 controls, 586 → 670 words (2026-10-19): Résultats is the answer AND its proof now — Preuve's heading and sentence under the answer's cards, its five blocks
   // closed (each a title and its one line: +5), « Preuve » in the map (+1), the fourth tab (+1); the three-view switch is gone (−3). Preuve alone was 30 / 213: the two
   // pages that were three views fell from 46 + 52 + 30 controls to 54 + 50.
-  'Résultats — Réponse': { controls: 54, words: 670 },
+  // 54 → 55 controls, 670 → 677 words (2026-10-20, Marc chose it): « Quand arrêter » has its chart — ONE closed fold under « En dates » (« Rentes et dépenses,
+  // année par année »), the chart mounting only once opened.
+  'Résultats — Réponse': { controls: 55, words: 677 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
