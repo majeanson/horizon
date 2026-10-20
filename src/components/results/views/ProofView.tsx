@@ -5,6 +5,7 @@ import { LedgerPanel } from '../LedgerPanel'
 import { MarginalWeather } from '../MarginalWeather'
 import { ParamsPanel } from '../ParamsPanel'
 import { YearTables } from '../YearTables'
+import { SectionHeader } from '../../SectionHeader'
 import { Skeleton } from '../../Skeleton'
 import { LEDGER_COPY } from '../../../lib/ledgerCopy'
 import { ACCURACY_COPY } from '../../../lib/accuracyCopy'
@@ -16,20 +17,22 @@ import { PROOF_BLOCKS, type ResultsModel } from '../../../lib/useResultsPage'
 const MarketFan = lazy(() => import('../MarketFan').then((m) => ({ default: m.MarketFan })))
 const AccuracyNote = lazy(() => import('../AccuracyNote').then((m) => ({ default: m.AccuracyNote })))
 
-// The « proof » view of the results page (« Preuve ») — how far to trust the answer, and everything behind it, in the order a doubting reader asks: how firm is it · which figures set it (and the
+// The proof of the answer (« Preuve »), on Résultats right under the answer's cards and in the same map — how far to trust the answer, and everything behind it, in the order a doubting reader asks: how firm is it · which figures set it (and the
 // calculation of each) · the year-by-year table · what the calculation was checked against and what it simplifies · the official figures it reads. Read-only: a figure is changed on Profil or
 // Hypothèses, and the ledger links there. It reads the page's state through the one model object (lib/useResultsPage.ts).
-// Five blocks, read ONE AT A TIME (components/Accordion.tsx): the address keeps which (`?bloc=`, « tout » opens them all), and a link to one — the answer's « Voir la sensibilité », the
+// Five blocks, read ONE AT A TIME and all CLOSED on arrival, each saying what it holds (components/Accordion.tsx): the address keeps which (`?bloc=`, « tout » opens them all), and a link to one — the answer's « Voir la sensibilité », the
 // accuracy note's « Voir les chiffres officiels » — opens it before landing on it.
 export function ProofView({ m }: { m: ResultsModel }) {
   const { lang, r, rc, profile, year, dollars, assumptions, births, runs, runsPending, scrollTo, names, label } = m
   const cc = CARDS_COPY[lang].closed
-  const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'solidite')
+  const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'none')
   const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
   const setOpen = (next: AccordionOpen) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))
   return (
     <>
-      <section className="arc" aria-label={rc.tabs.proof}>
+      <section id="preuve" className="arc results-section" aria-label={rc.tabs.proof}>
+        {/* Where the proof begins, said on the page like Décider's two steps: the map's « Preuve » label leads here. */}
+        <SectionHeader title={rc.tabs.proof} subtitle={rc.proofHint} concept="preuve" />
         <Accordion ids={PROOF_BLOCKS} open={open} onOpen={setOpen}>
           {/* How firm the answer is — the three scenarios and a hard market in brief, the grids of what moves it one tap under. */}
           <AccordionItem id="solidite" title={rc.headline.firmTitle} summary={cc.solidite} concept="solidite" className="results-section firm">

@@ -88,35 +88,37 @@ test('a finished block folds to its title and its count in the all-open shape, a
   await expect(page.locator('#trois')).not.toContainText('4 chiffres confirmés')
 })
 
-test('Décider: the first strategy is open and the rest are closed; a door from the answer opens the one it names; Preuve likewise from its address', async ({ page }) => {
+test('Décider: the first strategy is open and the rest are closed; a door from the answer opens the one it names; the proof likewise from its address', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   await expect(page.locator('#rentes')).toHaveClass(/is-open/)
   await expect(page.locator('#ordre')).toHaveClass(/is-closed/)
   await expect(page.locator('#ordre table')).toHaveCount(0)
   await page.goto('/resultats')
   await page.locator('#annee').getByRole('button', { name: 'Dans quel ordre puiser ?' }).click()
-  await expect(page).toHaveURL(/strat=ordre/)
+  await expect(page).toHaveURL(/\/decider\?.*strat=ordre/)
   await expect(page.locator('#ordre')).toHaveClass(/is-open/)
   await expect(page.locator('#rentes')).toHaveClass(/is-closed/)
   await expect(page.locator('#ordre table')).toBeVisible({ timeout: 90_000 })
 
-  await page.goto('/resultats?v=proof')
-  await expect(page.locator('#solidite')).toHaveClass(/is-open/)
+  // the proof's blocks are closed when Résultats opens; an address opens the one it names
+  await page.goto('/resultats')
+  await expect(page.locator('#solidite')).toHaveClass(/is-closed/)
   await expect(page.locator('#tableau')).toHaveClass(/is-closed/)
-  await page.goto('/resultats?v=proof&bloc=tableau')
+  await page.goto('/resultats?bloc=tableau')
   await expect(page.locator('#tableau')).toHaveClass(/is-open/)
   await expect(page.locator('#solidite')).toHaveClass(/is-closed/)
   await expect(page.locator('#tableau table').first()).toBeVisible({ timeout: 60_000 })
 })
 
 // ONE control for « all open / one at a time »: a small round icon at the END of the map row, the same on Hypothèses, Preuve and Profil (phone) — not a full-width switch of its own.
-for (const [name, path, map, size] of [
-  ['Hypothèses', '/hypotheses', 'Sections des hypothèses', { width: 390, height: 844 }],
-  ['Preuve', '/resultats?v=proof', 'Sections des résultats', { width: 390, height: 844 }],
-  ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }],
-  ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }],
+for (const [name, path, map, size, openFirst, allKey] of [
+  ['Hypothèses', '/hypotheses', 'Sections des hypothèses', { width: 390, height: 844 }, 1, /bloc=tout/],
+  // Résultats: the answer's two cards are open on arrival, the proof's blocks closed; the one icon answers for both
+  ['Résultats', '/resultats', 'Sections des résultats', { width: 390, height: 844 }, 2, /bloc=tout/],
+  ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }, 1, /bloc=tout/],
+  ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }, 1, /bloc=tout/],
 ] as const) {
   test(`${name}: the icon at the end of the map row closes every card while ANY is open — the first included — and opens every card once all are closed`, async ({ page }) => {
     await page.setViewportSize(size)
@@ -131,18 +133,18 @@ for (const [name, path, map, size] of [
     const rail = (await nav.locator('.rail').boundingBox())!
     expect(box.x, 'after the chips').toBeGreaterThanOrEqual(rail.x + rail.width - 1)
     expect(box.width).toBeLessThanOrEqual(48)
-    // the page opens on ONE card: the icon offers to close, and a tap closes it — not the rest opened
-    await expect(page.locator('.accordion__item.is-open')).toHaveCount(1)
+    // the page opens on its default card(s): the icon offers to close, and a tap closes them — not the rest opened
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(openFirst, { timeout: 60_000 })
     await expect(icon).toHaveAccessibleName('Tout fermer')
     await icon.click()
     await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
     // all closed: now it opens every card
     await expect(icon).toHaveAccessibleName('Tout ouvrir')
     await icon.click()
-    await expect(page).toHaveURL(/bloc=tout/)
+    await expect(page).toHaveURL(allKey)
     await expect(icon).toHaveAccessibleName('Tout fermer')
     await icon.click()
-    await expect(page).not.toHaveURL(/bloc=tout/)
+    await expect(page).not.toHaveURL(allKey)
     await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
   })
 }

@@ -34,6 +34,8 @@ type Budget = { controls: number; words: number }
 // plan fall by one control and RISE by three words. The strip that was pinned under the bar on Profil and Hypothèses is gone (Accueil with a plan: −3 controls, −6 words).
 // THE FOOT LINE, 2026-10-19: « Vos chiffres ne quittent jamais cet appareil. » joins « Bâti par marc.portal » at the foot of every page — the promise said where it is
 // always seen, not only in a closed fold on the front door: +7 words on every route, no control (the brand mark in the bar is a drawing, aria-hidden, no words).
+// THE FOURTH TAB, 2026-10-19 (Marc: Profil and Hypothèses have no level above their cards, Résultats had three views): « Décider » is a tab of its own — +1 link and
+// +1 word on every route; Résultats and Décider lose the three-view switch they carried (−3 controls each).
 const BUDGETS: Record<string, Budget> = {
   // 34 → 28 controls, 372 → 309 words (2026-10-15, the ratchet FALLS): the reading card is a one-time dialog now (closed here), its subtitle is gone, and the demo
   // card's three early-retirement households (+3 chips) cost less than what left. The time question (components/TimeBudget.tsx) is a dialog too, put off here.
@@ -41,14 +43,19 @@ const BUDGETS: Record<string, Budget> = {
   // 26 → 20 controls, 315 → 164 words (2026-10-19, the ratchet FALLS): the front door is a hero now — the question, what Horizon does and its two promises IN VIEW, one
   // « Commencer » and one « Voir un exemple » — and the three doors moved into the dialog « Commencer » opens (closed here); « how it works » and the map are two closed folds.
   // 20 → 21 controls, 164 → 169 words (2026-10-19, Marc: the showcase must show retiring early is reachable): « Couple, retraite avant 50 ans » joins the demo's chips.
-  'Accueil (first visit)': { controls: 21, words: 169 },
+  // 21 → 22, 169 → 170 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
+  // 22 → 31 controls, 170 → 206 words (2026-10-19, Marc: a first visit reads what Horizon is, then how to read it, then the hero): the reading controls left the
+  // dialog for the page, above the question, in view — language 2, day / night 2, contrast 2, size 3 (+9), their labels, the card's title and the zoom tip.
+  'Accueil (first visit)': { controls: 31, words: 206 },
   // 17 → 15, 78 → 77 (2026-10-15): the top bar.
-  'Profil (first visit, onboarding)': { controls: 15, words: 84 },
+  // 15 → 16, 84 → 85 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
+  'Profil (first visit, onboarding)': { controls: 16, words: 85 },
   // 30 → 21 controls, 261 → 186 words (2026-10-15, the ratchet FALLS): the same reading card, gone from the page.
   // 21 → 19, 186 → 184 (2026-10-15): the top bar, and the answer strip the page carried for a ready profile (its « Voir » link and its range line) is gone with it.
   // 19 → 22, 184 → 218 (2026-10-15): not growth — the count now WAITS for the drip question (three buttons, a sentence), which an earlier count read before it landed.
   // 22 → 17, 225 → 90 (2026-10-19, the ratchet FALLS): « Bon à savoir » is gone — its two promises are the hero's and the foot line's, its documents tip the dialog's last door.
-  'Accueil (with a plan)': { controls: 17, words: 90 },
+  // 17 → 18, 90 → 91 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
+  'Accueil (with a plan)': { controls: 18, words: 91 },
   // controls 314 → 322, words 1952 → 2018 (2026-10-14): the form's new « Estimation du relevé » pair (two RRQ statement fields with their ⓘ and clear buttons, labels and the « repère de contrôle » hint) — the facsimile's figures got their one home on the form too.
   // controls 322 → 324, words 2018 → 2026 (2026-10-14): « Calculer mes droits d’aujourd’hui » — the TFSA room worksheet's one summary per person (its two boxes and its result sit in a closed fold, so they
   // count only once opened): the CRA's January 1 figure less this year's deposits.
@@ -71,7 +78,8 @@ const BUDGETS: Record<string, Budget> = {
   // (components/NumberSlider.tsx): a thumb, a − and a + each, and a « Saisir le chiffre exact » chip that gives the typed box back. Fewer keyboards on a phone, more stops on a wide screen.
   // words 2039 → 2035 (2026-10-19, the ratchet FALLS): « Ma situation » closed says its answers (shorter than the lead it replaces, now inside), and the dots' legend of
   // « Rendre mon profil exact » is in view — it is needed to read every field's dot (+6 words).
-  'Profil (form)': { controls: 403, words: 2035 },
+  // 403 → 404, 2035 → 2036 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
+  'Profil (form)': { controls: 404, words: 2036 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
@@ -83,7 +91,8 @@ const BUDGETS: Record<string, Budget> = {
   // words 159 → 218 (2026-10-19, a conscious RISE — Marc: « no hidden information »): a closed block is never a bare title any more (components/Accordion.tsx shows its
   // one sentence while closed), so the six closed assumptions each say what they hold.
   // 218 → 202 words (2026-10-19, the ratchet FALLS — Marc: « Ce que vous supposez de l’avenir » is enough): the page head says one short sentence.
-  'Hypothèses': { controls: 32, words: 202 },
+  // 32 → 33, 202 → 203 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
+  'Hypothèses': { controls: 33, words: 203 },
   // 29 → 28, 385 → 388 (2026-10-15): the top bar (−1 control, +3 words on a route with an answer).
   // 28 → 32, 388 → 590 (2026-10-16): the two cards that left Profil — « Coussin de liquidités » and « Ce que coûtent les enfants » (four amounts, what the state pays back, a fold of sources): a conscious
   // trade, the sheet is where the household is READ.
@@ -94,7 +103,8 @@ const BUDGETS: Record<string, Budget> = {
   // 37 → 38 controls, 642 → 643 words (2026-10-17): « Imprimer… » moved here from the results page (one chip, its list is a closed dialog).
   // 38 → 43 controls, 650 → 667 words (2026-10-19): the sheet has its map, like every long page — a chip per section (Où vous en êtes, Aujourd’hui, À la retraite,
   // Ce que vous détenez, Ce qui préciserait la réponse), by its own title; and its sentence moved into the page head.
-  'Fiche': { controls: 43, words: 667 },
+  // 43 → 44, 667 → 668 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
+  'Fiche': { controls: 44, words: 668 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
@@ -107,7 +117,10 @@ const BUDGETS: Record<string, Budget> = {
   // words 577 → 581 (2026-10-19): the engine fixes of 2f89409 move the scenario range sentence under the answer (four more words in its figures) — measured, not new copy.
   // words 581 → 583 (2026-10-19): the answer card's own heading, « La réponse », for a screen reader's list of headings (`.sr-only`: the counter reads clipped text, a reader does not see it).
   // 45 → 46 controls, 583 → 586 words (2026-10-19): « D’où vient l’argent » in the map — the bar charts were three taps deep (Comparer ▸ the chart ▸ « Détail »).
-  'Résultats — Réponse': { controls: 46, words: 586 },
+  // 46 → 54 controls, 586 → 670 words (2026-10-19): Résultats is the answer AND its proof now — Preuve's heading and sentence under the answer's cards, its five blocks
+  // closed (each a title and its one line: +5), « Preuve » in the map (+1), the fourth tab (+1); the three-view switch is gone (−3). Preuve alone was 30 / 213: the two
+  // pages that were three views fell from 46 + 52 + 30 controls to 54 + 50.
+  'Résultats — Réponse': { controls: 54, words: 670 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
@@ -117,7 +130,8 @@ const BUDGETS: Record<string, Budget> = {
   // 50 → 49 controls, 830 → 871 words (2026-10-17): « Imprimer… » and the « Tout montrer » chip are gone, the same icon as every page replaces the chip (+1); the four what-ifs are cards that say in one line what they hold while closed (+41 words).
   // 49 → 51 controls (2026-10-19): the closed strategies say what they hold (lib/cardsCopy.ts `closed`), and « REER » in two of those lines is a glossary link, as in every subtitle.
   // 51 → 52 controls, 891 → 912 words (2026-10-19): the second step is said on the page — « Choisir comment » and its one sentence over the strategies (« REER » in it a glossary link).
-  'Résultats — Décider': { controls: 52, words: 912 },
+  // 52 → 50 controls (2026-10-19, the ratchet FALLS): a page of its own — the three-view switch gone (−3), the fourth tab (+1).
+  'Résultats — Décider': { controls: 50, words: 912 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits
@@ -126,7 +140,7 @@ const BUDGETS: Record<string, Budget> = {
   // 44 → 31, 1893 → 158 (2026-10-16, the ratchet FALLS): the blocks of Preuve are read one at a time; the firm answer is open, the ledger, the table, the accuracy and the parameters are closed titles.
   // 31 → 30 controls, 158 → 153 words (2026-10-17, the ratchet FALLS): « Imprimer… » left the page.
   // words 160 → 200 (2026-10-19, a conscious RISE — « no hidden information »): the four closed blocks of Preuve were bare titles; each says in one line what it holds.
-  'Résultats — Preuve': { controls: 30, words: 213 },
+  // Preuve was a view of its own until 2026-10-19; it is counted in Résultats now (above), so it has no budget.
 }
 
 // [label, path, readySelector, seed, completion sentinel (optional)]
@@ -141,8 +155,7 @@ const ROUTES: readonly Route[] = [
   ['Fiche', '/fiche', '.sheet--serious', EXAMPLE],
   // `#annee` is the last section the answer view adds (lazy).
   ['Résultats — Réponse', '/resultats?v=answer', '#verdict', EXAMPLE, '#annee'],
-  ['Résultats — Décider', '/resultats?v=decide', '.results-section, #verdict', EXAMPLE],
-  ['Résultats — Preuve', '/resultats?v=proof', '.results-section, #verdict', EXAMPLE],
+  ['Résultats — Décider', '/decider', '.results-section', EXAMPLE],
 ]
 
 interface Counts {

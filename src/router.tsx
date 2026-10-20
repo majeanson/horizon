@@ -10,6 +10,7 @@ const Accueil = lazy(() => import('./pages/Accueil').then((m) => ({ default: m.A
 const Profil = lazy(() => import('./pages/Profil').then((m) => ({ default: m.Profil })))
 const Hypotheses = lazy(() => import('./pages/Hypotheses').then((m) => ({ default: m.Hypotheses })))
 const Resultats = lazy(() => import('./pages/Resultats').then((m) => ({ default: m.Resultats })))
+const Decider = lazy(() => import('./pages/Resultats').then((m) => ({ default: m.Decider })))
 const Donnees = lazy(() => import('./pages/Donnees').then((m) => ({ default: m.Donnees })))
 const Fiche = lazy(() => import('./pages/Fiche').then((m) => ({ default: m.Fiche })))
 const Partage = lazy(() => import('./pages/Partage').then((m) => ({ default: m.Partage })))
@@ -35,6 +36,7 @@ export function AppRoutes() {
           <Route path="profil" element={<Profil />} />
           <Route path="hypotheses" element={<Hypotheses />} />
           <Route path="resultats" element={<Resultats />} />
+          <Route path="decider" element={<Decider />} />
           <Route path="documents" element={<EntryRedirect step="gather" />} />
           <Route path="saisie" element={<EntryRedirect step={null} />} />
           <Route path="fiche" element={<Fiche />} />

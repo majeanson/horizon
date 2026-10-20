@@ -22,13 +22,13 @@ const STATES: State[] = [
   { name: 'Profil, figures to fill', path: '/profil?form=1', seed: blankWithSalary(), rows: ['Façon de remplir le profil', 'Façon de remplir ce qui manque'] },
   { name: 'Hypothèses', path: '/hypotheses', seed: EXAMPLE, rows: ['Choisir un scénario'] },
   { name: 'Hypothèses, the markets', path: '/hypotheses?bloc=marches', seed: EXAMPLE, rows: ['Le parcours des marchés'] },
-  { name: 'Réponse', path: '/resultats', seed: EXAMPLE, ready: '#graphique', rows: ['Vues des résultats', 'Façons de comparer', 'Afficher'] },
-  { name: 'Réponse, where the money comes from', path: '/resultats?metric=detail', seed: EXAMPLE, ready: '#graphique', rows: ['Vues des résultats', 'Façons de comparer', 'Afficher', 'Montants', 'Départ', 'Pour qui'] },
-  { name: 'Décider, the pensions', path: '/resultats?v=decide', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Vues des résultats', 'Pour', 'Quatre façons de regarder vos rentes'] },
-  { name: 'Décider, the pensions year by year', path: '/resultats?v=decide&bv=years', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Vues des résultats', 'Pour', 'Quatre façons de regarder vos rentes', 'Années montrées'] },
-  { name: 'Décider, melting the RRSP', path: '/resultats?v=decide&strat=fonte', seed: EXAMPLE, ready: '#fonte [role="tablist"]', rows: ['Vues des résultats', 'Façons de fondre le REER'] },
-  { name: 'Preuve, the grids', path: '/resultats?v=proof&solidite=grids', seed: EXAMPLE, ready: '#solidite [role="tablist"]', rows: ['Vues des résultats', 'Rendement (lignes) · inflation (colonnes)'] },
-  { name: 'Preuve, the year table', path: '/resultats?v=proof&bloc=tableau', seed: EXAMPLE, ready: '#tableau [role="tablist"]', rows: ['Vues des résultats', 'Départ'] },
+  { name: 'Réponse', path: '/resultats', seed: EXAMPLE, ready: '#graphique', rows: ['Façons de comparer', 'Afficher'] },
+  { name: 'Réponse, where the money comes from', path: '/resultats?metric=detail', seed: EXAMPLE, ready: '#graphique', rows: ['Façons de comparer', 'Afficher', 'Montants', 'Départ', 'Pour qui'] },
+  { name: 'Décider, the pensions', path: '/decider', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Pour', 'Quatre façons de regarder vos rentes'] },
+  { name: 'Décider, the pensions year by year', path: '/decider?bv=years', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Pour', 'Quatre façons de regarder vos rentes', 'Années montrées'] },
+  { name: 'Décider, melting the RRSP', path: '/decider?strat=fonte', seed: EXAMPLE, ready: '#fonte [role="tablist"]', rows: ['Façons de fondre le REER'] },
+  { name: 'Preuve, the grids', path: '/resultats?bloc=solidite&solidite=grids', seed: EXAMPLE, ready: '#solidite [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Rendement (lignes) · inflation (colonnes)'] },
+  { name: 'Preuve, the year table', path: '/resultats?bloc=tableau', seed: EXAMPLE, ready: '#tableau [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Départ'] },
   // (Preuve ▸ « Paramètres utilisés » draws its year chooser only once there are two tax years: TableChooser hides a row of one.)
   { name: 'Réglages', path: '/donnees', seed: EXAMPLE, rows: ['Langue', 'Thème', 'Contraste', 'Taille du texte'] },
 ]
@@ -110,6 +110,7 @@ test.describe('the navigation marks where the reader is', () => {
   const PLACES: [path: string, name: RegExp][] = [
     ['/profil', /^Profil$/],
     ['/resultats', /^Résultats$/],
+    ['/decider', /^Décider$/],
     ['/hypotheses', /^Hypothèses$/],
     ['/fiche', /^Ma fiche/],
     ['/glossaire', /^Glossaire/],

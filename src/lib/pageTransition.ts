@@ -9,7 +9,7 @@ import { flushSync } from 'react-dom'
 // move (the sheet, the glossary, the settings, the brand) is a plain fade. `html[data-vt]` says which for the length of the transition, and it is also what gives the bars a
 // layer: at rest nothing carries a transition name.
 
-const TAB_ORDER = ['/profil', '/resultats', '/hypotheses']
+const TAB_ORDER = ['/profil', '/resultats', '/decider', '/hypotheses']
 
 /** Which way a move between two paths reads: along the tabs forward or back, or neither. Pure, so it is tested without a browser. */
 export function transitionKind(from: string, to: string): 'forward' | 'back' | 'fade' {

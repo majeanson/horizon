@@ -50,11 +50,15 @@ const FR_RESULTS = {
   /** Under one person's « d'où vient l'argent » bars: a stretch of years with no bar is not missing data — it says who pays then. */
   idle: (name: string, from: string, to: string) => `Entre ${from} et ${to}, rien ne vient de ${name} : le ménage vit alors des comptes et des revenus de l’autre personne. Des barres vides ici sont normales.`,
   tabs: { label: 'Vues des résultats', answer: 'Réponse', decide: 'Décider', proof: 'Preuve' },
-  /** The one sentence under the page's title: its three views, in words (on a phone the title and this line are kept for screen readers and paper only). */
-  subtitle: 'Votre réponse, ce que vous pourriez changer, et la preuve derrière chaque chiffre.',
+  /** The heading where the proof begins on Résultats, under the answer's cards: its one sentence. */
+  proofHint: 'Si la réponse tient, et d’où vient chaque chiffre.',
+  /** The one sentence under Résultats' title: the answer, then its proof (on a phone the title and this line are kept for screen readers and paper only). */
+  subtitle: 'Votre réponse, et la preuve derrière chaque chiffre.',
   /** « Décider »: the two steps of the view. */
   decide: {
     tryTitle: 'Essayer un changement',
+    /** The sentence under « Décider », the page of its own (pages/Resultats.tsx `Decider`). */
+    pageSub: 'Ce que vous pourriez changer, et comment commencer vos rentes et puiser dans vos comptes.',
     tryHint: 'Chaque essai se fait sur votre plan tel qu’il est ; rien n’est enregistré. Ouvrez-en un à la fois.',
     /** The second step of Décider, over the strategies: the same plan, done another way. */
     chooseTitle: 'Choisir comment',
@@ -282,9 +286,11 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   idle: (name: string, from: string, to: string) => `From${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', decide: 'Decide', proof: 'Proof' },
-  subtitle: 'Your answer, what you could change, and the proof behind every figure.',
+  proofHint: 'Whether the answer holds, and where each figure comes from.',
+  subtitle: 'Your answer, and the proof behind every figure.',
   decide: {
     tryTitle: 'Try a change',
+    pageSub: 'What you could change, and how to start your pensions and draw on your accounts.',
     tryHint: 'Each try runs on your plan as it stands; nothing is saved. Open one at a time.',
     chooseTitle: 'Choose how',
     chooseHint: 'The same plan, done another way: when to start your pensions, in which order to draw, how much to take from the RRSP.',

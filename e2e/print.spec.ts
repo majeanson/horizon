@@ -10,11 +10,11 @@ const afterPrint = (page: Page) => page.evaluate(() => window.dispatchEvent(new 
 // The number of pages of a PDF: its page objects (the pages TREE is « /Type /Pages »).
 const pagesOf = (pdf: Buffer): number => (pdf.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) ?? []).length
 
-for (const [name, query] of [['the answer', ''], ['Essayer', '?v=adjust'], ['Stratégies', '?v=strategies'], ['Vérifier', '?v=verify']] as const) {
+for (const [name, path, ready] of [['the answer', '/resultats', '#verdict'], ['Décider', '/decider', '#essayer'], ['the proof', '/resultats?bloc=tableau', '#tableau']] as const) {
   test(`printing from « ${name} » gives the same short plan, then gives the page back`, async ({ page }) => {
     await seedProfile(page, EXAMPLE)
-    await page.goto('/resultats' + query)
-    await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible({ timeout: 60_000 })
+    await page.goto(path)
+    await expect(page.locator(ready)).toBeVisible({ timeout: 60_000 })
     await expect(page.locator('.print-plan')).toHaveCount(0)
 
     await beforePrint(page)
@@ -29,11 +29,11 @@ for (const [name, query] of [['the answer', ''], ['Essayer', '?v=adjust'], ['Str
     // what stays on the screen: the year by year, the cited figures, the views and their tabs
     await expect(page.locator('.year-table')).toHaveCount(0)
     await expect(page.locator('.params')).toHaveCount(0)
-    await expect(page.locator('.results-pin')).toHaveCount(0)
+    await expect(page.locator('.results-page .section-nav')).toHaveCount(0)
 
     await afterPrint(page)
     await expect(page.locator('.print-plan')).toHaveCount(0)
-    await expect(page.getByRole('tab', { name: 'Réponse' })).toBeVisible()
+    await expect(page.locator(ready)).toBeVisible()
   })
 }
 
@@ -61,7 +61,7 @@ test('English: the printed plan speaks English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
-  await expect(page.getByRole('tab', { name: 'Answer' })).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await beforePrint(page)
   const plan = page.locator('.print-plan')
   await expect(plan.getByText('Horizon — my retirement plan')).toBeVisible()
@@ -102,7 +102,7 @@ test('« Imprimer… » prints the page that was chosen, then the plan again by 
   await slow(page.locator('.print-plan .timeline')).toHaveCount(0)
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
   await slow(page.locator('.print-plan')).toHaveCount(0)
-  await slow(page.getByRole('tab', { name: 'Réponse' })).toBeVisible()
+  await slow(page.locator('#verdict')).toBeVisible()
 
   // the calendar and the leaflet: the plan's dates, one row a year; the leaflet adds the answer and the assumptions in three panels
   dialog = await open()

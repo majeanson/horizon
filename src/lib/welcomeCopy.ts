@@ -55,9 +55,8 @@ const FR: WelcomeCopy = {
   guide: [
     { name: 'Profil', text: 'Vos chiffres. Remplissez-les par sujet, ou document par document : un chiffre reste « estimé » tant que vous ne l’avez pas confirmé sur un document.', to: '/profil' },
     { name: 'Hypothèses', text: 'Ce que vous supposez de l’avenir : prix, rendements, âge de fin du plan. Le scénario Neutre est déjà choisi.', to: '/hypotheses' },
-    { name: 'Résultats › Réponse', text: 'L’âge le plus tôt où l’argent dure jusqu’à la fin du plan. Comparez des âges de départ.', to: '/resultats' },
-    { name: 'Résultats › Décider', text: 'Ce que vous pourriez changer pour partir plus tôt (dépenser moins, épargner plus, des soins plus coûteux), puis quand commencer vos rentes (RRQ et PSV), dans quel ordre puiser dans vos comptes et jusqu’où fondre le REER.', to: '/resultats?v=decide' },
-    { name: 'Résultats › Preuve', text: 'Si la réponse est solide, ce qui a été vérifié, et chaque chiffre avec son calcul.', to: '/resultats?v=proof' },
+    { name: 'Résultats', text: 'L’âge le plus tôt où l’argent dure jusqu’à la fin du plan, comparé à d’autres âges de départ, puis sa preuve : si la réponse est solide, et chaque chiffre avec son calcul.', to: '/resultats' },
+    { name: 'Décider', text: 'Ce que vous pourriez changer pour partir plus tôt (dépenser moins, épargner plus, des soins plus coûteux), puis quand commencer vos rentes (RRQ et PSV), dans quel ordre puiser dans vos comptes et jusqu’où fondre le REER.', to: '/decider' },
     { name: 'Votre réponse', text: 'L’âge dans la barre du haut, à côté du nom : il bouge à mesure que vous tapez, et un appui ouvre les Résultats.', to: null },
     { name: 'Ma fiche', text: 'Votre ménage d’un coup d’œil : la réponse et sa solidité, le plan en une ligne, ce que vous détenez et les chiffres à confirmer en premier. Chaque carte mène au champ qui la change.', to: '/fiche' },
     { name: 'En haut', text: 'Le glossaire des sigles et les réglages (copies de sauvegarde, plans, exemples). Les barres du haut se cachent quand vous descendez et reviennent quand vous remontez.', to: null },
@@ -103,9 +102,8 @@ const EN: WelcomeCopy = {
   guide: [
     { name: 'Profile', text: 'Your figures. Fill them in by topic, or document by document: a figure stays “estimated” until you confirm it on a document.', to: '/profil' },
     { name: 'Assumptions', text: 'What you assume about the future: prices, returns, the age the plan runs to. The Neutral scenario is already chosen.', to: '/hypotheses' },
-    { name: 'Results › Answer', text: 'The earliest age at which the money lasts to the end of the plan. Compare departure ages.', to: '/resultats' },
-    { name: 'Results › Decide', text: 'What you could change to leave earlier (spend less, save more, costlier care), then when to start your pensions (QPP and OAS), in which order to draw your accounts and how far to melt down the RRSP.', to: '/resultats?v=decide' },
-    { name: 'Results › Proof', text: 'Whether the answer is firm, what was checked, and every figure with its calculation.', to: '/resultats?v=proof' },
+    { name: 'Results', text: 'The earliest age at which the money lasts to the end of the plan, set beside other departure ages, then its proof: whether the answer is firm, and every figure with its calculation.', to: '/resultats' },
+    { name: 'Decide', text: 'What you could change to leave earlier (spend less, save more, costlier care), then when to start your pensions (QPP and OAS), in which order to draw your accounts and how far to melt down the RRSP.', to: '/decider' },
     { name: 'Your answer', text: 'The age in the top bar, beside the name: it moves as you type, and a tap opens the Results.', to: null },
     { name: 'My sheet', text: 'Your household at a glance: the answer and how sturdy it is, the plan in one line, what you hold and the figures to confirm first. Each card leads to the field that changes it.', to: '/fiche' },
     { name: 'At the top', text: 'The glossary of acronyms and the settings (backup copies, plans, examples). The top bars hide as you scroll down and come back as you scroll up.', to: null },

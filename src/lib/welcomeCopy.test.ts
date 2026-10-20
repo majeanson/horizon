@@ -3,7 +3,7 @@ import { WELCOME_COPY } from './welcomeCopy.ts'
 
 // THE FRONT DOOR'S WORDS: the guide to the whole app says the same places in both languages, every place that is a page leads to a real route of the app, and every line says something.
 
-const ROUTES = new Set(['/profil', '/hypotheses', '/resultats', '/fiche'])
+const ROUTES = new Set(['/profil', '/hypotheses', '/resultats', '/decider', '/fiche'])
 const VIEWS = new Set(['decide', 'proof'])
 
 describe('the home page guide', () => {

@@ -94,8 +94,8 @@ test.describe('the page chrome', () => {
   test('the chosen tab’s fill sits exactly under it, before and after a change', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 1280, height: 900 })
-    await page.goto('/resultats')
-    const row = page.locator('.results-pin .subtabs')
+    await page.goto('/hypotheses')
+    const row = page.getByRole('tablist', { name: 'Choisir un scénario' })
     await expect(row).toHaveAttribute('data-thumb', '', { timeout: 60_000 })
     const under = async () => {
       const [thumb, tab] = await Promise.all([row.locator('.subtabs__thumb').boundingBox(), row.getByRole('tab', { selected: true }).boundingBox()])
@@ -103,26 +103,26 @@ test.describe('the page chrome', () => {
     }
     const first = await under() // whole pixels, give or take the rounding of a fractional text size
     expect(Math.max(first.dx, first.dw, first.dy)).toBeLessThanOrEqual(1)
-    await row.getByRole('tab', { name: 'Décider' }).click()
+    await row.getByRole('tab', { name: 'Prudent' }).click()
     await expect.poll(async () => (await under()).dx, { message: 'the fill glided to the new tab' }).toBeLessThanOrEqual(1)
     expect((await under()).dw).toBeLessThanOrEqual(1)
   })
 
-  test('the views and the map are ONE pinned box: nothing else on the page is sticky under the bar, and no pinned row is ever covered', async ({ page }) => {
+  test('the map is ONE pinned box: nothing else on the page is sticky under the bar, and no pinned row is ever covered', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/resultats')
     await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
     await page.waitForTimeout(1200)
     const stuck = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>('.results-pin, .section-nav, .pin-stack')].map((e) => `${e.className.split(' ')[0]}:${getComputedStyle(e).position}`),
+      [...document.querySelectorAll<HTMLElement>('.section-nav, .pin-stack')].map((e) => `${e.className.split(' ')[0]}:${getComputedStyle(e).position}`),
     )
-    expect(stuck).toEqual(['pin-stack:sticky', 'results-pin:static', 'section-nav:static'])
+    expect(stuck).toEqual(['pin-stack:sticky', 'section-nav:static'])
     // Scroll through the page with the programmatic scroller (it never hides the chrome): at every offset the point in the middle of each pinned row belongs to that row.
     for (const top of [0, 120, 260, 420, 700, 1100, 1700]) {
       await page.locator('#root').evaluate((el, y) => el.scrollTo({ top: y }), top)
       await page.waitForTimeout(120)
-      for (const sel of ['.results-pin', '.section-nav']) {
+      for (const sel of ['.section-nav']) {
         const covered = await page.locator(sel).first().evaluate((row) => {
           const r = row.getBoundingClientRect()
           if (r.bottom <= 0 || r.top >= window.innerHeight) return false

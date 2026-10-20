@@ -44,7 +44,7 @@ test.describe('golden couple', () => {
     await expect(chip).toBeVisible()
     await expect(rail.getByRole('button', { name: /^Fin du plan, \d{4} \(\d+/ })).toBeVisible()
     await chip.click()
-    await expect(page).toHaveURL(/v=decide/)
+    await expect(page).toHaveURL(/\/decider/)
     await expectLandedBelowChrome(page, '#rentes')
   })
 
@@ -61,7 +61,7 @@ test.describe('golden couple', () => {
     }
     expect(reached, 'the RRQ moment never took focus by Tab').toBe(true)
     await page.keyboard.press('Enter')
-    await expect(page).toHaveURL(/v=decide/)
+    await expect(page).toHaveURL(/\/decider/)
     await expectLandedBelowChrome(page, '#rentes')
   })
 

@@ -51,7 +51,7 @@ test('with a bad start chosen, the results page still answers', async ({ page })
 })
 
 test('« Vérifier » shows the earliest age under a hard market, beside « Lisse »', async ({ page }) => {
-  await page.goto('/resultats?v=verify')
+  await page.goto('/resultats?bloc=solidite') // « Solidité », on Résultats under the answer, opened by its address
   await expect(page.getByText('Si les marchés tournent mal')).toBeVisible()
   const smooth = page.locator('.verdict__range-item', { hasText: 'Lisse' })
   const bad = page.locator('.verdict__range-item', { hasText: 'Mauvais départ' })

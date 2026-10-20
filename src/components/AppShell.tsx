@@ -18,17 +18,19 @@ const BarAnswer = lazy(() => import('./BarAnswer'))
 // The chrome around every page: a top bar (the name, the answer's age, the sheet, the glossary, the settings gear) and the main
 // navigation — a bottom bar on a phone, a left rail on a wide screen. The switch between the
 // two is CSS only (styles/horizon.css), never a width check in JS: one markup, two layouts.
-// The language and the day / night choice are on the settings page and in the first visit's reading dialog, not in the bar: set once, they
+// The language and the day / night choice are on the settings page and on a first visit's front door, not in the bar: set once, they
 // do not earn two buttons on every screen, and the age they made room for is looked at every time.
 //
-// THREE destinations, in the order a person works in: who you are (Profil), what comes out (Résultats), and what
-// you assume about the future (Hypothèses) — optional, since the defaults are the Neutre scenario, and reached from
-// the answer when the person wants to try another future. Saving a copy, restoring one, the examples and the display
-// settings are a fourth page (« Sauvegarde et réglages ») behind the gear in the top bar: used a few times a year,
-// it does not earn a quarter of the thumb bar.
+// FOUR destinations, in the order a person works in, each ONE level of cards: who you are (Profil), what comes out and how
+// sure it is (Résultats: the answer, then its proof), what to change and how to start and draw (Décider — its own tab since
+// 2026-10-19, Marc: no level above the cards on one page and not on another), and what you assume about the future
+// (Hypothèses) — optional, since the defaults are the Neutre scenario. Saving a copy, restoring one, the examples and the
+// display settings are a page of their own (« Sauvegarde et réglages ») behind the gear in the top bar: used a few times a
+// year, they do not earn a place in the thumb bar.
 const TABS = [
   { to: '/profil', key: 'profile', icon: 'user-bold' },
   { to: '/resultats', key: 'results', icon: 'chart-line-up-bold' },
+  { to: '/decider', key: 'decide', icon: 'signpost-bold' },
   { to: '/hypotheses', key: 'assumptions', icon: 'sliders-horizontal-bold' },
 ] as const satisfies ReadonlyArray<{ to: string; key: string; icon: IconName }>
 

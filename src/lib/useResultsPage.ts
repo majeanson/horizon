@@ -1,7 +1,7 @@
 import { BRACKET_FILL_COPY } from './bracketFillCopy'
 import { SPOUSE_BALANCE_COPY } from './spouseBalanceCopy'
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { retirementState } from '../engine/ledger'
 import { useLang, useT } from '../i18n'
 import type { ChartMetric, Dollars } from './chartData'
@@ -144,9 +144,16 @@ export function useResultsPage() {
   const runs = gaps.length > 0 ? [] : (runsAnswer.value ?? [])
   const runsPending = gaps.length === 0 && runsAnswer.value === null
 
-  // Three jobs, one at a time (the address keeps it: `?v=decide|proof`): read the answer · decide what to do about it (try a change, choose how to start and draw) · check it.
-  const rawView = params.get('v')
-  const view: View = rawView === 'decide' || rawView === 'proof' ? rawView : ((rawView !== null ? LEGACY_VIEW[rawView] : undefined) ?? 'answer')
+  // TWO PAGES, ONE LEVEL EACH (Marc, 2026-10-19: Profil and Hypothèses have no level above their cards, so Résultats has none either): « Résultats » (/resultats)
+  // is the answer and, under it, its proof; « Décider » (/decider) is what to try and how to start and draw — a tab of its own. `view` is the page this hook
+  // serves: 'answer' on /resultats (whose cards include the proof's), 'decide' on /decider. A link to a section of the OTHER page goes there (`goTo`).
+  const { pathname, hash } = useLocation()
+  const navigate = useNavigate()
+  const view: View = pathname === '/decider' ? 'decide' : 'answer'
+  // The days of the three views in one page left `?v=` in bookmarks (and four views before that): on /resultats, a deciding view goes to /decider with the rest of
+  // its address, and a proof view stays here and lands on its section — and the ADDRESS follows, as the router's catch-all does for a path.
+  const rawView = view === 'answer' ? params.get('v') : null
+  const legacyTarget: View | null = rawView === null ? null : rawView === 'decide' || rawView === 'proof' || rawView === 'answer' ? rawView : (LEGACY_VIEW[rawView] ?? 'answer')
   // The what-ifs of « Décider » open one at a time. The address keeps it (`?essai=`; `none` is « all closed »); an address that carries one of their own keys (an old link with `?care=`,
   // `?spend=` or `?age=`) opens the matching one; a household that has stopped working has no spending to try, so it is offered the other two.
   const essaiKeys: Essai[] = retiredNow ? ['save', 'care'] : ['target', 'save', 'spend', 'care']
@@ -167,18 +174,21 @@ export function useResultsPage() {
   useEffect(() => {
     if (view === 'decide' && essai !== null && rawEssai !== essai) setParam('essai', essai)
   }, [view, rawEssai, essai, setParam])
-  // A view this page does not have (a typo) lands on the answer, and an old four-view address lands on its new view — and the ADDRESS follows, as the router's catch-all
-  // does for a path: leaving `?v=verifier` up would bookmark a link that only works by accident.
   useEffect(() => {
-    if (rawView === null || rawView === view) return
-    setParam('v', rawView in LEGACY_VIEW ? view : null)
-    // « Avenir » (`?v=future`) is gone: its care what-if is a thing to try under « Décider ».
-    if (rawView === 'future') setParam('essai', 'care')
-  }, [rawView, view, setParam])
+    if (legacyTarget === null) return
+    const next = new URLSearchParams(window.location.search)
+    next.delete('v')
+    if (legacyTarget === 'decide') {
+      // « Avenir » (`?v=future`) is gone: its care what-if is a thing to try under « Décider ».
+      if (rawView === 'future') next.set('essai', 'care')
+      navigate({ pathname: '/decider', search: next.toString() }, { replace: true })
+      return
+    }
+    setParams(next, { replace: true })
+    if (legacyTarget === 'proof') land(next.get('bloc') ?? 'solidite')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [legacyTarget])
 
-  // A link to a section of ANOTHER view switches the view first, then scrolls once that view's sections exist: a plain
-  // scroll to an id that is not on the page did nothing, on the one screen (« no age works ») where the reader most needs it.
-  const pendingScroll = useRef<string | null>(null)
   // The landing in progress (a wait for the anchor, then the hold): a new link or leaving the page cancels it, so two landings never fight over the scroll.
   const landing = useRef<() => void>(() => {})
   const land = (id: string) => {
@@ -187,47 +197,51 @@ export function useResultsPage() {
   }
   useEffect(() => () => landing.current(), [])
   const scrollTo = (id: string) => scrollToSection(id)
-  // A chip of the section map opens the block it names (the strategies and the proof's blocks are accordions: components/Accordion.tsx) before the map scrolls to it.
-  const openBlock = (id: string) => {
-    if (view === 'decide' && (STRATS as readonly string[]).includes(id)) setStrat(id as Strat)
-    if (view === 'proof' && (PROOF_BLOCKS as readonly string[]).includes(id)) setParam('bloc', id)
-    if (view === 'answer') openAnswerCard(id)
-    // « D’où vient l’argent »: the bar charts are the « Détail » of the chart inside Comparer (ages view). The chip opens all three, then lands once
-    // the panel exists — three taps deep is one tap from the map.
-    if (view === 'answer' && id === 'graphique') {
-      openAnswerCard('comparer')
-      setParam('cv', null)
-      setParam('metric', 'detail')
-      scrollToSectionWhenThere('graphique')
+  /** What opening a section takes, written into an address: the block it sits in (accordions mount nothing while closed), and the « D’où vient l’argent »
+   *  chart's card, ages view and « Détail » tab. Pure on the address, so a link to the OTHER page carries it there. */
+  const opening = (target: View, id: string, next: URLSearchParams): void => {
+    // The what-ifs and the 3 × 3 grids are folds that open on request.
+    const wanted = target === 'decide' ? ESSAI_OF[id] : undefined
+    if (wanted !== undefined && next.get('essai') !== 'all') next.set('essai', wanted)
+    if (target === 'decide' && (STRATS as readonly string[]).includes(id)) next.set('strat', id)
+    // Réponse's cards are all open unless the address closed some (`?cartes=`): a link to one opens it when it is shut.
+    if (target === 'answer' && (ANSWER_BLOCKS as readonly string[]).includes(id) && next.get('cartes') !== null) next.set('cartes', id)
+    if (target === 'answer' && id === 'graphique') {
+      if (next.get('cartes') !== null) next.set('cartes', 'comparer')
+      next.delete('cv')
+      next.set('metric', 'detail')
     }
-  }
-  // Réponse's cards are all open unless the address closed some (`?cartes=`): a link to one opens it when it is shut, and leaves a page that has every card open as it is.
-  const openAnswerCard = (id: string) => {
-    if ((ANSWER_BLOCKS as readonly string[]).includes(id) && params.get('cartes') !== null) setParam('cartes', id)
-  }
-  const goTo = (target: View, wantedId: string) => {
-    // The what-ifs and the 3 × 3 grids are folds that open on request: open the one the link names first (its body does not exist until then), then land on it.
-    const wanted = target === 'decide' ? ESSAI_OF[wantedId] : undefined
-    if (wanted !== undefined && !essaiAll && wanted !== essai) setEssai(wanted)
-    if (target === 'proof' && wantedId === 'sensibilite' && !gridsOpen) setGridsOpen(true)
-    // The strategies and the proof's blocks are accordions: the block a link names opens first (its body does not exist until then), then the landing.
-    if (target === 'decide' && (STRATS as readonly string[]).includes(wantedId)) setStrat(wantedId as Strat)
-    if (target === 'answer') openAnswerCard(wantedId)
     if (target === 'proof') {
-      const block = wantedId === 'sensibilite' ? 'solidite' : wantedId
-      if ((PROOF_BLOCKS as readonly string[]).includes(block)) setParam('bloc', block)
+      if (id === 'sensibilite') next.set('solidite', 'grids')
+      const block = id === 'sensibilite' ? 'solidite' : id
+      if ((PROOF_BLOCKS as readonly string[]).includes(block) && next.get('bloc') !== 'tout') next.set('bloc', block)
     }
-    if (target === view) return void land(wantedId)
-    pendingScroll.current = wantedId
-    setParam('v', target === 'answer' ? null : target)
   }
+  const pageOf = (target: View): View => (target === 'decide' ? 'decide' : 'answer')
+  // A chip of the section map opens the block it names before the map scrolls to it. The proof's sections share Résultats with the answer's.
+  const openBlock = (id: string) => {
+    const next = new URLSearchParams(window.location.search)
+    opening(view === 'decide' ? 'decide' : (PROOF_BLOCKS as readonly string[]).includes(id) ? 'proof' : 'answer', id, next)
+    setParams(next, { replace: true })
+    // « D’où vient l’argent »: three taps deep is one tap from the map — its panel appears only once the card, the view and the tab are open.
+    if (id === 'graphique') land('graphique')
+  }
+  // A link to a section: open what holds it, then land — on this page, or on the other one (the section in the address's # , landed on arrival below).
+  const goTo = (target: View, wantedId: string) => {
+    const next = new URLSearchParams(window.location.search)
+    opening(target, wantedId, next)
+    if (pageOf(target) === view) {
+      setParams(next, { replace: true })
+      return void land(wantedId)
+    }
+    navigate({ pathname: pageOf(target) === 'decide' ? '/decider' : '/resultats', search: next.toString(), hash: wantedId })
+  }
+  // Arriving with a section in the # (a link from the other page): land on it once it exists (the views are lazy chunks; ≤ 5 s).
+  const [arrivedAt] = useState(() => (hash.length > 1 ? decodeURIComponent(hash.slice(1)) : null))
   useEffect(() => {
-    const id = pendingScroll.current
-    if (id === null) return
-    pendingScroll.current = null
-    // The other view is a lazy chunk: its sections may not exist yet one frame after the switch, so wait for the anchor (≤ 5 s) rather than scroll to nothing.
-    land(id)
-  }, [view])
+    if (arrivedAt !== null) land(arrivedAt)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [arrivedAt])
 
   // Old deep links chose one question (`?q=save|stop`); the answers share the page now, so the link becomes a scroll
   // to its section, and the key is dropped from the address. Read once, at mount: stripping the key must not re-run
@@ -236,12 +250,9 @@ export function useResultsPage() {
   useEffect(() => {
     if (legacyQ !== 'save' && legacyQ !== 'stop') return
     setParam('q', null)
-    if (legacyQ === 'save') {
-      setParam('v', 'decide')
-      setParam('essai', 'save')
-    }
-    // The same landing as a link between views: wait for the anchor (the view is a lazy chunk), then hold it while the sections above stream in and give the scroll back at the reader's first move.
-    land(legacyQ === 'save' ? 'epargner' : 'arreter')
+    // « Combien épargner ? » is a what-if of Décider (another page now); « Quand arrêter » stays here. The same landing as any link.
+    if (legacyQ === 'save') goTo('decide', 'epargner')
+    else land('arreter')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legacyQ, setParam])
 
@@ -354,19 +365,18 @@ export function useResultsPage() {
     if (tourRaw !== null && (tourStep === 0 || (answered && !tourAvailable))) setParam('visite', null)
   }, [tourRaw, tourStep, answered, tourAvailable, setParam])
 
-  // The page's map, in reading order, one view at a time; a section that is not on the page has no chip.
+  // The page's map, in reading order; a section that is not on the page has no chip. On Résultats the proof follows the answer, its first chip under a « Preuve » label.
+  const proofLinks = [
+    { id: 'solidite', label: rc.nav.solidite, concept: 'solidite' as const, arc: rc.tabs.proof },
+    { id: 'donnees-calcul', label: rc.nav.chiffres, concept: 'documents' as const },
+    { id: 'tableau', label: rc.nav.tableau, concept: 'annee' as const },
+    { id: 'precision', label: rc.nav.precision, concept: 'precision' as const },
+    { id: 'parametres', label: rc.nav.parametres, concept: 'officiel' as const },
+  ]
   const navLinks =
     view === 'answer'
-      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, { id: 'graphique', label: rc.nav.argent, concept: 'dollars' as const }, { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }]
-      : view === 'decide'
-        ? [{ id: 'essayer', label: rc.nav.essayer, concept: 'essayer' as const }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, concept: 'rrq' as const }] : []), { id: 'ordre', label: rc.nav.ordre, concept: 'ordre' as const }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav, concept: 'fonte' as const }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav, concept: 'reer' as const }] : [])]
-        : [
-            { id: 'solidite', label: rc.nav.solidite, concept: 'solidite' as const },
-            { id: 'donnees-calcul', label: rc.nav.chiffres, concept: 'documents' as const },
-            { id: 'tableau', label: rc.nav.tableau, concept: 'annee' as const },
-            { id: 'precision', label: rc.nav.precision, concept: 'precision' as const },
-            { id: 'parametres', label: rc.nav.parametres, concept: 'officiel' as const },
-          ]
+      ? [{ id: 'verdict', label: rc.nav.reponse, concept: 'reponse' as const }, { id: 'comparer', label: rc.nav.comparer, concept: 'depart' as const }, { id: 'graphique', label: rc.nav.argent, concept: 'dollars' as const }, { id: 'annee', label: rc.nav.annee, concept: 'annee' as const }, ...proofLinks]
+      : [{ id: 'essayer', label: rc.nav.essayer, concept: 'essayer' as const }, ...(state.pensionsOpen ? [{ id: 'rentes', label: rc.nav.rentes, concept: 'rrq' as const }] : []), { id: 'ordre', label: rc.nav.ordre, concept: 'ordre' as const }, { id: 'fonte', label: BRACKET_FILL_COPY[lang].nav, concept: 'fonte' as const }, ...(profile.household.persons.length > 1 ? [{ id: 'equilibre', label: SPOUSE_BALANCE_COPY[lang].nav, concept: 'reer' as const }] : [])]
 
   // The headline sentence with its age drawn large: the copy marks where the age sits, the page splits it there.
   const sentence = retiredGlance ? rc.headline.retired(isCouple) : headline.kind === 'none' ? rc.headline.none(MAX_AGE) : headline.kind === 'now' ? rc.headline.now : rc.headline.at(AGE_TOKEN, isCouple)
@@ -441,8 +451,6 @@ export function useResultsPage() {
     runs,
     runsPending,
     view,
-    rawView,
-    pendingScroll,
     scrollTo,
     openBlock,
     goTo,

@@ -95,7 +95,7 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   await expect(page).not.toHaveURL(/spend=/)
   await expect(page.locator('#depenser')).toContainText('Soit 5 792 $ par mois', { timeout: 30_000 })
   await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses.', { timeout: 30_000 })
-  // The kept amount IS the profile's now: the answer, one view over, says so.
-  await page.getByRole('tab', { name: 'Réponse' }).click()
+  // The kept amount IS the profile's now: the answer, one tab over, says so.
+  await page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Résultats' }).click()
   await expect(page.getByText('Vous pouvez prendre votre retraite à 56 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
 })

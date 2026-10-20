@@ -71,6 +71,7 @@ export const FR = {
     profile: 'Profil',
     assumptions: 'Hypothèses',
     results: 'Résultats',
+    decide: 'Décider',
     data: 'Sauvegarde et réglages',
     glossary: 'Glossaire : les sigles expliqués',
     sheet: 'Ma fiche : la situation en cinq mesures',

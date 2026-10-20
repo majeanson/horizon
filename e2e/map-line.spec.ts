@@ -56,14 +56,17 @@ test('glossary: a tap on a far chip goes to its section, and the marked chip com
 
 test('results on a phone: the map is one line too, and a wide screen keeps it on one line without scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/resultats?v=verify')
-  const { chips, rail } = await oneLine(page, 5)
+  // Résultats' map: the answer's four sections, then the proof's five
+  await page.goto('/resultats')
+  const { chips, rail } = await oneLine(page, 9)
   await rail.evaluate((el) => el.scrollTo({ left: el.scrollWidth }))
   const last = (await chips.last().boundingBox())!
   expect(last.x + last.width).toBeLessThanOrEqual(360.5)
   await page.setViewportSize({ width: 1280, height: 800 })
-  await oneLine(page, 5)
-  expect(await rail.evaluate((el) => el.scrollWidth <= el.clientWidth + 1), 'plenty of room: no scrolling needed').toBe(true)
+  // nine chips on a wide screen: still ONE line, the last one reached by scrolling the line
+  await oneLine(page, 9)
+  await rail.evaluate((el) => el.scrollTo({ left: el.scrollWidth }))
+  await expect(chips.last()).toBeInViewport()
 })
 
 test('the map is still a set of real buttons: Tab reaches the chips, and the line itself can be driven by the keyboard when it overflows', async ({ page }) => {

@@ -9,14 +9,14 @@ test.beforeEach(async ({ page }) => {
   await seedProfile(page, EXAMPLE)
 })
 
-test('the views and the section map stay pinned while the page scrolls', async ({ page }) => {
+test('the section map stays pinned while the page scrolls', async ({ page }) => {
   await page.goto('/resultats')
-  const pin = page.locator('.results-pin')
+  const pin = page.locator('.results-page .pin-stack')
   await expect(pin).toBeVisible()
   const bar = await page.locator('.shell__bar').boundingBox()
   await page.locator('#root').evaluate((el) => el.scrollTo({ top: 1200 }))
   await expect.poll(async () => Math.round((await pin.boundingBox())!.y)).toBe(Math.round(bar!.y + bar!.height))
-  await expect(pin.getByRole('tab').first()).toBeInViewport()
+  await expect(pin.locator('.section-nav .chip').first()).toBeInViewport()
 })
 
 test('« Détail » shows where the money comes from, where it goes and what the accounts hold — and nothing the answer card already says', async ({ page }) => {
@@ -37,7 +37,7 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, true], ['des
     await page.setViewportSize({ width, height })
     await page.goto('/resultats')
     await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
-    const pin = page.locator('.results-pin')
+    const pin = page.locator('.results-page .pin-stack')
     const nav = page.locator('.section-nav')
     await expect(pin).toBeVisible()
     await page.locator('#root').evaluate((el) => el.scrollTo({ top: 1500 }))
@@ -45,8 +45,9 @@ for (const [name, width, height, mapPinned] of [['phone', 390, 844, true], ['des
     // measured later read as « not below » — on a slow runner, and every time on a busy machine.
     await expect
       .poll(async () => {
+        // the map IS the pinned box now (no view tabs above it): it sits inside the pin
         const [pinBox, navBox] = [(await pin.boundingBox())!, (await nav.boundingBox())!]
-        return navBox.y >= pinBox.y + pinBox.height - 1
+        return navBox.y >= pinBox.y - 1 && navBox.y + navBox.height <= pinBox.y + pinBox.height + 1
       })
       .toBe(mapPinned)
     // Back at the top, tap « Comparer » in the map: the section stops under the pinned chrome, fully clear of it.

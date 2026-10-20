@@ -103,7 +103,8 @@ test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the
   await page.goto('/resultats')
   // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
   await page.getByRole('tab', { name: 'Revenus hors épargne' }).click()
-  await page.getByRole('tab', { name: 'Preuve' }).click()
+  // « Solidité » is on this page, under the answer: its map chip opens it
+  await page.getByRole('navigation', { name: 'Sections des résultats' }).getByRole('button', { name: 'Solidité' }).click()
   // « Solidité » is one section at two depths: the grids are the second, a fold (the first is the scenarios and a hard market, in brief).
   await page.locator('#sensibilite > summary').click()
   await expect(page).toHaveURL(/solidite=grids/)

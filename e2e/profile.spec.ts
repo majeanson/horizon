@@ -226,7 +226,7 @@ test.describe('the example household', () => {
     await expect(chips.getByRole('button', { name: '57 ans' })).toHaveCount(0)
     await expect(page).toHaveURL(/ages=plan%2C65%2C55%2C56|ages=plan,65,55,56/)
 
-    await page.getByRole('tab', { name: 'Preuve' }).click()
+    // the proof is on this page, under the answer
     await page.locator('#tableau').getByRole('button', { expanded: false }).click() // Preuve is read one block at a time: open the table's
     const yearTable = page.locator('#tableau').getByRole('table').first()
     await expect(yearTable).toBeVisible()

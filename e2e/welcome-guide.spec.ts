@@ -16,10 +16,10 @@ for (const [who, seed] of [['a first visit', blankSeed()], ['a returning visit',
     await guide.locator('summary').click()
     await expect(guide.locator('summary')).toContainText('Comment s’y retrouver')
     const terms = guide.locator('dt')
-    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats › Réponse', 'Résultats › Décider', 'Résultats › Preuve', 'Votre réponse', 'Ma fiche', 'En haut'])
-    await expect(guide.locator('dd')).toHaveCount(8)
+    await expect(terms).toHaveText(['Profil', 'Hypothèses', 'Résultats', 'Décider', 'Votre réponse', 'Ma fiche', 'En haut'])
+    await expect(guide.locator('dd')).toHaveCount(7)
     // the places that are pages lead there
-    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats › Réponse', '/resultats'], ['Résultats › Décider', '/resultats?v=decide'], ['Résultats › Preuve', '/resultats?v=proof'], ['Ma fiche', '/fiche']] as const) {
+    for (const [name, href] of [['Profil', '/profil'], ['Hypothèses', '/hypotheses'], ['Résultats', '/resultats'], ['Décider', '/decider'], ['Ma fiche', '/fiche']] as const) {
       await expect(guide.getByRole('link', { name, exact: true })).toHaveAttribute('href', href)
     }
     // …and the two that are not pages are not links
@@ -32,9 +32,9 @@ test('a link of the guide opens the view it names', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.goto('/')
   await page.locator('section[aria-labelledby="welcome-guide"] summary').click()
-  await page.getByRole('link', { name: 'Résultats › Décider', exact: true }).click()
-  await expect(page).toHaveURL(/v=decide/)
-  await expect(page.getByRole('tab', { name: 'Décider' })).toHaveAttribute('aria-selected', 'true')
+  await page.locator('section[aria-labelledby="welcome-guide"]').getByRole('link', { name: 'Décider', exact: true }).click()
+  await expect(page).toHaveURL(/\/decider$/)
+  await expect(page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Décider' })).toHaveAttribute('aria-current', 'page')
 })
 
 test('English', async ({ page }) => {
@@ -43,5 +43,5 @@ test('English', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('section[aria-labelledby="welcome-guide"] summary')).toContainText('Finding your way')
   await page.locator('section[aria-labelledby="welcome-guide"] summary').click()
-  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results › Answer', 'Results › Decide', 'Results › Proof', 'Your answer', 'My sheet', 'At the top'])
+  await expect(page.locator('section[aria-labelledby="welcome-guide"] dt')).toHaveText(['Profile', 'Assumptions', 'Results', 'Decide', 'Your answer', 'My sheet', 'At the top'])
 })

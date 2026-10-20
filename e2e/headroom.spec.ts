@@ -12,8 +12,8 @@ const there = async (page: Page, sel: string) => { const r = await rect(page, se
 
 for (const [name, size, path, pinned] of [
   ['phone', { width: 390, height: 844 }, '/profil', ['.shell__bar', '.pinned-map .section-nav']],
-  ['phone', { width: 390, height: 844 }, '/resultats', ['.shell__bar', '.results-pin']],
-  ['desktop', { width: 1280, height: 800 }, '/resultats', ['.shell__bar', '.results-pin', '.results-page .section-nav']],
+  ['phone', { width: 390, height: 844 }, '/resultats', ['.shell__bar', '.results-page .section-nav']],
+  ['desktop', { width: 1280, height: 800 }, '/resultats', ['.shell__bar', '.results-page .section-nav']],
   ['desktop', { width: 1280, height: 800 }, '/profil', ['.shell__bar', '.pinned-map .section-nav']],
   ['phone', { width: 390, height: 844 }, '/hypotheses?bloc=tout', ['.shell__bar', '.pinned-map .section-nav']],
   // The Glossaire's map is a plain sticky `.section-nav`: it stayed pinned while everything else rolled up (2026-10-15).
@@ -71,7 +71,7 @@ test('the page’s own scrolling never hides the chrome: a programmatic scroll, 
   await page.locator('.results-page .section-nav').getByRole('button', { name: 'Comparer' }).click()
   await page.waitForTimeout(1500)
   expect(await away(page)).toBeNull()
-  expect(await there(page, '.results-pin')).toBe(true)
+  expect(await there(page, '.results-page .section-nav')).toBe(true)
 })
 
 test('a click on a tab or a chip leaves its focus there, and scrolling down still clears the row', async ({ page }) => {
@@ -80,14 +80,14 @@ test('a click on a tab or a chip leaves its focus there, and scrolling down stil
   await page.goto('/resultats')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await page.waitForTimeout(1500)
-  await page.getByRole('tab', { name: 'Décider' }).click()
+  await page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Décider' }).click()
   await expect(page.locator('#essayer')).toBeVisible({ timeout: 30_000 })
   await page.locator('.results-page .section-nav').getByRole('button', { name: 'Ordre de retrait' }).click()
   await page.waitForTimeout(1200)
   await page.mouse.move(640, 400)
   await page.mouse.wheel(0, 900)
   await expect(page.locator('.shell')).toHaveAttribute('data-away', '')
-  for (const sel of ['.results-pin', '.results-page .section-nav']) await expect.poll(() => gone(page, sel), { message: `${sel} slid away after a click` }).toBe(true)
+  for (const sel of ['.results-page .section-nav']) await expect.poll(() => gone(page, sel), { message: `${sel} slid away after a click` }).toBe(true)
   // …while the KEYBOARD still reaches it: a key focus inside a pinned row brings it back
   // A single wheel tick can land while the page is still settling from the 900 px scroll and be swallowed (CI's slow runner, once): the gesture is repeated until it takes.
   await expect
@@ -132,8 +132,8 @@ test('the keyboard can still reach what slid away: focusing inside it brings it 
   await page.mouse.move(200, 400)
   await page.mouse.wheel(0, 900)
   await expect(page.locator('.shell')).toHaveAttribute('data-away', '')
-  await page.locator('.results-pin').getByRole('tab').first().focus()
-  await expect.poll(() => there(page, '.results-pin')).toBe(true)
+  await page.locator('.results-page .section-nav .chip').first().focus()
+  await expect.poll(() => there(page, '.results-page .section-nav')).toBe(true)
   // back to the very top: shown, whatever the last direction was
   await page.locator('#root').evaluate((el) => el.scrollTo({ top: 0 }))
   await expect.poll(() => away(page)).toBeNull()
