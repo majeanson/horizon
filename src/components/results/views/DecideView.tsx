@@ -117,19 +117,21 @@ export function DecideView({ m }: { m: ResultsModel }) {
         <section id="essayer" className="results-section" aria-label={rc.decide.tryTitle}>
           <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} concept="essayer" />
           {!retiredNow && (
-            <div id="ajuster" className="surface">
-              {/* The changes a household could make, each tried alone and ranked by the years it gains. */}
-              <div className="verdict__range ajuster__levers">
-                <p className="verdict__range-title">{lc.title}</p>
-                <ul className="levers__list">{(showAll ? rows : rows.filter((l) => !quiet.includes(l))).map(leverRow)}</ul>
-                {!showAll && quiet.length > 0 && (
-                  <Fold summary={rc.decide.leversFold}>
-                    <ul className="levers__list">{quiet.map(leverRow)}</ul>
-                  </Fold>
-                )}
-                <p className="verdict__note">{lc.hint}</p>
-              </div>
-            </div>
+            // The changes a household could make, each tried alone and ranked by the years it gains. A card like every other on the page, open on arrival
+            // (`?leviers=none` shuts it): « Tout fermer » must reach it, or it reads as the one card that will not close.
+            <Accordion ids={['ajuster']} open={showAll ? 'all' : m.leversOpen ? 'ajuster' : null} onOpen={(id) => m.setLeversOpen(id !== null)}>
+              <AccordionItem id="ajuster" title={lc.title} summary={cc.ajuster} concept="essayer" nav={false} className="results-section">
+                <div className="verdict__range ajuster__levers">
+                  <ul className="levers__list">{(showAll ? rows : rows.filter((l) => !quiet.includes(l))).map(leverRow)}</ul>
+                  {!showAll && quiet.length > 0 && (
+                    <Fold summary={rc.decide.leversFold}>
+                      <ul className="levers__list">{quiet.map(leverRow)}</ul>
+                    </Fold>
+                  )}
+                  <p className="verdict__note">{lc.hint}</p>
+                </div>
+              </AccordionItem>
+            </Accordion>
           )}
           {/* The plan asked the other way round: an age to aim at, and what it would take to stop then. It shares the age (`?age=`) with « Combien épargner ? ». */}
           <Accordion ids={whatIfIds} open={whatIfOpen} onOpen={(id) => setEssai(id === null ? null : WHAT_IF[id as WhatIf].essai)}>

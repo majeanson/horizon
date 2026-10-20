@@ -84,8 +84,15 @@ export function AccordionMode({ open, onOpen }: { open: AccordionOpen; onOpen: (
   const anyOpen = open !== null
   const label = anyOpen ? c.closeAll : c.openAll
   const caret: IconName = anyOpen ? 'caret-up-bold' : 'caret-down-bold'
+  const toggle = () => {
+    // « Tout fermer » closes EVERYTHING that opens, not only the cards: a Fold that sits outside a card (« Ma situation », « Rendre mon profil exact », a fold
+    // on the answer) stayed open and read as the one thing the switch missed (Marc, 2026-10-20). A Fold is a native <details>: shutting it fires its toggle,
+    // so a controlled one tells its page (the address follows). Dialogs are portalled outside #root and keep theirs.
+    if (anyOpen) document.querySelectorAll<HTMLDetailsElement>('#root details.fold[open]').forEach((d) => (d.open = false))
+    onOpen(anyOpen ? null : 'all')
+  }
   return (
-    <button type="button" className="btn btn--icon btn--ghost accordion__all" aria-label={label} title={label} onClick={() => onOpen(anyOpen ? null : 'all')}>
+    <button type="button" className="btn btn--icon btn--ghost accordion__all" aria-label={label} title={label} onClick={toggle}>
       {/* two stacked carets: « all of them open » / « shut but one » — no new glyph in the eager icon set */}
       <span className="accordion__all-glyph" aria-hidden="true">
         <Icon name={caret} size={12} />

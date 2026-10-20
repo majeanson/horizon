@@ -248,3 +248,29 @@ for (const [path, open] of [
     await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
   })
 }
+
+// …and what opens outside a card: a Fold opened by hand (« Ma situation » on Profil, a fold on the answer) closes with the cards — it read as the one thing the
+// switch missed. A controlled fold tells its page, so its address key goes too.
+for (const [path, summary, key] of [
+  ['/profil', 'Ma situation', null], // a native, self-keeping fold
+  ['/resultats', 'Rentes et dépenses, année par année', /dates=1/], // a controlled one: the address keeps it (`?dates=1`)
+] as const) {
+  test(`« Tout fermer » on ${path} also closes « ${summary} », a fold opened by hand outside the cards`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await seedProfile(page, EXAMPLE)
+    await page.goto(path)
+    const icon = page.locator('.accordion__all').first()
+    await expect(icon).toHaveAttribute('aria-label', 'Tout fermer', { timeout: 60_000 })
+    const fold = page.locator('details.fold').filter({ has: page.locator('summary', { hasText: summary }) }).first()
+    await expect(fold).toBeVisible({ timeout: 60_000 })
+    await fold.locator('summary').first().click()
+    await expect(fold).toHaveAttribute('open', '')
+    if (key) await expect(page).toHaveURL(key)
+    await icon.click()
+    await expect(icon).toHaveAttribute('aria-label', 'Tout ouvrir')
+    await expect(fold).not.toHaveAttribute('open', '')
+    await expect(page.locator('#root details.fold[open]')).toHaveCount(0)
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
+    if (key) await expect(page).not.toHaveURL(key)
+  })
+}

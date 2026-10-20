@@ -1002,6 +1002,10 @@
   /* the one child of a bare `.surface` (DecideView #ajuster), which carries no padding of its own: without this the title and the levers sat flush against the card's edge */
   padding: 0.9rem 1.1rem;
 }
+/* …but it is a card now (2026-10-20, so « Tout fermer » reaches it): the card's body has its own padding, and the title is the card's. */
+.accordion__item .ajuster__levers {
+  padding: 0;
+}
 
 /* On paper the relevé is the whole list, not a box with a scroll bar. */
 @media print {

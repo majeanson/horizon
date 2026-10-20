@@ -174,6 +174,10 @@ export function useResultsPage() {
   const rawStrat = params.get('strat')
   const strat: Strat | null | undefined = rawStrat === null ? undefined : rawStrat === 'none' ? null : STRATS.find((k) => k === rawStrat)
   const setStrat = (next: Strat | null) => setParam('strat', next ?? 'none')
+  // « Ce qui change le plus », the first card on « Décider »: open unless the address shut it (`?leviers=none`), so « Tout fermer » closes it with the rest (Marc,
+  // 2026-10-20: it was a bare surface the switch never reached, and read as « the first one stayed open »). A household that has stopped working has no levers.
+  const leversOpen = !retiredNow && params.get('leviers') !== 'none'
+  const setLeversOpen = (open: boolean) => setParam('leviers', open ? null : 'none')
   // A what-if that came from one of its own keys is written down at once: when that key goes (« L'ajouter à mes événements » clears `?care=`), the reader stays where they are.
   useEffect(() => {
     if (view === 'decide' && essai !== null && rawEssai !== essai) setParam('essai', essai)
@@ -208,6 +212,7 @@ export function useResultsPage() {
     const wanted = target === 'decide' ? ESSAI_OF[id] : undefined
     if (wanted !== undefined && next.get('essai') !== 'all') next.set('essai', wanted)
     if (target === 'decide' && (STRATS as readonly string[]).includes(id)) next.set('strat', id)
+    if (target === 'decide' && id === 'ajuster') next.delete('leviers')
     // Réponse's cards are all open unless the address closed some (`?cartes=`): a link to one opens it when it is shut.
     if (target === 'answer' && (ANSWER_BLOCKS as readonly string[]).includes(id) && next.get('cartes') !== null) next.set('cartes', id)
     if (target === 'answer' && id === 'graphique') {
@@ -464,6 +469,8 @@ export function useResultsPage() {
     goTo,
     strat,
     setStrat,
+    leversOpen,
+    setLeversOpen,
     compareRef,
     headline,
     activePreset,

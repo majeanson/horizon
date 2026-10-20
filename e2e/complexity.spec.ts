@@ -135,7 +135,9 @@ const BUDGETS: Record<string, Budget> = {
   // 49 → 51 controls (2026-10-19): the closed strategies say what they hold (lib/cardsCopy.ts `closed`), and « REER » in two of those lines is a glossary link, as in every subtitle.
   // 51 → 52 controls, 891 → 912 words (2026-10-19): the second step is said on the page — « Choisir comment » and its one sentence over the strategies (« REER » in it a glossary link).
   // 52 → 50 controls (2026-10-19, the ratchet FALLS): a page of its own — the three-view switch gone (−3), the fourth tab (+1).
-  'Résultats — Décider': { controls: 50, words: 912 },
+  // 50 → 51 controls (2026-10-20, Marc: « the first one stayed open »): « Ce qui change le plus » is a card with a title button, so « Tout fermer » reaches it; its
+  // words are the same (the title moved into the header).
+  'Résultats — Décider': { controls: 51, words: 912 },
   // Décider words 1211 → 1217 (2026-10-14): not new copy — the example's answers moved one year when the Neutre wage growth went from 3,1 % to 2,7 % (Retraite Québec's 2024
   // valuation), and the lever lines and the strategies' sentences it prints carry a few more figures. The controls are the same 50.
   // 43/1859 → 44/1887 (2026-10-14): not growth — the earlier numbers were read BEFORE the idle range landed; the settle now waits

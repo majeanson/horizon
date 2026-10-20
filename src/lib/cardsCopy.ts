@@ -8,6 +8,7 @@ export interface CardsCopy {
   closed: {
     comparer: string
     annee: string
+    ajuster: string
     viser: string
     epargner: string
     depenser: string
@@ -41,6 +42,7 @@ export const CARDS_COPY: Record<Lang, CardsCopy> = {
     closed: {
       comparer: 'Votre âge de départ placé à côté d’autres, en cartes et en graphique.',
       annee: 'Le changement qui gagne le plus et les décisions qui ont leur propre carte.',
+      ajuster: 'Chaque changement essayé seul, rangé selon les années qu’il fait gagner.',
       viser: 'Un âge visé, et ce qu’il faudrait pour arrêter à ce moment.',
       epargner: 'L’épargne qu’il faut chaque mois pour atteindre un âge donné.',
       depenser: 'Ce que dépenser un peu moins ferait à votre âge de départ.',
@@ -69,6 +71,7 @@ export const CARDS_COPY: Record<Lang, CardsCopy> = {
     closed: {
       comparer: 'Your departure age set beside others, as cards and as a chart.',
       annee: 'The change that gains the most and the decisions that have a card of their own.',
+      ajuster: 'Each change tried alone, ranked by the years it gains.',
       viser: 'An age to aim at, and what it would take to stop then.',
       epargner: 'The monthly saving an age needs.',
       depenser: 'What spending a little less would do to your departure age.',

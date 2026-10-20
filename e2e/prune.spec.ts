@@ -61,6 +61,9 @@ test('« Tout ouvrir » (the icon at the end of the map row) opens every what-if
   await expect(page).not.toHaveURL(/essai=all/)
   await expect(page.locator('.try-fold.is-open')).toHaveCount(0)
   await expect(page.locator('#fonte')).toHaveClass(/is-closed/)
+  // « Ce qui change le plus » too: it was a bare box the switch never reached (Marc, 2026-10-20: « the first one stayed open »)
+  await expect(page.locator('#ajuster')).toHaveClass(/is-closed/)
+  await expect(page).toHaveURL(/leviers=none/)
 })
 
 test('?tout=1 opens everything: every strategy open, no verdict line, and the map row offers the way back', async ({ page }) => {

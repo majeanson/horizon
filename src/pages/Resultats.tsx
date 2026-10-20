@@ -143,12 +143,12 @@ function ResultsMode() {
   )
 }
 
-/** On Décider « tout » is two things the one icon turns on together: every strategy open, the ones that change little for this household too (`?tout=1`, which is what says « all »), and every what-if card (`?essai=all`). Closing puts both away. */
+/** On Décider « tout » is three things the one icon turns on together: every strategy open, the ones that change little for this household too (`?tout=1`, which is what says « all »), every what-if card (`?essai=all`) and « Ce qui change le plus » (`?leviers=`). Closing puts all three away. */
 function DecideMode({ m }: { m: ResultsModel }) {
   const [tout, setTout] = useParamChoice('tout', ['off', '1'] as const, 'off')
   const all = tout === '1'
   // Anything open — the first strategy, open by default (`strat` undefined), one chosen, or a what-if — makes the icon « Tout fermer ».
-  const anyOpen = all || m.strat !== null || m.essai !== null || m.essaiAll
+  const anyOpen = all || m.leversOpen || m.strat !== null || m.essai !== null || m.essaiAll
   return (
     <AccordionMode
       open={all ? 'all' : anyOpen ? 'some' : null}
@@ -156,8 +156,10 @@ function DecideMode({ m }: { m: ResultsModel }) {
         if (next === 'all') {
           setTout('1')
           m.setParam('essai', 'all')
+          m.setLeversOpen(true)
         } else {
           setTout('off')
+          m.setLeversOpen(false)
           m.setStrat(null)
           m.setEssai(null)
         }
