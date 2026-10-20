@@ -32,7 +32,7 @@ export interface FutureCopy {
     full: (max: number) => string
     /** « Le coût commencerait en 2051 (85 ans). » — the year arrives already built. */
     starts: (yearAge: string) => string
-    /** A care already sits among the dated events: this trial adds to it. */
+    /** A care already sits among the dated events: this trial (and « Garder ») replaces it. */
     already: string
     /** The reference chips under the amount: a public CHSLD's ceiling. */
     refTitle: string
@@ -80,7 +80,7 @@ const FR: FutureCopy = {
     kept: 'Ajouté à vos événements datés, sur Profil.',
     full: (max) => `Les ${max} événements sont utilisés : retirez-en un sur Profil pour en ajouter.`,
     starts: (yearAge) => `Le coût commencerait en ${yearAge}.`,
-    already: 'Un coût de soins est déjà dans vos événements : cet essai s’y ajoute.',
+    already: 'Un coût de soins est déjà dans vos événements : cet essai le remplace.',
     refTitle: 'Repère : un CHSLD public',
     refs: { privateRoom: 'Chambre privée', semiPrivate: 'Chambre semi-privée', ward: 'Salle' },
     refChip: (name, perYear) => `${name} : ${perYear} par année`,
@@ -123,7 +123,7 @@ const EN: FutureCopy = {
     kept: 'Added to your dated events, on Profile.',
     full: (max) => `All ${max} events are used: remove one on Profile to add this.`,
     starts: (yearAge) => `The cost would start in ${yearAge}.`,
-    already: 'A care cost is already among your events: this trial adds to it.',
+    already: 'A care cost is already among your events: this trial replaces it.',
     refTitle: 'Reference: a public CHSLD',
     refs: { privateRoom: 'Private room', semiPrivate: 'Semi-private room', ward: 'Ward' },
     refChip: (name, perYear) => `${name}: ${perYear} a year`,

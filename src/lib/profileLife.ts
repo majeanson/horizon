@@ -141,10 +141,11 @@ export function setSplitRow(p: Profile, id: Split['rows'][number]['id'], patch: 
 /**
  * « Garder » for a care period tried on the results page: the household's plan gets ONE care expense under that label — a second « Garder » (the
  * sliders reset after the first, so the chip is live again) REPLACES the one kept, never adds a twin that counts the care twice. Matched by its label, as
- * the page's « déjà là » note matches it.
+ * the page's « déjà là » note matches it — in ANY of `sameAs` (the label in every language: kept in French, « Garder » again in English must not
+ * find « Care later on » missing and add the care a second time).
  */
-export function keepFlowByLabel(p: Profile, flow: Flow): Profile {
-  const index = (p.household.flows ?? []).findIndex((f) => f.kind === flow.kind && f.label === flow.label)
+export function keepFlowByLabel(p: Profile, flow: Flow, sameAs: readonly string[] = [flow.label]): Profile {
+  const index = (p.household.flows ?? []).findIndex((f) => f.kind === flow.kind && sameAs.includes(f.label))
   return index < 0 ? addFlow(p, flow) : updateFlow(p, index, () => flow)
 }
 

@@ -121,7 +121,7 @@ export function Slider({
         </output>
       </div>
       <div className="slider__row">
-        <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.less} : ${label}`} disabled={local <= min} onClick={() => nudge(-1)}>
+        <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.less}${t.common.colon} ${label}`} disabled={local <= min} onClick={() => nudge(-1)}>
           <Icon name="minus-bold" size={18} />
         </button>
         <div className="slider__track" style={{ ['--lines' as string]: depth, ['--p' as string]: at(local) }}>
@@ -158,7 +158,7 @@ export function Slider({
             </div>
           )}
         </div>
-        <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.more} : ${label}`} disabled={local >= max} onClick={() => nudge(1)}>
+        <button type="button" className="btn btn--icon btn--ghost slider__step" aria-label={`${t.common.more}${t.common.colon} ${label}`} disabled={local >= max} onClick={() => nudge(1)}>
           <Icon name="plus-bold" size={18} />
         </button>
       </div>

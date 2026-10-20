@@ -112,4 +112,13 @@ describe('« Garder » a care period twice', () => {
     // another expense of another label is its own
     expect(keepFlowByLabel(twice, { ...care(5_000), label: 'Toit' }).household.flows).toHaveLength(2)
   })
+
+  it('kept in one language, kept again in the other: still ONE care expense (matched in every language), now under the new label', () => {
+    const care = (amount: number): Flow => ({ label: '', kind: 'expense', amount, fromYear: 2060, toYear: 2069, owner: 'self', taxable: false })
+    const labels = ['Des soins plus tard', 'Care later on']
+    const fr = keepFlowByLabel(defaultProfile({ year: 2026 }), { ...care(30_000), label: labels[0] }, labels)
+    const en = keepFlowByLabel(fr, { ...care(36_000), label: labels[1] }, labels)
+    expect(en.household.flows).toHaveLength(1)
+    expect(en.household.flows![0]).toMatchObject({ amount: 36_000, label: 'Care later on' })
+  })
 })

@@ -79,11 +79,11 @@ export function GuideBar({ ids, at, setAt, onClose }: { ids: string[]; at: numbe
           </div>
           <p className="guide-bar__title">{c.kind[fact.kind]}</p>
           <p className="guide-bar__where">
-            <strong>{c.guide.document} :</strong> {c.docs[fact.doc].name}. <strong>{c.guide.whereIs} :</strong> {where}
+            <strong>{c.guide.document}{t.common.colon}</strong> {c.docs[fact.doc].name}. <strong>{c.guide.whereIs}{t.common.colon}</strong> {where}
             {entry?.label ? (
               <>
                 {' '}
-                <strong>{c.guide.wording} :</strong> « {entry.label} »
+                <strong>{c.guide.wording}{t.common.colon}</strong> « {entry.label} »
               </>
             ) : null}
             {entry?.url ? (

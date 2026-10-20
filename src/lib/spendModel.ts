@@ -30,3 +30,12 @@ export function parseSpend(text: string | null): number | null {
   if (text === null || text === '' || !Number.isFinite(n)) return null
   return Math.min(SPEND_MAX, Math.max(SPEND_MIN, Math.round(n / SPEND_STEP) * SPEND_STEP))
 }
+
+/**
+ * What a released slider asks for: null (« back to your own amount », `?spend=` cleared) when it lands on the profile's amount OR on the step nearest it — the slider
+ * only offers its 500 $ steps, so an amount typed on Profil (41 237 $) could otherwise never be reached again: every release wrote a `?spend=` a few dollars off, and
+ * the panel ran a search for an amount that was almost, never quite, the household's own.
+ */
+export function spendChoice(released: number, current: number): number | null {
+  return released === current || released === Math.round(current / SPEND_STEP) * SPEND_STEP ? null : released
+}

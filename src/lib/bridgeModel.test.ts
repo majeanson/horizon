@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { bridgeRun, bridgeView, leversFor, profileLevers, type BridgeLevers } from '../engine/bridge.ts'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
-import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, shownPlan, strategiesOf, sturdiest, verdictOf, windowRows } from './bridgeModel.ts'
+import { barRows, bridgeQuery, defers, parseBridgeParams, SEGMENTS, shownPlan, strategiesOf, strategyMoves, sturdiest, verdictOf, windowRows } from './bridgeModel.ts'
+import { withStartAges } from './profileEdit.ts'
+import { defaultProfile, type Profile } from './schema.ts'
 
 const H = GOLDEN_HOUSEHOLD
 const q = (s: string) => new URLSearchParams(s)
@@ -181,5 +183,44 @@ describe('the sturdiest way to start', () => {
     // with only one open way left there is nothing to compare: no crown
     const maxPassed = { ...(row('max', 300) as object), passed: true } as never
     expect(sturdiest([row('standard', 100), maxPassed, asapPassed] as never, all)).toBeNull()
+  })
+})
+
+describe('what a tap on a way of starting writes to the profile (strategyMoves, withStartAges)', () => {
+  const cur = profileLevers(GOLDEN_HOUSEHOLD, 'self')
+  const profileOf = (household: typeof GOLDEN_HOUSEHOLD): Profile => ({ ...defaultProfile({ year: 2026 }), household })
+
+  it('« both defer to 70 » moves EVERYONE — the other person is stored too, not left in the address — and undo puts each back', () => {
+    const picked = strategyMoves('both', GOLDEN_HOUSEHOLD, GOLDEN_ASSUMPTIONS, cur)!
+    expect(picked.moves.map((m) => [m.id, m.rrq, m.oas, m.prevRrq, m.prevOas])).toEqual([
+      ['self', 70, 70, 65, 65],
+      ['spouse', 70, 70, 65, 65],
+    ])
+    const before = profileOf(GOLDEN_HOUSEHOLD)
+    const after = withStartAges(before, picked.moves)
+    expect(after.household.persons.map((p) => [p.rrq.startAge, p.oas.startAge])).toEqual([
+      [70, 70],
+      [70, 70],
+    ])
+    const undone = withStartAges(after, picked.moves, true)
+    expect(undone.household.persons.map((p) => [p.rrq.startAge, p.oas.startAge])).toEqual([
+      [65, 65],
+      [65, 65],
+    ])
+    expect(withStartAges(before, picked.moves, true)).toBe(before) // nothing to change: the same profile
+  })
+
+  it('the bridge alone moves only the person looked at', () => {
+    expect(strategyMoves('bridge', GOLDEN_HOUSEHOLD, GOLDEN_ASSUMPTIONS, cur)!.moves.map((m) => m.id)).toEqual(['self'])
+  })
+
+  it('a way no longer open — a pension paid since 65 for someone now 68 — writes NOTHING (its card is for comparing)', () => {
+    const [me, spouse] = GOLDEN_HOUSEHOLD.persons
+    const drawing = { ...GOLDEN_HOUSEHOLD, persons: [{ ...me, birth: { year: 1958, month: 3 } }, spouse] }
+    const levers = profileLevers(drawing, 'self')
+    expect(strategyMoves('bridge', drawing, GOLDEN_ASSUMPTIONS, levers)).toBeNull()
+    expect(strategyMoves('max', drawing, GOLDEN_ASSUMPTIONS, levers)).toBeNull()
+    expect(strategyMoves('both', drawing, GOLDEN_ASSUMPTIONS, levers)).toBeNull()
+    expect(strategyMoves('standard', drawing, GOLDEN_ASSUMPTIONS, levers)).not.toBeNull() // the ages they already have stay open
   })
 })

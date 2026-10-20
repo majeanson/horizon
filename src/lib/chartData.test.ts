@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { balanceBars, chartSeries, deflator, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
+import { balanceBars, chartSeries, deflator, fanBasis, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars } from './chartData.ts'
 import { runSelections } from './resultsModel.ts'
 import type { Profile } from './schema.ts'
 
@@ -49,6 +49,19 @@ describe('what the chart draws is what the table says', () => {
     const markers = retirementMarkers(profile.household, runs, label)
     expect(markers.map((m) => m.x)).toEqual([1978 + 60, 1978 + 65])
     expect(markers.map((m) => m.colour)).toEqual(SERIES_COLOURS.slice(0, 2))
+  })
+
+  it('the market fan reads the household’s OWN plan for its axis AND its marker, wherever « Mon plan » sits in the comparison', () => {
+    const planLast = runSelections(profile, TODAY, [65, 'plan'])
+    const { rows, markers } = fanBasis(profile.household, planLast, label)
+    expect(rows).toBe(planLast[1].result.rows)
+    const planAge = profile.household.persons[0].retirementAge
+    expect(planAge).not.toBe(65) // the case: the plan is not the first age compared
+    expect(markers.map((m) => m.x)).toEqual([1978 + planAge])
+    expect(markers.map((m) => m.label)).toEqual(['plan ans'])
+    // the plan not compared: the first run, for both
+    expect(fanBasis(profile.household, runs, label).markers.map((m) => m.x)).toEqual([1978 + 60])
+    expect(fanBasis(profile.household, [], label)).toEqual({ rows: undefined, markers: [] })
   })
 })
 

@@ -3,7 +3,7 @@ import { useLang, useT } from '../../i18n'
 import { formatMoney } from '../../lib/money'
 import { setSpending } from '../../lib/profileEdit'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
-import { SPEND_MAX, SPEND_MIN, SPEND_STEP } from '../../lib/spendModel'
+import { SPEND_MAX, SPEND_MIN, SPEND_STEP, spendChoice } from '../../lib/spendModel'
 import { updateProfile } from '../../lib/store'
 import { useNotice } from '../../lib/toast'
 import { useSpendEarliest } from '../../lib/useSpendEarliest'
@@ -76,7 +76,7 @@ export function SpendView({
         max={Math.max(SPEND_MAX, spend)}
         step={SPEND_STEP}
         valueText={money}
-        onCommit={(v) => onSpend(v === current ? null : v)}
+        onCommit={(v) => onSpend(spendChoice(v, current))}
       />
       <Fold summary={t.common.howToRead}>
         <p className="field-row__hint">{q.hint}</p>

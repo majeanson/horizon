@@ -43,7 +43,7 @@ function Dots({ k, matrix, copy }: { k: StrategyKey; matrix: BridgeMatrix | null
   const t = useT()
   const words = SCENARIOS.map((p) => {
     const cell = matrix?.[k][p]
-    return `${t.assumptions.presets[p]} : ${cell === undefined ? copy.marksPending : cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}`
+    return `${t.assumptions.presets[p]}${t.common.colon} ${cell === undefined ? copy.marksPending : cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}`
   }).join(' · ')
   return (
     <span className="dots" role="img" aria-label={words} title={words}>
@@ -127,7 +127,7 @@ function Cards({ shown, standard, pressed, copy, onPick, horizonAge, who, matrix
           return (
             <li key={s.key} className={'bridge-card surface' + (pressed.includes(s.key) ? ' bridge-card--on' : '') + (s.summary.ok ? '' : ' bridge-card--short') + (s.passed ? ' bridge-card--passed' : '')}>
               {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
-              <Chip radio selected={pressed.includes(s.key)} concept={STRATEGY_CONCEPT[s.key]} onClick={() => onPick(s.key)}>
+              <Chip radio selected={pressed.includes(s.key)} concept={STRATEGY_CONCEPT[s.key]} disabled={s.passed} onClick={() => onPick(s.key)}>
                 {label(s)}
               </Chip>
               <p className="bridge-card__line">{copy.strategyLine[s.key]}</p>
@@ -167,7 +167,7 @@ function Cards({ shown, standard, pressed, copy, onPick, horizonAge, who, matrix
                         <span key={k} className={'bridge-mark' + (cell === undefined ? '' : cell.ok ? ' bridge-mark--ok' : ' bridge-mark--short')}>
                           <span aria-hidden="true">{cell === undefined ? '' : cell.ok ? '✓ ' : '! '}</span>
                           {t.assumptions.presets[k]}
-                          {' '}: {cell === undefined ? copy.marksPending : cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}
+                          {t.common.colon} {cell === undefined ? copy.marksPending : cell.ok ? copy.matrixHolds : copy.matrixFails(cell.firstShortfallAge ?? 0)}
                         </span>
                       )
                     })}
@@ -206,7 +206,7 @@ function WideTable({ shown, standard, pressed, copy, onPick, matrix, bestKey, la
             {shown.map((s) => (
               <th key={s.key} scope="col">
                 {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
-                <Chip selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
+                <Chip selected={pressed.includes(s.key)} disabled={s.passed} onClick={() => onPick(s.key)}>
                   {label(s)}
                 </Chip>
               </th>
@@ -303,7 +303,7 @@ function NarrowTable({ shown, pressed, copy, onPick, matrix, bestKey, label, mon
             <tr key={s.key}>
               <th scope="row">
                 {bestKey === s.key && <span className="bridge-card__badge mono">{copy.sturdiestBadge}</span>}
-                <Chip selected={pressed.includes(s.key)} onClick={() => onPick(s.key)}>
+                <Chip selected={pressed.includes(s.key)} disabled={s.passed} onClick={() => onPick(s.key)}>
                   {label(s)}
                 </Chip>
                 <Dots k={s.key} matrix={matrix} copy={copy} />

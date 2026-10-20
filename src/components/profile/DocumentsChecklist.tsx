@@ -42,7 +42,7 @@ export function DocumentsChecklist({ onNext }: { onNext: () => void }) {
   const household = items.filter((it) => it.owner === 'household')
   const renderItem = (it: (typeof items)[number]) => {
           const on = ticked.has(it.id)
-          const label = `${c.have} : ${it.name}${it.who ? ` — ${it.who}` : ''}`
+          const label = `${c.have}${t.common.colon} ${it.name}${it.who ? ` — ${it.who}` : ''}`
           return (
             <li key={it.id} className={'docs-item surface' + (on ? ' is-done' : '')}>
               <label className="docs-item__check">
@@ -52,7 +52,7 @@ export function DocumentsChecklist({ onNext }: { onNext: () => void }) {
               <div className="docs-item__body">
                 <h3 className="docs-item__name"><ConceptPip id={DOC_CONCEPT[it.doc]} size="sm" />{it.name}</h3>
                 <p className={`docs-item__weight docs-item__weight--${it.weight} mono`}>
-                  {c.importance} : {c.weights[it.weight]}
+                  {c.importance}{t.common.colon} {c.weights[it.weight]}
                 </p>
                 {c.when[it.doc] && <p className="field-row__hint">{c.when[it.doc]}</p>}
                 <p>{it.what}</p>

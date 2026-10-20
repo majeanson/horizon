@@ -1,7 +1,7 @@
 import type { Assumptions, Household } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { pageFor } from '../../engine/params/twins'
-import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_AMOUNT_STEP, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, CARE_YEARS_MIN, careFlow, oldestBirthYear, sameCare, type Care } from '../../lib/careModel'
+import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_AMOUNT_STEP, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, CARE_YEARS_MIN, careFlow, oldestBirthYear, sameCare, withoutKeptCare, type Care } from '../../lib/careModel'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { formatYearAge } from '../../lib/format'
 import { FUTURE_COPY } from '../../lib/futureCopy'
@@ -48,22 +48,26 @@ export function CareView({
   const t = useT()
   const c = FUTURE_COPY[lang].care
   const notice = useNotice()
-  const answer = useCareEarliest(household, assumptions, care, age, true)
-  const a = answer.value
-  const busy = answer.busy
   const money = (n: number) => formatMoney(n, lang)
   const births = household.persons.map((p) => p.birth.year)
   const label = LIFE_COPY[lang].flows.starters.care
+  // The care expense kept from here, in whichever language it was kept: the « déjà là » note and the replace both read this.
+  const careLabels = Object.values(LIFE_COPY).map((l) => l.flows.starters.care)
   const flows = household.flows ?? []
-  const full = flows.length >= MAX_FLOWS
-  const alreadyThere = flows.some((f) => f.kind === 'expense' && f.label === label)
+  const alreadyThere = flows.some((f) => f.kind === 'expense' && careLabels.includes(f.label))
+  // A full list leaves « Garder » when it only REPLACES the care already kept (no flow is added).
+  const full = flows.length >= MAX_FLOWS && !alreadyThere
+  // The trial is the plan with this care INSTEAD of the one kept, since that is what « Garder » stores.
+  const answer = useCareEarliest(withoutKeptCare(household, careLabels), assumptions, care, age, true)
+  const a = answer.value
+  const busy = answer.busy
   const change = (patch: Partial<Care>) => {
     const next = { ...care, ...patch }
     onCare(sameCare(next, CARE_START) ? null : next)
   }
   const keep = () => {
     // one care expense: a second « Garder » replaces the first (lib/profileLife.ts keepFlowByLabel)
-    updateProfile((p) => keepFlowByLabel(p, careFlow(household, care, label)))
+    updateProfile((p) => keepFlowByLabel(p, careFlow(household, care, label), careLabels))
     onCare(null)
     notice(c.kept)
   }

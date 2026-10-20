@@ -46,6 +46,8 @@ export const FR = {
     delete: 'Supprimer',
     confirmTitle: 'Confirmer',
     clear: 'Effacer le texte',
+    /** Between a label and its value (« Prudent : tient »): U+00A0 before the colon in French, none in English. */
+    colon: ' :',
     whereToFind: 'Où trouver ce chiffre',
     aboutField: 'À propos de ce champ',
     inGlossary: 'Voir dans le glossaire',

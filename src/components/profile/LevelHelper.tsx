@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
 import { BASES, current, isOpen, levelFigure, LEVELS, setFigure } from '../../lib/levels'
 import { useBasis } from '../../lib/levelBasis'
@@ -15,6 +15,7 @@ import { Cluster } from '../Layout'
 // and never over a figure the person typed or confirmed. Closed by default, so nobody who knows their figure reads past it.
 export default function LevelHelper({ kind, owner }: { kind: FactKind; owner: FactOwner }) {
   const { lang } = useLang()
+  const t = useT()
   const c = LEVELS_COPY[lang]
   const profile = useProfile()
   const now = today()
@@ -34,7 +35,7 @@ export default function LevelHelper({ kind, owner }: { kind: FactKind; owner: Fa
         </Chip>
       )}
       {open && (
-        <Cluster role="group" aria-label={`${c.helper.group} : ${c.kind[kind as keyof typeof c.kind]}`}>
+        <Cluster role="group" aria-label={`${c.helper.group}${t.common.colon} ${c.kind[kind as keyof typeof c.kind]}`}>
           {figures.map((f) => (
             <Chip key={f.level} radio selected={picked === f.level} onClick={() => updateProfile((p) => setFigure(p, kind, owner, f.level, now, basis))}>
               {c.levels[f.level].name} · {formatMoney(f.value, lang)}

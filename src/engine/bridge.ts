@@ -323,7 +323,7 @@ export function breakEvenOf(option: ReadonlyMap<number, number>, baseline: Reado
 }
 
 /** Whether the start ages these levers set are still open to everyone they move (the person looked at, and with `both` everyone else). */
-function leversPassed(h: Household, a: Assumptions, l: BridgeLevers): boolean {
+export function leversPassed(h: Household, a: Assumptions, l: BridgeLevers): boolean {
   const moved = l.both ? h.persons : h.persons.filter((p) => p.id === l.id)
   return moved.some((p) => !canStartAt('rrq', p.birth, p.rrq.startAge, l.rrqStartAge, a.today) || !canStartAt('oas', p.birth, p.oas.startAge, l.oasStartAge, a.today))
 }

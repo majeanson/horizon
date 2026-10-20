@@ -37,6 +37,17 @@ export function careFlow(h: Household, care: Care, label: string): Flow {
 }
 
 /** The household as it would be with that care (a copy; the household itself is untouched). */
+/**
+ * The household without the care expense « Garder » kept (matched by its label in any of `labels`). The trial is worked out on THIS: « Garder » REPLACES the care kept
+ * (lib/profileLife.ts keepFlowByLabel), so the age and the « what is left » the page shows must be the plan with the trial INSTEAD of it — added on top, the page said a
+ * figure for two care costs and keeping stored one. The same household when there is none.
+ */
+export function withoutKeptCare(h: Household, labels: readonly string[]): Household {
+  const flows = h.flows ?? []
+  const kept = flows.filter((f) => !(f.kind === 'expense' && labels.includes(f.label)))
+  return kept.length === flows.length ? h : { ...h, flows: kept }
+}
+
 export const withCare = (h: Household, care: Care, label = 'care'): Household => ({ ...h, flows: [...(h.flows ?? []), careFlow(h, care, label)] })
 
 export interface CareAnswer {

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { BridgeLevers, BridgeView, StrategyKey } from '../../engine/bridge'
-import { leversFor, profileLevers } from '../../engine/bridge'
+import { profileLevers } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
@@ -15,13 +15,14 @@ import {
   bridgeQuery,
   parseBridgeParams,
   shownPlan,
+  strategyMoves,
   windowRows,
   type BridgeParams,
   type BridgeWindow,
 } from '../../lib/bridgeModel'
 import { formatPct } from '../../lib/format'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
-import { mapPerson } from '../../lib/profileEdit'
+import { withStartAges, type StartMove } from '../../lib/profileEdit'
 import { updateProfile } from '../../lib/store'
 import { useBridge, useBridgeMatrix } from '../../lib/useBridge'
 import { useDeathSweep } from '../../lib/useDeathSweep'
@@ -59,6 +60,8 @@ interface AppliedChange {
   rrq: number
   oas: number
   both: boolean
+  /** Every person whose ages the tap wrote (with « both », the other person too), to take each back. */
+  moves: StartMove[]
 }
 
 function BridgeCharts({ view, span, household, params, copy }: { view: BridgeView; span: BridgeWindow; household: Household; params: BridgeParams; copy: BridgeCopy }) {
@@ -255,19 +258,22 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   }
   const apply = (key: StrategyKey) => {
     const cur = parseBridgeParams(new URLSearchParams(window.location.search), household).levers
-    const l = leversFor(key, household, cur.id, cur.retirementAge)
-    updateProfile((p) => mapPerson(p, cur.id, (x) => (x.rrq.startAge === l.rrqStartAge && x.oas.startAge === l.oasStartAge ? x : { ...x, rrq: { ...x.rrq, startAge: l.rrqStartAge }, oas: { ...x.oas, startAge: l.oasStartAge } })))
+    const picked = strategyMoves(key, household, assumptions, cur)
+    if (picked === null) return // a way no longer open: its card compares, it never stores a start the person can no longer take
+    const { levers: l, moves } = picked
+    updateProfile((p) => withStartAges(p, moves))
     change({ both: l.both === true })
     // A card tap edits the stored profile (the house rule: the ages live in ONE place). The part a
     // comparison control must not do silently is the edit — so remember what changed, say so, and
     // keep a way back on screen until the next tap.
-    const next: AppliedChange = { id: cur.id, prevRrq: cur.rrqStartAge, prevOas: cur.oasStartAge, prevBoth: cur.both === true, rrq: l.rrqStartAge, oas: l.oasStartAge, both: l.both === true }
-    setApplied(next.rrq === next.prevRrq && next.oas === next.prevOas && next.both === next.prevBoth ? null : next)
+    const next: AppliedChange = { id: cur.id, prevRrq: cur.rrqStartAge, prevOas: cur.oasStartAge, prevBoth: cur.both === true, rrq: l.rrqStartAge, oas: l.oasStartAge, both: l.both === true, moves }
+    // Nothing to say only when NO ONE's ages moved (with « both », the other person's can move while this one's stay).
+    setApplied(moves.every((m) => m.rrq === m.prevRrq && m.oas === m.prevOas) && next.both === next.prevBoth ? null : next)
   }
   const undoApply = () => {
     if (applied === null) return
     const a = applied
-    updateProfile((p) => mapPerson(p, a.id, (x) => (x.rrq.startAge === a.prevRrq && x.oas.startAge === a.prevOas ? x : { ...x, rrq: { ...x.rrq, startAge: a.prevRrq }, oas: { ...x.oas, startAge: a.prevOas } })))
+    updateProfile((p) => withStartAges(p, a.moves, true))
     change({ both: a.prevBoth })
     setApplied(null)
   }

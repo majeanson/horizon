@@ -21,7 +21,7 @@ export function FieldHelp({ id, label }: { id: HelpId; label?: string }) {
   const [open, setOpen] = useState(false)
   const [mod, setMod] = useState<Module | null>(loaded)
   const panelId = useId()
-  const name = label ? `${t.common.aboutField} : ${label}` : t.common.aboutField
+  const name = label ? `${t.common.aboutField}${t.common.colon} ${label}` : t.common.aboutField
   const entry = mod?.FIELD_HELP[lang][id]
   const words = mod?.FIELD_HELP_WORDS[lang]
   return (

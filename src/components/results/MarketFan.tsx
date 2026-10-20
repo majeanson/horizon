@@ -5,7 +5,7 @@ import { useLang } from '../../i18n'
 import type { SeriesColour } from '../charts'
 import { SERIES_CSS } from '../charts/palette'
 import { agesByYear as agesOfRuns } from '../../lib/chartMarks'
-import { deflator, retirementMarkers } from '../../lib/chartData'
+import { deflator, fanBasis } from '../../lib/chartData'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { MARKET_FAN_COPY } from '../../lib/marketFanCopy'
 import { deepestDip } from '../../lib/marketFanView'
@@ -40,9 +40,9 @@ function Body({ m }: { m: ResultsModel }) {
   const household = runsProfile.household
   const c = MARKET_FAN_COPY[lang]
   const { value, busy } = useMarketFan(household, assumptions, true)
-  const rows = (runs.find((r) => r.selection === 'plan') ?? runs[0])?.result.rows
+  // the axis and the marker from ONE run: the household's own plan (lib/chartData.ts fanBasis)
+  const { rows, markers } = useMemo(() => fanBasis(household, runs, label), [household, runs, label])
   const ages = useMemo(() => agesOfRuns(rows ?? []), [rows])
-  const markers = useMemo(() => retirementMarkers(household, runs.slice(0, 1), label), [household, runs, label])
   const scale = (y: number, netWorth: number) => netWorth / (dollars === 'today' ? deflator(y, year, assumptions.inflation) : 1)
   const series = useMemo(
     () => (value === null ? [] : value.lines.map((l) => ({ id: l.id, label: c.names[l.id], colour: COLOUR[l.id], points: l.points.map((p) => ({ x: p.year, y: scale(p.year, p.netWorth) })) }))),

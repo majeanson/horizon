@@ -69,6 +69,15 @@ export function retirementMarkers(
   }))
 }
 
+/**
+ * What the market fan draws its plan from: the household's OWN plan — the « Mon plan » run (the first run only when the plan is not compared) gives both the
+ * age axis and the retirement marker. The marker once came from whichever age the comparison listed first (`?ages=60,plan`: « Retraite à 60 » over a plan that stops at 63).
+ */
+export function fanBasis<R extends { selection: Selection; result: AgeResult }>(household: Household, runs: readonly R[], label: (s: Selection) => string): { rows: AgeResult['rows'] | undefined; markers: ChartMarker[] } {
+  const run = runs.find((r) => r.selection === 'plan') ?? runs[0]
+  return { rows: run?.result.rows, markers: run === undefined ? [] : retirementMarkers(household, [run], label) }
+}
+
 // ── The whole picture, not only the net worth ────────────────────────────────────────────────────────────────────────
 // « Détail »: where each year's money comes from (work, pension plan, RRQ, OAS and its supplements, savings drawn) and what
 // the accounts hold. Everything is read from the engine's rows, for the household or for one person, so the bars and the

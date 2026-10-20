@@ -1,7 +1,8 @@
-import { leversFor, profileLevers, strategyKeysFor, type BridgeLevers, type BridgeSummary, type BridgeView, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
+import { leversFor, leversPassed, profileLevers, strategyKeysFor, type BridgeLevers, type BridgeSummary, type BridgeView, type BridgeYear, type StrategyKey } from '../engine/bridge.ts'
 import type { ChartSeries } from '../components/charts/types.ts'
-import type { Household, PersonId } from '../engine/types.ts'
+import type { Assumptions, Household, PersonId } from '../engine/types.ts'
 import { SOURCE_COLOUR, SOURCE_CONCEPT } from './chartData.ts'
+import type { StartMove } from './profileEdit.ts'
 import { MAX_AGE, MIN_AGE } from './resultsModel.ts'
 
 // What the « Mes années 60 à 70 » view keeps in the address bar, and the pure helpers around it: which strategy a set of
@@ -56,6 +57,20 @@ export function strategiesOf(levers: BridgeLevers, household: Household): Strate
     const l = leversFor(key, household, levers.id, levers.retirementAge)
     return l.rrqStartAge === levers.rrqStartAge && l.oasStartAge === levers.oasStartAge && !!l.both === !!levers.both
   })
+}
+
+/**
+ * What a tap on a way of starting writes to the profile: the start ages of EVERYONE the way moves — the person looked at, and with
+ * « both defer to 70 » the other person too (the rest of the app reads the profile, never the address: a deferral kept only in `bb=`
+ * was a plan the household believed it had stored) — each with the ages held before. null for a way no longer open (an age behind
+ * someone, a pension already being paid: the engine's own `leversPassed`): its card is there to compare, and a tap must never store
+ * a start the law no longer allows.
+ */
+export function strategyMoves(key: StrategyKey, household: Household, assumptions: Assumptions, cur: BridgeLevers): { levers: BridgeLevers; moves: StartMove[] } | null {
+  const levers = leversFor(key, household, cur.id, cur.retirementAge)
+  if (leversPassed(household, assumptions, levers)) return null
+  const moved = levers.both ? household.persons : household.persons.filter((p) => p.id === levers.id)
+  return { levers, moves: moved.map((p) => ({ id: p.id, rrq: levers.rrqStartAge, oas: levers.oasStartAge, prevRrq: p.rrq.startAge, prevOas: p.oas.startAge })) }
 }
 
 /** The years a window shows: the bridge years are the person's 60th to 70th year; the plan is every year to the horizon. */

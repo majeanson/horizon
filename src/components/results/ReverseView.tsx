@@ -34,6 +34,8 @@ export function ReverseView({
   const { lang } = useLang()
   const c = REVERSE_COPY[lang]
   const money = (n: number) => formatMoney(Math.round(n), lang)
+  // The answer held while a new age is worked out is the OLD age's: every sentence is worded from the age it was computed for (r.age), never the slider's —
+  // « needs 65 » beside 60's levers read « 2 years less » as « -2 ».
   const { value: r, busy } = useReverse(household, assumptions, age, true)
   const regret = useRegret(household, assumptions, true).value
   const waitFrom = regret === null ? -1 : regret.points.findIndex((p) => p.gain !== null)
@@ -50,17 +52,17 @@ export function ReverseView({
         <Skeleton count={3} />
       ) : r.works ? (
         <>
-          <p className="answer__big">{c.works(age)}</p>
+          <p className="answer__big">{c.works(r.age)}</p>
           {r.spend.max !== null && r.spend.max > r.spend.current && <p className="answer__note">{c.margin(money(r.spend.max))}</p>}
         </>
       ) : (
         <>
-          <p className="answer__note">{c.needs(age)}</p>
+          <p className="answer__note">{c.needs(r.age)}</p>
           <ul className="reverse__levers">
             <li>{r.spend.max === null ? c.spendNone : c.spend(money(r.spend.current), money(r.spend.max), formatPct(1 - r.spend.max / r.spend.current, lang, 0))}</li>
             <li>{r.save === null ? c.saveNone : c.save(money(r.save), money(r.save / 12))}</li>
-            <li>{r.earliest === null ? c.workNone : c.work(r.earliest, r.earliest - age)}</li>
-            <li>{r.partTime === null ? c.partTimeNone : c.partTime(r.partTime, r.partTime - age)}</li>
+            <li>{r.earliest === null ? c.workNone : c.work(r.earliest, r.earliest - r.age)}</li>
+            <li>{r.partTime === null ? c.partTimeNone : c.partTime(r.partTime, r.partTime - r.age)}</li>
             <li>{r.returns === null ? c.returnsNone(formatDecimal(MAX_EXTRA_RETURN * 100, lang, 0)) : c.returns(formatDecimal(r.returns * 100, lang, 1))}</li>
           </ul>
           <p className="answer__note">{c.alone}</p>

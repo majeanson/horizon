@@ -177,7 +177,7 @@ a box without one can commit a figure that blanks the plan at the next launch) �
 `twins` (every cited page has its other-language edition in `engine/params/twins.ts`, or a stated
 reason it has none; a new source must decide) · `verifiedHeader` (every worked example names its source) ·
 `fixtureSanity` (the golden couple, the example and every fixture hold to what life allows — earnings vs the cited ceilings, room vs the law, retired spending ≤ 1,05 × working — canary + ALLOWED reasons) ·
-`documentLang` (the head and manifest follow the reader's language) · `vocabulary` (words ruled out of the copy, in any case: « pécule » → « nid ») · `examplesMd` (EXAMPLES.md is the engine's own print of the nine example households: `npm run examples`) · the copy tests of the lazily-loaded results copy (`bridgeCopy`, `deferralCopy`, `resultsCopy`: non-empty, translated, no rate retyped).
+`documentLang` (the head and manifest follow the reader's language) · `colonRule` (a component never types the colon between a label and its value: `t.common.colon` — U+00A0 before it in French, no space in English) · `vocabulary` (words ruled out of the copy, in any case: « pécule » → « nid ») · `examplesMd` (EXAMPLES.md is the engine's own print of the nine example households: `npm run examples`) · the copy tests of the lazily-loaded results copy (`bridgeCopy`, `deferralCopy`, `resultsCopy`: non-empty, translated, no rate retyped).
 
 > **A new guard must be run against the bug it was written for before it is trusted.** A green
 > grep test proves nothing on its own — plant the violation (or stash the fix), watch the guard

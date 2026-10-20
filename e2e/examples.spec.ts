@@ -127,7 +127,7 @@ test('planner: a life to plan — the profile carries its events, the answer mov
   await page.goto('/profil')
   await expect(page.locator('.flow__line', { hasText: 'Un héritage' })).toBeVisible()
   await expect(page.locator('.flow__line', { hasText: 'Des soins plus tard' })).toBeVisible()
-  // the care what-if sits on top of the care the household already counts, and says so
+  // the care what-if REPLACES the care the household already counts (as « Garder » does), and says so
   await page.goto('/resultats?v=adjust&essai=care')
   await expect(page.locator('#soins')).toContainText('déjà dans vos événements', { timeout: 30_000 })
 })

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { choosePrintKind, currentPrintKind, PRINT_KINDS } from '../../lib/printKind'
+import { choosePrintKind, currentPrintKind, PRINT_KINDS, printReady } from '../../lib/printKind'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { PrintPlan } from './PrintPlan'
 
@@ -30,7 +30,7 @@ export function usePrintRequest(m: ResultsModel): void {
   const [params, setParams] = useSearchParams()
   const asked = PRINT_KINDS.find((k) => k === params.get('imprimer'))
   const raw = params.get('imprimer')
-  const ready = !m.answerPending && (asked !== 'years' || (!m.runsPending && m.runs.length > 0))
+  const ready = asked !== undefined && printReady(asked, { answerPending: m.answerPending, runsPending: m.runsPending, runs: m.runs.length, retiredNow: m.retiredNow, range: m.range, stress: m.stress })
   const gaps = m.gaps.length > 0
   const clear = () =>
     setParams(

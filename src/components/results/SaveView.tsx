@@ -32,6 +32,7 @@ export function SaveView({
   // to swap the figure for a skeleton inside the live region — a height jump and a screen-reader
   // announcement per keystroke. The live region also goes quiet while busy, like the bridge verdict.
   const { value: answer, busy } = useSavingsNeeded(household, assumptions, age, true)
+  // …and its sentences say the age it was worked out FOR (answer.age), never the slider's: the amount for 61 is not « to retire at 62 ».
   const saving = household.persons.reduce((s, p) => s + p.accounts.rrsp.annualContribution + p.accounts.tfsa.annualContribution + p.accounts.nonReg.annualContribution, 0)
   return (
     <div className="surface answer" aria-live={busy ? 'off' : 'polite'} aria-busy={busy}>
@@ -45,19 +46,19 @@ export function SaveView({
         <Skeleton count={2} />
       ) : answer.extraPerYear === null ? (
         <>
-          <p className="answer__big answer__big--short"><Cascade>{q.unreachable(age)}</Cascade></p>
+          <p className="answer__big answer__big--short"><Cascade>{q.unreachable(answer.age)}</Cascade></p>
           <p className="answer__note">{q.unreachableWhy}</p>
         </>
       ) : answer.extraPerYear === 0 ? (
         <>
-          <p className="answer__big"><Cascade>{q.nothing(age)}</Cascade></p>
+          <p className="answer__big"><Cascade>{q.nothing(answer.age)}</Cascade></p>
           <p className="answer__note">{q.nothingWhy}</p>
         </>
       ) : (
         <>
           <p className="answer__big"><CountUp>{q.amount(formatMoney(answer.extraPerYear, lang))}</CountUp></p>
           <p className="answer__note">{q.perMonth(formatMoney(answer.extraPerYear / 12, lang))}</p>
-          <p className="answer__note">{q.why(age)}</p>
+          <p className="answer__note">{q.why(answer.age)}</p>
         </>
       )}
       {saving > 0 && <p className="answer__note">{q.already(formatMoney(saving, lang))}</p>}

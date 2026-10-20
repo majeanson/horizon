@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { agesLedger } from '../../engine/ledger'
 import { oasTrace, rrqTrace } from '../../engine/trace'
 import type { AccountKind, Assumptions, Household } from '../../engine/types'
-import { useLang } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { factId } from '../../lib/facts'
 import { formatPct } from '../../lib/format'
 import { LEDGER_COPY } from '../../lib/ledgerCopy'
@@ -23,6 +23,7 @@ const monthYear = (ym: { year: number; month: number }) => `${String(ym.month).p
 
 export function LedgerPanel({ household, assumptions, names }: { household: Household; assumptions: Assumptions; names: readonly string[] }) {
   const { lang } = useLang()
+  const t = useT()
   const c = LEDGER_COPY[lang]
   const ledger = agesLedger(household, assumptions)
   const money = (n: number, cents = false) => formatMoney(n, lang, { cents })
@@ -56,7 +57,7 @@ export function LedgerPanel({ household, assumptions, names }: { household: Hous
           return (
             <section key={l.id} className={`ledger__person person who who--${Math.min(i, 1)}`} aria-label={c.person(name)}>
               <h3 className="year-table__title">{c.person(name)}</h3>
-              <Chip to={`/profil?person=${l.id}`} ariaLabel={`${c.editProfile} : ${name}`}>{c.editProfile}</Chip>
+              <Chip to={`/profil?person=${l.id}`} ariaLabel={`${c.editProfile}${t.common.colon} ${name}`}>{c.editProfile}</Chip>
               {row(c.retireLabel, c.age(String(p.retirementAge)) + done(l.retirement.done), null, c.retireCalc(monthYear(l.retirement.leaving)))}
               {row(
                 c.rrqLabel,

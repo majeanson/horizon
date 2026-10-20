@@ -123,6 +123,18 @@ describe('a question that is not asked yet', () => {
     act(() => FakeWorker.all[0].say({ v: 3 }))
     expect(result.current.value).toBe(3)
   })
+
+  it('shut off after an answer: the answer stays while the question is the same, and is NOT handed out for a different one (it would read as final)', () => {
+    const { result, rerender } = renderHook(useIt, { initialProps: { req: { n: 1 }, enabled: true } })
+    flush(0)
+    act(() => FakeWorker.all[0].say({ v: 3 }))
+    rerender({ req: { n: 1 }, enabled: false })
+    expect(result.current).toEqual({ value: 3, busy: false }) // the same question: its answer is still its answer
+    rerender({ req: { n: 2 }, enabled: false })
+    expect(result.current).toEqual({ value: null, busy: false }) // a different one, not asked: no answer — never 3 « final »
+    rerender({ req: { n: 1 }, enabled: false })
+    expect(result.current.value).toBe(3) // back to the question it answered
+  })
 })
 
 describe('a question that is RE-asked', () => {

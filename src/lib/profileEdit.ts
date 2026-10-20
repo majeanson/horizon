@@ -20,6 +20,28 @@ export function mapPerson(p: Profile, id: PersonId, change: (person: Person) => 
   return touched ? { ...p, household: { ...p.household, persons } } : p
 }
 
+/** One person's QPP and OAS start ages as a strategy card writes them, with the ages they held before (so the tap can be taken back). */
+export interface StartMove {
+  id: PersonId
+  rrq: number
+  oas: number
+  prevRrq: number
+  prevOas: number
+}
+
+/** Writes each move's start ages (`back`: the ones it held before). The same profile when nothing changes. */
+export function withStartAges(p: Profile, moves: readonly StartMove[], back = false): Profile {
+  return moves.reduce(
+    (acc, m) =>
+      mapPerson(acc, m.id, (x) => {
+        const rrq = back ? m.prevRrq : m.rrq
+        const oas = back ? m.prevOas : m.oas
+        return x.rrq.startAge === rrq && x.oas.startAge === oas ? x : { ...x, rrq: { ...x.rrq, startAge: rrq }, oas: { ...x.oas, startAge: oas } }
+      }),
+    p,
+  )
+}
+
 type Split = NonNullable<Profile['household']['spendingSplit']>
 const cents = (n: number) => Math.round(n * 100) / 100
 const columnSum = (s: Split, k: 'working' | 'retired') => cents(s.rows.reduce((a, r) => a + r[k], 0))

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
 import { retireAt } from '../engine/retireAt.ts'
-import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, careAnswer, careFlow, formatCare, oldestBirthYear, parseCare, sameCare, withCare, type Care } from './careModel.ts'
+import type { Flow } from '../engine/types.ts'
+import { CARE_AMOUNT_MAX, CARE_AMOUNT_MIN, chsldReferences, chsldSource, CARE_FROM_MAX, CARE_FROM_MIN, CARE_START, CARE_YEARS_MAX, careAnswer, careFlow, formatCare, oldestBirthYear, parseCare, sameCare, withCare, withoutKeptCare, type Care } from './careModel.ts'
+import { keepFlowByLabel } from './profileLife.ts'
+import { defaultProfile } from './schema.ts'
 
 const H = GOLDEN_HOUSEHOLD
 const A = GOLDEN_ASSUMPTIONS
@@ -106,5 +109,25 @@ describe('what a change of the care moves, in dollars and not only in whole year
     const big = careAnswer(H, A, { amount: 80_000, fromAge: 70, years: 10 }, 52)
     expect(big.unmet).toBeGreaterThan(small.unmet)
     expect(big.unmet - small.unmet).toBeGreaterThan(0)
+  })
+})
+
+describe('a trial while a care is already kept (withoutKeptCare)', () => {
+  const labels = ['Des soins plus tard', 'Care later on']
+  const roof: Flow = { label: 'Toit', kind: 'expense', amount: 8_000, fromYear: 2040, toYear: 2040, owner: 'self', taxable: false }
+
+  it('the trial is the plan « Garder » would store: the kept care REPLACED, in either language — never two care costs', () => {
+    const keptOnce = keepFlowByLabel({ ...defaultProfile({ year: 2026 }), household: { ...GOLDEN_HOUSEHOLD, flows: [roof] } }, careFlow(GOLDEN_HOUSEHOLD, CARE_START, labels[0]), labels)
+    const next: Care = { amount: 60_000, fromAge: 80, years: 5 }
+    const trial = withCare(withoutKeptCare(keptOnce.household, labels), next, labels[1]).flows
+    const stored = keepFlowByLabel(keptOnce, careFlow(keptOnce.household, next, labels[1]), labels).household.flows
+    expect(trial).toHaveLength(2) // the roof and ONE care
+    expect(trial).toEqual(expect.arrayContaining([...stored!]))
+    expect(stored).toHaveLength(2)
+  })
+
+  it('nothing kept: the same household; other expenses always stay', () => {
+    const h = { ...GOLDEN_HOUSEHOLD, flows: [roof] }
+    expect(withoutKeptCare(h, labels)).toBe(h)
   })
 })

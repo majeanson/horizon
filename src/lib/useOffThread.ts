@@ -80,5 +80,9 @@ export function useOffThread<Req, Msg, T>(request: Req, makeWorker: () => Worker
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, enabled, priority])
 
-  return { value: answer?.value ?? null, busy: enabled && answer?.key !== key }
+  // Not asked now (`enabled` false) and the answer held is for ANOTHER question: it answers nothing on screen. Handed out
+  // `busy: false`, it read as final — a re-ask whose gate shuts while its inputs change (the sweep behind a matrix being
+  // worked out, the range behind a profile just changed) showed the previous question's figures as the new one's.
+  const current = answer !== null && answer.key === key
+  return { value: enabled || current ? (answer?.value ?? null) : null, busy: enabled && !current }
 }

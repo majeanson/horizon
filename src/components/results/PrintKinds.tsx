@@ -96,7 +96,7 @@ export function PrintDossier({ m }: { m: ResultsModel }) {
   const c = TRACE_COPY[lang]
   const l = LEDGER_COPY[lang]
   const returns = [assumptions.returns.rrsp, assumptions.returns.tfsa, assumptions.returns.nonReg].map((x) => formatPct(x, lang, 1)).join(' / ')
-  const colon = lang === 'fr' ? ' :' : ':'
+  const colon = t.common.colon
   const ledger = agesLedger(profile.household, assumptions)
   return (
     <div className="print-plan print-kind print-kind--dossier">

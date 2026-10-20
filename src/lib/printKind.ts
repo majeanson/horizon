@@ -17,3 +17,25 @@ export function choosePrintKind(kind: PrintKind): void {
 export function resetPrintKind(): void {
   chosen = 'summary'
 }
+
+/** What the page has worked out, as far as a print can tell: undefined `range` / `stress` = still being worked out. */
+export interface PrintInputs {
+  answerPending: boolean
+  runsPending: boolean
+  runs: number
+  retiredNow: boolean
+  range: unknown
+  stress: unknown
+}
+
+/**
+ * Whether a page can go to paper NOW: every figure it prints is in. The plan prints the scenario range and the market stress (« Solidité »: they start only
+ * once the answer is in, so printing on the answer printed « … » for all three scenarios) and the ages compared; « years » prints the runs. The other pages read
+ * the answer alone.
+ */
+export function printReady(kind: PrintKind, m: PrintInputs): boolean {
+  if (m.answerPending) return false
+  if (kind === 'years') return !m.runsPending && m.runs > 0
+  if (kind === 'summary') return !m.runsPending && (m.retiredNow || (m.range !== undefined && m.stress !== undefined))
+  return true
+}

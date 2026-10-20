@@ -216,7 +216,7 @@ export const MUTANTS = [
   {
     id: 'hook-busy-never',
     file: `${LIB}/useOffThread.ts`,
-    from: 'busy: enabled && answer?.key !== key',
+    from: 'busy: enabled && !current',
     to: 'busy: false',
     tests: [`${LIB}/useOffThread.test.tsx`],
     why: 'a stale answer must be flagged busy: it is not the answer to the new question',
