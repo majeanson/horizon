@@ -663,11 +663,13 @@
   font-size: var(--text-sm);
 }
 /* The « the prudent scenario is far » note and its door, on one line when there is room. */
-.verdict__gap {
+.verdict__gap,
+.skeleton-as-verdict__gap {
   margin-top: 0.5rem;
   gap: 0.4rem 0.75rem;
 }
-.verdict__gap .verdict__note {
+.verdict__gap .verdict__note,
+.skeleton-as-verdict__gap .verdict__note {
   flex: 1 1 16rem;
   margin: 0;
 }
@@ -2278,4 +2280,22 @@
 }
 .saisie__confirm.surface {
   padding: 1rem;
+}
+
+/* « Mise à jour… » takes no line (2026-10-20): it came and went on every re-asked question, and the answer under it jumped twice (the placeholders guard caught it on
+   « Et si je dépensais moins ? »). It is the accent bar running along the top of what it updates; its words stay for assistive technology (role="status"). */
+:has(> .bridge__updating) {
+  position: relative;
+}
+.bridge__updating {
+  position: absolute;
+  top: 0;
+  left: 0.75rem;
+  right: 0.75rem;
+  height: 3px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: transparent;
+  white-space: nowrap;
 }

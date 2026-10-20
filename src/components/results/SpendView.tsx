@@ -11,7 +11,7 @@ import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Fold } from '../Fold'
 import { CountUp } from '../CountUp'
-import { Skeleton } from '../Skeleton'
+import { SkeletonText } from '../SkeletonShapes'
 import { Slider } from '../Slider'
 
 // « And if we spent less? » One slider — what the household spends once retired — and the verdict's age back for that amount,
@@ -93,7 +93,10 @@ export function SpendView({
           {q.sameAmount} {q.current}
         </p>
       ) : age === undefined ? (
-        <Skeleton count={2} />
+        // the answer about to come, in its own sentence with the earliest age as a stand-in (ghost text): the card is already its size
+        <p className="skeleton-as-answer__big">
+          <SkeletonText>{q.at(money(spend), earliest ?? 60)}</SkeletonText>
+        </p>
       ) : age === null ? (
         <p className="answer__big answer__big--short"><CountUp>{q.none(money(spend), maxAge)}</CountUp></p>
       ) : (
@@ -102,7 +105,15 @@ export function SpendView({
       <p className="answer__note">{q.perMonth(money(spend / 12))}</p>
       {!isCurrent && (
         <>
-          {delta !== null && <p className="answer__note">{delta}</p>}
+          {delta !== null ? (
+            <p className="answer__note">{delta}</p>
+          ) : (
+            age === undefined && (
+              <p className="skeleton-as-answer__note">
+                <SkeletonText>{q.earlier(q.years(2), money(current))}</SkeletonText>
+              </p>
+            )
+          )}
           <Cluster>
             <Chip icon="check-bold" onClick={keep}>
               {q.keep}

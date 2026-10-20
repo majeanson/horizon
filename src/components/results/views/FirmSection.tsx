@@ -5,6 +5,7 @@ import { Cluster } from '../../Layout'
 import { SectionHeader } from '../../SectionHeader'
 import { Fold } from '../../Fold'
 import { Skeleton } from '../../Skeleton'
+import { SkeletonChips, SkeletonText } from '../../SkeletonShapes'
 import { STRESS_PRESETS } from '../../../lib/marketRange'
 import { MAX_AGE } from '../../../lib/resultsModel'
 import type { ResultsModel } from '../../../lib/useResultsPage'
@@ -31,6 +32,16 @@ function Brief({ m }: { m: ResultsModel }) {
             </div>
           ))}
         </dl>
+        {/* While the scenarios are worked out, the gap note waits in its place (a prudent answer later than the plan's is the usual case): it used to arrive and push the
+            hard-market box and the grids down by its height. */}
+        {range === undefined && (
+          <Cluster className="skeleton-as-verdict__gap">
+            <p className="verdict__note">
+              <SkeletonText>{rc.headline.rangeGap}</SkeletonText>
+            </p>
+            <SkeletonChips labels={[rc.headline.trySensitivity]} />
+          </Cluster>
+        )}
         {range !== undefined && prudentGap && (
           <Cluster className="verdict__gap">
             <p className="verdict__note">{rc.headline.rangeGap}</p>

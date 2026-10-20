@@ -171,7 +171,8 @@ for (const size of [
       const context = await browser.newContext({ baseURL: 'http://127.0.0.1:5173', viewport: { width: size.width, height: size.height }, locale: 'fr-CA', timezoneId: 'America/Toronto', storageState: { cookies: [], origins: [{ origin: 'http://127.0.0.1:5173', localStorage: [{ name: 'horizon-first-answer', value: 'done' }] }] } })
       const page = await context.newPage()
       const cdp = await context.newCDPSession(page)
-      await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 })
+      // 4× by default (a phone, here); PLACEHOLDER_THROTTLE=16 is CI's runner, itself about 4× slower than a dev machine, slowed 4× again
+      await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.PLACEHOLDER_THROTTLE) || 4 })
       await watch(page, hunted)
       await seedProfile(page, EXAMPLE)
       await page.goto(s.path)

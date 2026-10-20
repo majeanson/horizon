@@ -68,9 +68,9 @@ test('the verdict says what the age can fund each month, beside what is planned'
 test('« Essayer » ranks what moves the answer most, each lever with its age', async ({ page }) => {
   await page.goto('/decider')
   await expect(page.getByText('Ce qui change le plus')).toBeVisible()
+  // the rows wait as placeholders (skeleton-as-levers__item) while the levers are worked out: the real ones arrive with the ranking
   const items = page.locator('.levers__item')
-  await expect(items).toHaveCount(4)
-  await expect(items.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 60_000 })
+  await expect(items).toHaveCount(4, { timeout: 60_000 })
   await expect(items.first()).toContainText(/plus tôt|même âge|plus tard|aucun âge|un âge existe/)
 })
 

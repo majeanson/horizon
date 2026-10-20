@@ -187,7 +187,8 @@
 @media print {
   .print-plan .firm a,
   .print-plan .firm .verdict__gap,
-  .print-plan .firm .verdict__note {
+  .print-plan .firm .verdict__note,
+.print-plan .firm .skeleton-as-verdict__gap {
     display: none !important;
   }
   .print-plan .firm.surface,
