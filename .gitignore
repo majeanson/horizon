@@ -27,3 +27,5 @@ horizon-*.json
 # Stryker (npm run stryker): scratch copies and its incremental cache
 .stryker-tmp/
 reports/
+# Claude Code: per-machine settings, launch config, review worktrees
+.claude/
