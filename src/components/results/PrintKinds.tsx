@@ -139,11 +139,11 @@ export function PrintDossier({ m }: { m: ResultsModel }) {
 
 /** The year-by-year table of the age chosen on screen (`?table=`), in the dollars shown, on a landscape page: a table of eight columns does not fit a portrait one. */
 export function PrintYears({ m }: { m: ResultsModel }) {
-  const { lang, runs, label, dollars, year, assumptions, profile, births } = m
+  const { lang, runs, label, dollars, year, runsAssumptions, runsProfile, runsBirths } = m
   return (
     <div className="print-plan print-kind print-kind--years">
       <PrintHead m={m} title={PRINT_MENU_COPY[lang].headings.years} />
-      <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={assumptions} livesAlone={profile.household.livesAlone} births={births} />
+      <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={runsAssumptions} livesAlone={runsProfile.household.livesAlone} births={runsBirths} />
       <PrintFoot m={m} />
     </div>
   )

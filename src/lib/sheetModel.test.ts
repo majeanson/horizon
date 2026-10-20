@@ -203,3 +203,13 @@ describe('the sheet of a household', { timeout: 120_000 }, () => {
     expect(JSON.stringify(p)).toBe(before)
   })
 })
+
+describe('a home with nothing owed is mortgage-free, whenever the household stopped working', () => {
+  it('a couple retired years ago with the house paid says so (it used to say nothing: the paid-off year was « this year », past their last stop)', () => {
+    const p = profileOf('retired')
+    const paid: Profile = { ...p, household: { ...p.household, home: { value: 400_000, mortgage: { balance: 0, rate: 0.05, monthlyPayment: 0 }, sale: null } } }
+    const a = assumptionsOf(paid, { year: 2026, month: 10 })
+    expect(Math.max(...paid.household.persons.map((x) => x.birth.year + x.retirementAge))).toBeLessThan(2026)
+    expect(sheetModel(paid, a, null).mortgageFree).toBe(true)
+  })
+})

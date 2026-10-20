@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from '../engine/golden/household.fixture.ts'
 import { project } from '../engine/projection.ts'
-import { MAX_SELECTIONS, assumptionsOf, defaultSelections, formatSelections, parseSelections, runSelections, scenarioOf, selectionAge, toggleSelection, worthAtHorizon } from './resultsModel.ts'
+import { MAX_SELECTIONS, anchorOf, assumptionsOf, defaultSelections, pairSelection, formatSelections, parseSelections, runSelections, scenarioOf, selectionAge, toggleSelection, worthAtHorizon } from './resultsModel.ts'
 import { SCHEMA_VERSION, type Profile } from './schema.ts'
 
 const dir = dirname(fileURLToPath(import.meta.url))
@@ -114,5 +114,32 @@ describe('the net worth on a comparison card is in the dollars the page shows', 
 describe('a household that has already retired', () => {
   it('compares only its own plan: there is no departure age to try', () => {
     expect(defaultSelections(GOLDEN_HOUSEHOLD, true)).toEqual(['plan'])
+  })
+})
+
+describe('a couple’s pair, as the comparison reads it', () => {
+  it('two equal ages are ONE age; an age outside the ages compared is no selection; anything else is the pair', () => {
+    expect(pairSelection(65, 65)).toBe(65)
+    expect(pairSelection(60, 65)).toBe('60-65')
+    expect(pairSelection(60, 71)).toBeNull()
+    expect(pairSelection(17, 60)).toBeNull()
+  })
+  it('what it gives is what the address reads back — the chip never writes a selection the page then throws away', () => {
+    for (const [a, b] of [[65, 65], [60, 65], [62, 58]] as const) {
+      const s = pairSelection(a, b)!
+      expect(parseSelections(formatSelections(['plan', s]), [])).toEqual(['plan', s])
+    }
+  })
+})
+
+describe('the section an address names', () => {
+  it('reads a plain or an escaped anchor, and NEVER throws on a broken one', () => {
+    expect(anchorOf('#comparer')).toBe('comparer')
+    expect(anchorOf('#donn%C3%A9es')).toBe('données')
+    expect(anchorOf('')).toBeNull()
+    expect(anchorOf('#')).toBeNull()
+    expect(() => anchorOf('#%E0')).not.toThrow()
+    expect(anchorOf('#%E0')).toBeNull()
+    expect(anchorOf('#%')).toBeNull()
   })
 })

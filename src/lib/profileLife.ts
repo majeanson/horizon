@@ -139,6 +139,16 @@ export function setSplitRow(p: Profile, id: Split['rows'][number]['id'], patch: 
 
 
 /**
+ * « Garder » for a care period tried on the results page: the household's plan gets ONE care expense under that label — a second « Garder » (the
+ * sliders reset after the first, so the chip is live again) REPLACES the one kept, never adds a twin that counts the care twice. Matched by its label, as
+ * the page's « déjà là » note matches it.
+ */
+export function keepFlowByLabel(p: Profile, flow: Flow): Profile {
+  const index = (p.household.flows ?? []).findIndex((f) => f.kind === flow.kind && f.label === flow.label)
+  return index < 0 ? addFlow(p, flow) : updateFlow(p, index, () => flow)
+}
+
+/**
  * The age part-time work is first offered to run until, when the person turns it on: three years past their retirement age — held within the
  * 50 to 80 the profile keeps (schema.ts `partTime.untilAge`), so someone who retires at 45 starts at 50, not at a 48 the schema refuses.
  */

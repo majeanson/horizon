@@ -25,7 +25,8 @@ export function MarginalWeather({ m }: { m: ResultsModel }) {
 }
 
 function Body({ m }: { m: ResultsModel }) {
-  const { lang, runs, assumptions, profile, names } = m
+  // The rates read off the plan's rows, under the assumptions those rows were projected with (useResultsPage `runsAssumptions`).
+  const { lang, runs, runsAssumptions: assumptions, runsProfile: profile, names } = m
   const c = MARGINAL_WEATHER_COPY[lang]
   const household = profile.household
   // The household's own plan, not whichever comparison the table above is showing: the question is about the plan one lives.

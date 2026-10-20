@@ -212,7 +212,10 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
   const { levers } = state
   const { value: view, busy } = useBridge(household, assumptions, levers)
   // The three scenarios per strategy: fifteen more projections, started once the page is idle, marked on the cards as they land.
-  const { value: matrix } = useBridgeMatrix(household, assumptions, levers)
+  // While it is being worked out again (a strategy picked, a figure changed) the last one is NOT the answer: shown as pending, never as final dots beside
+  // fresh cards — `sturdiest` mixing the new summaries with the old cells could crown a way from the previous ages — and the death sweep waits for it.
+  const { value: matrixValue, busy: matrixBusy } = useBridgeMatrix(household, assumptions, levers)
+  const matrix = matrixBusy ? null : matrixValue
   // Four views of the one question « when do I start my pensions? », one on screen at a time (they were four blocks stacked: the charts, the ways, a short life, the reasons). The address keeps it (`?bv=`).
   const VIEWS = ['ways', 'years', 'death', 'why'] as const
   const [bridgeView, setBridgeView] = useParamChoice('bv', VIEWS, 'ways')

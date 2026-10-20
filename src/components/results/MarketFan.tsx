@@ -35,12 +35,14 @@ export function MarketFan({ m }: { m: ResultsModel }) {
 }
 
 function Body({ m }: { m: ResultsModel }) {
-  const { lang, profile, assumptions, runs, label, dollars, year } = m
+  // The fan, the plan line over it and their markers all from the profile the runs were projected from (useResultsPage `runsProfile`): one plan, settled.
+  const { lang, runsProfile, runsAssumptions: assumptions, runs, label, dollars, year } = m
+  const household = runsProfile.household
   const c = MARKET_FAN_COPY[lang]
-  const { value, busy } = useMarketFan(profile.household, assumptions, true)
+  const { value, busy } = useMarketFan(household, assumptions, true)
   const rows = (runs.find((r) => r.selection === 'plan') ?? runs[0])?.result.rows
   const ages = useMemo(() => agesOfRuns(rows ?? []), [rows])
-  const markers = useMemo(() => retirementMarkers(profile.household, runs.slice(0, 1), label), [profile.household, runs, label])
+  const markers = useMemo(() => retirementMarkers(household, runs.slice(0, 1), label), [household, runs, label])
   const scale = (y: number, netWorth: number) => netWorth / (dollars === 'today' ? deflator(y, year, assumptions.inflation) : 1)
   const series = useMemo(
     () => (value === null ? [] : value.lines.map((l) => ({ id: l.id, label: c.names[l.id], colour: COLOUR[l.id], points: l.points.map((p) => ({ x: p.year, y: scale(p.year, p.netWorth) })) }))),

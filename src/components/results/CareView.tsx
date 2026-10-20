@@ -6,7 +6,7 @@ import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { formatYearAge } from '../../lib/format'
 import { FUTURE_COPY } from '../../lib/futureCopy'
 import { LIFE_COPY } from '../../lib/lifeCopy'
-import { addFlow } from '../../lib/profileLife'
+import { keepFlowByLabel } from '../../lib/profileLife'
 import { MAX_FLOWS } from '../../lib/schema'
 import { updateProfile } from '../../lib/store'
 import { useNotice } from '../../lib/toast'
@@ -62,7 +62,8 @@ export function CareView({
     onCare(sameCare(next, CARE_START) ? null : next)
   }
   const keep = () => {
-    updateProfile((p) => addFlow(p, careFlow(household, care, label)))
+    // one care expense: a second « Garder » replaces the first (lib/profileLife.ts keepFlowByLabel)
+    updateProfile((p) => keepFlowByLabel(p, careFlow(household, care, label)))
     onCare(null)
     notice(c.kept)
   }

@@ -16,6 +16,7 @@ export function EarliestEachPanel({
   answer,
   maxAge,
   onCompare,
+  canCompare,
   compareDisabled,
 }: {
   household: Household
@@ -26,6 +27,8 @@ export function EarliestEachPanel({
   maxAge: number
   /** The pair (first person's age, second person's age) to add to the comparison. */
   onCompare: (first: number, second: number) => void
+  /** Whether a pair can be compared at all (lib/resultsModel.ts `pairSelection`): a pair outside the ages compared gets no live chip. */
+  canCompare: (first: number, second: number) => boolean
   compareDisabled: boolean
 }) {
   const { lang } = useLang()
@@ -49,7 +52,7 @@ export function EarliestEachPanel({
             return (
               <li key={a.id} className={`verdict__each-row who who--${Math.min(household.persons.findIndex((p) => p.id === a.id), 1)}`}>
                 <span>{e.line(me, a.earliestOk, other, a.other.heldAt)}</span>{' '}
-                <Chip onClick={() => onCompare(pair[0], pair[1])} disabled={compareDisabled} ariaLabel={e.compareLabel(me, a.earliestOk, other, a.other.heldAt)}>
+                <Chip onClick={() => onCompare(pair[0], pair[1])} disabled={compareDisabled || !canCompare(pair[0], pair[1])} ariaLabel={e.compareLabel(me, a.earliestOk, other, a.other.heldAt)}>
                   {e.compare}
                 </Chip>
               </li>

@@ -88,10 +88,11 @@ function FillNudgeLine({ m }: { m: ResultsModel }) {
 function BalanceNudgeLine({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
   const c = SPOUSE_BALANCE_COPY[lang]
-  const { profile, assumptions, firstAge, earliest } = m
+  const { profile, assumptions, firstAge, earliest, answered } = m
   const { box, seen } = useSeen()
   const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
-  const { value } = useSpouseBalance(profile.household, assumptions, age, firstAge, seen)
+  // Asked only once the answer is in, as the order nudge above: before it the age is the plan's own, and a figure said early would change under the reader.
+  const { value } = useSpouseBalance(profile.household, assumptions, age, firstAge, seen && answered)
   const r = value?.balance ?? null
   const nudge = spouseBalanceNudge(r)
   return (

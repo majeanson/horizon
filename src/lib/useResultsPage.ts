@@ -25,7 +25,7 @@ import { LEVERS_COPY } from './leversCopy'
 import { useLevers } from './useLevers'
 import { formatMoney } from './money'
 import { profileGaps } from './profileGaps'
-import { MAX_AGE, assumptionsOf, defaultSelections, formatSelections, isSplit, parseSelections, splitAges, splitOf, toggleSelection, type Selection } from './resultsModel'
+import { MAX_AGE, assumptionsOf, defaultSelections, formatSelections, anchorOf, isSplit, pairSelection, parseSelections, splitAges, toggleSelection, type Selection } from './resultsModel'
 import { accuracyOf, factsOf } from './facts'
 import { useFactImpact } from './useFactImpact'
 import { parseSpend } from './spendModel'
@@ -89,12 +89,12 @@ export function useResultsPage() {
   const slowAssumptions = useMemo(() => assumptionsOf(slow, { year, month }), [slow, year, month])
   // Everybody already stopped working: « when can I retire? » is answered, and what is left to say is whether the money lasts.
   const state = useMemo(() => retirementState(slow.household, slowAssumptions), [slow, slowAssumptions])
-  const retiredNow = state.everyoneRetired && profileGaps(profile).length === 0
+  const gaps = profileGaps(profile)
+  const retiredNow = state.everyoneRetired && gaps.length === 0
   // A « chacun son âge » split names two people: on a one-person household it would only duplicate a plain age.
   const selections = parseSelections(params.get('ages'), defaultSelections(profile.household, state.everyoneRetired)).filter((s) => !isSplit(s) || profile.household.persons.length > 1)
   const metric: ChartMetric = params.get('metric') === 'income' ? 'income' : params.get('metric') === 'detail' ? 'detail' : 'netWorth'
   const dollars: Dollars = params.get('dollars') === 'nominal' ? 'nominal' : 'today'
-  const gaps = profileGaps(profile)
   const assumptions = assumptionsOf(profile, { year, month })
   // A year is always said with the age(s) it comes with: « 2043 (63 ans) ».
   const births = profile.household.persons.map((p) => p.birth.year)
@@ -118,7 +118,6 @@ export function useResultsPage() {
     [setParams],
   )
 
-  const oldest = Math.max(...profile.household.persons.map((p) => year - p.birth.year))
   // The question put to the answer worker (the ages it starts from, whether everybody has stopped) is worked out in ONE place: lib/answerRequest.ts.
   const request = useMemo(() => answerRequest(slow, { year, month }), [slow, year, month])
   const { firstAge, youngest } = request
@@ -143,6 +142,11 @@ export function useResultsPage() {
   const runsAnswer = useRuns(slow, { year, month }, parseSelections(picked, []), gaps.length === 0)
   const runs = gaps.length > 0 ? [] : (runsAnswer.value ?? [])
   const runsPending = gaps.length === 0 && runsAnswer.value === null
+  // The profile the runs on screen were PROJECTED from, and its assumptions: what every figure read off them is deflated and marked with (useRuns `basis`)
+  // — the live profile's inflation on rows projected under another said a « today's dollars » that matched neither plan while a new answer was worked out.
+  const runsProfile = runsAnswer.basis ?? slow
+  const runsAssumptions = useMemo(() => assumptionsOf(runsProfile, { year, month }), [runsProfile, year, month])
+  const runsBirths = useMemo(() => runsProfile.household.persons.map((p) => p.birth.year), [runsProfile])
 
   // TWO PAGES, ONE LEVEL EACH (Marc, 2026-10-19: Profil and Hypothèses have no level above their cards, so Résultats has none either): « Résultats » (/resultats)
   // is the answer and, under it, its proof; « Décider » (/decider) is what to try and how to start and draw — a tab of its own. `view` is the page this hook
@@ -237,7 +241,7 @@ export function useResultsPage() {
     navigate({ pathname: pageOf(target) === 'decide' ? '/decider' : '/resultats', search: next.toString(), hash: wantedId })
   }
   // Arriving with a section in the # (a link from the other page): land on it once it exists (the views are lazy chunks; ≤ 5 s).
-  const [arrivedAt] = useState(() => (hash.length > 1 ? decodeURIComponent(hash.slice(1)) : null))
+  const [arrivedAt] = useState(() => anchorOf(hash))
   useEffect(() => {
     if (arrivedAt !== null) land(arrivedAt)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,10 +324,13 @@ export function useResultsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [r, names.join('|'), planAges],
   )
-  const addSplit = (first: number, second: number) => {
-    const s = splitOf(first, second)
+  /** Add a couple's pair to the comparison; false when the pair is no selection (resultsModel `pairSelection`), so the caller does not switch to a view it did not change. */
+  const addSplit = (first: number, second: number): boolean => {
+    const s = pairSelection(first, second)
+    if (s === null) return false
     const cur = latest()
     if (!cur.includes(s)) commit(toggleSelection(cur, s))
+    return true
   }
   // Any other age is typed: a box instead of one chip per age from today's to 70 — twenty look-alike pills were the page's
   // loudest row, and the three milestones plus the answer's own age are what people actually compare against.
@@ -423,6 +430,9 @@ export function useResultsPage() {
     year,
     month,
     slowAssumptions,
+    runsProfile,
+    runsAssumptions,
+    runsBirths,
     state,
     retiredNow,
     selections,
@@ -435,7 +445,6 @@ export function useResultsPage() {
     isCouple,
     accuracy,
     setParam,
-    oldest,
     youngest,
     firstAge,
     answer,
@@ -447,7 +456,6 @@ export function useResultsPage() {
     answered,
     earliestEachAnswer,
     picked,
-    runsAnswer,
     runs,
     runsPending,
     view,
@@ -456,7 +464,6 @@ export function useResultsPage() {
     goTo,
     strat,
     setStrat,
-    legacyQ,
     compareRef,
     headline,
     activePreset,
@@ -477,8 +484,6 @@ export function useResultsPage() {
     comfort,
     stop,
     pending,
-    agesNow,
-    latest,
     commit,
     toggle,
     names,
@@ -488,7 +493,6 @@ export function useResultsPage() {
     otherAge,
     setOtherAge,
     addAge,
-    wantedSaveAge,
     saveAge,
     spend,
     care,

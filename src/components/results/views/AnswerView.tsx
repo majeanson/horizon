@@ -20,7 +20,7 @@ import { longDate } from '../../../lib/months'
 import { answerSpread } from '../../../lib/answerSpread'
 import { ANSWER_SPREAD_COPY } from '../../../lib/answerSpreadCopy'
 import { TOUR_COPY } from '../../../lib/tourCopy'
-import { MAX_AGE, MAX_SELECTIONS, isSplit, worthAtHorizon } from '../../../lib/resultsModel'
+import { MAX_AGE, MAX_SELECTIONS, isSplit, pairSelection, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
 import { AnswerGlance } from '../AnswerGlance'
@@ -34,7 +34,7 @@ const YearSection = lazy(() => import('./YearSection').then((m) => ({ default: m
 
 // The « answer » view of the results page — cut from the page unchanged; it reads the page's state through the one model object (lib/useResultsPage.ts).
 export function AnswerView({ m }: { m: ResultsModel }) {
-  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, confidenceRange, setTour, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, sentenceBefore, sentenceAfter, pct, money } = m
+  const { vintage, t, lang, r, rc, profile, slow, slowAssumptions, runsProfile, runsAssumptions, year, retiredNow, selections, metric, dollars, gaps, assumptions, births, at, isCouple, accuracy, setParam, firstAge, answer, answerPending, earliest, retiredGlance, answered, earliestEachAnswer, runs, runsPending, goTo, compareRef, headline, activePreset, mc, firstSearchesIn, confidenceRange, setTour, comfort, stop, toggle, names, planAges, label, addSplit, otherAge, addAge, sentenceBefore, sentenceAfter, pct, money } = m
   // Three ways of comparing, one on screen at a time: departure ages (the chips, the cards, the chart), each person's own earliest age (a couple) and the saved plans (when there are some).
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
@@ -234,7 +234,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                     {r.scenario.retireAt(label(selection))}
                   </p>
                   <p className={'scenario__verdict' + (result.ok ? '' : ' scenario__verdict--short')}>{result.ok ? r.scenario.works(assumptions.horizonAge) : r.scenario.lastsUntil(at(result.firstShortfallYear! - 1))}</p>
-                  <p className="scenario__worth mono">{r.scenario.endWorth(money(worthAtHorizon(result, dollars, assumptions)))}</p>
+                  <p className="scenario__worth mono">{r.scenario.endWorth(money(worthAtHorizon(result, dollars, runsAssumptions)))}</p>
                 </li>
               ))}
             </ul>
@@ -244,11 +244,11 @@ export function AnswerView({ m }: { m: ResultsModel }) {
             {runs.length > 0 && (
               <ChartPanel
                 runs={runs}
-                household={profile.household}
+                household={runsProfile.household}
                 names={names}
                 todayYear={year}
-                inflation={assumptions.inflation}
-                horizonAge={assumptions.horizonAge}
+                inflation={runsAssumptions.inflation}
+                horizonAge={runsAssumptions.horizonAge}
                 metric={metric}
                 dollars={dollars}
                 onMetric={(m) => setParam('metric', m === 'netWorth' ? null : m)}
@@ -269,9 +269,10 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                   answer={earliestEachAnswer}
                   maxAge={MAX_AGE}
                   onCompare={(a, b) => {
-                    addSplit(a, b)
-                    setCompareView('ages')
+                    // only to the comparison when the pair landed in it (two equal ages are one card; an age out of the range is none)
+                    if (addSplit(a, b)) setCompareView('ages')
                   }}
+                  canCompare={(a, b) => pairSelection(a, b) !== null}
                   compareDisabled={selections.length >= MAX_SELECTIONS}
                 />
               </div>

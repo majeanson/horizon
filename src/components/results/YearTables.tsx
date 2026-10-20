@@ -16,6 +16,7 @@ import { Chip } from '../Chip'
 import { TableChooser } from '../TableChooser'
 import type { Selection } from '../../lib/resultsModel'
 import type { AgeResult, Assumptions } from '../../engine/types'
+import { saveAsFile } from '../../lib/download'
 
 // The picture's text: one row per year for the retirement age chosen in the table's header, every figure the chart
 // draws and the ones it does not (tax, spending, what is left to cover). One table, not one per age: the header picks
@@ -64,12 +65,8 @@ export function YearTables({
   const unit = dollars === 'today' ? c.today : c.nominal
   const saveCsv = (selection: Selection, result: AgeResult) => {
     const csv = yearCsv(result, r.table, lang, { factor, unit })
-    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-    const a = document.createElement('a')
-    a.href = url
-    a.download = out.csvFile(csvLabel(label(selection)))
-    a.click()
-    URL.revokeObjectURL(url)
+    // the app's one way to hand a file over (lib/download.ts): attached while clicked, its address kept a moment — iOS fetched nothing otherwise
+    saveAsFile(csv, out.csvFile(csvLabel(label(selection))), 'text/csv;charset=utf-8')
     notice(out.csvDone)
   }
   // The rows of the table, already in the dollars shown (lib/yearTable.ts — the same model the spreadsheet is written from).

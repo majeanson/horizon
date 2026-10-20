@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Flow } from '../engine/types.ts'
-import { addFlow, confirmFlow, removeFlow, updateFlow } from './profileLife.ts'
+import { addFlow, confirmFlow, keepFlowByLabel, removeFlow, updateFlow } from './profileLife.ts'
 import { MAX_FLOWS, defaultProfile, validateProfile, type Profile } from './schema.ts'
 
 // THE EDITS OF A DATED EVENT, and what they do to the word « estimé »: an amount typed over makes the figure the person's own, nothing else does, and
@@ -99,5 +99,17 @@ describe('what is saved', () => {
       p.household.flows[0].estimate = bad
       expect(validateProfile(p).ok, String(bad)).toBe(false)
     }
+  })
+})
+
+describe('« Garder » a care period twice', () => {
+  it('keeps ONE care expense under its label: the second replaces the first, never a twin that counts the care twice', () => {
+    const care = (amount: number): Flow => ({ label: 'Soins de longue durée', kind: 'expense', amount, fromYear: 2060, toYear: 2069, owner: 'self', taxable: false })
+    const once = keepFlowByLabel(defaultProfile({ year: 2026 }), care(30_000))
+    const twice = keepFlowByLabel(once, care(36_000))
+    expect(twice.household.flows).toHaveLength(1)
+    expect(twice.household.flows![0].amount).toBe(36_000)
+    // another expense of another label is its own
+    expect(keepFlowByLabel(twice, { ...care(5_000), label: 'Toit' }).household.flows).toHaveLength(2)
   })
 })

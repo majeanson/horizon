@@ -23,7 +23,7 @@ const AccuracyNote = lazy(() => import('../AccuracyNote').then((m) => ({ default
 // Five blocks, read ONE AT A TIME and all CLOSED on arrival, each saying what it holds (components/Accordion.tsx): the address keeps which (`?bloc=`, « tout » opens them all), and a link to one — the answer's « Voir la sensibilité », the
 // accuracy note's « Voir les chiffres officiels » — opens it before landing on it.
 export function ProofView({ m }: { m: ResultsModel }) {
-  const { lang, r, rc, profile, year, dollars, assumptions, births, runs, runsPending, scrollTo, names, label } = m
+  const { lang, r, rc, profile, year, dollars, assumptions, runs, runsPending, names, label, goTo, runsProfile, runsAssumptions, runsBirths } = m
   const cc = CARDS_COPY[lang].closed
   const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'none')
   const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
@@ -48,7 +48,7 @@ export function ProofView({ m }: { m: ResultsModel }) {
 
           <AccordionItem id="tableau" title={r.table.title} summary={cc.tableau} concept="annee" className="results-section">
             {runsPending && <Skeleton count={6} />}
-            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={assumptions} livesAlone={profile.household.livesAlone} births={births} />
+            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={runsAssumptions} livesAlone={runsProfile.household.livesAlone} births={runsBirths} />
             {/* What the next RRSP dollar costs at every retired age: a calendar of ages, one fold, read off the same rows. */}
             {!runsPending && <MarginalWeather m={m} />}
           </AccordionItem>
@@ -57,10 +57,9 @@ export function ProofView({ m }: { m: ResultsModel }) {
           <AccordionItem id="precision" title={ACCURACY_COPY[lang].title} summary={cc.precision} concept="precision" className="results-section">
             <Suspense fallback={<Skeleton count={4} />}>
               <AccuracyNote
-                onSeeFigures={() => {
-                  setBloc('parametres')
-                  requestAnimationFrame(() => scrollTo('parametres'))
-                }}
+                // The page's own way to a section (useResultsPage goTo): it keeps « Tout ouvrir » (bloc=tout) instead of closing every other block, and lands once
+                // the block exists — a one-frame scroll measured mid-relayout and jumped by the height of what had just closed.
+                onSeeFigures={() => goTo('proof', 'parametres')}
               />
             </Suspense>
           </AccordionItem>

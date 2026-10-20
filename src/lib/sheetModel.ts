@@ -236,7 +236,9 @@ export function sheetModel(profile: Profile, assumptions: Assumptions, earliest:
     investable: slots.filter((s) => SLOT_GROUP[s.kind] === 'investable').reduce((sum, s) => sum + (s.amount ?? 0), 0),
     rooms,
     diversified: kinds.size === 3,
-    mortgageFree: h.home ? mortgageEnd !== null && mortgageEnd <= lastStop : null,
+    // A home with nothing owed IS mortgage-free — whenever the last person stopped (a couple retired in 2020 with the house paid: `mortgageEnd` is this year,
+    // past their last stop, and the tag used to go missing for exactly the households it describes best).
+    mortgageFree: h.home ? h.home.mortgage.balance <= 0 || (mortgageEnd !== null && mortgageEnd <= lastStop) : null,
     sharpen: { status, remaining: unconfirmed.length, movers, absent },
     accuracy: { confirmed: accuracy.confirmed, total: accuracy.total },
     scenarios,

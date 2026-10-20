@@ -80,6 +80,29 @@ export function parseSelections(text: string | null, fallback: readonly Selectio
 
 export const formatSelections = (selections: readonly Selection[]): string => selections.join(',')
 
+/**
+ * The section an address's « # » names (« #comparer »), or null — never a throw: a truncated or hand-edited escape (« #%E0 ») made decodeURIComponent
+ * throw during render, and the whole Résultats / Décider page fell to the error screen for a link it could simply have ignored.
+ */
+export function anchorOf(hash: string): string | null {
+  if (hash.length <= 1) return null
+  try {
+    return decodeURIComponent(hash.slice(1))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The selection a couple's pair of ages makes in the comparison — the same rule `parseSelections` reads the address by, so a chip never writes what the
+ * page then throws away: two equal ages are ONE age (both at 65 is the « 65 » card), and a pair with an age outside the ages compared (MIN_AGE to
+ * MAX_AGE — the other person held at 71, say) is no selection at all: null, and the chip offering it is off.
+ */
+export function pairSelection(first: number, second: number): Selection | null {
+  if (!inRange(first) || !inRange(second)) return null
+  return first === second ? first : splitOf(first, second)
+}
+
 /** Turn one selection on or off, never past the cap; order is kept (the chart's colours follow it). */
 export function toggleSelection(selections: readonly Selection[], selection: Selection): Selection[] {
   if (selections.includes(selection)) return selections.filter((s) => s !== selection)
