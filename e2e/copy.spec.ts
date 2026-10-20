@@ -20,9 +20,10 @@ test('copies the answer, its dates and its assumptions as plain text', async ({ 
   expect(text).not.toContain('Et si je dépensais moins')
 })
 
-test('is not offered on the other views', async ({ page }) => {
+test('is not offered on « Décider »', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/resultats?v=strategies')
-  await expect(page.getByRole('heading', { name: 'Résultats', level: 1 })).toBeVisible()
+  // « Décider » is a page of its own since 2026-10-19: the old `/resultats?v=strategies` redirects there, and its « Résultats » heading showed for a moment first (red on CI).
+  await page.goto('/decider')
+  await expect(page.getByRole('heading', { name: 'Décider', level: 1 })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Copier le résumé' })).toHaveCount(0)
 })
