@@ -218,3 +218,33 @@ for (const [where, path, width] of [
     }
   })
 }
+
+// Marc, 2026-10-20: « if we press the close all button, all cards are closed » — on EVERY page that has the switch, from what it opens with, after a card opened
+// by hand, and after « Tout ouvrir ». The check is the whole page (no `.accordion__item.is-open` left), not one named block: a card opened by default is the one
+// that used to survive.
+for (const [path, open] of [
+  ['/profil', null],
+  ['/hypotheses', null],
+  ['/resultats', null],
+  ['/decider', null],
+  ['/decider', '#epargner'],
+  ['/resultats', '#solidite'],
+] as const) {
+  test(`« Tout fermer » closes every card on ${path}${open ? `, ${open} opened by hand first` : ''} — and again after « Tout ouvrir »`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await seedProfile(page, EXAMPLE)
+    await page.goto(path)
+    const icon = page.locator('.accordion__all').first()
+    await expect(icon).toHaveAttribute('aria-label', 'Tout fermer', { timeout: 60_000 })
+    if (open) await page.locator(`${open} .accordion__toggle`).click()
+    if (open) await expect(page.locator(`${open}.accordion__item`)).toHaveClass(/is-open/)
+    await icon.click()
+    await expect(icon).toHaveAttribute('aria-label', 'Tout ouvrir')
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
+    await icon.click()
+    await expect(icon).toHaveAttribute('aria-label', 'Tout fermer')
+    await expect(page.locator('.accordion__item.is-open').first()).toBeVisible()
+    await icon.click()
+    await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
+  })
+}
