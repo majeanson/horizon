@@ -101,8 +101,9 @@ test.describe('the page chrome', () => {
       const [thumb, tab] = await Promise.all([row.locator('.subtabs__thumb').boundingBox(), row.getByRole('tab', { selected: true }).boundingBox()])
       return { dx: Math.abs(thumb!.x - tab!.x), dw: Math.abs(thumb!.width - tab!.width), dy: Math.abs(thumb!.y - tab!.y) }
     }
-    const first = await under() // whole pixels, give or take the rounding of a fractional text size
-    expect(Math.max(first.dx, first.dw, first.dy)).toBeLessThanOrEqual(1)
+    // whole pixels, give or take the rounding of a fractional text size. Polled: the fill is re-measured when a tab changes size (the web font arriving after the
+    // first measure widens every label), and CI's slow runner once read the moment between the two (1.28 px, f47f916, a change that touched no tab).
+    await expect.poll(async () => { const u = await under(); return Math.max(u.dx, u.dw, u.dy) }, { message: 'the fill sits under the chosen tab once the row has its size' }).toBeLessThanOrEqual(1)
     await row.getByRole('tab', { name: 'Prudent' }).click()
     await expect.poll(async () => (await under()).dx, { message: 'the fill glided to the new tab' }).toBeLessThanOrEqual(1)
     expect((await under()).dw).toBeLessThanOrEqual(1)
