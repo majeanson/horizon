@@ -59,6 +59,7 @@ export function SaveView({
           <p className="answer__big"><CountUp>{q.amount(formatMoney(answer.extraPerYear, lang))}</CountUp></p>
           <p className="answer__note">{q.perMonth(formatMoney(answer.extraPerYear / 12, lang))}</p>
           <p className="answer__note">{q.why(answer.age)}</p>
+          {answer.account !== null && <p className="answer__note">{q.into[answer.account]}</p>}
         </>
       )}
       {saving > 0 && <p className="answer__note">{q.already(formatMoney(saving, lang))}</p>}

@@ -1,6 +1,6 @@
 import { maxRetiredSpending } from './maxSpending.ts'
 import { everyoneAt, retireAt, runScenario } from './retireAt.ts'
-import { savingsNeeded } from './savingsNeeded.ts'
+import { savingsNeeded, type SavingsAccount } from './savingsNeeded.ts'
 import type { Assumptions, Household } from './types.ts'
 
 // « I WANT TO STOP AT X. WHAT HAS TO BE TRUE? » — the plan asked the other way round. The usual question fixes the plan and finds the age; here the age is fixed and each
@@ -29,6 +29,8 @@ export interface ReverseTarget {
   spend: { current: number; max: number | null }
   /** The extra yearly saving while working, in today's dollars: 0 when it already works, null when no amount does (see `savingsNeeded`). */
   save: number | null
+  /** Where that saving goes first (the placement that needs the least, see `savingsNeeded`); null with no amount. */
+  saveAccount: SavingsAccount | null
   /** The earliest age that works as the plan stands (null: none up to 70). */
   earliest: number | null
   /** The points a year each return would have to gain (0,012 = 1,2 points): 0 when it already works, null when even `MAX_EXTRA_RETURN` does not. */
@@ -78,11 +80,13 @@ export function partTimeUntil(h: Household, a: Assumptions, age: number): number
 
 export function reverseTarget(h: Household, a: Assumptions, age: number): ReverseTarget {
   const works = runScenario(h, a, everyoneAt(h, age), age).ok
+  const saving = savingsNeeded(h, a, age)
   return {
     age,
     works,
     spend: { current: h.spending.retiredToday, max: maxRetiredSpending(h, a, age) },
-    save: savingsNeeded(h, a, age).extraPerYear,
+    save: saving.extraPerYear,
+    saveAccount: saving.account,
     earliest: retireAt(h, a, { stopAtFirstOk: true }).earliestOk,
     returns: requiredReturn(h, a, age),
     partTime: partTimeUntil(h, a, age),

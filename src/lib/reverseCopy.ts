@@ -1,6 +1,8 @@
 // The words of « Arrêter à l’âge de mon choix » (components/results/ReverseView.tsx): the plan asked the other way round (engine/reverse.ts), and what waiting a year is worth
 // (engine/regret.ts). Both languages, each written for its reader. Every amount arrives already formatted; the copy only says what it means.
 
+import type { SavingsAccount } from '../engine/savingsNeeded.ts'
+
 const ansFr = (n: number) => (n === 1 ? 'an' : 'ans')
 const yrsEn = (n: number) => (n === 1 ? 'year' : 'years')
 
@@ -15,7 +17,9 @@ interface ReverseCopy {
   needs: (age: number) => string
   spend: (current: string, max: string, less: string) => string
   spendNone: string
-  save: (perYear: string, perMonth: string) => string
+  save: (perYear: string, perMonth: string, into: string) => string
+  /** Where the saving goes first, in a few words (engine/savingsNeeded.ts picks the placement that needs the least). */
+  saveInto: Record<SavingsAccount, string>
   saveNone: string
   work: (age: number, years: number) => string
   workNone: string
@@ -43,7 +47,8 @@ export const REVERSE_COPY: { fr: ReverseCopy; en: ReverseCopy } = {
     needs: (age) => `Pour arrêter à ${age} ${ansFr(age)}, il faudrait l’une de ces choses — chacune suffit seule.`,
     spend: (current, max, less) => `Dépenser ${max} par année à la retraite au lieu de ${current} (${less} de moins).`,
     spendNone: 'Dépenser moins ne suffit pas : même sans rien dépenser, l’argent ne tient pas jusque-là.',
-    save: (perYear, perMonth) => `Mettre ${perYear} de plus de côté chaque année en travaillant (${perMonth} par mois), pris sur les dépenses.`,
+    save: (perYear, perMonth, into) => `Mettre ${perYear} de plus de côté chaque année en travaillant (${perMonth} par mois), pris sur les dépenses et placé ${into}.`,
+    saveInto: { rrsp: 'dans votre REER d’abord', tfsa: 'dans votre CELI d’abord', nonReg: 'dans un compte non enregistré' },
     saveNone: 'Épargner davantage ne suffit pas, même en y mettant toutes les dépenses du travail.',
     work: (age, years) => `Travailler jusqu’à ${age} ans (${years} ${ansFr(years)} de plus).`,
     workNone: 'Aucun âge jusqu’à 70 ans ne fait tenir le plan tel quel.',
@@ -68,7 +73,8 @@ export const REVERSE_COPY: { fr: ReverseCopy; en: ReverseCopy } = {
     needs: (age) => `To stop at ${age}, one of these would have to be true — each is enough on its own.`,
     spend: (current, max, less) => `Spend ${max} a year in retirement instead of ${current} (${less} less).`,
     spendNone: 'Spending less is not enough: even spending nothing, the money does not last that far.',
-    save: (perYear, perMonth) => `Put ${perYear} more aside each year while you work (${perMonth} a month), taken out of spending.`,
+    save: (perYear, perMonth, into) => `Put ${perYear} more aside each year while you work (${perMonth} a month), taken out of spending and put ${into}.`,
+    saveInto: { rrsp: 'in your RRSP first', tfsa: 'in your TFSA first', nonReg: 'in a non-registered account' },
     saveNone: 'Saving more is not enough, even moving all of the working years’ spending.',
     work: (age, years) => `Work until ${age} (${years} ${yrsEn(years)} longer).`,
     workNone: 'No age up to 70 makes the plan hold as it stands.',

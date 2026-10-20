@@ -38,8 +38,9 @@ describe('stopping before the earliest age that works', () => {
   it('saving: the extra stated works and a clearly smaller one does not', () => {
     expect(r.save).not.toBeNull()
     expect(r.save!).toBeGreaterThan(0)
-    expect(works(withExtraSavings(G.household, r.save!), G.assumptions, age)).toBe(true)
-    if (r.save! > 200) expect(works(withExtraSavings(G.household, r.save! - 200), G.assumptions, age)).toBe(false)
+    expect(r.saveAccount).not.toBeNull()
+    expect(works(withExtraSavings(G.household, r.save!, r.saveAccount!), G.assumptions, age)).toBe(true)
+    if (r.save! > 200) expect(works(withExtraSavings(G.household, r.save! - 200, r.saveAccount!), G.assumptions, age)).toBe(false)
   })
 
   it('returns: the rise stated works and a hair less does not', () => {
