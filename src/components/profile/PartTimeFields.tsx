@@ -5,6 +5,7 @@ import { Chip } from '../Chip'
 import { ConceptPip } from '../ConceptPip'
 import { Cluster } from '../Layout'
 import { NumberSlider } from '../NumberSlider'
+import { partTimeSeed } from '../../lib/profileLife'
 import type { PersonEditor } from './shared'
 
 // Work kept after the retirement age: a share of the salary until an age. Off by default — most plans say « I stop », and the retirement
@@ -25,7 +26,7 @@ export function PartTimeFields({ person, edit }: PersonEditor) {
         <Chip radio selected={pt === null} onClick={() => set(null)}>
           {c.off}
         </Chip>
-        <Chip radio selected={pt !== null} onClick={() => pt === null && set({ share: 0.4, untilAge: Math.min(80, person.retirementAge + 3) })}>
+        <Chip radio selected={pt !== null} onClick={() => pt === null && set({ share: 0.4, untilAge: partTimeSeed(person.retirementAge) })}>
           {c.on}
         </Chip>
       </Cluster>

@@ -2,6 +2,7 @@ import { presetOf, withPreset, type PresetKey } from '../engine/assumptionPreset
 import { CUSTOM_PATH_YEARS, MARKET_PATHS } from '../engine/marketPaths.ts'
 import { rregopPension } from '../engine/presets.ts'
 import type { AccountKind, DbPension, Home, Person, PersonId } from '../engine/types.ts'
+import { withoutStaleConfirmations } from './facts.ts'
 import { blankPerson, MAX_PLAN_NAME, MAX_PLANS, type CustomScenario, type Profile, type StoredAssumptions } from './schema.ts'
 
 // Every way the pages change a profile, as a pure function from profile to profile. A page never builds a new
@@ -29,13 +30,17 @@ const columnSum = (s: Split, k: 'working' | 'retired') => cents(s.rows.reduce((a
  */
 export function setSpending(p: Profile, patch: Partial<Profile['household']['spending']>): Profile {
   const next = { ...p.household.spending, ...patch }
+  if (next.workingToday === p.household.spending.workingToday && next.retiredToday === p.household.spending.retiredToday) return p
   const split = p.household.spendingSplit
   if (!split) return { ...p, household: { ...p.household, spending: next } }
   const share = (k: 'working' | 'retired', to: number): number[] => {
     const old = columnSum(split, k)
     const parts = split.rows.map((r) => (old > 0 ? cents((r[k] * to) / old) : r.id === 'joint' ? to : 0))
     const drift = cents(to - parts.reduce((a, b) => a + b, 0))
-    const at = Math.max(0, split.rows.findIndex((r) => r.id === 'joint'))
+    // The rounding drift (a cent, either way) goes to the joint account — unless it is a cent DOWN and the joint row cannot give it (a row below 0 is one the
+    // schema refuses, and one refused figure stops every save): then to the largest part, which always can.
+    const joint = Math.max(0, split.rows.findIndex((r) => r.id === 'joint'))
+    const at = parts[joint] + drift >= 0 ? joint : parts.indexOf(Math.max(...parts))
     parts[at] = cents(parts[at] + drift)
     return parts
   }
@@ -46,7 +51,18 @@ export function setSpending(p: Profile, patch: Partial<Profile['household']['spe
 }
 
 export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): Profile {
+  const a = p.assumptions as Record<string, unknown>
+  if (Object.entries(patch).every(([k, v]) => sameValue(a[k], v))) return p
   return { ...p, assumptions: { ...p.assumptions, ...patch } }
+}
+
+/** Equal as a profile field is: a plain value, or an object / array whose members are (the returns, a market path). */
+function sameValue(x: unknown, y: unknown): boolean {
+  if (x === y) return true
+  if (typeof x !== 'object' || typeof y !== 'object' || x === null || y === null || Array.isArray(x) !== Array.isArray(y)) return false
+  const kx = Object.keys(x)
+  const ky = Object.keys(y)
+  return kx.length === ky.length && kx.every((k) => sameValue((x as Record<string, unknown>)[k], (y as Record<string, unknown>)[k]))
 }
 
 // ── The REER's locked-in part ──────────────────────────────────────────────────────────────────────────
@@ -60,7 +76,8 @@ export function setAssumptions(p: Profile, patch: Partial<StoredAssumptions>): P
 export function setBirthYear(person: Person, year: number): Person {
   if (person.birth.year === year) return person
   const lifelong = person.oas.residentSince <= person.birth.year + 18
-  const residentSince = lifelong ? person.oas.residentSince + (year - person.birth.year) : person.oas.residentSince
+  // …never past 2100, the last year the profile keeps (schema.ts): a birth year typed far ahead would otherwise write one the schema refuses.
+  const residentSince = lifelong ? Math.min(2100, person.oas.residentSince + (year - person.birth.year)) : person.oas.residentSince
   return { ...person, birth: { ...person.birth, year }, oas: { ...person.oas, residentSince } }
 }
 
@@ -94,7 +111,8 @@ export function setFacts(p: Profile, ids: readonly string[], confirmed: boolean)
 export const blankHome = (): Home => ({ value: 0, mortgage: { balance: 0, rate: 0.05, monthlyPayment: 0 }, sale: null })
 
 export const addHome = (p: Profile): Profile => (p.household.home ? p : { ...p, household: { ...p.household, home: blankHome() } })
-export const removeHome = (p: Profile): Profile => (p.household.home ? { ...p, household: { ...p.household, home: null } } : p)
+// The home's « confirmed » marks go with it: a home added back starts from blank figures, never « confirmed » ones (facts.ts `withoutStaleConfirmations`).
+export const removeHome = (p: Profile): Profile => (p.household.home ? withoutStaleConfirmations({ ...p, household: { ...p.household, home: null } }) : p)
 
 /** Change the home; the same profile back when nothing changes (or there is no home to change). */
 export function updateHome(p: Profile, change: (home: Home) => Home): Profile {
@@ -340,6 +358,12 @@ export function updatePension(person: Person, index: number, change: (p: DbPensi
   const next = change(person.pensions[index])
   if (next === person.pensions[index]) return person
   return { ...person, pensions: person.pensions.map((p, i) => (i === index ? next : p)) }
+}
+
+/** Remove one of a person's plans; with the last one goes the « confirmed » mark on the person's pension (facts.ts `withoutStaleConfirmations`). */
+export function removePensionOf(p: Profile, id: PersonId, index: number): Profile {
+  const next = mapPerson(p, id, (x) => removePension(x, index))
+  return next === p ? p : withoutStaleConfirmations(next)
 }
 
 export function removePension(person: Person, index: number): Person {

@@ -1,3 +1,4 @@
+import { parseDecimal } from './money.ts'
 // READING A PASTED « RELEVÉ DE PARTICIPATION ». The relevé lists one row per year; copied off the page (or out of a PDF) it arrives as
 // text: a year, then one or more amounts, in no promised layout — tabs from a copied table, `$` signs, spaces as thousands separators,
 // French (« 52 300,50 $ ») or English (« 52,300.50 ») numbers. This reads it all tolerantly and reports what it understood, so the person
@@ -21,26 +22,13 @@ const FIRST_YEAR = 1966
 
 /** One amount as typed → dollars, or null when it is not one. Handles « 52 300,50 $ », « 52,300.50 », « 52.300,50 », « 1 234 ». */
 export function parseAmount(text: string): number | null {
-  const s = text.replace(/[$\s  ]/g, '').replace(/[^\d.,-]/g, '')
-  if (!/\d/.test(s) || s.startsWith('.') && s.length === 1) return null
+  // A pasted cell carries more than a typed box: a « $ », a currency code (« CA », « CAD »), thousands spaces of every width. Those go; the number itself
+  // is read by THE one parser (lib/money.ts `parseDecimal`) — the same separator rules a typed figure has, plus `dotThousands`: « 52.300 » pasted is
+  // 52 300. A minus anywhere is the sign (a trailing one, « 45,00- », is read as money out by the bank import, which passes the cell without it).
+  const s = text.replace(/[^\d.,-]/g, '')
   const negative = s.startsWith('-')
-  const body = s.replace(/-/g, '')
-  const lastDot = body.lastIndexOf('.')
-  const lastComma = body.lastIndexOf(',')
-  let normal: string
-  if (lastDot >= 0 && lastComma >= 0) {
-    // Both present: the last one is the decimal mark, the other is thousands.
-    const dec = Math.max(lastDot, lastComma)
-    normal = body.slice(0, dec).replace(/[.,]/g, '') + '.' + body.slice(dec + 1)
-  } else if (lastDot >= 0 || lastComma >= 0) {
-    const mark = lastDot >= 0 ? '.' : ','
-    const parts = body.split(mark)
-    const last = parts[parts.length - 1]
-    // « 52,300 » (three digits, one mark) is thousands; « 52,30 » / « 52,5 » is a decimal; « 1,234,567 » is thousands.
-    normal = parts.length > 2 || last.length === 3 ? parts.join('') : parts.join('.')
-  } else normal = body
-  const n = Number(normal)
-  return Number.isFinite(n) ? (negative ? -n : n) : null
+  const n = parseDecimal(s.replace(/-/g, ''), { dotThousands: true })
+  return n === null ? null : negative ? -n : n
 }
 
 /** Split what follows the year into cells: by tab, else by `$`, else by runs of two spaces or more, else one cell. */

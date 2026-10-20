@@ -81,6 +81,7 @@ export function updateFlow(p: Profile, index: number, change: (f: Flow) => Flow)
   if (index < 0 || index >= flows.length) return p
   const before = flows[index]
   const changed = change(before)
+  if (changed === before) return p
   const next = normalFlow(p, changed.amount !== before.amount ? owned(changed) : changed)
   return { ...p, household: { ...p.household, flows: flows.map((f, i) => (i === index ? next : f)) } }
 }
@@ -103,6 +104,8 @@ export function removeFlow(p: Profile, index: number): Profile {
 type Split = NonNullable<Profile['household']['spendingSplit']>
 const cents = (n: number) => Math.round(n * 100) / 100
 const columnSum = (s: Split, k: 'working' | 'retired') => cents(s.rows.reduce((a, r) => a + r[k], 0))
+/** The largest budget the profile keeps, a year (schema.ts: `household.spending`). */
+const MAX_SPENDING = 1e8
 
 /** A couple starts entering the budget by account: the joint account holds today's figures, each person's own spending starts at 0 — the total does not move. */
 export function startSplit(p: Profile): Profile {
@@ -123,7 +126,20 @@ export function stopSplit(p: Profile): Profile {
 export function setSplitRow(p: Profile, id: Split['rows'][number]['id'], patch: { working?: number; retired?: number }): Profile {
   const split = p.household.spendingSplit
   if (!split || !split.rows.some((r) => r.id === id)) return p
-  const rows = split.rows.map((r) => (r.id === id ? { ...r, ...patch } : r))
+  // Each part is held so the TOTAL stays within what the profile keeps (1e8, schema.ts): three parts each at their own maximum would sum past it, and a
+  // refused total stops every save after it.
+  const fit = (k: 'working' | 'retired', v: number | undefined): number | undefined => (v === undefined ? undefined : Math.max(0, Math.min(v, MAX_SPENDING - split.rows.reduce((a, r) => a + (r.id === id ? 0 : r[k]), 0))))
+  const w = fit('working', patch.working)
+  const t = fit('retired', patch.retired)
+  const row = split.rows.find((r) => r.id === id)!
+  if ((w === undefined || w === row.working) && (t === undefined || t === row.retired)) return p
+  const rows = split.rows.map((r) => (r.id === id ? { ...r, ...(w === undefined ? {} : { working: w }), ...(t === undefined ? {} : { retired: t }) } : r))
   return { ...p, household: { ...p.household, spendingSplit: { rows }, spending: { workingToday: columnSum({ rows }, 'working'), retiredToday: columnSum({ rows }, 'retired') } } }
 }
 
+
+/**
+ * The age part-time work is first offered to run until, when the person turns it on: three years past their retirement age — held within the
+ * 50 to 80 the profile keeps (schema.ts `partTime.untilAge`), so someone who retires at 45 starts at 50, not at a 48 the schema refuses.
+ */
+export const partTimeSeed = (retirementAge: number): number => Math.min(80, Math.max(50, retirementAge + 3))

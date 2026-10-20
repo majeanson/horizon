@@ -162,15 +162,24 @@ function signed(cell: string, unsignedSign: number): number | null {
  * Read an export. The header is the first line (among the first fifteen) with a date column and an amount — or a debit and a credit. Money out is negative. An export
  * that marks money IN with a « + » and leaves money out unsigned (some banks print them so) is read that way: with no minus sign anywhere, an unsigned amount is money out.
  */
-export function readBank(text: string): BankRead {
-  const table = parseDelimited(text, delimiterOf(text))
-  let at = -1
-  let cols: Columns | null = null
-  for (let i = 0; i < Math.min(15, table.length) && cols === null; i++) {
-    cols = columnsOf(table[i])
-    if (cols) at = i
+/** The header: the first of the first fifteen lines that reads as one (a date column and an amount, or a debit and a credit), and where it is. */
+function headerOf(table: string[][]): { at: number; cols: Columns } | null {
+  for (let i = 0; i < Math.min(15, table.length); i++) {
+    const cols = columnsOf(table[i])
+    if (cols) return { at: i, cols }
   }
-  if (cols === null) return { rows: [], skipped: table.length }
+  return null
+}
+
+export function readBank(text: string): BankRead {
+  // The delimiter is the one under which a header is FOUND in those fifteen lines — not the first line's alone: an export that opens with a preamble
+  // (an account number, « Données en date du … ») has no « ; » or tab on that line, and read on « , » a semicolon file had no header at all.
+  const guess = delimiterOf(text)
+  const tables = [guess, ...['\t', ';', ','].filter((d) => d !== guess)].map((d) => parseDelimited(text, d))
+  const found = tables.map((t) => ({ table: t, header: headerOf(t) })).find((x) => x.header !== null)
+  const table = found?.table ?? tables[0]
+  if (!found?.header) return { rows: [], skipped: table.length }
+  const { at, cols } = found.header
   const body = table.slice(at + 1)
   // Read in the AMOUNT column only, and by the same forms `signed` treats as money out (a « - » in a description is not a sign).
   const amountCol = cols.amount

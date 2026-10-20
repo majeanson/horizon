@@ -6,8 +6,9 @@ import { factId } from '../../lib/facts'
 import { useGuided } from '../../lib/guide'
 import { formatDecimal, formatPct } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
-import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePension, updatePension } from '../../lib/profileEdit'
+import { addPension, applyDeferredRule, blankPension, inPayPension, needsDeferredRule, removePensionOf, updatePension } from '../../lib/profileEdit'
 import { MAX_IN_PAY_ANNUAL } from '../../lib/schema'
+import { updateProfile } from '../../lib/store'
 import { useNotice } from '../../lib/toast'
 import { Chip } from '../Chip'
 import { FactMark } from '../FactMark'
@@ -142,7 +143,7 @@ export function PensionPlans({ person, edit }: PersonEditor) {
                 aria-label={p.removeLabel(name)}
                 title={p.removeLabel(name)}
                 onClick={async () => {
-                  if (await confirm({ message: p.removeConfirm, confirmLabel: t.common.remove })) edit((x) => removePension(x, i))
+                  if (await confirm({ message: p.removeConfirm, confirmLabel: t.common.remove })) updateProfile((q) => removePensionOf(q, person.id, i)) // the profile-level edit: the last plan takes its « confirmed » mark with it
                 }}
               >
                 <Icon name="trash-bold" size={18} />

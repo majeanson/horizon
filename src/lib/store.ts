@@ -35,7 +35,7 @@ let current: Profile = load()
 let timer: ReturnType<typeof setTimeout> | undefined
 const listeners = new Set<() => void>()
 
-function load(): Profile {
+function load(fromOtherTab = false): Profile {
   // The portfolio preview never reads the visitor's own profile: it shows an invented one (components/PreviewGate.tsx), from a blank start.
   if (isPreview()) return defaultProfile(today())
   let text: string | null
@@ -57,9 +57,21 @@ function load(): Profile {
     }
     return result.profile
   }
-  keepUnreadable(text)
+  // A file from a NEWER version stays where it is (save() never writes over it): copying it again each time that other version saves would push an older
+  // rescued copy out of the two slots — and then the profile itself. Copied once, on this tab's own first read.
+  if (!(fromOtherTab && result.reason === 'newer')) keepUnreadable(text)
   issue = result.reason === 'newer' ? 'newer' : 'unreadable'
   return defaultProfile(today())
+}
+
+/**
+ * An IMPORTED file that left a named plan out (migrations.ts `droppedPlans`): kept like a stored one, and said by the same notice — the person must know
+ * the plan is not in the profile now on screen.
+ */
+export function noteDroppedPlans(text: string): void {
+  keepUnreadable(text)
+  issue = 'planDropped'
+  notify()
 }
 
 /** Copy a stored file that could not be read whole to the rescue key — never erasing an earlier copy that may not have been rescued yet. */
@@ -87,13 +99,16 @@ function notify(): void {
   for (const l of listeners) l()
 }
 
-function save(): void {
+function save(deliberate = false): void {
   timer = undefined
   // The preview's household lives in memory only: nothing it shows or that is changed in it is ever written to this device.
   if (isPreview()) return
   // NEVER WRITE WHAT WOULD NOT READ BACK. A profile with a figure outside the schema's limits saved fine and blanked the
   // whole plan at the next launch. The pages hold the same limits at the keyboard (numberFieldBounds.test.ts); this is
   // the net under them, so an edit that slips past them costs one unsaved figure, not the household's plan.
+  // A stored profile written by a NEWER version of the app is one this build cannot read: an edit here must never write over it (it is the person's real
+  // profile, still open in that other version). Only a deliberate replace — an import, the example, a reset — takes its place.
+  if (issue === 'newer' && !deliberate) return
   const check = validateProfile(current)
   if (!check.ok) {
     console.error('[horizon] not saved — the profile would not read back:', check.problems.map((p) => `${p.path} (${p.problem})`).join(', '))
@@ -106,7 +121,7 @@ function save(): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(current))
     noteUnbackedEdit()
-    if (issue === 'unavailable' || issue === 'unsaved' || issue === 'conflict') {
+    if (issue === 'unavailable' || issue === 'unsaved' || issue === 'conflict' || issue === 'newer') {
       issue = null
       notify()
     }
@@ -208,7 +223,7 @@ export const useStorageIssue = (): StorageIssue => useSyncExternalStore(subscrib
 export function replaceProfile(next: Profile): void {
   current = next
   if (timer !== undefined) clearTimeout(timer)
-  save()
+  save(true)
   notify()
 }
 
@@ -239,9 +254,9 @@ export function clearProfile(): void {
 }
 
 /** Re-read storage (another tab saved, or a test seeded it). */
-export function reloadProfile(): void {
+export function reloadProfile(fromOtherTab = false): void {
   issue = null
-  current = load()
+  current = load(fromOtherTab)
   notify()
 }
 
@@ -260,7 +275,7 @@ if (typeof window !== 'undefined') {
     const hadPendingEdit = timer !== undefined
     if (timer !== undefined) clearTimeout(timer)
     timer = undefined
-    reloadProfile()
+    reloadProfile(true)
     if (hadPendingEdit) {
       issue = 'conflict'
       notify()

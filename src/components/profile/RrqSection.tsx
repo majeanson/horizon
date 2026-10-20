@@ -9,6 +9,7 @@ import { FactMark } from '../FactMark'
 import { formatYearAge } from '../../lib/format'
 import { formatMoney } from '../../lib/money'
 import { setEarning, setStatement } from '../../lib/profileEdit'
+import { canUndo, type FillDone } from '../../lib/fillUndo'
 import { useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
@@ -38,17 +39,19 @@ export function RrqSection({ person, edit }: PersonEditor) {
   // The note under the fill action and, while nothing else has been touched since, the way back:
   // one tap writes ~30 estimated years that are indistinguishable from typed ones afterward, so the
   // state keeps the history as it was. A manual cell edit clears the offer (undoing would eat it).
-  const [filledNote, setFilledNote] = useState<{ note: string; before: Record<number, number> | null } | null>(null)
+  // The offer also goes when the history is replaced from elsewhere (« Coller mon relevé »): it stands only while the filled history is the one held.
+  const [filledNote, setFilledNote] = useState<FillDone<Readonly<Record<number, number>>> | null>(null)
 
   const fill = () => {
     const filled = fillFromSalary(person, now, assumptions.wageGrowth)
     const added = Object.keys(filled).length - typed
-    setFilledNote(added > 0 ? { note: r.filled(added), before: person.earningsHistory } : { note: r.nothingToFill, before: null })
+    setFilledNote(added > 0 ? { note: r.filled(added), before: person.earningsHistory, after: filled } : { note: r.nothingToFill, before: null, after: null })
     if (added > 0) edit((x) => ({ ...x, earningsHistory: filled }))
   }
+  const undoable = canUndo(filledNote, person.earningsHistory)
   const unfill = () => {
     const before = filledNote?.before
-    if (before == null) return
+    if (!undoable || before == null) return
     edit((x) => ({ ...x, earningsHistory: before }))
     setFilledNote(null)
   }
@@ -94,7 +97,7 @@ export function RrqSection({ person, edit }: PersonEditor) {
           {filledNote && (
             <div className="earnings__filled">
               <StatusMessage tone="info">{filledNote.note}</StatusMessage>
-              {filledNote.before !== null && <Chip onClick={unfill}>{r.fillUndo}</Chip>}
+              {undoable && <Chip onClick={unfill}>{r.fillUndo}</Chip>}
             </div>
           )}
           {/* One line per year, oldest first, like the relevé: the year (with the age it falls at) on the left, the amount on the right. */}

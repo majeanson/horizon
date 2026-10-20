@@ -9,7 +9,7 @@ import { useConfirm } from '../lib/confirm'
 import { formatMoney } from '../lib/money'
 import { DOCUMENTS_COPY } from '../lib/documentsCopy'
 import { ONBOARD_COPY } from '../lib/onboardCopy'
-import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePension, setBirthYear, removeSpouse, setFacts, setSpending, updateHome, updatePension } from '../lib/profileEdit'
+import { addHome, addPension, addSpouse, hasSpouse, isRregopRules, mapPerson, removeHome, removePensionOf, setBirthYear, removeSpouse, setFacts, setSpending, updateHome, updatePension } from '../lib/profileEdit'
 import { factId } from '../lib/facts'
 import type { Profile } from '../lib/schema'
 import { profileGaps, type ProfileGap } from '../lib/profileGaps'
@@ -161,7 +161,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
     const pick = (next: 'none' | 'rregop' | 'other') => {
       setOtherPlan((o) => ({ ...o, [id]: next === 'other' ? true : undefined }))
       if (next === 'rregop' && rregop < 0) edit(id, (x) => addPension(x, rregopPension({ serviceYearsToDate: 0, startAge: Math.max(55, Math.min(x.retirementAge, 65)) })))
-      if (next !== 'rregop' && rregop >= 0) edit(id, (x) => removePension(x, rregop))
+      if (next !== 'rregop' && rregop >= 0) updateProfile((p) => removePensionOf(p, id, rregop))
     }
     return (
       <>

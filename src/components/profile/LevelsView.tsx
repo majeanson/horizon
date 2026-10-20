@@ -6,7 +6,8 @@ import { setBasis, useBasis } from '../../lib/levelBasis'
 import { LEVELS_COPY } from '../../lib/levelsCopy'
 import { formatMoney } from '../../lib/money'
 import type { Profile } from '../../lib/schema'
-import { replaceProfile, updateProfile, useProfile } from '../../lib/store'
+import { canUndo, type FillDone } from '../../lib/fillUndo'
+import { getProfile, replaceProfile, updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { Fold } from '../Fold'
@@ -20,7 +21,7 @@ import { StatusMessage } from '../StatusMessage'
 const SOURCES = [TYPICAL_BY_AGE, TYPICAL_BY_WEALTH, TYPICAL_SPENDING_BY_HOUSEHOLD, TYPICAL_SPENDING_BY_INCOME, TYPICAL_SPENDING_BY_AGE].map((x) => x.source)
 
 /** What a level just filled, said once, with the profile as it was so one tap takes it back. */
-export type LevelsDone = { note: string; before: Profile | null }
+export type LevelsDone = FillDone<Profile>
 
 export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone: (d: LevelsDone | null) => void }) {
   const { lang } = useLang()
@@ -32,9 +33,9 @@ export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone
 
   const pick = (level: Level) => {
     const e = applyLevel(profile, level, now, basis)
-    if (e.profile === profile) return setDone({ note: c.nothing, before: null })
+    if (e.profile === profile) return setDone({ note: c.nothing, before: null, after: null })
     updateProfile((p) => applyLevel(p, level, now, basis).profile)
-    setDone({ note: c.filled(e.changes.length), before: profile })
+    setDone({ note: c.filled(e.changes.length), before: profile, after: getProfile() })
   }
   // Changing how the retirement budget is set re-fills the figures a level put there (never one the person typed).
   const chooseBasis = (next: RetiredBasis) => {
@@ -42,8 +43,10 @@ export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone
     setBasis(next)
     if (current !== null) updateProfile((p) => applyLevel(p, current, now, next).profile)
   }
+  // Only while the level's figures are still what is on screen: after any other edit, undoing would throw that edit away too (lib/fillUndo.ts).
+  const undoable = canUndo(done, profile)
   const undo = () => {
-    if (done?.before) replaceProfile(done.before)
+    if (undoable && done?.before) replaceProfile(done.before)
     setDone(null)
   }
   const money = (n: number | null) => (n === null ? '' : formatMoney(n, lang))
@@ -84,7 +87,7 @@ export function LevelsView({ done, setDone }: { done: LevelsDone | null; setDone
       {done && (
         <Cluster>
           <StatusMessage tone="info">{done.note}</StatusMessage>
-          {done.before !== null && <Chip onClick={undo}>{c.undo}</Chip>}
+          {undoable && <Chip onClick={undo}>{c.undo}</Chip>}
         </Cluster>
       )}
       <Fold summary={c.how.open}>

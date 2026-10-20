@@ -106,6 +106,19 @@ export function factsOf(p: Profile): Fact[] {
   return out
 }
 
+/**
+ * The profile with no « confirmed » mark left on a figure that no longer applies — what every edit that REMOVES a part of the household (a home, a plan,
+ * a topic answered « non ») runs last. A mark outliving its figure came back « confirmed » on the blank one the part returns with: a 0 $ home value read
+ * off no document, counted by the accuracy meter, skipped by the level helper (« nothing is ever assumed real »). Only marks of a known kind are
+ * judged; anything else is left as it is. The same profile back when nothing is stale.
+ */
+export function withoutStaleConfirmations(p: Profile): Profile {
+  const applying = new Set(factsOf(p).map((f) => f.id))
+  const known = new Set(FACTS.map((d) => d.kind as string))
+  const kept = p.confirmed.filter((id) => applying.has(id) || !known.has(id.slice(id.indexOf(':') + 1)))
+  return kept.length === p.confirmed.length ? p : { ...p, confirmed: kept }
+}
+
 export interface Accuracy {
   confirmed: number
   total: number

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import type { PersonId } from '../engine/types.ts'
-import type { DocId } from './facts.ts'
+import { withoutStaleConfirmations, type DocId } from './facts.ts'
 import { removeHome } from './profileEdit.ts'
 import type { Profile } from './schema.ts'
 
@@ -74,8 +74,13 @@ export function lostBy(p: Profile, topic: Topic, owner?: PersonId): number {
 }
 
 /** The profile with this topic emptied: no children, no home, no dated flows, no plan, no money outside the REER and the CELI, a lifelong residence, no work kept after retiring. */
+/** A topic answered « non »: its figures cleared, and their « confirmed » marks with them (a topic answered « oui » again starts from blank figures). */
 export function clearTopic(p: Profile, topic: Topic, owner?: PersonId): Profile {
   if (lostBy(p, topic, owner) === 0) return p
+  return withoutStaleConfirmations(clearedTopic(p, topic, owner))
+}
+
+function clearedTopic(p: Profile, topic: Topic, owner?: PersonId): Profile {
   const h = p.household
   const mapOwner = (change: (x: (typeof h.persons)[number]) => (typeof h.persons)[number]): Profile => ({ ...p, household: { ...h, persons: h.persons.map((x) => (x.id === owner ? change(x) : x)) } })
   switch (topic) {

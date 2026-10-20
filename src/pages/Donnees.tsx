@@ -24,7 +24,7 @@ import type { Profile } from '../lib/schema'
 import { saveCopy } from '../lib/saveCopy'
 import { TIME_BUDGETS, setTimeBudget, useTimeBudget } from '../lib/timeBudget'
 import { TIME_BUDGET_COPY } from '../lib/timeBudgetCopy'
-import { clearProfile, getProfile, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
+import { clearProfile, getProfile, noteDroppedPlans, replaceProfile, unreadableCopies, useStorageIssue } from '../lib/store'
 import { SHEET_COPY } from '../lib/sheetCopy'
 import { useNotice } from '../lib/toast'
 import { useParamChoice } from '../lib/useParamChoice'
@@ -90,6 +90,8 @@ export function Donnees() {
       if (await confirm({ message: d.import.confirm, confirmLabel: d.import.confirmLabel, tone: 'default' })) {
         setPrevious(getProfile())
         replaceProfile(result.profile)
+        // a plan in the file that could not be read: the file is kept, and the shell says so (as at a load)
+        if (result.droppedPlans > 0) noteDroppedPlans(text)
         notice(d.import.done)
       }
     } finally {

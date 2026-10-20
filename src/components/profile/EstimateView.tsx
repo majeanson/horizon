@@ -2,14 +2,15 @@ import { useLang } from '../../i18n'
 import { estimateMissing } from '../../lib/estimates'
 import { GUIDE_COPY } from '../../lib/guideCopy'
 import type { Profile } from '../../lib/schema'
-import { replaceProfile, updateProfile, useProfile } from '../../lib/store'
+import { canUndo, type FillDone } from '../../lib/fillUndo'
+import { getProfile, replaceProfile, updateProfile, useProfile } from '../../lib/store'
 import { today } from '../../lib/today'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { StatusMessage } from '../StatusMessage'
 
 /** What the estimate just did, said once — with the profile as it was, so one tap takes it back. */
-export type EstimateDone = { note: string; before: Profile | null }
+export type EstimateDone = FillDone<Profile>
 
 // « Estimer ce qui manque » — the second view of « Remplir ce qui manque » (FillBlanks.tsx): fill the blank earnings years (from the salary) and a CELI room left at 0 (from the age
 // and the balance), confirm nothing, never touch a figure that was typed. It used to be a chip at the foot of « Rendre mon profil exact »; it is the same job as the level picker.
@@ -19,12 +20,14 @@ export function EstimateView({ done, setDone }: { done: EstimateDone | null; set
   const profile = useProfile()
   const estimate = () => {
     const e = estimateMissing(profile, today())
-    if (e.years === 0 && e.rooms === 0 && e.rrspRooms === 0) return setDone({ note: c.panel.estimateNothing, before: null })
+    if (e.years === 0 && e.rooms === 0 && e.rrspRooms === 0) return setDone({ note: c.panel.estimateNothing, before: null, after: null })
     updateProfile((p) => estimateMissing(p, today()).profile)
-    setDone({ note: c.panel.estimateDone(e.years, e.rooms, e.rrspRooms), before: profile })
+    setDone({ note: c.panel.estimateDone(e.years, e.rooms, e.rrspRooms), before: profile, after: getProfile() })
   }
+  // Only while the estimates are still what is on screen: after any other edit, undoing would throw that edit away too (lib/fillUndo.ts).
+  const undoable = canUndo(done, profile)
   const undo = () => {
-    if (done?.before) replaceProfile(done.before)
+    if (undoable && done?.before) replaceProfile(done.before)
     setDone(null)
   }
   return (
@@ -37,7 +40,7 @@ export function EstimateView({ done, setDone }: { done: EstimateDone | null; set
       {done && (
         <Cluster>
           <StatusMessage tone="info">{done.note}</StatusMessage>
-          {done.before !== null && <Chip onClick={undo}>{c.panel.estimateUndo}</Chip>}
+          {undoable && <Chip onClick={undo}>{c.panel.estimateUndo}</Chip>}
         </Cluster>
       )}
     </>

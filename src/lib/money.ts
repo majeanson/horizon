@@ -54,7 +54,9 @@ export function formatCompactMoney(dollars: number | null | undefined, lang: Lan
 //   * any other comma is grouping and is stripped;
 //   * a dot stays the decimal mark;
 //   * if BOTH appear, the LAST one is the decimal mark ("1.234,56" and "1,234.56").
-export function parseDecimal(input: string, opts: { negative?: boolean; places?: number } = {}): number | null {
+//   * `dotThousands` (pasted text only — a relevé, a bank export): a lone dot before exactly three digits, or several dots, group thousands
+//     (« 1.234 » is 1 234, « 1.234.567 » 1 234 567), as a comma does; a box a person types into keeps « 1.234 » a decimal.
+export function parseDecimal(input: string, opts: { negative?: boolean; places?: number; dotThousands?: boolean } = {}): number | null {
   // A LETTER IS NEVER PART OF A NUMBER. Dropping it made « 12e5 » read as 125 and « 1a2b3 » as 123: a typo became a
   // confidently wrong figure in a retirement plan. Symbols a person may add around an amount (« $ », « % », spaces) are
   // still ignored below; anything spelled with letters is refused, and the box says so.
@@ -70,10 +72,14 @@ export function parseDecimal(input: string, opts: { negative?: boolean; places?:
     normalized = cleaned.slice(0, decimalAt).replace(/[.,]/g, '') + '.' + cleaned.slice(decimalAt + 1).replace(/[.,]/g, '')
   } else if (lastComma >= 0) {
     normalized = /,\d{1,2}$/.test(cleaned) ? cleaned.replace(',', '.') : cleaned.replace(/,/g, '')
+  } else if (opts.dotThousands && lastDot >= 0 && (cleaned.indexOf('.') !== lastDot || /\.\d{3}$/.test(cleaned))) {
+    normalized = cleaned.replace(/\./g, '')
   } else {
     normalized = cleaned
   }
 
+  // Separators with no digit (« , », « ,, », « $, ») strip to nothing — and Number('') is 0, then Number('e2') is NaN, which a box would have saved.
+  if (!/\d/.test(normalized)) return null
   const n = Number(normalized)
   if (!Number.isFinite(n) || (n < 0 && !opts.negative)) return null
   // Round by moving the decimal point in the EXPONENT, not by multiplying:
