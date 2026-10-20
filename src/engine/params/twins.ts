@@ -7,8 +7,8 @@
 //
 // Every twin below was OPENED, not guessed: nearly all are the target of the page's own language-toggle link (the `hreflang`
 // alternate), the statutes and one leaflet follow the agency's published /fra/ and /fr/ address pattern and answered with the
-// right-language document, and two Revenu Québec pages and one Finances Québec PDF were taken from the agencies' own search
-// results (Revenu Québec refuses every automated client, so those cannot be fetched from here). A test holds this table to the
+// right-language document, and one Finances Québec PDF was taken from the agency's own search results. The two Revenu Québec pages
+// (which refuse every automated client) were opened in a browser on 2026-10-20, both languages, each the other's twin. A test holds this table to the
 // params: a cited page missing from it fails the build, and a twin must be an official host and the OTHER language.
 //
 // Pure data, no imports: it runs under plain Node (`npm run sources`) and in the browser alike.

@@ -161,7 +161,7 @@ const QC_PARAMS = src(
   { note: 'Finances Québec, novembre 2025 — Tableau 3.' },
 )
 const QC_RATES = src('https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/income-tax-rates/', 'Income Tax Rates', {
-  note: 'Page « Taux d’imposition », lue sur revenuquebec.ca le 2026-10-06 : 2026 — 54 345 $ ou moins 14 % ; au-delà de 54 345 $ jusqu’à 108 680 $ 19 % ; au-delà de 108 680 $ jusqu’à 132 245 $ 24 % ; au-delà de 132 245 $ 25,75 %.',
+  note: 'Page « Taux d’imposition », lue sur revenuquebec.ca le 2026-10-06, relue le 2026-10-20 dans ses deux langues : 2026 — 54 345 $ ou moins 14 % ; au-delà de 54 345 $ jusqu’à 108 680 $ 19 % ; au-delà de 108 680 $ jusqu’à 132 245 $ 24 % ; au-delà de 132 245 $ 25,75 %.',
 })
 const QC_EXPENDITURES_2020 = src(
   'https://www.budget.finances.gouv.qc.ca/budget/outils/depenses-fiscales/documents/Depenses_fiscales_2020_Description_mesures.pdf',
@@ -178,7 +178,7 @@ const QC_LINE_361 = src(
   'https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/350-a-398-1-credits-dimpot-non-remboursables/ligne-361/',
   "Ligne 361 - Montant accordé en raison de l'âge ou pour personne vivant seule ou pour revenus de retraite",
   {
-    note: 'Guide TP-1.G (2025-12), ligne 361 : « Vous pouvez inscrire un montant en raison de votre âge si vous êtes né(e) avant le 1er janvier 1961 » (65 ans en 2025).',
+    note: 'Page « Ligne 361 », lue sur revenuquebec.ca le 2026-10-20 (déclaration 2025) : « Vous pouvez inscrire un montant en raison de votre âge si vous êtes née ou né avant le 1er janvier 1961 » — 65 ans en 2025 ; le montant pour revenus de retraite n’y pose aucune condition d’âge (lignes 122 ou 123). Le guide TP-1.G (2025-12) dit la même chose.',
   },
 )
 
