@@ -29,7 +29,7 @@ const read = async (page: Page): Promise<string[]> => {
 const OPENED: [string, string, (page: Page) => Promise<void>][] = [
   [
     'stop at an age, and who starts first',
-    '/resultats?v=decide&essai=target&age=55&strat=rentes',
+    '/decider?essai=target&age=55&strat=rentes',
     async (page) => {
       await expect(page.locator('#viser .reverse__levers').first().locator('li')).toHaveCount(5, { timeout: 90_000 })
       await expect(page.locator('#viser .reverse__wait li').first()).toBeVisible({ timeout: 90_000 })

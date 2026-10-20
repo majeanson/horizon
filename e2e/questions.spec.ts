@@ -14,7 +14,7 @@ test('the three answers: the verdict and stopping on the first view, saving and 
   await page.goto('/resultats')
   await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible()
   await expect(page.locator('#epargner')).toHaveCount(0)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   // « Décider » shows the changes ranked, and each what-if as a closed fold until it is opened
   await expect(page.locator('#ajuster')).toBeVisible()
   await expect(page.locator('#epargner')).toHaveClass(/is-closed/)
@@ -46,20 +46,20 @@ test('« Quand arrêter de travailler ? » gives each person a year, and says wh
 })
 
 test('« Combien épargner ? » says nothing more at an age that already works, an amount before it, and « ne tient pas » far too early', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&age=60')
+  await page.goto('/decider?age=60')
   await expect(page.getByText('Rien de plus : à 60 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
-  await page.goto('/resultats?v=adjust&age=58')
+  await page.goto('/decider?age=58')
   await expect(page.getByText(/de plus par année/)).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText(/Soit environ .* par mois/)).toBeVisible()
   // …and where it goes: the placement that needs the least of the three tried (engine/savingsNeeded.ts)
   await expect(page.getByText(/^Placé dans (votre REER|votre CELI|un compte non enregistré)/)).toBeVisible()
   await expect(page.getByText(/ont chacun été essayés/)).toBeVisible()
-  await page.goto('/resultats?v=adjust&age=50')
+  await page.goto('/decider?age=50')
   await expect(page.getByText('À 50 ans, l’argent ne dure pas.')).toBeVisible({ timeout: 30_000 })
 })
 
 test('typing an age in « Combien épargner ? » recomputes the answer and keeps it in the address', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&age=60')
+  await page.goto('/decider?age=60')
   await expect(page.getByText('Rien de plus : à 60 ans, l’argent dure déjà.')).toBeVisible({ timeout: 30_000 })
   const box = await exactBox(page, 'Partir à (âge)')
   await box.fill('58')
@@ -71,7 +71,8 @@ test('typing an age in « Combien épargner ? » recomputes the answer and keeps
 test('« Quand arrêter » says when no pension has begun yet, and what they cover once every one is in pay', async ({ page }) => {
   await page.goto('/resultats')
   // The golden couple's verdict (59) has the plan pension in pay the year after the last stop; every pension is in pay later.
-  await expect(page.locator('#arreter')).toContainText(/vos rentes, après impôt, couvrent \d+\s*% de vos dépenses/)
+  // The dates come with the answer, off the page's thread: the default 5 s missed them on a busy machine (2026-10-20).
+  await expect(page.locator('#arreter')).toContainText(/vos rentes, après impôt, couvrent \d+\s*% de vos dépenses/, { timeout: 60_000 })
   await expect(page.locator('#arreter')).toContainText(/Une fois toutes vos rentes commencées, en 20\d\d \(\d\d \/ \d\d ans\), elles couvrent \d+\s*% de vos dépenses, après impôt\./)
 })
 
@@ -98,7 +99,7 @@ test('« Et si je dépensais moins ? » recomputes the age for an amount from th
   await expect(page.locator('#depenser')).toContainText('C’est le montant de vos hypothèses. Glissez pour voir l’âge à un autre montant.')
   await expect(page.locator('#depenser')).not.toContainText('dès 60 ans')
   // A lower amount from the address: an earlier age, said against the profile's own.
-  await page.goto('/resultats?v=adjust&spend=70000')
+  await page.goto('/decider?spend=70000')
   await expect(page.locator('#depenser')).toContainText('À 70 000 $ par année : dès 56 ans.', { timeout: 30_000 })
   await expect(page.locator('#depenser')).toContainText('4 ans plus tôt qu’avec les 90 000 $ de vos hypothèses.')
   // The slider's step button is one exact step, kept in the address.

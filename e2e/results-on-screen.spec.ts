@@ -47,7 +47,7 @@ test('« Voir les pages officielles » inside « Précision » keeps every block
 test('after a way of starting is picked, the three-scenario marks are pending until worked out again — never the previous ages’ dots shown as final', async ({ page }) => {
   test.slow()
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats?v=strategies&bt=cards')
+  await page.goto('/decider?bt=cards')
   // the marks are inside each card's « Détails »: open them all, as bridge.spec does
   await expect(page.locator('.bridge-card').first()).toBeVisible({ timeout: 60_000 })
   for (const b of await page.locator('.bridge-card').getByRole('button', { name: /^Détails/ }).all()) await b.click()
@@ -69,7 +69,7 @@ test('a way of starting already behind the person (a pension paid since 65, now 
   const p = structuredClone(EXAMPLE) as unknown as { household: { persons: Person[] } }
   Object.assign(p.household.persons[0], { birth: { year: 1958, month: 3 }, retirementAge: 60 })
   await seedProfile(page, p as never)
-  await page.goto('/resultats?v=strategies&bt=cards')
+  await page.goto('/decider?bt=cards')
   const card = (name: string) => page.locator('.bridge-card').getByRole('radio', { name, exact: true })
   await expect(card('Pont jusqu’à 70 ans')).toBeVisible({ timeout: 60_000 })
   await expect(card('Pont jusqu’à 70 ans')).toBeDisabled() // its note says it: shown to compare, not to choose
@@ -81,7 +81,7 @@ test('a way of starting already behind the person (a pension paid since 65, now 
 
 test('« Les deux à 70 ans » stores BOTH people’s ages — the rest of the app reads the profile, not the address — and undo puts both back', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats?v=strategies&bt=cards')
+  await page.goto('/decider?bt=cards')
   const card = (name: string) => page.locator('.bridge-card').getByRole('radio', { name, exact: true })
   await card('Les deux à 70 ans').click()
   await expect.poll(async () => (await saved(page)).household.persons.map((x: Person) => [x.rrq.startAge, x.oas.startAge])).toEqual([
@@ -100,7 +100,7 @@ test('a full list of events that holds the care keeps « Garder »: it REPLACES 
   const roof = (i: number) => ({ label: `Toit ${i}`, kind: 'expense', amount: 1_000, fromYear: 2030 + i, toYear: 2030 + i, owner: 'self', taxable: false })
   p.household.flows = [...Array.from({ length: 19 }, (_, i) => roof(i)), { label: 'Des soins plus tard', kind: 'expense', amount: 30_000, fromYear: 2063, toYear: 2072, owner: 'self', taxable: false }]
   await seedProfile(page, p as never)
-  await page.goto('/resultats?v=adjust&care=45000,88,6')
+  await page.goto('/decider?care=45000,88,6')
   await expect(page.locator('#soins .answer__big')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('#soins')).toContainText('cet essai le remplace')
   await page.locator('#soins').getByRole('button', { name: 'L’ajouter à mes événements' }).click()

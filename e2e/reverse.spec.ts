@@ -7,7 +7,7 @@ import { seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page))
 
 test('an age that does not work names the five changes, each in its own unit, and what waiting buys', async ({ page }) => {
-  await page.goto('/resultats?v=decide&essai=target&age=55')
+  await page.goto('/decider?essai=target&age=55')
   const fold = page.locator('#viser')
   await expect(fold).toHaveClass(/is-open/)
   const levers = fold.locator('.reverse__levers').first().locator('li')
@@ -25,7 +25,7 @@ test('an age that does not work names the five changes, each in its own unit, an
 })
 
 test('an age that works says so, and how much more could be spent', async ({ page }) => {
-  await page.goto('/resultats?v=decide&essai=target&age=62')
+  await page.goto('/decider?essai=target&age=62')
   const fold = page.locator('#viser')
   await expect(fold.getByText('À 62 ans, votre plan tient déjà tel quel.')).toBeVisible({ timeout: 90_000 })
   await expect(fold.getByText('Vous pourriez même dépenser jusqu’à')).toBeVisible()
@@ -33,7 +33,7 @@ test('an age that works says so, and how much more could be spent', async ({ pag
 })
 
 test('the age is the one « Combien épargner ? » reads: moving it here moves it there', async ({ page }) => {
-  await page.goto('/resultats?v=decide&essai=target&age=55')
+  await page.goto('/decider?essai=target&age=55')
   await expect(page.locator('#viser').getByText('Pour arrêter à 55 ans')).toBeVisible({ timeout: 90_000 })
   await expect(page).toHaveURL(/age=55/)
   await page.locator('#viser .accordion__toggle').click() // close it, open the saving
@@ -43,7 +43,7 @@ test('the age is the one « Combien épargner ? » reads: moving it here moves i
 
 test('in English the fold speaks English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats?v=decide&essai=target&age=55')
+  await page.goto('/decider?essai=target&age=55')
   await expect(page.locator('#viser .accordion__name')).toHaveText('Stop at the age I choose')
   await expect(page.locator('#viser').getByText('To stop at 55, one of these would have to be true')).toBeVisible({ timeout: 90_000 })
 })

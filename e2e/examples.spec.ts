@@ -40,7 +40,7 @@ test('modest single: one person, no couple widgets, and the GIS is in the year t
   await expect(page.locator('.verdict__line')).toContainText('64 ans.')
   await expect(page.locator('.verdict__line')).not.toContainText('tous les deux')
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
-  await page.goto('/resultats?v=strategies&bv=years')
+  await page.goto('/decider?bv=years')
   await expect(page.locator('#rentes')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Pour les deux' })).toHaveCount(0)
   await expect(page.locator('.bridge__table')).toContainText('SRG')
@@ -62,7 +62,7 @@ test('retired couple: no retirement question, no age to compare, no pension star
   await expect(page.locator('.verdict__line')).toHaveText('Vous êtes déjà tous les deux à la retraite.')
   await expect(page.locator('.compare')).toHaveCount(0) // no departure ages to try (the plan's own card and chart stay)
   await expect(page.getByText('Chacun de son côté')).toHaveCount(0)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   await expect(page.locator('#ordre')).toBeVisible()
   await expect(page.locator('#rentes')).toHaveCount(0)
   await openLedger(page)
@@ -85,7 +85,7 @@ test('heir: young and rich — « dès maintenant » rather than a first age tri
   await loadExample(page, 'Une personne, grand héritage')
   await expect(page.locator('.verdict__line')).toHaveText('Vous pouvez déjà prendre votre retraite.')
   // the spending lever says it too, whatever the amount that still works
-  await page.goto('/resultats?v=adjust&spend=60000')
+  await page.goto('/decider?spend=60000')
   await expect(page.locator('#depenser')).toContainText(/dès maintenant.|C’est le montant de vos hypothèses./, { timeout: 30_000 })
   // the comparison starts at the age already reached, and nobody is shown an age in the past
   await page.goto('/resultats')
@@ -128,7 +128,7 @@ test('planner: a life to plan — the profile carries its events, the answer mov
   await expect(page.locator('.flow__line', { hasText: 'Un héritage' })).toBeVisible()
   await expect(page.locator('.flow__line', { hasText: 'Des soins plus tard' })).toBeVisible()
   // the care what-if REPLACES the care the household already counts (as « Garder » does), and says so
-  await page.goto('/resultats?v=adjust&essai=care')
+  await page.goto('/decider?essai=care')
   await expect(page.locator('#soins')).toContainText('déjà dans vos événements', { timeout: 30_000 })
 })
 

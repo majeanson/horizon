@@ -75,7 +75,7 @@ const PAGES = [
   ['the documents to gather', '/documents', '.page-head__title'],
   ['the entry by document', '/saisie?etape=bank', '.page-head__title'],
   ['the component gallery', '/dev/kit', '.devkit'],
-  ['the try view of the results', '/resultats?v=adjust', '.page-head__title'],
+  ['the try view of the results', '/decider', '.page-head__title'],
   ['the check view of the results', '/resultats?v=verify', '.page-head__title'],
   ['the detail chart of the results', '/resultats?metric=detail', '.page-head__title'],
   ['the proof view of the results', '/resultats?v=proof', '.page-head__title'],

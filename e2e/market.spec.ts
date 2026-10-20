@@ -66,7 +66,7 @@ test('the verdict says what the age can fund each month, beside what is planned'
 })
 
 test('« Essayer » ranks what moves the answer most, each lever with its age', async ({ page }) => {
-  await page.goto('/resultats?v=adjust')
+  await page.goto('/decider')
   await expect(page.getByText('Ce qui change le plus')).toBeVisible()
   const items = page.locator('.levers__item')
   await expect(items).toHaveCount(4)

@@ -180,7 +180,7 @@ test('Réponse: two cards, open by default; « Tout fermer » closes them, a map
 test('Décider: « Tout ouvrir » opens the four what-ifs and every strategy; closing one what-if leaves the rest open', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
   await expect(page.locator('.try-fold')).toHaveCount(4, { timeout: 60_000 })
   await expect(page.locator('.try-fold.is-open')).toHaveCount(0)
@@ -198,7 +198,7 @@ test('Décider: « Tout ouvrir » opens the four what-ifs and every strategy; cl
 // one block at a time, a phone's Profil included. Measured with the example household, every block closed but the default one.
 for (const [where, path, width] of [
   ['Hypothèses', '/hypotheses', 1280],
-  ['Décider', '/resultats?v=decide', 1280],
+  ['Décider', '/decider', 1280],
   ['Preuve', '/resultats?v=proof', 1280],
   ['Réponse', '/resultats?v=answer&cartes=none', 1280],
   ['Profil on a phone', '/profil?form=1', 390],

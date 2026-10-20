@@ -193,7 +193,7 @@ test.describe('more inputs', () => {
 })
 
 test.describe('a figure that counts up', () => {
-  const url = '/resultats?v=decide&essai=spend&spend=40000'
+  const url = '/decider?essai=spend&spend=40000'
   // Records every value the count draws, from the first frame.
   const watch = (page: import('@playwright/test').Page) =>
     page.addInitScript(() => {

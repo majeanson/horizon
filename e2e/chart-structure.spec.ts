@@ -10,8 +10,8 @@ test.beforeEach(async ({ page }) => seedProfile(page))
 const VIEWS = [
   ['the answer', '/resultats', 1],
   ['the detail bars', '/resultats?metric=detail', 3],
-  ['the strategies, every section open', '/resultats?v=strategies&tout=1', 2],
-  ['the strategies, the bridge years', '/resultats?v=strategies&bv=years', 3],
+  ['the strategies, every section open', '/decider?tout=1', 2],
+  ['the strategies, the bridge years', '/decider?bv=years', 3],
 ] as const
 
 async function settle(page: Page): Promise<Locator> {

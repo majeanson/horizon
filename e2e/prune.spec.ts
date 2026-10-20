@@ -26,7 +26,7 @@ const SAME = 'Pour vous, remplir la tranche change peu'
 test('the golden couple: « Fonte du REER » is a closed block with its title and one line; a tap opens the whole panel; the section stays in the map', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   const section = page.locator('#fonte')
   await section.scrollIntoViewIfNeeded()
   await expect(section.getByText(SAME, { exact: false })).toBeVisible({ timeout: 90_000 })
@@ -44,7 +44,7 @@ test('the golden couple: « Fonte du REER » is a closed block with its title an
 test('« Tout ouvrir » (the icon at the end of the map row) opens every what-if and every strategy, the ones that changed little too; « Tout fermer » puts them away', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
   // the first strategy is open: the icon closes it, then opens everything
   await nav.getByRole('button', { name: 'Tout fermer' }).click({ timeout: 90_000 })
@@ -66,7 +66,7 @@ test('« Tout ouvrir » (the icon at the end of the map row) opens every what-if
 test('?tout=1 opens everything: every strategy open, no verdict line, and the map row offers the way back', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page)
-  await page.goto('/resultats?v=decide&tout=1')
+  await page.goto('/decider?tout=1')
   const section = page.locator('#fonte')
   await section.scrollIntoViewIfNeeded()
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })
@@ -80,7 +80,7 @@ test('?tout=1 opens everything: every strategy open, no verdict line, and the ma
 test('a household built for the habit sees the whole panel once the block is open, with no line about it', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page, melter() as never)
-  await page.goto('/resultats?v=decide&strat=fonte')
+  await page.goto('/decider?strat=fonte')
   const section = page.locator('#fonte')
   await section.scrollIntoViewIfNeeded()
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })

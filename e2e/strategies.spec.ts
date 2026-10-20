@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => seedProfile(page))
 
 test('a wide screen shows the comparison as a table: the ways are the columns, the best of a row is marked', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/decider')
   const table = page.locator('.strategies__table')
   await expect(table).toBeVisible({ timeout: 60_000 })
   await expect(page.getByRole('button', { name: 'Tableau' })).toHaveAttribute('aria-pressed', 'true')
@@ -20,7 +20,7 @@ test('a wide screen shows the comparison as a table: the ways are the columns, t
 
 test('a phone shows closed cards with three dots each; « Détails » opens one', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/decider')
   const cards = page.locator('.bridge-card')
   await expect(cards.first()).toBeVisible({ timeout: 60_000 })
   await expect(page.getByRole('button', { name: 'Cartes' })).toHaveAttribute('aria-pressed', 'true')
@@ -36,7 +36,7 @@ test('a phone shows closed cards with three dots each; « Détails » opens one'
 
 test('the reader chooses, on either screen, and the choice is in the address', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/decider')
   await expect(page.locator('.bridge-card').first()).toBeVisible({ timeout: 60_000 })
   await page.getByRole('button', { name: 'Tableau' }).click()
   await expect(page).toHaveURL(/bt=table/)
@@ -54,7 +54,7 @@ test('the reader chooses, on either screen, and the choice is in the address', a
 
 test('the comparison is the first view of the pensions; the chart is one switch away', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/resultats?v=strategies')
+  await page.goto('/decider')
   await expect(page.getByRole('heading', { name: 'Façons de commencer vos rentes' })).toBeVisible({ timeout: 60_000 })
   await expect(page.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toHaveCount(0)
   await page.getByRole('tab', { name: 'Année par année' }).click()
@@ -76,7 +76,7 @@ test('« Votre plan en une ligne » (on Ma fiche): one bar per person, with the 
 
 test('« Et si Camille décédait plus tôt ? » compares every way of starting at five death ages, and the best of a column is marked', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/resultats?v=strategies&bv=death')
+  await page.goto('/decider?bv=death')
   const panel = page.locator('.sweep')
   await expect(panel.getByRole('heading', { name: /Et si Camille décédait plus tôt/ })).toBeVisible({ timeout: 60_000 })
   const table = panel.locator('table')
@@ -99,7 +99,7 @@ test('« Et si Camille décédait plus tôt ? » compares every way of starting 
 
 test('a phone gets the compact table: ages as bare numbers, amounts in k and M', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/resultats?v=strategies&bv=death')
+  await page.goto('/decider?bv=death')
   const panel = page.locator('.sweep')
   await expect(panel.locator('table')).toBeVisible({ timeout: 90_000 })
   await expect(panel.getByText('Colonnes : l’âge au décès.', { exact: false })).toBeVisible()
@@ -108,7 +108,7 @@ test('a phone gets the compact table: ages as bare numbers, amounts in k and M',
 
 test('Décider says its two steps on the page: « Essayer un changement », then « Choisir comment » over the strategies', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/resultats?v=decide')
+  await page.goto('/decider')
   const steps = page.locator('.arc > .results-section > .section-header .section-header__title')
   await expect(steps).toHaveText(['Essayer un changement', 'Choisir comment'])
   // the strategies are inside the second step

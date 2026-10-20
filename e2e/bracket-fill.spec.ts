@@ -24,7 +24,7 @@ test('the three ways are tabs, the table sets them side by side, and one tap mak
   await page.setViewportSize({ width: 1280, height: 900 })
   await seedProfile(page, melter() as never)
   // `tout=1`: once the way is adopted the household's own is the best, so the section would present as a line and a closed fold (e2e/prune.spec.ts); this test drives the whole panel.
-  await page.goto('/resultats?v=strategies&tout=1')
+  await page.goto('/decider?tout=1')
   const section = page.locator('#fonte')
   await section.scrollIntoViewIfNeeded()
   await expect(section.getByRole('tab')).toHaveCount(3, { timeout: 90_000 })
@@ -48,7 +48,7 @@ test('the three ways are tabs, the table sets them side by side, and one tap mak
 test('on a phone the panel fits the screen: no sideways scroll but the table’s own', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
   await seedProfile(page, melter() as never)
-  await page.goto('/resultats?v=strategies&strat=fonte') // the strategies are read one at a time: the address opens this one
+  await page.goto('/decider?strat=fonte') // the strategies are read one at a time: the address opens this one
   await page.locator('#fonte').scrollIntoViewIfNeeded()
   await expect(page.locator('#fonte tbody tr')).toHaveCount(3, { timeout: 90_000 })
   const overflow = await page.evaluate(() => document.getElementById('root')!.scrollWidth - document.getElementById('root')!.clientWidth)

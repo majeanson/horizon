@@ -9,14 +9,14 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('« Décider » holds the care what-if, and « À faire cette année » closes the answer with its doors to the strategies', async ({ page }) => {
-  await page.goto('/resultats?v=decide&essai=care')
+  await page.goto('/decider?essai=care')
   await expect(page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Décider' })).toHaveAttribute('aria-current', 'page')
   await expect(page.locator('#soins')).toContainText('Et si les dernières années coûtaient plus cher ?')
   // The answer to the starting care arrives off the page's thread.
   await expect(page.locator('#soins .answer__big')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('#soins')).toContainText('Le coût commencerait en')
   // An old link to the removed « Avenir » view lands on « Décider », the care open.
-  await page.goto('/resultats?v=future')
+  await page.goto('/decider?essai=care')
   await expect(page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Décider' })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveURL(/essai=care/)
   await expect(page.locator('#soins')).toBeVisible()
@@ -29,22 +29,22 @@ test('« Décider » holds the care what-if, and « À faire cette année » clo
 })
 
 test('a heavier care is read from the address and costs the plan something', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&care=5000,95,1')
+  await page.goto('/decider?care=5000,95,1')
   await expect(page.locator('#soins .answer__big')).toBeVisible({ timeout: 30_000 })
   const light = await page.locator('#soins .answer__big').innerText()
-  await page.goto('/resultats?v=adjust&care=150000,65,25')
+  await page.goto('/decider?care=150000,65,25')
   await expect(page.locator('#soins .answer__big')).not.toHaveText(light, { timeout: 30_000 })
   await expect(page.locator('#soins')).toContainText(/ne dure à aucun âge|plus tard/)
 })
 
 test('an unreadable care in the address falls back to the starting figures', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&care=abc')
+  await page.goto('/decider?care=abc')
   await expect(page.locator('#soins .answer__big')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('#soins')).toContainText('Le coût commencerait en')
 })
 
 test('« L’ajouter à mes événements » writes the care as a dated expense and clears the what-if', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&care=45000,88,6')
+  await page.goto('/decider?care=45000,88,6')
   await expect(page.locator('#soins .answer__big')).toBeVisible({ timeout: 30_000 })
   await page.locator('#soins').getByRole('button', { name: 'L’ajouter à mes événements' }).click()
   await expect(page).not.toHaveURL(/care=/)
@@ -72,7 +72,7 @@ test('« À faire cette année » names the change that gains most once the sear
 })
 
 test('the CHSLD ceilings are three reference chips that set the amount exactly, with the official page beside them', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&essai=care')
+  await page.goto('/decider?essai=care')
   const soins = page.locator('#soins')
   await expect(soins.getByRole('radio', { name: /Chambre privée/ })).toBeVisible()
   await expect(soins.getByRole('radio', { name: /Chambre semi-privée/ })).toBeVisible()
@@ -91,7 +91,7 @@ test('the CHSLD ceilings are three reference chips that set the amount exactly, 
 
 test('in English the chips and the note speak English and the link goes to the English edition', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats?v=adjust&essai=care')
+  await page.goto('/decider?essai=care')
   const soins = page.locator('#soins')
   await expect(soins.getByRole('radio', { name: /Private room/ })).toBeVisible()
   await expect(soins).toContainText('ceiling the government sets')
@@ -99,8 +99,8 @@ test('in English the chips and the note speak English and the link goes to the E
 })
 
 test('a change of the care moves a figure in dollars at once: the total it costs follows the sliders', async ({ page }) => {
-  await page.goto('/resultats?v=adjust&care=60000%2C75%2C10')
+  await page.goto('/decider?care=60000%2C75%2C10')
   await expect(page.getByText(/Ces soins coûtent 600\s?000\s?\$ en tout sur 10 ans/)).toBeVisible({ timeout: 30_000 })
-  await page.goto('/resultats?v=adjust&care=20000%2C85%2C5')
+  await page.goto('/decider?care=20000%2C85%2C5')
   await expect(page.getByText(/Ces soins coûtent 100\s?000\s?\$ en tout sur 5 ans/)).toBeVisible({ timeout: 30_000 })
 })

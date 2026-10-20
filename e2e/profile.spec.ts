@@ -259,7 +259,7 @@ test.describe('the example household', () => {
     await expect.poll(async () => (await savedProfile(page)).assumptions.inflation).toBe(0.025)
     // The order has one home: the comparison on Résultats ▸ Stratégies, where a row is adopted in one tap.
     await expect(page.getByRole('button', { name: /Monter/ })).toHaveCount(0)
-    await page.goto('/resultats?v=strategies&strat=ordre')
+    await page.goto('/decider?strat=ordre')
     const row = page.getByRole('row', { name: /^Non enregistré → CELI → REER/ })
     await row.getByRole('button', { name: 'Choisir cet ordre' }).click()
     await expect.poll(async () => (await savedProfile(page)).assumptions.withdrawalOrder).toEqual(['nonReg', 'tfsa', 'rrsp'])

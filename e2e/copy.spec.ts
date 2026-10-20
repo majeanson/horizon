@@ -22,7 +22,7 @@ test('copies the answer, its dates and its assumptions as plain text', async ({ 
 
 test('is not offered on « Décider »', async ({ page }) => {
   await seedProfile(page)
-  // « Décider » is a page of its own since 2026-10-19: the old `/resultats?v=strategies` redirects there, and its « Résultats » heading showed for a moment first (red on CI).
+  // « Décider » is a page of its own since 2026-10-19: the old `?v=strategies` address redirects there, and its « Résultats » heading showed for a moment first (red on CI).
   await page.goto('/decider')
   await expect(page.getByRole('heading', { name: 'Décider', level: 1 })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Copier le résumé' })).toHaveCount(0)

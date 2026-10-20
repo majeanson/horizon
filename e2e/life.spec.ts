@@ -199,7 +199,7 @@ test.describe('it reaches the answer', () => {
 
   test('the printed year-by-year and the charts name the dated income in the work bar', async ({ page }) => {
     await seedProfile(page, withFlows([{ label: 'Loyer', kind: 'income', amount: 15000, fromYear: 2040, toYear: 2060, owner: 'self', taxable: true }]))
-    await page.goto('/resultats?v=strategies&bv=years')
+    await page.goto('/decider?bv=years')
     await expect(page.getByText('Travail et autres revenus').first()).toBeVisible({ timeout: 60_000 })
   })
 })

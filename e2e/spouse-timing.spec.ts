@@ -8,7 +8,7 @@ import { seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page))
 
 const open = async (page: Page) => {
-  await page.goto('/resultats?v=decide&strat=rentes')
+  await page.goto('/decider?strat=rentes')
   const fold = page.locator('.spouse-timing')
   await expect(fold).toBeVisible({ timeout: 60_000 })
   return fold
@@ -35,14 +35,14 @@ test('a household of one is not offered it', async ({ page }) => {
   await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name: 'Une personne, petit revenu', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
-  await page.goto('/resultats?v=decide&strat=rentes')
+  await page.goto('/decider?strat=rentes')
   await expect(page.getByText('Quand commencer mes rentes ?').first()).toBeVisible({ timeout: 60_000 })
   await expect(page.locator('.spouse-timing')).toHaveCount(0)
 })
 
 test('in English the grid speaks English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
-  await page.goto('/resultats?v=decide&strat=rentes')
+  await page.goto('/decider?strat=rentes')
   const fold = page.locator('.spouse-timing')
   await expect(fold.locator('summary')).toHaveText('Who starts first')
   await fold.locator('summary').click()
