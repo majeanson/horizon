@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { BridgeLevers, BridgeView, StrategyKey } from '../../engine/bridge'
-import { profileLevers } from '../../engine/bridge'
+import type { BridgeLevers, BridgeSummary, BridgeView, StrategyKey } from '../../engine/bridge'
+import { leversFor, profileLevers, strategyKeysFor } from '../../engine/bridge'
 import type { Assumptions, Household, PersonId } from '../../engine/types'
 import { useLang } from '../../i18n'
 import { BRIDGE_COPY, type BridgeCopy } from '../../lib/bridgeCopy'
@@ -29,9 +29,9 @@ import { useDeathSweep } from '../../lib/useDeathSweep'
 import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
-import { Loading } from '../Loading'
 import { Fold } from '../Fold'
-import { Skeleton } from '../Skeleton'
+import { SkeletonStatus } from '../Skeleton'
+import { SkeletonFill, SkeletonGhost, SkeletonText } from '../SkeletonShapes'
 import { DeathSweepPanel } from './DeathSweepPanel'
 import { StrategyViews, type StrategyLayout } from './StrategyViews'
 import { StatusMessage } from '../StatusMessage'
@@ -89,7 +89,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
       <h3 className="bridge__heading">{copy.barsTitle}</h3>
       <p className="field-row__hint">{copy.barsHint}</p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <StackedBarChart
             data={bars}
             series={SEGMENTS.map((id) => ({ id, label: id === 'work' && rows.some((r) => r.dated > 0) ? copy.segment.workOther : copy.segment[id], colour: SEGMENT_COLOUR[id], concept: SEGMENT_CONCEPT[id] }))}
@@ -106,7 +106,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
       <h3 className="bridge__heading">{copy.nestTitle}</h3>
       <p className="field-row__hint">{copy.nestHint(params.levers.rrqStartAge, params.levers.oasStartAge)}</p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <LineChart
             series={nestSeries}
             markers={markers}
@@ -121,7 +121,7 @@ function BridgeCharts({ view, span, household, params, copy }: { view: BridgeVie
       <h3 className="bridge__heading">{copy.incomeTitle}</h3>
       <p className="field-row__hint">{copy.incomeHint}</p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <LineChart
             series={lines('guaranteed')}
             markers={markers}
@@ -312,7 +312,23 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
       </div>
 
       {view === null || verdict === null ? (
-        <Skeleton count={4} />
+        // The first answer is seconds away on a phone: the panel waits as a ghost of itself (components/Skeleton.tsx SkeletonGhost) — the verdict's sentence, the
+        // views' tabs and the ways of starting drawn by their own components with stand-in figures — so it opens at the size it will have, cards or table.
+        <>
+          <SkeletonStatus />
+          <p className="skeleton__bridge-verdict">
+            <SkeletonText>{copy.verdict({ kind: 'holds', defers: false, horizonAge: endAge }, who)}</SkeletonText>
+          </p>
+          <SkeletonGhost>
+            <SubTabs size="mini" ariaLabel={copy.views.label} value={bridgeView} onSelect={() => {}} options={VIEWS.map((key) => ({ key, label: copy.views[key] }))} />
+            {bridgeView === 'ways' && (
+              <>
+                <h3 className="bridge__heading">{copy.strategyTitle}</h3>
+                <StrategyViews view={ghostView(household, levers)} pressed={[]} copy={copy} onPick={() => {}} horizonAge={endAge} who={who} matrix={null} layout={layout} onLayout={() => {}} />
+              </>
+            )}
+          </SkeletonGhost>
+        </>
       ) : (
         <>
           <p className={'bridge__verdict' + (view.selected.summary.ok ? '' : ' bridge__verdict--short')} aria-live={busy ? 'off' : 'polite'}>
@@ -414,4 +430,12 @@ export function BridgePanel({ household, assumptions, names }: { household: Hous
       )}
     </div>
   )
+}
+
+/** The ways of starting as the waiting panel draws them: this household's own strategies (their names, their ages), each with the same stand-in figures — the ghost
+ *  needs their SHAPE, never their answer. Only `strategies` is read by the views. */
+function ghostView(household: Household, levers: BridgeLevers): BridgeView {
+  const summary: BridgeSummary = { ok: true, firstShortfallYear: null, firstShortfallAge: null, netWorth85: 600000, netWorth95: 400000, lowestNest: { amount: 250000, age: 66 }, lifetimeAfterTax: 2500000, taxTotal: 400000, gisTotal: 0, oasRecoveryTotal: 0, drawn6070: 300000 }
+  const strategies = strategyKeysFor(household).map((key) => ({ key, levers: leversFor(key, household, levers.id, levers.retirementAge), summary, nest: [], extraDrawn6070: 50000, breakEven: 80, breakEvenKind: 'later' as const, passed: false }))
+  return { strategies } as unknown as BridgeView
 }

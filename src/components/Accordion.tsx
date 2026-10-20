@@ -35,6 +35,10 @@ interface Ctx {
   flipped: ReadonlySet<string>
   flip: (id: string) => void
   doneCount: ReadonlyMap<string, number>
+  /** Blocks closed by default in the « all » shape without being done (Profil's « Ma situation »: answered once, read rarely). */
+  folded: ReadonlySet<string>
+  /** How much of each block is confirmed: « 3/9 » in its title row, the same count the page's map chip wears. */
+  progress: ReadonlyMap<string, { done: number; total: number }>
   /** Make a block open, whatever the shape (a map chip, a deep link): the page then scrolls to it itself. */
   reveal: (id: string) => void
 }
@@ -45,9 +49,30 @@ const AccordionContext = createContext<Ctx | null>(null)
  * The provider: `ids` in reading order (prev / next follow it), `open` the page's state, `onOpen` how the page changes it (an id, or null for all closed).
  * `done` names the blocks whose figures are all confirmed, `doneCount` how many each holds (the closed line says it).
  */
-export function Accordion({ ids, open, onOpen, done, doneCount, children }: { ids: readonly string[]; open: AccordionOpen; onOpen: (id: string | null) => void; done?: ReadonlySet<string>; doneCount?: ReadonlyMap<string, number>; children: ReactNode }) {
+export function Accordion({
+  ids,
+  open,
+  onOpen,
+  done,
+  doneCount,
+  folded,
+  progress,
+  children,
+}: {
+  ids: readonly string[]
+  open: AccordionOpen
+  onOpen: (id: string | null) => void
+  done?: ReadonlySet<string>
+  doneCount?: ReadonlyMap<string, number>
+  folded?: ReadonlySet<string>
+  progress?: ReadonlyMap<string, { done: number; total: number }>
+  children: ReactNode
+}) {
   const [flipped, setFlipped] = useState<ReadonlySet<string>>(() => new Set())
   const doneSet = done ?? new Set<string>()
+  const foldedSet = folded ?? new Set<string>()
+  /** Closed until tapped in the « all » shape: a finished block, or one the page folds by default. */
+  const shut = (id: string) => doneSet.has(id) || foldedSet.has(id)
   /** Set (not toggle) whether a block is against its default: a deep link or the guide may ask twice for the same block (React's dev double-effect does), and the second ask must leave it open. */
   const setFlippedTo = (id: string, on: boolean) =>
     setFlipped((prev) => {
@@ -68,10 +93,10 @@ export function Accordion({ ids, open, onOpen, done, doneCount, children }: { id
     if (!ids.includes(id)) return
     if (open === 'all') {
       // open in this shape = (done) equals (flipped): ask for exactly that
-      setFlippedTo(id, doneSet.has(id))
+      setFlippedTo(id, shut(id))
     } else onOpen(id)
   }
-  return <AccordionContext.Provider value={{ ids, open, setOpen: onOpen, done: doneSet, flipped, flip, doneCount: doneCount ?? new Map(), reveal }}>{children}</AccordionContext.Provider>
+  return <AccordionContext.Provider value={{ ids, open, setOpen: onOpen, done: doneSet, flipped, flip, doneCount: doneCount ?? new Map(), folded: foldedSet, progress: progress ?? new Map(), reveal }}>{children}</AccordionContext.Provider>
 }
 
 /**
@@ -154,9 +179,20 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
 
   if (acc === null || !acc.ids.includes(id)) {
     if (plain) {
+      // A bare block still OPENS with a card's head (pip · title · one sentence), so a person's column reads like every other block of the page; its cards follow.
       return (
         <section id={id} className={classes} aria-label={title}>
-          <Heading className="person__title">{title}</Heading>
+          <div className="surface plain-head">
+            <div className="section-header">
+              <div className="section-header__main">
+                {pip}
+                <div className="section-header__text">
+                  <Heading className="section-header__title">{title}</Heading>
+                  {subtitle != null && <span className="section-header__sub">{glossed(subtitle)}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
           {children}
         </section>
       )
@@ -181,7 +217,9 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
   const c = ACCORDION_COPY[lang]
   const isDone = acc.done.has(id)
   const all = acc.open === 'all'
-  const isOpen = all ? isDone === acc.flipped.has(id) : acc.open === id
+  const isOpen = all ? (isDone || acc.folded.has(id)) === acc.flipped.has(id) : acc.open === id
+  // How much of the block is confirmed, in its title row — the same count as its chip on the map; a finished block wears its ✓ there instead.
+  const tally = acc.progress.get(id)
   const at = acc.ids.indexOf(id)
   const prev = at > 0 ? acc.ids[at - 1] : null
   const next = at < acc.ids.length - 1 ? acc.ids[at + 1] : null
@@ -218,20 +256,30 @@ export function AccordionItem({ id, title, subtitle, details, icon, concept, fam
       )}
     </Cluster>
   )
+  const head = (
+    <div className="section-header accordion__head">
+      <Heading className="section-header__title accordion__title">
+        <button type="button" className="accordion__toggle" aria-expanded={isOpen} aria-controls={plain ? id : `${id}-body`} onClick={toggle}>
+          {pip}
+          <span className="accordion__name">{title}</span>
+          {!isDone && tally !== undefined && tally.total > 0 && (
+            // Decorative like the map's: the open block's fields carry their own marks, and the closed line says it in words when done.
+            <span key={`${tally.done}/${tally.total}`} className="section-nav__progress accordion__progress" aria-hidden="true">
+              {tally.done}/{tally.total}
+            </span>
+          )}
+          {isDone && <Icon name="check-bold" size={16} />}
+          <Icon name={isOpen ? 'caret-up-bold' : 'caret-down-bold'} size={16} />
+        </button>
+      </Heading>
+      {isOpen && subtitle != null && <span className="section-header__sub">{glossed(subtitle)}</span>}
+      {!isOpen && closedLine != null && <p className={'accordion__summary' + (isDone ? ' is-done' : '')}>{glossed(closedLine)}</p>}
+    </div>
+  )
   return (
     <section id={id} className={classes + ' accordion__item' + (isOpen ? ' is-open' : ' is-closed') + (isDone ? ' is-done' : '') + (justDone ? ' is-just-done' : '')} aria-label={title}>
-      <div className={(plain ? '' : 'section-header ') + 'accordion__head'}>
-        <Heading className={(plain ? 'person__title' : 'section-header__title') + ' accordion__title'}>
-          <button type="button" className="accordion__toggle" aria-expanded={isOpen} aria-controls={plain ? id : `${id}-body`} onClick={toggle}>
-            {pip}
-            <span className="accordion__name">{title}</span>
-            {isDone && <Icon name="check-bold" size={16} />}
-            <Icon name={isOpen ? 'caret-up-bold' : 'caret-down-bold'} size={16} />
-          </button>
-        </Heading>
-        {isOpen && subtitle != null && <span className="section-header__sub">{glossed(subtitle)}</span>}
-        {!isOpen && closedLine != null && <p className={'accordion__summary' + (isDone ? ' is-done' : '')}>{glossed(closedLine)}</p>}
-      </div>
+      {/* A bare block (a person's column) wears the same head as every card, in a card of its own: its cards follow it, side by side on a wide screen. */}
+      {plain ? <div className="surface plain-head">{head}</div> : head}
       {isOpen && detailsFold}
       {isOpen && body}
       {isOpen && nav}

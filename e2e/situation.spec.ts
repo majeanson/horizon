@@ -14,12 +14,14 @@ const simple = (): SeedProfile => {
 // (a section inside a person's column is a level-3 heading; the household's are level 2)
 const section = (page: Page, title: string) => page.getByRole('heading', { name: title })
 const question = (page: Page, text: string | RegExp) => page.getByRole('radiogroup', { name: text })
+// « Ma situation » is a card of Profil's accordion: its head (title, chevron, and closed, its answers) is always there
+const head = (page: Page) => page.locator('#situation .accordion__head')
 
 test('a simple household sees only what concerns it — and the card says how to open the rest', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
   await openSituation(page)
-  await expect(page.locator('#situation > summary')).toBeVisible()
+  await expect(head(page)).toBeVisible()
   // no children, home, employer plan, years abroad or dated events: none of their sections, none of their fields
   await expect(section(page, 'Régimes de retraite de l’employeur')).toHaveCount(0)
   await expect(section(page, 'Résidence principale')).toHaveCount(0)
@@ -115,7 +117,7 @@ test('English', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
   await openSituation(page)
-  await expect(page.locator('#situation > summary')).toBeVisible()
+  await expect(head(page)).toBeVisible()
   await page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' }).click()
   await expect(page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' })).toBeChecked()
 })
@@ -124,22 +126,22 @@ test('« Ma situation » is one of the first things on the page: right after who
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
   await openSituation(page)
-  await expect(page.locator('#situation > summary')).toBeVisible()
-  // document order of the page's landmarks: who → what applies → the housekeeping (backup, accuracy) → the sections the answers decide
+  await expect(head(page)).toBeVisible()
+  // document order of the page's landmarks: who → what applies → the sections the answers decide → the housekeeping (backup)
   const order = await page.evaluate(() => {
     const at = (el: Element | null) => (el === null ? -1 : [...document.querySelectorAll('*')].indexOf(el))
     const heading = (text: string) => [...document.querySelectorAll('h2, h3')].find((h) => h.textContent?.trim() === text) ?? null
     return {
       family: at(heading('Famille')),
       situation: at(document.getElementById('situation')),
-      accuracy: at(document.querySelector('.accuracy-line')),
-      budget: at(heading('Budget')),
+      backup: at(document.querySelector('.backup-line')),
+      budget: at(document.getElementById('budget')), // its head also wears its count (« 0/2 »), so not found by its title's text
       person: at(document.getElementById('person-self')),
     }
   })
   for (const [name, v] of Object.entries(order)) expect(v, name).toBeGreaterThan(-1)
   expect(order.family).toBeLessThan(order.situation)
-  expect(order.situation).toBeLessThan(order.accuracy)
+  expect(order.situation).toBeLessThan(order.backup)
   expect(order.situation).toBeLessThan(order.budget)
   expect(order.situation).toBeLessThan(order.person)
   // …and on a phone it is on the first screen's neighbour, not three screens down
@@ -183,15 +185,15 @@ test('money outside the REER and the CELI: no question answered, no fields; a «
 test('closed, the card says its answers — what decides which sections exist is never hidden', async ({ page }) => {
   await seedProfile(page, simple())
   await page.goto('/profil?form=1')
-  const summary = page.locator('#situation > summary')
+  const summary = head(page)
   // every answer « non »: said, with what it means for the form
   await expect(summary).toContainText('Ma situation')
   await expect(summary).toContainText('seules les sections de base sont ouvertes')
   await openSituation(page)
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await question(page, /Propriétaire/).getByRole('radio', { name: 'Oui' }).click()
-  await summary.click()
-  await expect(page.locator('#situation')).not.toHaveAttribute('open', /.*/)
+  await page.locator('#situation .accordion__toggle').click()
+  await expect(page.locator('#situation')).toHaveClass(/is-closed/)
   // closed again: the « oui » are listed, in the questions' order
   await expect(summary).toContainText('Oui pour')
   await expect(summary).toContainText('maison, régime d’employeur')

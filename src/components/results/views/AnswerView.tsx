@@ -13,7 +13,8 @@ import { SubTabs } from '../../SubTabs'
 import { useParamChoice } from '../../../lib/useParamChoice'
 import { ANSWER_BLOCKS } from '../../../lib/useResultsPage'
 
-import { Skeleton } from '../../Skeleton'
+import { Skeleton, SkeletonLines, SkeletonStatus } from '../../Skeleton'
+import { SkeletonChips, SkeletonText } from '../../SkeletonShapes'
 import { agesLedger } from '../../../engine/ledger'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
@@ -23,8 +24,10 @@ import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, pairSelection, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
 import type { ResultsModel } from '../../../lib/useResultsPage'
-import { AnswerGlance } from '../AnswerGlance'
+import { AnswerGlance, answerAtGlance } from '../AnswerGlance'
 import { CARDS_COPY } from '../../../lib/cardsCopy'
+import { AGE_TOKEN } from '../../../lib/resultsCopy'
+import { SHARE_COPY } from '../../../lib/shareCopy'
 import { ShareChip } from '../ShareChip'
 import { Cascade } from '../../Cascade'
 import { useChangePulse } from '../../../lib/useChangePulse'
@@ -60,6 +63,9 @@ export function AnswerView({ m }: { m: ResultsModel }) {
     : accuracy.confirmed === accuracy.total
       ? rc.headline.confidenceAll
       : rc.headline.confidence(accuracy.confirmed, accuracy.total)
+  // The answer's card, closed: the glance in one line — or, with no glance (retired, no age works), the answer's own sentence.
+  const glance = answerAtGlance(m)
+  const closedAnswer = glance !== null ? cc.glance.closed(glance.start, glance.lasts, glance.margin) : sentenceAfter === undefined ? sentenceBefore : `${sentenceBefore}${rc.headline.ageText(headline.age!)}${sentenceAfter}`
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
       {confidenceText}{' '}
@@ -75,11 +81,12 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   return (
     <>
         <section className="arc" aria-label={rc.tabs.answer}>
-          <div id="verdict" className={'verdict surface results-section' + (answer.busy ? ' is-busy' : '')} aria-live="polite" aria-busy={answer.busy || undefined}>
-            {/* The answer's own heading, for a screen reader's list of headings (the map chip says the same words): on screen, the big sentence under it already says it. */}
-            <h2 className="sr-only">{rc.nav.reponse}</h2>
+          <Accordion ids={ANSWER_BLOCKS} open={cardsOpen} onOpen={(id) => setCartes(id ?? 'none')}>
+          {/* The answer is a card like the two under it (Marc, 2026-10-20): « Tout fermer » shuts it to its title and the glance in one line. */}
+          <AccordionItem id="verdict" title={rc.nav.reponse} summary={answerPending ? undefined : closedAnswer} concept="reponse" nav={false} className="results-section verdict-card">
+          <div className={'verdict' + (answer.busy ? ' is-busy' : '')} aria-live="polite" aria-busy={answer.busy || undefined}>
             {answerPending ? (
-              <Skeleton count={3} className="skeleton--verdict" />
+              <VerdictSkeleton m={m} />
             ) : (
               <>
               <p className="verdict__line">
@@ -161,9 +168,16 @@ export function AnswerView({ m }: { m: ResultsModel }) {
               )}
               </>
             )}
-            {headline.age !== null && !retiredNow && comfort !== undefined && (
+            {/* What the age can fund each month arrives a beat after the answer (its own search): its lines wait in its place, so nothing under it moves. */}
+            {(answerPending ? !retiredNow : headline.age !== null && !retiredNow) && (
               <p className="verdict__note">
-                {comfort === null ? mc.income.none(headline.age) : mc.income.line(headline.age, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
+                {answerPending || comfort === undefined ? (
+                  <SkeletonLines widths={[95, 90, 55]} />
+                ) : (
+                  <>
+                    {comfort === null ? mc.income.none(headline.age!) : mc.income.line(headline.age!, money(Math.round(comfort / 12 / 10) * 10), money(Math.round(profile.household.spending.retiredToday / 12 / 10) * 10))} {mc.income.note}
+                  </>
+                )}
               </p>
             )}
             {/* How much of the answer stands on the person's own documents belongs WITH the answer, not three sections down. */}
@@ -182,12 +196,12 @@ export function AnswerView({ m }: { m: ResultsModel }) {
               </Fold>
             )}
           </div>
+          </AccordionItem>
 
           {!answerPending && gaps.length === 0 && !retiredNow && <LevelRange profile={slow} enabled={answered && firstSearchesIn} />}
 
           {/* Every departure-age comparison — the chips, the cards, the chart and (for a couple) « Chacun de son côté » —
               is ONE section: the same runs, seen as cards, as a picture, and per person. */}
-          <Accordion ids={ANSWER_BLOCKS} open={cardsOpen} onOpen={(id) => setCartes(id ?? 'none')}>
           <AccordionItem id="comparer" title={r.compare.label} subtitle={headline.earlierAge !== null && headline.earlierShortfallYear !== null ? rc.headline.earlier(headline.earlierAge, at(headline.earlierShortfallYear - 1)) : undefined} summary={cc.closed.comparer} concept="depart" nav={false} className="results-section">
             {compareKeys.length > 1 && (
               <SubTabs
@@ -311,4 +325,83 @@ function AnswerSpreadLine({ age, m }: { age: number; m: ResultsModel }) {
   if (spread === null) return null
   const c = ANSWER_SPREAD_COPY[m.lang]
   return <p className="verdict__note">{spread.high === null ? c.open(spread.low, MAX_AGE) : c.range(spread.low, spread.high)}</p>
+}
+
+/** The answer's card while its first answer is worked out: the common answer (an age, the glance, the note, the dates, the doors) in its own elements, its words written
+ *  out as ghost text with likely figures (components/Skeleton.tsx SkeletonText) — so it wraps, and is as tall, as the answer that replaces it, at any width and text size. */
+function VerdictSkeleton({ m }: { m: ResultsModel }) {
+  const { rc, lang, isCouple, names, assumptions, activePreset, t, profile, retiredNow, money, pct, year, births } = m
+  const g = CARDS_COPY[lang].glance
+  const [lead, tail] = rc.headline.at(AGE_TOKEN, isCouple).split(AGE_TOKEN)
+  const age = profile.household.persons[0]?.retirementAge ?? 60
+  const stop = rc.questions.stop
+  const later = (n: number) => formatYearAge(year + n, births, lang)
+  return (
+    // `skeleton--verdict`: the mark of the answer still being worked out (e2e/results-on-screen.spec.ts waits on it); the placeholder's own parts carry no class a
+    // reader of the answer looks for (the age is `skeleton__age`, not `verdict__age`), so nothing takes the ghost for the answer
+    <div className="skeleton--verdict">
+      <SkeletonStatus />
+      <p className="verdict__line">
+        <span className="verdict__lead">
+          <SkeletonText>{lead}</SkeletonText>
+        </span>
+        <span className="verdict__big">
+          <strong className="skeleton__age">
+            <SkeletonText>{rc.headline.ageText(age)}</SkeletonText>
+          </strong>
+          <SkeletonText>{tail}</SkeletonText>
+        </span>
+      </p>
+      {!retiredNow && (
+        <>
+          <ul className="glance" aria-hidden="true">
+            <li className="glance__tile">
+              <span className="glance__name">{g.start}</span>
+              <strong className="glance__value">
+                <SkeletonText>{rc.headline.ageText(age)}</SkeletonText>
+              </strong>
+            </li>
+            <li className="glance__tile">
+              <span className="glance__name">{g.lasts}</span>
+              <strong className="glance__value">
+                <SkeletonText>{g.holdsTo(assumptions.horizonAge)}</SkeletonText>
+              </strong>
+            </li>
+            <li className="glance__tile">
+              <span className="glance__name">{g.margin}</span>
+              <strong className="glance__value mono">
+                <SkeletonText>{'+' + money(300)}</SkeletonText>
+              </strong>
+              <span className="glance__sub">
+                <SkeletonText>{g.fundsOf(money(7800), money(7500))}</SkeletonText>
+              </span>
+            </li>
+          </ul>
+          <p className="verdict__note">
+            <SkeletonText>{`${rc.headline.holds(assumptions.horizonAge)} ${activePreset ? rc.headline.scenario(t.assumptions.presets[activePreset]) : rc.headline.scenarioCustom}`}</SkeletonText>
+          </p>
+          <div className="verdict__dates" aria-hidden="true">
+            <p className="verdict__range-title">{stop.title}</p>
+            <ul className="verdict__dates-list">
+              {births.map((b, i) => (
+                <li key={i}>
+                  <SkeletonText>{stop.when(names[i] ?? '', formatYearAge(year + 12, [b], lang))}</SkeletonText>
+                </li>
+              ))}
+              <li>
+                <SkeletonText>{stop.share(pct(0.22), later(16))}</SkeletonText>
+              </li>
+              <li>
+                <SkeletonText>{stop.shareAll(pct(0.76), later(21))}</SkeletonText>
+              </li>
+              <li>
+                <SkeletonText>{stop.neverCovers}</SkeletonText>
+              </li>
+            </ul>
+          </div>
+          <SkeletonChips labels={[rc.headline.trySpend, TOUR_COPY[lang].open, SHARE_COPY[lang].button]} />
+        </>
+      )}
+    </div>
+  )
 }

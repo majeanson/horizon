@@ -63,11 +63,16 @@ test('Profil on a phone: one block at a time, the map opens a person, a link to 
 
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/profil')
-  await expect(page.locator('.accordion__item.is-closed')).toHaveCount(0)
+  // every block open but « Ma situation », answered once and closed to its answers until tapped
+  await expect(page.locator('.accordion__item.is-closed')).toHaveCount(1)
+  await expect(page.locator('#situation')).toHaveClass(/is-closed/)
   await expect(page.locator('.accordion__item.is-open').first()).toBeVisible()
   await expect(page.getByRole('button', { name: /^(Tout ouvrir|Tout fermer)$/ })).toHaveCount(0)
-  // « Suivant » at the foot of every block, walking the form
+  // « Suivant » at the foot of every block, walking the form: the household, what applies to it, then the people
   await page.locator('#famille').getByRole('button', { name: 'Suivant' }).click()
+  await expect(page.locator('#situation')).toHaveClass(/is-open/)
+  await expect(page.locator('#situation')).toBeInViewport()
+  await page.locator('#situation').getByRole('button', { name: 'Suivant' }).click()
   await expect(page.locator('#person-self')).toBeInViewport()
 })
 
@@ -116,7 +121,7 @@ test('Décider: the first strategy is open and the rest are closed; a door from 
 for (const [name, path, map, size, openFirst, allKey] of [
   ['Hypothèses', '/hypotheses', 'Sections des hypothèses', { width: 390, height: 844 }, 1, /bloc=tout/],
   // Résultats: the answer's two cards are open on arrival, the proof's blocks closed; the one icon answers for both
-  ['Résultats', '/resultats', 'Sections des résultats', { width: 390, height: 844 }, 2, /bloc=tout/],
+  ['Résultats', '/resultats', 'Sections des résultats', { width: 390, height: 844 }, 3, /bloc=tout/],
   ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }, 1, /bloc=tout/],
   ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }, 1, /bloc=tout/],
 ] as const) {
@@ -149,8 +154,8 @@ for (const [name, path, map, size, openFirst, allKey] of [
   })
 }
 
-// RÉPONSE AND DÉCIDER FOLD THE SAME WAY. Réponse's two cards are open until closed (`?cartes=`); Décider's what-ifs and strategies open together under the same icon (`?essai=all` + `?tout=1`). The glance under the answer's sentence sits on the page.
-test('Réponse: two cards, open by default; « Tout fermer » closes them, a map chip opens one, « Tout ouvrir » gives them back; the glance shows three tiles', async ({ page }) => {
+// RÉPONSE AND DÉCIDER FOLD THE SAME WAY. Réponse's three cards — the answer itself among them (Marc, 2026-10-20) — are open until closed (`?cartes=`); Décider's what-ifs and strategies open together under the same icon (`?essai=all` + `?tout=1`). The glance under the answer's sentence sits on the page.
+test('Réponse: three cards, the answer first, open by default; « Tout fermer » closes them — the answer to its glance in one line —, a map chip opens one, « Tout ouvrir » gives them back; the glance shows three tiles', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
@@ -162,6 +167,9 @@ test('Réponse: two cards, open by default; « Tout fermer » closes them, a map
   await nav.getByRole('button', { name: 'Tout fermer' }).click()
   await expect(page).toHaveURL(/cartes=none/)
   await expect(page.locator('.results-page .accordion__item.is-open')).toHaveCount(0)
+  // the answer, closed, still says the result and the quick figures — the glance in one line — and nothing else of it is mounted
+  await expect(page.locator('#verdict .accordion__summary')).toHaveText(/^Départ\s: \d+ ans · l’argent dure jusqu’à \d+ ans · marge de [+−][\d\s ]+\s\$ par mois$/)
+  await expect(page.locator('#verdict .verdict__line')).toHaveCount(0)
   // a closed card says in one line what it holds, and mounts nothing
   await expect(page.locator('#comparer .accordion__summary')).toBeVisible()
   await expect(page.locator('#comparer .scenarios')).toHaveCount(0)
@@ -169,6 +177,7 @@ test('Réponse: two cards, open by default; « Tout fermer » closes them, a map
   await expect(page).toHaveURL(/cartes=comparer/)
   await expect(page.locator('#comparer')).toHaveClass(/is-open/)
   await expect(page.locator('#annee')).toHaveClass(/is-closed/)
+  await expect(page.locator('#verdict')).toHaveClass(/is-closed/)
   // one card open: the icon closes it; all closed, it gives every card back
   await nav.getByRole('button', { name: 'Tout fermer' }).click()
   await expect(page).toHaveURL(/cartes=none/)
@@ -249,10 +258,9 @@ for (const [path, open] of [
   })
 }
 
-// …and what opens outside a card: a Fold opened by hand (« Ma situation » on Profil, a fold on the answer) closes with the cards — it read as the one thing the
-// switch missed. A controlled fold tells its page, so its address key goes too.
+// …and what opens outside a card: a Fold opened by hand (a fold on the answer) closes with the cards — it read as the one thing the switch missed. A controlled
+// fold tells its page, so its address key goes too. (« Ma situation » on Profil was such a fold; it is a card of the accordion now, closed with the others.)
 for (const [path, summary, key] of [
-  ['/profil', 'Ma situation', null], // a native, self-keeping fold
   ['/resultats', 'Rentes et dépenses, année par année', /dates=1/], // a controlled one: the address keeps it (`?dates=1`)
 ] as const) {
   test(`« Tout fermer » on ${path} also closes « ${summary} », a fold opened by hand outside the cards`, async ({ page }) => {
@@ -268,7 +276,8 @@ for (const [path, summary, key] of [
     if (key) await expect(page).toHaveURL(key)
     await icon.click()
     await expect(icon).toHaveAttribute('aria-label', 'Tout ouvrir')
-    await expect(fold).not.toHaveAttribute('open', '')
+    // shut — or gone with the card that held it (« Rentes et dépenses » sits in the answer's card, which mounts nothing while closed)
+    await expect(page.locator('details.fold[open]').filter({ has: page.locator('summary', { hasText: summary }) })).toHaveCount(0)
     await expect(page.locator('#root details.fold[open]')).toHaveCount(0)
     await expect(page.locator('.accordion__item.is-open')).toHaveCount(0)
     if (key) await expect(page).not.toHaveURL(key)

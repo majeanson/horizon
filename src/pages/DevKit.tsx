@@ -34,7 +34,8 @@ import { EstFlag } from '../components/EstFlag'
 import { Gloss } from '../components/Gloss'
 import { SectionNav } from '../components/SectionNav'
 import { ImpactMeter } from '../components/ImpactMeter'
-import { Skeleton } from '../components/Skeleton'
+import { Skeleton, SkeletonLines } from '../components/Skeleton'
+import { SkeletonChips, SkeletonFill, SkeletonGhost, SkeletonText, SliderSkeleton } from '../components/SkeletonShapes'
 import { StatusMessage } from '../components/StatusMessage'
 import { Fold } from '../components/Fold'
 import { HeatGrid } from '../components/HeatGrid'
@@ -691,10 +692,39 @@ function ENTRIES(): Entry[] {
       cat: 'Feedback',
       name: 'Skeleton',
       file: 'src/components/Skeleton.tsx',
-      kw: 'chargement forme réserve',
+      exports: ['SkeletonLines', 'SkeletonStatus', 'PageSkeleton'],
+      kw: 'chargement forme réserve lignes page',
       render: () => (
         <>
           <Skeleton count={2} />
+          {/* shaped: lines inside the element they stand for, in its own type */}
+          <p className="verdict__line">
+            <SkeletonLines widths={[80, 35]} />
+          </p>
+          <Loading />
+        </>
+      ),
+    },
+    {
+      cat: 'Feedback',
+      name: 'SkeletonText',
+      file: 'src/components/SkeletonShapes.tsx',
+      exports: ['SkeletonChips', 'SkeletonFill', 'SkeletonGhost', 'SliderSkeleton'],
+      kw: 'chargement fantôme texte puces curseur graphique',
+      render: () => (
+        <>
+          {/* ghost text, ghost chips, a slider, a chart's slot, and real components as a ghost */}
+          <p className="answer__note">
+            <SkeletonText>Une phrase connue, avec un chiffre de 1 234 $ encore inconnu, attend à sa propre taille.</SkeletonText>
+          </p>
+          <SkeletonChips labels={['Dépenser moins', 'Visite guidée']} />
+          <SliderSkeleton label="Âge" />
+          <div className="chart-slot">
+            <SkeletonFill />
+          </div>
+          <SkeletonGhost>
+            <Chip>Un vrai composant, en fantôme</Chip>
+          </SkeletonGhost>
           <Loading />
         </>
       ),

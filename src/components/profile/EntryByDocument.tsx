@@ -10,6 +10,7 @@ import { PensionPlans } from './PensionPlans'
 import { RrqSection } from './RrqSection'
 import { TaxFields } from './TaxFields'
 import type { PersonEditor } from './shared'
+import { AccordionItem } from '../Accordion'
 import { Chip } from '../Chip'
 import { Cluster, Rail } from '../Layout'
 import { SubTabs } from '../SubTabs'
@@ -40,10 +41,10 @@ function Persons({ render }: { render: (person: Person, edit: PersonEditor['edit
       {profile.household.persons.map((p, i) => {
         const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
         return (
-          <section key={p.id} className={`person who who--${Math.min(i, 1)}`} aria-label={name}>
-            <h2 className="person__title">{name}</h2>
+          // The person's column opens with the same card head as on « Par sujet » (pip · name), then the document's cards.
+          <AccordionItem key={p.id} id={`etape-${p.id}`} title={name} concept="personne" plain className={`person who who--${Math.min(i, 1)}`}>
             {render(p, (change) => updateProfile((x) => mapPerson(x, p.id, change)))}
-          </section>
+          </AccordionItem>
         )
       })}
     </div>

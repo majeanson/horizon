@@ -13,7 +13,6 @@ import { BackupLine } from '../components/profile/BackupLine'
 import { ProfileMap } from '../components/profile/ProfileMap'
 import { CARD_COPY } from '../lib/cardCopy'
 import { ENTRY_COPY } from '../lib/entryCopy'
-import { Chip } from '../components/Chip'
 import { Loading } from '../components/Loading'
 import { NextStep } from '../components/NextStep'
 import { PageHead } from '../components/PageHead'
@@ -23,8 +22,7 @@ import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
 import { accuracyOf, blockOfFact } from '../lib/facts'
 import { bringIntoView, setGuided } from '../lib/guide'
-import { GUIDE_COPY } from '../lib/guideCopy'
-import { mapProgress } from '../lib/mapProgress'
+import { mapProgress, type Progress } from '../lib/mapProgress'
 import { scrollBehavior } from '../lib/motion'
 import { hasSpouse, mapPerson } from '../lib/profileEdit'
 import { profileGaps } from '../lib/profileGaps'
@@ -44,8 +42,11 @@ const SituationCard = lazy(() => import('../components/profile/SituationCard'))
 // The profile: the household's facts (who is in it, what it spends, the home), then EVERY person's fields on the page —
 // side by side on a wide screen, one after the other on a phone — then « Rendre mon profil exact », the documents that
 // confirm each figure. Nothing sits behind a tab. Every field writes straight to the store through lib/profileEdit.ts;
-// there is no « save » — a profile is always as typed. The form comes FIRST and the meter is one quiet line above it: a
-// returning reader is here to change a number, not to be told their score.
+// there is no « save » — a profile is always as typed. The form comes FIRST: a returning reader is here to change a number, not to be told their score
+// (each block's head says its own count, as its chip on the map does).
+//
+// ONE SHAPE for every block (Marc, 2026-10-20: « lots of different types of components in one page »): Famille, « Ma situation », each person, the budget,
+// the home, the events and « Rendre mon profil exact » all wear the same card head — pip · title · one sentence · count or ✓ · chevron — and close the same way.
 //
 // The form's blocks (the family, each person, the budget, the home, the events) sit in an accordion (components/Accordion.tsx). On a WIDE screen every
 // block is open, except a finished one (every figure confirmed), which folds to its title and « n chiffres confirmés » until tapped; « Suivant » at
@@ -61,7 +62,6 @@ export function Profil() {
   const yes = useYes()
   const gaps = profileGaps(profile)
   const acc = useMemo(() => accuracyOf(profile), [profile])
-  const g = GUIDE_COPY[lang].panel
   // The welcome card's fate is decided at arrival: a first visit keeps it for the WHOLE visit, so
   // committing the last number (Enter or blur — possibly in a field inside the card) swaps its
   // content to « c'est assez » instead of yanking the card, and the focus with it, out of the page.
@@ -88,19 +88,27 @@ export function Profil() {
   const withHome = applies(profile, yes, 'home')
   const withEvents = applies(profile, yes, 'events')
   const blockIds = useMemo(
-    () => ['famille', ...profile.household.persons.map((p) => `person-${p.id}`), 'budget', ...(withHome ? ['maison'] : []), ...(withEvents ? ['evenements'] : [])],
-    [profile.household.persons, withHome, withEvents],
+    () => ['famille', 'situation', ...profile.household.persons.map((p) => `person-${p.id}`), 'budget', ...(withHome ? ['maison'] : []), ...(withEvents ? ['evenements'] : []), ...(acc.total > 0 ? ['exact'] : [])],
+    [profile.household.persons, withHome, withEvents, acc.total],
   )
   const [bloc, setBloc] = useParamChoice<string>('bloc', [...blockIds, 'tout', 'none'], 'famille')
-  const progress = useMemo(() => mapProgress(profile), [profile])
+  // Each block's count, the map's own (lib/mapProgress.ts), and the whole profile's for « Rendre mon profil exact ».
+  const progress = useMemo((): Record<string, Progress> => ({ ...mapProgress(profile), exact: { done: acc.confirmed, total: acc.total } }), [profile, acc])
+  const tallies = useMemo(() => new Map(Object.entries(progress)), [progress])
   const done = useMemo(() => new Set(blockIds.filter((id) => progress[id] !== undefined && progress[id].total > 0 && progress[id].done === progress[id].total)), [blockIds, progress])
   const doneCount = useMemo(() => new Map(blockIds.filter((id) => progress[id] !== undefined).map((id) => [id, progress[id].total] as const)), [blockIds, progress])
   const open: AccordionOpen = wide || bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
+  // « Ma situation » is answered once: closed on a wide screen too, saying its answers, until tapped.
+  const folded = useMemo(() => new Set(['situation']), [])
 
   // `/profil#exact` (the front door's « Voir tout ce qui reste estimé »): the figure guide loads on its own, after the form, so the browser's own jump to the anchor finds nothing — wait for it.
   const { hash } = useLocation()
+  // Read once, at arrival: opening the block rewrites the address (`?bloc=exact`), which drops the #, and must not cancel the wait it is part of.
+  const [arrivedAtExact] = useState(() => hash === '#exact')
   useEffect(() => {
-    if (hash !== '#exact') return
+    if (!arrivedAtExact) return
+    // It is a block of the accordion: open it first (a wide screen has it open already, unless every figure is confirmed).
+    if (!wide) setBloc('exact')
     let tries = 0
     const timer = window.setInterval(() => {
       const el = document.getElementById('exact')
@@ -108,7 +116,8 @@ export function Profil() {
       if (el || ++tries > 20) window.clearInterval(timer)
     }, 150)
     return () => window.clearInterval(timer)
-  }, [hash])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [arrivedAtExact])
 
   // A first visit that arrives with NO way in named (the Profil tab, a bare link) takes the one the person's time allows — asked on the front door
   // (lib/timeBudget.ts): two minutes is the quick path, thirty is by document, and the address says so (a reload keeps it). Fifteen is the full
@@ -159,7 +168,7 @@ export function Profil() {
           <EntryByDocument />
         </Suspense>
       ) : (
-        <Accordion ids={blockIds} open={open} onOpen={(id) => setBloc(id ?? 'none')} done={done} doneCount={doneCount}>
+        <Accordion ids={blockIds} open={open} onOpen={(id) => setBloc(id ?? 'none')} done={done} doneCount={doneCount} folded={folded} progress={tallies}>
           <DeepLinks profile={profile} spouse={spouse} />
           {/* A couple's profile is twenty screens on a phone: the map says where each block is, and which one the reader is in. */}
           <ProfileMap
@@ -177,17 +186,6 @@ export function Profil() {
           <Suspense fallback={null}>
             <SituationCard />
           </Suspense>
-          {/* One line: how much of the profile stands on documents, and the door to the section that makes it exact. */}
-          {acc.total > 0 && (
-            <div className="accuracy-line">
-              <span className="accuracy-line__text">{acc.confirmed === acc.total ? g.allDone : g.count(acc.confirmed, acc.total)}</span>
-              {acc.confirmed < acc.total && (
-                <Chip icon="caret-down-bold" onClick={() => document.getElementById('exact')?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })}>
-                  {g.title}
-                </Chip>
-              )}
-            </div>
-          )}
           {/* « Remplir ce qui manque »: a level of living or an estimate fills what is blank; loaded on its own (it carries the official tables). */}
           <Suspense fallback={null}>
             <FillBlanks />
@@ -197,7 +195,7 @@ export function Profil() {
               const name = p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse)
               return (
                 // Keyed by person: a removed spouse unmounts, so no typed-but-uncommitted text crosses over. A bare block (its cards are inside it), one per person.
-                <AccordionItem key={p.id} id={`person-${p.id}`} title={name} summary={CARD_COPY[lang].person} plain className={`person who who--${Math.min(i, 1)}`}>
+                <AccordionItem key={p.id} id={`person-${p.id}`} title={name} summary={CARD_COPY[lang].person} concept="personne" plain className={`person who who--${Math.min(i, 1)}`}>
                   <SectionLevel.Provider value={3}>
                     <PersonFields id={p.id} />
                   </SectionLevel.Provider>

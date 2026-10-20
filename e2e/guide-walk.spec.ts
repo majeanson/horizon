@@ -14,6 +14,8 @@ for (const [name, size] of [
     await page.setViewportSize(size)
     await seedProfile(page, EXAMPLE)
     await page.goto('/profil?form=1')
+    // « Rendre mon profil exact » is a block like the others: on a phone it opens from the map (a wide screen has it open)
+    await page.getByRole('navigation', { name: 'Sections du profil' }).getByRole('button', { name: /^Rendre exact/ }).click()
     await page.getByRole('button', { name: 'Tout confirmer pas à pas' }).click()
     const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
     await expect(bar).toBeVisible()

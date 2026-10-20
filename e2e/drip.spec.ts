@@ -12,7 +12,8 @@ test.describe('the drip question', () => {
     await page.goto('/')
     await expect(card(page)).toBeVisible({ timeout: 60_000 })
     await expect(page.getByRole('region', { name: 'Une question pour préciser votre réponse' })).toHaveCount(1)
-    await expect(card(page).getByRole('link', { name: 'Confirmer ce chiffre' })).toHaveAttribute('href', /^\/profil\?fact=[^&]+$/)
+    // the card is there from the first frame, its sentence and its doors waiting as a ghost while the search runs: the real door comes with the answer
+    await expect(card(page).getByRole('link', { name: 'Confirmer ce chiffre' })).toHaveAttribute('href', /^\/profil\?fact=[^&]+$/, { timeout: 60_000 })
     await expect(card(page).getByRole('link', { name: 'Voir tout ce qui reste estimé' })).toHaveAttribute('href', '/profil#exact')
     await expect(card(page)).toContainText(/resserrer la réponse d’environ \d+ ans?/)
   })

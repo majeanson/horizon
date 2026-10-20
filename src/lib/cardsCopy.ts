@@ -34,6 +34,8 @@ export interface CardsCopy {
     fundsOf: (funds: string, asked: string) => string
     noFigure: string
     now: string
+    /** The answer's card, closed: the three tiles in one line (« Départ : 60 ans · l’argent dure jusqu’à 95 ans · marge de +300 $ par mois »). */
+    closed: (start: string, lasts: string, margin: string | null) => string
   }
 }
 
@@ -65,6 +67,7 @@ export const CARDS_COPY: Record<Lang, CardsCopy> = {
       fundsOf: (funds, asked) => `${funds} possibles pour ${asked} demandés`,
       noFigure: 'à préciser',
       now: 'dès maintenant',
+      closed: (start, lasts, margin) => `Départ : ${start} · l’argent dure ${lasts}${margin === null ? '' : ` · marge de ${margin} par mois`}`,
     },
   },
   en: {
@@ -94,6 +97,7 @@ export const CARDS_COPY: Record<Lang, CardsCopy> = {
       fundsOf: (funds, asked) => `${funds} possible against ${asked} asked`,
       noFigure: 'to be pinned down',
       now: 'right now',
+      closed: (start, lasts, margin) => `Start: ${start} · the money lasts ${lasts}${margin === null ? '' : ` · a margin of ${margin} a month`}`,
     },
   },
 }

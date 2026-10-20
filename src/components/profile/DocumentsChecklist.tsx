@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { AccordionItem } from '../Accordion'
 import { Chip } from '../Chip'
 import { ConceptPip } from '../ConceptPip'
 import { DOC_CONCEPT } from '../../lib/concepts'
@@ -100,10 +101,10 @@ export function DocumentsChecklist({ onNext }: { onNext: () => void }) {
       )}
       <div className={'persons' + (people.length > 1 ? ' persons--two persons--aligned' : '')}>
         {people.map((p, i) => (
-          <section key={p.id} className={`person who who--${Math.min(i, 1)}`} aria-label={p.name}>
-            <h2 className="person__title">{people.length > 1 ? p.name : c.you}</h2>
+          // The same person head as the form's (pip · name), then that person's documents.
+          <AccordionItem key={p.id} id={`documents-${p.id}`} title={people.length > 1 ? p.name : c.you} concept="personne" plain className={`person who who--${Math.min(i, 1)}`}>
             <ul className="docs-list">{items.filter((it) => it.owner === p.id).map(renderItem)}</ul>
-          </section>
+          </AccordionItem>
         ))}
       </div>
       <p className="field-row__hint no-print">

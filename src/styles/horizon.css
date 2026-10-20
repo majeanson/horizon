@@ -1118,7 +1118,8 @@
   gap: 0.6rem;
   min-width: 0;
 }
-.bridge__verdict {
+.bridge__verdict,
+.skeleton__bridge-verdict {
   margin: 0;
   padding: 0.8rem 1rem;
   border-left: 4px solid var(--sage-deep);
@@ -1659,7 +1660,8 @@
 }
 
 /* « Arrêter à l'âge de mon choix » (components/results/ReverseView.tsx): the four changes, each its own line, and what waiting a year buys. */
-.reverse__levers {
+.reverse__levers,
+.skeleton__levers {
   display: grid;
   gap: 0.4rem;
   margin: 0.4rem 0;

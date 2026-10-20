@@ -29,7 +29,8 @@ import type { Selection } from '../../lib/resultsModel'
 import type { View } from '../../lib/useResultsPage'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
-import { Loading } from '../Loading'
+import { SkeletonLines } from '../Skeleton'
+import { SkeletonFill } from '../SkeletonShapes'
 import { SubTabs } from '../SubTabs'
 
 // The picture: the retirement ages the person chose, drawn against the years, in one of three views and in today's or
@@ -130,7 +131,7 @@ export function ChartPanel({
             {markers.length > 0 && <> {c.markersHint}</>}
           </p>
           <div className="chart-slot">
-            <Suspense fallback={<Loading />}>
+            <Suspense fallback={<SkeletonFill />}>
               {series.length > 0 && years && (
                 <LineChart
                   series={series}
@@ -249,7 +250,7 @@ function DetailView({
       )}
       {idle !== null && birth !== undefined && <p className="field-row__hint">{RESULTS_COPY[lang].idle(names[whoIndex] ?? '', formatYearAge(idle.from, [birth], lang), formatYearAge(idle.to, [birth], lang))}</p>}
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <StackedBarChart
             data={sources}
             series={SOURCE_SEGMENTS.map((id) => ({ id, label: id === 'work' && hasDatedIncome(rows) ? c.source.workOther : c.source[id], colour: SOURCE_COLOUR[id], concept: SOURCE_CONCEPT[id] }))}
@@ -264,7 +265,7 @@ function DetailView({
         </Suspense>
       </div>
 
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<FlowSkeleton />}>
         <FlowSection rows={rows} sources={sources} personId={personId} births={household.persons.map((p) => p.birth.year)} scale={flowScale} agesByYear={agesByYear} />
       </Suspense>
 
@@ -272,7 +273,7 @@ function DetailView({
       <p className="field-row__hint">{c.balancesHint}</p>
       {balanceSegments.includes('home') && <p className="field-row__hint">{c.balancesHomeHint}</p>}
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <StackedBarChart
             data={balances}
             series={balanceSegments.map((id) => ({ id, label: c.balance[id], colour: BALANCE_COLOUR[id], concept: BALANCE_CONCEPT[id] }))}
@@ -286,5 +287,22 @@ function DetailView({
         </Suspense>
       </div>
     </div>
+  )
+}
+
+/** « Où va l'argent » while its chunk arrives: its heading, its « how to read » line and its chart's slot, in their own elements — the bars under it do not move when it lands. */
+function FlowSkeleton() {
+  return (
+    <>
+      <h4 className="chart-detail__heading">
+        <SkeletonLines widths={[55]} />
+      </h4>
+      <p className="field-row__hint">
+        <SkeletonLines widths={[30]} />
+      </p>
+      <div className="chart-slot">
+        <SkeletonFill />
+      </div>
+    </>
   )
 }

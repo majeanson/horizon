@@ -6,7 +6,8 @@ import { useSavingsNeeded } from '../../lib/useSavingsNeeded'
 import { NumberSlider } from '../NumberSlider'
 import { Cascade } from '../Cascade'
 import { CountUp } from '../CountUp'
-import { Skeleton } from '../Skeleton'
+import { SkeletonStatus } from '../Skeleton'
+import { SkeletonText } from '../SkeletonShapes'
 
 // « How much should I put aside to retire at X? » One age to choose, one number back: the yearly amount to move from
 // spending (while working) into saving so the plan lasts, from engine/savingsNeeded.ts, computed in a worker.
@@ -18,6 +19,7 @@ export function SaveView({
   onAge,
   minAge,
   maxAge,
+  expectNothing = false,
 }: {
   household: Household
   assumptions: Assumptions
@@ -25,6 +27,8 @@ export function SaveView({
   onAge: (age: number) => void
   minAge: number
   maxAge: number
+  /** Whether the age already works (Décider knows the earliest age): the waiting card takes the shape of « nothing more ». */
+  expectNothing?: boolean
 }) {
   const { lang } = useLang()
   const q = RESULTS_COPY[lang].questions.save
@@ -43,7 +47,31 @@ export function SaveView({
         </p>
       )}
       {answer === null ? (
-        <Skeleton count={2} />
+        // the answer about to come, in its own sentences (ghost text): « nothing more » when the age already works, else an amount — the card is already its size
+        expectNothing ? (
+          <>
+            <SkeletonStatus />
+            <p className="answer__big">
+              <SkeletonText>{q.nothing(age)}</SkeletonText>
+            </p>
+            <p className="answer__note">
+              <SkeletonText>{q.nothingWhy}</SkeletonText>
+            </p>
+          </>
+        ) : (
+        <>
+          <SkeletonStatus />
+          <p className="answer__big">
+            <SkeletonText>{q.amount(formatMoney(4800, lang))}</SkeletonText>
+          </p>
+          <p className="answer__note">
+            <SkeletonText>{q.perMonth(formatMoney(400, lang))}</SkeletonText>
+          </p>
+          <p className="answer__note">
+            <SkeletonText>{q.why(age)}</SkeletonText>
+          </p>
+        </>
+        )
       ) : answer.extraPerYear === null ? (
         <>
           <p className="answer__big answer__big--short"><Cascade>{q.unreachable(answer.age)}</Cascade></p>

@@ -4,7 +4,7 @@ import { stopCoverageSeries, type Dollars } from '../../lib/chartData'
 import { formatYearAge } from '../../lib/format'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
-import { Loading } from '../Loading'
+import { SkeletonFill } from '../SkeletonShapes'
 
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
 
@@ -35,7 +35,7 @@ export function StopChart({
     <>
       <p className="field-row__hint">{c.chartHint}</p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <LineChart
             series={series}
             yFormat={(y) => formatCompactMoney(y, lang)}

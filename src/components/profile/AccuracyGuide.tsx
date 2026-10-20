@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useLang, useT } from '../../i18n'
+import { useLang } from '../../i18n'
+import { CARD_COPY } from '../../lib/cardCopy'
 import { accuracyOf, factsOf } from '../../lib/facts'
 import { GUIDE_COPY } from '../../lib/guideCopy'
 import { useProfile } from '../../lib/store'
 import { Chip } from '../Chip'
-import { Fold } from '../Fold'
 import { Cluster } from '../Layout'
 import { GuideBar } from './GuideBar'
 import { Section } from './shared'
@@ -23,7 +23,6 @@ import { Section } from './shared'
 export default function AccuracyGuide() {
   const { lang } = useLang()
   const c = GUIDE_COPY[lang]
-  const t = useT()
   const profile = useProfile()
   const facts = useMemo(() => factsOf(profile), [profile])
   const acc = useMemo(() => accuracyOf(profile), [profile])
@@ -45,15 +44,18 @@ export default function AccuracyGuide() {
       { replace: false },
     )
   const pct = acc.total === 0 ? 0 : Math.round((100 * acc.confirmed) / acc.total)
+  // What is left to confirm, in words: with the « why » under the card's one « En savoir plus » (it had a second fold of its own).
+  const note = acc.confirmed === 0 ? c.panel.none : acc.confirmed === acc.total ? c.panel.allDone : c.panel.estimatedNote(acc.total - acc.confirmed)
   return (
     <>
-      <Section id="exact" title={c.panel.title} subtitle={c.panel.lead} concept="documents">
+      {/* One of Profil's blocks (its own head, chevron and closed line, like the others): the one sentence, the longer « why » folded; its head says the count. */}
+      <Section id="exact" title={c.panel.title} subtitle={CARD_COPY[lang].exact} details={<><p className="field-row__hint">{c.panel.lead}</p><p className="field-row__hint">{note}</p></>} concept="documents">
         <div className="accuracy__meter">
           <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={acc.total} aria-valuenow={acc.confirmed} aria-label={c.panel.count(acc.confirmed, acc.total)}>
             <span className="meter__fill" style={{ width: `${pct}%` }} />
           </div>
           {/* The progress and what the dots mean stay in view: the legend is needed to READ every field's dot, so it is never folded (components/Fold.tsx's rule). What is
-              left to confirm is one fold away. */}
+              left to confirm is in the card's « En savoir plus ». */}
           <p className="accuracy__count">
             <strong>{c.panel.count(acc.confirmed, acc.total)}</strong>
           </p>
@@ -61,9 +63,6 @@ export default function AccuracyGuide() {
             <span className="fact-dot is-on" aria-hidden="true" /> {c.panel.legendConfirmed}
             <span className="fact-dot" aria-hidden="true" /> {c.panel.legendEstimated}
           </p>
-          <Fold summary={t.common.moreDetails}>
-            <p className="field-row__hint">{acc.confirmed === 0 ? c.panel.none : acc.confirmed === acc.total ? c.panel.allDone : c.panel.estimatedNote(acc.total - acc.confirmed)}</p>
-          </Fold>
         </div>
 
         <Cluster>

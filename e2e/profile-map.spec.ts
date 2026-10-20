@@ -13,7 +13,7 @@ for (const [name, size] of [
     await seedProfile(page, EXAMPLE)
     await page.goto('/profil')
     const map = page.getByRole('navigation', { name: 'Sections du profil' })
-    await expect(map.locator('.rail').getByRole('button')).toHaveCount(5) // Famille · two people · Budget · Rendre exact (« Ma situation » is a fold right under Famille)
+    await expect(map.locator('.rail').getByRole('button')).toHaveCount(5) // Famille · two people · Budget · Rendre exact (« Ma situation » is a card right under Famille, reached by its « Suivant »: no chip of its own)
     await map.getByRole('button', { name: 'Budget' }).click()
     await expect(map.getByRole('button', { name: 'Budget' })).toHaveAttribute('aria-current', 'true')
     await expect(map).toBeInViewport() // still pinned after a long scroll

@@ -13,10 +13,11 @@ import { Fold } from '../../Fold'
 import { CARDS_COPY } from '../../../lib/cardsCopy'
 import type { ConceptId } from '../../../lib/concepts'
 import { SectionHeader } from '../../SectionHeader'
-import { Skeleton } from '../../Skeleton'
+import { SkeletonLines, SkeletonStatus } from '../../Skeleton'
+import { SkeletonChips, SkeletonText, SliderSkeleton } from '../../SkeletonShapes'
 import { BRACKET_FILL_COPY } from '../../../lib/bracketFillCopy'
 import { FUTURE_COPY } from '../../../lib/futureCopy'
-import { formatCompactMoney } from '../../../lib/money'
+import { formatCompactMoney, formatMoney } from '../../../lib/money'
 import { MAX_AGE } from '../../../lib/resultsModel'
 import { balanceRelevant, fonteRelevant, leverPruned, orderRelevant } from '../../../lib/relevance'
 import { REVERSE_COPY } from '../../../lib/reverseCopy'
@@ -93,9 +94,16 @@ export function DecideView({ m }: { m: ResultsModel }) {
         <Chip onClick={() => m.goTo('decide', 'rentes')}>{lc.names[l.id]}</Chip>
       )}
       <span className="mono levers__result">
-        {levers === undefined
-          ? lc.pending
-          : l.earliest === null
+        {/* While the levers are worked out, the result waits as its two lines (the years gained, what is left at the end), so the card is already its size. */}
+        {levers === undefined ? (
+          <>
+            {l === rows[0] && <SkeletonStatus />}
+            <SkeletonLines widths={[60]} />
+            <span className="levers__end">
+              <SkeletonLines widths={[70]} />
+            </span>
+          </>
+        ) : l.earliest === null
             ? lc.none
             : l.yearsGained === null
               ? lc.found(l.earliest)
@@ -139,12 +147,12 @@ export function DecideView({ m }: { m: ResultsModel }) {
             tryFold(
               'viser',
               REVERSE_COPY[lang].title,
-              <ReverseView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />,
+              <ReverseView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} expectWorks={earliest !== null && saveAge >= earliest} />,
             )}
           {tryFold(
             'epargner',
             rc.questions.tabs.save,
-            <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} />,
+            <SaveView household={profile.household} assumptions={assumptions} age={saveAge} onAge={(a) => setParam('age', String(a))} minAge={firstAge} maxAge={MAX_AGE} expectNothing={earliest !== null && saveAge >= earliest} />,
           )}
           {!retiredNow &&
             tryFold(
@@ -156,7 +164,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
           {tryFold(
             'soins',
             FUTURE_COPY[lang].care.title,
-            <Suspense fallback={<Skeleton count={3} />}>
+            <Suspense fallback={<CareSkeleton m={m} />}>
               <CareSection m={m} />
             </Suspense>,
           )}
@@ -193,5 +201,45 @@ export function DecideView({ m }: { m: ResultsModel }) {
         </section>
       </section>
     </>
+  )
+}
+
+/** « Et si les dernières années coûtaient plus cher ? » while its chunk arrives: the what-if's own controls and sentences (its words ride with this view), each as a ghost
+ *  of itself — three sliders by their real labels, the reference chips, the notes, the answer, the door — so the card opens at the size it will have. */
+function CareSkeleton({ m }: { m: ResultsModel }) {
+  const { lang, t, earliest, firstAge, profile } = m
+  const c = FUTURE_COPY[lang].care
+  const money = (n: number) => formatMoney(n, lang)
+  const age = earliest ?? Math.min(MAX_AGE, Math.max(firstAge, profile.household.persons[0].retirementAge))
+  return (
+    <div className="surface answer">
+      <SkeletonStatus />
+      <SliderSkeleton label={c.amount} />
+      <SkeletonChips labels={Object.values(c.refs).map((name) => c.refChip(name, money(60000)))} />
+      <p className="field-row__hint">
+        <SkeletonText>{`${c.refNote(2025, money(2100))} ${c.refSource} ${c.hint.slice(0, 60)}`}</SkeletonText>
+      </p>
+      <SliderSkeleton label={c.fromAge} />
+      <SliderSkeleton label={c.years} />
+      <p className="field-row__hint">
+        <SkeletonText>{t.common.howToRead}</SkeletonText>
+      </p>
+      <p className="answer__note">
+        <SkeletonText>{c.starts(c.age(85))}</SkeletonText>
+      </p>
+      <p className="answer__note">
+        <SkeletonText>{c.total(money(240000), 4)}</SkeletonText>
+      </p>
+      <p className="answer__big">
+        <SkeletonText>{c.same(age)}</SkeletonText>
+      </p>
+      <p className="answer__note">
+        <SkeletonText>{c.holds(age)}</SkeletonText>
+      </p>
+      <SkeletonChips labels={[c.keep]} />
+      <p className="answer__note">
+        <SkeletonText>{c.caveat}</SkeletonText>
+      </p>
+    </div>
   )
 }

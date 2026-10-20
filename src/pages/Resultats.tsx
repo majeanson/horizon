@@ -10,7 +10,7 @@ import { PrintKindView, usePrintRequest } from '../components/results/PrintMenu'
 import { SectionNav } from '../components/SectionNav'
 import { EmptyState } from '../components/EmptyState'
 import { AnswerView } from '../components/results/views/AnswerView'
-import { Skeleton } from '../components/Skeleton'
+import { PageSkeleton } from '../components/Skeleton'
 import { firstAnswerSeen, markFirstAnswerSeen } from '../lib/firstAnswer'
 import { ANSWER_BLOCKS, PROOF_BLOCKS, useResultsPage, type ResultsModel } from '../lib/useResultsPage'
 import { useParamChoice } from '../lib/useParamChoice'
@@ -91,7 +91,7 @@ function ResultsPage() {
           </PinStack>
 
           {deciding ? (
-            <Suspense fallback={<Skeleton count={4} />}>
+            <Suspense fallback={<PageSkeleton head={false} />}>
               <DecideView m={m} />
             </Suspense>
           ) : (
@@ -99,7 +99,7 @@ function ResultsPage() {
               {/* The answer, compared and dated, and what the plan points at this year. */}
               <AnswerView m={m} />
               {/* Its proof: how firm it is, and every figure behind it with its calculation. */}
-              <Suspense fallback={<Skeleton count={4} />}>
+              <Suspense fallback={<PageSkeleton head={false} />}>
                 <ProofView m={m} />
               </Suspense>
             </>

@@ -12,8 +12,8 @@ import type { Answer } from '../../lib/useOffThread'
 import { useParamChoice } from '../../lib/useParamChoice'
 import { Chip } from '../Chip'
 import { Fold } from '../Fold'
-import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
+import { SkeletonFill } from '../SkeletonShapes'
 import { SubTabs } from '../SubTabs'
 
 const LineChart = lazy(() => import('../charts').then((m) => ({ default: m.LineChart })))
@@ -98,7 +98,7 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
       <h3 className="bridge__heading">{c.incomeTitle}</h3>
       <p className="field-row__hint">{c.incomeHint}</p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <LineChart
             series={fillIncomeSeries(years, shown.choice, { income: c.seriesIncome, line: c.seriesLine })}
             markers={markers}
@@ -120,7 +120,7 @@ export function BracketFillPanel({ household, fill }: { household: Household; fi
       <h3 className="bridge__heading">{c.balancesTitle}</h3>
       <p className="field-row__hint">{c.balancesHint}</p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <LineChart
             series={fillBalanceSeries(years, { rrsp: c.seriesRrsp, tfsa: c.seriesTfsa })}
             yFormat={money}

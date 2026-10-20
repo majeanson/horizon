@@ -36,6 +36,8 @@ type Budget = { controls: number; words: number }
 // always seen, not only in a closed fold on the front door: +7 words on every route, no control (the brand mark in the bar is a drawing, aria-hidden, no words).
 // THE FOURTH TAB, 2026-10-19 (Marc: Profil and Hypothèses have no level above their cards, Résultats had three views): « Décider » is a tab of its own — +1 link and
 // +1 word on every route; Résultats and Décider lose the three-view switch they carried (−3 controls each).
+// Résultats — Réponse raised 55 → 56 controls (2026-10-20): the answer is a card like the two under it (Marc: « Tout fermer » must close it too, to its result in one
+// line) — its title is a button now, the one disclosure it gained; the words stay within budget (its old heading was already read, as a hidden heading).
 const BUDGETS: Record<string, Budget> = {
   // 34 → 28 controls, 372 → 309 words (2026-10-15, the ratchet FALLS): the reading card is a one-time dialog now (closed here), its subtitle is gone, and the demo
   // card's three early-retirement households (+3 chips) cost less than what left. The time question (components/TimeBudget.tsx) is a dialog too, put off here.
@@ -81,7 +83,10 @@ const BUDGETS: Record<string, Budget> = {
   // 403 → 404, 2035 → 2036 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
   // 404 → 406, 2036 → 2058 (2026-10-20, Marc: RREGOP « document, don't build »): the deferred pension's hint says how to enter a transfer to a CRI by hand
   // (one sentence; « CRI » and « REER » are glossary terms, so two buttons). The golden couple's RREGOP is deferred, so this route shows it.
-  'Profil (form)': { controls: 406, words: 2058 },
+  // 406 → 410 controls, 2058 → 2048 words (2026-10-20, Marc: « lots of different types of components in one page »): every block wears ONE card head. « Rendre mon profil
+  // exact » is a block like the others (its head is a button, its foot a « Précédent », and Budget's foot gains the « Suivant » to it: +3); « Ma situation » is a card that
+  // says its answers closed, where « REER » and « CELI » are glossary terms (+2); the boxed meter line above the form is gone — each head and map chip says its count (−1).
+  'Profil (form)': { controls: 410, words: 2048 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
@@ -124,7 +129,7 @@ const BUDGETS: Record<string, Budget> = {
   // pages that were three views fell from 46 + 52 + 30 controls to 54 + 50.
   // 54 → 55 controls, 670 → 677 words (2026-10-20, Marc chose it): « Quand arrêter » has its chart — ONE closed fold under « En dates » (« Rentes et dépenses,
   // année par année »), the chart mounting only once opened.
-  'Résultats — Réponse': { controls: 55, words: 677 },
+  'Résultats — Réponse': { controls: 56, words: 677 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each

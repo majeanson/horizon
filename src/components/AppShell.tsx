@@ -8,7 +8,7 @@ import { snoozeBackup, useBackupDue, useStorageIssue } from '../lib/store'
 import { useNotice } from '../lib/toast'
 import { BrandMark } from './BrandMark'
 import { Icon, type IconName } from './Icon'
-import { Skeleton } from './Skeleton'
+import { PageSkeleton } from './Skeleton'
 import { StatusMessage } from './StatusMessage'
 
 const PreviewGate = lazy(() => import('./PreviewGate'))
@@ -173,7 +173,7 @@ export function AppShell() {
         )}
         {/* The page chunk loads INSIDE the shell: the bar and the navigation never vanish while a route is fetched — and the
             wait has a shape (a few quiet blocks where the page's cards will be), not a lone word. */}
-        <Suspense fallback={<Skeleton count={4} />}>
+        <Suspense fallback={<PageSkeleton />}>
           {/* The portfolio preview (lib/preview.ts) wraps the page: its invented household is in the store before the page first renders. */}
           {isPreview() ? (
             <PreviewGate>

@@ -8,6 +8,7 @@ import { formatMoney } from '../../lib/money'
 import { useWide } from '../../lib/useWide'
 import { STRATEGY_CONCEPT } from '../../lib/concepts'
 import { Chip } from '../Chip'
+import { SkeletonText } from '../SkeletonShapes'
 
 // THE WAYS OF STARTING THE PENSIONS, side by side — one comparison, two ways of showing it, and the reader chooses (`?bt=cards|table`):
 //
@@ -73,7 +74,16 @@ export function StrategyViews({ view, pressed, copy, onPick, horizonAge, who, ma
 
   return (
     <div className="strategies">
-      {sentence !== null && <p className="bridge-sturdiest">{sentence}</p>}
+      {/* « La plus solide » needs the grid of scenarios, which comes a beat after the cards: its sentence waits in its place as ghost text, so the cards do not drop. */}
+      {sentence !== null ? (
+        <p className="bridge-sturdiest">{sentence}</p>
+      ) : (
+        matrix === null && (
+          <p className="bridge-sturdiest">
+            <SkeletonText>{copy.sturdiest(copy.strategyName.standard, 2, 1)}</SkeletonText>
+          </p>
+        )
+      )}
       <div className="strategies__bar">
         <div className="strategies__layout" role="group" aria-label={copy.layoutLabel}>
           <Chip selected={effective === 'cards'} onClick={() => onLayout('cards')}>

@@ -13,6 +13,7 @@ import { Cluster } from '../Layout'
 import { PinStack } from '../PinStack'
 import { SectionHeader, SectionLevel } from '../SectionHeader'
 import { SectionNav } from '../SectionNav'
+import { SkeletonLines } from '../Skeleton'
 import { StatBar } from './StatBar'
 
 // The household sheet: a clean page of cards. It draws the SHEET VIEW (lib/sheetView.ts) and nothing else: every figure is already text there, so this file
@@ -29,7 +30,14 @@ function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
         <p className="sheet__stat-value mono">{s.valueText}</p>
       </div>
       <StatBar name={s.name} percent={s.percent} valueText={s.valueText} />
-      {s.detail && <p className="sheet__stat-detail">{s.detail}</p>}
+      {/* A measure still being worked out keeps the room of its line (two, as the earliest age's « Vous prévoyez arrêter à… » takes): the cards under it stay put. */}
+      {s.status === 'pending' ? (
+        <p className="sheet__stat-detail">
+          <SkeletonLines widths={[95, 40]} />
+        </p>
+      ) : (
+        s.detail && <p className="sheet__stat-detail">{s.detail}</p>
+      )}
       <Fold summary={howToRead}>
         <p className="field-row__hint">{s.hint}</p>
         <p className="field-row__hint sheet__scale">{s.scaleText}</p>

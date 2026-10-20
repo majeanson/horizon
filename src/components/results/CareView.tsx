@@ -15,7 +15,8 @@ import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
 import { Fold } from '../Fold'
 import { Cascade } from '../Cascade'
-import { Skeleton } from '../Skeleton'
+import { SkeletonStatus } from '../Skeleton'
+import { SkeletonText } from '../SkeletonShapes'
 import { Slider } from '../Slider'
 
 // « And if the last years cost more? » Three sliders — what it costs a year, from what age, for how long — and the plan back with that
@@ -117,7 +118,19 @@ export function CareView({
         </p>
       )}
       {a === null ? (
-        <Skeleton count={3} />
+        // the common answer (the age holds, the money lasts, what is left) in its own sentences, as ghost text
+        <>
+          <SkeletonStatus />
+          <p className="answer__big">
+            <SkeletonText>{c.same(age)}</SkeletonText>
+          </p>
+          <p className="answer__note">
+            <SkeletonText>{c.holds(age)}</SkeletonText>
+          </p>
+          <p className="answer__note">
+            <SkeletonText>{c.leaves(formatCompactMoney(850000, lang), formatCompactMoney(1200000, lang))}</SkeletonText>
+          </p>
+        </>
       ) : (
         <>
           <p className="answer__big"><Cascade>{earliestLine ?? ''}</Cascade></p>

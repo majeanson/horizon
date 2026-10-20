@@ -6,7 +6,7 @@ import { formatYearAge } from '../../lib/format'
 import { FLOW_COPY } from '../../lib/flowCopy'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
 import { Fold } from '../Fold'
-import { Loading } from '../Loading'
+import { SkeletonFill, SliderSkeleton } from '../SkeletonShapes'
 import { Slider } from '../Slider'
 
 // « Où va l’argent » — the second half of the « Détail » view: the household's money by what it is spent on (the budget, the mortgage, tax, what comes off the pay, what is
@@ -73,7 +73,7 @@ export function FlowSection({
             <p className="field-row__hint">{f.hint}</p>
           </Fold>
           <div className="chart-slot">
-            <Suspense fallback={<Loading />}>
+            <Suspense fallback={<SkeletonFill />}>
               <StackedBarChart
                 data={spent}
                 series={present.map((id: ExpenseSegment) => ({ id, label: f.segment[id], colour: EXPENSE_COLOUR[id], concept: EXPENSE_CONCEPT[id] }))}
@@ -93,7 +93,7 @@ export function FlowSection({
 
       <div className="flow-readout">
         <h4 className="chart-detail__heading">{f.readout.title}</h4>
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SliderSkeleton label={f.readout.year} />}>
           <Slider
             label={f.readout.year}
             value={year}

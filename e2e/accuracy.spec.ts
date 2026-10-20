@@ -41,8 +41,10 @@ test('the panel is a door to « Par document », beside the guide for every figu
   await expect(panel(page).getByRole('button', { name: 'Estimer ce qui manque' })).toHaveCount(0)
   // the documents are NOT listed a second time here: no per-document cards in the panel
   await expect(panel(page).locator('.doc')).toHaveCount(0)
-  // the panel sits AFTER the form, and the one-line meter above the form leads to it
-  expect(await page.locator('.accuracy-line').evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(await panel(page).evaluate((el) => el.getBoundingClientRect().top))
+  // the panel sits AFTER the form, and the map's « Rendre exact » chip (with the count its head wears) leads to it
+  expect(await page.locator('#budget').evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(await panel(page).evaluate((el) => el.getBoundingClientRect().top))
+  await expect(page.getByRole('navigation', { name: 'Sections du profil' }).getByRole('button', { name: /^Rendre exact/ })).toContainText(/0\/\d+/)
+  await expect(page.locator('#exact .accordion__progress')).toHaveText(/^0\/\d+$/)
   await panel(page).getByRole('button', { name: 'Confirmer document par document' }).click()
   await expect(page).toHaveURL(/par=document/)
   await expect(page.getByRole('tab', { name: 'Par document' })).toHaveAttribute('aria-selected', 'true')

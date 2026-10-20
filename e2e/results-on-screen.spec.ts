@@ -49,7 +49,8 @@ test('after a way of starting is picked, the three-scenario marks are pending un
   await seedProfile(page, EXAMPLE)
   await page.goto('/decider?bt=cards')
   // the marks are inside each card's « Détails »: open them all, as bridge.spec does
-  await expect(page.locator('.bridge-card').first()).toBeVisible({ timeout: 60_000 })
+  // the cards wait as an inert ghost of themselves (BridgePanel): the real ones are those with a « Détails » a reader can press
+  await expect(page.locator('.bridge-card').getByRole('button', { name: /^Détails/ }).first()).toBeVisible({ timeout: 60_000 })
   for (const b of await page.locator('.bridge-card').getByRole('button', { name: /^Détails/ }).all()) await b.click()
   const marks = page.locator('.bridge-mark')
   await expect(marks.first()).toBeVisible({ timeout: 60_000 })

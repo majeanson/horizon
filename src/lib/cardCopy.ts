@@ -11,6 +11,8 @@ export type CardId =
   | 'family'
   | 'about'
   | 'person'
+  | 'situation'
+  | 'exact'
   | 'rrq'
   | 'oas'
   | 'accounts'
@@ -30,6 +32,8 @@ const FR: Record<CardId, string> = {
   family: 'Qui vit avec vous : un ou une partenaire, et les enfants.',
   about: 'Qui vous êtes, et l’âge où votre salaire s’arrête.',
   person: 'Âge, salaire, comptes, régime d’employeur, RRQ et PSV de cette personne.',
+  situation: 'Ce qui vous concerne : vos réponses choisissent les sections du formulaire.',
+  exact: 'Confirmer chaque chiffre avec le document où il est écrit.',
   rrq: 'La rente du Québec : quand la commencer, et les gains qui la calculent.',
   oas: 'La pension fédérale, selon vos années vécues au Canada.',
   accounts: 'Ce que vous avez déjà mis de côté, compte par compte.',
@@ -50,6 +54,8 @@ const EN: Record<CardId, string> = {
   family: 'Who lives with you: a partner, and the children.',
   about: 'Who you are, and the age your salary stops.',
   person: 'This person’s age, pay, accounts, employer plan, QPP and OAS.',
+  situation: 'What applies to you: your answers choose the sections of the form.',
+  exact: 'Confirm each figure against the document it is written on.',
   rrq: 'The Québec pension: when to start it, and the earnings it is built on.',
   oas: 'The federal pension, based on your years lived in Canada.',
   accounts: 'What you have already set aside, account by account.',

@@ -6,7 +6,9 @@ import { MarginalWeather } from '../MarginalWeather'
 import { ParamsPanel } from '../ParamsPanel'
 import { YearTables } from '../YearTables'
 import { SectionHeader } from '../../SectionHeader'
-import { Skeleton } from '../../Skeleton'
+import { Skeleton, SkeletonStatus } from '../../Skeleton'
+import { SkeletonChips, SkeletonText } from '../../SkeletonShapes'
+import type { Lang } from '../../../i18n'
 import { LEDGER_COPY } from '../../../lib/ledgerCopy'
 import { ACCURACY_COPY } from '../../../lib/accuracyCopy'
 import { CARDS_COPY } from '../../../lib/cardsCopy'
@@ -55,7 +57,7 @@ export function ProofView({ m }: { m: ResultsModel }) {
 
           {/* What the calculation was checked against and what it simplifies: after the figures it was checked on. */}
           <AccordionItem id="precision" title={ACCURACY_COPY[lang].title} summary={cc.precision} concept="precision" className="results-section">
-            <Suspense fallback={<Skeleton count={4} />}>
+            <Suspense fallback={<AccuracyGhost lang={lang} />}>
               <AccuracyNote
                 // The page's own way to a section (useResultsPage goTo): it keeps « Tout ouvrir » (bloc=tout) instead of closing every other block, and lands once
                 // the block exists — a one-frame scroll measured mid-relayout and jumped by the height of what had just closed.
@@ -71,5 +73,37 @@ export function ProofView({ m }: { m: ResultsModel }) {
         </Accordion>
       </section>
     </>
+  )
+}
+
+/** « Précision » while its chunk arrives: the same note, its words as ghost text (they ride with this view), so the block opens at its own height. */
+function AccuracyGhost({ lang }: { lang: Lang }) {
+  const c = ACCURACY_COPY[lang]
+  return (
+    <div className="surface accuracy">
+      <SkeletonStatus />
+      <p className="field-row__hint">
+        <SkeletonText>{c.intro}</SkeletonText>
+      </p>
+      <p className="field-row__hint">
+        <SkeletonText>{c.range('10 %')}</SkeletonText>
+      </p>
+      {[
+        [c.checkedTitle, c.checked],
+        [c.simplifiedTitle, c.simplified],
+      ].map(([title, lines]) => (
+        <div key={title as string} className="verdict__range">
+          <p className="verdict__range-title">{title as string}</p>
+          <ul className="note-list" aria-hidden="true">
+            {(lines as readonly string[]).map((line) => (
+              <li key={line}>
+                <SkeletonText>{line}</SkeletonText>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <SkeletonChips labels={[c.seeFigures, c.seeSources, c.seeEngine]} />
+    </div>
   )
 }

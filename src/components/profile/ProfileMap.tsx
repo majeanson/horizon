@@ -1,6 +1,7 @@
 import type { ReactNode, RefObject } from 'react'
 import { useT } from '../../i18n'
-import { mapProgress } from '../../lib/mapProgress'
+import { accuracyOf } from '../../lib/facts'
+import { mapProgress, type Progress } from '../../lib/mapProgress'
 import { useProfile } from '../../lib/store'
 import { useAccordion } from '../Accordion'
 import { PinnedMap } from '../PinnedMap'
@@ -13,7 +14,10 @@ export function ProfileMap({ people, withHome, withEvents, withExact, page, end 
   const n = t.profile.nav
   const acc = useAccordion()
   // Each chip says how much of its block is confirmed: where the gaps are, without scrolling the form.
-  const progress = mapProgress(useProfile())
+  // « Rendre exact » counts the whole profile — the same « 3/19 » its block's head wears.
+  const profile = useProfile()
+  const confirmed = accuracyOf(profile)
+  const progress: Record<string, Progress> = { ...mapProgress(profile), exact: { done: confirmed.confirmed, total: confirmed.total } }
   const links: SectionLink[] = [
     { id: 'famille', label: n.family, concept: 'famille' as const },
     ...people.map((p) => ({ id: `person-${p.id}`, label: p.name, concept: 'personne' as const })),

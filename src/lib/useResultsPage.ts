@@ -57,8 +57,9 @@ const ESSAI_OF: Readonly<Record<string, Essai>> = { viser: 'target', epargner: '
 export const STRATS = ['rentes', 'ordre', 'fonte', 'equilibre'] as const
 export type Strat = (typeof STRATS)[number]
 /** The blocks of « Preuve », the same way (`?bloc=`). */
-/** The two cards under the answer's sentence (`?cartes=`): the comparison of departure ages and « À faire cette année ». */
-export const ANSWER_BLOCKS = ['comparer', 'annee'] as const
+/** Réponse's cards (`?cartes=`): the answer itself, the comparison of departure ages and « À faire cette année ». The answer is a card like the others (Marc, 2026-10-20):
+ *  « Tout fermer » shuts it to its title and one line of the glance. */
+export const ANSWER_BLOCKS = ['verdict', 'comparer', 'annee'] as const
 export const PROOF_BLOCKS = ['solidite', 'donnees-calcul', 'tableau', 'precision', 'parametres'] as const
 
 export const SERIES_CLASS = ['accent', 'sky', 'sage', 'berry'] as const
@@ -401,6 +402,13 @@ export function useResultsPage() {
   // The answer as plain text, for a message or an email: read from the card as it is on screen, so it says exactly what the screen says, in
   // the reader's language, with the assumptions beside it. Handed to the browser's clipboard; nothing is sent anywhere.
   const copySummary = async () => {
+    // The answer is a card that « Tout fermer » shuts, and a shut card holds no sentence to read: open it, and read it once it is drawn.
+    if (document.querySelector('#verdict .verdict__line') === null) {
+      const next = new URLSearchParams(window.location.search)
+      if (next.get('cartes') !== null) next.set('cartes', 'verdict')
+      setParams(next, { replace: true })
+      for (let i = 0; i < 60 && document.querySelector('#verdict .verdict__line') === null; i++) await new Promise((done) => requestAnimationFrame(done))
+    }
     const card = document.getElementById('verdict')
     if (!card) return
     const text = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ').trim()

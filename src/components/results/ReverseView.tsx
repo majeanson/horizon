@@ -7,7 +7,8 @@ import { REVERSE_COPY } from '../../lib/reverseCopy'
 import { useRegret } from '../../lib/useRegret'
 import { useReverse } from '../../lib/useReverse'
 import { NumberSlider } from '../NumberSlider'
-import { Skeleton } from '../Skeleton'
+import { SkeletonStatus } from '../Skeleton'
+import { SkeletonText } from '../SkeletonShapes'
 
 /** The most rows of « waiting one more year » listed: the first ages that work, which is where the gain is still large. */
 const WAIT_ROWS = 6
@@ -23,6 +24,7 @@ export function ReverseView({
   onAge,
   minAge,
   maxAge,
+  expectWorks = false,
 }: {
   household: Household
   assumptions: Assumptions
@@ -30,6 +32,8 @@ export function ReverseView({
   onAge: (age: number) => void
   minAge: number
   maxAge: number
+  /** Whether the age is at or past the earliest one (Décider knows it): the waiting card takes the shape of the answer it is about to be. */
+  expectWorks?: boolean
 }) {
   const { lang } = useLang()
   const c = REVERSE_COPY[lang]
@@ -49,7 +53,46 @@ export function ReverseView({
         </p>
       )}
       {r === null ? (
-        <Skeleton count={3} />
+        // the answer about to come, in its own sentences with likely figures (ghost text): « it works » is two lines, « it needs » a list of five
+        <>
+          <SkeletonStatus />
+          {expectWorks ? (
+            <>
+              <p className="answer__big">
+                <SkeletonText>{c.works(age)}</SkeletonText>
+              </p>
+              <p className="answer__note">
+                <SkeletonText>{c.margin(money(52000))}</SkeletonText>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="answer__note">
+                <SkeletonText>{c.needs(age)}</SkeletonText>
+              </p>
+              <ul className="skeleton__levers" aria-hidden="true">
+                <li>
+                  <SkeletonText>{c.spend(money(48000), money(42000), formatPct(0.12, lang, 0))}</SkeletonText>
+                </li>
+                <li>
+                  <SkeletonText>{c.save(money(5000), money(417), c.saveInto.tfsa)}</SkeletonText>
+                </li>
+                <li>
+                  <SkeletonText>{c.work(age + 2, 2)}</SkeletonText>
+                </li>
+                <li>
+                  <SkeletonText>{c.partTime(age + 3, 3)}</SkeletonText>
+                </li>
+                <li>
+                  <SkeletonText>{c.returns(formatDecimal(1.5, lang, 1))}</SkeletonText>
+                </li>
+              </ul>
+              <p className="answer__note">
+                <SkeletonText>{c.alone}</SkeletonText>
+              </p>
+            </>
+          )}
+        </>
       ) : r.works ? (
         <>
           <p className="answer__big">{c.works(r.age)}</p>
@@ -71,7 +114,22 @@ export function ReverseView({
       <div className="reverse__wait">
         <p className="verdict__range-title">{c.waitTitle}</p>
         {regret === null ? (
-          <Skeleton count={2} />
+          // its hint, its rows of years and its closing line, as ghost text
+          <>
+            <p className="field-row__hint">
+              <SkeletonText>{c.waitHint}</SkeletonText>
+            </p>
+            <ul className="skeleton__levers" aria-hidden="true">
+              {Array.from({ length: WAIT_ROWS }, (_, i) => (
+                <li key={i}>
+                  <SkeletonText>{c.waitRow(age + i, money(12000))}</SkeletonText>
+                </li>
+              ))}
+            </ul>
+            <p className="answer__note">
+              <SkeletonText>{c.waitKnee(age + 3, money(8000))}</SkeletonText>
+            </p>
+          </>
         ) : waitRows.length === 0 ? (
           <p className="answer__note">{c.waitNone}</p>
         ) : (

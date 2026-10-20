@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { useLang, useT } from '../../i18n'
 import type { PersonId } from '../../engine/types'
+import { CARD_COPY } from '../../lib/cardCopy'
+import { Accordion, AccordionItem, useAccordion } from '../Accordion'
 import { useConfirm } from '../../lib/confirm'
 import { addHome } from '../../lib/profileEdit'
 import { answer, applies, clearTopic, HOUSEHOLD_TOPICS, lostBy, PERSON_TOPICS, useYes, type Topic } from '../../lib/situation'
@@ -7,7 +10,6 @@ import { SITUATION_COPY } from '../../lib/situationCopy'
 import { updateProfile, useProfile } from '../../lib/store'
 import { Chip } from '../Chip'
 import { Cluster } from '../Layout'
-import { Fold } from '../Fold'
 
 // « Ma situation » — the plain yes / no questions that decide what the rest of the form shows (lib/situation.ts). « Oui » opens the matching
 // section (or starts the home); « Non » closes it, and over typed figures says first what would be lost. Nothing here is a profile figure: a
@@ -90,23 +92,31 @@ export default function SituationCard() {
   const c = SITUATION_COPY[lang]
   const profile = useProfile()
   const yes = useYes()
+  const acc = useAccordion()
+  // Outside a page's accordion (« Par document ») the card is its own one-block accordion, closed until tapped — the same head, the same chevron.
+  const [own, setOwn] = useState<string | null>(null)
   // What the answers ARE, said on the closed card: they decide which sections the form shows, so a section that is not there is never a mystery.
   const people = profile.household.persons.map((p) => p.id)
   const on = [...HOUSEHOLD_TOPICS.filter((topic) => applies(profile, yes, topic)), ...PERSON_TOPICS.filter((topic) => people.some((id) => applies(profile, yes, topic, id)))]
-  return (
-    // A fold, closed: these answers are set once (the first-visit path asks the same questions) and a returning reader is here for the figures below — a long list of yes / no ahead of them was the first thing on the page.
-    <Fold
+  // A card like every block of Profil, closed by default: these answers are set once (the first-visit path asks the same questions) and a returning reader
+  // is here for the figures below — a long list of yes / no ahead of them was the first thing on the page. It was a bare fold of its own shape (Marc, 2026-10-20).
+  const card = (
+    <AccordionItem
       id="situation"
-      className="surface"
-      summary={
-        <>
-          <strong>{c.title}</strong> — {on.length === 0 ? c.allNo : c.answered(on.map((topic) => c.short[topic]).join(', '))}
-        </>
-      }
+      title={c.title}
+      subtitle={CARD_COPY[lang].situation}
+      details={c.lead}
+      concept="situation"
+      summary={on.length === 0 ? c.allNo : c.answered(on.map((topic) => c.short[topic]).join(', '))}
     >
-      <p className="field-row__hint">{c.lead}</p>
       <SituationQuestions />
       <p className="field-row__hint">{c.hidden}</p>
-    </Fold>
+    </AccordionItem>
+  )
+  if (acc?.ids.includes('situation')) return card
+  return (
+    <Accordion ids={['situation']} open={own} onOpen={setOwn}>
+      {card}
+    </Accordion>
   )
 }

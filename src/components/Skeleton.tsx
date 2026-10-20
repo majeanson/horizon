@@ -1,5 +1,5 @@
+import type { CSSProperties } from 'react'
 import { useT } from '../i18n'
-
 // The waiting state for a surface whose SHAPE is already known — a list of rows, a
 // grid of cards. Instead of one centred « Chargement… » line that pops into a full
 // page, reserve the space the content is about to take, so the first paint is
@@ -49,5 +49,61 @@ export function Skeleton({
         ))}
       </div>
     </>
+  )
+}
+
+// SHAPED PLACEHOLDERS. A row of identical bars promises a shape and then breaks it: the answer's card waited as three bars 120 px tall and arrived 1 000 px tall,
+// and everything under it jumped (Marc, 2026-10-20: « I don't like when the layout changes after a loading »). The cure is to wait INSIDE the real layout:
+// render the elements the content will be — `<p className="verdict__line">`, the `.glance` grid, a `.chart-slot` — and put placeholder lines in them. Each line
+// is one line of its HOST's type (`1lh`: its own font size and line height), so the placeholder is as tall as the text it stands for, at every text size,
+// in either language, at any width. A surface built this way says « Chargement… » once, with `SkeletonStatus`.
+
+/** One placeholder line per entry, each as wide as its percentage — inside the element the text will be. */
+export function SkeletonLines({ widths }: { widths: readonly number[] }) {
+  return (
+    <>
+      {widths.map((w, i) => (
+        <span key={i} className="skeleton__line" aria-hidden="true" style={{ '--w': `${w}%` } as CSSProperties}>
+          <span className="skeleton__block" />
+        </span>
+      ))}
+    </>
+  )
+}
+
+/** The one « Chargement… » a shaped placeholder says to a screen reader — its lines are decorative. */
+export function SkeletonStatus() {
+  const t = useT()
+  return (
+    <p className="sr-only" role="status">
+      {t.common.loading}
+    </p>
+  )
+}
+
+/** The wait for a whole page (a route's chunk) or a whole part of one (Décider's view, the proof): the page's head in its own type, then card-sized blocks, and at least
+ *  the rest of a screen — so what sits under the page (the next-step card, the footer) is never seen in the gap and then pushed away. `head` off for a part of a page. */
+export function PageSkeleton({ head = true }: { head?: boolean }) {
+  return (
+    // a whole page sits in the page's own frame (its gutters and rhythm); a part of a page is already in it
+    <div className={'skeleton--screen' + (head ? ' page-body' : '')}>
+      <SkeletonStatus />
+      {head && (
+        // the head's own TYPE under classes of its own: a page's real head is what a reader (and a test) waits for, and a placeholder never passes for it
+        <div className="skeleton__page-head" aria-hidden="true">
+          <p className="skeleton__page-title">
+            <SkeletonLines widths={[45]} />
+          </p>
+          <p className="skeleton__page-sub">
+            <SkeletonLines widths={[90, 40]} />
+          </p>
+        </div>
+      )}
+      <div className="skeleton skeleton--row skeleton--cards" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="skeleton__block" />
+        ))}
+      </div>
+    </div>
   )
 }

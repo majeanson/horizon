@@ -33,7 +33,7 @@ const offerInstall = (page: Page, outcome: 'accepted' | 'dismissed' = 'accepted'
 test('with nothing to install the front door says nothing, and the settings page says where a browser keeps the command', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.locator('.install-card')).toHaveCount(0)
+  await expect(page.locator('.install-card:not(.drip)')).toHaveCount(0)
   await page.goto('/donnees')
   await expect(page.getByRole('heading', { name: 'Installer l’application' })).toBeVisible()
   await expect(page.getByText('Dans le menu de votre navigateur')).toBeVisible()
@@ -43,7 +43,7 @@ test('with nothing to install the front door says nothing, and the settings page
 test('when the browser offers it, the front door makes ONE quiet offer: a card, « Plus tard » ends it for good', async ({ page }) => {
   await page.goto('/')
   await offerInstall(page)
-  const card = page.locator('.install-card')
+  const card = page.locator('.install-card:not(.drip)')
   await expect(card).toBeVisible()
   await expect(card).toContainText('Installer Horizon')
   await expect(card).toContainText('sans réseau')
@@ -52,7 +52,7 @@ test('when the browser offers it, the front door makes ONE quiet offer: a card, 
   // remembered on this device: it does not come back, even when the browser offers again
   await page.reload()
   await offerInstall(page)
-  await expect(page.locator('.install-card')).toHaveCount(0)
+  await expect(page.locator('.install-card:not(.drip)')).toHaveCount(0)
   expect(await page.evaluate(() => localStorage.getItem('horizon-install'))).toBe('later')
   // …and the settings page still has the button for whoever changes their mind
   await page.goto('/donnees')
@@ -63,8 +63,8 @@ test('when the browser offers it, the front door makes ONE quiet offer: a card, 
 test('« Installer » fires the browser’s dialog once and the offer closes', async ({ page }) => {
   await page.goto('/')
   await offerInstall(page)
-  await page.locator('.install-card').getByRole('button', { name: 'Installer' }).click()
-  await expect(page.locator('.install-card')).toHaveCount(0)
+  await page.locator('.install-card:not(.drip)').getByRole('button', { name: 'Installer' }).click()
+  await expect(page.locator('.install-card:not(.drip)')).toHaveCount(0)
   expect(await page.evaluate(() => (window as unknown as { __prompted?: number }).__prompted)).toBe(1)
   expect(await page.evaluate(() => localStorage.getItem('horizon-install'))).toBe('done')
 })
@@ -73,15 +73,15 @@ test('in English the offer speaks English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await page.goto('/')
   await offerInstall(page)
-  await expect(page.locator('.install-card')).toContainText('Install Horizon')
-  await expect(page.locator('.install-card').getByRole('button', { name: 'Later' })).toBeVisible()
+  await expect(page.locator('.install-card:not(.drip)')).toContainText('Install Horizon')
+  await expect(page.locator('.install-card:not(.drip)').getByRole('button', { name: 'Later' })).toBeVisible()
 })
 
 test.describe('on an iPhone there is no prompt to fire, only the words', () => {
   test.use({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' })
   test('the card says Share ▸ Add to Home Screen and has no install button', async ({ page }) => {
     await page.goto('/')
-    const card = page.locator('.install-card')
+    const card = page.locator('.install-card:not(.drip)')
     await expect(card).toBeVisible()
     await expect(card).toContainText('Partager')
     await expect(card.getByRole('button', { name: 'Installer' })).toHaveCount(0)
@@ -100,7 +100,7 @@ test.describe('installed', () => {
     await page.goto('/')
     await expect(page.locator('html')).toHaveAttribute('data-standalone', '')
     await offerInstall(page)
-    await expect(page.locator('.install-card')).toHaveCount(0)
+    await expect(page.locator('.install-card:not(.drip)')).toHaveCount(0)
     await page.goto('/donnees')
     await expect(page.getByText('Horizon est installé sur cet appareil.')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Installer' })).toHaveCount(0)

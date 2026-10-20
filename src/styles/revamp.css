@@ -816,8 +816,7 @@
   color: var(--ink);
 }
 
-/* ── Profil: the one-line meter above the form; the full panel sits after it ───────────────────────────────────── */
-.accuracy-line,
+/* ── Profil: the backup line under the form ─────────────────────────────────────────────────────────────────────── */
 .backup-line {
   display: flex;
   flex-wrap: wrap;
@@ -2029,4 +2028,224 @@
    carried none, and a tap left their first lines under the bar on a phone (e2e/landing.spec.ts walks every map chip). */
 :has(> .pin-stack) [id] {
   scroll-margin-top: calc(var(--bar-h) + var(--pin-h, 7rem) + 0.75rem);
+}
+
+/* ── The answer is a card ─────────────────────────────────────────────────────────────────────────────────────── */
+/* Réponse's first card (components/results/views/AnswerView.tsx): the card gives the padding and the title row, so the answer inside it adds none of its own. */
+.verdict-card .verdict {
+  padding: 0;
+}
+
+/* ── Shaped placeholders (components/Skeleton.tsx SkeletonLines / SkeletonFill) ───────────────────────────────── */
+/* A placeholder line is ONE line of its host's own type: `1lh` is the host's line height, so a placeholder in a `.verdict__line` is as tall as the headline
+   and one in a `.field-row__hint` as tall as a hint. The bar is the text's x-height band, as wide as `--w`; the sweep is the blocks' own (styles/motion.css). */
+.skeleton__line {
+  display: block;
+  height: 1lh;
+  position: relative;
+}
+.skeleton__line > .skeleton__block {
+  position: absolute;
+  left: 0;
+  top: 22%;
+  height: 56%;
+  width: var(--w, 100%);
+  border-radius: 999px;
+}
+/* A picture's wait fills the slot that already has the picture's height. */
+.skeleton__fill {
+  height: 100%;
+  min-height: inherit;
+  display: grid;
+}
+.skeleton__fill > .skeleton__block {
+  height: 100%;
+  min-height: 8rem;
+}
+/* The age's placeholder is a block line of the age's own size (the age itself is inline beside its tail). */
+.skeleton__age {
+  display: block;
+}
+/* A row of doors (chips) waiting: chip-high pills in a wrapping row, like a Cluster of Chips. */
+.skeleton__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.skeleton__chips > .skeleton__block {
+  height: 2.75rem;
+  border-radius: 999px;
+}
+/* A page (or a part of one) waiting for its chunk holds at least the rest of the screen, and its blocks are card-sized. */
+.skeleton--screen {
+  min-height: 100dvh;
+}
+.skeleton--cards .skeleton__block {
+  height: 9rem;
+}
+/* A lever's result waits right-aligned, as wide as a result (the grid would shrink an empty line to nothing). */
+.levers__result .skeleton__line {
+  justify-self: stretch;
+  min-width: 9rem;
+}
+.levers__result .skeleton__line > .skeleton__block {
+  left: auto;
+  right: 0;
+}
+/* A control drawn as a ghost of itself while what it acts on is worked out: the real label sets its exact size, unseen, on the placeholder's wash. */
+.skeleton__ghost {
+  color: transparent !important;
+  background: var(--card) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Profil: one card head for every block ────────────────────────────────────────────────────────────────────── */
+/* A person's column (a bare accordion block whose cards are its children) opens with a card of its own holding the same head as Famille, Budget or « Ma
+   situation » — pip · name · one sentence · count · chevron — instead of a bare name (Marc, 2026-10-20: « lots of different types of components »).
+   Closed, it is the same slim card as a closed block; the column itself draws no padding of its own. */
+.accordion__item.person.is-closed {
+  padding-block: 0;
+}
+.accordion__item.is-closed > .plain-head {
+  gap: 0.15rem;
+  padding-block: 0.35rem;
+}
+/* The block's count in its head rides beside the name, as on its map chip. */
+.accordion__progress {
+  flex: none;
+}
+/* The backup line is a quiet line under the form, not a box of a third kind. */
+.backup-line {
+  border: 0;
+  padding-inline: 0;
+}
+/* « Par document »'s step: its `gap` (above) never applied — the page was not a flex box — and the step's cards (Famille, « Ma situation », each person's
+   head) touched one another. */
+.saisie {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* A slider waiting for its chunk: the track's own height (the range input's 2.75 rem) with a thin rail drawn across it. */
+.skeleton__value {
+  min-width: 6rem;
+}
+.skeleton__track {
+  min-height: 2.75rem;
+  display: grid;
+  align-items: center;
+}
+.skeleton__track > .skeleton__block {
+  height: 0.5rem;
+  border-radius: 999px;
+}
+/* Ghost text: the words unseen on the placeholder's wash, one rounded band per line (box-decoration-break), so a paragraph waits as the paragraph it will be. */
+.skeleton__text {
+  color: transparent;
+  background: var(--card);
+  opacity: 0.55;
+  border-radius: 0.4em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  user-select: none;
+  pointer-events: none;
+}
+/* A chip's ghost: the chip's own type, padding and thumb height (styles/kit.css .chip), room for its leading icon, the label unseen on the wash. */
+.skeleton__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  padding: 0.4rem 0.8rem;
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+  color: transparent;
+  background: var(--card);
+  opacity: 0.55;
+  user-select: none;
+}
+.skeleton__chip::before {
+  content: '';
+  width: 1.1rem;
+}
+/* The person's head card is not a section of the form (it holds no field): it borrows the card's padding and, in two columns, the person's edge. */
+.plain-head {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  min-width: 0;
+}
+.persons--aligned .person.who > .plain-head {
+  border-left: 4px solid var(--who);
+}
+/* A ghost of real components (components/Skeleton.tsx SkeletonGhost): the layout is real, the words and glyphs unseen, every control and card one quiet wash. */
+.skeleton__ghost-tree {
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+.skeleton__ghost-tree * {
+  color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.skeleton__ghost-tree svg,
+.skeleton__ghost-tree .pip,
+.skeleton__ghost-tree .dots__dot {
+  visibility: hidden;
+}
+.skeleton__ghost-tree :is(button, .chip, .subtabs, .surface, th, td, .bridge-card__badge) {
+  background: var(--card) !important;
+}
+/* Ghost words are drawn, not written (components/Skeleton.tsx SkeletonText, SkeletonChips): they lay out and wrap as text, and are no text of the page. */
+.skeleton__text::before,
+.skeleton__chip::after {
+  content: attr(data-ghost);
+}
+/* A page's head while its chunk arrives: the head's own type (styles/horizon.css .page-head), under classes of its own. */
+.skeleton__page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.skeleton__page-title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--text-xl);
+}
+.skeleton__page-sub {
+  margin: 0;
+  font-size: var(--text-md);
+}
+/* THE PLACEHOLDER'S WASH is a tint of the ink, not the card's colour: `--card` IS the card's own background, so a placeholder inside a card (the answer, a strategy,
+   a what-if) drew nothing and read as a blank hole. A translucent ink shows on the page, on a card and on a tile alike, by day and by night. */
+.skeleton__block,
+.skeleton__text,
+.skeleton__chip,
+.skeleton__ghost {
+  background: color-mix(in srgb, var(--ink) 9%, transparent) !important;
+  opacity: 1;
+}
+.skeleton__ghost-tree {
+  opacity: 1;
+}
+.skeleton__ghost-tree :is(button, .chip, .subtabs, .surface, th, td, .bridge-card__badge) {
+  background: color-mix(in srgb, var(--ink) 7%, transparent) !important;
+}
+/* The age's placeholder (AnswerView VerdictSkeleton): the age's own type (.verdict__age, both its rules) under a class of its own — a reader of the answer looks for
+   `.verdict__age`, and must never find the ghost. Inline like the age, beside its tail. */
+.skeleton__age {
+  display: inline;
+  margin: 0;
+  font-size: clamp(3rem, 14vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
 }

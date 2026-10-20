@@ -12,8 +12,8 @@ import { deepestDip } from '../../lib/marketFanView'
 import { useMarketFan } from '../../lib/useMarketFan'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { Fold } from '../Fold'
-import { Loading } from '../Loading'
 import { Skeleton } from '../Skeleton'
+import { SkeletonFill } from '../SkeletonShapes'
 
 // « Les marchés, année par année » — the household's own plan drawn under five ways the returns could go (engine/fan.ts), as lines of net worth, with a table that says the same in
 // text: whether the money lasts, the lowest point and where it ends. A fold under « En bref » of the firmness block, mounted when opened; the five projections run off the page's
@@ -62,7 +62,7 @@ function Body({ m }: { m: ResultsModel }) {
         {c.hint} {dollars === 'today' ? c.today : c.nominal}
       </p>
       <div className="chart-slot">
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SkeletonFill />}>
           <LineChart
             series={series}
             markers={markers}

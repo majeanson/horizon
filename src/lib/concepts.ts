@@ -65,6 +65,8 @@ export const CONCEPTS = {
   // ── The household and what it owns outside the accounts — sky ──────────────────────────────────────────────────────
   personne: c('household', 'user-bold'),
   famille: c('household', 'users-three-bold'),
+  // « Ma situation » on Profil: the yes / no questions that decide which of the household's sections the form shows.
+  situation: c('household', 'list-checks-bold'),
   enfants: c('household', 'baby-bold'),
   maison: c('household', 'house-bold'),
   hypotheque: c('household', 'key-bold'),

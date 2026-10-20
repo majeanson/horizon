@@ -70,10 +70,12 @@ export async function showAllSections(page: Page): Promise<void> {
   })
 }
 
-/** « Ma situation » is a closed fold on Profil: open it before touching its questions (a no-op when it is already open). */
+/** « Ma situation » is a closed card on Profil (a block of its accordion, and a one-card accordion of its own on « Par document »): open it before touching its
+ *  questions (a no-op when it is already open). */
 export async function openSituation(page: Page): Promise<void> {
-  const fold = page.locator('details#situation')
-  if (!(await fold.evaluate((el: HTMLDetailsElement) => el.open))) await fold.locator('summary').click()
+  const toggle = page.locator('#situation .accordion__toggle')
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
 }
 
 /**
