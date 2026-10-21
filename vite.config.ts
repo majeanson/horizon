@@ -67,6 +67,27 @@ function securityHeadersFile(): Plugin {
   }
 }
 
+// The first screen's faces, fetched WITH the page: a <link rel="preload"> per file in the head, so they arrive before the app paints instead of after it. Fetched
+// only when the CSS asked for them (font-display: swap), they landed after the first paint on a slow phone, and every title and button reflowed under the reader
+// (the front door's question card: its title two lines in the system face, one in Baloo 2 — e2e/placeholders.spec.ts saw it on CI's runner). Four files: the body's
+// two weights (text, buttons and chips) and the titles' two. The rest of the faces keep loading as the CSS asks.
+const FIRST_FACES = ['hanken-grotesk-latin-400-normal', 'hanken-grotesk-latin-600-normal', 'baloo-2-latin-700-normal', 'baloo-2-latin-800-normal']
+function preloadFirstFaces(): Plugin {
+  return {
+    name: 'horizon-font-preload',
+    transformIndexHtml: {
+      order: 'post',
+      handler(_html, ctx) {
+        // a build knows the hashed names; the dev server serves the package files where the CSS points
+        const hrefs = ctx.bundle
+          ? Object.keys(ctx.bundle).filter((file) => file.endsWith('.woff2') && FIRST_FACES.some((face) => file.includes(face))).map((file) => '/' + file)
+          : FIRST_FACES.map((face) => `/node_modules/@fontsource/${face.startsWith('baloo') ? 'baloo-2' : 'hanken-grotesk'}/files/${face}.woff2`)
+        return hrefs.map((href) => ({ tag: 'link', attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href, crossorigin: '' }, injectTo: 'head-prepend' as const }))
+      },
+    },
+  }
+}
+
 // Build-time service worker: emit /sw.js with the REAL hashed asset list baked in, so a
 // freshly-installed app precaches the whole shell and reopens offline. Hand-rolled and
 // dependency-free on purpose — the caching policy is a dozen lines (see swSource) and the
@@ -282,7 +303,7 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __BUILD_SHA__: JSON.stringify(buildSha()),
   },
-  plugins: [react(), serviceWorker(), securityHeadersFile()],
+  plugins: [react(), serviceWorker(), securityHeadersFile(), preloadFirstFaces()],
   build: {
     // The build manifest lets scripts/check-bundle.mjs walk the ENTRY'S STATIC CLOSURE —
     // every chunk the browser fetches before it can run a line of the app — rather than guess
