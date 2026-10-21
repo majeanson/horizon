@@ -69,9 +69,9 @@ function securityHeadersFile(): Plugin {
 
 // The first screen's faces, fetched WITH the page: a <link rel="preload"> per file in the head, so they arrive before the app paints instead of after it. Fetched
 // only when the CSS asked for them (font-display: swap), they landed after the first paint on a slow phone, and every title and button reflowed under the reader
-// (the front door's question card: its title two lines in the system face, one in Baloo 2 — e2e/placeholders.spec.ts saw it on CI's runner). Four files: the body's
-// two weights (text, buttons and chips) and the titles' two. The rest of the faces keep loading as the CSS asks.
-const FIRST_FACES = ['hanken-grotesk-latin-400-normal', 'hanken-grotesk-latin-600-normal', 'baloo-2-latin-700-normal', 'baloo-2-latin-800-normal']
+// (the front door's question card: its title two lines in the system face, one in Baloo 2 — e2e/placeholders.spec.ts saw it on CI's runner). Five files: the body's
+// three weights (text 400, chips 600, buttons 700 — the front door's two buttons re-wrapped from two rows to one when 700 landed) and the titles' two. The rest of the faces keep loading as the CSS asks.
+const FIRST_FACES = ['hanken-grotesk-latin-400-normal', 'hanken-grotesk-latin-600-normal', 'hanken-grotesk-latin-700-normal', 'baloo-2-latin-700-normal', 'baloo-2-latin-800-normal']
 function preloadFirstFaces(): Plugin {
   return {
     name: 'horizon-font-preload',
