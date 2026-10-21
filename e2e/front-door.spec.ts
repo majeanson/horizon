@@ -53,6 +53,8 @@ for (const [w, h, scale] of [[320, 568, 'normal'], [360, 640, 'normal'], [360, 6
     await page.goto('/')
     const begin = page.getByRole('button', { name: 'Commencer', exact: true })
     await expect(begin).toBeVisible()
+    // measured in the faces the reader sees: a measure taken before they land (the system face) passed or failed by where the race fell
+    await page.evaluate(() => document.fonts.ready)
     const box = (await begin.boundingBox())!
     const tabs = (await page.getByRole('navigation', { name: 'Navigation principale' }).boundingBox())!
     expect(box.y + box.height).toBeLessThanOrEqual(tabs.y)
