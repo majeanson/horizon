@@ -47,7 +47,8 @@ const ALLOWED: Record<string, string> = {
 
 /** The budgets: the layout shift each scenario may cause, measured on 2026-10-20 (4× slowed CPU). They only fall. */
 const BUDGET: Record<string, number> = {}
-const DEFAULT_BUDGET = 0.05
+// PLACEHOLDER_BUDGET overrides it, to read every scenario's causes (a budget of 0.001 makes each one report what moved and what resized)
+const DEFAULT_BUDGET = Number(process.env.PLACEHOLDER_BUDGET) || 0.05
 
 type Scenario = { name: string; path: string; open?: string; move?: boolean }
 const PAGES: Scenario[] = [
@@ -75,6 +76,22 @@ async function watch(page: Page, hunted: string[]): Promise<void> {
     const w = window as unknown as { __cls: number; __hits: Record<string, string>; __moved: string[] }
     w.__cls = 0
     w.__moved = []
+    // …and what GREW or SHRANK (the cause; a shift names only the casualties): the page's top layers, as they mount
+    const grew = ((window as unknown as { __grew: string[] }).__grew = [] as string[])
+    const sizes = new WeakMap<Element, number>()
+    const sizeWatch = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        const h = Math.round(e.contentRect.height)
+        const before = sizes.get(e.target)
+        sizes.set(e.target, h)
+        // an element taken away (a placeholder replaced) reads 0: that is not a cause
+        if (before === undefined || h === 0 || Math.abs(h - before) < 8) continue
+        const el = e.target
+        const at = el.closest('[id]')
+        grew.push(`${at ? '#' + at.id + ' ' : ''}${el.tagName.toLowerCase()}.${typeof el.className === 'string' ? el.className.split(' ')[0] : ''} ${before}→${h}`)
+      }
+    })
+    const watchedSize = new WeakSet<Element>()
     w.__hits = {}
     new PerformanceObserver((list) => {
       for (const e of list.getEntries() as unknown as { value: number; hadRecentInput: boolean; sources: { node: Node | null; previousRect: DOMRectReadOnly; currentRect: DOMRectReadOnly }[] }[]) {
@@ -104,6 +121,11 @@ async function watch(page: Page, hunted: string[]): Promise<void> {
     let queued = false
     const scan = () => {
       queued = false
+      for (const el of document.querySelectorAll('#main > *, #main > * > *, #main > * > * > *, #main > * > * > * > *'))
+        if (!watchedSize.has(el)) {
+          watchedSize.add(el)
+          sizeWatch.observe(el)
+        }
       if (!document.querySelector('[data-placeholder]')) return
       for (const el of document.querySelectorAll(selector)) {
         // a ghost of real components (SkeletonGhost) wears their classes by design: one entry for all of it
@@ -183,12 +205,12 @@ for (const size of [
         await page.locator(`#${s.open} .accordion__toggle`).first().click()
         await expect(page.locator(`#${s.open}`)).toHaveClass(/is-open/, { timeout: 15_000 })
         await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))))
-        await page.evaluate(() => void ((window as unknown as { __cls: number; __moved: string[] }).__cls = 0, ((window as unknown as { __moved: string[] }).__moved = [])))
+        await page.evaluate(() => void ((window as unknown as { __cls: number; __moved: string[] }).__cls = 0, ((window as unknown as { __moved: string[] }).__moved = []), ((window as unknown as { __grew: string[] }).__grew = [])))
         await page.waitForTimeout(600)
         await settled(page)
       }
       if (s.move) {
-        await page.evaluate(() => void ((window as unknown as { __cls: number; __moved: string[] }).__cls = 0, ((window as unknown as { __moved: string[] }).__moved = [])))
+        await page.evaluate(() => void ((window as unknown as { __cls: number; __moved: string[] }).__cls = 0, ((window as unknown as { __moved: string[] }).__moved = []), ((window as unknown as { __grew: string[] }).__grew = [])))
         const slider = page.locator(`#${s.open}`).getByRole('slider').first()
         await slider.focus()
         await page.keyboard.press('ArrowRight')
@@ -196,14 +218,14 @@ for (const size of [
         await page.waitForTimeout(600)
         await settled(page)
       }
-      const { cls, found, moved } = await page.evaluate(() => {
+      const { cls, found, moved, grew } = await page.evaluate(() => {
         const w = window as unknown as { __cls: number; __hits: Record<string, string>; __moved: string[] }
-        return { cls: w.__cls, found: w.__hits, moved: w.__moved.slice(0, 6) }
+        return { cls: w.__cls, found: w.__hits, moved: w.__moved.slice(0, 6), grew: (window as unknown as { __grew: string[] }).__grew.slice(-12) }
       })
       const key = `${size.name} · ${s.name}`
       const budget = BUDGET[key] ?? DEFAULT_BUDGET
       console.log(`${key}: layout shift ${cls.toFixed(4)} (budget ${budget})`)
-      if (cls > budget) over.push(`${key}: ${cls.toFixed(4)} > ${budget} — moved: ${moved.join(' | ')}`)
+      if (cls > budget) over.push(`${key}: ${cls.toFixed(4)} > ${budget} — moved: ${moved.join(' | ')} — resized: ${grew.join(' | ')}`)
       for (const [c, why] of Object.entries(found)) if (!hits.has(c)) hits.set(c, `${key} — ${why}`)
       await context.close()
     }

@@ -2299,12 +2299,3 @@
   color: transparent;
   white-space: nowrap;
 }
-/* Lines held whether the words are known yet or not: on CI's fonts a placeholder sentence and the real one did not wrap alike, and the page under them moved by a line.
-   The front door's question keeps three lines; the earliest age's measure on Ma fiche keeps two. */
-/* rounded up to a whole pixel: a fractional height left the page and its sticky bar half a pixel off after a scroll (shell.spec) */
-.drip > p {
-  min-height: round(up, 3lh, 1px);
-}
-.sheet__stat--runway .sheet__stat-detail {
-  min-height: round(up, 2lh, 1px);
-}
