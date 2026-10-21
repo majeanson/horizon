@@ -27,7 +27,15 @@ function StatCard({ s, howToRead }: { s: StatView; howToRead: string }) {
     <li className={'surface sheet__stat sheet__stat--' + s.id}>
       <div className="sheet__stat-head">
         <p className="sheet__stat-name">{s.name}</p>
-        <p className="sheet__stat-value mono">{s.valueText}</p>
+        {/* waiting, the figure is a ghost of its likely self; « Calcul en cours… » stays, for assistive technology */}
+        {s.status === 'pending' ? (
+          <p className="skeleton-as-sheet__stat-value skeleton-as-mono">
+            <span className="sr-only">{s.valueText}</span>
+            <SkeletonText>{s.ghostValue}</SkeletonText>
+          </p>
+        ) : (
+          <p className="sheet__stat-value mono">{s.valueText}</p>
+        )}
       </div>
       <StatBar name={s.name} percent={s.percent} valueText={s.valueText} />
       {/* A measure still being worked out keeps the room of its line (two, as the earliest age's « Vous prévoyez arrêter à… » takes): the cards under it stay put. */}

@@ -64,7 +64,8 @@
 .sheet__stat-name {
   font-weight: 700;
 }
-.sheet__stat-value {
+.sheet__stat-value,
+.skeleton-as-sheet__stat-value {
   font-size: var(--text-lg);
 }
 .sheet__stat-detail {

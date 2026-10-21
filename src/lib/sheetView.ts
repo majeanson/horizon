@@ -29,6 +29,8 @@ export interface StatView {
   detail: string
   /** While the measure is worked out, the sentence it will most likely say (a stand-in figure): its placeholder wraps as it will, at any width. Empty when there is none. */
   ghost: string
+  /** …and the figure it will most likely show (« 60 ans »): « Calcul en cours… » in the figure's monospace wrapped to a second line on narrow fonts. */
+  ghostValue: string
 }
 
 export interface SlotView {
@@ -115,6 +117,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
 
     // the runway's usual sentence with its planned age and a stand-in margin, for its wait
     const ghost = s.id === 'runway' && s.status === 'pending' && s.detail.planned !== undefined ? words.detail.runway(words.value.age(String(s.detail.planned)), years(2)) : ''
+    const ghostValue = s.status === 'pending' ? words.value.age(String(s.detail.planned ?? 60)) : ''
     let detail = ''
     if (s.id === 'runway') {
       if (model.people.every((x) => x.retired)) detail = words.detail.retired
@@ -129,7 +132,7 @@ export function sheetView(model: SheetModel, lang: Lang, words: SheetWords, birt
       const held = PRESET_KEYS.filter((k) => model.scenarios[k]).map((k) => words.scenarioNames[k])
       detail = held.length === 0 ? words.detail.resilienceNone : words.detail.resilience(held.join(', '))
     }
-    return { id: s.id, name: w.name, hint: w.hint, valueText, status: s.status, fill: s.fill, percent: s.fill === null ? null : Math.round(Math.max(0, Math.min(1, s.fill)) * 100), valueNow: s.value, scaleText, detail, ghost }
+    return { id: s.id, name: w.name, hint: w.hint, valueText, status: s.status, fill: s.fill, percent: s.fill === null ? null : Math.round(Math.max(0, Math.min(1, s.fill)) * 100), valueNow: s.value, scaleText, detail, ghost, ghostValue }
   }
 
   const slotItems = model.slots.map((s, i): { group: SlotGroup; view: SlotView } => {
