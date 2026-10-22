@@ -360,21 +360,36 @@ function simulateYear(
     if (survivorOf && survivorOf.qualified.survivor) {
       const grow = qppIndex(survivorOf.baseYear, year)
       const c = survivorOf.components
-      const ownBase = year < r.rrq.start.year ? null : roundTo(r.rrq.base * r.rrq.adjustment * qppIndex(r.rrq.start.year, year), 0.01)
-      const monthly = survivorPensionMonthly(
-        { age, deceased: { base: c.base * grow, additionalFirst: c.additionalFirst * grow, additionalSecond: c.additionalSecond * grow }, ownBase, ownStartAge: r.rrqStartAge, year },
-        {
-          baseShareUnder65: P.rrq.survivorBaseShareUnder65,
-          baseShare65: P.rrq.survivorBaseShare65,
-          additionalShare: P.rrq.survivorAdditionalShare,
-          ownPensionOffset: P.rrq.survivorOwnPensionOffset,
-          flatRate45to64: P.rrq.survivorFlatRate45to64,
-          flatRateUnder45: P.rrq.survivorFlatRateUnder45,
-          flatRateAge: P.rrq.survivorFlatRateAge,
-        },
-        rrqRules,
-      )
-      survivorRrq = roundTo(monthly * 12, 0.01)
+      const ownBaseOnceStarted = year < r.rrq.start.year ? null : roundTo(r.rrq.base * r.rrq.adjustment * qppIndex(r.rrq.start.year, year), 0.01)
+      const monthlyAt = (ageForRules: number, ownBase: number | null) =>
+        survivorPensionMonthly(
+          { age: ageForRules, deceased: { base: c.base * grow, additionalFirst: c.additionalFirst * grow, additionalSecond: c.additionalSecond * grow }, ownBase, ownStartAge: r.rrqStartAge, year },
+          {
+            baseShareUnder65: P.rrq.survivorBaseShareUnder65,
+            baseShare65: P.rrq.survivorBaseShare65,
+            additionalShare: P.rrq.survivorAdditionalShare,
+            ownPensionOffset: P.rrq.survivorOwnPensionOffset,
+            flatRate45to64: P.rrq.survivorFlatRate45to64,
+            flatRateUnder45: P.rrq.survivorFlatRateUnder45,
+            flatRateAge: P.rrq.survivorFlatRateAge,
+          },
+          rrqRules,
+        )
+      // Paid month by month, because two things change PART-WAY through a year and the pension is a different amount either side of each: the under-65 rules (flat-rate
+      // portion, the 37,5 % base share) run to the month of the 65th birthday and the from-65 rules from the month after; and the survivor's OWN pension caps the survivor
+      // pension only from the month it is paid (arts. 136, 136.1). Reading both from the year alone paid the whole year of the birthday at the from-65 rate, and capped the
+      // months before the own pension started by a pension not yet in payment. At most four distinct monthly amounts occur in a year, so each is worked out once.
+      const monthly = new Map<string, number>()
+      let paid = 0
+      for (let month = 1; month <= 12; month++) {
+        const rulesAge = age === rrqRules.normalAge && month <= r.p.birth.month ? age - 1 : age
+        const ownBase = ownBaseOnceStarted !== null && !(year === r.rrq.start.year && month < r.rrq.start.month) ? ownBaseOnceStarted : null
+        const key = `${rulesAge}|${ownBase === null}`
+        let m = monthly.get(key)
+        if (m === undefined) monthly.set(key, (m = monthlyAt(rulesAge, ownBase)))
+        paid += m
+      }
+      survivorRrq = roundTo(paid, 0.01)
     }
     // The death benefit: one payment, the year after the death, taxed as the survivor's income (it is the estate's or the recipient's) — when the deceased qualified for it.
     const deathBenefit = survivorOf && survivorOf.qualified.deathBenefit && year === survivorOf.deathYear + 1 ? P.rrq.deathBenefit : 0
@@ -500,12 +515,17 @@ function simulateYear(
     people.map((_, i) => {
       if (fixed[i].oasMonths === 0) return 0
       const other = i === 0 ? 1 : 0
-      const category: GisCategoryName = gisCategory({ present: couple, receivesOas: couple && fixed[other].oasMonths > 0 })
       const counted = countedOf(persons, netBefore)
       const income = couple ? counted(0) + counted(1) : counted(i)
-      // In the months the spouse receives the Allowance, this person's GIS is the one beside it (and the ordinary one once it is nil).
-      const withAllowance = couple && allowanceMonthly(income, P.oas) > 0 ? Math.min(alwMonths[other], fixed[i].oasMonths) : 0
-      return roundTo(gisMonthly(income, category, P.oas) * (fixed[i].oasMonths - withAllowance) + gisWithAllowanceSpouseMonthly(income, P.oas) * withAllowance, 0.01)
+      if (!couple) return roundTo(gisMonthly(income, gisCategory({ present: false, receivesOas: false }), P.oas) * fixed[i].oasMonths, 0.01)
+      // The category is the couple's situation IN THE MONTH: the OAS months of a year are its last ones (a start is never undone), so the months both
+      // are on the OAS are the shorter of the two runs; in the months the spouse receives the Allowance this person's GIS is the one beside it; the
+      // rest are months the spouse has no pension. (« The spouse has ANY OAS month this year » moved a whole year to the couple's curve when the spouse started in December.)
+      const withAllowance = allowanceMonthly(income, P.oas) > 0 ? Math.min(alwMonths[other], fixed[i].oasMonths) : 0
+      const bothMonths = Math.min(fixed[i].oasMonths, fixed[other].oasMonths)
+      const spouseNoneMonths = Math.max(0, fixed[i].oasMonths - bothMonths - withAllowance)
+      const monthly = (category: GisCategoryName) => gisMonthly(income, category, P.oas)
+      return roundTo(monthly('spouseOas') * bothMonths + monthly('spouseNone') * spouseNoneMonths + gisWithAllowanceSpouseMonthly(income, P.oas) * withAllowance, 0.01)
     })
 
   /** Net cash the household has after tax and committed savings, for the current withdrawals, with a fixed split. */

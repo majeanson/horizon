@@ -22,8 +22,8 @@ import { monthAfterBirthday, monthIndex, type YearMonth } from './rrq.ts'
 //
 // KNOWN SIMPLIFICATIONS (named in ENGINE.md §2): the recovery tax and the GIS use the SAME year's
 // income, where the real rules use the previous year's income from July; the GIS assumes a
-// full-residence pensioner (a partial pension changes it); the Allowance (a spouse aged 60–64) is
-// not modelled, so such a spouse is treated as receiving no pension.
+// full-residence pensioner (a partial pension changes it). The Allowance (a spouse aged 60–64) and the
+// Allowance for the Survivor are modelled (below, and in projection.ts); remarriage is not.
 
 export type OasRules = Plain<YearParams>['oas']
 export type GisCategoryName = 'single' | 'spouseOas' | 'spouseNone'

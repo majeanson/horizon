@@ -663,7 +663,7 @@ Résidence principale : valeur 420 000 $, hypothèque 130 000 $ à 4,5 % (1
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 928 223 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 929 179 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 46 ans.
 
 ### Le calcul des rentes
@@ -683,13 +683,13 @@ Résidence principale : valeur 420 000 $, hypothèque 130 000 $ à 4,5 % (1
 | 50 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 62 000 $ | 0 $ | 1 319 983 $ | tire du nid |
 | 55 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 70 765 $ | 8 765 $ | 1 121 910 $ | tire du nid |
 | 60 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 70 765 $ | 8 765 $ | 881 009 $ | tire du nid |
-| 65 | 62 000 $ | 0 $ | 0 $ | 29 216 $ | 15 250 $ | 0 $ | 22 220 $ | 4 091 $ | 668 748 $ | tire du nid |
-| 70 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 18 300 $ | 0 $ | 10 121 $ | 1 590 $ | 694 070 $ | tire du nid |
-| 75 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 19 825 $ | 0 $ | 9 027 $ | 2 022 $ | 726 642 $ | tire du nid |
-| 80 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 768 964 $ | tire du nid |
-| 85 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 816 501 $ | tire du nid |
-| 90 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 869 893 $ | tire du nid |
-| 95 | 43 400 $ | 0 $ | 0 $ | 25 560 $ | 10 065 $ | 0 $ | 10 412 $ | 2 637 $ | 928 223 $ | tire du nid |
+| 65 | 62 000 $ | 0 $ | 0 $ | 29 216 $ | 15 250 $ | 373 $ | 21 700 $ | 3 943 $ | 669 279 $ | tire du nid |
+| 70 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 18 300 $ | 0 $ | 10 121 $ | 1 590 $ | 694 605 $ | tire du nid |
+| 75 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 19 825 $ | 0 $ | 9 027 $ | 2 022 $ | 727 242 $ | tire du nid |
+| 80 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 769 638 $ | tire du nid |
+| 85 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 817 258 $ | tire du nid |
+| 90 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 809 $ | 2 109 $ | 870 743 $ | tire du nid |
+| 95 | 43 400 $ | 0 $ | 0 $ | 25 560 $ | 10 065 $ | 0 $ | 10 412 $ | 2 637 $ | 929 179 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2039, en dollars d’aujourd’hui
 
