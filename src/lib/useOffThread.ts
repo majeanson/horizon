@@ -18,18 +18,42 @@ export interface Answer<T> {
 /** How long a re-asked question waits for the next change before it is sent: the pace of a held arrow key, not of a tap. */
 const SETTLE_MS = 350
 
+// A page is unmounted when the reader leaves it, and its hooks with it: coming back used to ask every question again, from a skeleton. The finished answers
+// are kept here instead, by question (the worker that answers it + the request's content), so a page reopened with the same profile shows them at once.
+// Every request carries what it depends on (the profile, the assumptions, today's year and month), so the same content is the same answer; a changed profile
+// is a different key and works as before. Bounded: the oldest goes first, and nothing here ever leaves the page's memory (the profile never leaves the device).
+const KEPT_MAX = 48
+const kept = new Map<string, unknown>()
+
+/** For the tests: forget every answer kept, so one test's question is never answered by another's. */
+export function forgetKeptAnswers(): void {
+  kept.clear()
+}
+
 export function useOffThread<Req, Msg, T>(request: Req, makeWorker: () => Worker, compute: () => T, pick: (m: Msg) => T | null, enabled = true, priority: 'now' | 'idle' = 'now'): Answer<T> {
-  const [answer, setAnswer] = useState<{ key: string; value: T } | null>(null)
   const key = JSON.stringify(request)
+  // The worker's own source names its file (the bundler writes the hashed URL into it), so it tells two hooks apart.
+  const keptKey = makeWorker.toString() + key
+  const [answer, setAnswer] = useState<{ key: string; value: T } | null>(() => (enabled && kept.has(keptKey) ? { key, value: kept.get(keptKey) as T } : null))
   // Whether this hook has answered once already: the first question is urgent, a re-asked one can wait for the hand to stop.
-  const answered = useRef(false)
+  const answered = useRef(answer !== null)
 
   useEffect(() => {
     if (!enabled) return
+    // Asked before, with this very content: the answer is already in hand, no worker needed.
+    if (kept.has(keptKey)) {
+      answered.current = true
+      const value = kept.get(keptKey) as T
+      setAnswer((a) => (a !== null && a.key === key ? a : { key, value }))
+      return
+    }
     let cancelled = false
     let worker: Worker | null = null
     let stopFallback: (() => void) | null = null
     const done = (value: T) => {
+      kept.delete(keptKey)
+      kept.set(keptKey, value)
+      if (kept.size > KEPT_MAX) kept.delete(kept.keys().next().value as string)
       if (cancelled) return
       answered.current = true
       setAnswer({ key, value })

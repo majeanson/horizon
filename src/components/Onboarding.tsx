@@ -1,8 +1,9 @@
-import { useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { rregopPension } from '../engine/presets'
 import type { PersonId } from '../engine/types'
 import { useLang, useT } from '../i18n'
+import { forgetOnboardStep, lastOnboardStep, rememberOnboardStep } from '../lib/onboardStep'
 import { saveCopy } from '../lib/saveCopy'
 import { useNotice } from '../lib/toast'
 import { useConfirm } from '../lib/confirm'
@@ -16,7 +17,9 @@ import { profileGaps, type ProfileGap } from '../lib/profileGaps'
 import { applies, PERSON_TOPICS, useYes } from '../lib/situation'
 import { updateProfile, useProfile } from '../lib/store'
 import { today } from '../lib/today'
+import type { ConceptId } from '../lib/concepts'
 import { Chip } from './Chip'
+import { ConceptPip } from './ConceptPip'
 import { Cluster } from './Layout'
 import { LiveAnswer } from './LiveAnswer'
 import { SituationQuestions } from './profile/SituationCard'
@@ -67,6 +70,28 @@ const quickStepsOf = (couple: boolean): StepId[] => [
   'done',
 ]
 
+/** What each screen is about, as the app's own pip (lib/concepts.ts): the same glyph the form's card and the Glossaire give the idea. */
+const STEP_CONCEPT: Record<StepId, ConceptId> = {
+  who: 'famille',
+  birth: 'evenements',
+  spouseBirth: 'evenements',
+  situation: 'situation',
+  income: 'salaire',
+  spouseIncome: 'salaire',
+  savings: 'reer',
+  spouseSavings: 'reer',
+  pension: 'employeur',
+  spousePension: 'employeur',
+  retire: 'depart',
+  spending: 'depenses',
+  home: 'maison',
+  done: 'reponse',
+}
+const SPOUSE_STEPS: readonly StepId[] = ['spouseBirth', 'spouseIncome', 'spouseSavings', 'spousePension']
+const SELF_STEPS: readonly StepId[] = ['birth', 'income', 'savings', 'pension']
+/** A screen about one person of a couple wears that person's colour (the first marigold, the second sky); every other screen wears its family's. */
+const personHue = (step: StepId, couple: boolean): 'marigold' | 'sky' | undefined => (SPOUSE_STEPS.includes(step) ? 'sky' : couple && SELF_STEPS.includes(step) ? 'marigold' : undefined)
+
 /** The question a gap a result needs is answered on. */
 const STEP_OF_GAP: Record<ProfileGap, StepId> = { income: 'income', spending: 'spending' }
 
@@ -83,8 +108,16 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
   // The quick path ends the first time « Préciser » is tapped: from then on the person is on the full questions.
   const [quick, setQuick] = useState(mode === 'quick')
   const steps = quick ? quickStepsOf(couple) : stepsOf(couple, { pension: applies(profile, yes, 'pension', 'self'), spousePension: couple && applies(profile, yes, 'pension', 'spouse'), home: applies(profile, yes, 'home') })
-  const [at, setAt] = useState(0)
+  // A return after the tab was closed lands on the screen the person left (lib/onboardStep.ts), if that screen is still one of the questions asked.
+  const [startAt] = useState(() => Math.max(0, steps.indexOf(lastOnboardStep() as StepId)))
+  const [at, setAt] = useState(startAt)
+  // Only a tap on a button of this section asks for a box to take focus: arriving mid-way is not such a tap.
+  const [moved, setMoved] = useState(false)
   const step = steps[Math.min(at, steps.length - 1)]
+  useEffect(() => {
+    if (step === 'done' || step === 'who') forgetOnboardStep()
+    else rememberOnboardStep(step)
+  }, [step])
   const last = steps.length - 1
   const money = (n: number) => formatMoney(n, lang)
   const self = profile.household.persons[0]
@@ -95,10 +128,17 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
   const typed = (change: (p: Profile) => Profile, ...facts: string[]) => updateProfile((p) => setFacts(change(p), facts, true))
   const personOf = (id: PersonId) => profile.household.persons.find((x) => x.id === id)!
   // Which years of birth were TYPED: the stored profile always holds one (a default), and a default is not an answer.
-  const [birthTyped, setBirthTyped] = useState<Partial<Record<PersonId, true>>>({})
+  // A person who comes back past the birth screens has typed those years (they cannot leave the screen without).
+  const [birthTyped, setBirthTyped] = useState<Partial<Record<PersonId, true>>>(() => ({
+    ...(startAt > steps.indexOf('birth') ? { self: true as const } : {}),
+    ...(steps.includes('spouseBirth') && startAt > steps.indexOf('spouseBirth') ? { spouse: true as const } : {}),
+  }))
   // A box that appears on the tap that asked for it takes focus — never on the landing screen, which has none.
-  const focus = at > 0
-  const goTo = (i: number) => setAt(Math.max(0, Math.min(last, i)))
+  const focus = at > 0 && (moved || startAt === 0)
+  const goTo = (i: number) => {
+    setMoved(true)
+    setAt(Math.max(0, Math.min(last, i)))
+  }
   const next = () => goTo(at + 1)
   // Enter in a box commits it (the box's own handler), then moves on — unless the box refused what was typed.
   const onKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -411,7 +451,9 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
         </div>
       )}
       <h2 id="onboard-q" className="onboard__question">
-        {question}
+        {/* The pip is the question's subject in a picture (hidden from a screen reader: the question is written); a person's own screens wear their colour. */}
+        <ConceptPip id={STEP_CONCEPT[step]} hue={personHue(step, couple)} />
+        <span>{question}</span>
       </h2>
       <p className="onboard__why">{why}</p>
       {skipped && <p className="field-row__hint">{skipped}</p>}
@@ -443,7 +485,7 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
                   ? () => {
                       // Back into the FULL questions, at « Ma situation » (the third screen): the answers there decide which documents the checklist lists.
                       setQuick(false)
-                      setAt(stepsOf(couple, { pension: false, spousePension: false, home: false }).indexOf('situation'))
+                      goTo(stepsOf(couple, { pension: false, spousePension: false, home: false }).indexOf('situation'))
                     }
                   : onSkip
               }

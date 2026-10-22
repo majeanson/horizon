@@ -16,6 +16,7 @@ import { useAnswer } from '../lib/useAnswer'
 import { WELCOME_COPY } from '../lib/welcomeCopy'
 import { Cascade } from './Cascade'
 import { Chip } from './Chip'
+import { HouseholdGlyphs } from './HouseholdGlyphs'
 import { Cluster } from './Layout'
 import { Skeleton } from './Skeleton'
 
@@ -70,6 +71,7 @@ export function DemoAnswer() {
           </Chip>
         ))}
       </Cluster>
+      <HouseholdGlyphs profile={example} year={year} />
       <p className="field-row__hint">{names[id].story}</p>
       <div className={'demo__answer' + (answer.busy ? ' is-busy' : '')} role="status" aria-live="polite" aria-busy={answer.busy || undefined}>
         {sentence === null ? (

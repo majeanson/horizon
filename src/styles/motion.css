@@ -708,3 +708,9 @@ textarea.input:focus {
     transform: none;
   }
 }
+
+/* The household's pips arrive one after the other (transform-only, like every pip; the reduced-motion block above switches `.pip` animation off). */
+.household-glyphs .pip:nth-child(2) { animation-delay: 60ms; }
+.household-glyphs .pip:nth-child(3) { animation-delay: 120ms; }
+.household-glyphs .pip:nth-child(4) { animation-delay: 180ms; }
+.household-glyphs .pip:nth-child(n + 5) { animation-delay: 240ms; }

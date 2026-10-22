@@ -15,7 +15,8 @@ import { useLang, useT } from '../i18n'
 import { useConfirm } from '../lib/confirm'
 import { saveAsFile } from '../lib/download'
 import { EXAMPLE_IDS, type ExampleId } from '../engine/golden/examples'
-import { loadExample } from '../lib/example'
+import { exampleProfile, loadExample } from '../lib/example'
+import { HouseholdGlyphs } from '../components/HouseholdGlyphs'
 import { EXAMPLE_COPY } from '../lib/exampleCopy'
 import { freshStart, profileLooksReal } from '../lib/freshStart'
 import { FRESH_START_COPY } from '../lib/freshStartCopy'
@@ -28,6 +29,14 @@ import { clearProfile, getProfile, noteDroppedPlans, replaceProfile, unreadableC
 import { SHEET_COPY } from '../lib/sheetCopy'
 import { useNotice } from '../lib/toast'
 import { useParamChoice } from '../lib/useParamChoice'
+
+// The pictogram of each example is read off its profile; the fourteen are built once, when the list is first opened.
+const examplePictures = new Map<ExampleId, Profile>()
+const profileOfExample = (id: ExampleId): Profile => {
+  let p = examplePictures.get(id)
+  if (!p) examplePictures.set(id, (p = exampleProfile(id)))
+  return p
+}
 
 // Where the figures go — which is nowhere — and the device's own settings. Save a copy to keep, restore one, see an
 // example household, set the display, or erase this device's copy. Every action that replaces the profile asks first,
@@ -177,6 +186,7 @@ export function Donnees() {
         <ul className="example-list">
           {EXAMPLE_IDS.map((id: ExampleId) => (
             <li key={id}>
+              <HouseholdGlyphs profile={profileOfExample(id)} />
               <button
                 type="button"
                 className="btn btn--ghost btn--sm"

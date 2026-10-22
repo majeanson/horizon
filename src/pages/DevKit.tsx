@@ -5,6 +5,9 @@ import { Cascade } from '../components/Cascade'
 import { CountUp } from '../components/CountUp'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
+import { HouseholdGlyphs } from '../components/HouseholdGlyphs'
+import { EXAMPLE_IDS } from '../engine/golden/examples'
+import { exampleProfile } from '../lib/example'
 import { DisplayControls } from '../components/DisplayControls'
 import { BrandMark } from '../components/BrandMark'
 import { WelcomeDialog } from '../components/WelcomeDialog'
@@ -610,6 +613,22 @@ function ENTRIES(): Entry[] {
       ),
     },
     { cat: 'Affichage', name: 'ConceptPip', file: 'src/components/ConceptPip.tsx', exports: ['ConceptPip', 'FamilyPip'], kw: 'pastille concept icône couleur famille glossaire', render: () => <ConceptPipSpecimen /> },
+    {
+      cat: 'Affichage',
+      name: 'HouseholdGlyphs',
+      file: 'src/components/HouseholdGlyphs.tsx',
+      kw: 'ménage pictogramme exemple personnes enfants maison épargne',
+      render: () => (
+        <div style={{ display: 'grid', gap: '0.6rem' }}>
+          {EXAMPLE_IDS.map((id) => (
+            <div key={id} style={{ display: 'grid', gap: '0.15rem' }}>
+              <HouseholdGlyphs profile={exampleProfile(id)} />
+              <span className="field-row__hint">{id}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
     {
       cat: 'Affichage',
       name: 'SectionHeader',

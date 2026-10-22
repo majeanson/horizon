@@ -65,6 +65,10 @@ export const CONCEPTS = {
   // ── The household and what it owns outside the accounts — sky ──────────────────────────────────────────────────────
   personne: c('household', 'user-bold'),
   famille: c('household', 'users-three-bold'),
+  // The stages of a working life, for the household's pictogram (lib/householdPictogram.ts): young, close to the stop, at rest. The middle of life is `personne`.
+  jeune: c('household', 'person-simple-run-bold'),
+  avance: c('household', 'person-simple-walk-bold'),
+  retraite: c('household', 'armchair-bold'),
   // « Ma situation » on Profil: the yes / no questions that decide which of the household's sections the form shows.
   situation: c('household', 'list-checks-bold'),
   enfants: c('household', 'baby-bold'),

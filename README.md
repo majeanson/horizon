@@ -3,8 +3,9 @@
 A web app that answers one question for a **Québec** household: *at what age can you retire, and
 what does it look like at 60 versus 65?*
 
-**Try it:** https://retraite.marcportal.com — « Données ▸ Charger l'exemple » fills in a fictional
-couple so you can see a result before typing a single number of your own.
+**Try it:** https://retraite.marcportal.com — « Voir un exemple » on the front door shows the answer
+for a fictional household, and « Essayer avec ce ménage » loads it so you can explore every page
+before typing a single number of your own.
 
 You enter, by hand, the numbers the government already holds about you — the Retraite Québec
 *relevé de participation*, your CRA / Revenu Québec notices of assessment, an employer pension

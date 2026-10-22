@@ -11,10 +11,12 @@ import { Glyph } from './Icon'
 
 const MARKUP: Record<string, string> = { ...PIP_ICONS, ...PIP_ICONS_MORE }
 
-export function ConceptPip({ id, size = 'md' }: { id: ConceptId; size?: 'sm' | 'md' | 'lg' }) {
+// `hue` is for the ONE place a pip is not its family's colour: a person of a household wears their own (the first marigold, the second sky: `.who--N`), so the
+// household's picture reads like its columns. Everywhere else the family decides.
+export function ConceptPip({ id, size = 'md', hue }: { id: ConceptId; size?: 'sm' | 'md' | 'lg'; hue?: 'marigold' | 'sky' }) {
   const { glyph, family } = CONCEPTS[id]
   return (
-    <span className={`pip pip--${FAMILY_HUE[family]} pip--${size}`} aria-hidden="true">
+    <span className={`pip pip--${hue ?? FAMILY_HUE[family]} pip--${size}`} aria-hidden="true">
       {/* The glyph fills ~80 % of the disc whatever its size (pips.css scales the svg), so the picture — not the empty wash — is what the eye reads. */}
       <Glyph markup={MARKUP[glyph] ?? ''} size={20} />
     </span>

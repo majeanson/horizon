@@ -1,6 +1,6 @@
 import { act, cleanup, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useOffThread } from './useOffThread.ts'
+import { forgetKeptAnswers, useOffThread } from './useOffThread.ts'
 
 // THE HOOK THAT EVERY HEAVY PANEL STANDS ON. A question goes to a worker; the last answer stays on screen while a new one is worked out (flagged busy: it must never read as the answer to the new
 // question); a question that is RE-asked waits a beat for the hand to stop (a slider on a held key writes the profile many times a second, and a worker spawned and killed for each starved the page);
@@ -40,6 +40,7 @@ const useIt = (p: Props) => useOffThread<{ n: number }, { v: number | null }, nu
 const flush = (ms: number) => act(() => void vi.advanceTimersByTime(ms))
 
 beforeEach(() => {
+  forgetKeptAnswers()
   FakeWorker.all = []
   vi.useFakeTimers()
 })
@@ -73,6 +74,23 @@ describe('the first question', () => {
     act(() => FakeWorker.all[0].say({ v: null }))
     expect(result.current).toEqual({ value: null, busy: true })
     expect(FakeWorker.all[0].terminated).toBe(true)
+  })
+})
+
+describe('a page left and reopened', () => {
+  it('shows the answer it already had at once, with no worker; a different question is still worked out', () => {
+    const first = renderHook(useIt, { initialProps: { req: { n: 1 } } })
+    flush(0)
+    act(() => FakeWorker.all[0].say({ v: 42 }))
+    first.unmount()
+    const again = renderHook(useIt, { initialProps: { req: { n: 1 } } })
+    expect(again.result.current).toEqual({ value: 42, busy: false })
+    flush(1000)
+    expect(FakeWorker.all).toHaveLength(1)
+    const other = renderHook(useIt, { initialProps: { req: { n: 2 } } })
+    expect(other.result.current).toEqual({ value: null, busy: true })
+    flush(0)
+    expect(FakeWorker.all).toHaveLength(2)
   })
 })
 

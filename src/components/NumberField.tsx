@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLang, useT } from '../i18n'
 import { emptyValue, readNumber, showNumber, stepped, type NumberKind } from '../lib/numberInput'
+import { useKeepWhenHidden } from '../lib/useKeepWhenHidden'
 import { EditField } from './EditField'
 import { StatusMessage } from './StatusMessage'
 
@@ -113,6 +114,9 @@ export function NumberField(props: NumberFieldProps) {
       ring()
     }
   }
+
+  // A figure still being typed when the page is hidden is kept if it reads (lib/useKeepWhenHidden.ts).
+  useKeepWhenHidden(() => typing.current, commit)
 
   // ↑ / ↓: step from what is in the box when it reads as a number (else from the stored figure), keep the result at once.
   const arrow = (dir: 1 | -1, fast: boolean) => {

@@ -1848,3 +1848,6 @@
 .fold--card[open] > summary {
   margin-bottom: 0.5rem;
 }
+
+/* An example's pictogram sits above its name in the list on the data page (components/HouseholdGlyphs.tsx). */
+.example-list .household-glyphs { margin-block-end: 0.15rem; }

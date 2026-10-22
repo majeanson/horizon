@@ -92,3 +92,26 @@
   .section-header__main:has(> .pip) > .section-header__text { display: contents; }
   .section-header__main:has(> .pip) .section-header__sub { grid-column: 1 / -1; }
 }
+
+/* A household as a row of pips (components/HouseholdGlyphs.tsx): the people at their stage, then a hairline, then what they have. A picture that wraps, never scrolls. */
+.household-glyphs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+}
+.household-glyphs__people,
+.household-glyphs__have {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+.household-glyphs__have {
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--line, var(--ink-faint));
+}
+
+/* The first-visit questions: the question's subject as a pip beside it, the words keeping the rest of the line (never under the disc, at any text size). */
+.onboard__question { display: flex; align-items: center; gap: 0.7rem; }
+.onboard__question > span { min-width: 0; }
