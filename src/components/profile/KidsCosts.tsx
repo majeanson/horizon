@@ -47,7 +47,7 @@ export function KidsCosts() {
     <div className="kids-cost">
       {/* The numbers themselves — what a child costs by age, what the state pays back — are READ on Ma fiche; what acts on them is chosen here. */}
       <p className="field-row__hint">
-        <ConceptPip id="enfants" size="sm" /> <strong>{c.title}</strong> <span className="mono">({c.estimated})</span> · <Link className="info-note__link" to="/fiche">{k.cost.seeSheet}</Link>
+        <ConceptPip id="enfants" size="sm" /> <strong>{c.title}</strong> <span className="mono">({c.estimated})</span> · <Link className="info-note__link" to="/fiche?bloc=enfants">{k.cost.seeSheet}</Link>
       </p>
       <Cluster>
         {hasFuture && !byAge && <Chip onClick={() => updateProfile((p) => patchChildSpending(p, { byAge: s.bands }))}>{c.useAll}</Chip>}

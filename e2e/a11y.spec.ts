@@ -110,7 +110,7 @@ for (const s of STATES) {
     await setState(page, s)
     await seedProfile(page, profile)
     await showAllSections(page)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await page.locator('.page-head__title').waitFor()
     await expect(page.locator('.flow__estimate')).toHaveCount(3)
     for (const fold of await page.locator('.flow__estimate details').all()) await fold.locator('summary').click()
@@ -123,7 +123,7 @@ for (const s of STATES) {
   test(`the bank import, opened with a statement read, has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
     await setState(page, s)
     await seedProfile(page, EXAMPLE)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await page.locator('.page-head__title').waitFor()
     const fold = page.locator('details.fold', { hasText: 'Importer un relevé de banque' })
     await fold.locator('summary').click()
@@ -139,7 +139,7 @@ for (const s of STATES) {
   test(`the checks against my statements, opened with figures typed, have no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
     await setState(page, s)
     await seedProfile(page, EXAMPLE)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await page.locator('.page-head__title').waitFor()
     const fold = page.locator('#person-self').locator('details.fold', { hasText: 'Vérifier avec mes relevés' })
     await fold.locator('summary').click()
@@ -158,7 +158,7 @@ for (const s of STATES) {
   test(`the household sheet has no WCAG A/AA violations — ${s.name}`, async ({ page }) => {
     await setState(page, s)
     await seedProfile(page, EXAMPLE)
-    await page.goto('/fiche')
+    await page.goto('/fiche?bloc=tout')
     await page.locator('.sheet--serious').waitFor({ timeout: 30_000 })
     await page.waitForFunction(() => !(document.querySelector('.sheet')?.textContent ?? '').match(/Calcul en cours/), null, { timeout: 30_000 })
     expect(await violations(page)).toEqual([])
@@ -174,7 +174,7 @@ test('the gallery stays accessible with its dialog open', async ({ page }) => {
 
 test('the whole shell is reachable by keyboard, in a sensible order', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.locator('.shell__answer-link').waitFor({ timeout: 30_000 }) // the answer in the bar lands a moment after the page (a lazy chunk, a worker)
   const order: string[] = []
   for (let i = 0; i < 11; i++) {

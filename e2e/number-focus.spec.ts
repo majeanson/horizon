@@ -7,7 +7,7 @@ import { EXAMPLE, seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('focusing a number box selects its figure, so the first keystroke replaces it', async ({ page }) => {
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const salary = page.getByRole('textbox', { name: /Revenu de travail par année/ }).first()
   await salary.click()
   await expect.poll(() => salary.evaluate((el: HTMLInputElement) => el.selectionStart === 0 && el.selectionEnd === el.value.length && el.value.length > 0)).toBe(true)
@@ -18,7 +18,7 @@ test('focusing a number box selects its figure, so the first keystroke replaces 
 })
 
 test('a box holding 0 is selected on focus: the first digit replaces it, never « 05 »', async ({ page }) => {
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const box = page.getByRole('textbox', { name: /Revenu de travail par année/ }).first()
   await box.click()
   await box.press('Control+a')

@@ -13,7 +13,7 @@ for (const [name, size] of [
     test.setTimeout(120_000)
     await page.setViewportSize(size)
     await seedProfile(page, EXAMPLE)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     // « Rendre mon profil exact » is a block like the others: on a phone it opens from the map (a wide screen has it open)
     await page.getByRole('navigation', { name: 'Sections du profil' }).getByRole('button', { name: /^Rendre exact/ }).click()
     await page.getByRole('button', { name: 'Tout confirmer pas à pas' }).click()
@@ -53,7 +53,7 @@ const LIT = '[data-fact][class*="--guided"]'
 test('a block folded by hand is opened again when the guide reaches one of its figures — desktop', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await seedProfile(page, EXAMPLE)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const self = page.locator('#person-self')
   await expect(self).toHaveClass(/is-open/)
   await self.getByRole('button', { expanded: true }).first().click()
@@ -73,7 +73,7 @@ for (const [fact, block] of [
   test(`a link to ${fact} opens ${block} and lands on the figure — phone`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await seedProfile(page, EXAMPLE)
-    await page.goto(`/profil?form=1&fact=${encodeURIComponent(fact)}`)
+    await page.goto(`/profil?bloc=tout&form=1&fact=${encodeURIComponent(fact)}`)
     await expect(page.locator(`#${block}`)).toHaveClass(/is-open/, { timeout: 10_000 })
     const field = page.locator(`[data-fact="${fact}"]`)
     await expect(field).toBeVisible()
@@ -97,7 +97,7 @@ test('the front door’s question leads to its figure, in its open block — pho
 test('« Voir tout ce qui reste estimé » reaches the panel and the guide it starts walks from there — phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, EXAMPLE)
-  await page.goto('/profil?form=1#exact')
+  await page.goto('/profil?bloc=tout&form=1#exact')
   await expect(page.locator('#exact')).toBeInViewport({ timeout: 8_000 })
   await page.getByRole('button', { name: 'Tout confirmer pas à pas' }).click()
   await expect(page.locator(LIT)).toHaveCount(1)
@@ -109,7 +109,7 @@ for (const etape of ['budget', 'tax', 'bank', 'rrq', 'employer'] as const) {
   test(`« Par document » › ${etape}: « Me guider » lights the first figure and brings it on screen — phone`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await seedProfile(page, EXAMPLE)
-    await page.goto(`/profil?form=1&par=document&etape=${etape}`)
+    await page.goto(`/profil?bloc=tout&form=1&par=document&etape=${etape}`)
     const guide = page.getByRole('button', { name: 'Me guider' })
     await expect(guide).toBeVisible({ timeout: 15_000 })
     await guide.click()

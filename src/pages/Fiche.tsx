@@ -1,15 +1,17 @@
 import { useDeferredValue, useMemo } from 'react'
 import { answerRequest } from '../lib/answerRequest'
+import { AccordionItem } from '../components/Accordion'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { PrintChip } from '../components/PrintChip'
 import { PlanCalendar } from '../components/results/PlanCalendar'
 import { TimelineStrip } from '../components/results/TimelineStrip'
-import { CashBufferCard } from '../components/sheet/CashBufferCard'
-import { KidsCostCard } from '../components/sheet/KidsCostCard'
+import { CashBufferCard, cashBufferShown } from '../components/sheet/CashBufferCard'
+import { KidsCostCard, kidsCostShown } from '../components/sheet/KidsCostCard'
 import { SheetSerious } from '../components/sheet/SheetSerious'
 import { useLang, useT } from '../i18n'
 import { profileGaps } from '../lib/profileGaps'
+import { RESULTS_COPY } from '../lib/resultsCopy'
 import { SHEET_COPY } from '../lib/sheetCopy'
 import { sheetModel, unconfirmedFacts } from '../lib/sheetModel'
 import { useProfile } from '../lib/store'
@@ -43,6 +45,7 @@ export function Fiche() {
   const births = settled.household.persons.map((p) => p.birth.year)
   const names = settled.household.persons.map((p, i) => p.name.trim() || (i === 0 ? t.profile.self : t.profile.spouse))
   const words = SHEET_COPY[lang]
+  const timelineWords = RESULTS_COPY[lang].timeline
 
   return (
     <section className="page-body">
@@ -52,6 +55,7 @@ export function Fiche() {
         lang={lang}
         births={births}
         names={names}
+        shown={{ timeline: gaps.length === 0, cash: cashBufferShown(settled), kids: kidsCostShown(settled) }}
         cards={
           <>
             <CashBufferCard profile={settled} />
@@ -60,10 +64,10 @@ export function Fiche() {
         }
         timeline={
           gaps.length === 0 ? (
-            <>
-              <TimelineStrip household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
+            <AccordionItem id="fiche-ligne" className="sheet__section" title={timelineWords.title} subtitle={timelineWords.hint} concept="annee" nav={false}>
+              <TimelineStrip bare household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
               <PlanCalendar household={settled.household} names={names} todayYear={year} horizonAge={assumptions.horizonAge} />
-            </>
+            </AccordionItem>
           ) : undefined
         }
       />

@@ -14,7 +14,7 @@ test.describe('on Profil', () => {
   })
 
   test('what a child costs: typed, saved, and said in a line', async ({ page }) => {
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     const cost = box(page, 'Ce que coûte chaque enfant, par année')
     await cost.fill('6000')
     await cost.press('Enter')
@@ -27,7 +27,7 @@ test.describe('on Profil', () => {
   })
 
   test('work kept after retirement: off by default, on with two figures, saved per person', async ({ page }) => {
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     const first = page.locator('#person-self')
     await expect(first.getByRole('radio', { name: 'Je m’arrête complètement' })).toBeChecked()
     await first.getByRole('radio', { name: 'Je continue de travailler' }).click()
@@ -42,7 +42,7 @@ test.describe('on Profil', () => {
   })
 
   test('a dated event: added from a starting point, edited, saved, and removed with a confirmation that says what is lost', async ({ page }) => {
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await page.getByRole('button', { name: 'Ajouter · Un héritage' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.flows.length).toBe(1)
     const amount = box(page, 'Montant')
@@ -57,7 +57,7 @@ test.describe('on Profil', () => {
   })
 
   test('an income can be taxed or not, and is the first person’s or the partner’s', async ({ page }) => {
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await page.getByRole('button', { name: 'Ajouter · Un loyer reçu' }).click()
     await expect.poll(async () => (await savedProfile(page)).household.flows[0]?.kind).toBe('income')
     const flow = page.locator('.flow').first()
@@ -82,7 +82,7 @@ test.describe('expenses to plan for', () => {
   test.beforeEach(async ({ page }) => {
     await seedProfile(page, owners())
     await showAllSections(page)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
   })
 
   test('the house\'s upkeep: offered apart, added as an estimate with its Statistics Canada average, its source in the reader\'s language', async ({ page }) => {
@@ -162,7 +162,7 @@ test.describe('expenses to plan for', () => {
 test('a household with no home is offered the cars only, with the renters’ average', async ({ page }) => {
   await seedProfile(page) // the golden couple: no home entered
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await expect(page.getByText('Dépenses à prévoir', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Ajouter · Entretien et réparations de la maison' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Ajouter · Réserve de rénovations' })).toHaveCount(0)
@@ -190,7 +190,7 @@ test.describe('it reaches the answer', () => {
 
   test('a large dated expense moves the answer later; the answer on arrival says so on Profil', async ({ page }) => {
     await seedProfile(page, withFlows([{ label: 'Toit', kind: 'expense', amount: 90000, fromYear: 2030, toYear: 2055, owner: 'self', taxable: false }]))
-    await page.goto('/resultats')
+    await page.goto('/resultats?cartes=all')
     // 90 000 $ a year more than the budget, for twenty-five years: no age works any more (the example answers 60 without it).
     await expect(page.getByText(/l’argent ne suffit pas encore/)).toBeVisible({ timeout: 60_000 })
     // (« 60 ans » alone is not a sign: the profile's own retirement age is on the page. The headline is — it names an age only when one works.)

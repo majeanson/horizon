@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('the section map stays pinned while the page scrolls', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const pin = page.locator('.results-page .pin-stack')
   await expect(pin).toBeVisible()
   const bar = await page.locator('.shell__bar').boundingBox()
@@ -20,7 +20,7 @@ test('the section map stays pinned while the page scrolls', async ({ page }) => 
 })
 
 test('« Détail » shows where the money comes from, where it goes and what the accounts hold — and nothing the answer card already says', async ({ page }) => {
-  await page.goto('/resultats?metric=detail')
+  await page.goto('/resultats?cartes=all&metric=detail')
   const chart = page.locator('.chart-panel')
   await expect(chart.getByRole('img')).toHaveCount(3, { timeout: 30_000 })
   await expect(chart.getByRole('heading', { name: 'D’où vient l’argent, année par année' })).toBeVisible()
@@ -35,7 +35,7 @@ test('« Détail » shows where the money comes from, where it goes and what the
 for (const [name, width, height, mapPinned] of [['phone', 390, 844, true], ['desktop', 1280, 720, true]] as const) {
   test(`${name}: the views are pinned${mapPinned ? ' with the section map' : ', the map scrolls away'}, and a tapped section stops below them`, async ({ page }) => {
     await page.setViewportSize({ width, height })
-    await page.goto('/resultats')
+    await page.goto('/resultats?cartes=all')
     await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
     const pin = page.locator('.results-page .pin-stack')
     const nav = page.locator('.section-nav')
@@ -109,7 +109,7 @@ test('what a table shows lives in the address: a link opens on the same set, the
 });
 
 test('« Mon plan » always says its age', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.getByRole('button', { name: /^Mon plan \(\d+( \/ \d+)? ans\)$/ })).toBeVisible()
   await page.goto('/decider?bt=cards')
   // (the card for it is folded into « Standard » when the plan's pension ages ARE the standard, and says so)
@@ -121,7 +121,7 @@ test('« Mon plan » always says its age', async ({ page }) => {
 test('two people on the Profil: sections start at the same height, the colour follows down, every input shows in full', async ({ page }) => {
   await showAllSections(page) // every section a person can have, so the two columns have the same five
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   const columns = page.locator('.persons--aligned > .person')
   await expect(columns).toHaveCount(2)
   const tops = async (col: number) => columns.nth(col).locator(':scope > .profile-section').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top + (document.getElementById('root')?.scrollTop ?? 0))))
@@ -142,7 +142,7 @@ test('two people on the Profil: sections start at the same height, the colour fo
 
 test('« Depuis la naissance » sets the year of residence to the year of birth, and reads as chosen', async ({ page }) => {
   await showAllSections(page) // the residence year is asked of someone who said « oui » to years abroad
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   const person = (await savedProfile(page)).household.persons[0]
   const chip = page.getByRole('button', { name: 'Depuis la naissance' }).first()
   await expect(chip).toHaveAttribute('aria-pressed', 'false')
@@ -157,7 +157,7 @@ test('the estimate shows the pay as it was — about the salary last year — an
   seed.household.persons[0].salaryToday = 120_000
   seed.household.persons[0].earningsHistory = {}
   // (beforeEach already seeded the example, and a second seed is ignored — once per tab: replace what is stored, then reload.)
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
   const section = page.locator('.persons .profile-section', { hasText: 'Revenus de travail admissibles par année' }).first()
@@ -173,7 +173,7 @@ test('the estimate shows the pay as it was — about the salary last year — an
 })
 
 test('the home: owning one, its mortgage says when the payment stops, and it is saved with the profile', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await openSituation(page)
   // « Ma situation »: the home's section opens on a « oui » to owning one
   await page.getByRole('radiogroup', { name: /Propriétaire de votre résidence/ }).getByRole('radio', { name: 'Oui' }).click()

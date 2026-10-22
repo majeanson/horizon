@@ -19,7 +19,7 @@ const head = (page: Page) => page.locator('#situation .accordion__head')
 
 test('a simple household sees only what concerns it — and the card says how to open the rest', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   await expect(head(page)).toBeVisible()
   // no children, home, employer plan, years abroad or dated events: none of their sections, none of their fields
@@ -36,7 +36,7 @@ test('a simple household sees only what concerns it — and the card says how to
 
 test('a yes opens its section; the answer is kept on this device; a no closes it again', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await expect(section(page, 'Régimes de retraite de l’employeur')).toBeVisible()
@@ -58,7 +58,7 @@ test('a no over typed figures asks first, says what is lost, and keeps everythin
   const withHome = structuredClone(EXAMPLE) as unknown as { household: { home: { value: number; mortgage: { balance: number; rate: number; monthlyPayment: number }; sale: null } | null } }
   withHome.household.home = { value: 450_000, mortgage: { balance: 120_000, rate: 0.05, monthlyPayment: 1_000 }, sale: null }
   await seedProfile(page, withHome as unknown as SeedProfile)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   // this household has a home: it shows without any answer, and the question reads « oui »
   await expect(section(page, 'Résidence principale')).toBeVisible()
@@ -76,7 +76,7 @@ test('a no over typed figures asks first, says what is lost, and keeps everythin
 
 test('a couple is asked once per person, by name', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   for (const name of ['Camille', 'Alex']) await expect(page.getByRole('group', { name })).toContainText('Un régime de retraite d’employeur')
 })
@@ -91,7 +91,7 @@ test('the documents list and the entry by document keep only what the household 
   await page.goto('/saisie')
   await expect(page.getByText(/Étape 1 sur 5/)).toBeVisible()
   // answering yes brings the documents back
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   await question(page, /régime de retraite d’employeur/).getByRole('radio', { name: 'Oui' }).click()
   await page.goto('/documents')
@@ -101,7 +101,7 @@ test('the documents list and the entry by document keep only what the household 
 
 test('the proof of residence is asked only of someone who lived abroad', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   await expect(page.locator('[data-fact="self:residence"]')).toHaveCount(0)
   await page.getByText(/chiffres confirmés/).first().waitFor()
@@ -115,7 +115,7 @@ test('the proof of residence is asked only of someone who lived abroad', async (
 test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   await expect(head(page)).toBeVisible()
   await page.getByRole('radiogroup', { name: /Part-time work after you retire/ }).getByRole('radio', { name: 'Yes' }).click()
@@ -124,7 +124,7 @@ test('English', async ({ page }) => {
 
 test('« Ma situation » is one of the first things on the page: right after who is in the household, before the housekeeping and before every section it decides', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   await expect(head(page)).toBeVisible()
   // document order of the page's landmarks: who → what applies → the sections the answers decide → the housekeeping (backup)
@@ -153,7 +153,7 @@ test('« Ma situation » is one of the first things on the page: right after who
 
 test('money outside the REER and the CELI: no question answered, no fields; a « oui » opens them; a « non » over a balance says what is erased first', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await openSituation(page)
   const ask = question(page, /Des placements hors REER et CELI/)
   await expect(ask.getByRole('radio', { name: 'Non' })).toBeChecked()
@@ -184,7 +184,7 @@ test('money outside the REER and the CELI: no question answered, no fields; a «
 
 test('closed, the card says its answers — what decides which sections exist is never hidden', async ({ page }) => {
   await seedProfile(page, simple())
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const summary = head(page)
   // every answer « non »: said, with what it means for the form
   await expect(summary).toContainText('Ma situation')

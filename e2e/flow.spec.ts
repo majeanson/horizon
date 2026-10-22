@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 const open = async (page: Page, search = '') => {
-  await page.goto('/resultats?metric=detail' + search)
+  await page.goto('/resultats?cartes=all&metric=detail' + search)
   await expect(page.locator('.chart-detail')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.flow-readout')).toBeVisible({ timeout: 30_000 })
 }
@@ -110,7 +110,7 @@ test('the children and the care a plan states are drawn apart in « Où va l’a
   family.household.spending = { workingToday: 70_000, retiredToday: 55_000 }
   family.household.flows = [{ label: 'Des soins plus tard', kind: 'expense', amount: 26_906, fromYear: 2040, toYear: 2045, owner: 'self', taxable: false }]
   await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const) // after the file's own seed: the last write wins
-  await page.goto('/resultats?metric=detail')
+  await page.goto('/resultats?cartes=all&metric=detail')
   const legend = page.locator('.chart-detail .chart__legend')
   await expect(legend.getByText('Enfants', { exact: true })).toBeVisible({ timeout: 30_000 })
   await expect(legend.getByText('Soins et événements', { exact: true })).toBeVisible()
@@ -123,7 +123,7 @@ test('children that take most of a typed budget are said so on the profile, with
   family.household.childSpending = { perChild: 19_300, untilAge: 23 }
   family.household.spending = { workingToday: 45_000, retiredToday: 45_000 }
   await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const note = page.getByText(/Ces 2 enfants représentent/)
   await expect(note).toBeVisible({ timeout: 30_000 })
   await expect(note).toContainText('86 %')
@@ -138,7 +138,7 @@ test('the profile says where the children are: inside the annual budget, or on t
   family.household.childSpending = { perChild: 6_000, untilAge: 23 }
   family.household.spending = { workingToday: 45_000, retiredToday: 45_000 }
   await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const where = page.getByRole('radiogroup', { name: 'Où sont les enfants dans vos dépenses ?' })
   await expect(where.getByRole('radio', { name: 'Déjà dans mon budget annuel' })).toBeChecked({ timeout: 30_000 })
   await expect(page.getByText(/sa part en sort/)).toBeVisible()
@@ -147,6 +147,6 @@ test('the profile says where the children are: inside the annual budget, or on t
   await expect(page.getByText(/sa part en sort/)).toHaveCount(0)
   await expect.poll(async () => (await page.evaluate((k) => JSON.parse(localStorage.getItem(k)!), PROFILE_KEY)).household.childSpending.onTop).toBe(true)
   // the second chart draws the added cost as the children
-  await page.goto('/resultats?metric=detail')
+  await page.goto('/resultats?cartes=all&metric=detail')
   await expect(page.locator('.chart-detail .chart__legend').getByText('Enfants', { exact: true })).toBeVisible({ timeout: 30_000 })
 })

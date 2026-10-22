@@ -128,7 +128,7 @@ function ResultsPage() {
 /** « Tout ouvrir / Tout fermer » on Résultats: the answer's cards (open unless `?cartes=` closed them) and the proof's blocks (closed unless `?bloc=` opened one,
  *  « tout » every one) answer to the one icon — closed together while anything is open, opened together once everything is shut. */
 function ResultsMode() {
-  const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'none'], 'all')
+  const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'all', 'none'], 'verdict')
   const [bloc, setBloc] = useParamChoice<string>('bloc', [...PROOF_BLOCKS, 'tout', 'none'], 'none')
   const anyOpen = cartes !== 'none' || bloc !== 'none'
   const open: AccordionOpen = cartes === 'all' && bloc === 'tout' ? 'all' : anyOpen ? 'some' : null

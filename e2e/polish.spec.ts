@@ -9,7 +9,7 @@ test.describe('the number box', () => {
   test.beforeEach(async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 1280, height: 900 })
-    await page.goto('/profil')
+    await page.goto('/profil?bloc=tout')
     await page.locator('.page-head__title').waitFor()
   })
 
@@ -58,7 +58,7 @@ test.describe('the number box', () => {
 test('confirming a figure draws its tick once; a figure that arrives confirmed shows the plain mark', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.locator('.page-head__title').waitFor()
   const open = page.locator('button.fact-btn[aria-pressed="false"]').first()
   await open.scrollIntoViewIfNeeded()
@@ -73,7 +73,7 @@ test('confirming a figure draws its tick once; a figure that arrives confirmed s
 
 test('the digits of the answer arrive one by one but the text is whole: « N ans » reads at once', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const age = page.locator('.verdict__age').first()
   await expect(age).toBeVisible({ timeout: 60_000 })
   expect((await age.textContent())?.trim()).toMatch(/^\d{2} ans$/)
@@ -84,7 +84,7 @@ test('the first answer a device sees lights the map once: the wave plays, the fl
   await page.addInitScript(() => localStorage.removeItem('horizon-first-answer'))
   await seedProfile(page, EXAMPLE)
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('.section-nav')).toHaveClass(/is-celebrating/, { timeout: 60_000 })
   expect(await page.evaluate(() => localStorage.getItem('horizon-first-answer'))).toBe('done')
   await expect(page.locator('.section-nav')).not.toHaveClass(/is-celebrating/, { timeout: 8000 })
@@ -112,7 +112,7 @@ test.describe('the page chrome', () => {
   test('the map is ONE pinned box: nothing else on the page is sticky under the bar, and no pinned row is ever covered', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 390, height: 844 })
-    await page.goto('/resultats')
+    await page.goto('/resultats?cartes=all')
     await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
     await page.waitForTimeout(1200)
     const stuck = await page.evaluate(() =>
@@ -137,7 +137,7 @@ test.describe('the page chrome', () => {
 
   test('a thin line along the top fills as the page is read (a browser with scroll-driven animations)', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
-    await page.goto('/profil')
+    await page.goto('/profil?bloc=tout')
     await page.locator('.page-head__title').waitFor()
     const supported = await page.evaluate(() => CSS.supports('animation-timeline: scroll()'))
     test.skip(!supported, 'no scroll-driven animations in this browser: the line is simply absent')
@@ -153,7 +153,7 @@ test.describe('more inputs', () => {
   test('a choose-one set walks with the arrow keys: → chooses the next chip, ← the one before, and it wraps', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 1280, height: 900 })
-    await page.goto('/profil')
+    await page.goto('/profil?bloc=tout')
     await page.locator('.page-head__title').waitFor()
     const group = page.getByRole('radiogroup').first()
     await group.scrollIntoViewIfNeeded()
@@ -171,7 +171,7 @@ test.describe('more inputs', () => {
 
   test('a file dropped on the bank paste box is read, and the box shows it is a drop target while the file is over it', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await page.locator('.page-head__title').waitFor()
     const fold = page.locator('details.fold', { hasText: 'Importer un relevé de banque' })
     await fold.locator('summary').click()
@@ -270,7 +270,7 @@ test.describe('the settings and the docked cards', () => {
   test('the tour bar and the guide card dock with a meter along their top edge that follows the step', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 390, height: 844 })
-    await page.goto('/resultats?visite=1')
+    await page.goto('/resultats?cartes=all&visite=1')
     const tour = page.locator('.tour-bar')
     await expect(tour).toBeVisible({ timeout: 60_000 })
     const meter = () => tour.evaluate((el) => Number(el.style.getPropertyValue('--p')))
@@ -279,7 +279,7 @@ test.describe('the settings and the docked cards', () => {
     expect(before).toBeLessThan(1)
     await tour.getByRole('button', { name: 'Suivant' }).click()
     await expect.poll(meter, { message: 'the meter moved on with the step' }).toBeGreaterThan(before)
-    await page.goto('/profil?form=1&par=document&etape=bank')
+    await page.goto('/profil?bloc=tout&form=1&par=document&etape=bank')
     await page.getByRole('button', { name: 'Me guider' }).click()
     const guide = page.locator('.guide-bar')
     await expect(guide).toBeVisible()
@@ -289,7 +289,7 @@ test.describe('the settings and the docked cards', () => {
   test('the chart tooltip is a small table: one row per series, its figure on the right', async ({ page }) => {
     await seedProfile(page, EXAMPLE)
     await page.setViewportSize({ width: 1280, height: 900 })
-    await page.goto('/resultats')
+    await page.goto('/resultats?cartes=all')
     const plot = page.locator('.chart-panel .chart__plot')
     await plot.locator('.recharts-surface').waitFor()
     await plot.scrollIntoViewIfNeeded()

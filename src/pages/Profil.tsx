@@ -99,7 +99,7 @@ export function Profil() {
   const tallies = useMemo(() => new Map(Object.entries(progress)), [progress])
   const done = useMemo(() => new Set(blockIds.filter((id) => progress[id] !== undefined && progress[id].total > 0 && progress[id].done === progress[id].total)), [blockIds, progress])
   const doneCount = useMemo(() => new Map(blockIds.filter((id) => progress[id] !== undefined).map((id) => [id, progress[id].total] as const)), [blockIds, progress])
-  const open: AccordionOpen = wide || bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
+  const open: AccordionOpen = bloc === 'tout' ? 'all' : bloc === 'none' ? null : bloc
   // « Ma situation » is answered once: closed on a wide screen too, saying its answers, until tapped.
   const folded = useMemo(() => new Set(['situation']), [])
 
@@ -180,8 +180,7 @@ export function Profil() {
             withEvents={withEvents}
             withExact={acc.total > 0}
             withFill={withFill}
-            // On a phone the blocks are read one at a time; a wide screen has room for them all, so the switch is not offered there.
-            end={!wide ? <AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} /> : undefined}
+            end={<AccordionMode open={open} onOpen={(next) => setBloc(next === 'all' ? 'tout' : (next ?? 'none'))} />}
           />
           {/* First the household (who), then « Ma situation » (what applies to it): the questions answered here decide which sections of everything below are shown, so they come before it. */}
           <FamilySection withKids={applies(profile, yes, 'kids')} />

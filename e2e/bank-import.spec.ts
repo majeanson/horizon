@@ -15,7 +15,7 @@ function year(): string {
 
 test.beforeEach(async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
 })
 
 const sheet = (page: Page): Locator => page.locator('details.fold', { hasText: 'Importer un relevé de banque' })

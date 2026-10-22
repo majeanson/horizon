@@ -87,7 +87,8 @@ const BUDGETS: Record<string, Budget> = {
   // exact » is a block like the others (its head is a button, its foot a « Précédent », and Budget's foot gains the « Suivant » to it: +3); « Ma situation » is a card that
   // says its answers closed, where « REER » and « CELI » are glossary terms (+2); the boxed meter line above the form is gone — each head and map chip says its count (−1).
   // 410 → 411 controls, 2048 → 2050 words (2026-10-20): « Ma situation » has its chip on the map like every other block (it was the one block a reader could only reach by « Suivant »).
-  'Profil (form)': { controls: 411, words: 2050 },
+  // 411 → 42 controls, 2050 → 204 words (2026-10-21, the ratchet FALLS): Profil opens its first block only on arrival at every width, as Ma fiche and the answer do (« Tout ouvrir » gives the form back).
+  'Profil (form)': { controls: 42, words: 204 },
   // Hypothèses words 659 → 680 (2026-10-14): the one line under « Hausse des salaires » that says the figure after inflation and Retraite Québec's (« Après inflation : +0,6 % par année… ») — a typed
   // wage growth is nominal and the pension grows by the real part, which the ⓘ's number alone hid. No control added.
   // controls 66 → 70, words 680 → 603 (2026-10-15): the card anatomy — four long subtitles (scénario, marchés, âge, dépenses) became one sentence each,
@@ -112,7 +113,9 @@ const BUDGETS: Record<string, Budget> = {
   // 38 → 43 controls, 650 → 667 words (2026-10-19): the sheet has its map, like every long page — a chip per section (Où vous en êtes, Aujourd’hui, À la retraite,
   // Ce que vous détenez, Ce qui préciserait la réponse), by its own title; and its sentence moved into the page head.
   // 43 → 44, 667 → 668 (2026-10-19): the fourth tab, « Décider » (+1 link, +1 word on every route).
-  'Fiche': { controls: 44, words: 668 },
+  // 44 → 33 controls, 668 → 260 words (2026-10-21, the ratchet FALLS): every section is a card of the accordion and only the first is open on arrival; the rest show a title and one sentence.
+  // 33 → 34 controls, 260 → 280 words (2026-10-21): the map names every card — the plan's line, the cash buffer and the children's cost join it (the sections it already listed are the same).
+  'Fiche': { controls: 34, words: 280 },
   // words 683 → 686 (2026-10-15): « Préciser » shows how much is confirmed — a bar with its « n/N » beside it — and ranks five figures instead of four.
     // 47 → 48 controls, 686 → 692 words (2026-10-15): the foot line (+1 / +3) and « Partager ce scénario » beside the card's other doors (+3 words; the chip is the share link, lib/shareLink.ts).
   // 48 → 47, 692 → 695 (2026-10-15): the top bar.
@@ -130,7 +133,8 @@ const BUDGETS: Record<string, Budget> = {
   // pages that were three views fell from 46 + 52 + 30 controls to 54 + 50.
   // 54 → 55 controls, 670 → 677 words (2026-10-20, Marc chose it): « Quand arrêter » has its chart — ONE closed fold under « En dates » (« Rentes et dépenses,
   // année par année »), the chart mounting only once opened.
-  'Résultats — Réponse': { controls: 56, words: 677 },
+  // 56 → 38 controls, 677 → 413 words (2026-10-21, the ratchet FALLS): Réponse opens the answer card only on arrival; the comparison and the year cards open on a tap.
+  'Résultats — Réponse': { controls: 38, words: 413 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
@@ -301,7 +305,8 @@ test.describe('complexity ratchet', () => {
       if (label === 'Accueil (with a plan)') await page.locator('.drip').waitFor({ timeout: 60_000 })
       // The two routes whose LAST block arrives from an idle search, long after the page is up (counted a beat early, the same route read 32 / 590 and 36 / 637, 603 and 604 words):
       // the sheet's ranked figures (the example has some), and « À faire cette année » once its levers are in. A visit sees them; the count waits for them.
-      if (label === 'Fiche') await page.locator('.sheet__movers li').first().waitFor({ timeout: 60_000 })
+      // Only the first card is open on arrival (the ranked figures are a closed card now): wait for its measures to land.
+      if (label === 'Fiche') await expect(page.locator('.sheet')).not.toContainText('Calcul en cours', { timeout: 60_000 })
       if (label === 'Résultats — Réponse') await expect(page.locator('#annee')).not.toContainText('Calcul en cours', { timeout: 60_000 })
       // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
       // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).

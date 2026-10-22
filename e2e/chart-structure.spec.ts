@@ -8,8 +8,8 @@ import { seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page))
 
 const VIEWS = [
-  ['the answer', '/resultats', 1],
-  ['the detail bars', '/resultats?metric=detail', 3],
+  ['the answer', '/resultats?cartes=all', 1],
+  ['the detail bars', '/resultats?cartes=all&metric=detail', 3],
   ['the strategies, every section open', '/decider?tout=1', 2],
   ['the strategies, the bridge years', '/decider?bv=years', 3],
 ] as const

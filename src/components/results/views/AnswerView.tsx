@@ -48,8 +48,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   // The address keeps it (`?cv=`); the last two are offered only when they exist.
   const compareKeys = ['ages', ...(isCouple && !retiredNow ? (['each'] as const) : []), ...(!retiredNow && profile.plans.length > 0 ? (['plans'] as const) : [])] as const
   const [compareView, setCompareView] = useParamChoice('cv', compareKeys, 'ages')
-  // The two cards under the answer, every one open unless the address says otherwise (`?cartes=none` closes them, a card's name keeps just that one open): the same « Tout ouvrir / Tout fermer » as every other page.
-  const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'none'], 'all')
+  // The two cards under the answer, only the first (the answer itself) open on arrival (`?cartes=all` opens every one, `?cartes=none` closes them, a card's name keeps just that one open): the same « Tout ouvrir / Tout fermer » as every other page.
+  const [cartes, setCartes] = useParamChoice<string>('cartes', [...ANSWER_BLOCKS, 'all', 'none'], 'verdict')
   // « Quand arrêter »'s chart: open or not is in the address (`?dates=1`), like every controlled fold — and only a CONTROLLED fold mounts on open, so the chart
   // library is not loaded on every visit (an uncontrolled one rendered the chart hidden, and chart-structure.spec found it first on the page).
   const [datesFold, setDatesFold] = useParamChoice('dates', ['0', '1'] as const, '0')
@@ -82,11 +82,11 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   const confidenceLine = accuracy.total > 0 && (
     <p className="verdict__note refine__confidence">
       {confidenceText}{' '}
-      <Link className="info-note__link" to="/profil">
+      <Link className="info-note__link" to="/profil?bloc=exact">
         {rc.headline.confidenceLink}
       </Link>
       {' · '}
-      <Link className="info-note__link" to="/fiche">
+      <Link className="info-note__link" to="/fiche?bloc=fiche-preciser">
         {rc.headline.confidenceSheet}
       </Link>
     </p>

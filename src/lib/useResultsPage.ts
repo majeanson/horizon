@@ -214,10 +214,10 @@ export function useResultsPage() {
     if (wanted !== undefined && next.get('essai') !== 'all') next.set('essai', wanted)
     if (target === 'decide' && (STRATS as readonly string[]).includes(id)) next.set('strat', id)
     if (target === 'decide' && id === 'ajuster') next.delete('leviers')
-    // Réponse's cards are all open unless the address closed some (`?cartes=`): a link to one opens it when it is shut.
-    if (target === 'answer' && (ANSWER_BLOCKS as readonly string[]).includes(id) && next.get('cartes') !== null) next.set('cartes', id)
+    // Réponse opens its first card only (`?cartes=all` opens every one): a link to another opens it, unless they are all open already.
+    if (target === 'answer' && (ANSWER_BLOCKS as readonly string[]).includes(id) && next.get('cartes') !== 'all') next.set('cartes', id)
     if (target === 'answer' && id === 'graphique') {
-      if (next.get('cartes') !== null) next.set('cartes', 'comparer')
+      if (next.get('cartes') !== 'all') next.set('cartes', 'comparer')
       next.delete('cv')
       next.set('metric', 'detail')
     }

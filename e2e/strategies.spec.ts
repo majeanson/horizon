@@ -63,7 +63,7 @@ test('the comparison is the first view of the pensions; the chart is one switch 
 })
 
 test('« Votre plan en une ligne » (on Ma fiche): one bar per person, with the dates ahead, in text as well as in colour', async ({ page }) => {
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=fiche-ligne')
   const strip = page.locator('.timeline')
   await expect(strip).toBeVisible({ timeout: 60_000 })
   await expect(strip.getByText('Votre plan en une ligne')).toBeVisible()

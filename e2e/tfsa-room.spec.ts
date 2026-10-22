@@ -5,7 +5,7 @@ import { savedProfile, seedProfile } from './seed'
 
 test.beforeEach(async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
 })
 
 const worksheet = (page: Page) => page.locator('#person-self').locator('details.fold', { hasText: 'Calculer mes droits d’aujourd’hui' })

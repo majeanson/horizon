@@ -16,7 +16,7 @@ test('the spouses’ balance nudge is not asked before the answer is in — even
     if (w.url().includes('spouseBalance')) balanceAsked = true
   })
   await seedProfile(page, EXAMPLE) // a couple: the nudge applies
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const year = page.locator('#annee')
   await year.waitFor({ state: 'attached', timeout: 60_000 })
   await year.scrollIntoViewIfNeeded()

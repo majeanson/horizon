@@ -55,7 +55,7 @@ const OPENED: [string, string, (page: Page) => Promise<void>][] = [
   ],
   [
     'the dates of the plan',
-    '/fiche',
+    '/fiche?bloc=fiche-ligne',
     async (page) => {
       await page.locator('.plan-calendar-fold summary').click()
       await expect(page.locator('.plan-calendar__year').first()).toBeVisible({ timeout: 60_000 })

@@ -41,7 +41,7 @@ test('Hypothèses: the scenario is open and the six others are closed titles; «
   await expect(page.locator('.accordion__item.is-open')).toHaveCount(7)
 })
 
-test('Profil on a phone: one block at a time, the map opens a person, a link to a figure opens its block; a wide screen keeps the whole form and offers no switch', async ({ page }) => {
+test('Profil on a phone: one block at a time, the map opens a person, a link to a figure opens its block; « Tout ouvrir » gives the whole form back, a wide screen included', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, EXAMPLE)
   await page.goto('/profil')
@@ -56,18 +56,18 @@ test('Profil on a phone: one block at a time, the map opens a person, a link to 
   await expect(page.locator('#famille')).toHaveClass(/is-closed/)
   await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année' })).toBeVisible()
   // a link from the results page to one figure of the OTHER person opens that block and lands on the field
-  await page.goto('/profil?form=1&fact=spouse:salary')
+  await page.goto('/profil?bloc=tout&form=1&fact=spouse:salary')
   await expect(page.locator('#person-spouse')).toHaveClass(/is-open/)
   await expect(page.locator('#person-spouse').getByRole('textbox', { name: 'Revenu de travail par année' })).toBeInViewport({ timeout: 15_000 })
   await expect(page).not.toHaveURL(/fact=/)
 
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   // every block open but « Ma situation », answered once and closed to its answers until tapped
   await expect(page.locator('.accordion__item.is-closed')).toHaveCount(1)
   await expect(page.locator('#situation')).toHaveClass(/is-closed/)
   await expect(page.locator('.accordion__item.is-open').first()).toBeVisible()
-  await expect(page.getByRole('button', { name: /^(Tout ouvrir|Tout fermer)$/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Tout fermer' })).toBeVisible()
   // « Suivant » at the foot of every block, walking the form: the household, what applies to it, then the people
   await page.locator('#famille').getByRole('button', { name: 'Suivant' }).click()
   await expect(page.locator('#situation')).toHaveClass(/is-open/)
@@ -100,7 +100,7 @@ test('Décider: the first strategy is open and the rest are closed; a door from 
   await expect(page.locator('#rentes')).toHaveClass(/is-open/)
   await expect(page.locator('#ordre')).toHaveClass(/is-closed/)
   await expect(page.locator('#ordre table')).toHaveCount(0)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await page.locator('#annee').getByRole('button', { name: 'Dans quel ordre puiser ?' }).click()
   await expect(page).toHaveURL(/\/decider\?.*strat=ordre/)
   await expect(page.locator('#ordre')).toHaveClass(/is-open/)
@@ -108,7 +108,7 @@ test('Décider: the first strategy is open and the rest are closed; a door from 
   await expect(page.locator('#ordre table')).toBeVisible({ timeout: 90_000 })
 
   // the proof's blocks are closed when Résultats opens; an address opens the one it names
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('#solidite')).toHaveClass(/is-closed/)
   await expect(page.locator('#tableau')).toHaveClass(/is-closed/)
   await page.goto('/resultats?bloc=tableau')
@@ -120,8 +120,8 @@ test('Décider: the first strategy is open and the rest are closed; a door from 
 // ONE control for « all open / one at a time »: a small round icon at the END of the map row, the same on Hypothèses, Preuve and Profil (phone) — not a full-width switch of its own.
 for (const [name, path, map, size, openFirst, allKey] of [
   ['Hypothèses', '/hypotheses', 'Sections des hypothèses', { width: 390, height: 844 }, 1, /bloc=tout/],
-  // Résultats: the answer's two cards are open on arrival, the proof's blocks closed; the one icon answers for both
-  ['Résultats', '/resultats', 'Sections des résultats', { width: 390, height: 844 }, 3, /bloc=tout/],
+  // Résultats: the answer card is open on arrival, the others and the proof's blocks closed; the one icon answers for both
+  ['Résultats', '/resultats', 'Sections des résultats', { width: 390, height: 844 }, 1, /bloc=tout/],
   ['Profil (phone)', '/profil', 'Sections du profil', { width: 390, height: 844 }, 1, /bloc=tout/],
   ['Hypothèses (desktop)', '/hypotheses', 'Sections des hypothèses', { width: 1280, height: 900 }, 1, /bloc=tout/],
 ] as const) {
@@ -155,15 +155,16 @@ for (const [name, path, map, size, openFirst, allKey] of [
 }
 
 // RÉPONSE AND DÉCIDER FOLD THE SAME WAY. Réponse's three cards — the answer itself among them (Marc, 2026-10-20) — are open until closed (`?cartes=`); Décider's what-ifs and strategies open together under the same icon (`?essai=all` + `?tout=1`). The glance under the answer's sentence sits on the page.
-test('Réponse: three cards, the answer first, open by default; « Tout fermer » closes them — the answer to its glance in one line —, a map chip opens one, « Tout ouvrir » gives them back; the glance shows three tiles', async ({ page }) => {
+test('Réponse: three cards, the answer first, only the answer open on arrival; « Tout fermer » closes it — the answer to its glance in one line —, a map chip opens one, « Tout ouvrir » gives them back; the glance shows three tiles', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await seedProfile(page, EXAMPLE)
   await page.goto('/resultats')
   const nav = page.getByRole('navigation', { name: 'Sections des résultats' })
   await expect(page.locator('.glance .glance__tile')).toHaveCount(3, { timeout: 60_000 })
   await expect(page.locator('.glance').getByText('Marge par mois')).toBeVisible()
-  await expect(page.locator('#comparer')).toHaveClass(/is-open/)
-  await expect(page.locator('#annee')).toHaveClass(/is-open/, { timeout: 30_000 })
+  await expect(page.locator('#verdict')).toHaveClass(/is-open/)
+  await expect(page.locator('#comparer')).toHaveClass(/is-closed/)
+  await expect(page.locator('#annee')).toHaveClass(/is-closed/, { timeout: 30_000 })
   await nav.getByRole('button', { name: 'Tout fermer' }).click()
   await expect(page).toHaveURL(/cartes=none/)
   await expect(page.locator('.results-page .accordion__item.is-open')).toHaveCount(0)
@@ -182,7 +183,7 @@ test('Réponse: three cards, the answer first, open by default; « Tout fermer �
   await nav.getByRole('button', { name: 'Tout fermer' }).click()
   await expect(page).toHaveURL(/cartes=none/)
   await nav.getByRole('button', { name: 'Tout ouvrir' }).click()
-  await expect(page).not.toHaveURL(/cartes=/)
+  await expect(page).toHaveURL(/cartes=all/)
   await expect(page.locator('#annee')).toHaveClass(/is-open/)
 })
 

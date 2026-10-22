@@ -21,7 +21,7 @@ test('« Décider » holds the care what-if, and « À faire cette année » clo
   await expect(page).toHaveURL(/essai=care/)
   await expect(page.locator('#soins')).toBeVisible()
   // The decisions with their own home are links, not copies.
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('#annee')).toContainText('À faire cette année')
   await page.locator('#annee').getByRole('button', { name: 'Dans quel ordre puiser ?' }).click()
   await expect(page).toHaveURL(/\/decider/)
@@ -64,7 +64,7 @@ test('« L’ajouter à mes événements » writes the care as a dated expense a
 })
 
 test('« À faire cette année » names the change that gains most once the searches are in, and does not repeat the ranking of Ma fiche', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const year = page.locator('#annee')
   await expect(year).not.toContainText('Calcul en cours', { timeout: 60_000 })
   await expect(year.getByText('Le changement qui avance le plus', { exact: true })).toBeVisible()

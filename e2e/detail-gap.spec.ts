@@ -15,7 +15,7 @@ test('a stretch of years with nothing from one person is explained under their b
   alex.accounts.nonReg = { balance: 0, acb: 0, annualContribution: 0 }
   camille.accounts.nonReg = { balance: 1_500_000, acb: 1_000_000, annualContribution: 0 }
   await seedProfile(page, p as never)
-  await page.goto('/resultats?metric=detail')
+  await page.goto('/resultats?cartes=all&metric=detail')
   await page.locator('.chart-panel').getByRole('tab', { name: 'Alex' }).click()
   await expect(page.locator('.chart-panel').getByText(/rien ne vient de Alex/)).toBeVisible({ timeout: 30_000 })
   await page.locator('.chart-panel').getByRole('tab', { name: 'Camille' }).click()
@@ -24,7 +24,7 @@ test('a stretch of years with nothing from one person is explained under their b
 
 test('when the two plans end in different years, each person’s bars say why one stops and the other jumps', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats?metric=detail')
+  await page.goto('/resultats?cartes=all&metric=detail')
   const panel = page.locator('.chart-panel')
   // the household's view has no discontinuity to explain
   await expect(panel.getByText(/le saut dans les barres est voulu|les barres de Camille s’arrêtent/)).toHaveCount(0)

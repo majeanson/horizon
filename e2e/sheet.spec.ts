@@ -22,6 +22,10 @@ test('the header leads to the sheet, which shows five stats, each with its figur
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ma fiche')
   await settled(page)
   await expect(page.locator('.sheet--serious')).toBeVisible()
+  // on arrival only the first card is open: the verdict's two measures
+  await expect(page.locator('.sheet__stat')).toHaveCount(2)
+  await page.goto('/fiche?bloc=tout')
+  await settled(page)
   await expect(page.locator('.sheet__stat')).toHaveCount(5)
   await expect(page.locator('.sheet-bar[role="meter"]')).toHaveCount(5)
   for (const name of ['Âge le plus tôt', 'Rentes', 'Épargne', 'Ce qui reste', 'Solidité']) await expect(page.locator('.sheet__stat-name', { hasText: name })).toBeVisible()
@@ -33,9 +37,9 @@ test('the header leads to the sheet, which shows five stats, each with its figur
 })
 
 test('the page reads in the order of the questions: verdict, today, once retired, what it holds, what would sharpen the answer', async ({ page }) => {
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=tout')
   await settled(page)
-  await expect(page.locator('.sheet h2')).toHaveText(['Où vous en êtes', 'Aujourd’hui', 'À la retraite', 'Ce que vous détenez', 'Coussin de liquidités', 'Ce que coûte un enfant, selon Statistique Canada', 'Ce qui préciserait la réponse'])
+  await expect(page.locator('.sheet h2')).toHaveText(['Où vous en êtes', 'Votre plan en une ligne', 'Aujourd’hui', 'À la retraite', 'Ce que vous détenez', 'Coussin de liquidités', 'Ce que coûte un enfant, selon Statistique Canada', 'Ce qui préciserait la réponse'])
   // the verdict holds the earliest age and the plan's sturdiness; the plan's line sits right under it
   await expect(page.locator('.sheet__section').first().locator('.sheet__stat-name')).toHaveText(['Âge le plus tôt', 'Solidité'])
   await expect(page.locator('.sheet__section').first().getByRole('link', { name: 'Voir la réponse' })).toHaveAttribute('href', '/resultats')
@@ -43,7 +47,7 @@ test('the page reads in the order of the questions: verdict, today, once retired
 })
 
 test('what it holds keeps the money to live on apart: totalled, shared out, and each card leads to its own field', async ({ page }) => {
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=fiche-detenu')
   await settled(page)
   const holds = page.locator('.sheet__section', { hasText: 'Ce que vous détenez' })
   await expect(holds).toContainText(/Total\s:/)
@@ -55,7 +59,7 @@ test('what it holds keeps the money to live on apart: totalled, shared out, and 
 
 test('on a phone the sheet does not run off the screen', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=tout')
   await expect(page.locator('.sheet--serious')).toBeVisible({ timeout: 30_000 })
   await settled(page)
   await expectNoHorizontalOverflow(page, '.sheet')
@@ -73,7 +77,7 @@ test('a household already retired has no runway to draw, and a blank profile is 
   await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name: 'Couple à la retraite', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=tout')
   await settled(page)
   await expect(page.locator('.sheet__stat', { hasText: 'Âge le plus tôt' })).toContainText('Tout le monde est déjà à la retraite')
   await expect(page.locator('.sheet__stat', { hasText: 'Épargne' })).toContainText('Personne ne travaille plus')
@@ -89,7 +93,7 @@ test('a blank profile gets a way to the profile, and nothing invented', async ({
 })
 
 test('what would sharpen the answer is ranked, and each figure leads to its own field', async ({ page }) => {
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=fiche-preciser')
   await settled(page)
   const section = page.locator('.sheet__section', { hasText: 'Ce qui préciserait la réponse' })
   await expect(section.locator('.sheet__mover').first()).toBeVisible({ timeout: 45_000 })
@@ -112,7 +116,7 @@ test('on the narrowest phones the header leaves the sheet button out, and the se
 // What the profile SAYS about the household — the cash buffer, what the children cost — is read on the sheet, not among the fields of Profil. The choices that act on the
 // children's cost stay on Profil, with a door to the numbers.
 test('the cash buffer and what the children cost are read on the sheet, and no longer sit among Profil’s fields', async ({ page }) => {
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=tout')
   await settled(page)
   const buffer = page.locator('#coussin')
   await expect(buffer).toContainText('Coussin de liquidités')
@@ -135,7 +139,7 @@ test('the cash buffer and what the children cost are read on the sheet, and no l
 })
 
 test('« Les dates de votre plan » is one tap under the plan’s line, one row a year with the ages, and says what the profile says', async ({ page }) => {
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=fiche-ligne')
   await settled(page)
   const fold = page.locator('.plan-calendar-fold')
   await expect(fold).toBeVisible()
@@ -159,4 +163,20 @@ test('the sheet has its map, like every long page: each chip is a section by its
   for (const name of ['Où vous en êtes', 'Ce que vous détenez']) await expect(map.getByRole('button', { name })).toBeVisible()
   await map.getByRole('button', { name: 'Ce que vous détenez' }).click()
   await expect(page.locator('#fiche-detenu')).toBeInViewport()
+})
+
+// Every section is a card of the accordion, and on arrival only the FIRST one is open — the rest show their title and one sentence until asked for.
+test('every section is a card, and only the first is open on arrival', async ({ page }) => {
+  await page.goto('/fiche')
+  await settled(page)
+  const toggles = page.locator('.sheet .accordion__toggle')
+  await expect(toggles).toHaveCount(8)
+  await expect(toggles.first()).toHaveAttribute('aria-expanded', 'true')
+  await expect(page.locator('.sheet .accordion__toggle[aria-expanded="true"]')).toHaveCount(1)
+  // a closed card still says what it is for
+  await expect(page.locator('#fiche-detenu .accordion__summary')).toContainText('Les comptes, les rentes et la maison')
+  // a tap opens it, and the first one closes: one at a time
+  await page.locator('#fiche-detenu .accordion__toggle').click()
+  await expect(page.locator('#fiche-detenu .accordion__toggle')).toHaveAttribute('aria-expanded', 'true')
+  await expect(page.locator('.sheet .accordion__toggle[aria-expanded="true"]')).toHaveCount(1)
 })

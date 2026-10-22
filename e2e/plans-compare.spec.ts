@@ -10,7 +10,7 @@ test('a kept plan shows beside the current one, with how far apart they are; wit
   plan.household.spending.retiredToday = 140000
   const profile = { ...structuredClone(EXAMPLE), plans: [{ name: 'Dépenses plus hautes', profile: plan }] }
   await seedProfile(page, profile)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   // a kept plan makes « Mes plans » a way of comparing, one tab beside the departure ages
   await page.getByRole('tab', { name: 'Mes plans' }).click()
   await expect(page).toHaveURL(/cv=plans/)
@@ -23,12 +23,12 @@ test('a kept plan shows beside the current one, with how far apart they are; wit
 
 test('no kept plan, no block', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.getByText(/Vous pouvez prendre votre retraite/)).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText('Mes plans, côte à côte')).toHaveCount(0)
   await expect(page.getByRole('tab', { name: 'Mes plans' })).toHaveCount(0)
   // an address that names a way of comparing the household does not have falls back to the departure ages
-  await page.goto('/resultats?cv=plans')
+  await page.goto('/resultats?cartes=all&cv=plans')
   await expect(page.locator('.scenarios')).toBeVisible({ timeout: 60_000 })
 })
 
@@ -37,7 +37,7 @@ test('on a phone, three ways of comparing (ages, each of us, my plans) fit the s
   plan.plans = []
   await seedProfile(page, { ...structuredClone(EXAMPLE), plans: [{ name: 'Un autre plan', profile: plan }] })
   await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const ways = page.getByRole('tablist', { name: 'Façons de comparer' })
   await expect(ways.getByRole('tab')).toHaveText(['Âges de départ', 'Chacun de son côté', 'Mes plans'])
   await expectNoHorizontalOverflow(page, page.locator('.results-page'))

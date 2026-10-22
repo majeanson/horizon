@@ -7,7 +7,7 @@ import { EXAMPLE, seedProfile } from './seed'
 // (lib/useResultsPage.ts holds the state, components/results/TourBar.tsx the bar, lib/tourCopy.ts the words.)
 
 async function openAnswer(page: Page, path = '/resultats') {
-  await page.goto(path)
+  await page.goto(path + (path.includes('?') ? '&' : '?') + 'cartes=all')
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
   // `#annee` is the last section of the answer view (lazy).
   await expect(page.locator('#annee')).toBeAttached({ timeout: 30_000 })
@@ -86,7 +86,7 @@ test.describe('golden couple', () => {
     await openAnswer(page, '/resultats?visite=0')
     await expect(bar(page)).toHaveCount(0)
     await expect.poll(() => new URL(page.url()).searchParams.has('visite')).toBe(false)
-    await page.goto('/resultats?visite=9')
+    await page.goto('/resultats?cartes=all&visite=9')
     await expect(bar(page)).toHaveCount(0)
     await expect.poll(() => new URL(page.url()).searchParams.has('visite')).toBe(false)
   })
@@ -125,12 +125,12 @@ test('a household that has already stopped working is not offered the tour', asy
   await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name: 'Couple à la retraite', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 30_000 })
   await expect(page.getByRole('button', { name: 'Visite guidée', exact: true })).toHaveCount(0)
   // …and a shared link to a tour does not open one for them.
-  await page.goto('/resultats?visite=2')
+  await page.goto('/resultats?cartes=all&visite=2')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 30_000 })
   await expect(bar(page)).toHaveCount(0)
 })

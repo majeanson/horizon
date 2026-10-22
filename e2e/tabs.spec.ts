@@ -19,16 +19,16 @@ const blankWithSalary = (): SeedProfile => {
 const STATES: State[] = [
   { name: 'Profil, the form', path: '/profil?form=1', seed: EXAMPLE, rows: ['Façon de remplir le profil'] },
   { name: 'Profil, a document step', path: '/profil?form=1&par=document&etape=rrq', seed: EXAMPLE, rows: ['Façon de remplir le profil', 'Présentation des cases'] },
-  { name: 'Profil, figures to fill', path: '/profil?form=1', seed: blankWithSalary(), rows: ['Façon de remplir le profil', 'Façon de remplir ce qui manque'] },
+  { name: 'Profil, figures to fill', path: '/profil?form=1&bloc=tout', seed: blankWithSalary(), rows: ['Façon de remplir le profil', 'Façon de remplir ce qui manque'] },
   { name: 'Hypothèses', path: '/hypotheses', seed: EXAMPLE, rows: ['Choisir un scénario'] },
   { name: 'Hypothèses, the markets', path: '/hypotheses?bloc=marches', seed: EXAMPLE, rows: ['Le parcours des marchés'] },
-  { name: 'Réponse', path: '/resultats', seed: EXAMPLE, ready: '#graphique', rows: ['Façons de comparer', 'Afficher'] },
-  { name: 'Réponse, where the money comes from', path: '/resultats?metric=detail', seed: EXAMPLE, ready: '#graphique', rows: ['Façons de comparer', 'Afficher', 'Montants', 'Départ', 'Pour qui'] },
+  { name: 'Réponse', path: '/resultats?cartes=all', seed: EXAMPLE, ready: '#graphique', rows: ['Façons de comparer', 'Afficher'] },
+  { name: 'Réponse, where the money comes from', path: '/resultats?cartes=all&metric=detail', seed: EXAMPLE, ready: '#graphique', rows: ['Façons de comparer', 'Afficher', 'Montants', 'Départ', 'Pour qui'] },
   { name: 'Décider, the pensions', path: '/decider', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Pour', 'Quatre façons de regarder vos rentes'] },
   { name: 'Décider, the pensions year by year', path: '/decider?bv=years', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Pour', 'Quatre façons de regarder vos rentes', 'Années montrées'] },
   { name: 'Décider, melting the RRSP', path: '/decider?strat=fonte', seed: EXAMPLE, ready: '#fonte [role="tablist"]', rows: ['Façons de fondre le REER'] },
-  { name: 'Preuve, the grids', path: '/resultats?bloc=solidite&solidite=grids', seed: EXAMPLE, ready: '#solidite [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Rendement (lignes) · inflation (colonnes)'] },
-  { name: 'Preuve, the year table', path: '/resultats?bloc=tableau', seed: EXAMPLE, ready: '#tableau [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Départ'] },
+  { name: 'Preuve, the grids', path: '/resultats?cartes=all&bloc=solidite&solidite=grids', seed: EXAMPLE, ready: '#solidite [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Rendement (lignes) · inflation (colonnes)'] },
+  { name: 'Preuve, the year table', path: '/resultats?cartes=all&bloc=tableau', seed: EXAMPLE, ready: '#tableau [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Départ'] },
   // (Preuve ▸ « Paramètres utilisés » draws its year chooser only once there are two tax years: TableChooser hides a row of one.)
   { name: 'Réglages', path: '/donnees', seed: EXAMPLE, rows: ['Langue', 'Thème', 'Contraste', 'Taille du texte'] },
 ]

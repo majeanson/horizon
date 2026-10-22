@@ -19,7 +19,7 @@ const fill = async (page: Page, name: string, value: string) => {
   await f.press('Enter')
 }
 test('the first landing is ONE question, not the form: who the calculation is for, with its promise, and nothing else on the page', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pour commencer')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Pour qui faisons-nous le calcul ?')
   // the promise: how many questions, and what comes out
@@ -35,7 +35,7 @@ test('the first landing is ONE question, not the form: who the calculation is fo
 })
 
 test('the year of birth is typed, never pre-filled: the box is empty, « Suivant » waits for it, and the box has focus', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await next(page)
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Quelle est votre année de naissance ?')
   const year = box(page, 'Année de naissance')
@@ -53,7 +53,7 @@ test('the year of birth is typed, never pre-filled: the box is empty, « Suivant
 })
 
 test('walking through for one person: each answer is saved as typed, and the answer answers', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await next(page) // who: Juste moi (the default)
   await fill(page, 'Année de naissance', '1985')
   // « Ma situation »: an employer plan, yes (so its screen comes later); a home, no (so its screen never does)
@@ -109,7 +109,7 @@ test('walking through for one person: each answer is saved as typed, and the ans
 test('the answer forms under the question as soon as it can be computed: absent on the landing and while a figure is missing, present once income and spending are typed, and it never takes the focus', async ({ page }) => {
   // the strip IN the path (the top bar carries the same answer, outside <main>)
   const strip = page.locator('main').getByRole('status').filter({ hasText: 'Votre réponse' })
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await expect(strip).toHaveCount(0) // the landing screen
   await next(page)
   await fill(page, 'Année de naissance', '1985')
@@ -130,7 +130,7 @@ test('the answer forms under the question as soon as it can be computed: absent 
 })
 
 test('a couple adds a person’s questions in the same order, and the progress counts them', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await expect(progress(page)).toHaveText('Question 1 sur 10')
   await next(page)
@@ -156,7 +156,7 @@ test('a couple adds a person’s questions in the same order, and the progress c
 })
 
 test('going back to « Juste moi » after typing for the partner asks first, in words that say what is lost', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await next(page)
   await fill(page, 'Année de naissance', '1980')
@@ -177,7 +177,7 @@ test('going back to « Juste moi » after typing for the partner asks first, in 
 })
 
 test('going back keeps what was typed; a home asks for its balance and, if there is one, the payment', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await next(page)
   await fill(page, 'Année de naissance', '1990')
   // « Ma situation »: a home, yes — which is why its screen comes later
@@ -200,7 +200,7 @@ test('going back keeps what was typed; a home asks for its balance and, if there
 })
 
 test('the last screen says what is still missing, takes the reader back to that question, and holds the answer back until it is there', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await next(page)
   await fill(page, 'Année de naissance', '1985')
   for (let i = 0; i < 5; i++) await next(page)
@@ -215,14 +215,14 @@ test('the last screen says what is still missing, takes the reader back to that 
 })
 
 test('leaving for the full form: the form is there, with what was typed, and a link can carry the choice', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await next(page)
   await fill(page, 'Année de naissance', '1975')
   await page.getByRole('button', { name: 'Passer au formulaire complet' }).click()
   await expect(page).toHaveURL(/form=1/)
   await expect(page.locator('#person-self')).toBeVisible()
   await expect(page.locator('#person-self').getByRole('textbox', { name: 'Année de naissance' })).toHaveValue('1975')
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await expect(page.locator('#person-self')).toBeVisible()
 })
 
@@ -230,7 +230,7 @@ test('a returning visitor — someone with a profile — never sees the path', a
   // Seeded BEFORE the first load, as a returning visitor's profile is: overwriting storage under a page that has just loaded races the app's own write when the page is hidden (the reload).
   // (the file's beforeEach already seeded a blank one, once per tab; this init script runs after it and puts a real profile in place.)
   await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(EXAMPLE)])
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Profil')
   await expect(page.locator('.onboard')).toHaveCount(0)
   await expect(page.locator('#person-self')).toBeVisible()
@@ -238,7 +238,7 @@ test('a returning visitor — someone with a profile — never sees the path', a
 
 test('on a phone each question fits the screen: no sideways scroll, the buttons are thumb-sized', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   const check = async () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     for (const b of await page.locator('.onboard button.btn:not(.btn--sm)').all()) expect((await b.boundingBox())!.height).toBeGreaterThanOrEqual(43)
@@ -256,7 +256,7 @@ test('on a phone each question fits the screen: no sideways scroll, the buttons 
 const situation = (page: Page) => page.getByRole('heading', { level: 2, name: 'Quelques oui ou non sur votre situation' })
 const ask = (page: Page, text: string | RegExp) => page.getByRole('radiogroup', { name: text })
 const toSituation = async (page: Page, birth = '1985') => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await next(page) // who: Juste moi
   await fill(page, 'Année de naissance', birth)
   await expect(situation(page)).toBeVisible()
@@ -309,7 +309,7 @@ test('a « oui » keeps the screen it would have skipped: the plan, the non-regi
 })
 
 test('a couple is asked for each person: the plan screen of the partner comes only with the partner’s « oui »', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await next(page)
   await fill(page, 'Année de naissance', '1980')
@@ -347,7 +347,7 @@ test('what is answered here is what the full form shows: the same questions, the
 
 // THE QUICK PATH (« J'ai 2 minutes », `?debut=rapide`): who, born when, income, savings, spending — nothing else — and a last screen that calls the departure age an assumption.
 test('the quick path asks only what a first answer needs: five questions for one person, and none of situation, plan, retirement age or home', async ({ page }) => {
-  await page.goto('/profil?debut=rapide')
+  await page.goto('/profil?bloc=tout&debut=rapide')
   await expect(page.locator('.onboard__lead')).toContainText('5 questions')
   await expect(progress(page)).toHaveText('Question 1 sur 5')
   await next(page) // who: Juste moi
@@ -364,7 +364,7 @@ test('the quick path asks only what a first answer needs: five questions for one
 })
 
 test('the quick path’s last screen states the departure age as an ASSUMPTION, never as an answer', async ({ page }) => {
-  await page.goto('/profil?debut=rapide')
+  await page.goto('/profil?bloc=tout&debut=rapide')
   await next(page)
   await fill(page, 'Année de naissance', '1985')
   await fill(page, 'Revenu de travail par année', '90000')
@@ -380,7 +380,7 @@ test('the quick path’s last screen states the departure age as an ASSUMPTION, 
 })
 
 test('a couple on the quick path is asked each person’s birth, income and savings, and the assumption names both ages', async ({ page }) => {
-  await page.goto('/profil?debut=rapide')
+  await page.goto('/profil?bloc=tout&debut=rapide')
   await page.getByRole('radio', { name: 'Moi et mon ou ma partenaire' }).click()
   await expect(progress(page)).toHaveText('Question 1 sur 8')
   await next(page)
@@ -398,7 +398,7 @@ test('a couple on the quick path is asked each person’s birth, income and savi
 })
 
 test('« Préciser » on the quick path’s last screen re-enters the FULL questions at « Ma situation »', async ({ page }) => {
-  await page.goto('/profil?debut=rapide')
+  await page.goto('/profil?bloc=tout&debut=rapide')
   await next(page)
   await fill(page, 'Année de naissance', '1985')
   await fill(page, 'Revenu de travail par année', '90000')
@@ -415,7 +415,7 @@ test('« Préciser » on the quick path’s last screen re-enters the FULL quest
 })
 
 test('an unknown value of the quick key is the full path', async ({ page }) => {
-  await page.goto('/profil?debut=lent')
+  await page.goto('/profil?bloc=tout&debut=lent')
   await expect(progress(page)).toHaveText('Question 1 sur 7')
 })
 

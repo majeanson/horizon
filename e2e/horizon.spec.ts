@@ -49,7 +49,7 @@ test('with Alex at 80 the plan still ends with Camille: the last year of the tab
 })
 
 test('a pension plan says what share it pays a surviving spouse: RREGOP’s 50 % is pre-filled and editable', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.getByRole('button', { name: /^Régimes d’employeur/ }).first().click().catch(() => {})
   const share = (await exactBox(page, /^Part versée au conjoint survivant/)).first()
   await expect(share).toHaveValue(/^50/)

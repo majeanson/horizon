@@ -10,7 +10,7 @@ import { EXAMPLE, seedProfile } from './seed'
 const RRQ_CHIP = /^RRQ.*, \d{4} \(\d+( \/ \d+)? ans\)$/
 
 async function openAnswer(page: Page) {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
   await expect(page.locator('.chart__plot').first()).toBeVisible({ timeout: 30_000 })
 }

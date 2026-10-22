@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
 test('the chart draws one line per comparison, a marker for each retirement, and names itself for a screen reader', async ({ page }) => {
   const problems = watchConsole(page)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const chart = page.locator('.chart-panel figure.chart')
   await expect(chart).toBeVisible()
   await expect(chart).toHaveAttribute('role', 'img')
@@ -34,7 +34,7 @@ test('the chart draws one line per comparison, a marker for each retirement, and
 })
 
 test('hovering the chart shows the year, the ages and each scenario’s exact figure', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const plot = page.locator('.chart-panel .chart__plot')
   await plot.locator('.recharts-surface').waitFor()
   // The mouse can only hover what is on screen.
@@ -50,14 +50,14 @@ test('hovering the chart shows the year, the ages and each scenario’s exact fi
 })
 
 test('the measure is chosen in the address, and the chart follows; today’s dollars have no switch, an old link still opens the year’s dollars', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const chart = page.locator('.chart-panel figure.chart')
   await page.getByRole('tab', { name: 'Revenus hors épargne' }).click()
   await expect(page).toHaveURL(/metric=income/)
   await expect(chart).toHaveAttribute('aria-label', /^Revenus hors épargne de 2026 à 2076/)
   await expect(page.getByRole('tab', { name: 'Dollars de l’année' })).toHaveCount(0)
   // The address alone restores the view — an old link with the year's dollars included.
-  await page.goto('/resultats?metric=income&dollars=nominal&ages=62')
+  await page.goto('/resultats?cartes=all&metric=income&dollars=nominal&ages=62')
   await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Revenus hors épargne de 2026 à 2076 pour : 62 ans.')
   await expect(page.getByRole('tab', { name: 'Revenus hors épargne', selected: true })).toBeVisible()
   await expect(page.getByText('Tous les montants sont dans les dollars de chaque année')).toBeVisible()
@@ -67,7 +67,7 @@ test('the measure is chosen in the address, and the chart follows; today’s dol
 })
 
 test('another comparison — typed in the « Autre âge » box — adds a line and keeps the other choices', async ({ page }) => {
-  await page.goto('/resultats?dollars=nominal')
+  await page.goto('/resultats?cartes=all&dollars=nominal')
   const other = page.getByRole('textbox', { name: 'Autre âge' })
   await other.fill('62')
   await other.press('Enter')
@@ -84,7 +84,7 @@ test('the year-by-year table says which dollars it holds, and its last net worth
   // The « Mon plan » table's last row ends on the same number the scenario card prints (today's dollars, both).
   const last = tables.locator('.year-table').first().locator('tbody tr').last().locator('td').last()
   const worth = (await last.textContent())!.trim()
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('.scenario').first()).toContainText(`Valeur nette à la fin du plan : ${worth}`)
   // An old link with the year's dollars still opens them, and says so.
   await page.goto('/resultats?v=verify&bloc=tableau&dollars=nominal')
@@ -92,7 +92,7 @@ test('the year-by-year table says which dollars it holds, and its last net worth
 })
 
 test('the chart speaks English too', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await switchLanguage(page, 'en')
   await expect(page.locator('.chart-panel figure.chart')).toHaveAttribute('aria-label', 'Net worth from 2026 to 2076 for: My plan (age 60 / 62), 65.')
   await expect(page.getByRole('tab', { name: 'Income excluding savings' })).toBeVisible()
@@ -100,7 +100,7 @@ test('the chart speaks English too', async ({ page }) => {
 
 test('« what if the future is worse » fills a 3 × 3 grid per horizon, off the page’s thread, and the middle is the verdict', async ({ page }) => {
   const problems = watchConsole(page)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   // It runs by itself, last in line behind the verdict and the chart; the page stays alive while it computes.
   await page.getByRole('tab', { name: 'Revenus hors épargne' }).click()
   // « Solidité » is on this page, under the answer: its map chip opens it
@@ -174,7 +174,7 @@ test('« Paramètres utilisés » follows the reader\'s language: the page, the 
 
 test('no chart or table runs past the right edge on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await page.locator('.chart-panel figure.chart').waitFor()
   const box = (await page.locator('.chart-panel figure.chart').boundingBox())!
   expect(box.x).toBeGreaterThanOrEqual(0)
@@ -183,7 +183,7 @@ test('no chart or table runs past the right edge on a phone', async ({ page }) =
 
 test('a couple gets each person\'s own earliest age, worked out off the page\'s thread, and can send the pair to the comparison', async ({ page }) => {
   const problems = watchConsole(page)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   // a couple's comparison has two ways: the departure ages, and each person's own earliest age
   await expect(page.getByRole('tablist', { name: 'Façons de comparer' }).getByRole('tab')).toHaveText(['Âges de départ', 'Chacun de son côté'])
   await page.getByRole('tab', { name: 'Chacun de son côté' }).click()

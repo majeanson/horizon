@@ -21,7 +21,7 @@ const box = (page: import('@playwright/test').Page, name: string) => page.getByR
 test('a planned child is added with one tap, shown as « prévu », and its cost is suggested from Statistics Canada', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await expect(page.getByText(`${THIS_YEAR + 1} · prévu`)).toBeVisible()
   await expect.poll(async () => (await savedProfile(page)).household.children).toEqual([THIS_YEAR + 1])
@@ -35,7 +35,7 @@ test('a planned child is added with one tap, shown as « prévu », and its cost
   await expect(page.getByText(/de 6 à 12 ans.+26\D000/)).toBeVisible()
   await expect(page.getByText(/de 13 à 18 ans.+28\D600/)).toBeVisible()
   await expect(page.getByText(/à 19 ans et plus.+28\D400/)).toBeVisible()
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   // nothing is put in the profile until the person asks
   expect((await savedProfile(page)).household.childSpending ?? null).toBeNull()
   await page.getByRole('button', { name: 'Utiliser ces montants pour un enfant prévu' }).click()
@@ -46,7 +46,7 @@ test('a planned child is added with one tap, shown as « prévu », and its cost
 test('the amounts by age can be typed over, and taken away; a typed figure is never replaced by the suggestion', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await page.getByRole('button', { name: 'Utiliser ces montants pour un enfant prévu' }).click()
   const first = box(page, 'de 0 à 5 ans')
@@ -64,14 +64,14 @@ test('past, current and planned children sit in one list, each with where it sta
   p.household.children = [THIS_YEAR - 30, THIS_YEAR - 4]
   await seedProfile(page, p as unknown as SeedProfile)
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await expect(page.getByText(`${THIS_YEAR - 30} · parti`)).toBeVisible()
   await expect(page.getByText(`${THIS_YEAR - 4} · à la maison`)).toBeVisible()
   await box(page, 'Année de naissance de l’enfant').fill(String(THIS_YEAR + 2))
   await page.getByRole('button', { name: 'Ajouter un enfant' }).click()
   await expect(page.getByText(`${THIS_YEAR + 2} · prévu`)).toBeVisible()
   // for the child at home the suggestion is read at their age today (a 4-year-old: the 0–5 band)
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=enfants')
   await expect(page.getByText(/Un enfant à la maison à son âge d’aujourd’hui.+environ/)).toBeVisible()
 })
 
@@ -83,7 +83,7 @@ test('a planned child makes the answer later: its cost is added to the budget', 
   withChild.household.childSpending = { perChild: 0, untilAge: 23, byAge: [24_600, 26_000, 28_600, 28_400] }
   const answer = async (profile: unknown, tab: import('@playwright/test').Page) => {
     await seedProfile(tab, profile as SeedProfile)
-    await tab.goto('/resultats')
+    await tab.goto('/resultats?cartes=all')
     await expect(tab.getByText(/Vous pouvez prendre votre retraite/)).toBeVisible({ timeout: 60_000 })
     // the age is on its own line under the sentence: read it from the page's text
     return Number(/retraite à\s+(\d+)/.exec(await tab.locator('body').innerText())![1])
@@ -96,15 +96,15 @@ test('a planned child makes the answer later: its cost is added to the budget', 
 test('what the state pays is said beside what a child costs; adding a child counts it in the plan, and a switch takes it out', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   // a first child counts the benefits (a visible switch), and the card says what they come to at this income
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects).toEqual({ benefits: true, qppExclusion: true, leave: null })
   // what they come to at this income is read on Ma fiche
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=enfants')
   await expect(page.getByText('Ce que l’État verse pour eux')).toBeVisible()
   await expect(page.getByText(/Un enfant prévu en \d{4}.+environ .+ sa première année, moins .+ d’allocations, soit .+ net/)).toBeVisible()
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const toggle = page.getByRole('button', { name: 'Tenir compte des allocations dans le plan (estimation)' })
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
   await toggle.click()
@@ -124,7 +124,7 @@ test('what the state pays is said beside what a child costs; adding a child coun
 test('a parental leave for a child to come: who gives birth, the weeks each takes, and what it does to the pay', async ({ page }) => {
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await page.getByRole('button', { name: 'Un enfant prévu' }).click()
   await page.getByRole('button', { name: 'Tenir compte d’un congé parental (RQAP)' }).click()
   await expect.poll(async () => (await savedProfile(page)).household.kidsEffects?.leave).toEqual({ birthParent: 'self', birthParentWeeks: 32, otherParentWeeks: 0 })
@@ -154,7 +154,7 @@ test('English', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
   await seedProfile(page, couple())
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await page.getByRole('button', { name: 'A planned child' }).click()
   await expect(page.getByText(`${THIS_YEAR + 1} · planned`)).toBeVisible()
   await expect(page.getByText('What a child costs, according to Statistics Canada')).toBeVisible()

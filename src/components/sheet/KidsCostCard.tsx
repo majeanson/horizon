@@ -9,13 +9,21 @@ import { formatMoney } from '../../lib/money'
 import type { Profile } from '../../lib/schema'
 import { today } from '../../lib/today'
 import { Fold } from '../Fold'
-import { SectionHeader } from '../SectionHeader'
+import { AccordionItem } from '../Accordion'
 
 // « Ce que coûtent les enfants » on the sheet: what Statistics Canada says a family like this one spends per child, by the child's age, what the state pays back, what a
 // parental leave costs in pay — said in plain numbers, an ESTIMATE, never put over a figure the person typed. It used to sit among the fields of the Famille card on
 // Profil; the choices that ACT on it (use these amounts, count the benefits, take a leave) stay there, and this is where the numbers are READ. Where they come from
 // (the method, the pages) is one tap away. Shown once there is a child at home or one still to come.
 const SOURCES = [CHILD_COSTS, CPI_ANNUAL].map((x) => x.source)
+
+/** Whether the card has anything to say (a child at home or still to come): the sheet's map lists it only then. */
+export function kidsCostShown(profile: Profile): boolean {
+  const now = today()
+  const untilAge = profile.household.childSpending?.untilAge ?? DEFAULT_LEAVE_AGE
+  const stages = (profile.household.children ?? []).map((y) => childStage(y, now.year, untilAge))
+  return suggestChildCost(profile, now.year) !== null && (stages.includes('home') || stages.includes('future'))
+}
 
 export function KidsCostCard({ profile }: { profile: Profile }) {
   const { lang } = useLang()
@@ -35,9 +43,10 @@ export function KidsCostCard({ profile }: { profile: Profile }) {
   const summary = kidsSummary(profile, now.year)
   const lines = leaveSummary(profile, now.year)
   const nameOf = (id: 'self' | 'spouse') => profile.household.persons.find((x) => x.id === id)?.name.trim() || (id === 'self' ? t.profile.self : t.profile.spouse)
+  // The lead introduces the bands below it (it ends on a colon); closed, the card says it as a sentence.
+  const lead = c.lead(c.families[s.family], c.levels[s.level], s.children)
   return (
-    <section id="enfants" className="sheet__section" aria-label={c.title}>
-      <SectionHeader title={c.title} subtitle={c.lead(c.families[s.family], c.levels[s.level], s.children)} concept="enfants" />
+    <AccordionItem id="enfants" className="sheet__section" title={c.title} subtitle={lead} summary={lead.replace(/s?:$/u, '.')} concept="enfants" nav={false}>
       <ul className="kids-cost__bands">
         {s.bands.map((band, i) => (
           <li key={c.bands[i]}>{c.bandLine(c.bands[i], money(band))}</li>
@@ -79,6 +88,6 @@ export function KidsCostCard({ profile }: { profile: Profile }) {
           </ul>
         </div>
       </Fold>
-    </section>
+    </AccordionItem>
   )
 }

@@ -10,7 +10,7 @@ const how = (page: import('@playwright/test').Page) => page.getByRole('radiogrou
 const box = (card: import('@playwright/test').Locator, group: string, name: string) => card.getByRole('group', { name: group }).getByRole('textbox', { name, exact: true })
 
 test('Ensemble → Séparé: the joint account holds the figure, each person adds their own, and the total is their sum — saved and reopened as left', async ({ page }) => {
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   const card = page.locator('#budget')
   await expect(how(page).getByRole('radio', { name: 'Ensemble' })).toBeChecked({ timeout: 30_000 })
   const before = (await savedProfile(page)).household.spending
@@ -51,7 +51,7 @@ test('one person has no such choice: the budget is one figure', async ({ page })
   alone.household.persons = alone.household.persons.slice(0, 1)
   alone.household.livesAlone = true
   await page.addInitScript(([key, value]) => localStorage.setItem(key, value), ['horizon-profile', JSON.stringify(alone)] as const)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await expect(page.locator('#budget')).toBeVisible({ timeout: 30_000 })
   await expect(how(page)).toHaveCount(0)
 })

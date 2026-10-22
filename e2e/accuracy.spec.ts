@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 const panel = (page: import('@playwright/test').Page) => page.locator('.profile-section', { hasText: 'Rendre mon profil exact' })
 
 test('a figure is estimated until the person says it is real; the mark, the meter and the saved profile agree, and a reload keeps it', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   const meter = panel(page).getByRole('progressbar')
   await expect(meter).toHaveAttribute('aria-valuenow', '0')
   const total = Number(await meter.getAttribute('aria-valuemax'))
@@ -35,7 +35,7 @@ test('a figure is estimated until the person says it is real; the mark, the mete
 })
 
 test('the panel is a door to « Par document », beside the guide for every figure, and sits after the form', async ({ page }) => {
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   // the two ways are two chips: walk every figure with the guide, or confirm document by document — filling what is blank is « Remplir ce qui manque », not here
   await expect(panel(page).getByRole('button', { name: 'Tout confirmer pas à pas' })).toBeVisible()
   await expect(panel(page).getByRole('button', { name: 'Estimer ce qui manque' })).toHaveCount(0)
@@ -52,7 +52,7 @@ test('the panel is a door to « Par document », beside the guide for every figu
 })
 
 test('a document’s step names it, says what it settles and where to get it, and links its official page', async ({ page }) => {
-  await page.goto('/profil?form=1&par=document&etape=tax')
+  await page.goto('/profil?bloc=tout&form=1&par=document&etape=tax')
   await expect(page.getByRole('heading', { name: 'Avis de cotisation et compte de l’ARC', level: 2 })).toBeVisible()
   await expect(page.getByRole('link', { name: /page officielle/ })).toHaveAttribute('href', /^https:\/\/www\.canada\.ca\//)
   await expect(page.locator('.saisie__head').getByText('Où le trouver')).toBeVisible()
@@ -63,7 +63,7 @@ test('a document’s step names it, says what it settles and where to get it, an
 })
 
 test('the guide walks the form: it lights the field, says where the figure is, confirms on a tap, and ends with the count', async ({ page }) => {
-  await page.goto('/profil?form=1&par=document&etape=bank')
+  await page.goto('/profil?bloc=tout&form=1&par=document&etape=bank')
   await page.getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await expect(bar).toBeVisible()
@@ -88,7 +88,7 @@ test('the guide walks the form: it lights the field, says where the figure is, c
 })
 
 test('the guide finishes: after the last figure it says how many are confirmed', async ({ page }) => {
-  await page.goto('/profil?form=1&par=document&etape=budget')
+  await page.goto('/profil?bloc=tout&form=1&par=document&etape=budget')
   // the budget document has two figures: confirm both
   await page.getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
@@ -104,7 +104,7 @@ test('the guide finishes: after the last figure it says how many are confirmed',
 
 test('on a phone the guide sits above the bottom navigation, inside the window, and nothing runs off the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/profil?form=1&par=document&etape=bank')
+  await page.goto('/profil?bloc=tout&form=1&par=document&etape=bank')
   await page.getByRole('button', { name: 'Me guider' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   await expect(bar).toBeVisible()
@@ -123,7 +123,7 @@ test('« Remplir ce qui manque » › « Estimer ce qui manque » fills blank ea
   me.earningsHistory = { '2020': 55_000 }
   me.accounts.tfsa.balance = 40_000
   me.accounts.tfsa.room = 0
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
   const quick = page.locator('#niveau')
@@ -151,12 +151,14 @@ test('« Remplir ce qui manque » › « Estimer ce qui manque » fills blank ea
 })
 
 test('the results say how much of the answer stands on confirmed figures, and point back to the profile', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   // With unconfirmed figures the line is the answer’s range (every estimated figure moved at once), still counting the confirmed ones.
   const note = page.locator('.verdict .refine__confidence')
   await expect(note).toContainText(/Entre \d+ (?:et \d+ ans|ans et peut-être aucun âge avant \d+),? selon vos chiffres estimés — 0 sur \d+ confirmés\./, { timeout: 60_000 })
   await note.getByRole('link', { name: 'Rendre mon profil exact' }).click()
-  await expect(page).toHaveURL(/\/profil$/)
+  await expect(page).toHaveURL(/\/profil\?bloc=exact$/)
+  // the figure itself sits in the person's block: open that one
+  await page.getByRole('navigation', { name: 'Sections du profil' }).getByRole('button', { name: /^Camille/ }).click()
   await page.locator('[data-fact="self:rrspBalance"]').getByRole('button', { name: /^Estimé/ }).click()
   await page.getByRole('link', { name: 'Résultats' }).first().click()
   await expect(page.locator('.verdict')).toContainText(/1 sur \d+ (?:chiffres )?confirmés/)
@@ -171,7 +173,7 @@ for (const [name, size, maxShare] of [
 ] as const) {
   test(`the guide never covers the figure it is on, and stays a strip — ${name}`, async ({ page }) => {
     await page.setViewportSize(size)
-    await page.goto('/profil?form=1&par=document&etape=bank')
+    await page.goto('/profil?bloc=tout&form=1&par=document&etape=bank')
     await page.getByRole('button', { name: 'Me guider' }).click()
     const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
     await expect(bar).toBeVisible()
@@ -204,7 +206,7 @@ test('« Estimer ce qui manque » also estimates a REER room left at 0 — from 
   alex.salaryToday = 100_000
   alex.earningsHistory = {}
   alex.accounts.rrsp = { ...alex.accounts.rrsp, balance: 60_000, room: 0, lockedIn: 0 }
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.evaluate(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(seed)])
   await page.reload()
   const quick = page.locator('#niveau')

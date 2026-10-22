@@ -25,7 +25,7 @@ test('the answer says when another order of drawing clearly wins, and says what 
   // but the default 45 s TEST budget cut them off on CI's slow runner (the element was there, still empty at 45.1 s — red 2026-10-14).
   test.slow()
   await seedProfile(page, rrspHeavy() as never)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const year = page.locator('#annee')
   await year.scrollIntoViewIfNeeded()
   const nudge = year.locator('.order-nudge')
@@ -39,7 +39,7 @@ test('the answer says when another order of drawing clearly wins, and says what 
 
 test('a household whose own order is already the best hears nothing', async ({ page }) => {
   await seedProfile(page, EXAMPLE)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const year = page.locator('#annee')
   await year.scrollIntoViewIfNeeded()
   await expect(year.getByRole('button', { name: 'Dans quel ordre puiser ?' })).toBeVisible()
@@ -53,7 +53,7 @@ test('the six orders are not asked until the block is scrolled into view', async
   const workers: string[] = []
   page.on('worker', (w) => workers.push(w.url()))
   await seedProfile(page, rrspHeavy() as never)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await page.waitForTimeout(4_000)
   expect(workers.some((u) => u.includes('withdrawalOrders')), 'no order search while the block is far below').toBe(false)

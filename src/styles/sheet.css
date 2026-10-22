@@ -120,3 +120,22 @@
     display: none;
   }
 }
+
+/* Inside a card of the accordion the measures are not cards of their own: a raised card in a raised card read as clutter. They sit flat, parted by a hairline; the
+   holdings' tiles keep a quiet tint (no shadow) so each stays a thing one can tap. Appended last: the cascade is the import order. */
+.sheet__section .sheet__stat,
+.sheet__section .sheet__mover {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.6rem 0 0;
+  border-top: 1px solid var(--line);
+}
+.sheet__section .sheet__stats > .sheet__stat:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.sheet__section .sheet__slot {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--line) 35%, transparent);
+}

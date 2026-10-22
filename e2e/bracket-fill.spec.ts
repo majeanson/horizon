@@ -60,7 +60,7 @@ test('the answer says so when melting the REER clearly wins, and not before the 
   const workers: string[] = []
   page.on('worker', (w) => workers.push(w.url()))
   await seedProfile(page, melter() as never)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await page.waitForTimeout(3_000)
   expect(workers.some((u) => u.includes('bracketFill')), 'nothing asked while the block is far below').toBe(false)

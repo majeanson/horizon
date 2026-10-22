@@ -14,7 +14,7 @@ async function loadExample(page: Page, name: string) {
   await page.goto('/donnees?autres=examples')
   await page.getByRole('button', { name, exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Charger' }).click()
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('.verdict__line')).toBeVisible()
 }
 // The ledger lives on the « Preuve » view of the results page.
@@ -88,7 +88,7 @@ test('heir: young and rich — « dès maintenant » rather than a first age tri
   await page.goto('/decider?spend=60000')
   await expect(page.locator('#depenser')).toContainText(/dès maintenant.|C’est le montant de vos hypothèses./, { timeout: 30_000 })
   // the comparison starts at the age already reached, and nobody is shown an age in the past
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.getByRole('group', { name: 'Comparer des âges de départ' }).getByRole('button', { name: /^27 ans/ })).toBeVisible()
 })
 
@@ -102,7 +102,7 @@ test('average couple: the home is in the year table (the mortgage paid, the equi
   await expect(table.locator('tbody tr').first()).toContainText('13 800 $')
   await expect(table.locator('tbody tr', { hasText: /^2045/ })).toContainText('—')
   // the chart's « Détail »: the house beside the accounts
-  await page.goto('/resultats?metric=detail')
+  await page.goto('/resultats?cartes=all&metric=detail')
   await expect(page.locator('.chart-detail .chart__legend-item', { hasText: 'Maison (valeur nette)' })).toBeVisible({ timeout: 30_000 })
 })
 
@@ -111,7 +111,7 @@ test('downsizer: selling the house is what lets them stop at 58, and the plan sh
   await expect(page.locator('.verdict__line')).toContainText('58 ans')
   await expect(page.locator('.scenario').first()).toContainText('L’argent dure jusqu’à')
   // the profile says it: a home, a mortgage, a planned sale
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   const home = page.locator('.profile-section', { hasText: 'Résidence principale' })
   await expect(home.getByRole('textbox', { name: 'Valeur de la maison aujourd’hui' })).toHaveValue(/880\s?000/)
   await expect(await exactBox(home, 'Âge de la vente (première personne)')).toHaveValue('58')
@@ -124,7 +124,7 @@ test('planner: a life to plan — the profile carries its events, the answer mov
   await loadExample(page, 'Couple, une vie à planifier')
   await expect(page.locator('.verdict__line')).toContainText('57 ans')
   // the profile says it: a child to come, a part-time work, an inheritance and a care cost among the dated events
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await expect(page.locator('.flow__line', { hasText: 'Un héritage' })).toBeVisible()
   await expect(page.locator('.flow__line', { hasText: 'Des soins plus tard' })).toBeVisible()
   // the care what-if REPLACES the care the household already counts (as « Garder » does), and says so
@@ -137,7 +137,7 @@ test('family: one big pay and one small, two children — the profile carries th
   await expect(page.locator('.verdict__line')).toContainText('60 ans')
   await expect(page.locator('.verdict__line')).toContainText('tous les deux')
   // the profile says it: two children and what the household counts about them
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await expect(page.getByText('Olivier').first()).toBeVisible()
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('horizon-profile')!).household)
   expect(saved.children).toEqual([2024, 2028])

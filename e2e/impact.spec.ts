@@ -6,7 +6,7 @@ import { savedProfile, seedProfile } from './seed'
 
 test('Ma fiche ranks the unconfirmed figures, and each one opens its own field, lit, on Profil', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/fiche')
+  await page.goto('/fiche?bloc=fiche-preciser')
   await expect(page.getByRole('heading', { name: 'Ce qui préciserait la réponse' })).toBeVisible({ timeout: 60_000 })
   const find = page.locator('.sheet__movers').getByRole('link')
   await expect(find.first()).toBeVisible({ timeout: 60_000 })
@@ -25,7 +25,7 @@ const RANGE = /^Entre (\d+) (?:et (\d+) ans|ans et peut-être aucun âge avant \
 
 test('the verdict carries a range while figures are estimates', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const line = page.locator('.verdict .refine__confidence')
   await expect(line).toContainText(/selon vos chiffres estimés/, { timeout: 60_000 })
   const text = ((await line.textContent()) ?? '').trim()
@@ -38,14 +38,14 @@ test('the verdict carries a range while figures are estimates', async ({ page })
 
 test('once every figure is confirmed the verdict says so, with no range', async ({ page }) => {
   await seedProfile(page)
-  await page.goto('/profil')
+  await page.goto('/profil?bloc=tout')
   await page.getByRole('button', { name: 'Tout confirmer pas à pas' }).click()
   const bar = page.getByRole('region', { name: 'Guide pour confirmer vos chiffres' })
   const confirm = bar.getByRole('button', { name: 'C’est confirmé' })
   for (let i = 0; i < 80 && (await confirm.count()) > 0; i++) await confirm.click()
   await expect(bar).toContainText('Guide terminé')
   await expect.poll(async () => (await savedProfile(page)).confirmed.length).toBeGreaterThan(10)
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const line = page.locator('.verdict .refine__confidence')
   await expect(line).toContainText('Tous les chiffres de votre profil sont confirmés par vos documents.', { timeout: 60_000 })
   await expect(line).not.toContainText(/Entre \d+/)

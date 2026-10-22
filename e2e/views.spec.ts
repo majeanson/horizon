@@ -7,7 +7,7 @@ import { seedProfile } from './seed'
 test.beforeEach(async ({ page }) => seedProfile(page))
 
 test('two pages, one level each: Résultats is the answer then its proof; « Décider » holds the levers, then the what-ifs one at a time, kept in the address', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const nav = page.getByRole('navigation', { name: 'Navigation principale' })
   await expect(nav.getByRole('link')).toHaveText(['Profil', 'Résultats', 'Décider', 'Hypothèses'])
   await expect(page.getByRole('tablist', { name: 'Vues des résultats' })).toHaveCount(0)
@@ -36,14 +36,14 @@ test('two pages, one level each: Résultats is the answer then its proof; « Dé
 })
 
 test('the answer carries no « Comment lire cette page ? » chip: the guide to the whole app is on the home page', async ({ page }) => {
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await expect(page.getByRole('button', { name: 'Comment lire cette page ?' })).toHaveCount(0)
 })
 
 test('« Décider »: a link to one of its parts opens that part by itself, and an address that carries its own key does too; old addresses land where their content lives', async ({ page }) => {
   // the door on the answer card (« Et si je dépensais moins ? ») goes to Décider, on the spending what-if, open
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   await page.getByRole('button', { name: 'Et si je dépensais moins ?' }).first().click()
   await expect(page).toHaveURL(/\/decider\?/)
   await expect(page).toHaveURL(/essai=spend/)
@@ -95,7 +95,7 @@ test('« Preuve » › « Solidité »: the scenarios and a hard market in brief
 
 test('« Comparer »: the departure ages are the first way, and a way that the household does not have is not offered', async ({ page }) => {
   // the golden couple has no kept plan: two ways, the ages and each of us
-  await page.goto('/resultats')
+  await page.goto('/resultats?cartes=all')
   const ways = page.getByRole('tablist', { name: 'Façons de comparer' })
   await expect(ways.getByRole('tab')).toHaveText(['Âges de départ', 'Chacun de son côté'])
   await expect(page.locator('.scenarios')).toBeVisible({ timeout: 60_000 })
@@ -105,6 +105,6 @@ test('« Comparer »: the departure ages are the first way, and a way that the h
   await expect(page.locator('.scenarios')).toHaveCount(0)
   await expect(page.locator('.chart-panel')).toHaveCount(0)
   // an address that names a way opens it
-  await page.goto('/resultats?cv=each')
+  await page.goto('/resultats?cartes=all&cv=each')
   await expect(page.locator('.verdict__each')).toBeVisible({ timeout: 60_000 })
 })

@@ -24,6 +24,8 @@ export interface SheetWords {
     noEarner: string
   }
   verdict: { title: string }
+  /** The one sentence under each card's title — and what a closed card says in place of its body. */
+  sentences: { situation: string; holdings: string; sharpen: string }
   groups: { today: { title: string; hint: string }; retirement: { title: string; hint: string } }
   howToRead: string
   slots: {
@@ -60,6 +62,7 @@ export interface SheetWords {
 const FR: SheetWords = {
   title: 'Ma fiche',
   verdict: { title: 'Où vous en êtes' },
+  sentences: { situation: 'Le plus tôt où l’argent dure, et la solidité du plan.', holdings: 'Les comptes, les rentes et la maison sur lesquels le plan repose.', sharpen: 'Les chiffres qui feraient le plus bouger la réponse.' },
   groups: { today: { title: 'Aujourd’hui', hint: 'Pendant que vous travaillez encore.' }, retirement: { title: 'À la retraite', hint: 'Une fois toutes les rentes versées.' } },
   howToRead: 'Comment lire cette mesure',
   intro: 'Votre ménage d’un coup d’œil. Tout vient du même calcul que la réponse, et chaque carte mène à l’endroit où le changer.',
@@ -136,6 +139,7 @@ const FR: SheetWords = {
 const EN: SheetWords = {
   title: 'My sheet',
   verdict: { title: 'Where you stand' },
+  sentences: { situation: 'The earliest the money lasts, and how sturdy the plan is.', holdings: 'The accounts, pensions and home the plan stands on.', sharpen: 'The figures that would move the answer most.' },
   groups: { today: { title: 'Today', hint: 'While you still work.' }, retirement: { title: 'Once retired', hint: 'When every pension is in pay.' } },
   howToRead: 'How to read this measure',
   intro: 'Your household at a glance. All of it comes from the same calculation as the answer, and each card leads to where you change it.',

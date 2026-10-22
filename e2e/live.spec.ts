@@ -10,7 +10,7 @@ const bar = (page: Parameters<typeof seedProfile>[0]) => page.locator('.shell__b
 test.describe('the answer in the bar', () => {
   test('follows an edit: it shows the answer on arrival, then the age a typed figure moves it to; a tap opens Résultats', async ({ page }) => {
     await seedProfile(page)
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await expect(bar(page)).toContainText('60 ans', { timeout: 30_000 })
     // (the link's name is the aria-label, « Votre réponse : 60 ans. Voir les résultats »; the accessible name normalises the French no-break space, so the regex skips the colon)
     const link = bar(page).getByRole('link', { name: /Votre réponse.*60 ans\. Voir les résultats/ })
@@ -43,7 +43,7 @@ test.describe('the answer in the bar', () => {
 
   test('says nothing while the profile has gaps', async ({ page }) => {
     await seedProfile(page, blankSeed())
-    await page.goto('/profil?form=1')
+    await page.goto('/profil?bloc=tout&form=1')
     await expect(page.getByRole('heading', { name: 'Profil', level: 1 })).toBeVisible()
     await page.waitForTimeout(1500)
     await expect(page.getByText('Votre réponse', { exact: true })).toHaveCount(0)
@@ -52,7 +52,7 @@ test.describe('the answer in the bar', () => {
   test('fits the bar on a small phone: the label goes, the age stays, nothing runs past the edge', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 780 })
     await seedProfile(page)
-    await page.goto('/profil')
+    await page.goto('/profil?bloc=tout')
     await expect(bar(page)).toContainText('ans', { timeout: 30_000 })
     await expect(bar(page).locator('.shell__answer-label')).toBeHidden()
     await expectNoHorizontalOverflow(page)
@@ -65,7 +65,7 @@ test.describe('the answer in the bar', () => {
   test('English', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
     await seedProfile(page)
-    await page.goto('/profil')
+    await page.goto('/profil?bloc=tout')
     await expect(page.locator('.shell__bar').getByRole('status')).toContainText('Your answer', { timeout: 30_000 })
     await expect(page.locator('.shell__bar').getByRole('link', { name: /Your answer: age 60/ })).toBeVisible()
   })

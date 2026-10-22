@@ -14,7 +14,7 @@ test('Profil: the household, what applies, the people, then the household’s sp
   family.household.home = { value: 400_000, mortgage: { balance: 100_000, rate: 0.05, monthlyPayment: 1_200, frequency: 'monthly', renewal: null }, sale: null }
   await page.addInitScript(([key, value]) => localStorage.setItem(key, value), [PROFILE_KEY, JSON.stringify(family)] as const)
   await showAllSections(page)
-  await page.goto('/profil?form=1')
+  await page.goto('/profil?bloc=tout&form=1')
   await expect(page.locator('#budget')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('#exact')).toBeVisible() // the lazy card at the end
   // the order of the cards in the DOM: the household, the situation, the people, then the household's costs

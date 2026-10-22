@@ -7,15 +7,16 @@ import { timelineOf, type MarkKind, type PhaseKind } from '../../lib/timeline'
 // « Votre plan en une ligne » — the whole plan at a glance: one thin bar per person from today to the end of the plan, in three stretches
 // (working · on the nest · on pensions), with the dates ahead named under it. It says only what the profile states (lib/timeline.ts): no projection
 // runs here, so it is instant and can never disagree with the profile. The stretches are told in text too (the bar is a picture, not the only way).
-export function TimelineStrip({ household, names, todayYear, horizonAge }: { household: Household; names: readonly string[]; todayYear: number; horizonAge: number }) {
+export function TimelineStrip({ household, names, todayYear, horizonAge, bare }: { household: Household; names: readonly string[]; todayYear: number; horizonAge: number; bare?: boolean }) {
   const { lang } = useLang()
   const t = useT()
   const c = RESULTS_COPY[lang].timeline
   const people = timelineOf(household, todayYear, horizonAge)
   const markText = (kind: MarkKind, age: number) => (kind === 'retire' ? c.retire(age) : kind === 'rrq' ? c.rrq(age) : c.oas(age))
   return (
-    <figure id="ligne" className="timeline surface">
-      <figcaption className="timeline__title">{c.title}</figcaption>
+    <figure id={bare ? undefined : 'ligne'} className={bare ? 'timeline' : 'timeline surface'}>
+      {/* `bare`: inside a card that already carries the title (Ma fiche) */}
+      {bare ? <figcaption className="sr-only">{c.title}</figcaption> : <figcaption className="timeline__title">{c.title}</figcaption>}
       {people.map((t, i) => {
         const span = t.endAge - t.nowAge
         const name = names[i] ?? ''
