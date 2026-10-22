@@ -22,6 +22,7 @@ import { computeAnswer } from './answer.ts'
 import { careAnswer } from './careModel.ts'
 import { marketRange } from './marketRange.ts'
 import { comparePlans } from './plansCompare.ts'
+import { planFactsOf } from './planFacts.ts'
 import { readProfileJson } from './migrations.ts'
 import { runSelections } from './resultsModel.ts'
 import { spendAnswer } from './spendModel.ts'
@@ -70,6 +71,7 @@ const CASES: Case[] = [
   },
   { name: 'factImpact', module: './factImpact.worker.ts', request: { household: S, assumptions: SA, facts: FACTS }, expected: () => [factSwings(S, SA, FACTS)] },
   { name: 'runs', module: './runs.worker.ts', request: { profile, today: TODAY, selections: ['plan', 60] }, expected: () => [runSelections(profile, TODAY, ['plan', 60])] },
+  { name: 'planFacts', module: './planFacts.worker.ts', request: { profile, today: TODAY }, expected: () => [planFactsOf({ profile, today: TODAY })] },
   { name: 'decide (reverse)', module: './decide.worker.ts', request: { what: 'reverse', household: S, assumptions: SA, age: 62 }, expected: () => [{ what: 'reverse', answer: reverseTarget(S, SA, 62) }] },
   { name: 'decide (regret)', module: './decide.worker.ts', request: { what: 'regret', household: S, assumptions: SA }, expected: () => [{ what: 'regret', answer: regretAnswer(S, SA) }] },
   { name: 'decide (fan)', module: './decide.worker.ts', request: { what: 'fan', household: S, assumptions: SA }, expected: () => [{ what: 'fan', answer: { lines: fan(S, SA) } }] },

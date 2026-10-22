@@ -4,6 +4,7 @@ import { Chip } from '../components/Chip'
 import { Cluster } from '../components/Layout'
 import { PageHead } from '../components/PageHead'
 import { InstallLine } from '../components/install/InstallHint'
+import { PlanStoryFold } from '../components/PlanStoryFold'
 import { PlansSection } from '../components/PlansSection'
 import { Section } from '../components/profile/shared'
 import { StatusMessage } from '../components/StatusMessage'
@@ -200,6 +201,7 @@ export function Donnees() {
                 {EXAMPLE_COPY[lang][id].name}
               </button>
               <span className="field-row__hint">{EXAMPLE_COPY[lang][id].story}</span>
+              <PlanStoryFold id={id} profile={profileOfExample(id)} />
             </li>
           ))}
         </ul>

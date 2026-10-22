@@ -1851,3 +1851,11 @@
 
 /* An example's pictogram sits above its name in the list on the data page (components/HouseholdGlyphs.tsx). */
 .example-list .household-glyphs { margin-block-end: 0.15rem; }
+
+/* An example household's plan in plain words, and its « and if…? » cards (components/PlanStory.tsx). */
+.plan-story { display: grid; gap: 0.6rem; }
+.plan-story__text { margin: 0; }
+.plan-story__heading { margin: 0.4rem 0 0; font-size: var(--text-md, 1rem); }
+.plan-story__cards { display: grid; gap: 0.7rem; margin: 0; padding: 0; list-style: none; }
+.plan-story__cards li { display: grid; gap: 0.15rem; justify-items: start; }
+.example-list .plan-story-fold, .demo .plan-story-fold { justify-self: stretch; }

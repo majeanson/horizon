@@ -41,6 +41,7 @@ import { Skeleton, SkeletonLines } from '../components/Skeleton'
 import { SkeletonChips, SkeletonFill, SkeletonGhost, SkeletonText, SliderSkeleton } from '../components/SkeletonShapes'
 import { StatusMessage } from '../components/StatusMessage'
 import { Fold } from '../components/Fold'
+import { PlanStoryFold } from '../components/PlanStoryFold'
 import { HeatGrid } from '../components/HeatGrid'
 import { SubTabs } from '../components/SubTabs'
 import { Switch } from '../components/Switch'
@@ -595,6 +596,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'HeatGrid', file: 'src/components/HeatGrid.tsx', kw: 'grille tableau couleur chaleur meilleur trois par trois comparer', render: () => <HeatGridSpecimen /> },
     { cat: 'Saisie', name: 'TableChooser', file: 'src/components/TableChooser.tsx', kw: 'tableau choisir scénario hypothèses entête', render: () => <TableChooserSpecimen /> },
     { cat: 'Affichage', name: 'Fold', file: 'src/components/Fold.tsx', kw: 'replier déplier explication détails comment lire', render: () => <Fold summary="Comment lire cette mesure"><p className="field-row__hint">Ce que la mesure veut dire, et ce que représente une barre pleine.</p></Fold> },
+    { cat: 'Affichage', name: 'PlanStoryFold', file: 'src/components/PlanStoryFold.tsx', kw: 'plan en mots histoire exemple et si chute marchés décès dépenser moins rentes', render: () => <PlanStoryFold id="golden" profile={exampleProfile('golden')} /> },
     { cat: 'Affichage', name: 'Accordion', file: 'src/components/Accordion.tsx', exports: ['Accordion', 'AccordionItem', 'AccordionMode'], kw: 'accordéon un bloc à la fois suivant précédent replier blocs terminés', render: () => <AccordionSpecimen /> },
     { cat: 'Saisie', name: 'SubTabs', file: 'src/components/SubTabs.tsx', kw: 'onglets segmenté', render: () => <SubTabsSpecimen /> },
     { cat: 'Affichage', name: 'DisplayControls', file: 'src/components/DisplayControls.tsx', kw: 'affichage thème contraste taille texte lisibilité accessibilité', render: () => <DisplayControls /> },
