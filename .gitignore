@@ -29,3 +29,6 @@ horizon-*.json
 reports/
 # Claude Code: per-machine settings, launch config, review worktrees
 .claude/
+
+# LLM fuzz harness output
+scripts/fuzz/out/

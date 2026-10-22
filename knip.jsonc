@@ -2,6 +2,8 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": ["scripts/*.mjs", "scripts/*.ts", "e2e/**/*.ts"],
   "project": ["src/**/*.{ts,tsx}", "worker/**/*.ts", "scripts/**/*.{mjs,ts}"],
+  // The LLM audit harness (scripts/fuzz) is developer tooling run by hand with its own package.json (the Anthropic SDK): never imported by the app, and not an entry of the build.
+  "ignore": ["scripts/fuzz/**"],
   // A planner's exports are checked for real, but an export used only INSIDE its own module is a
   // superfluous `export` keyword, not dead code — and that noise is what makes a report get skimmed.
   "ignoreExportsUsedInFile": true,

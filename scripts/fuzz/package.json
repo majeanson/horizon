@@ -1,0 +1,9 @@
+{
+  "name": "horizon-fuzz",
+  "private": true,
+  "type": "module",
+  "description": "LLM-generated households + a semantic audit of the engine's tables. Dev tooling only: never imported by the app.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.1.0"
+  }
+}
