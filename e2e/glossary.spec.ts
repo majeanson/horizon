@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, seedProfile, switchLanguage } from './seed'
 
-// THE GLOSSARY. A sigle in a hint is a link to its entry; following it lands on that entry, marked, and the page keeps working
-// as a page of its own (the map, the documents, the official links).
+// THE GLOSSARY. A sigle in a hint is a link to its entry: a plain tap says what it is in a small dialog, right where the person is reading, and the way on
+// from there lands on that entry, marked; the page keeps working as a page of its own (the map, the documents, the official links).
 
 test.beforeEach(async ({ page }) => seedProfile(page, EXAMPLE))
 
-test('a sigle in a hint opens its glossary entry, scrolled to and marked', async ({ page }) => {
+test('a sigle in a hint says what it is in place, and the way on opens its glossary entry, scrolled to and marked', async ({ page }) => {
   await page.goto('/profil')
   await page.locator('.page-head__title').waitFor()
   // The ⓘ notes are closed: take a hint that is on screen.
@@ -15,6 +15,11 @@ test('a sigle in a hint opens its glossary entry, scrolled to and marked', async
   const href = await link.getAttribute('href')
   expect(href).toMatch(/^\/glossaire#terme-[a-z-]+$/)
   await link.click()
+  // The tap stays on the page: a dialog with the sentence, not a new page.
+  const card = page.getByRole('dialog')
+  await expect(card).toBeVisible()
+  await expect(page).toHaveURL((url) => url.pathname === '/profil')
+  await card.locator(`a[href="${href}"]`).click()
   await expect(page).toHaveURL((url) => url.pathname + url.hash === href)
   const entry = page.locator(`#${href!.split('#')[1]}`)
   await expect(entry).toBeInViewport()

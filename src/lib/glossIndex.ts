@@ -7,11 +7,11 @@ import type { Lang } from '../i18n'
 
 export const GLOSS_SIGLES: Readonly<Record<Lang, Readonly<Record<string, string>>>> = {
   fr: {
-    RRQ: 'rrq', PSV: 'psv', SRG: 'srg', MGA: 'mga', REER: 'reer', CELI: 'celi', FERR: 'ferr', PBR: 'pbr', ARC: 'arc',
+    RRQ: 'rrq', PSV: 'psv', SRG: 'srg', ACEBE: 'acebe', MGA: 'mga', REER: 'reer', CELI: 'celi', FERR: 'ferr', PBR: 'pbr', ARC: 'arc',
     RREGOP: 'rregop', RVER: 'rver', RPAC: 'rpac', CRI: 'cri', FRV: 'frv',
   },
   en: {
-    QPP: 'rrq', OAS: 'psv', GIS: 'srg', YMPE: 'mga', RRSP: 'reer', TFSA: 'celi', RRIF: 'ferr', ACB: 'pbr', CRA: 'arc',
+    QPP: 'rrq', OAS: 'psv', GIS: 'srg', CGEB: 'acebe', YMPE: 'mga', RRSP: 'reer', TFSA: 'celi', RRIF: 'ferr', ACB: 'pbr', CRA: 'arc',
     RREGOP: 'rregop', VRSP: 'rver', PRPP: 'rpac', LIRA: 'cri', LIF: 'frv',
   },
 }

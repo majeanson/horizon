@@ -183,7 +183,7 @@ export const GLOSSARY_GROUP_FAMILY: Record<string, Family> = {
   horizon: 'horizon',
 }
 export const GLOSSARY_TERM_CONCEPT: Record<string, ConceptId> = {
-  rrq: 'rrq', psv: 'psv', srg: 'srg', indexation: 'indexation', releve: 'releve', mga: 'mga',
+  rrq: 'rrq', psv: 'psv', srg: 'srg', acebe: 'srg', indexation: 'indexation', releve: 'releve', mga: 'mga',
   reer: 'reer', celi: 'celi', ferr: 'ferr', droits: 'droits', fonte: 'fonte', rver: 'rver', rpac: 'rpac', cri: 'verrouille', frv: 'verrouille',
   'non-enregistre': 'nonEnregistre', pbr: 'pbr',
   'rente-employeur': 'employeur', 'rente-viagere': 'viagere', rregop: 'rregop',

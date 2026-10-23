@@ -2299,3 +2299,32 @@
   color: transparent;
   white-space: nowrap;
 }
+
+/* ── A sigle's plain sentence, in a small dialog (components/Gloss.tsx) ───────────────────────────────────────────────────────
+   Read by people who may need large type: the sentence is set a notch above the body, with room around it, and the way on to the glossary is a full-width,
+   thumb-sized link rather than a line of small print. */
+.kit-modal.gloss-card {
+  max-width: min(30rem, calc(100vw - 2rem));
+}
+.gloss-card__body {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  padding-block: var(--space-2, 0.5rem);
+}
+.gloss-card__name {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.gloss-card__plain {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.55;
+}
+.gloss-card__more {
+  margin: 0;
+}
+.gloss-card__more a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target, 44px);
+}

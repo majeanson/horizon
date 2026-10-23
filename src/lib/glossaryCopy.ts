@@ -100,6 +100,14 @@ const FR_GLOSSARY = {
           host: 'Service Canada',
         },
         {
+          id: 'acebe',
+          abbr: 'ACEBE',
+          name: 'Allocation canadienne pour l’épicerie et les besoins essentiels',
+          plain: 'Un versement du gouvernement fédéral, quatre fois par an, si votre revenu est modeste. Il n’est pas imposable. Jusqu’en juin 2026, on l’appelait le « crédit pour la TPS/TVH ».',
+          url: 'https://www.canada.ca/fr/agence-revenu/services/prestations-enfants-familles/allocation-canadienne-epicerie-besoins-essentiels.html',
+          host: 'Agence du revenu du Canada',
+        },
+        {
           id: 'indexation',
           abbr: 'Indexation',
           name: 'Le rajustement au coût de la vie',
@@ -462,6 +470,14 @@ const EN_GLOSSARY: typeof FR_GLOSSARY = {
           plain: 'A top-up to the OAS for modest incomes. It falls as other income rises, and stops above a certain threshold.',
           url: 'https://www.canada.ca/en/services/benefits/publicpensions/old-age-security/guaranteed-income-supplement.html',
           host: 'Service Canada',
+        },
+        {
+          id: 'acebe',
+          abbr: 'CGEB',
+          name: 'Canada Groceries and Essentials Benefit',
+          plain: 'A payment from the federal government, four times a year, if your income is modest. It is not taxable. Until June 2026 it was called the “GST/HST credit”.',
+          url: 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit.html',
+          host: 'Canada Revenue Agency',
         },
         {
           id: 'indexation',
