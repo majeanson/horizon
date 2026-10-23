@@ -32,6 +32,7 @@ const CCB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benef
 const CGEB_AMOUNTS = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit/how-much/payment-amounts.html'
 const CGEB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit.html'
 const ITA_122_5 = 'https://laws-lois.justice.gc.ca/eng/acts/I-3.3/section-122.5.html'
+const STATCAN_LIFE = 'https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401'
 const QC_PARAMS_PDF = 'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf'
 const RQ_SOLIDARITY_RULE = 'https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/credit-dimpot-pour-solidarite/'
 const RQ_SENIOR = 'https://www.revenuquebec.ca/fr/citoyens/credits-dimpot/credit-dimpot-pour-soutien-aux-aines/montant-du-credit-dimpot-pour-soutien-aux-aines/'
@@ -230,6 +231,21 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'qcCredits.solidarity.threshold': [43_195, QC_PARAMS_PDF],
   'qcCredits.solidarity.rateWithHousing': [0.06, RQ_SOLIDARITY_RULE],
   'qcCredits.solidarity.rateTvqOnly': [0.03, RQ_SOLIDARITY_RULE],
+  // Statistics Canada's life table for Québec, both sexes, 2022 to 2024: survivors at each exact age out of 100 000 born.
+  'mortality.survivors': [
+    {
+      25: 99098, 26: 99059, 27: 99019, 28: 98977, 29: 98932, 30: 98885, 31: 98835, 32: 98780, 33: 98723, 34: 98661,
+      35: 98596, 36: 98529, 37: 98458, 38: 98384, 39: 98305, 40: 98222, 41: 98134, 42: 98039, 43: 97937, 44: 97828,
+      45: 97710, 46: 97582, 47: 97444, 48: 97294, 49: 97130, 50: 96952, 51: 96756, 52: 96542, 53: 96307, 54: 96049,
+      55: 95766, 56: 95455, 57: 95115, 58: 94740, 59: 94330, 60: 93878, 61: 93383, 62: 92839, 63: 92241, 64: 91585,
+      65: 90864, 66: 90073, 67: 89205, 68: 88253, 69: 87210, 70: 86067, 71: 84816, 72: 83447, 73: 81952, 74: 80322,
+      75: 78545, 76: 76613, 77: 74517, 78: 72247, 79: 69796, 80: 67158, 81: 64328, 82: 61304, 83: 58089, 84: 54686,
+      85: 51108, 86: 47370, 87: 43496, 88: 39517, 89: 35469, 90: 31400, 91: 27364, 92: 23430, 93: 19679, 94: 16187,
+      95: 13015, 96: 10189, 97: 7769, 98: 5759, 99: 4144, 100: 2889, 101: 1949, 102: 1271, 103: 800, 104: 486,
+      105: 285, 106: 161, 107: 88, 108: 46, 109: 23, 110: 11,
+    },
+    STATCAN_LIFE,
+  ],
   'groceriesBenefit.adult': [445, CGEB_AMOUNTS],
   'groceriesBenefit.child': [234, CGEB_AMOUNTS],
   'groceriesBenefit.singleExtra': [234, CGEB_AMOUNTS],

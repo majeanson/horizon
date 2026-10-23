@@ -153,6 +153,11 @@ const CRA_CGEB = src(
   'Canada Groceries and Essentials Benefit (CGEB) - Canada.ca',
   { retrieved: '2026-10-23', note: '« In July 2026, there was a 25% increase to the benefit amount which will remain for 5 years from 2026 to 2031. » The payments of the five years start in July 2026, 2027, 2028, 2029 and 2030 (the Act’s last month is April 2031).' },
 )
+// How long people live (read 2026-10-23): Statistics Canada's complete life table, Québec, both sexes, 2022 to 2024 (released 2026-01-13). Pulled through the Web Data Service, coordinates 5.<age+1>.1.1.
+const STATCAN_LIFE_TABLE = src('https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401', 'Life expectancy and other elements of the complete life table, three-year estimates, Canada, all provinces except Prince Edward Island', {
+  retrieved: '2026-10-23',
+  note: 'Table 13-10-0114-01, geography Québec, sex « Both sexes », element « Number of survivors at age x (lx) », reference period 2022 to 2024, out of 100 000 at birth. Checks: men aged 65 89 035 and women 92 829 (both sexes 90 864); e(0) both sexes 82,39 years.',
+})
 // Québec's senior assistance and solidarity credits (read 2026-10-23). The amounts of the solidarity credit are Finance Québec's TABLEAU 4 (the document QC_PARAMS already cites); the ceilings Revenu Québec prints
 // (64 545 $, 70 395 $, 2 634 $ a child) are what the amounts reproduce at 6 %: (363 + 172 + 746) / 0,06 + 43 195 = 64 545.
 const QC_SOLIDARITY = src('https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf', "Paramètres du régime d'imposition des particuliers pour l'année d'imposition 2026", {
@@ -447,6 +452,26 @@ export const P2026 = {
       thresholdCouple: c(60_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Two-parent family: $60 000 or less » — the maximum is paid up to this family income (the page prints it to the nearest 1 000 $; the exact figure, a few hundred dollars higher, moves a payment by under 16 $ a year).' }, 100),
       thresholdSingle: c(44_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Single-parent family: $44 000 or less » — the maximum plus the supplement is paid up to this family income (printed to the nearest 1 000 $).' }, 100),
     },
+  },
+
+  mortality: {
+    survivors: c<Record<number, number>>(
+      {
+        25: 99098, 26: 99059, 27: 99019, 28: 98977, 29: 98932, 30: 98885, 31: 98835, 32: 98780,
+        33: 98723, 34: 98661, 35: 98596, 36: 98529, 37: 98458, 38: 98384, 39: 98305, 40: 98222,
+        41: 98134, 42: 98039, 43: 97937, 44: 97828, 45: 97710, 46: 97582, 47: 97444, 48: 97294,
+        49: 97130, 50: 96952, 51: 96756, 52: 96542, 53: 96307, 54: 96049, 55: 95766, 56: 95455,
+        57: 95115, 58: 94740, 59: 94330, 60: 93878, 61: 93383, 62: 92839, 63: 92241, 64: 91585,
+        65: 90864, 66: 90073, 67: 89205, 68: 88253, 69: 87210, 70: 86067, 71: 84816, 72: 83447,
+        73: 81952, 74: 80322, 75: 78545, 76: 76613, 77: 74517, 78: 72247, 79: 69796, 80: 67158,
+        81: 64328, 82: 61304, 83: 58089, 84: 54686, 85: 51108, 86: 47370, 87: 43496, 88: 39517,
+        89: 35469, 90: 31400, 91: 27364, 92: 23430, 93: 19679, 94: 16187, 95: 13015, 96: 10189,
+        97: 7769, 98: 5759, 99: 4144, 100: 2889, 101: 1949, 102: 1271, 103: 800, 104: 486,
+        105: 285, 106: 161, 107: 88, 108: 46, 109: 23, 110: 11,
+      },
+      'none',
+      STATCAN_LIFE_TABLE,
+    ),
   },
 
   qcCredits: {

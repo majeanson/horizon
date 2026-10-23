@@ -17,7 +17,7 @@
 
 ## 2026
 
-179 parameters.
+180 parameters.
 
 | Parameter | Value | Official page | Read on | Moves with | Note |
 | --- | --- | --- | --- | --- | --- |
@@ -163,6 +163,7 @@
 | `childBenefits.familyAllowance.reductionRate` | 0.04 | [Amounts of Family Allowance payments based on family income - Retraite Québec](https://www.retraitequebec.gouv.qc.ca/en/citizens/children/amounts-family-allowance-payments-based-family-income) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/montants-allocation-famille-selon-revenu-familial) | 2026-10-09 | fixed | The table of payments by family income (the 2025 amounts). Every row is the maximum less 4 % of the family income over the threshold, never under the minimum, with the single-parent supplement paid once: 1 child, two parents, 100 000 $: 3 006 − 4 % × (100 000 − 59 369) = 1 381 $; 2 children, one parent, 80 000 $: 7 067 − 4 % × (80 000 − 43 280) = 5 598 $; 2 children, two parents, 150 000 $: the floor, 2 × 1 196 = 2 392 $. |
 | `childBenefits.familyAllowance.thresholdCouple` | 60,000 | [Family Allowance - Retraite Québec](https://www.retraitequebec.gouv.qc.ca/en/citizens/children/family-allowance) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/allocation-famille) | 2026-10-09 | prices (CPI) · rounded to 100 | « Two-parent family: $60 000 or less » — the maximum is paid up to this family income (the page prints it to the nearest 1 000 $; the exact figure, a few hundred dollars higher, moves a payment by under 16 $ a year). |
 | `childBenefits.familyAllowance.thresholdSingle` | 44,000 | [Family Allowance - Retraite Québec](https://www.retraitequebec.gouv.qc.ca/en/citizens/children/family-allowance) · [version française](https://www.retraitequebec.gouv.qc.ca/fr/citoyens/enfants/allocation-famille) | 2026-10-09 | prices (CPI) · rounded to 100 | « Single-parent family: $44 000 or less » — the maximum plus the supplement is paid up to this family income (printed to the nearest 1 000 $). |
+| `mortality.survivors` | 86 entries: 25 → 99,098 … 110 → 11 | [Life expectancy and other elements of the complete life table, three-year estimates, Canada, all provinces except Prince Edward Island](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401) · [version française](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=1310011401) | 2026-10-23 | observation | Table 13-10-0114-01, geography Québec, sex « Both sexes », element « Number of survivors at age x (lx) », reference period 2022 to 2024, out of 100 000 at birth. Checks: men aged 65 89 035 and women 92 829 (both sexes 90 864); e(0) both sexes 82,39 years. |
 | `qcCredits.seniorAssistance.maxPerPerson` | 2,000 | [Amount of the Senior Assistance Tax Credit](https://www.revenuquebec.ca/en/citizens/tax-credits/senior-assistance-tax-credit/amount-of-the-credit/) · [version française](https://www.revenuquebec.ca/fr/citoyens/credits-dimpot/credit-dimpot-pour-soutien-aux-aines/montant-du-credit-dimpot-pour-soutien-aux-aines/) | 2026-10-23 | fixed | Année d’imposition 2025 : montant maximal 4 000 $ (conjoint admissible, tous deux 70 ans ou plus au 31 décembre 2025), 2 000 $ (sinon, avec ou sans conjoint) ; réduit de 5,40 % de la partie du revenu familial (ligne 275, avec celle du conjoint) qui dépasse 45 270 $ (avec conjoint) ou 27 835 $ (sans conjoint) ; revenu familial maximal 119 345 $ · 82 308 $ · 64 873 $. Finances Québec (Paramètres 2026, TABLEAU 3, p. 10) : seuils de 2026 28 405 $ et 46 200 $, taux 5,47 % (2025 : 27 835 $, 45 270 $, 5,40 %). |
 | `qcCredits.seniorAssistance.minAge` | 70 | [Amount of the Senior Assistance Tax Credit](https://www.revenuquebec.ca/en/citizens/tax-credits/senior-assistance-tax-credit/amount-of-the-credit/) · [version française](https://www.revenuquebec.ca/fr/citoyens/credits-dimpot/credit-dimpot-pour-soutien-aux-aines/montant-du-credit-dimpot-pour-soutien-aux-aines/) | 2026-10-23 | fixed | « vous et votre conjointe ou conjoint aviez 70 ans ou plus au 31 décembre 2025 ». |
 | `qcCredits.seniorAssistance.thresholdSingle` | 27,835 | [Amount of the Senior Assistance Tax Credit](https://www.revenuquebec.ca/en/citizens/tax-credits/senior-assistance-tax-credit/amount-of-the-credit/) · [version française](https://www.revenuquebec.ca/fr/citoyens/credits-dimpot/credit-dimpot-pour-soutien-aux-aines/montant-du-credit-dimpot-pour-soutien-aux-aines/) | 2026-10-23 | prices (CPI) · rounded to 5 | Année d’imposition 2025 : montant maximal 4 000 $ (conjoint admissible, tous deux 70 ans ou plus au 31 décembre 2025), 2 000 $ (sinon, avec ou sans conjoint) ; réduit de 5,40 % de la partie du revenu familial (ligne 275, avec celle du conjoint) qui dépasse 45 270 $ (avec conjoint) ou 27 835 $ (sans conjoint) ; revenu familial maximal 119 345 $ · 82 308 $ · 64 873 $. Finances Québec (Paramètres 2026, TABLEAU 3, p. 10) : seuils de 2026 28 405 $ et 46 200 $, taux 5,47 % (2025 : 27 835 $, 45 270 $, 5,40 %). |
@@ -246,7 +247,7 @@
 
 ## Pages consulted
 
-68 official pages. A page cited by many figures is the first one to re-read.
+69 official pages. A page cited by many figures is the first one to re-read.
 
 | Official page | Figures | Last read |
 | --- | --- | --- |
@@ -317,4 +318,5 @@
 | [Household spending by household income quintile, Canada, regions and provinces](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110022301) | 1 | 2026-10-09 |
 | [Household spending by household type](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110022401) | 1 | 2026-10-09 |
 | [Household spending by age of reference person](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110022701) | 1 | 2026-10-09 |
+| [Life expectancy and other elements of the complete life table, three-year estimates, Canada, all provinces except Prince Edward Island](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401) | 1 | 2026-10-23 |
 | [Consumer Price Index, annual average, not seasonally adjusted](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000501) | 1 | 2026-10-09 |

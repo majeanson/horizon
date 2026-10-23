@@ -21,6 +21,7 @@ export const PARAM_LABELS: {
     "accounts.lifUnlockShareOfMga": "CRI/FRV : part du MGA sous laquelle le solde se débloque",
     "accounts.rrifDivisor": "FERR : diviseur du retrait minimum",
     "accounts.rrifFactors": "FERR : pourcentage de retrait minimum, par âge",
+    "mortality.survivors": "Table de mortalité du Québec, deux sexes (2022 à 2024) : personnes en vie à chaque âge, sur 100 000 nées",
     "accounts.rrspLimit": "Plafond de cotisation REER",
     "accounts.rrspRate":
       "Taux de droits de cotisation REER (% du revenu gagné)",
@@ -242,6 +243,7 @@ export const PARAM_LABELS: {
     "accounts.lifUnlockShareOfMga": "LIRA/LIF: share of the MPE under which the balance unlocks",
     "accounts.rrifDivisor": "RRIF minimum withdrawal divisor",
     "accounts.rrifFactors": "RRIF minimum withdrawal percentage, by age",
+    "mortality.survivors": "Life table, Québec, both sexes (2022 to 2024): people alive at each age, out of 100 000 born",
     "accounts.rrspLimit": "RRSP contribution dollar limit",
     "accounts.rrspRate": "RRSP contribution room rate (% of earned income)",
     "accounts.tfsaCumulativeSince2009": "TFSA cumulative room since 2009",

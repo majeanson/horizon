@@ -22,6 +22,10 @@ import { useLang, useT } from '../i18n'
 import { CARD_COPY } from '../lib/cardCopy'
 import { useConfirm } from '../lib/confirm'
 import { formatPct } from '../lib/format'
+import { paramsFor } from '../engine/params/index'
+import { SURVIVAL_COPY } from '../lib/survivalCopy'
+import { survivalView } from '../lib/survivalView'
+import { today } from '../lib/today'
 import { applyPreset, hasSpouse, mapPerson, resizeMarketPath, restoreCustom, sameScenario, scenarioOf, setAssumptions, setMarketPreset, setMarketYear, setReturn } from '../lib/profileEdit'
 import { MARKET_PATHS, MARKET_PRESETS } from '../engine/marketPaths'
 import { Cluster } from '../components/Layout'
@@ -65,6 +69,8 @@ export function Hypotheses() {
     return a.presets.summary(pct(v.inflation), pct(v.wageGrowth), [v.returns.rrsp, v.returns.tfsa, v.returns.nonReg].map(pct).join(' / '), v.horizonAge)
   }
   const impact = t.assumptions.impact
+  // The chance of reaching the age the plan lasts to (Statistics Canada's life table for Québec, both sexes): an average, said as one.
+  const survival = survivalView(profile.household.persons, assumptions.horizonAge, today().year, paramsFor(today().year, { inflation: assumptions.inflation, wageGrowth: assumptions.wageGrowth }).mortality.survivors)
   /** The meter for one assumption: where the value sits against the three scenarios, and why it matters. */
   const meter = (field: ImpactField, value: number) => {
     const { level, tilt } = impactOf(field, value)
@@ -234,6 +240,17 @@ export function Hypotheses() {
             </div>
           )
         })}
+        {survival && (
+          <div className="horizon-survival">
+            {survival.people.map((p) => (
+              <p key={p.id} className="field-row__hint">
+                {SURVIVAL_COPY[lang].one(p.age, p.horizon, formatPct(p.chance, lang, 0))}
+              </p>
+            ))}
+            {survival.couple && <p className="field-row__hint">{SURVIVAL_COPY[lang].couple(survival.couple.year, formatPct(survival.couple.chance, lang, 0))}</p>}
+            <p className="field-row__hint">{SURVIVAL_COPY[lang].average}</p>
+          </div>
+        )}
         {meter('horizonAge', Math.max(...profile.household.persons.map((p) => p.horizonAge ?? assumptions.horizonAge)))}
         {hasSpouse(profile) && (
           <NumberSlider kind="percent" label={a.horizon.survivor} infoId="survivorSpending" hint={a.horizon.survivorHint} digits={0} min={0.3} max={1} step={0.05} value={assumptions.survivorSpending ?? 0.7} onChange={(survivorSpending) => updateProfile((p) => setAssumptions(p, { survivorSpending }))} marks={[0.5, 0.7, 1].map((value) => ({ value, label: formatPct(value, lang, 0) }))} />

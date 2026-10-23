@@ -302,6 +302,14 @@ export interface YearParams {
   }
 
   /**
+   * How long people live (engine/survival.ts) — Statistics Canada's complete life table for Québec, both sexes, the three years 2022 to 2024. An observation, never projected: `survivors[age]` is how many
+   * of 100 000 people born are alive at that exact age.
+   */
+  mortality: {
+    survivors: Cited<Record<number, number>>
+  }
+
+  /**
    * Québec's two refundable credits a retired household most often gets (engine/qcCredits.ts) — Revenu Québec and Finance Québec. The year is the one the money ARRIVES in: the senior
    * assistance credit of the plan's year Y is the one for tax year Y − 1, the solidarity credit is the one paid from July of Y (on the return for Y − 1).
    */
