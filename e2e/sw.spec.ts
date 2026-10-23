@@ -173,12 +173,15 @@ test('offline, the saved profile is intact and the results — the chart and the
   await page.context().setOffline(true)
   await page.reload()
   await expect(page.getByText('Vous pouvez prendre votre retraite à 60 ans, tous les deux.')).toBeVisible({ timeout: 30_000 })
+  // the chart sits in « Comparer », a card that opens closed on arrival (only the first card does): its map chip opens it
+  await page.getByRole('navigation', { name: 'Sections des résultats' }).getByRole('button', { name: 'Comparer', exact: true }).click()
   await expect(page.locator('.chart-panel figure.chart')).toBeVisible()
   await expect(page.locator('.chart-panel path.recharts-line-curve')).toHaveCount(2)
 
   // The profile page, offline, still holds what was saved (both people are on the page: scope to the first).
-  await page.getByRole('link', { name: 'Profil', exact: true }).click()
-  await expect(page.locator('#person-self').getByRole('textbox', { name: 'Revenu de travail par année', exact: true })).toHaveValue(/85\D000/)
+  // (Profil opens only its first card: ?bloc=tout opens them all; an offline deep link boots from the cached shell)
+  await page.goto('/profil?bloc=tout')
+  await expect(page.getByRole('textbox', { name: 'Revenu de travail par année', exact: true }).first()).toHaveValue(/85\D000/)
 
   // …and the worker runs offline: the « what if » grid starts by itself and fills from the cache.
   await page.getByRole('link', { name: 'Résultats', exact: true }).click()
