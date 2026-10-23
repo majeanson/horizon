@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { stringLiterals } from './buildGuardScan.ts'
 import { GLOSS_SIGLES } from './glossIndex.ts'
 
 // EVERY ABBREVIATION ON SCREEN HAS AN ENTRY IN THE GLOSSARY. A sigle a reader meets in the app (« RRQ », « CHSLD », « RAMQ ») and cannot decode is a place the app stops being understood — and the people
@@ -25,42 +26,6 @@ const NO_ENTRY: Record<string, string> = {
   VUS: 'the everyday French word for an SUV (« véhicule utilitaire sport ») in a sentence about what households spend on cars',
 }
 
-/** The strings of a TypeScript file: single-, double- and back-quoted literals (comments skipped, escapes unescaped, a template's `${…}` left in). */
-function stringsOf(text: string): string[] {
-  const out: string[] = []
-  let i = 0
-  while (i < text.length) {
-    const ch = text[i]
-    if (ch === '/' && text[i + 1] === '/') {
-      while (i < text.length && text[i] !== '\n') i++
-      continue
-    }
-    if (ch === '/' && text[i + 1] === '*') {
-      const end = text.indexOf('*/', i + 2)
-      i = end < 0 ? text.length : end + 2
-      continue
-    }
-    if (ch === "'" || ch === '"' || ch === '`') {
-      let j = i + 1
-      let s = ''
-      while (j < text.length && text[j] !== ch) {
-        if (text[j] === '\\') {
-          s += text[j + 1]
-          j += 2
-        } else {
-          s += text[j]
-          j++
-        }
-      }
-      out.push(s)
-      i = j + 1
-      continue
-    }
-    i++
-  }
-  return out
-}
-
 const COPY_FILES = [
   'i18n.ts',
   'i18n.en.ts',
@@ -73,7 +38,7 @@ const COPY_FILES = [
 function sigles(): Map<string, Set<string>> {
   const found = new Map<string, Set<string>>()
   for (const file of COPY_FILES) {
-    for (const s of stringsOf(readFileSync(join(srcDir, file), 'utf8'))) {
+    for (const s of stringLiterals(readFileSync(join(srcDir, file), 'utf8'))) {
       for (const m of s.matchAll(/(?<![\p{L}\d])([A-Z]{3,6})(?![\p{L}\d])/gu)) {
         if (!found.has(m[1])) found.set(m[1], new Set())
         found.get(m[1])!.add(file)
@@ -85,7 +50,7 @@ function sigles(): Map<string, Set<string>> {
 
 describe('abbreviations on screen', () => {
   it('the detector finds a sigle in a sentence and in a template, and skips a comment', () => {
-    expect(stringsOf("const a = 'le RRQ' // un FOO\nconst b = `la ${x} PSV`\n/* BAR */ const c = \"it's QPP\"")).toEqual(['le RRQ', 'la ${x} PSV', "it's QPP"])
+    expect(stringLiterals("const a = 'le RRQ' // un FOO\nconst b = `la ${x} PSV`\n/* BAR */ const c = \"it's QPP\"")).toEqual(['le RRQ', 'la ${x} PSV', "it's QPP"])
   })
 
   it('every sigle the copy prints is in the glossary index, or excused below with its reason', () => {

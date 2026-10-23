@@ -165,3 +165,42 @@ export function arrayStrings(src: string, name: string): string[] {
   const body = blankComments(src.slice(open + 1, src.indexOf(']', open)))
   return [...body.matchAll(/'([^']*)'|"([^"]*)"/g)].map((m) => m[1] ?? m[2])
 }
+
+/**
+ * The string literals of a TypeScript file — single-, double- and back-quoted — with their escapes undone, a template's `${…}` left in place; comments are skipped. For the guards that read what
+ * the PEOPLE read (the dictionaries and the copy files): a regex over lines would also read the code around the strings.
+ */
+export function stringLiterals(text: string): string[] {
+  const out: string[] = []
+  let i = 0
+  while (i < text.length) {
+    const ch = text[i]
+    if (ch === '/' && text[i + 1] === '/') {
+      while (i < text.length && text[i] !== '\n') i++
+      continue
+    }
+    if (ch === '/' && text[i + 1] === '*') {
+      const end = text.indexOf('*/', i + 2)
+      i = end < 0 ? text.length : end + 2
+      continue
+    }
+    if (ch === "'" || ch === '"' || ch === '`') {
+      let j = i + 1
+      let s = ''
+      while (j < text.length && text[j] !== ch) {
+        if (text[j] === '\\') {
+          s += text[j + 1]
+          j += 2
+        } else {
+          s += text[j]
+          j++
+        }
+      }
+      out.push(s)
+      i = j + 1
+      continue
+    }
+    i++
+  }
+  return out
+}

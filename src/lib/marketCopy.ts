@@ -28,7 +28,7 @@ const FR: MarketCopy = {
   },
   together: {
     on: 'Tout partager : l’épargne et les retraits',
-    hint: 'L’argent qui reste est mis moitié dans le compte non enregistré de chacun (sinon, tout va chez la personne au revenu le plus bas), et chaque retrait est partagé entre vous deux en proportion de ce que chacun a au total, chacun puisant dans ses propres comptes selon l’ordre choisi : les deux s’épuisent au même rythme et les deux barres de « D’où vient l’argent » se remplissent. Désactivé : tout le surplus va chez la personne au revenu le plus bas, et chaque compte est puisé à tour de rôle chez la personne dont le revenu imposable est le plus bas.',
+    hint: 'Le surplus est mis moitié-moitié dans le compte non enregistré de chacun. Chaque retrait est partagé entre vous deux selon ce que chacun possède, et chacun puise dans ses propres comptes, dans l’ordre choisi. Les deux s’épuisent au même rythme, et les deux barres de « D’où vient l’argent » se remplissent. Désactivé : tout le surplus va à la personne dont le revenu est le plus bas, et on puise chez celle dont le revenu imposable est le plus bas.',
   },
   income: {
     line: (age, perMonth, planned) => `À ${age} ans, le plan peut financer jusqu’à ${perMonth} par mois (après impôt) — vous prévoyez ${planned}.`,
@@ -69,7 +69,7 @@ const EN: MarketCopy = {
   },
   together: {
     on: 'Share everything: the savings and the draws',
-    hint: 'The money left over goes half into each of your non-registered accounts (otherwise it all goes to the lower earner), and each withdrawal is shared between the two of you in proportion to everything each holds, each drawing from their own accounts in the order you chose: both run down at the same pace and both people’s bars in “Where the money comes from” fill in. Off: the whole surplus goes to the lower earner, and each account in turn is drawn from whoever has the lower taxable income.',
+    hint: 'The surplus goes half into each person’s non-registered account. Each withdrawal is shared between the two of you in proportion to what each holds, and each draws from their own accounts in the order you chose. Both run down at the same pace, and both people’s bars in “Where the money comes from” fill in. Off: the whole surplus goes to the lower earner, and each account in turn is drawn from whoever has the lower taxable income.',
   },
   income: {
     line: (age, perMonth, planned) => `At ${age}, the plan can fund up to ${perMonth} a month (after tax) — you plan ${planned}.`,
