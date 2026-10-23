@@ -39,8 +39,9 @@ for (const vp of VIEWPORTS) {
       expect(after.scrollable, `${route} has something to scroll`).toBeGreaterThan(0)
       expect(after.top, `${route} scrolled`).toBeGreaterThan(before.top)
       expect(after.bar.top, `${route} bar`).toBeCloseTo(0, 0)
-      expect(after.nav.top, `${route} nav top`).toBeCloseTo(before.nav.top, 0)
-      expect(after.nav.bottom, `${route} nav bottom`).toBeCloseTo(before.nav.bottom, 0)
+      // Within half a pixel, inclusive: a page whose scroll height ends on a fraction of a pixel lands the sticky rail a half pixel off (53 → 52.5 on the home page), which is rounding, not chrome that moved.
+      expect(Math.abs(after.nav.top - before.nav.top), `${route} nav top`).toBeLessThanOrEqual(0.5)
+      expect(Math.abs(after.nav.bottom - before.nav.bottom), `${route} nav bottom`).toBeLessThanOrEqual(0.5)
       if (vp.width >= 860) {
         // The rail reaches the foot of the window, however far down the page is.
         expect(after.nav.bottom, `${route} rail reaches the bottom`).toBeGreaterThanOrEqual(vp.height - 1)
