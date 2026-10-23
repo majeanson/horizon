@@ -431,6 +431,7 @@ export const FR = {
       year: 'Année',
       ages: 'Âges',
       income: 'Revenu brut',
+      credits: 'dont crédits et allocations',
       tax: 'Impôt',
       avgRate: 'Taux moyen',
       spending: 'Dépenses',

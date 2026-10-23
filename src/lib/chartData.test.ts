@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { balanceBars, chartSeries, deflator, fanBasis, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars, stopCoverageSeries } from './chartData.ts'
+import { balanceBars, chartSeries, creditParts, deflator, fanBasis, idleStretch, metricValue, retirementMarkers, SERIES_COLOURS, SOURCE_SEGMENTS, sourceBars, stopCoverageSeries } from './chartData.ts'
 import { runSelections } from './resultsModel.ts'
 import type { Profile } from './schema.ts'
 
@@ -137,5 +137,22 @@ describe('« Quand arrêter »: the pensions and the spending, in the page’s d
     expect(p.points[0].y).toBeCloseTo(30_000 / deflator(2040, 2026, 0.02), 6)
     expect(sp.points[1].y).toBeCloseTo(51_000 / deflator(2041, 2026, 0.02), 6)
     expect(p.points[0].y < sp.points[0].y && p.points[1].y > sp.points[1].y).toBe(true)
+  })
+})
+
+describe('what the credits bar is made of', () => {
+  const household = (over: Record<string, number>) => ({ ...over }) as unknown as Parameters<typeof creditParts>[0]
+
+  it('splits the bar between the parts that were paid, in the readout’s order, and the parts add up to the bar', () => {
+    const parts = creditParts(household({ childBenefit: 1_000, groceriesBenefit: 500, seniorAssistance: 2_000, solidarityCredit: 500 }), 2_000)
+    expect(parts.map(([id]) => id)).toEqual(['child', 'groceries', 'senior', 'solidarity'])
+    expect(parts.reduce((s, [, v]) => s + v, 0)).toBeCloseTo(2_000, 9)
+    expect(parts[2][1]).toBeCloseTo(1_000, 9) // a half of the money, a half of the bar: the bar may be in monthly or today’s dollars
+  })
+
+  it('leaves out a part of nothing, and everything when nothing was paid', () => {
+    expect(creditParts(household({ solidarityCredit: 600 }), 50).map(([id]) => id)).toEqual(['solidarity'])
+    expect(creditParts(household({}), 0)).toEqual([])
+    expect(creditParts(household({ solidarityCredit: 600 }), 0)).toEqual([])
   })
 })

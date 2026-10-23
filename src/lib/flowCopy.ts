@@ -22,6 +22,8 @@ export interface FlowWords {
     total: (amount: string, perMonth: boolean) => string
     none: string
     source: Record<SourceSegment, string>
+    /** The parts of « Crédits et allocations », listed under it in the year's reading: what the State paid, one line each. */
+    creditParts: { child: string; groceries: string; senior: string; solidarity: string }
     unmet: (amount: string, perMonth: boolean) => string
   }
 }
@@ -51,6 +53,7 @@ const FR: FlowWords = {
     total: (amount, perMonth) => `${amount} ${perMonth ? 'par mois' : 'par année'}`,
     none: 'rien cette année',
     source: { work: 'Salaire et autres revenus', db: 'Rente d’employeur', rrq: 'RRQ', oas: 'PSV et SRG', credits: 'Crédits et allocations', nest: 'Retiré de l’épargne' },
+    creditParts: { child: 'Prestations pour enfants', groceries: 'Allocation canadienne pour l’épicerie', senior: 'Crédit pour soutien aux aînés', solidarity: 'Crédit de solidarité' },
     unmet: (amount, perMonth) => `Les dépenses ne sont pas toutes couvertes : il manque ${amount} ${perMonth ? 'par mois' : 'par année'}.`,
   },
 }
@@ -80,6 +83,7 @@ const EN: FlowWords = {
     total: (amount, perMonth) => `${amount} ${perMonth ? 'a month' : 'a year'}`,
     none: 'nothing this year',
     source: { work: 'Pay and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS and GIS', credits: 'Credits and benefits', nest: 'Drawn from savings' },
+    creditParts: { child: 'Child benefits', groceries: 'Canada Groceries and Essentials Benefit', senior: 'Senior assistance credit', solidarity: 'Solidarity credit' },
     unmet: (amount, perMonth) => `Spending is not all covered: ${amount} ${perMonth ? 'a month' : 'a year'} is missing.`,
   },
 }

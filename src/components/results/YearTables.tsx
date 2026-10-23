@@ -85,7 +85,7 @@ export function YearTables({
   // The years that look different for a reason, read off these very rows (lib/yearNotes.ts).
   const notes = useMemo(() => (shown && names ? yearNotes(shown.result.rows) : []), [shown, names])
   if (!shown || !model) return null
-  const { rows, hasHome, hasLocked, hasShortfall, firstShortYear } = model
+  const { rows, hasHome, hasLocked, hasShortfall, hasCredits, firstShortYear } = model
   return (
     <div className="year-table">
       <TableChooser
@@ -120,6 +120,7 @@ export function YearTables({
                 {r.table.year} · {r.table.ages}
               </th>
               <th scope="col">{r.table.income}</th>
+              {hasCredits && <th scope="col">{r.table.credits}</th>}
               <th scope="col">{r.table.tax}</th>
               <th scope="col">{r.table.avgRate}</th>
               <th scope="col">{r.table.spending}</th>
@@ -139,6 +140,7 @@ export function YearTables({
                   {row.projected && <span className="projected mono"> {t.common.projected}</span>}
                 </th>
                 <td>{money(row.income)}</td>
+                {hasCredits && <td>{row.credits > 0 ? money(row.credits) : '—'}</td>}
                 <td>{money(row.tax)}</td>
                 <td>{row.avgRate === null ? '—' : formatPct(row.avgRate, lang, 1)}</td>
                 <td>{money(row.spending)}</td>

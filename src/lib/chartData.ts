@@ -39,6 +39,21 @@ export function metricValue(row: YearRow, metric: Metric): number {
   return sum + benefitsOfYear(row.household)
 }
 
+/** The parts of the « Crédits et allocations » bar, in the order the readout lists them. */
+export const CREDIT_PARTS = ['child', 'groceries', 'senior', 'solidarity'] as const
+export type CreditPart = (typeof CREDIT_PARTS)[number]
+
+/**
+ * What the credits bar of a year is made of: each part the State paid that year, in the order of `CREDIT_PARTS`, in the unit the bar is drawn in (`bar` is the bar's own value, so the parts add up to
+ * it to the cent). A part of nothing is left out; so is everything when nothing was paid.
+ */
+export function creditParts(household: YearRow['household'], bar: number): [CreditPart, number][] {
+  const total = benefitsOfYear(household)
+  if (!(total > 0) || !(bar > 0)) return []
+  const amounts: Record<CreditPart, number> = { child: household.childBenefit ?? 0, groceries: household.groceriesBenefit ?? 0, senior: household.seniorAssistance ?? 0, solidarity: household.solidarityCredit ?? 0 }
+  return CREDIT_PARTS.map((id): [CreditPart, number] => [id, (amounts[id] / total) * bar]).filter(([, v]) => v > 0.005)
+}
+
 /** The factor that turns a dollar of `year` into a dollar of `todayYear`. */
 export const deflator = (year: number, todayYear: number, inflation: number): number => (1 + inflation) ** (year - todayYear)
 

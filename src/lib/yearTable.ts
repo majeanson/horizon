@@ -1,3 +1,4 @@
+import { benefitsOfYear } from '../engine/benefitsOf.ts'
 import type { YearRow } from '../engine/types.ts'
 
 // THE YEAR-BY-YEAR TABLE, ONCE. The table on the results page and the spreadsheet it exports (lib/yearCsv.ts) say the same numbers because they are the same
@@ -23,6 +24,8 @@ interface YearTableRow {
   short: boolean
   // Every figure below is already in the dollars shown (the year's own, or today's): the engine's figure divided by `factor(year)`.
   income: number
+  /** What the State paid the household inside that income (child benefits, groceries benefit, Québec's two credits): tax-free, and part of `income`. */
+  credits: number
   tax: number
   /** Tax ÷ net income, a share (no dollar factor applies); null when there is no net income. */
   avgRate: number | null
@@ -38,7 +41,9 @@ interface YearTableRow {
 
 interface YearTableModel {
   rows: YearTableRow[]
-  /** A column that would be empty in every year is left out: the home's two only when the plan has a home… */
+  /** A column that would be empty in every year is left out: the credits only when the State pays some in a year… */
+  hasCredits: boolean
+  /** …the home's two only when the plan has a home… */
   hasHome: boolean
   /** …the locked-in REER only when someone has a locked part… */
   hasLocked: boolean
@@ -59,6 +64,7 @@ export function yearTableModel(rows: readonly YearRow[], factor: (year: number) 
       projected: row.projected === true,
       short: h.shortfall > 0,
       income: h.grossIncome / k,
+      credits: benefitsOfYear(h) / k,
       tax: h.tax / k,
       avgRate: averageRateOf(row),
       spending: h.spending / k,
@@ -71,6 +77,7 @@ export function yearTableModel(rows: readonly YearRow[], factor: (year: number) 
   })
   return {
     rows: out,
+    hasCredits: rows.some((r) => benefitsOfYear(r.household) > 0),
     hasHome: rows.some((r) => r.household.homeValueEnd > 0),
     hasLocked: rows.some((r) => lockedOf(r) > 0),
     hasShortfall: rows.some((r) => r.household.shortfall > 0),

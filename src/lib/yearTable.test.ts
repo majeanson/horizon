@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { EXAMPLES, EXAMPLE_IDS } from '../engine/golden/examples.ts'
+import { benefitsOfYear } from '../engine/benefitsOf.ts'
 import { everyoneAt, runScenario } from '../engine/retireAt.ts'
 import type { AgeResult } from '../engine/types.ts'
 import { SOURCE_SEGMENTS, chartSeries, deflator, expenseBars, sourceBars } from './chartData.ts'
@@ -209,5 +210,33 @@ describe('the average rate beside the marginal rate of a retired year', { timeou
       expect(rates.marginal.rate, label(r)).toBeLessThan(1.5)
     }
     expect(seen, 'most examples retire inside their plan').toBeGreaterThan(runs.length / 2)
+  })
+})
+
+describe('the credits column: what the State paid, inside the income', { timeout: 120_000 }, () => {
+  it('is the engine’s sum of the four payments, divided by the year’s factor, never more than the income that holds it', () => {
+    for (const r of runs) {
+      const model = yearTableModel(r.result.rows, factorOf(r.id))
+      model.rows.forEach((m, i) => {
+        expect(m.credits, `${label(r)} ${m.year}`).toBeCloseTo(benefitsOfYear(r.result.rows[i].household) / factorOf(r.id)(m.year), 6)
+        expect(m.credits, `${label(r)} ${m.year}`).toBeLessThanOrEqual(m.income + 0.01)
+      })
+    }
+  })
+
+  it('exists as a column exactly when some year has some, and some examples do and some do not', () => {
+    const has = runs.map((r) => yearTableModel(r.result.rows).hasCredits)
+    for (const r of runs) expect(yearTableModel(r.result.rows).hasCredits, label(r)).toBe(r.result.rows.some((row) => benefitsOfYear(row.household) > 0))
+    expect(has.some(Boolean)).toBe(true)
+    expect(has.some((h) => !h)).toBe(true)
+  })
+
+  it('is in the spreadsheet, right after the income, when it is a column, and absent when it is not', () => {
+    const withCredits = runs.find((r) => yearTableModel(r.result.rows).hasCredits)!
+    const without = runs.find((r) => !yearTableModel(r.result.rows).hasCredits)!
+    const heads = { ...HEADS, credits: 'dont crédits' }
+    const first = yearCsv(withCredits.result, heads, 'fr').split('\r\n')[0].split(';')
+    expect(first[first.indexOf('Revenu') + 1]).toBe('dont crédits')
+    expect(yearCsv(without.result, heads, 'fr')).not.toContain('dont crédits')
   })
 })

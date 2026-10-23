@@ -2328,3 +2328,9 @@
   align-items: center;
   min-height: var(--touch-target, 44px);
 }
+
+/* The parts of « Crédits et allocations » in the year's reading: indented under their sum, quieter than it. */
+.flow-readout__row--part {
+  padding-inline-start: 1rem;
+  color: var(--ink-soft);
+}

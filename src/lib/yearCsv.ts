@@ -28,6 +28,8 @@ export interface YearCsvHeads {
   spending: string
   shortfall: string
   netWorth: string
+  /** Heading of the « of which credits and benefits » column; added only when the State pays some in a year of the plan. */
+  credits?: string
   /** Heading of the locked-in REER column; added only when a year of the plan has a locked part. */
   rrspLocked?: string
   /** Headings of the two home columns; added only when a year of the plan has a home. */
@@ -50,13 +52,15 @@ export function yearCsv(result: AgeResult, heads: YearCsvHeads, lang: Lang, opti
   const model = yearTableModel(result.rows, options.factor)
   const withHome = heads.mortgage !== undefined && heads.homeEquity !== undefined && model.hasHome
   const withLocked = heads.rrspLocked !== undefined && model.hasLocked
-  const lines = [[heads.year, heads.ages, money(heads.income), money(heads.tax), money(heads.spending), money(heads.shortfall), money(heads.netWorth), ...(withLocked ? [money(heads.rrspLocked!)] : []), ...(withHome ? [money(heads.mortgage!), money(heads.homeEquity!)] : [])]]
+  const withCredits = heads.credits !== undefined && model.hasCredits
+  const lines = [[heads.year, heads.ages, money(heads.income), ...(withCredits ? [money(heads.credits!)] : []), money(heads.tax), money(heads.spending), money(heads.shortfall), money(heads.netWorth), ...(withLocked ? [money(heads.rrspLocked!)] : []), ...(withHome ? [money(heads.mortgage!), money(heads.homeEquity!)] : [])]]
   const whole = (n: number) => String(Math.round(n))
   for (const row of model.rows) {
     lines.push([
       String(row.year),
       row.ages.join(' / '),
       whole(row.income),
+      ...(withCredits ? [whole(row.credits)] : []),
       whole(row.tax),
       whole(row.spending),
       whole(row.shortfall),

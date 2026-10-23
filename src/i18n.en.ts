@@ -412,6 +412,7 @@ export const EN: typeof FR = {
       ages: 'Ages',
       income: 'Gross income',
       tax: 'Tax',
+      credits: 'of which credits and benefits',
       avgRate: 'Average rate',
       spending: 'Spending',
       shortfall: 'To cover',

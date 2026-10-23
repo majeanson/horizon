@@ -1,7 +1,7 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { Fragment, lazy, Suspense, useMemo, useState } from 'react'
 import type { YearRow } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
-import { EXPENSE_COLOUR, EXPENSE_CONCEPT, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, expenseBars, type ExpenseSegment, type Per, type SourceSegment, type sourceBars } from '../../lib/chartData'
+import { EXPENSE_COLOUR, EXPENSE_CONCEPT, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, creditParts as creditPartsOf, expenseBars, type ExpenseSegment, type Per, type SourceSegment, type sourceBars } from '../../lib/chartData'
 import { formatYearAge } from '../../lib/format'
 import { FLOW_COPY } from '../../lib/flowCopy'
 import { formatCompactMoney, formatMoney } from '../../lib/money'
@@ -60,6 +60,8 @@ export function FlowSection({
 
   const comesIn = SOURCE_SEGMENTS.filter((id) => src[id] > 0.5).sort((a, b) => src[b] - src[a])
   const comesInTotal = SOURCE_SEGMENTS.reduce((s, id) => s + src[id], 0)
+  // What the « Crédits et allocations » line is made of, in the unit shown (the bar's own scale applied to each part), so that nothing the State pays is a single unexplained sum.
+  const creditParts = rows[at] ? creditPartsOf(rows[at].household, src.credits) : []
   const goesOut = (['living', 'children', 'events', 'mortgage', 'tax', 'deductions', 'saved'] as const).filter((id) => out[id] > 0.5).sort((a, b) => out[b] - out[a])
   const goesOutTotal = goesOut.reduce((s, id) => s + out[id], 0)
 
@@ -113,10 +115,20 @@ export function FlowSection({
             <p className="flow-readout__total mono">{comesIn.length === 0 ? f.readout.none : f.readout.total(money(comesInTotal), perMonth)}</p>
             <dl className="flow-readout__list">
               {comesIn.map((id: SourceSegment) => (
-                <div key={id} className="flow-readout__row">
-                  <dt>{f.readout.source[id]}</dt>
-                  <dd className="mono">{money(src[id])}</dd>
-                </div>
+                <Fragment key={id}>
+                  <div className="flow-readout__row">
+                    <dt>{f.readout.source[id]}</dt>
+                    <dd className="mono">{money(src[id])}</dd>
+                  </div>
+                  {id === 'credits' &&
+                    creditParts.length > 1 &&
+                    creditParts.map(([part, value]) => (
+                      <div key={part} className="flow-readout__row flow-readout__row--part">
+                        <dt>{f.readout.creditParts[part]}</dt>
+                        <dd className="mono">{money(value)}</dd>
+                      </div>
+                    ))}
+                </Fragment>
               ))}
             </dl>
           </section>
