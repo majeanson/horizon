@@ -138,7 +138,10 @@ const BUDGETS: Record<string, Budget> = {
   // 54 → 55 controls, 670 → 677 words (2026-10-20, Marc chose it): « Quand arrêter » has its chart — ONE closed fold under « En dates » (« Rentes et dépenses,
   // année par année »), the chart mounting only once opened.
   // 56 → 38 controls, 677 → 413 words (2026-10-21, the ratchet FALLS): Réponse opens the answer card only on arrival; the comparison and the year cards open on a tap.
-  'Résultats — Réponse': { controls: 39, words: 415 },
+  // words 415 → 420 (2026-10-23): not new copy — the count now WAITS for the answer's range line (« Entre 55 ans et peut-être aucun âge avant 70, selon vos chiffres estimés… »,
+  // 19 words) instead of racing it: it lands from the heaviest idle search, and a count taken before it read the plain 14-word « Votre profil : n sur N chiffres confirmés » — 415 on a
+  // slow runner, 420 on a fast one (CI failed and passed on the same code). A visit sees the range; the budget is the complete state.
+  'Résultats — Réponse': { controls: 39, words: 420 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each
@@ -312,6 +315,8 @@ test.describe('complexity ratchet', () => {
       // Only the first card is open on arrival (the ranked figures are a closed card now): wait for its measures to land.
       if (label === 'Fiche') await expect(page.locator('.sheet')).not.toContainText('Calcul en cours', { timeout: 60_000 })
       if (label === 'Résultats — Réponse') await expect(page.locator('#annee')).not.toContainText('Calcul en cours', { timeout: 60_000 })
+      // …and the range under the answer (components/results/views/AnswerView.tsx: the plain count of confirmed figures until the heaviest idle search lands, then « Entre … »).
+      if (label === 'Résultats — Réponse') await expect(page.locator('.refine__confidence')).toContainText('Entre', { timeout: 90_000 })
       // « … » is the house's pending cell (a worker's answer not yet landed — Solidité's ranges): counting before it clears
       // reads a page that is still changing shape (caught at 4× throttle: the prudent-gap chip only exists once the range is in).
       await expect(page.locator('.mono', { hasText: '…' })).toHaveCount(0, { timeout: 30_000 })
