@@ -42,7 +42,7 @@ const OPENED: [string, string, (page: Page) => Promise<void>][] = [
     '/resultats?v=proof&bloc=tableau',
     async (page) => {
       await page.locator('.marginal-weather summary').click()
-      await expect(page.locator('.marginal-weather .heat')).toBeVisible({ timeout: 60_000 })
+      await expect(page.locator('.marginal-weather figure.chart')).toBeVisible({ timeout: 60_000 })
     },
   ],
   [

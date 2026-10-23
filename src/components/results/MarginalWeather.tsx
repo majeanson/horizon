@@ -1,16 +1,23 @@
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { useParamChoice } from '../../lib/useParamChoice'
 import { useLang } from '../../i18n'
-import { formatPct } from '../../lib/format'
 import { marginalWeather, weatherSummary } from '../../lib/marginalWeather'
 import { MARGINAL_WEATHER_COPY } from '../../lib/marginalWeatherCopy'
+import { formatMoney } from '../../lib/money'
 import type { ResultsModel } from '../../lib/useResultsPage'
 import { Fold } from '../Fold'
-import { HeatGrid, type HeatCellData } from '../HeatGrid'
+import { SkeletonFill } from '../SkeletonShapes'
 
-// « Le coût d'un dollar de plus, par âge » — the household's own plan, every retired year: what the next RRSP dollar costs (tax, OAS recovery tax, GIS lost), as a calendar of ages,
-// ten to a row. A fold under the year-by-year table, mounted when opened: the figures are read off the rows the table already holds, so nothing runs again, but the grid is only drawn
-// for whoever asks.
+const StackedBarChart = lazy(() => import('../charts').then((m) => ({ default: m.StackedBarChart })))
+
+// « Le coût d'un dollar de plus, par âge » — the household's own plan, every retired year: what the next RRSP dollar costs (tax, OAS recovery tax, GIS lost), one bar per age, three
+// parts stacked, in dollars out of every 100 taken. A fold under the year-by-year table, mounted when opened: the figures are read off the rows the table already holds, so nothing runs
+// again, and the chart is only fetched for whoever asks. A real case in one sentence comes first — the percentages of the old calendar were true and told nobody anything.
+
+/** The "real life" case: a thousand dollars more out of the RRSP. */
+const EXAMPLE_TAKEN = 1000
+/** The scale of the bars: dollars lost out of every hundred taken. */
+const PER = 100
 
 export function MarginalWeather({ m }: { m: ResultsModel }) {
   const { lang } = useLang()
@@ -33,33 +40,42 @@ function Body({ m }: { m: ResultsModel }) {
   const rows = (runs.find((r) => r.selection === 'plan') ?? runs[0])?.result.rows
   const points = useMemo(() => (rows === undefined ? [] : marginalWeather(rows, assumptions, household.persons[0].id, household.livesAlone)), [rows, assumptions, household])
   const summary = weatherSummary(points)
+  const data = useMemo(() => points.map((p) => ({ x: p.age, tax: p.tax * PER, oas: p.oasRecovery * PER, gis: p.gisLost * PER })), [points])
   if (summary === null) return <p className="answer__note">{c.none}</p>
-  const pct = (x: number) => formatPct(x, lang, 0)
-  const byAge = new Map(points.map((p) => [p.age, p]))
-  const decades = [...new Set(points.map((p) => Math.floor(p.age / 10) * 10))].sort((a, b) => a - b)
+  const money = (x: number) => formatMoney(x, lang)
+  const per = money(PER)
+  const lost = (rate: number) => money(rate * PER)
   const lo = summary.lowest.rate
   const hi = summary.highest.rate
   const flat = hi - lo < 0.02
-  const cells: HeatCellData[][] = decades.map((d) =>
-    Array.from({ length: 10 }, (_, n): HeatCellData => {
-      const p = byAge.get(d + n)
-      if (p === undefined) return { text: '' }
-      const mark = flat ? undefined : p === summary.highest ? c.highestMark : p === summary.lowest ? c.lowestMark : undefined
-      return { text: pct(p.rate), heat: hi > lo ? (p.rate - lo) / (hi - lo) : 0, mark }
-    }),
-  )
+  // The case told in words: the dearest year, or the first when the cost hardly moves.
+  const shown = flat ? points[0] : summary.highest
+  // Steps exist only where a benefit is touched somewhere: otherwise the bars are the tax bracket alone.
+  const benefits = points.some((p) => p.oasRecovery > 0.005 || p.gisLost > 0.005)
+  const name = names[0] ?? ''
   return (
     <div className="marginal-weather__body">
-      <p className="field-row__hint">{c.hint}</p>
-      <HeatGrid
-        tone="cost"
-        caption={c.caption(names[0] ?? '')}
-        rows={decades.map((d) => c.decade(d))}
-        cols={Array.from({ length: 10 }, (_, n) => c.plus(n))}
-        cells={cells}
-      />
-      <p className="answer__note">{flat ? c.flat(pct(lo)) : `${c.lowest(pct(lo), summary.lowest.age)} ${c.highest(pct(hi), summary.highest.age)}`}</p>
-      <p className="field-row__hint">{c.parts}</p>
+      <p className="field-row__hint">{c.intro}</p>
+      <p className="answer__note">{c.example(shown.age, money(EXAMPLE_TAKEN), money(shown.rate * EXAMPLE_TAKEN))} {c.kept(money(EXAMPLE_TAKEN * (1 - shown.rate)))}</p>
+      <Suspense fallback={<SkeletonFill />}>
+        <StackedBarChart
+          data={data}
+          series={[
+            { id: 'tax', label: c.tax, colour: 'clay' },
+            { id: 'oas', label: c.oas, colour: 'sun' },
+            { id: 'gis', label: c.gis, colour: 'berry' },
+          ]}
+          yFormat={money}
+          yDetail={money}
+          xTitle={(x) => `${x}`}
+          xTick={(x) => [String(x)]}
+          ariaLabel={`${c.caption(name, per)}. ${flat ? c.flat(lost(lo), per) : `${c.lowest(lost(lo), per, summary.lowest.age)} ${c.highest(lost(hi), per, summary.highest.age)}`}`}
+          height={260}
+        />
+      </Suspense>
+      <p className="field-row__hint">{c.reading}</p>
+      <p className="answer__note">{flat ? c.flat(lost(lo), per) : `${c.lowest(lost(lo), per, summary.lowest.age)} ${c.highest(lost(hi), per, summary.highest.age)}`}</p>
+      <p className="field-row__hint">{benefits ? c.steps : c.taxOnly}</p>
       {lo < 0.01 && <p className="field-row__hint">{c.zero}</p>}
       <p className="field-row__hint">{c.who}</p>
     </div>
