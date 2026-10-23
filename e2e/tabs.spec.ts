@@ -28,7 +28,7 @@ const STATES: State[] = [
   { name: 'Décider, the pensions year by year', path: '/decider?bv=years', seed: EXAMPLE, ready: '#rentes [role="tablist"]', rows: ['Pour', 'Quatre façons de regarder vos rentes', 'Années montrées'] },
   { name: 'Décider, melting the RRSP', path: '/decider?strat=fonte', seed: EXAMPLE, ready: '#fonte [role="tablist"]', rows: ['Façons de fondre le REER'] },
   { name: 'Preuve, the grids', path: '/resultats?cartes=all&bloc=solidite&solidite=grids', seed: EXAMPLE, ready: '#solidite [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Rendement (lignes) · inflation (colonnes)'] },
-  { name: 'Preuve, the year table', path: '/resultats?cartes=all&bloc=tableau', seed: EXAMPLE, ready: '#tableau [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Départ'] },
+  { name: 'Preuve, the year table', path: '/resultats?cartes=all&bloc=tableau', seed: EXAMPLE, ready: '#tableau [role="tablist"]', rows: ['Façons de comparer', 'Afficher', 'Départ', 'Montants'] },
   // (Preuve ▸ « Paramètres utilisés » draws its year chooser only once there are two tax years: TableChooser hides a row of one.)
   { name: 'Réglages', path: '/donnees', seed: EXAMPLE, rows: ['Langue', 'Thème', 'Contraste', 'Taille du texte'] },
 ]
