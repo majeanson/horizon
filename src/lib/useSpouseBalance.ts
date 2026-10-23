@@ -1,7 +1,8 @@
 import { spouseBalance } from '../engine/spouseBalance.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
-import type { SpouseBalanceAnswer, SpouseBalanceMessage, SpouseBalanceRequest } from './spouseBalance.worker.ts'
+import type { SpouseBalanceAnswer, SpouseBalanceMessage, SpouseBalanceRequest } from './spouseBalance.job.ts'
 import { useOffThread, type Answer } from './useOffThread.ts'
+import { engineWorker } from './engineWorker.ts'
 
 // What evening out the two spouses' RRSPs would save, computed off the page's thread (lib/useOffThread.ts), started behind the verdict
 // and the chart ('idle'). `enabled` false asks nothing yet (the answer's one-line pointer waits until it is scrolled into view).
@@ -10,7 +11,7 @@ import { useOffThread, type Answer } from './useOffThread.ts'
 export function useSpouseBalance(household: Household, assumptions: Assumptions, age: number, firstAge: number, enabled = true): Answer<SpouseBalanceAnswer> {
   return useOffThread<SpouseBalanceRequest, SpouseBalanceMessage, SpouseBalanceAnswer>(
     { household, assumptions, age, firstAge },
-    () => new Worker(new URL('./spouseBalance.worker.ts', import.meta.url), { type: 'module' }),
+    () => engineWorker('spouseBalance'),
     () => ({ balance: spouseBalance(household, assumptions, age, firstAge) }),
     (m) => m.answer,
     // A one-person household has nothing to even out: no worker at all.

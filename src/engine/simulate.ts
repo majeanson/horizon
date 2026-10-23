@@ -62,5 +62,5 @@ export function* sensitivityCells(h: Household, a: Assumptions, options: Sensiti
 export const sensitivity = (h: Household, a: Assumptions, options: SensitivityOptions = {}): SensitivityCell[] => [...sensitivityCells(h, a, options)]
 
 // The verdict under each READY-MADE set is not here any more: the three figures belong to the results page's own
-// range line, computed by lib/presetEarliest.worker.ts straight from retireAt + withPreset (one home per figure).
+// range line, computed by lib/presetEarliest.job.ts straight from retireAt + withPreset (one home per figure).
 // The sensitivity worker used to compute them a second time and the page dropped them unseen.

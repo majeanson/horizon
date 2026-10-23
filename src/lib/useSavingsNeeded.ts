@@ -1,7 +1,8 @@
 import { savingsNeeded, type SavingsNeeded } from '../engine/savingsNeeded.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
-import type { SavingsNeededMessage, SavingsNeededRequest } from './savingsNeeded.worker.ts'
+import type { SavingsNeededMessage, SavingsNeededRequest } from './savingsNeeded.job.ts'
 import { useOffThread, type Answer } from './useOffThread.ts'
+import { engineWorker } from './engineWorker.ts'
 
 // « How much should I put aside to retire at `age`? », computed off the page's thread (lib/useOffThread.ts). The LAST answer
 // stays up while a new age recomputes (`busy`), so an edit never swaps the figure for a skeleton under the reader —
@@ -11,7 +12,7 @@ import { useOffThread, type Answer } from './useOffThread.ts'
 export function useSavingsNeeded(household: Household, assumptions: Assumptions, age: number, enabled: boolean): Answer<SavingsNeeded> {
   const answer = useOffThread<SavingsNeededRequest, SavingsNeededMessage, SavingsNeeded>(
     { household, assumptions, age },
-    () => new Worker(new URL('./savingsNeeded.worker.ts', import.meta.url), { type: 'module' }),
+    () => engineWorker('savingsNeeded'),
     () => savingsNeeded(household, assumptions, age),
     (m) => m.answer,
     enabled,

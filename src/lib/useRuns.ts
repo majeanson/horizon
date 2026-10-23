@@ -1,8 +1,9 @@
 import { useRef } from 'react'
 import { runSelections, type Selection } from './resultsModel.ts'
-import type { RunsMessage, RunsRequest } from './runs.worker.ts'
+import type { RunsMessage, RunsRequest } from './runs.job.ts'
 import type { Profile } from './schema.ts'
 import { useOffThread } from './useOffThread.ts'
+import { engineWorker } from './engineWorker.ts'
 
 // The comparisons (lib/resultsModel.ts `runSelections`), off the page's thread: `value` is null until the first ones are
 // in (the cards, the chart and the tables show a skeleton), then always the LAST ones — a chosen age added, a slider
@@ -15,7 +16,7 @@ export function useRuns(profile: Profile, today: { year: number; month: number }
   const request: RunsRequest = { profile, today, selections }
   const answer = useOffThread<RunsRequest, RunsMessage, RunsMessage>(
     request,
-    () => new Worker(new URL('./runs.worker.ts', import.meta.url), { type: 'module' }),
+    () => engineWorker('runs'),
     () => runSelections(profile, today, selections),
     (m) => m,
     enabled,

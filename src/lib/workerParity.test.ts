@@ -28,7 +28,7 @@ import { runSelections } from './resultsModel.ts'
 import { spendAnswer } from './spendModel.ts'
 import { SCHEMA_VERSION } from './schema.ts'
 
-// THE WORKER IS THE FUNCTION, WITH A LETTER ADDED. Seventeen workers carry the heavy questions off the page's thread, and each is five lines: take the message, call the pure function, post the result. The
+// THE WORKER IS THE FUNCTION, WITH A LETTER ADDED. Nineteen jobs, all behind one worker script (engine.worker.ts), carry the heavy questions off the page's thread, and each is five lines: take the message, call the pure function, post the result. The
 // five lines can be wrong in ways no test of the function sees — an argument dropped or swapped, a field read from the wrong place, a result that cannot be cloned across the thread (a function, a class,
 // a Map) and so arrives as an error or as nothing. For every worker: load its real file, hand it a real request exactly as the page does, and compare what it POSTS with the direct call — and that
 // what it posts survives `structuredClone`, which is what the thread boundary does to it.
@@ -49,60 +49,60 @@ const FACTS = [{ id: 'self:salary', owner: 'self' as const, kind: 'salary' as co
 
 type Case = { name: string; module: string; request: unknown; expected: () => unknown[] }
 const CASES: Case[] = [
-  { name: 'answer', module: './answer.worker.ts', request: { household: S, assumptions: SA, firstAge: 55, youngest: 60, everyoneRetired: false }, expected: () => [computeAnswer({ household: S, assumptions: SA, firstAge: 55, youngest: 60, everyoneRetired: false })] },
-  { name: 'bracketFill', module: './bracketFill.worker.ts', request: { household: S, assumptions: SA, firstAge: 55 }, expected: () => [{ answer: fillComparison(S, SA, 55) }] },
-  { name: 'bridge (view)', module: './bridge.worker.ts', request: { household: H, assumptions: A, levers, what: 'view' }, expected: () => [{ what: 'view', view: bridgeView(H, A, levers) }] },
-  { name: 'bridge (matrix)', module: './bridge.worker.ts', request: { household: S, assumptions: SA, levers: profileLevers(S, S.persons[0].id), what: 'matrix' }, expected: () => [{ what: 'matrix', matrix: bridgeMatrix(S, SA, profileLevers(S, S.persons[0].id)) }] },
-  { name: 'deathSweep', module: './deathSweep.worker.ts', request: { household: H, assumptions: A, levers }, expected: () => [deathSweep(H, A, levers)] },
-  { name: 'spouseBalance', module: './spouseBalance.worker.ts', request: { household: H, assumptions: A, age, firstAge: 55 }, expected: () => [{ answer: { balance: spouseBalance(H, A, age, 55) } }] },
-  { name: 'careEarliest', module: './careEarliest.worker.ts', request: { household: S, assumptions: SA, care: { amount: 20_000, fromAge: 80, years: 5 }, age: 65 }, expected: () => [careAnswer(S, SA, { amount: 20_000, fromAge: 80, years: 5 }, 65)] },
-  { name: 'earliestEach', module: './earliestEach.worker.ts', request: { household: H, assumptions: A }, expected: () => [{ each: earliestEach(H, A) }] },
-  { name: 'leversEarliest', module: './leversEarliest.worker.ts', request: { household: S, assumptions: SA }, expected: () => [leverRanking(S, SA)] },
-  { name: 'marketEarliest', module: './marketEarliest.worker.ts', request: { household: S, assumptions: SA }, expected: () => [marketRange(S, SA)] },
-  { name: 'plansCompare', module: './plansCompare.worker.ts', request: { plans: [{ name: 'A', household: S, assumptions: SA }, { name: 'B', household: H, assumptions: A }] }, expected: () => [comparePlans([{ name: 'A', household: S, assumptions: SA }, { name: 'B', household: H, assumptions: A }])] },
+  { name: 'answer', module: './answer.job.ts', request: { household: S, assumptions: SA, firstAge: 55, youngest: 60, everyoneRetired: false }, expected: () => [computeAnswer({ household: S, assumptions: SA, firstAge: 55, youngest: 60, everyoneRetired: false })] },
+  { name: 'bracketFill', module: './bracketFill.job.ts', request: { household: S, assumptions: SA, firstAge: 55 }, expected: () => [{ answer: fillComparison(S, SA, 55) }] },
+  { name: 'bridge (view)', module: './bridge.job.ts', request: { household: H, assumptions: A, levers, what: 'view' }, expected: () => [{ what: 'view', view: bridgeView(H, A, levers) }] },
+  { name: 'bridge (matrix)', module: './bridge.job.ts', request: { household: S, assumptions: SA, levers: profileLevers(S, S.persons[0].id), what: 'matrix' }, expected: () => [{ what: 'matrix', matrix: bridgeMatrix(S, SA, profileLevers(S, S.persons[0].id)) }] },
+  { name: 'deathSweep', module: './deathSweep.job.ts', request: { household: H, assumptions: A, levers }, expected: () => [deathSweep(H, A, levers)] },
+  { name: 'spouseBalance', module: './spouseBalance.job.ts', request: { household: H, assumptions: A, age, firstAge: 55 }, expected: () => [{ answer: { balance: spouseBalance(H, A, age, 55) } }] },
+  { name: 'careEarliest', module: './careEarliest.job.ts', request: { household: S, assumptions: SA, care: { amount: 20_000, fromAge: 80, years: 5 }, age: 65 }, expected: () => [careAnswer(S, SA, { amount: 20_000, fromAge: 80, years: 5 }, 65)] },
+  { name: 'earliestEach', module: './earliestEach.job.ts', request: { household: H, assumptions: A }, expected: () => [{ each: earliestEach(H, A) }] },
+  { name: 'leversEarliest', module: './leversEarliest.job.ts', request: { household: S, assumptions: SA }, expected: () => [leverRanking(S, SA)] },
+  { name: 'marketEarliest', module: './marketEarliest.job.ts', request: { household: S, assumptions: SA }, expected: () => [marketRange(S, SA)] },
+  { name: 'plansCompare', module: './plansCompare.job.ts', request: { plans: [{ name: 'A', household: S, assumptions: SA }, { name: 'B', household: H, assumptions: A }] }, expected: () => [comparePlans([{ name: 'A', household: S, assumptions: SA }, { name: 'B', household: H, assumptions: A }])] },
   {
     name: 'presetEarliest',
-    module: './presetEarliest.worker.ts',
+    module: './presetEarliest.job.ts',
     request: { household: S, assumptions: SA },
     expected: () => {
       const [prudent, neutral, bold] = PRESET_KEYS.map((p) => retireAt(S, withPreset(SA, p), { stopAtFirstOk: true }).earliestOk)
       return [{ prudent, neutral, bold }]
     },
   },
-  { name: 'factImpact', module: './factImpact.worker.ts', request: { household: S, assumptions: SA, facts: FACTS }, expected: () => [factSwings(S, SA, FACTS)] },
-  { name: 'runs', module: './runs.worker.ts', request: { profile, today: TODAY, selections: ['plan', 60] }, expected: () => [runSelections(profile, TODAY, ['plan', 60])] },
-  { name: 'planFacts', module: './planFacts.worker.ts', request: { profile, today: TODAY }, expected: () => [planFactsOf({ profile, today: TODAY })] },
-  { name: 'decide (reverse)', module: './decide.worker.ts', request: { what: 'reverse', household: S, assumptions: SA, age: 62 }, expected: () => [{ what: 'reverse', answer: reverseTarget(S, SA, 62) }] },
-  { name: 'decide (regret)', module: './decide.worker.ts', request: { what: 'regret', household: S, assumptions: SA }, expected: () => [{ what: 'regret', answer: regretAnswer(S, SA) }] },
-  { name: 'decide (fan)', module: './decide.worker.ts', request: { what: 'fan', household: S, assumptions: SA }, expected: () => [{ what: 'fan', answer: { lines: fan(S, SA) } }] },
-  { name: 'decide (timing)', module: './decide.worker.ts', request: { what: 'timing', household: H, assumptions: A }, expected: () => [{ what: 'timing', answer: { timing: spouseTiming(H, A) } }] },
-  { name: 'savingsNeeded', module: './savingsNeeded.worker.ts', request: { household: S, assumptions: SA, age: 62 }, expected: () => [{ answer: savingsNeeded(S, SA, 62) }] },
-  { name: 'spendEarliest', module: './spendEarliest.worker.ts', request: { household: S, assumptions: SA, retiredToday: 30_000 }, expected: () => [spendAnswer(S, SA, 30_000)] },
-  { name: 'withdrawalOrders', module: './withdrawalOrders.worker.ts', request: { household: H, assumptions: A, age, firstAge: 55 }, expected: () => [{ answer: withdrawalOrders(H, A, age, 55) }] },
-  { name: 'sensitivity (a message per cell, then done)', module: './sensitivity.worker.ts', request: { household: S, assumptions: SA }, expected: () => [...[...sensitivityCells(S, SA)].map((cell) => ({ cell })), { done: true }] },
+  { name: 'factImpact', module: './factImpact.job.ts', request: { household: S, assumptions: SA, facts: FACTS }, expected: () => [factSwings(S, SA, FACTS)] },
+  { name: 'runs', module: './runs.job.ts', request: { profile, today: TODAY, selections: ['plan', 60] }, expected: () => [runSelections(profile, TODAY, ['plan', 60])] },
+  { name: 'planFacts', module: './planFacts.job.ts', request: { profile, today: TODAY }, expected: () => [planFactsOf({ profile, today: TODAY })] },
+  { name: 'decide (reverse)', module: './decide.job.ts', request: { what: 'reverse', household: S, assumptions: SA, age: 62 }, expected: () => [{ what: 'reverse', answer: reverseTarget(S, SA, 62) }] },
+  { name: 'decide (regret)', module: './decide.job.ts', request: { what: 'regret', household: S, assumptions: SA }, expected: () => [{ what: 'regret', answer: regretAnswer(S, SA) }] },
+  { name: 'decide (fan)', module: './decide.job.ts', request: { what: 'fan', household: S, assumptions: SA }, expected: () => [{ what: 'fan', answer: { lines: fan(S, SA) } }] },
+  { name: 'decide (timing)', module: './decide.job.ts', request: { what: 'timing', household: H, assumptions: A }, expected: () => [{ what: 'timing', answer: { timing: spouseTiming(H, A) } }] },
+  { name: 'savingsNeeded', module: './savingsNeeded.job.ts', request: { household: S, assumptions: SA, age: 62 }, expected: () => [{ answer: savingsNeeded(S, SA, 62) }] },
+  { name: 'spendEarliest', module: './spendEarliest.job.ts', request: { household: S, assumptions: SA, retiredToday: 30_000 }, expected: () => [spendAnswer(S, SA, 30_000)] },
+  { name: 'withdrawalOrders', module: './withdrawalOrders.job.ts', request: { household: H, assumptions: A, age, firstAge: 55 }, expected: () => [{ answer: withdrawalOrders(H, A, age, 55) }] },
+  { name: 'sensitivity (a message per cell, then done)', module: './sensitivity.job.ts', request: { household: S, assumptions: SA }, expected: () => [...[...sensitivityCells(S, SA)].map((cell) => ({ cell })), { done: true }] },
 ]
 
 const stub = { onmessage: null as null | ((e: { data: unknown }) => void), postMessage: vi.fn() }
 vi.stubGlobal('self', stub)
 afterAll(() => vi.unstubAllGlobals())
 
-/** What a worker posts for a request, from its own file. */
+/** What the worker posts for a request to one job — through the ONE worker script, with the message the page's `engineWorker` wraps it in. */
 async function posted(module: string, request: unknown): Promise<unknown[]> {
   stub.postMessage.mockClear()
   stub.onmessage = null
   vi.resetModules()
-  await import(/* @vite-ignore */ module)
-  expect(typeof stub.onmessage, `${module} sets no onmessage`).toBe('function')
-  stub.onmessage!({ data: request })
+  await import('./engine.worker.ts')
+  expect(typeof stub.onmessage, 'engine.worker.ts sets no onmessage').toBe('function')
+  stub.onmessage!({ data: { job: module.replace('./', '').replace('.job.ts', ''), req: request } })
   return stub.postMessage.mock.calls.map((c) => c[0])
 }
 const plain = (x: unknown): unknown => JSON.parse(JSON.stringify(x === undefined ? null : x))
 
 describe('every worker posts what the direct call returns, and it crosses the thread', { timeout: 600_000 }, () => {
-  it('there are as many cases as there are worker files (a new worker is held the day it is added)', () => {
-    const files = Object.keys(import.meta.glob('./*.worker.ts'))
+  it('there are as many cases as there are job files (a new job is held the day it is added)', () => {
+    const files = Object.keys(import.meta.glob('./*.job.ts'))
     const covered = new Set(CASES.map((c) => c.module))
-    expect(files.filter((f) => !covered.has(f)), 'a worker with no parity case').toEqual([])
+    expect(files.filter((f) => !covered.has(f)), 'a job with no parity case').toEqual([])
     expect(files.length).toBeGreaterThanOrEqual(17)
   })
 

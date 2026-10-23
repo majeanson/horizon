@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { StrategyCard, StrategyKey, BridgeView } from '../../engine/bridge'
 import { useLang, useT } from '../../i18n'
-import type { BridgeMatrix } from '../../lib/bridge.worker'
+import type { BridgeMatrix } from '../../lib/bridge.job'
 import type { BridgeCopy } from '../../lib/bridgeCopy'
 import { sturdiest, verdictOf } from '../../lib/bridgeModel'
 import { formatMoney } from '../../lib/money'

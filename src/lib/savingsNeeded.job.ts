@@ -1,5 +1,6 @@
 import { savingsNeeded, type SavingsNeeded } from "../engine/savingsNeeded.ts";
 import type { Assumptions, Household } from "../engine/types.ts";
+import type { JobPort } from './engineJob.ts'
 
 // « How much should I put aside to retire at X? » is a search: a dozen full projections. It runs here, off the page's
 // thread, and answers once. Nothing here touches the network or storage.
@@ -12,7 +13,7 @@ export interface SavingsNeededRequest {
 
 export type SavingsNeededMessage = { answer: SavingsNeeded };
 
-self.onmessage = (event: MessageEvent<SavingsNeededRequest>) => {
+export function handle(event: { data: SavingsNeededRequest }, self: JobPort): void {
   const { household, assumptions, age } = event.data;
   self.postMessage({ answer: savingsNeeded(household, assumptions, age) } satisfies SavingsNeededMessage);
-};
+}

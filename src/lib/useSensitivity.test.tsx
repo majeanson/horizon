@@ -51,7 +51,7 @@ describe('with a worker', () => {
     act(() => result.current.run(household, assumptions))
     expect(result.current.state).toEqual({ status: 'running', cells: [] })
     expect(FakeWorker.all).toHaveLength(1)
-    expect(FakeWorker.all[0].posted).toEqual([{ household, assumptions }])
+    expect(FakeWorker.all[0].posted).toEqual([{ job: 'sensitivity', req: { household, assumptions } }]) // the page's engineWorker wraps each request with the job's name
   })
 
   it('the cells appear as they are posted, in order, and the last message makes it « done » and lets the worker go', () => {

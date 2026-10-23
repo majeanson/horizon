@@ -9,7 +9,7 @@ import { stopWorking, type StopWorking } from './stopWorking.ts'
 // THE answer of the results page, as one job: the earliest age that works (a search of a dozen full projections), whether
 // stopping today works, the headline built around that age, what it can fund each month (a binary search of a dozen more)
 // and the age put in dates — or, for a household that has already stopped working, whether the money lasts, under its own
-// scenario and under Prudent. Some forty projections — run by `answer.worker.ts` off the page's thread, and by `useAnswer`
+// scenario and under Prudent. Some forty projections — run by `answer.job.ts` off the page's thread, and by `useAnswer`
 // on it only where a worker cannot be made. One function so the two can never disagree.
 
 export interface AnswerRequest {

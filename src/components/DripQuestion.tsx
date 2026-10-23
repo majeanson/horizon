@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { FactImpactAnswer, FactImpactRequest } from '../lib/factImpact.worker'
+import type { FactImpactAnswer, FactImpactRequest } from '../lib/factImpact.job'
 import { useLang, useT } from '../i18n'
 import { GUIDE_COPY } from '../lib/guideCopy'
 import { useProfile } from '../lib/store'

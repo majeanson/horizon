@@ -74,7 +74,7 @@ Almost nothing you will be asked for is greenfield. Before implementing a change
 | An icon | **`Icon`** / `InlineIcon` (Phosphor, never an emoji) | `components/Icon.tsx` |
 | Format a number / money / percent | the **cached** helpers in `lib/format.ts` / `lib/money.ts` | — |
 | A chart | **`LineChart`** from `components/charts` — the only folder that touches the chart library (`chartBoundary.test.ts`); build `ChartSeries` in `lib/chartData.ts` | `components/charts/` |
-| Heavy work (a long loop of projections) | a **web worker** (`lib/sensitivity.worker.ts` + `useSensitivity`) that streams results — never a multi-second loop on the page's thread | `lib/` |
+| Heavy work (a long loop of projections) | a **job** in the ONE worker script: a `lib/<name>.job.ts` exporting `handle(event, self)`, registered in `lib/engine.worker.ts` (that is how the engine ships once), started by `engineWorker('<name>')`; `useSensitivity` streams results — never a multi-second loop on the page's thread | `lib/` |
 | A heavy derivation that FOLLOWS a control (the answer behind a slider, a typed figure) | **`useSettled`** — derive from the value once the hand has rested, never from every step: a block of projections cannot be interrupted once begun, so deferring it is not enough | `lib/useSettled.ts` |
 
 **When you add a shared component:** register it in `src/pages/DevKit.tsx` and add its row to
@@ -114,6 +114,7 @@ npm run typecheck      # tsc -b --noEmit
 npm test               # vitest run — the engine, the guards, the helpers
 npm run test:engine    # vitest run src/engine only
 npm run sources        # regenerate SOURCES.md (FR) and SOURCES.en.md (EN) from the params files
+npm run figures:check  # network: does each watched figure (CCB, OAS, CHSLD) still read the same on its cited page? weekly in figures.yml; only reports (scripts/figureWatch.ts is the list)
 npm run examples       # regenerate EXAMPLES.md (the twelve example households, printed) from the engine
 npm run test:fast      # vitest without the slowest suites (about 2 minutes, not 6): while iterating; verify still runs everything
 npm run specs-for      # the unit suites and e2e specs worth running for the files you changed (it only tells you; no hook)

@@ -95,7 +95,7 @@ describe('a figure held while a new age is worked out says the age it was worked
     const c = REVERSE_COPY.fr
     const { container, rerender } = render(<ReverseView {...props} age={60} />)
     act(() => void vi.advanceTimersByTime(2000))
-    const reverse = workerFor((m) => (m as { what?: string }).what === 'reverse')
+    const reverse = workerFor((m) => (m as { req?: { what?: string } }).req?.what === 'reverse')
     act(() => reverse.say({ what: 'reverse', answer: { age: 60, works: false, spend: { current: 60_000, max: null }, save: null, earliest: 63, partTime: null, returns: null } }))
     expect(container.textContent).toContain(c.needs(60))
     rerender(<ReverseView {...props} age={65} />) // the slider moved: 65 is being worked out, 60's answer is still the one held

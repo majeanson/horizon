@@ -1,7 +1,8 @@
 import type { Assumptions, Household } from '../engine/types.ts'
-import type { SpendEarliestMessage, SpendEarliestRequest } from './spendEarliest.worker.ts'
+import type { SpendEarliestMessage, SpendEarliestRequest } from './spendEarliest.job.ts'
 import { spendAnswer } from './spendModel.ts'
 import { useOffThread, type Answer } from './useOffThread.ts'
+import { engineWorker } from './engineWorker.ts'
 
 // « And if we spent `retiredToday` a year in retirement? », computed off the page's thread (lib/useOffThread.ts). The LAST
 // answer stays up while a new amount recomputes (`busy`), so a slider release never swaps the age for a skeleton under the
@@ -11,7 +12,7 @@ import { useOffThread, type Answer } from './useOffThread.ts'
 export function useSpendEarliest(household: Household, assumptions: Assumptions, retiredToday: number, enabled: boolean): Answer<{ earliest: number | null; now: boolean }> {
   const answer = useOffThread<SpendEarliestRequest, SpendEarliestMessage, { earliest: number | null; now: boolean }>(
     { household, assumptions, retiredToday },
-    () => new Worker(new URL('./spendEarliest.worker.ts', import.meta.url), { type: 'module' }),
+    () => engineWorker('spendEarliest'),
     () => spendAnswer(household, assumptions, retiredToday),
     (m) => m,
     enabled,

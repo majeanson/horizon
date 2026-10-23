@@ -3,6 +3,7 @@ import { regretAnswer, type RegretAnswer } from "../engine/regret.ts";
 import { reverseTarget, type ReverseTarget } from "../engine/reverse.ts";
 import { spouseTiming, type SpouseTiming } from "../engine/spouseTiming.ts";
 import type { Assumptions, Household } from "../engine/types.ts";
+import type { JobPort } from './engineJob.ts'
 
 // The heavy questions that Phase 16 added to « Décider » and « Preuve » — « I want to stop at X » (four searches), « what does one more year of work buy » (one sweep over the ages) and « who
 // starts the QPP first » (nine combinations of three runs), and the plan year by year under five ways the markets could go — share ONE worker, so the engine is shipped to the device once and not once each. Each is a few dozen full
@@ -20,7 +21,7 @@ export type DecideMessage =
   | { what: "timing"; answer: { timing: SpouseTiming | null } }
   | { what: "fan"; answer: { lines: FanLine[] } };
 
-self.onmessage = (event: MessageEvent<DecideRequest>) => {
+export function handle(event: { data: DecideRequest }, self: JobPort): void {
   const r = event.data;
   const message: DecideMessage =
     r.what === "reverse"
@@ -31,4 +32,4 @@ self.onmessage = (event: MessageEvent<DecideRequest>) => {
           ? { what: "timing", answer: { timing: spouseTiming(r.household, r.assumptions) } }
           : { what: "fan", answer: { lines: fan(r.household, r.assumptions) } };
   self.postMessage(message);
-};
+}

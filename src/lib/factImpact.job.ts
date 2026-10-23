@@ -1,5 +1,6 @@
 import { factSwings, type FactSwing, type ImpactKind, type UncertaintyRange } from '../engine/factImpact.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
+import type { JobPort } from './engineJob.ts'
 
 // Off the page's thread: two short walks of a few full projections for every figure not yet read off a document. Nothing here
 // touches the network or storage.
@@ -12,7 +13,7 @@ export interface FactImpactRequest {
 
 export type FactImpactAnswer = { base: number | null; swings: Record<string, FactSwing>; range: UncertaintyRange | null }
 
-self.onmessage = (event: MessageEvent<FactImpactRequest>) => {
+export function handle(event: { data: FactImpactRequest }, self: JobPort): void {
   const { household, assumptions, facts } = event.data
   self.postMessage(factSwings(household, assumptions, facts) satisfies FactImpactAnswer)
 }

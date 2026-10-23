@@ -1,5 +1,6 @@
 import { earliestEach, type EarliestEach } from "../engine/retireAt.ts";
 import type { Assumptions, Household } from "../engine/types.ts";
+import type { JobPort } from './engineJob.ts'
 
 // « When can EACH of us retire? » is up to two searches of a dozen full projections each — a second or two of
 // arithmetic. It runs here, off the page's thread, and answers once with both people's earliest ages. Nothing here
@@ -12,8 +13,8 @@ export interface EarliestEachRequest {
 
 export type EarliestEachMessage = { each: EarliestEach[] };
 
-self.onmessage = (event: MessageEvent<EarliestEachRequest>) => {
+export function handle(event: { data: EarliestEachRequest }, self: JobPort): void {
   self.postMessage({
     each: earliestEach(event.data.household, event.data.assumptions),
   } satisfies EarliestEachMessage);
-};
+}

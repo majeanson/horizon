@@ -1,5 +1,6 @@
 import { spouseBalance, type SpouseBalance } from "../engine/spouseBalance.ts";
 import type { Assumptions, Household } from "../engine/types.ts";
+import type { JobPort } from './engineJob.ts'
 
 // Two plans (the household's own and the evened-out one) × a scan of retirement ages: a few dozen projections. It runs here,
 // off the page's thread, and answers once. Nothing here touches the network or storage.
@@ -18,7 +19,7 @@ export interface SpouseBalanceAnswer {
 
 export type SpouseBalanceMessage = { answer: SpouseBalanceAnswer };
 
-self.onmessage = (event: MessageEvent<SpouseBalanceRequest>) => {
+export function handle(event: { data: SpouseBalanceRequest }, self: JobPort): void {
   const { household, assumptions, age, firstAge } = event.data;
   self.postMessage({ answer: { balance: spouseBalance(household, assumptions, age, firstAge) } } satisfies SpouseBalanceMessage);
-};
+}

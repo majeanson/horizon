@@ -205,7 +205,7 @@ describe('applying a set', () => {
 })
 
 describe('the verdict under each set', () => {
-  // The computation of the verdict's « Selon le scénario » row (lib/presetEarliest.worker.ts), pinned here
+  // The computation of the verdict's « Selon le scénario » row (lib/presetEarliest.job.ts), pinned here
   // against the golden household so the three preset ages cannot drift unnoticed.
   const presetEarliest = () => Object.fromEntries(PRESET_KEYS.map((p) => [p, retireAt(H, withPreset(GOLDEN_ASSUMPTIONS, p), { stopAtFirstOk: true }).earliestOk]))
 

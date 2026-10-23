@@ -1,8 +1,9 @@
 import { PRESET_KEYS, withPreset } from '../engine/assumptionPresets.ts'
 import { retireAt } from '../engine/retireAt.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
-import type { PresetEarliestMessage, PresetEarliestRequest } from './presetEarliest.worker.ts'
+import type { PresetEarliestMessage, PresetEarliestRequest } from './presetEarliest.job.ts'
 import { useOffThread } from './useOffThread.ts'
+import { engineWorker } from './engineWorker.ts'
 
 /** The earliest age that works under each ready-made scenario (null: none up to 70). */
 export interface PresetRange {
@@ -15,7 +16,7 @@ export interface PresetRange {
 export function usePresetRange(household: Household, assumptions: Assumptions, enabled: boolean): PresetRange | undefined {
   const { value, busy } = useOffThread<PresetEarliestRequest, PresetEarliestMessage, PresetRange>(
     { household, assumptions },
-    () => new Worker(new URL('./presetEarliest.worker.ts', import.meta.url), { type: 'module' }),
+    () => engineWorker('presetEarliest'),
     () => {
       const [prudent, neutral, bold] = PRESET_KEYS.map((p) => retireAt(household, withPreset(assumptions, p), { stopAtFirstOk: true }).earliestOk)
       return { prudent, neutral, bold }

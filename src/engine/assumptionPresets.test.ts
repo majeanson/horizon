@@ -78,7 +78,7 @@ describe('the three ready-made assumption sets', () => {
   })
 
   it('the verdict never gets better as the preset gets more prudent', () => {
-    // The same computation as lib/presetEarliest.worker.ts (the verdict's « Selon le scénario » row).
+    // The same computation as lib/presetEarliest.job.ts (the verdict's « Selon le scénario » row).
     const v = Object.fromEntries(PRESET_KEYS.map((p) => [p, retireAt(GOLDEN_HOUSEHOLD, withPreset(GOLDEN_ASSUMPTIONS, p), { stopAtFirstOk: true }).earliestOk ?? Infinity]))
     expect(v.bold).toBeLessThanOrEqual(v.neutral)
     expect(v.neutral).toBeLessThanOrEqual(v.prudent)

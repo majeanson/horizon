@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { sensitivityCells, type SensitivityCell } from '../engine/simulate.ts'
 import type { Assumptions, Household } from '../engine/types.ts'
-import type { SensitivityMessage, SensitivityRequest } from './sensitivity.worker.ts'
+import type { SensitivityMessage, SensitivityRequest } from './sensitivity.job.ts'
+import { engineWorker } from './engineWorker.ts'
 
 // Runs the sensitivity grid without freezing the page: in a web worker where there is one, and — where a worker
 // cannot be made — on the page's own thread, one cell per turn of the event loop so the screen still breathes.
@@ -32,7 +33,7 @@ export function useSensitivity(): { state: SensitivityState; run: (household: Ho
 
     let worker: Worker | null = null
     try {
-      worker = new Worker(new URL('./sensitivity.worker.ts', import.meta.url), { type: 'module' })
+      worker = engineWorker('sensitivity')
     } catch {
       worker = null
     }

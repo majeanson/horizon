@@ -111,7 +111,7 @@ export interface PlanFactsResult {
   whatIf: WhatIfFacts
 }
 
-/** Both sets of facts of a profile in one job (some seventy projections): run by `planFacts.worker.ts` off the page's thread, and by `usePlanFacts` on it only where a worker cannot be made. */
+/** Both sets of facts of a profile in one job (some seventy projections): run by `planFacts.job.ts` off the page's thread, and by `usePlanFacts` on it only where a worker cannot be made. */
 export function planFactsOf({ profile, today }: PlanFactsRequest): PlanFactsResult {
   return { facts: planFacts(profile, today), whatIf: whatIfFacts(profile, today) }
 }

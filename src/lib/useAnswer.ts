@@ -1,6 +1,7 @@
 import { computeAnswer, type AnswerRequest, type AnswerResult } from './answer.ts'
-import type { AnswerMessage } from './answer.worker.ts'
+import type { AnswerMessage } from './answer.job.ts'
 import { useOffThread } from './useOffThread.ts'
+import { engineWorker } from './engineWorker.ts'
 
 // The answer of the results page, off the page's thread: `value` is null until the first answer is in (the page shows a
 // skeleton), then always the LAST answer — a re-asked question (a slider released, a figure typed) keeps it on screen,
@@ -12,7 +13,7 @@ import { useOffThread } from './useOffThread.ts'
 export function useAnswer(request: AnswerRequest, enabled: boolean, priority: 'now' | 'idle' = 'now'): { value: AnswerResult | null; busy: boolean } {
   return useOffThread<AnswerRequest, AnswerMessage, AnswerResult>(
     request,
-    () => new Worker(new URL('./answer.worker.ts', import.meta.url), { type: 'module' }),
+    () => engineWorker('answer'),
     () => computeAnswer(request),
     (m) => m,
     enabled,
