@@ -402,7 +402,7 @@ const EN: Record<HelpId, FieldHelpEntry> = {
   },
   dbCoordinationRate: {
     what: 'The rate that sets how much the pension drops when it is coordinated with the QPP.',
-    effect: 'From the coordination age, the pension drops by this rate, times your years of service (up to the maximum), times the lesser of your average salary and the average Year’s Maximum Pensionable Earnings (YMPE).',
+    effect: 'From the coordination age, the pension drops by this rate, times your years of service (up to the maximum), times the lesser of your average salary and the average maximum pensionable earnings (MPE).',
     where: 'Your plan’s booklet, under coordination with the QPP.',
   },
   dbCoordinationFrom: {

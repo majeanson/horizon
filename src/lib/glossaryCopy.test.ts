@@ -12,7 +12,7 @@ const { fr, en } = GLOSSARY_COPY
 const all = (g: typeof fr): GlossaryTerm[] => g.groups.flatMap((x) => [...x.terms])
 
 // Official hosts only (the same families fieldInfoCopy.test.ts accepts for the ⓘ notes), plus the two named reference bodies.
-const OFFICIAL = /^https:\/\/(www\.(canada\.ca|retraitequebec\.gouv\.qc\.ca|banqueducanada\.ca|bankofcanada\.ca)|institutpf\.org)\//
+const OFFICIAL = /^https:\/\/(www\.(canada\.ca|retraitequebec\.gouv\.qc\.ca|banqueducanada\.ca|bankofcanada\.ca|ramq\.gouv\.qc\.ca|revenuquebec\.ca)|institutpf\.org)\//
 
 describe('the glossary, in both languages', () => {
   it('has the same groups, in the same order, with the same number of terms, and no empty text', () => {
@@ -105,6 +105,6 @@ describe('the glossary, in both languages', () => {
     const frAbbr = new Set(all(fr).map((t) => t.abbr))
     const enAbbr = new Set(all(en).map((t) => t.abbr))
     for (const a of ['RRQ', 'PSV', 'SRG', 'REER', 'CELI', 'FERR', 'RVER', 'RPAC', 'CRI', 'FRV', 'PBR', 'ARC', 'RREGOP', 'MGA']) expect(frAbbr.has(a), a).toBe(true)
-    for (const a of ['QPP', 'OAS', 'GIS', 'RRSP', 'TFSA', 'RRIF', 'VRSP', 'PRPP', 'LIRA', 'LIF', 'ACB', 'CRA', 'RREGOP', 'YMPE']) expect(enAbbr.has(a), a).toBe(true)
+    for (const a of ['QPP', 'OAS', 'GIS', 'RRSP', 'TFSA', 'RRIF', 'VRSP', 'PRPP', 'LIRA', 'LIF', 'ACB', 'CRA', 'RREGOP', 'MPE']) expect(enAbbr.has(a), a).toBe(true)
   })
 })

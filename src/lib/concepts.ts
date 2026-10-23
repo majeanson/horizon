@@ -176,6 +176,7 @@ export const STARTER_CONCEPT: Record<StarterId, ConceptId> = { upkeep: 'entretie
 /** A group of lib/glossaryCopy.ts is ONE family (glossaryCopy.test / conceptRegistry.test hold it). */
 export const GLOSSARY_GROUP_FAMILY: Record<string, Family> = {
   publics: 'public',
+  quebec: 'public',
   comptes: 'accounts',
   autres: 'household',
   employeur: 'work',
@@ -183,7 +184,7 @@ export const GLOSSARY_GROUP_FAMILY: Record<string, Family> = {
   horizon: 'horizon',
 }
 export const GLOSSARY_TERM_CONCEPT: Record<string, ConceptId> = {
-  rrq: 'rrq', psv: 'psv', srg: 'srg', acebe: 'srg', indexation: 'indexation', releve: 'releve', mga: 'mga',
+  rrq: 'rrq', psv: 'psv', srg: 'srg', acebe: 'srg', solidarite: 'srg', 'soutien-aines': 'srg', chsld: 'officiel', ramq: 'officiel', rqap: 'officiel', indexation: 'indexation', releve: 'releve', mga: 'mga',
   reer: 'reer', celi: 'celi', ferr: 'ferr', droits: 'droits', fonte: 'fonte', rver: 'rver', rpac: 'rpac', cri: 'verrouille', frv: 'verrouille',
   'non-enregistre': 'nonEnregistre', pbr: 'pbr',
   'rente-employeur': 'employeur', 'rente-viagere': 'viagere', rregop: 'rregop',
