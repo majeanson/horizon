@@ -9,12 +9,13 @@ import { WHATIF_WORDS, whatIfCards, type WhatIfId } from './whatIfCopy.ts'
 
 const LANGS = ['fr', 'en'] as const
 const ORDER: WhatIfId[] = ['crash', 'death', 'spend10', 'pensions70']
-const ALLOWED: readonly TokenName[] = ['age', 'base', 'who', 'nestEnd', 'nestEndBase', 'gain', 'yearsWord']
+const ALLOWED: readonly TokenName[] = ['age', 'base', 'year', 'baseYear', 'who', 'nestEnd', 'nestEndBase', 'gain', 'yearsWord', 'maxSpend', 'asked', 'margin', 'cut']
 const nowOf = (id: ExampleId) => EXAMPLES[id].assumptions.today
-const flat = (lang: 'fr' | 'en') => Object.entries(WHATIF_WORDS[lang]).flatMap(([card, words]) => Object.entries(words).map(([k, text]) => ({ key: `${card}.${k}`, text: text as string })))
+const flatten = (prefix: string, o: unknown): { key: string; text: string }[] => (typeof o === 'string' ? [{ key: prefix, text: o }] : Object.entries(o as Record<string, unknown>).flatMap(([k, v]) => flatten(prefix ? `${prefix}.${k}` : k, v)))
+const flat = (lang: 'fr' | 'en') => flatten('', WHATIF_WORDS[lang])
 
-const baseFacts: PlanFacts = { kind: 'at', earliest: 60, everyoneRetired: false, ownPlanHolds: true, firstShortfallYear: null, nestEnd: 400_000, comfort: 80_000, levers: [] }
-const baseWhatIf: WhatIfFacts = { crash: { earliest: 62, base: 60, ownPlanHolds: true, nestEnd: 100_000 }, death: null }
+const baseFacts: PlanFacts = { kind: 'at', earliest: 60, everyoneRetired: false, ownPlanHolds: true, firstShortfallYear: null, nestEnd: 400_000, comfort: 80_000, levers: [], retiree: null }
+const baseWhatIf: WhatIfFacts = { crash: { earliest: 62, base: 60, ownPlanHolds: true, firstShortfallYear: null, nestEnd: 100_000 }, death: null }
 
 describe('the templates', () => {
   it('hold no figure of their own (a digit is a number the engine did not give), and the two languages have the same keys and the same tokens', () => {
@@ -35,7 +36,7 @@ describe('the money basis', () => {
     for (const lang of LANGS) {
       const said = lang === 'fr' ? /aujourd’hui/ : /today’s/
       for (const s of flat(lang)) {
-        const money = tokensIn(s.text).some((t) => t === 'nestEnd' || t === 'nestEndBase' || t === 'gain')
+        const money = tokensIn(s.text).some((t) => ['nestEnd', 'nestEndBase', 'gain', 'maxSpend', 'asked', 'margin', 'cut'].includes(t))
         if (money) expect(s.text, `${lang} ${s.key} states an amount without its dollars`).toMatch(said)
       }
     }
@@ -56,8 +57,11 @@ describe('the cards of the fourteen examples', { timeout: 300_000 }, () => {
       for (const lang of LANGS) {
         const out = cards(id, lang)
         expect(out.length, `${id} ${lang}`).toBeGreaterThanOrEqual(2)
-        const order = out.map((c) => ORDER.indexOf(c.id))
-        expect(order, `${id} ${lang}`).toEqual([...order].sort((a, b) => a - b))
+        // a household still working has a fixed order; a retiree's changes come best first as the engine ranked them (whatIfRetired.test.ts holds that)
+        if (!factsOf(id).f.retiree) {
+          const order = out.map((c) => ORDER.indexOf(c.id))
+          expect(order, `${id} ${lang}`).toEqual([...order].sort((a, b) => a - b))
+        }
         for (const c of out) {
           expect(c.title.trim(), `${id} ${lang} ${c.id}`).not.toBe('')
           expect(c.text + c.title, `${id} ${lang} ${c.id}`).not.toMatch(/[{}]/)
@@ -69,7 +73,8 @@ describe('the cards of the fourteen examples', { timeout: 300_000 }, () => {
     for (const id of EXAMPLE_IDS) {
       const ids = cards(id, 'fr').map((c) => c.id)
       expect(ids.includes('death'), `${id}`).toBe(EXAMPLES[id].household.persons.length === 2)
-      expect(ids.includes('pensions70'), `${id}`).toBe(factsOf(id).f.levers.some((l) => l.id === 'pensions70'))
+      const f = factsOf(id).f
+      expect(ids.includes('pensions70'), `${id}`).toBe((f.retiree ? f.retiree.levers : f.levers).some((l) => l.id === 'pensions70'))
     }
   })
 
@@ -100,13 +105,13 @@ describe('the branches no example reaches, on made-up facts', () => {
 
   it('no crash card when no age works as things stand; a crash that ends every answer says so', () => {
     expect(whatIfCards('fr', baseFacts, { ...baseWhatIf, crash: { ...baseWhatIf.crash, base: null, earliest: null } }, 'A').map((c) => c.id)).not.toContain('crash')
-    const none = whatIfCards('fr', baseFacts, { ...baseWhatIf, crash: { earliest: null, base: 60, ownPlanHolds: false, nestEnd: 0 } }, 'A').find((c) => c.id === 'crash')!
+    const none = whatIfCards('fr', baseFacts, { ...baseWhatIf, crash: { earliest: null, base: 60, ownPlanHolds: false, firstShortfallYear: 2040, nestEnd: 0 } }, 'A').find((c) => c.id === 'crash')!
     expect(none.text).toContain('aucun âge ne fonctionne plus')
     expect(none.text).toContain('manquerait')
   })
 
   it('a crash that changes nothing says the age stays', () => {
-    const same = whatIfCards('en', baseFacts, { ...baseWhatIf, crash: { earliest: 60, base: 60, ownPlanHolds: true, nestEnd: 50_000 } }, 'A').find((c) => c.id === 'crash')!
+    const same = whatIfCards('en', baseFacts, { ...baseWhatIf, crash: { earliest: 60, base: 60, ownPlanHolds: true, firstShortfallYear: null, nestEnd: 50_000 } }, 'A').find((c) => c.id === 'crash')!
     expect(same.text).toContain('stays at 60')
   })
 

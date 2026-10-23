@@ -14,7 +14,8 @@ export const SAVE_MORE_PER_MONTH = 500
 
 type Change = (h: Household, a: Assumptions) => [Household, Assumptions]
 
-const CHANGES: Record<LeverId, Change> = {
+/** The change each lever makes to the inputs (also read by retiree.ts, which measures the same changes by whether the money lasts rather than by the age they allow). */
+export const CHANGES: Record<LeverId, Change> = {
   // Live on 10 % less in retirement.
   spend10: (h, a) => [{ ...h, spending: { ...h.spending, retiredToday: h.spending.retiredToday * 0.9 } }, a],
   // Put 500 $ a month more into the TFSA of whoever is working longest (the account whose growth is never taxed) — FOUND by spending that much
@@ -38,7 +39,7 @@ const AT = 70
 const at70 = (p: Household['persons'][number], kind: PensionKind, a: Assumptions): number => (canStartAt(kind, p.birth, p[kind].startAge, AT, a.today) ? AT : p[kind].startAge)
 
 /** A lever that would change nothing for this household (every pension already at 70, or none that can still move) is not offered at all. */
-const applies = (id: LeverId, h: Household, a: Assumptions): boolean =>
+export const applies = (id: LeverId, h: Household, a: Assumptions): boolean =>
   id !== 'pensions70' || h.persons.some((p) => (['rrq', 'oas'] as const).some((k) => at70(p, k, a) !== p[k].startAge))
 
 export interface LeverResult {

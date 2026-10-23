@@ -1,18 +1,21 @@
 import type { Lang } from '../i18n'
 import { formatMoney } from './money.ts'
-import type { PlanFacts, WhatIfFacts } from './planFacts.ts'
+import type { PlanFacts, RetireeLeverFact, WhatIfFacts } from './planFacts.ts'
 import { fillTokens, yearsWord } from './storyTokens.ts'
 
-// « AND IF…? » CARDS: four things a household may ask, each answered in plain words from the engine's own figures. Unlike an example's story (exampleStory.ts) these texts are
-// GENERIC: they name no one and type no figure, so the same card reads right for any household — an example now, the one on this device later — and it is all computed on the device.
-// The variant of each sentence is picked from the facts (planFacts.ts): the crash by whether the answer moved, the death by whether the money lasts and whether more or less is left,
-// each lever by the years it moves the answer and by what it adds at the end.
+// « AND IF…? » CARDS: what a household may ask, each answered in plain words from the engine's own figures. Unlike an example's story (exampleStory.ts) these texts are GENERIC: they name no
+// one and type no figure, so the same card reads right for any household — an example, or the one on this device — and it is all computed on the device. The variant of each sentence is
+// picked from the facts (planFacts.ts), never decided here.
 //
-// A card that has nothing true to say is not shown: no death card for one person, none for a lever that changes nothing for this household, none when no age works as things stand.
+// TWO FAMILIES, because the two questions differ. A household still working asks WHEN it can stop: its cards read the answer as an age (a crash moves it, spending less brings it
+// forward). A household that has ALREADY stopped has no age left to move; it asks whether the money lasts, until when, how much it can spend, and which change helps — so its cards read the
+// plan as it stands (a first short year, what is left, a ceiling on spending) and its levers are the retiree's (engine/retiree.ts).
 //
-// Register: Québécois. No digit in a template: figures are tokens.
+// A card that has nothing true to say is not shown: no death card for one person, none for a lever that changes nothing, none when no age works as things stand.
+//
+// Register: Québécois. No digit in a template: figures are tokens, and an amount always says its dollars are today's.
 
-export type WhatIfId = 'crash' | 'death' | 'spend10' | 'pensions70'
+export type WhatIfId = 'crash' | 'death' | 'spend10' | 'pensions70' | 'spendMax' | 'spend20' | 'income'
 
 export interface WhatIfCard {
   id: WhatIfId
@@ -21,11 +24,27 @@ export interface WhatIfCard {
   text: string
 }
 
+interface LeverWords {
+  title: string
+  earlier: string
+  same: string
+  later: string
+  more: string
+  less: string
+}
+
 interface Words {
   crash: { title: string; later: string; same: string; none: string; holds: string; short: string }
   death: { title: string; holdsMore: string; holdsLess: string; short: string; alreadyShort: string }
-  spend10: { title: string; earlier: string; same: string; later: string; more: string; less: string }
-  pensions70: { title: string; earlier: string; same: string; later: string; more: string; less: string }
+  spend10: LeverWords
+  pensions70: LeverWords
+  /** The retiree's: what a household that has already stopped asks. */
+  retired: {
+    spendMax: { title: string; none: string; room: string; cut: string }
+    crash: { title: string; holds: string; breaks: string; alreadyShort: string }
+    levers: { spend10: string; spend20: string; income: string; pensions70: string }
+    outcome: { holdsMore: string; holdsLess: string; noChange: string; breaks: string; fixes: string; later: string; sameShort: string; earlier: string }
+  }
 }
 
 export const WHATIF_WORDS: Record<Lang, Words> = {
@@ -61,6 +80,36 @@ export const WHATIF_WORDS: Record<Lang, Words> = {
       more: 'À la fin du plan, il reste {gain} de plus, en dollars d’aujourd’hui.',
       less: 'À la fin du plan, il reste {gain} de moins, en dollars d’aujourd’hui.',
     },
+    retired: {
+      spendMax: {
+        title: 'Combien le ménage peut dépenser',
+        none: 'Même sans rien dépenser, l’argent ne durerait pas jusqu’à la fin du plan.',
+        room: 'Le plan peut financer jusqu’à {maxSpend} par année, en dollars d’aujourd’hui, soit {margin} de plus que les {asked} prévus.',
+        cut: 'Pour que l’argent dure jusqu’à la fin, il faudrait dépenser au plus {maxSpend} par année, en dollars d’aujourd’hui, soit {cut} de moins que les {asked} prévus.',
+      },
+      crash: {
+        title: 'Si les marchés chutent maintenant',
+        holds: 'Même après une chute des marchés au début de la retraite, l’argent dure jusqu’à la fin du plan, avec environ {nestEnd} à la fin contre {nestEndBase} dans le plan de départ (dollars d’aujourd’hui).',
+        breaks: 'Après une chute des marchés au début de la retraite, l’argent manquerait dès {year}.',
+        alreadyShort: 'L’argent manquait déjà dès {baseYear} ; après une chute des marchés, il manquerait dès {year}.',
+      },
+      levers: {
+        spend10: 'Si le ménage dépense dix pour cent de moins',
+        spend20: 'Si le ménage dépense vingt pour cent de moins',
+        income: 'Si un revenu d’appoint de dix mille dollars par année s’ajoute pendant cinq ans',
+        pensions70: 'Si la RRQ et la PSV commencent à soixante-dix ans',
+      },
+      outcome: {
+        holdsMore: 'L’argent dure jusqu’à la fin du plan et il reste {gain} de plus, en dollars d’aujourd’hui.',
+        holdsLess: 'L’argent dure jusqu’à la fin du plan, mais il reste {gain} de moins, en dollars d’aujourd’hui.',
+        noChange: 'Cela ne change rien au plan : l’argent dure jusqu’à la fin.',
+        breaks: 'L’argent manquerait dès {year}, alors qu’il dure jusqu’à la fin du plan sans ce changement.',
+        fixes: 'L’argent dure alors jusqu’à la fin du plan, avec environ {nestEnd} à la fin, en dollars d’aujourd’hui.',
+        later: 'L’argent manque plus tard : dès {year} au lieu de {baseYear}.',
+        sameShort: 'L’argent manque quand même dès {year}.',
+        earlier: 'L’argent manquerait plus tôt : dès {year} au lieu de {baseYear}, parce que ces rentes arrivent plus tard.',
+      },
+    },
   },
   en: {
     crash: {
@@ -94,13 +143,61 @@ export const WHATIF_WORDS: Record<Lang, Words> = {
       more: 'At the end of the plan, {gain} more is left, in today’s dollars.',
       less: 'At the end of the plan, {gain} less is left, in today’s dollars.',
     },
+    retired: {
+      spendMax: {
+        title: 'How much the household can spend',
+        none: 'Even spending nothing, the money would not last to the end of the plan.',
+        room: 'The plan can fund up to {maxSpend} a year, in today’s dollars, which is {margin} more than the {asked} planned.',
+        cut: 'For the money to last to the end, spending would have to be at most {maxSpend} a year, in today’s dollars, which is {cut} less than the {asked} planned.',
+      },
+      crash: {
+        title: 'If the markets fall now',
+        holds: 'Even after a market fall early in retirement, the money lasts to the end of the plan, with about {nestEnd} left against {nestEndBase} in the starting plan (today’s dollars).',
+        breaks: 'After a market fall early in retirement, the money would run short from {year}.',
+        alreadyShort: 'The money was already running short from {baseYear}; after a market fall, it would run short from {year}.',
+      },
+      levers: {
+        spend10: 'If the household spends ten percent less',
+        spend20: 'If the household spends twenty percent less',
+        income: 'If a side income of ten thousand dollars a year is added for five years',
+        pensions70: 'If the QPP and OAS start at seventy',
+      },
+      outcome: {
+        holdsMore: 'The money lasts to the end of the plan and {gain} more is left, in today’s dollars.',
+        holdsLess: 'The money lasts to the end of the plan, but {gain} less is left, in today’s dollars.',
+        noChange: 'This changes nothing in the plan: the money lasts to the end.',
+        breaks: 'The money would run short from {year}, whereas without this change it lasts to the end of the plan.',
+        fixes: 'The money then lasts to the end of the plan, with about {nestEnd} left, in today’s dollars.',
+        later: 'The money runs short later: from {year} instead of {baseYear}.',
+        sameShort: 'The money still runs short from {year}.',
+        earlier: 'The money would run short sooner: from {year} instead of {baseYear}, because these pensions arrive later.',
+      },
+    },
   },
 }
 
 /** The cards that have something true to say about this household, in a fixed order. `who` is the name of the person the death card is about (the first of a couple). */
 export function whatIfCards(lang: Lang, facts: PlanFacts, wi: WhatIfFacts, who: string): WhatIfCard[] {
+  return facts.retiree ? retiredCards(lang, facts, facts.retiree, wi, who) : workingCards(lang, facts, wi, who)
+}
+
+const dollars = (lang: Lang) => (x: number) => formatMoney(x, lang)
+
+/** The death card, the same for both families: it reads the plan as entered, and says so when that plan already ran short. */
+function deathCard(lang: Lang, facts: PlanFacts, wi: WhatIfFacts, who: string): WhatIfCard | null {
+  const d = wi.death
+  if (!d) return null
+  const w = WHATIF_WORDS[lang].death
+  const money = dollars(lang)
+  const values = { who, age: String(d.age), nestEnd: money(d.nestEnd), nestEndBase: money(d.nestEndBase) }
+  const template = !facts.ownPlanHolds ? w.alreadyShort : !d.ownPlanHolds ? w.short : d.nestEnd >= d.nestEndBase ? w.holdsMore : w.holdsLess
+  return { id: 'death', title: fillTokens(w.title, { who }), text: fillTokens(template, values) }
+}
+
+/** A household still working: an answer that is an age. */
+function workingCards(lang: Lang, facts: PlanFacts, wi: WhatIfFacts, who: string): WhatIfCard[] {
   const w = WHATIF_WORDS[lang]
-  const money = (x: number) => formatMoney(x, lang)
+  const money = dollars(lang)
   const cards: WhatIfCard[] = []
 
   // a crash: compared with the answer as it stands, so nothing to say when no age works as it stands
@@ -116,13 +213,8 @@ export function whatIfCards(lang: Lang, facts: PlanFacts, wi: WhatIfFacts, who: 
     cards.push({ id: 'crash', title: w.crash.title, text: `${answer} ${plan}` })
   }
 
-  // a death: a couple only
-  const d = wi.death
-  if (d) {
-    const values = { who, age: String(d.age), nestEnd: money(d.nestEnd), nestEndBase: money(d.nestEndBase) }
-    const template = !facts.ownPlanHolds ? w.death.alreadyShort : !d.ownPlanHolds ? w.death.short : d.nestEnd >= d.nestEndBase ? w.death.holdsMore : w.death.holdsLess
-    cards.push({ id: 'death', title: fillTokens(w.death.title, { who }), text: fillTokens(template, values) })
-  }
+  const death = deathCard(lang, facts, wi, who)
+  if (death) cards.push(death)
 
   // the levers: only those that apply, and only when there is an answer to compare with
   for (const id of ['spend10', 'pensions70'] as const) {
@@ -134,4 +226,56 @@ export function whatIfCards(lang: Lang, facts: PlanFacts, wi: WhatIfFacts, who: 
     cards.push({ id, title: words.title, text: money2 ? `${years} ${money2}` : years })
   }
   return cards
+}
+
+/** A household that has already stopped: the plan as it stands, not an age. */
+function retiredCards(lang: Lang, facts: PlanFacts, r: NonNullable<PlanFacts['retiree']>, wi: WhatIfFacts, who: string): WhatIfCard[] {
+  const w = WHATIF_WORDS[lang].retired
+  const money = dollars(lang)
+  const cards: WhatIfCard[] = []
+
+  // how much can be spent and still last: the retiree's first question
+  const s = w.spendMax
+  if (r.maxSpend === null) cards.push({ id: 'spendMax', title: s.title, text: s.none })
+  else {
+    const diff = r.maxSpend - r.asked
+    const values = { maxSpend: money(r.maxSpend), asked: money(r.asked), margin: money(Math.abs(diff)), cut: money(Math.abs(diff)) }
+    cards.push({ id: 'spendMax', title: s.title, text: fillTokens(diff >= 0 ? s.room : s.cut, values) })
+  }
+
+  // a crash, read on the plan itself
+  const c = wi.crash
+  const cw = w.crash
+  const crashText = facts.ownPlanHolds
+    ? c.ownPlanHolds
+      ? fillTokens(cw.holds, { nestEnd: money(c.nestEnd), nestEndBase: money(facts.nestEnd) })
+      : fillTokens(cw.breaks, { year: String(c.firstShortfallYear) })
+    : fillTokens(cw.alreadyShort, { baseYear: String(facts.firstShortfallYear), year: String(c.firstShortfallYear ?? facts.firstShortfallYear) })
+  cards.push({ id: 'crash', title: cw.title, text: crashText })
+
+  const death = deathCard(lang, facts, wi, who)
+  if (death) cards.push(death)
+
+  // the changes, best first as the engine ranked them
+  for (const l of r.levers) cards.push({ id: l.id, title: w.levers[l.id], text: leverText(lang, facts, l) })
+  return cards
+}
+
+function leverText(lang: Lang, facts: PlanFacts, l: RetireeLeverFact): string {
+  const o = WHATIF_WORDS[lang].retired.outcome
+  const money = dollars(lang)
+  const gain = money(Math.abs(l.endGain))
+  const baseYear = facts.firstShortfallYear
+  if (facts.ownPlanHolds) {
+    if (!l.lasts) return fillTokens(o.breaks, { year: String(l.firstShortfallYear) })
+    if (l.endGain > 0) return fillTokens(o.holdsMore, { gain })
+    if (l.endGain < 0) return fillTokens(o.holdsLess, { gain })
+    return o.noChange
+  }
+  if (l.lasts) return fillTokens(o.fixes, { nestEnd: money(l.nestEnd) })
+  const year = l.firstShortfallYear ?? baseYear ?? 0
+  const base = baseYear ?? year
+  if (year > base) return fillTokens(o.later, { year: String(year), baseYear: String(base) })
+  if (year < base) return fillTokens(o.earlier, { year: String(year), baseYear: String(base) })
+  return fillTokens(o.sameShort, { year: String(year) })
 }

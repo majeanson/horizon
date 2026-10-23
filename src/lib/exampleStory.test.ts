@@ -128,15 +128,6 @@ describe('what is shown for each example', { timeout: 300_000 }, () => {
     }
   })
 
-  it('skipping the answer drops that sentence and only that one (the front door already states the answer in its own words)', () => {
-    for (const id of EXAMPLE_IDS)
-      for (const lang of LANGS) {
-        const all = renderStory(id, lang, factsOf(id))
-        const rest = renderStory(id, lang, factsOf(id), { skipAnswer: true })
-        expect(rest, `${id} ${lang}`).toEqual(all.slice(1))
-      }
-  })
-
   it('both languages tell the same story in the figures too (same digits, in the same order)', () => {
     for (const id of EXAMPLE_IDS) {
       const digits = (lang: 'fr' | 'en') => renderStory(id, lang, factsOf(id)).join(' ').replace(/[^\d ]/g, '').replace(/\s+/g, ' ').split(' ').filter(Boolean).join('').replace(/\D/g, '')

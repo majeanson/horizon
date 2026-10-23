@@ -16,7 +16,6 @@ import { useAnswer } from '../lib/useAnswer'
 import { WELCOME_COPY } from '../lib/welcomeCopy'
 import { Cascade } from './Cascade'
 import { Chip } from './Chip'
-import { PlanStoryFold } from './PlanStoryFold'
 import { HouseholdGlyphs } from './HouseholdGlyphs'
 import { Cluster } from './Layout'
 import { Skeleton } from './Skeleton'
@@ -95,7 +94,6 @@ export function DemoAnswer() {
           </p>
         )}
       </div>
-      <PlanStoryFold id={id} profile={example} skipAnswer />
       <p className="verdict__note">{c.demo.frame}</p>
       <Cluster>
         <Chip onClick={() => void tryIt()}>{c.demo.try}</Chip>

@@ -10,6 +10,7 @@ import { SpouseBalancePanel } from '../SpouseBalancePanel'
 import { SpouseTimingFold } from '../SpouseTimingPanel'
 import { Chip } from '../../Chip'
 import { Fold } from '../../Fold'
+import { PlanStoryFold } from '../../PlanStoryFold'
 import { CARDS_COPY } from '../../../lib/cardsCopy'
 import type { ConceptId } from '../../../lib/concepts'
 import { SectionHeader } from '../../SectionHeader'
@@ -134,6 +135,8 @@ export function DecideView({ m }: { m: ResultsModel }) {
       <section className="arc" aria-label={rc.tabs.decide}>
         <section id="essayer" className="results-section" aria-label={rc.decide.tryTitle}>
           <SectionHeader title={rc.decide.tryTitle} subtitle={rc.decide.tryHint} concept="essayer" />
+          {/* A household that has already stopped has no age left to move, so the levers below that rank « retire sooner » are not offered to it: this is its way to see how much it can spend and what helps the money last. */}
+          {retiredNow && <PlanStoryFold profile={profile} retired />}
           {!retiredNow && (
             // The changes a household could make, each tried alone and ranked by the years it gains. A card like every other on the page, open on arrival
             // (`?leviers=none` shuts it): « Tout fermer » must reach it, or it reads as the one card that will not close.

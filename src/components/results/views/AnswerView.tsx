@@ -9,6 +9,7 @@ import { LevelRange } from '../LevelRange'
 import { EarliestEachPanel } from '../EarliestEachPanel'
 import { PlansCompare } from '../PlansCompare'
 import { Fold } from '../../Fold'
+import { PlanStoryFold } from '../../PlanStoryFold'
 import { SubTabs } from '../../SubTabs'
 import { useParamChoice } from '../../../lib/useParamChoice'
 import { ANSWER_BLOCKS } from '../../../lib/useResultsPage'
@@ -208,6 +209,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                 <p className="verdict__note">{rc.out.vintage(vintage.year, longDate(vintage.newestRead, lang))}</p>
               </Fold>
             )}
+            {/* The plan in plain words and the « and if…? » cards, one tap away — for a household that has stopped working, how to make the money last. */}
+            {!answerPending && gaps.length === 0 && <PlanStoryFold profile={profile} retired={retiredNow} />}
           </div>
           </AccordionItem>
 

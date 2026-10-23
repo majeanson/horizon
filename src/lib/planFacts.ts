@@ -1,4 +1,5 @@
 import { leverRanking, type LeverId } from '../engine/levers.ts'
+import { maxOwnRetiredSpending, retireeLevers, type RetireeLeverId } from '../engine/retiree.ts'
 import { DEATH_AGES, sweepAges } from '../engine/deathSweep.ts'
 import { project } from '../engine/projection.ts'
 import { retireAt } from '../engine/retireAt.ts'
@@ -28,6 +29,25 @@ export interface LeverFact {
   endGain: number | null
 }
 
+/** One change tried by a household that has already stopped: does the money last with it, until when, and what is left (today's dollars, to the thousand). */
+export interface RetireeLeverFact {
+  id: RetireeLeverId
+  lasts: boolean
+  firstShortfallYear: number | null
+  nestEnd: number
+  endGain: number
+}
+
+/** What a household that has already stopped working asks: how much can it spend and still last, and which change helps most. Null for a household still working. */
+export interface RetireeFacts {
+  /** The most a year of retirement can cost for the plan as entered to last, today's dollars to the hundred; null when not even nothing lasts. */
+  maxSpend: number | null
+  /** What the plan asks for: the retired spending entered, a year, today's dollars to the hundred. */
+  asked: number
+  /** The changes that apply, best first. */
+  levers: RetireeLeverFact[]
+}
+
 export interface PlanFacts {
   /** The headline's kind: `now` (everyone has already reached the earliest age that works), `at`, or `none` (no age up to the search's end works). */
   kind: 'now' | 'at' | 'none'
@@ -44,6 +64,18 @@ export interface PlanFacts {
   /** The most the answer's age can fund each year in retirement, today's dollars; null when even nothing works, undefined without an age. */
   comfort: number | null | undefined
   levers: LeverFact[]
+  retiree: RetireeFacts | null
+}
+
+const thousand = (x: number) => Math.round(x / 1000) * 1000
+
+function retireeFactsOf(h: Household, a: Assumptions): RetireeFacts {
+  const max = maxOwnRetiredSpending(structuredClone(h), structuredClone(a))
+  return {
+    maxSpend: max,
+    asked: Math.round(h.spending.retiredToday / 100) * 100,
+    levers: retireeLevers(structuredClone(h), structuredClone(a)).levers.map((l) => ({ id: l.id, lasts: l.ok, firstShortfallYear: l.firstShortfallYear, nestEnd: thousand(l.netWorthEnd), endGain: thousand(l.endGain) })),
+  }
 }
 
 export function planFacts(profile: Profile, now: { year: number; month: number }): PlanFacts {
@@ -59,6 +91,7 @@ export function planFacts(profile: Profile, now: { year: number; month: number }
     firstShortfallYear: short,
     nestEnd: realThousand(rows, req.assumptions),
     comfort: answer.comfort,
+    retiree: req.everyoneRetired ? retireeFactsOf(req.household, req.assumptions) : null,
     levers: leverRanking(req.household, req.assumptions).levers.map((l) => ({
       id: l.id,
       yearsGained: l.yearsGained,
@@ -85,7 +118,7 @@ export function planFactsOf({ profile, today }: PlanFactsRequest): PlanFactsResu
 
 export interface WhatIfFacts {
   /** A crash in the first years of retirement (the « bad start » market path) against the markets as the household assumed. */
-  crash: { earliest: number | null; base: number | null; ownPlanHolds: boolean; nestEnd: number }
+  crash: { earliest: number | null; base: number | null; ownPlanHolds: boolean; firstShortfallYear: number | null; nestEnd: number }
   /** One of a couple dying earlier (the first person, at the age the death sweep offers nearest 75); null for a household of one, or when no age fits. */
   death: { who: PersonId; age: number; ownPlanHolds: boolean; nestEnd: number; nestEndBase: number } | null
 }
@@ -99,7 +132,7 @@ export function whatIfFacts(profile: Profile, now: { year: number; month: number
   const baseRows = run(h, a)
   const bad: Assumptions = { ...a, marketPath: { preset: 'badStart', custom: [] } }
   const badRows = run(h, bad)
-  const crash = { earliest: earliestOf(h, bad), base: earliestOf(h, a), ownPlanHolds: shortfallYear(badRows) === null, nestEnd: realThousand(badRows, bad) }
+  const crash = { earliest: earliestOf(h, bad), base: earliestOf(h, a), ownPlanHolds: shortfallYear(badRows) === null, firstShortfallYear: shortfallYear(badRows), nestEnd: realThousand(badRows, bad) }
 
   let death: WhatIfFacts['death'] = null
   if (h.persons.length === 2) {

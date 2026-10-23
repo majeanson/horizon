@@ -233,18 +233,14 @@ export function deriveFeatures(h: Household, today: { year: number }): StoryFeat
 }
 
 /** The sentences of a household's story, in order: the answer, what the answer's age can fund, the plan as entered, what makes the household its own. */
-export function renderStory(id: ExampleId, lang: Lang, facts: PlanFacts, opts: { skipAnswer?: boolean } = {}): string[] {
+export function renderStory(id: ExampleId, lang: Lang, facts: PlanFacts): string[] {
   const s = EXAMPLE_STORY[id][lang]
   const money = (x: number) => formatMoney(x, lang)
   const plan = facts.ownPlanHolds ? s.plan.holds : s.plan.short
   if (plan === undefined) throw new Error(`${id} (${lang}): no plan sentence for « ${facts.ownPlanHolds ? 'holds' : 'short'} »`)
-  const out: string[] = []
-  // `skipAnswer`: where the page already states the answer in its own words (the front door's live headline), the story does not say it twice.
-  if (!opts.skipAnswer) {
-    const answer = facts.kind === 'now' ? s.answer.now : facts.kind === 'at' ? s.answer.at : undefined
-    if (answer === undefined) throw new Error(`${id} (${lang}): no answer sentence for the headline kind « ${facts.kind} »`)
-    out.push(fillTokens(answer, { age: String(facts.earliest ?? '') }))
-  }
+  const answer = facts.kind === 'now' ? s.answer.now : facts.kind === 'at' ? s.answer.at : undefined
+  if (answer === undefined) throw new Error(`${id} (${lang}): no answer sentence for the headline kind « ${facts.kind} »`)
+  const out = [fillTokens(answer, { age: String(facts.earliest ?? '') })]
   if (facts.comfort != null) out.push(fillTokens(COMFORT[lang], { comfort: money(Math.round(facts.comfort / 100) * 100) }))
   out.push(fillTokens(plan, { nestEnd: money(facts.nestEnd), year: String(facts.firstShortfallYear ?? '') }))
   out.push(s.distinct)

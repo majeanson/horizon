@@ -38,6 +38,10 @@ type Budget = { controls: number; words: number }
 // +1 word on every route; Résultats and Décider lose the three-view switch they carried (−3 controls each).
 // Résultats — Réponse raised 55 → 56 controls (2026-10-20): the answer is a card like the two under it (Marc: « Tout fermer » must close it too, to its result in one
 // line) — its title is a button now, the one disclosure it gained; the words stay within budget (its old heading was already read, as a hidden heading).
+// Résultats — Réponse raised 38 → 39 controls and 413 → 415 words (2026-10-23): « Votre plan en mots, et si… ? » — a closed disclosure at the foot of the answer card (components/
+// PlanStoryFold.tsx; for a household that has already stopped working it reads « Comment faire durer l’argent plus longtemps »). A conscious trade (Marc: a retiree could not see how
+// to make the money last longer, nor the plan in words): the card is the one place a retiree is told how much can be spent and what helps. It costs one summary line and mounts nothing
+// until opened. NOT put on Accueil's first-visit demo for that reason — that page's budget did not move.
 const BUDGETS: Record<string, Budget> = {
   // 34 → 28 controls, 372 → 309 words (2026-10-15, the ratchet FALLS): the reading card is a one-time dialog now (closed here), its subtitle is gone, and the demo
   // card's three early-retirement households (+3 chips) cost less than what left. The time question (components/TimeBudget.tsx) is a dialog too, put off here.
@@ -134,7 +138,7 @@ const BUDGETS: Record<string, Budget> = {
   // 54 → 55 controls, 670 → 677 words (2026-10-20, Marc chose it): « Quand arrêter » has its chart — ONE closed fold under « En dates » (« Rentes et dépenses,
   // année par année »), the chart mounting only once opened.
   // 56 → 38 controls, 677 → 413 words (2026-10-21, the ratchet FALLS): Réponse opens the answer card only on arrival; the comparison and the year cards open on a tap.
-  'Résultats — Réponse': { controls: 38, words: 413 },
+  'Résultats — Réponse': { controls: 39, words: 415 },
   // 51 → 50, 1220 → 1223 (2026-10-15): the top bar.
   // 50 → 48, 1223 → 823 (2026-10-16, the ratchet FALLS): the strategies are read one at a time (components/Accordion.tsx): the first is open, the others are closed titles.
   // 48 → 49 controls, 823 → 826 words (2026-10-17, Phase 16 slice 4): « Arrêter à l’âge de mon choix » — ONE more closed what-if beside the other three (the plan asked the other way round: four changes, each

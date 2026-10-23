@@ -12,10 +12,13 @@ import { useNotice } from '../../lib/toast'
 import { useParamChoice } from '../../lib/useParamChoice'
 import { csvLabel, yearCsv } from '../../lib/yearCsv'
 import { yearTableModel } from '../../lib/yearTable'
+import { yearNotes } from '../../lib/yearNotes'
+import { YEAR_NOTES_COPY, yearNoteText } from '../../lib/yearNotesCopy'
+import { Fold } from '../Fold'
 import { Chip } from '../Chip'
 import { TableChooser } from '../TableChooser'
 import type { Selection } from '../../lib/resultsModel'
-import type { AgeResult, Assumptions } from '../../engine/types'
+import type { AgeResult, Assumptions, PersonId } from '../../engine/types'
 import { saveAsFile } from '../../lib/download'
 
 // The picture's text: one row per year for the retirement age chosen in the table's header, every figure the chart
@@ -37,6 +40,7 @@ export function YearTables({
   assumptions,
   livesAlone,
   births,
+  names,
 }: {
   runs: readonly { selection: Selection; result: AgeResult }[]
   label: (s: Selection) => string
@@ -48,6 +52,8 @@ export function YearTables({
   livesAlone?: boolean
   /** The birth years of the household, for the « year (ages) » of the first year that falls short. */
   births: readonly number[]
+  /** The household's names, by person: given where the page can say which years stand out and why (a pension starting part-way through a year, a survivor's pension changing rule). Left out for print. */
+  names?: Readonly<Record<PersonId, string>>
 }) {
   const t = useT()
   const { lang } = useLang()
@@ -73,6 +79,8 @@ export function YearTables({
   const model = useMemo(() => (shown ? yearTableModel(shown.result.rows, factor) : null), [shown, dollars, todayYear, inflation]) // eslint-disable-line react-hooks/exhaustive-deps
   // The average rate against the cost of one more REER dollar, in the first year without a salary (rates, not dollars: the unit does not matter).
   const rates = useMemo(() => (shown ? retiredRates(shown.result.rows, assumptions, livesAlone) : null), [shown, assumptions, livesAlone])
+  // The years that look different for a reason, read off these very rows (lib/yearNotes.ts).
+  const notes = useMemo(() => (shown && names ? yearNotes(shown.result.rows) : []), [shown, names])
   if (!shown || !model) return null
   const { rows, hasHome, hasLocked, hasShortfall, firstShortYear } = model
   return (
@@ -141,6 +149,17 @@ export function YearTables({
           </tbody>
         </table>
       </div>
+      {names && notes.length > 0 && (
+        <Fold summary={YEAR_NOTES_COPY[lang].title}>
+          <ul className="year-table__notes">
+            {notes.map((n) => (
+              <li key={`${n.year}-${n.kind}-${n.who}`}>
+                <strong>{n.year}</strong> · {yearNoteText(lang, n, names)}
+              </li>
+            ))}
+          </ul>
+        </Fold>
+      )}
     </div>
   )
 }

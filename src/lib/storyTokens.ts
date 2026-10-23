@@ -3,7 +3,7 @@ import type { Lang } from '../i18n'
 // THE TOKENS OF A PLAIN-LANGUAGE TEXT. A template (exampleStory.ts, whatIfCopy.ts) never types a figure: it holds `{age}`, `{nestEnd}`… and the figure is put in
 // where the text is shown, from the facts of planFacts.ts. A token a template names that the facts do not give is an error here, loudly, never an empty space in a sentence.
 
-export type TokenName = 'age' | 'base' | 'year' | 'who' | 'nestEnd' | 'nestEndBase' | 'comfort' | 'gain' | 'yearsWord'
+export type TokenName = 'age' | 'base' | 'year' | 'baseYear' | 'who' | 'nestEnd' | 'nestEndBase' | 'comfort' | 'gain' | 'yearsWord' | 'maxSpend' | 'asked' | 'margin' | 'cut'
 
 const TOKEN = /\{(\w+)\}/g
 

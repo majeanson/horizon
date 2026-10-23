@@ -1859,3 +1859,4 @@
 .plan-story__cards { display: grid; gap: 0.7rem; margin: 0; padding: 0; list-style: none; }
 .plan-story__cards li { display: grid; gap: 0.15rem; justify-items: start; }
 .example-list .plan-story-fold, .demo .plan-story-fold { justify-self: stretch; }
+.year-table__notes { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: 0.4rem; }

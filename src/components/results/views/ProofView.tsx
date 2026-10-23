@@ -50,7 +50,7 @@ export function ProofView({ m }: { m: ResultsModel }) {
 
           <AccordionItem id="tableau" title={r.table.title} summary={cc.tableau} concept="annee" className="results-section">
             {runsPending && <Skeleton count={6} />}
-            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={runsAssumptions} livesAlone={runsProfile.household.livesAlone} births={runsBirths} />
+            <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={runsAssumptions} livesAlone={runsProfile.household.livesAlone} births={runsBirths} names={Object.fromEntries(runsProfile.household.persons.map((p) => [p.id, p.name])) as Record<"self" | "spouse", string>} />
             {/* What the next RRSP dollar costs at every retired age: a calendar of ages, one fold, read off the same rows. */}
             {!runsPending && <MarginalWeather m={m} />}
           </AccordionItem>
