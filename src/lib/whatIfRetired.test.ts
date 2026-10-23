@@ -51,8 +51,8 @@ describe('the cards of the retired examples', { timeout: 300_000 }, () => {
   })
 
   it('starting the pensions later can make the shortfall come SOONER, and the card says so', () => {
-    expect(cards('couple62', 'fr').find((c) => c.id === 'pensions70')!.text).toMatch(/plus tôt : dès \d{4} au lieu de 2032/)
-    expect(cards('couple62', 'en').find((c) => c.id === 'pensions70')!.text).toMatch(/sooner: from \d{4} instead of 2032/)
+    expect(cards('couple62', 'fr').find((c) => c.id === 'pensions70')!.text).toMatch(/plus tôt : dès \d{4} au lieu de 2031/)
+    expect(cards('couple62', 'en').find((c) => c.id === 'pensions70')!.text).toMatch(/sooner: from \d{4} instead of 2031/)
   })
 
   it('the spending card says how much room there is, or how much would have to go', () => {

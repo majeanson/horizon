@@ -301,6 +301,37 @@ export interface YearParams {
     bumpLastYear: Cited
   }
 
+  /**
+   * Québec's two refundable credits a retired household most often gets (engine/qcCredits.ts) — Revenu Québec and Finance Québec. The year is the one the money ARRIVES in: the senior
+   * assistance credit of the plan's year Y is the one for tax year Y − 1, the solidarity credit is the one paid from July of Y (on the return for Y − 1).
+   */
+  qcCredits: {
+    seniorAssistance: {
+      /** The most a person aged `minAge` or more brings (twice that for a couple of two). */
+      maxPerPerson: Cited
+      minAge: Cited
+      /** The family income above which the credit is reduced, for a person without a spouse and for a couple. */
+      thresholdSingle: Cited
+      thresholdCouple: Cited
+      /** The share of the family income over the threshold that is taken off. */
+      reductionRate: Cited
+    }
+    solidarity: {
+      /** The QST component: base, spouse, and the addition for someone who lived alone all of last year. */
+      tvqBase: Cited
+      tvqSpouse: Cited
+      tvqAlone: Cited
+      /** The housing component: a couple, a person alone or a lone parent, and each child. */
+      housingCouple: Cited
+      housingSingle: Cited
+      housingChild: Cited
+      /** The family income above which the credit is reduced; the share taken off (with the housing component, and with the QST component alone). */
+      threshold: Cited
+      rateWithHousing: Cited
+      rateTvqOnly: Cited
+    }
+  }
+
   /** Registered accounts — Canada Revenue Agency. */
   accounts: {
     rrspLimit: Cited

@@ -70,7 +70,8 @@ describe('one person plus the other is the household', { timeout: 120_000 }, () 
       const whole = sourceBars(rows, null, s)
       const parts = ids.map((id) => sourceBars(rows, id, s))
       whole.forEach((w, i) => {
-        for (const k of SOURCE_SEGMENTS) expect(parts.reduce((t, p) => t + p[i][k], 0), `${label(r)} ${w.x} ${k}`).toBeCloseTo(w[k], 4)
+        // The credits are the household's, not a person's: they are in the household's bars only.
+        for (const k of SOURCE_SEGMENTS) if (k !== 'credits') expect(parts.reduce((t, p) => t + p[i][k], 0), `${label(r)} ${w.x} ${k}`).toBeCloseTo(w[k], 4)
       })
       const wholeBal = balanceBars(rows, null, s)
       const partsBal = ids.map((id) => balanceBars(rows, id, s))

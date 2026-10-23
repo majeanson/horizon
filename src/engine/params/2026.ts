@@ -153,6 +153,20 @@ const CRA_CGEB = src(
   'Canada Groceries and Essentials Benefit (CGEB) - Canada.ca',
   { retrieved: '2026-10-23', note: '« In July 2026, there was a 25% increase to the benefit amount which will remain for 5 years from 2026 to 2031. » The payments of the five years start in July 2026, 2027, 2028, 2029 and 2030 (the Act’s last month is April 2031).' },
 )
+// Québec's senior assistance and solidarity credits (read 2026-10-23). The amounts of the solidarity credit are Finance Québec's TABLEAU 4 (the document QC_PARAMS already cites); the ceilings Revenu Québec prints
+// (64 545 $, 70 395 $, 2 634 $ a child) are what the amounts reproduce at 6 %: (363 + 172 + 746) / 0,06 + 43 195 = 64 545.
+const QC_SOLIDARITY = src('https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf', "Paramètres du régime d'imposition des particuliers pour l'année d'imposition 2026", {
+  retrieved: '2026-10-23',
+  note: 'TABLEAU 4, p. 12, « Paramètres du crédit d’impôt remboursable pour la solidarité », juillet 2026 à juin 2027 : montant de base 363 $ · montant pour conjoint 363 $ · montant additionnel pour personne vivant seule 172 $ · logement : couple 906 $, personne vivant seule ou famille monoparentale 746 $, chaque enfant à charge 158 $ · seuil de réduction 43 195 $ (juillet 2025 à juin 2026 : 356 · 356 · 169 · 888 · 731 · 155 · 42 325). Les paramètres sont indexés le 1er juillet.',
+})
+const QC_SOLIDARITY_RULE = src('https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/credit-dimpot-pour-solidarite/', 'Crédit d’impôt pour solidarité – Aide par ligne', {
+  retrieved: '2026-10-23',
+  note: 'Revenu familial maximal, période de juillet 2026 à juin 2027 : couple 70 395 $ · famille monoparentale 64 545 $ · personne sans conjoint 64 545 $ · + 2 634 $ par enfant à charge. Le taux de réduction (6 %, ou 3 % avec une seule composante) est celui de Finances Québec, « Crédit d’impôt remboursable pour la solidarité », Dépenses fiscales : « selon un taux de 6 % (3 % si le particulier ne bénéficie que d’une seule des trois composantes du crédit d’impôt) pour chaque dollar de revenu familial du particulier qui excède le seuil de réduction ».',
+})
+const QC_SENIOR_ASSISTANCE = src('https://www.revenuquebec.ca/fr/citoyens/credits-dimpot/credit-dimpot-pour-soutien-aux-aines/montant-du-credit-dimpot-pour-soutien-aux-aines/', 'Montant du crédit d’impôt pour soutien aux aînés', {
+  retrieved: '2026-10-23',
+  note: 'Année d’imposition 2025 : montant maximal 4 000 $ (conjoint admissible, tous deux 70 ans ou plus au 31 décembre 2025), 2 000 $ (sinon, avec ou sans conjoint) ; réduit de 5,40 % de la partie du revenu familial (ligne 275, avec celle du conjoint) qui dépasse 45 270 $ (avec conjoint) ou 27 835 $ (sans conjoint) ; revenu familial maximal 119 345 $ · 82 308 $ · 64 873 $. Finances Québec (Paramètres 2026, TABLEAU 3, p. 10) : seuils de 2026 28 405 $ et 46 200 $, taux 5,47 % (2025 : 27 835 $, 45 270 $, 5,40 %).',
+})
 const RQ_FAMILY_ALLOWANCE_TABLE = src(
   'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/amounts-family-allowance-payments-based-family-income',
   'Amounts of Family Allowance payments based on family income - Retraite Québec',
@@ -432,6 +446,27 @@ export const P2026 = {
       reductionRate: c(0.04, 'fixed', RQ_FAMILY_ALLOWANCE_TABLE),
       thresholdCouple: c(60_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Two-parent family: $60 000 or less » — the maximum is paid up to this family income (the page prints it to the nearest 1 000 $; the exact figure, a few hundred dollars higher, moves a payment by under 16 $ a year).' }, 100),
       thresholdSingle: c(44_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Single-parent family: $44 000 or less » — the maximum plus the supplement is paid up to this family income (printed to the nearest 1 000 $).' }, 100),
+    },
+  },
+
+  qcCredits: {
+    seniorAssistance: {
+      maxPerPerson: c(2_000, 'fixed', QC_SENIOR_ASSISTANCE),
+      minAge: c(70, 'fixed', { ...QC_SENIOR_ASSISTANCE, note: '« vous et votre conjointe ou conjoint aviez 70 ans ou plus au 31 décembre 2025 ».' }),
+      thresholdSingle: c(27_835, 'cpi', QC_SENIOR_ASSISTANCE, 5),
+      thresholdCouple: c(45_270, 'cpi', QC_SENIOR_ASSISTANCE, 5),
+      reductionRate: c(0.054, 'fixed', { ...QC_SENIOR_ASSISTANCE, note: '« Le crédit d’impôt est réduit de 5,40 % de la partie du revenu familial qui dépasse … ». Revalorisé chaque année (5,47 % pour 2026) : le taux de l’année d’imposition 2025 est celui de l’année du plan 2026.' }),
+    },
+    solidarity: {
+      tvqBase: c(363, 'cpi', QC_SOLIDARITY, 1),
+      tvqSpouse: c(363, 'cpi', QC_SOLIDARITY, 1),
+      tvqAlone: c(172, 'cpi', QC_SOLIDARITY, 1),
+      housingCouple: c(906, 'cpi', QC_SOLIDARITY, 1),
+      housingSingle: c(746, 'cpi', QC_SOLIDARITY, 1),
+      housingChild: c(158, 'cpi', QC_SOLIDARITY, 1),
+      threshold: c(43_195, 'cpi', QC_SOLIDARITY, 5),
+      rateWithHousing: c(0.06, 'fixed', QC_SOLIDARITY_RULE),
+      rateTvqOnly: c(0.03, 'fixed', QC_SOLIDARITY_RULE),
     },
   },
 

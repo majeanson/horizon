@@ -92,14 +92,14 @@ export function verdictOf(l: BridgeLevers, summary: BridgeSummary, standard: Bri
 }
 
 /** The bar chart's rows: each year's sources (and the nest drawn), as plain numbers keyed by the segment ids below. */
-export const SEGMENTS = ['work', 'db', 'rrq', 'oas', 'nest'] as const
+export const SEGMENTS = ['work', 'db', 'rrq', 'oas', 'credits', 'nest'] as const
 export type SegmentId = (typeof SEGMENTS)[number]
 /** The bars of these years are the sources chart's own (lib/chartData.ts): one colour per kind of money, whichever page draws it. */
 export const SEGMENT_COLOUR: Record<SegmentId, (typeof SOURCE_COLOUR)[SegmentId]> = SOURCE_COLOUR
 export const SEGMENT_CONCEPT: Record<SegmentId, (typeof SOURCE_CONCEPT)[SegmentId]> = SOURCE_CONCEPT
 
 export function barRows(rows: readonly BridgeYear[]): ({ x: number; need: number } & Record<SegmentId, number>)[] {
-  return rows.map((r) => ({ x: r.age, need: r.spending + r.tax, work: r.employment, db: r.db, rrq: r.rrq, oas: r.oas + r.gis + r.groceries, nest: r.drawn }))
+  return rows.map((r) => ({ x: r.age, need: r.spending + r.tax, work: r.employment, db: r.db, rrq: r.rrq, oas: r.oas + r.gis, credits: r.credits, nest: r.drawn }))
 }
 
 /**

@@ -51,7 +51,7 @@ describe('what the answer’s age can fund', { timeout: 300_000 }, () => {
       const base = maxRetiredSpending(h, a, age)
       if (base === null) continue
       const longer = maxRetiredSpending(h, { ...a, horizonAge: a.horizonAge + 5 }, age)
-      expect(longer === null ? -1 : longer, `${id} longer plan`).toBeLessThanOrEqual(base + 2 * STEP) // each figure is within one step of its own edge: two of them may differ by two
+      expect(longer === null ? -1 : longer, `${id} longer plan`).toBeLessThanOrEqual(base + 3 * STEP) // each figure is within one step of its own edge: two of them may differ by two; a longer plan also spreads the drawing differently, and the income-tested credits (they read last year's income) add a third
       const richer = structuredClone(h)
       richer.persons[0].accounts.tfsa.balance += 100_000
       const more = maxRetiredSpending(richer, a, age)

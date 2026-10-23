@@ -66,6 +66,7 @@ export interface BridgeCopy {
   colRrq: string
   colOas: string
   colGis: string
+  colCredits: string
   colDraw: string
   colTax: string
   colNest: string
@@ -78,7 +79,7 @@ export interface BridgeCopy {
   barsTitle: string
   barsHint: string
   barsFigure: (from: number, to: number) => string
-  segment: { work: string; workOther: string; db: string; rrq: string; oas: string; nest: string }
+  segment: { work: string; workOther: string; db: string; rrq: string; oas: string; credits: string; nest: string }
   needLine: string
   nestTitle: string
   nestHint: (rrq: number, oas: number) => string
@@ -203,6 +204,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     colRrq: 'RRQ',
     colOas: 'PSV',
     colGis: 'SRG et allocation',
+    colCredits: 'Crédits et allocations',
     colDraw: 'Tiré du nid',
     colNonReg: 'dont non enregistré',
     colRrsp: 'dont REER / FERR',
@@ -215,7 +217,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     barsTitle: 'D’où vient l’argent, année par année',
     barsHint: 'Chaque barre est une année : le travail, les rentes garanties et ce que le nid doit fournir. La ligne pointillée est ce qu’il faut couvrir (dépenses et impôt).',
     barsFigure: (from, to) => `Sources de revenus année par année, de ${from} à ${to} ans`,
-    segment: { work: 'Travail', workOther: 'Travail et autres revenus', db: 'Rente de l’employeur', rrq: 'RRQ', oas: 'PSV, SRG et allocation', nest: 'Tiré du nid' },
+    segment: { work: 'Travail', workOther: 'Travail et autres revenus', db: 'Rente de l’employeur', rrq: 'RRQ', oas: 'PSV, SRG et allocation', credits: 'Crédits et allocations', nest: 'Tiré du nid' },
     needLine: 'Dépenses + impôt',
     nestTitle: 'Le nid, selon la façon de commencer',
     nestHint: (rrq, oas) => `Traits pointillés : début du RRQ (${rrq} ans) et de la PSV (${oas} ans) de votre choix. Reporter creuse le nid d’abord, puis le fait remonter.`,
@@ -343,6 +345,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     colRrq: 'QPP',
     colOas: 'OAS',
     colGis: 'GIS and Allowance',
+    colCredits: 'Credits and benefits',
     colDraw: 'Drawn from the nest egg',
     colNonReg: 'of which non-registered',
     colRrsp: 'of which RRSP / RRIF',
@@ -355,7 +358,7 @@ export const BRIDGE_COPY: { fr: BridgeCopy; en: BridgeCopy } = {
     barsTitle: 'Where the money comes from, year by year',
     barsHint: 'Each bar is a year: work, guaranteed pensions and what the nest egg has to supply. The dashed line is what has to be covered (spending and tax).',
     barsFigure: (from, to) => `Sources of income year by year, ages ${from} to ${to}`,
-    segment: { work: 'Work', workOther: 'Work and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS, GIS and Allowance', nest: 'Drawn from the nest egg' },
+    segment: { work: 'Work', workOther: 'Work and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS, GIS and Allowance', credits: 'Credits and benefits', nest: 'Drawn from the nest egg' },
     needLine: 'Spending + tax',
     nestTitle: 'The nest egg, by way of starting',
     nestHint: (rrq, oas) => `Dashed lines: your chosen QPP start (${rrq}) and OAS start (${oas}). Deferring digs into the nest egg first, then lets it recover.`,

@@ -68,12 +68,13 @@ describe('each story', () => {
     expect(planGlance(household, assumptions).ok).toBe(true)
   })
 
-  it('modest: the plan holds only just, and the GIS is a large part of why', () => {
+  it('modest: the plan holds with a modest nest, and the GIS and Québec’s credits are a large part of why', () => {
     const { household, assumptions } = EXAMPLES.modest
     const g = planGlance(household, assumptions)
     expect(g.ok).toBe(true)
     expect(sumOver(rowsOf('modest'), (p) => p.gis)).toBeGreaterThan(100_000)
-    expect(g.netWorthEnd).toBeLessThan(150_000)
+    // Québec's credits (solidarity, senior assistance) and the groceries benefit carry a modest plan for decades: it holds with a modest nest, not on the edge
+    expect(g.netWorthEnd).toBeLessThan(300_000)
   })
 
   it('rich: retires early, the plan holds with a large nest left, and the GIS is next to nothing', () => {
@@ -112,7 +113,7 @@ describe('each story', () => {
     expect(g.firstShortfallYear!).toBeLessThanOrEqual(2033)
     const retiredAt = (age: number) => ({ ...household, persons: household.persons.map((p) => ({ ...p, retirementAge: age })) })
     expect(planGlance(retiredAt(64), assumptions).ok).toBe(true)
-    expect(planGlance({ ...household, spending: { workingToday: 36_000, retiredToday: 36_000 } }, assumptions).ok).toBe(true)
+    expect(planGlance({ ...household, spending: { workingToday: 38_000, retiredToday: 38_000 } }, assumptions).ok).toBe(true)
     const early = { ...household, persons: household.persons.map((p) => ({ ...p, rrq: { startAge: 62 } })) }
     const g62 = planGlance(early, assumptions)
     expect(g62.ok).toBe(false)
@@ -206,10 +207,10 @@ describe('each story', () => {
       retireAt(plannerHousehold({ child: true, care: true, heritage: true, partTime: true, ...events }), assumptions, { stopAtFirstOk: true }).earliestOk!
     const all = earliest({})
     expect(all).toBe(57)
-    // a child still to come adds its cost (and the state's benefits take some back): without it they could stop two years sooner
-    expect(earliest({ child: false })).toBe(55)
-    // the care of the last years is paid decades before it is spent: without it, two years sooner as well
-    expect(earliest({ care: false })).toBe(55)
+    // a child still to come adds its cost (and the state's benefits take some back): without it they could stop three years sooner
+    expect(earliest({ child: false })).toBe(54)
+    // the care of the last years is paid decades before it is spent: without it, three years sooner as well
+    expect(earliest({ care: false })).toBe(54)
     // an inheritance and part-time work each help: take either away and the earliest age is the same or later, never sooner
     expect(earliest({ heritage: false })).toBeGreaterThanOrEqual(all)
     expect(earliest({ partTime: false })).toBeGreaterThanOrEqual(all)

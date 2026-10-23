@@ -386,6 +386,10 @@ export interface YearRow {
     childBenefit?: number
     /** What the household was paid this year by the Canada Groceries and Essentials Benefit (the GST/HST credit), tax-free; present only when it is more than 0. */
     groceriesBenefit?: number
+    /** What Québec paid the household this year as the senior assistance tax credit (2 000 $ a person aged 70 or over, reduced by income), tax-free; present only when it is more than 0. */
+    seniorAssistance?: number
+    /** What Québec paid the household this year as the solidarity tax credit (QST, housing and children components), tax-free; present only when it is more than 0. */
+    solidarityCredit?: number
     /** What the home is worth at the end of the year (0 with no home): wealth the net worth does not count. */
     homeValueEnd: number
     /** Still owed on the mortgage at the end of the year. */

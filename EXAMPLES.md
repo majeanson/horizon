@@ -25,7 +25,7 @@ Dépenses : 88 000 $ par année en travaillant, 90 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 438 186 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 440 011 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 60 ans.
 
 ### Le calcul des rentes
@@ -77,7 +77,7 @@ Résidence principale : valeur 520 000 $, hypothèque 150 000 $ à 4,9 % (1
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 758 306 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 779 226 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 60 ans.
 
 ### Le calcul des rentes
@@ -98,11 +98,11 @@ Résidence principale : valeur 520 000 $, hypothèque 150 000 $ à 4,9 % (1
 | 60 | 72 000 $ | 144 460 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 25 787 $ | 935 149 $ | couvert |
 | 65 | 74 000 $ | 0 $ | 0 $ | 31 704 $ | 14 487 $ | 0 $ | 36 349 $ | 8 540 $ | 811 942 $ | tire du nid |
 | 70 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 18 300 $ | 0 $ | 22 960 $ | 8 580 $ | 789 047 $ | tire du nid |
-| 75 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 19 749 $ | 0 $ | 21 547 $ | 8 616 $ | 766 386 $ | tire du nid |
-| 80 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 21 824 $ | 8 826 $ | 746 847 $ | tire du nid |
-| 85 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 16 375 $ | 3 850 $ | 746 702 $ | tire du nid |
-| 90 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 16 375 $ | 3 850 $ | 750 959 $ | tire du nid |
-| 95 | 51 800 $ | 0 $ | 0 $ | 29 789 $ | 10 065 $ | 0 $ | 15 126 $ | 3 723 $ | 758 306 $ | tire du nid |
+| 75 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 19 749 $ | 0 $ | 21 406 $ | 8 576 $ | 767 819 $ | tire du nid |
+| 80 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 21 811 $ | 8 822 $ | 748 604 $ | tire du nid |
+| 85 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 14 932 $ | 3 850 $ | 752 682 $ | tire du nid |
+| 90 | 74 000 $ | 0 $ | 0 $ | 41 320 $ | 20 130 $ | 0 $ | 15 093 $ | 3 850 $ | 764 891 $ | tire du nid |
+| 95 | 51 800 $ | 0 $ | 0 $ | 29 789 $ | 10 065 $ | 0 $ | 13 995 $ | 3 723 $ | 779 226 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2047, en dollars d’aujourd’hui
 
@@ -126,8 +126,8 @@ Dépenses : 30 000 $ par année en travaillant, 28 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 127 615 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 63 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 258 576 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 62 ans.
 
 ### Le calcul des rentes
 
@@ -139,15 +139,15 @@ Dépenses : 30 000 $ par année en travaillant, 28 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 55 | 30 000 $ | 40 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 359 $ | 45 202 $ | couvert |
-| 60 | 30 000 $ | 41 189 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 649 $ | 70 928 $ | couvert |
-| 65 | 28 000 $ | 35 345 $ | 0 $ | 882 $ | 763 $ | 0 $ | 0 $ | 1 996 $ | 103 602 $ | couvert |
-| 70 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 9 150 $ | 4 805 $ | 2 912 $ | 0 $ | 100 760 $ | tire du nid |
-| 75 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 9 226 $ | 4 882 $ | 2 760 $ | 0 $ | 97 725 $ | tire du nid |
-| 80 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 719 $ | 1 084 $ | 0 $ | 103 915 $ | tire du nid |
-| 85 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 720 $ | 1 082 $ | 0 $ | 110 918 $ | tire du nid |
-| 90 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 720 $ | 1 083 $ | 0 $ | 118 783 $ | tire du nid |
-| 95 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 720 $ | 1 083 $ | 0 $ | 127 615 $ | tire du nid |
+| 55 | 30 000 $ | 40 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 359 $ | 46 512 $ | couvert |
+| 60 | 30 000 $ | 41 189 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 649 $ | 79 262 $ | couvert |
+| 65 | 28 000 $ | 35 345 $ | 0 $ | 882 $ | 763 $ | 0 $ | 0 $ | 1 996 $ | 119 826 $ | couvert |
+| 70 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 9 150 $ | 6 062 $ | 398 $ | 0 $ | 132 503 $ | tire du nid |
+| 75 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 9 226 $ | 5 104 $ | 2 315 $ | 0 $ | 150 325 $ | tire du nid |
+| 80 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 146 $ | 2 230 $ | 0 $ | 173 391 $ | tire du nid |
+| 85 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 189 $ | 2 145 $ | 0 $ | 198 870 $ | tire du nid |
+| 90 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 232 $ | 2 059 $ | 0 $ | 227 127 $ | tire du nid |
+| 95 | 28 000 $ | 0 $ | 0 $ | 10 589 $ | 10 065 $ | 5 281 $ | 1 961 $ | 0 $ | 258 576 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2037, en dollars d’aujourd’hui
 
@@ -155,7 +155,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Hélène | 66 | 0 $ | 0 $ | 10 589 $ | 9 150 $ | 2 913 $ | 22 652 $ | 0 $ | 0 $ | 0 $ |
+| Hélène | 66 | 0 $ | 0 $ | 10 589 $ | 9 150 $ | 351 $ | 20 090 $ | 0 $ | 0 $ | 0 $ |
 
 ## rich — Couple, hauts revenus
 
@@ -172,7 +172,7 @@ Dépenses : 150 000 $ par année en travaillant, 130 000 $ à la retraite (d
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 979 284 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 997 777 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 57 ans.
 
 ### Le calcul des rentes
@@ -189,13 +189,13 @@ Dépenses : 150 000 $ par année en travaillant, 130 000 $ à la retraite (d
 | 50 | 150 000 $ | 320 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 80 839 $ | 1 975 167 $ | couvert |
 | 55 | 150 000 $ | 329 514 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 84 971 $ | 2 626 681 $ | couvert |
 | 60 | 150 000 $ | 137 845 $ | 0 $ | 0 $ | 0 $ | 0 $ | 58 215 $ | 39 398 $ | 2 968 256 $ | tire du nid |
-| 65 | 130 000 $ | 0 $ | 0 $ | 14 142 $ | 6 100 $ | 1 830 $ | 109 604 $ | 2 388 $ | 2 786 577 $ | tire du nid |
-| 70 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 18 300 $ | 0 $ | 104 315 $ | 37 494 $ | 2 632 162 $ | tire du nid |
-| 75 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 18 910 $ | 0 $ | 105 215 $ | 39 004 $ | 2 389 499 $ | tire du nid |
-| 80 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 039 $ | 39 048 $ | 2 124 890 $ | tire du nid |
-| 85 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 080 $ | 39 088 $ | 1 828 767 $ | tire du nid |
-| 90 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 115 $ | 39 124 $ | 1 496 353 $ | tire du nid |
-| 95 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 147 $ | 39 156 $ | 1 121 747 $ | tire du nid |
+| 65 | 130 000 $ | 0 $ | 0 $ | 14 142 $ | 6 100 $ | 1 936 $ | 107 683 $ | 2 207 $ | 2 790 281 $ | tire du nid |
+| 70 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 18 300 $ | 0 $ | 101 692 $ | 34 870 $ | 2 641 588 $ | tire du nid |
+| 75 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 18 910 $ | 0 $ | 105 215 $ | 39 004 $ | 2 400 396 $ | tire du nid |
+| 80 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 847 $ | 39 354 $ | 2 136 818 $ | tire du nid |
+| 85 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 105 151 $ | 39 494 $ | 1 842 139 $ | tire du nid |
+| 90 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 115 $ | 39 124 $ | 1 511 373 $ | tire du nid |
+| 95 | 130 000 $ | 0 $ | 0 $ | 44 879 $ | 20 130 $ | 0 $ | 104 247 $ | 39 194 $ | 1 139 401 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2039, en dollars d’aujourd’hui
 
@@ -220,7 +220,7 @@ Dépenses : 46 000 $ par année en travaillant, 38 000 $ à la retraite (dol
 ### Ce qui sort
 
 - Le plan tel que décrit : manque d’argent en 2036.
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 69 ans.
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 68 ans.
 
 ### Le calcul des rentes
 
@@ -232,9 +232,9 @@ Dépenses : 46 000 $ par année en travaillant, 38 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 52 | 46 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 507 $ | 49 866 $ | couvert |
-| 55 | 46 000 $ | 63 099 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 527 $ | 57 908 $ | couvert |
-| 60 | 38 000 $ | 27 073 $ | 0 $ | 0 $ | 0 $ | 0 $ | 18 675 $ | 5 761 $ | 56 862 $ | tire du nid |
+| 52 | 46 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 421 $ | 50 110 $ | couvert |
+| 55 | 46 000 $ | 63 099 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 10 320 $ | 59 908 $ | couvert |
+| 60 | 38 000 $ | 27 073 $ | 0 $ | 0 $ | 0 $ | 0 $ | 18 271 $ | 5 647 $ | 61 531 $ | tire du nid |
 | 65 | 38 000 $ | 0 $ | 0 $ | 7 919 $ | 4 575 $ | 4 120 $ | 0 $ | 0 $ | 0 $ | manque |
 | 70 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 9 150 $ | 3 637 $ | 0 $ | 0 $ | 0 $ | manque |
 | 75 | 38 000 $ | 0 $ | 0 $ | 15 837 $ | 9 607 $ | 3 637 $ | 0 $ | 47 $ | 0 $ | manque |
@@ -249,7 +249,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Julien | 61 | 0 $ | 0 $ | 0 $ | 0 $ | 40 893 $ | 40 893 $ | 2 857 $ | 2 272 $ | 0 $ |
+| Julien | 61 | 0 $ | 0 $ | 0 $ | 0 $ | 41 527 $ | 41 527 $ | 2 931 $ | 2 361 $ | 0 $ |
 
 ## retired — Couple à la retraite
 
@@ -266,7 +266,7 @@ Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 276 794 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 298 193 $ (dollars d’aujourd’hui).
 - Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
 
 ### Le calcul des rentes
@@ -280,13 +280,13 @@ Dépenses : 82 000 $ par année en travaillant, 82 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 68 | 82 000 $ | 0 $ | 34 000 $ | 20 789 $ | 18 300 $ | 0 $ | 14 229 $ | 6 190 $ | 633 108 $ | tire du nid |
-| 70 | 82 000 $ | 0 $ | 33 304 $ | 20 789 $ | 18 300 $ | 0 $ | 15 849 $ | 6 221 $ | 630 523 $ | tire du nid |
-| 75 | 82 000 $ | 0 $ | 31 627 $ | 20 789 $ | 18 986 $ | 0 $ | 22 566 $ | 11 681 $ | 596 321 $ | tire du nid |
-| 80 | 82 000 $ | 0 $ | 30 033 $ | 20 789 $ | 20 130 $ | 0 $ | 22 672 $ | 11 625 $ | 550 101 $ | tire du nid |
-| 85 | 82 000 $ | 0 $ | 28 521 $ | 20 789 $ | 20 130 $ | 0 $ | 24 265 $ | 11 678 $ | 491 401 $ | tire du nid |
-| 90 | 82 000 $ | 0 $ | 27 084 $ | 20 789 $ | 20 130 $ | 0 $ | 25 775 $ | 11 742 $ | 417 296 $ | tire du nid |
-| 95 | 82 000 $ | 0 $ | 25 720 $ | 20 789 $ | 20 130 $ | 0 $ | 27 978 $ | 12 014 $ | 325 329 $ | tire du nid |
+| 68 | 82 000 $ | 0 $ | 34 000 $ | 20 789 $ | 18 300 $ | 0 $ | 12 534 $ | 6 130 $ | 634 833 $ | tire du nid |
+| 70 | 82 000 $ | 0 $ | 33 304 $ | 20 789 $ | 18 300 $ | 0 $ | 15 847 $ | 6 219 $ | 632 317 $ | tire du nid |
+| 75 | 82 000 $ | 0 $ | 31 627 $ | 20 789 $ | 18 986 $ | 0 $ | 22 848 $ | 11 766 $ | 604 003 $ | tire du nid |
+| 80 | 82 000 $ | 0 $ | 30 033 $ | 20 789 $ | 20 130 $ | 0 $ | 22 016 $ | 11 427 $ | 562 691 $ | tire du nid |
+| 85 | 82 000 $ | 0 $ | 28 521 $ | 20 789 $ | 20 130 $ | 0 $ | 23 795 $ | 11 541 $ | 509 039 $ | tire du nid |
+| 90 | 82 000 $ | 0 $ | 27 084 $ | 20 789 $ | 20 130 $ | 0 $ | 25 738 $ | 11 731 $ | 438 241 $ | tire du nid |
+| 95 | 82 000 $ | 0 $ | 25 720 $ | 20 789 $ | 20 130 $ | 0 $ | 28 427 $ | 12 149 $ | 349 420 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2026, en dollars d’aujourd’hui
 
@@ -294,7 +294,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Gilles | 68 | 0 $ | 34 000 $ | 11 052 $ | 9 150 $ | 0 $ | 45 780 $ | 2 118 $ | 2 486 $ | 0 $ |
+| Gilles | 68 | 0 $ | 34 000 $ | 11 052 $ | 9 150 $ | 0 $ | 45 568 $ | 2 093 $ | 2 451 $ | 0 $ |
 | Francine | 66 | 0 $ | 0 $ | 9 738 $ | 9 150 $ | 0 $ | 29 088 $ | 167 $ | 1 419 $ | 0 $ |
 
 ## newcomer — Arrivée au Canada à 30 ans
@@ -310,8 +310,8 @@ Dépenses : 38 000 $ par année en travaillant, 36 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 242 251 $ (dollars d’aujourd’hui).
-- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 62 ans.
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 326 216 $ (dollars d’aujourd’hui).
+- L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 61 ans.
 
 ### Le calcul des rentes
 
@@ -323,16 +323,16 @@ Dépenses : 38 000 $ par année en travaillant, 36 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 50 | 38 000 $ | 58 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 8 539 $ | 174 483 $ | couvert |
-| 55 | 38 000 $ | 59 724 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 019 $ | 238 528 $ | couvert |
-| 60 | 38 000 $ | 61 500 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 542 $ | 315 223 $ | couvert |
-| 65 | 36 000 $ | 5 277 $ | 0 $ | 12 777 $ | 6 672 $ | 0 $ | 14 065 $ | 2 529 $ | 381 917 $ | tire du nid |
-| 70 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 006 $ | 0 $ | 14 734 $ | 2 616 $ | 350 081 $ | tire du nid |
-| 75 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 673 $ | 0 $ | 14 087 $ | 2 636 $ | 314 891 $ | tire du nid |
-| 80 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 0 $ | 13 972 $ | 2 655 $ | 278 871 $ | tire du nid |
-| 85 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 7 428 $ | 0 $ | 258 996 $ | tire du nid |
-| 90 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 7 428 $ | 0 $ | 251 109 $ | tire du nid |
-| 95 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 7 428 $ | 0 $ | 242 251 $ | tire du nid |
+| 50 | 38 000 $ | 58 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 8 539 $ | 174 884 $ | couvert |
+| 55 | 38 000 $ | 59 724 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 019 $ | 242 375 $ | couvert |
+| 60 | 38 000 $ | 61 500 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 9 542 $ | 322 397 $ | couvert |
+| 65 | 36 000 $ | 5 277 $ | 0 $ | 12 777 $ | 6 672 $ | 0 $ | 13 547 $ | 2 396 $ | 392 404 $ | tire du nid |
+| 70 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 006 $ | 0 $ | 13 010 $ | 2 173 $ | 371 095 $ | tire du nid |
+| 75 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 673 $ | 0 $ | 11 247 $ | 1 907 $ | 354 010 $ | tire du nid |
+| 80 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 0 $ | 11 302 $ | 1 969 $ | 337 478 $ | tire du nid |
+| 85 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 0 $ | 11 474 $ | 2 025 $ | 317 951 $ | tire du nid |
+| 90 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 5 276 $ | 0 $ | 315 846 $ | tire du nid |
+| 95 | 36 000 $ | 0 $ | 0 $ | 15 333 $ | 8 807 $ | 3 890 $ | 5 361 $ | 0 $ | 326 216 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2042, en dollars d’aujourd’hui
 
@@ -340,7 +340,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Amira | 66 | 0 $ | 0 $ | 15 333 $ | 8 006 $ | 14 716 $ | 38 055 $ | 1 281 $ | 1 317 $ | 0 $ |
+| Amira | 66 | 0 $ | 0 $ | 15 333 $ | 8 006 $ | 12 992 $ | 36 331 $ | 1 080 $ | 1 075 $ | 0 $ |
 
 ## heir — Une personne, grand héritage
 
@@ -355,7 +355,7 @@ Dépenses : 52 000 $ par année en travaillant, 54 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 6 827 581 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 7 019 841 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 27 ans.
 
 ### Le calcul des rentes
@@ -368,21 +368,21 @@ Dépenses : 52 000 $ par année en travaillant, 54 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 27 | 52 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 559 $ | 10 801 $ | 3 726 290 $ | tire du nid |
-| 30 | 54 000 $ | 42 066 $ | 0 $ | 0 $ | 0 $ | 0 $ | 20 589 $ | 5 484 $ | 3 907 503 $ | tire du nid |
-| 35 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 53 644 $ | 0 $ | 4 003 942 $ | tire du nid |
-| 40 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 53 644 $ | 0 $ | 4 109 664 $ | tire du nid |
-| 45 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 53 611 $ | 0 $ | 4 226 028 $ | tire du nid |
-| 50 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 53 564 $ | 0 $ | 4 354 291 $ | tire du nid |
-| 55 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 53 732 $ | 207 $ | 4 494 999 $ | tire du nid |
-| 60 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 53 887 $ | 394 $ | 4 648 922 $ | tire du nid |
-| 65 | 54 000 $ | 0 $ | 0 $ | 1 355 $ | 2 288 $ | 295 $ | 49 528 $ | 0 $ | 4 822 130 $ | tire du nid |
-| 70 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 9 150 $ | 713 $ | 39 580 $ | 1 407 $ | 5 085 994 $ | tire du nid |
-| 75 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 9 379 $ | 0 $ | 40 192 $ | 1 535 $ | 5 371 121 $ | tire du nid |
-| 80 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 39 773 $ | 1 801 $ | 5 686 654 $ | tire du nid |
-| 85 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 39 901 $ | 1 930 $ | 6 032 450 $ | tire du nid |
-| 90 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 40 009 $ | 2 038 $ | 6 411 623 $ | tire du nid |
-| 95 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 40 100 $ | 2 129 $ | 6 827 581 $ | tire du nid |
+| 27 | 52 000 $ | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 406 $ | 10 801 $ | 3 726 447 $ | tire du nid |
+| 30 | 54 000 $ | 42 066 $ | 0 $ | 0 $ | 0 $ | 0 $ | 20 379 $ | 5 480 $ | 3 908 407 $ | tire du nid |
+| 35 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 52 363 $ | 0 $ | 4 011 714 $ | tire du nid |
+| 40 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 52 363 $ | 0 $ | 4 124 964 $ | tire du nid |
+| 45 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 52 336 $ | 0 $ | 4 249 567 $ | tire du nid |
+| 50 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 52 291 $ | 0 $ | 4 386 845 $ | tire du nid |
+| 55 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 52 407 $ | 154 $ | 4 537 678 $ | tire du nid |
+| 60 | 54 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 52 558 $ | 337 $ | 4 702 747 $ | tire du nid |
+| 65 | 54 000 $ | 0 $ | 0 $ | 1 355 $ | 2 288 $ | 361 $ | 48 191 $ | 0 $ | 4 888 201 $ | tire du nid |
+| 70 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 9 150 $ | 1 096 $ | 37 720 $ | 1 210 $ | 5 168 210 $ | tire du nid |
+| 75 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 9 379 $ | 0 $ | 38 158 $ | 1 311 $ | 5 473 516 $ | tire du nid |
+| 80 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 37 881 $ | 1 587 $ | 5 809 222 $ | tire du nid |
+| 85 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 38 104 $ | 1 721 $ | 6 176 566 $ | tire du nid |
+| 90 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 38 296 $ | 1 835 $ | 6 578 900 $ | tire du nid |
+| 95 | 54 000 $ | 0 $ | 0 $ | 5 420 $ | 10 065 $ | 0 $ | 38 462 $ | 1 932 $ | 7 019 841 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2030, en dollars d’aujourd’hui
 
@@ -390,7 +390,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Jules | 31 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 526 $ | 0 $ | 0 $ | 0 $ |
+| Jules | 31 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 4 418 $ | 0 $ | 0 $ | 0 $ |
 
 ## downsizer — Couple, vendre la maison
 
@@ -403,13 +403,13 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Paul | né·e en 1973-01 | retraite à 58 ans | salaire 74 000 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1991) |
 | ↳ comptes | REER 170 000 $ (+4 000 $/an) | CELI 62 000 $ (+5 000 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 92 000 $ par année en travaillant, 80 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 93 000 $ par année en travaillant, 81 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 880 000 $, hypothèque 70 000 $ à 4,5 % (1 300 $ par mois, payée en 2031), vendue à 58 ans (logement de remplacement : 360 000 $). Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 289 474 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 254 281 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 58 ans.
 
 ### Le calcul des rentes
@@ -423,15 +423,15 @@ Résidence principale : valeur 880 000 $, hypothèque 70 000 $ à 4,5 % (1�
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 55 | 107 600 $ | 170 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 112 $ | 617 669 $ | couvert |
-| 60 | 80 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 80 000 $ | 0 $ | 1 140 144 $ | tire du nid |
-| 65 | 80 000 $ | 0 $ | 0 $ | 9 661 $ | 4 575 $ | 6 283 $ | 58 769 $ | 0 $ | 871 069 $ | tire du nid |
-| 70 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 18 300 $ | 0 $ | 34 109 $ | 10 837 $ | 784 598 $ | tire du nid |
-| 75 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 18 758 $ | 0 $ | 33 699 $ | 10 884 $ | 698 783 $ | tire du nid |
-| 80 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 32 378 $ | 10 929 $ | 610 435 $ | tire du nid |
-| 85 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 33 154 $ | 11 177 $ | 511 795 $ | tire du nid |
-| 90 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 31 103 $ | 9 224 $ | 402 079 $ | tire du nid |
-| 95 | 80 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 24 307 $ | 3 031 $ | 321 178 $ | tire du nid |
+| 55 | 108 600 $ | 170 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 112 $ | 616 647 $ | couvert |
+| 60 | 81 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 81 000 $ | 0 $ | 1 133 658 $ | tire du nid |
+| 65 | 81 000 $ | 0 $ | 0 $ | 9 661 $ | 4 575 $ | 6 305 $ | 58 116 $ | 0 $ | 867 235 $ | tire du nid |
+| 70 | 81 000 $ | 0 $ | 0 $ | 38 428 $ | 18 300 $ | 0 $ | 35 504 $ | 11 232 $ | 777 899 $ | tire du nid |
+| 75 | 81 000 $ | 0 $ | 0 $ | 38 428 $ | 18 758 $ | 0 $ | 34 788 $ | 11 193 $ | 684 960 $ | tire du nid |
+| 80 | 81 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 33 764 $ | 11 322 $ | 587 889 $ | tire du nid |
+| 85 | 81 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 34 832 $ | 11 661 $ | 478 626 $ | tire du nid |
+| 90 | 81 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 25 404 $ | 3 027 $ | 367 206 $ | tire du nid |
+| 95 | 81 000 $ | 0 $ | 0 $ | 38 428 $ | 20 130 $ | 0 $ | 23 435 $ | 3 031 $ | 287 207 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2031, en dollars d’aujourd’hui
 
@@ -439,7 +439,7 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Nadia | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 3 080 $ | 0 $ | 0 $ | 0 $ |
+| Nadia | 60 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 3 122 $ | 0 $ | 0 $ | 0 $ |
 | Paul | 58 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ |
 
 ## planner — Couple, une vie à planifier
@@ -461,7 +461,7 @@ Résidence principale : valeur 470 000 $, hypothèque 215 000 $ à 4,9 % (1
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 523 336 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 539 944 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 57 ans.
 
 ### Le calcul des rentes
@@ -476,18 +476,18 @@ Résidence principale : valeur 470 000 $, hypothèque 215 000 $ à 4,9 % (1
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 37 | 96 600 $ | 162 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 30 504 $ | 156 239 $ | couvert |
-| 40 | 106 476 $ | 152 369 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 675 $ | 213 391 $ | couvert |
-| 45 | 103 251 $ | 172 553 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 33 211 $ | 355 816 $ | couvert |
-| 50 | 101 696 $ | 177 445 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 969 $ | 602 859 $ | couvert |
-| 55 | 89 500 $ | 182 483 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 36 779 $ | 856 085 $ | couvert |
-| 60 | 78 000 $ | 30 209 $ | 0 $ | 0 $ | 0 $ | 0 $ | 64 507 $ | 14 427 $ | 797 139 $ | tire du nid |
-| 65 | 72 000 $ | 0 $ | 0 $ | 41 219 $ | 16 013 $ | 0 $ | 23 515 $ | 8 061 $ | 634 198 $ | tire du nid |
-| 70 | 70 567 $ | 0 $ | 0 $ | 47 743 $ | 18 300 $ | 0 $ | 12 676 $ | 7 513 $ | 640 239 $ | tire du nid |
-| 75 | 67 109 $ | 0 $ | 0 $ | 47 743 $ | 19 901 $ | 0 $ | 5 734 $ | 6 024 $ | 673 451 $ | tire du nid |
-| 80 | 63 820 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 3 210 $ | 5 825 $ | 739 582 $ | tire du nid |
-| 85 | 105 692 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 43 487 $ | 5 669 $ | 678 258 $ | tire du nid |
-| 90 | 102 717 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 40 513 $ | 5 669 $ | 538 317 $ | tire du nid |
-| 95 | 39 202 $ | 0 $ | 0 $ | 33 558 $ | 10 065 $ | 0 $ | 0 $ | 4 709 $ | 523 336 $ | couvert |
+| 40 | 106 476 $ | 147 751 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 26 675 $ | 213 391 $ | couvert |
+| 45 | 103 251 $ | 169 775 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 33 211 $ | 355 816 $ | couvert |
+| 50 | 101 696 $ | 174 822 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 34 969 $ | 602 859 $ | couvert |
+| 55 | 89 500 $ | 180 020 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 36 779 $ | 856 085 $ | couvert |
+| 60 | 78 000 $ | 30 209 $ | 0 $ | 0 $ | 0 $ | 0 $ | 63 753 $ | 14 233 $ | 799 940 $ | tire du nid |
+| 65 | 72 000 $ | 0 $ | 0 $ | 41 219 $ | 16 013 $ | 0 $ | 23 514 $ | 8 061 $ | 637 416 $ | tire du nid |
+| 70 | 70 567 $ | 0 $ | 0 $ | 47 743 $ | 18 300 $ | 0 $ | 12 676 $ | 7 513 $ | 643 853 $ | tire du nid |
+| 75 | 67 109 $ | 0 $ | 0 $ | 47 743 $ | 19 901 $ | 0 $ | 5 160 $ | 5 950 $ | 679 774 $ | tire du nid |
+| 80 | 63 820 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 3 647 $ | 5 872 $ | 748 528 $ | tire du nid |
+| 85 | 105 692 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 43 043 $ | 5 669 $ | 687 302 $ | tire du nid |
+| 90 | 102 717 $ | 0 $ | 0 $ | 47 743 $ | 20 130 $ | 0 $ | 40 093 $ | 5 669 $ | 551 031 $ | tire du nid |
+| 95 | 39 202 $ | 0 $ | 0 $ | 33 558 $ | 10 065 $ | 0 $ | 0 $ | 4 709 $ | 539 944 $ | couvert |
 
 ### Année témoin pour un calculateur d’impôt : 2053, en dollars d’aujourd’hui
 
@@ -495,8 +495,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Élise | 64 | 0 $ | 0 $ | 0 $ | 0 $ | 51 701 $ | 51 701 $ | 4 121 $ | 4 502 $ | 0 $ |
-| Thomas | 66 | 0 $ | 0 $ | 21 644 $ | 9 150 $ | 449 $ | 31 243 $ | 600 $ | 1 721 $ | 0 $ |
+| Élise | 64 | 0 $ | 0 $ | 0 $ | 0 $ | 51 617 $ | 51 617 $ | 4 111 $ | 4 479 $ | 0 $ |
+| Thomas | 66 | 0 $ | 0 $ | 21 644 $ | 9 150 $ | 508 $ | 31 303 $ | 600 $ | 1 729 $ | 0 $ |
 
 ## family — Couple, une famille qui grandit
 
@@ -517,7 +517,7 @@ Résidence principale : valeur 590 000 $, hypothèque 410 000 $ à 4,9 % (2
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 963 913 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 981 610 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 59 ans.
 
 ### Le calcul des rentes
@@ -531,19 +531,19 @@ Résidence principale : valeur 590 000 $, hypothèque 410 000 $ à 4,9 % (2
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 38 | 108 200 $ | 162 818 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 406 $ | 211 117 $ | couvert |
-| 40 | 118 052 $ | 160 496 $ | 0 $ | 0 $ | 0 $ | 0 $ | 2 275 $ | 37 632 $ | 232 223 $ | tire du nid |
-| 45 | 115 382 $ | 173 368 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 38 178 $ | 294 683 $ | couvert |
-| 50 | 111 476 $ | 176 662 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 40 248 $ | 408 146 $ | couvert |
-| 55 | 111 307 $ | 178 173 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 42 438 $ | 546 811 $ | couvert |
+| 38 | 108 200 $ | 159 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 406 $ | 211 117 $ | couvert |
+| 40 | 118 052 $ | 151 066 $ | 0 $ | 0 $ | 0 $ | 0 $ | 2 275 $ | 37 632 $ | 232 223 $ | tire du nid |
+| 45 | 115 382 $ | 165 657 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 38 178 $ | 294 683 $ | couvert |
+| 50 | 111 476 $ | 170 582 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 40 248 $ | 408 146 $ | couvert |
+| 55 | 111 307 $ | 175 654 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 42 438 $ | 546 811 $ | couvert |
 | 60 | 94 852 $ | 180 876 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 44 693 $ | 733 742 $ | couvert |
 | 65 | 66 000 $ | 0 $ | 0 $ | 14 135 $ | 4 575 $ | 0 $ | 62 984 $ | 10 157 $ | 620 996 $ | tire du nid |
 | 70 | 66 000 $ | 0 $ | 0 $ | 40 201 $ | 18 300 $ | 0 $ | 13 928 $ | 5 727 $ | 593 587 $ | tire du nid |
-| 75 | 62 765 $ | 0 $ | 0 $ | 40 201 $ | 18 757 $ | 0 $ | 9 857 $ | 4 728 $ | 611 073 $ | tire du nid |
-| 80 | 59 689 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 9 495 $ | 5 035 $ | 655 107 $ | tire du nid |
-| 85 | 56 764 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 9 130 $ | 4 951 $ | 721 859 $ | tire du nid |
-| 90 | 53 982 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 8 765 $ | 4 865 $ | 812 506 $ | tire du nid |
-| 95 | 51 336 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 8 346 $ | 4 762 $ | 929 297 $ | tire du nid |
+| 75 | 62 765 $ | 0 $ | 0 $ | 40 201 $ | 18 757 $ | 0 $ | 9 871 $ | 4 731 $ | 613 906 $ | tire du nid |
+| 80 | 59 689 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 9 508 $ | 5 039 $ | 661 735 $ | tire du nid |
+| 85 | 56 764 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 9 143 $ | 4 955 $ | 731 739 $ | tire du nid |
+| 90 | 53 982 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 8 777 $ | 4 868 $ | 825 426 $ | tire du nid |
+| 95 | 51 336 $ | 0 $ | 0 $ | 40 201 $ | 20 130 $ | 0 $ | 8 358 $ | 4 765 $ | 945 113 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2053, en dollars d’aujourd’hui
 
@@ -567,7 +567,7 @@ Dépenses : 42 000 $ par année en travaillant, 42 000 $ à la retraite (dol
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 660 734 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 679 131 $ (dollars d’aujourd’hui).
 - Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
 
 ### Le calcul des rentes
@@ -580,14 +580,14 @@ Dépenses : 42 000 $ par année en travaillant, 42 000 $ à la retraite (dol
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 60 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 345 $ | 8 884 $ | 1 657 014 $ | tire du nid |
-| 65 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 344 $ | 7 177 $ | 1 591 966 $ | tire du nid |
-| 70 | 42 000 $ | 0 $ | 0 $ | 18 171 $ | 8 296 $ | 0 $ | 27 879 $ | 7 199 $ | 1 552 700 $ | tire du nid |
-| 75 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 274 $ | 0 $ | 74 228 $ | 32 827 $ | 1 584 968 $ | tire du nid |
-| 80 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 71 501 $ | 31 689 $ | 1 597 730 $ | tire du nid |
-| 85 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 68 754 $ | 30 384 $ | 1 614 467 $ | tire du nid |
-| 90 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 66 002 $ | 29 099 $ | 1 635 209 $ | tire du nid |
-| 95 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 62 851 $ | 27 625 $ | 1 660 734 $ | tire du nid |
+| 60 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 345 $ | 8 884 $ | 1 658 323 $ | tire du nid |
+| 65 | 42 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 54 344 $ | 7 177 $ | 1 597 076 $ | tire du nid |
+| 70 | 42 000 $ | 0 $ | 0 $ | 18 171 $ | 8 296 $ | 0 $ | 27 879 $ | 7 199 $ | 1 562 078 $ | tire du nid |
+| 75 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 274 $ | 0 $ | 74 228 $ | 32 827 $ | 1 597 351 $ | tire du nid |
+| 80 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 71 501 $ | 31 689 $ | 1 611 399 $ | tire du nid |
+| 85 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 68 754 $ | 30 384 $ | 1 629 557 $ | tire du nid |
+| 90 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 66 002 $ | 29 099 $ | 1 651 869 $ | tire du nid |
+| 95 | 42 000 $ | 0 $ | 0 $ | 27 256 $ | 13 688 $ | 0 $ | 62 851 $ | 27 625 $ | 1 679 131 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2026, en dollars d’aujourd’hui
 
@@ -608,13 +608,13 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 | Linda | né·e en 1964-05 | retraite à 62 ans | salaire 32 500 $ | RRQ à 65 ans, PSV à 65 ans (au Canada depuis 1982) |
 | ↳ comptes | REER 40 000 $ (+0 $/an) | CELI 35 000 $ (+0 $/an) | non enregistré 0 $ (+0 $/an) | rente d’employeur : aucune |
 
-Dépenses : 48 000 $ par année en travaillant, 48 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
+Dépenses : 50 000 $ par année en travaillant, 50 000 $ à la retraite (dollars d’aujourd’hui). Inflation 2,1 %, croissance des salaires 2,7 %, rendements REER 4,5 % · CELI 4,5 % · non enregistré 4,0 %, horizon 95 ans, ordre de retrait nonReg → rrsp → tfsa.
 
 Résidence principale : valeur 450 000 $, hypothèque 0 $ à 5,0 % (0 $ par mois, aucune hypothèque), gardée à vie. Le paiement s’ajoute aux dépenses tant qu’il dure ; la valeur nette de la maison compte à part des comptes.
 
 ### Ce qui sort
 
-- Le plan tel que décrit : manque d’argent en 2032.
+- Le plan tel que décrit : manque d’argent en 2031.
 - Tout le monde est déjà à la retraite : la question n’est plus « quand ? » mais « l’argent dure-t-il ? » (la réponse est la ligne du dessus).
 
 ### Le calcul des rentes
@@ -628,14 +628,14 @@ Résidence principale : valeur 450 000 $, hypothèque 0 $ à 5,0 % (0 $ par
 
 | Âge | Dépenses | Travail | Rente d’employeur | RRQ | PSV | SRG | Tiré du nid | Impôt | Nid en fin d’année | État |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 62 | 48 000 $ | 21 667 $ | 0 $ | 0 $ | 0 $ | 0 $ | 30 343 $ | 2 711 $ | 125 731 $ | tire du nid |
-| 65 | 48 000 $ | 0 $ | 0 $ | 10 771 $ | 10 675 $ | 5 747 $ | 19 916 $ | 0 $ | 11 146 $ | tire du nid |
-| 70 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 18 300 $ | 6 032 $ | 1 $ | 0 $ | 0 $ | manque |
-| 75 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 19 367 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
-| 80 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
-| 85 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
-| 90 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
-| 95 | 48 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 62 | 50 000 $ | 21 667 $ | 0 $ | 0 $ | 0 $ | 0 $ | 32 682 $ | 3 373 $ | 123 341 $ | tire du nid |
+| 65 | 50 000 $ | 0 $ | 0 $ | 10 771 $ | 10 675 $ | 5 755 $ | 20 277 $ | 0 $ | 6 770 $ | tire du nid |
+| 70 | 50 000 $ | 0 $ | 0 $ | 18 465 $ | 18 300 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 75 | 50 000 $ | 0 $ | 0 $ | 18 465 $ | 19 367 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 80 | 50 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 85 | 50 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 90 | 50 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
+| 95 | 50 000 $ | 0 $ | 0 $ | 18 465 $ | 20 130 $ | 6 032 $ | 0 $ | 0 $ | 0 $ | manque |
 
 ### Année témoin pour un calculateur d’impôt : 2027, en dollars d’aujourd’hui
 
@@ -643,8 +643,8 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Dave | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 25 150 $ | 25 150 $ | 1 017 $ | 69 $ | 0 $ |
-| Linda | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 25 150 $ | 25 150 $ | 1 017 $ | 868 $ | 0 $ |
+| Dave | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 24 579 $ | 24 579 $ | 950 $ | 0 $ | 0 $ |
+| Linda | 63 | 0 $ | 0 $ | 0 $ | 0 $ | 24 579 $ | 24 579 $ | 950 $ | 747 $ | 0 $ |
 
 ## early — Couple, retraite avant 50 ans
 
@@ -663,7 +663,7 @@ Résidence principale : valeur 420 000 $, hypothèque 130 000 $ à 4,5 % (1
 
 ### Ce qui sort
 
-- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 954 330 $ (dollars d’aujourd’hui).
+- Le plan tel que décrit : tient jusqu’à l’horizon, valeur nette à la fin 1 057 661 $ (dollars d’aujourd’hui).
 - L’âge le plus tôt où tout le monde peut partir et que l’argent dure : 45 ans.
 
 ### Le calcul des rentes
@@ -680,16 +680,16 @@ Résidence principale : valeur 420 000 $, hypothèque 130 000 $ à 4,5 % (1
 | 35 | 84 000 $ | 184 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 33 226 $ | 564 041 $ | couvert |
 | 40 | 82 816 $ | 189 470 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 35 134 $ | 934 710 $ | couvert |
 | 45 | 81 748 $ | 195 103 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 37 102 $ | 1 371 385 $ | couvert |
-| 50 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 61 288 $ | 0 $ | 1 322 202 $ | tire du nid |
-| 55 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 70 765 $ | 8 765 $ | 1 127 195 $ | tire du nid |
-| 60 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 70 765 $ | 8 765 $ | 886 946 $ | tire du nid |
-| 65 | 62 000 $ | 0 $ | 0 $ | 29 216 $ | 15 250 $ | 376 $ | 21 668 $ | 3 934 $ | 676 828 $ | tire du nid |
-| 70 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 18 300 $ | 0 $ | 9 706 $ | 1 590 $ | 702 105 $ | tire du nid |
-| 75 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 19 825 $ | 0 $ | 8 623 $ | 2 022 $ | 737 878 $ | tire du nid |
-| 80 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 483 $ | 2 109 $ | 783 345 $ | tire du nid |
-| 85 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 483 $ | 2 109 $ | 834 397 $ | tire du nid |
-| 90 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 8 483 $ | 2 109 $ | 891 738 $ | tire du nid |
-| 95 | 43 400 $ | 0 $ | 0 $ | 25 560 $ | 10 065 $ | 0 $ | 10 256 $ | 2 637 $ | 954 330 $ | tire du nid |
+| 50 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 59 656 $ | 0 $ | 1 327 289 $ | tire du nid |
+| 55 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 70 639 $ | 8 729 $ | 1 139 867 $ | tire du nid |
+| 60 | 62 000 $ | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 70 667 $ | 8 737 $ | 901 710 $ | tire du nid |
+| 65 | 62 000 $ | 0 $ | 0 $ | 29 216 $ | 15 250 $ | 411 $ | 21 247 $ | 3 815 $ | 694 761 $ | tire du nid |
+| 70 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 18 300 $ | 0 $ | 8 761 $ | 1 590 $ | 720 871 $ | tire du nid |
+| 75 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 19 825 $ | 0 $ | 6 209 $ | 2 022 $ | 772 393 $ | tire du nid |
+| 80 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 6 419 $ | 2 109 $ | 833 575 $ | tire du nid |
+| 85 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 6 575 $ | 2 109 $ | 901 373 $ | tire du nid |
+| 90 | 62 000 $ | 0 $ | 0 $ | 35 170 $ | 20 130 $ | 0 $ | 6 715 $ | 2 109 $ | 976 742 $ | tire du nid |
+| 95 | 43 400 $ | 0 $ | 0 $ | 25 560 $ | 10 065 $ | 0 $ | 9 805 $ | 2 637 $ | 1 057 661 $ | tire du nid |
 
 ### Année témoin pour un calculateur d’impôt : 2039, en dollars d’aujourd’hui
 
@@ -697,6 +697,6 @@ Montants de l’année divisés par l’inflation : les barèmes sont indexés s
 
 | Personne | Âge | Travail | Rente d’employeur | RRQ | PSV | Retraits REER/FERR | Revenu net | Impôt fédéral | Impôt du Québec | Récupération PSV |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Juliette | 48 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 6 171 $ | 0 $ | 0 $ | 0 $ |
-| Mathieu | 49 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 698 $ | 0 $ | 0 $ | 0 $ |
+| Juliette | 48 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 6 028 $ | 0 $ | 0 $ | 0 $ |
+| Mathieu | 49 | 0 $ | 0 $ | 0 $ | 0 $ | 0 $ | 5 566 $ | 0 $ | 0 $ | 0 $ |
 

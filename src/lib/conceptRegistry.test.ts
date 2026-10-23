@@ -123,7 +123,7 @@ describe('the charts draw the registry’s hues', () => {
     clay: 'terracotta', coral: 'terracotta', 'clay-soft': 'terracotta',
     ink: 'ink',
   }
-  const SOURCE_CONCEPTS = { work: 'salaire', db: 'employeur', rrq: 'rrq', oas: 'psv', nest: 'nid' } as const
+  const SOURCE_CONCEPTS = { work: 'salaire', db: 'employeur', rrq: 'rrq', oas: 'psv', credits: 'srg', nest: 'nid' } as const
   const BALANCE_CONCEPTS = { rrsp: 'reer', rrspLocked: 'verrouille', tfsa: 'celi', nonReg: 'nonEnregistre', home: 'maison' } as const
   const EXPENSE_CONCEPTS = { living: 'budget', children: 'enfants', events: 'evenements', mortgage: 'hypotheque', tax: 'impot', deductions: 'salaire', saved: 'reer', unmet: 'depenses' } as const
 

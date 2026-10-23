@@ -1,5 +1,6 @@
 import type { ChartMarker, ChartSeries, SeriesColour } from '../components/charts/types.ts'
 import type { AgeResult, Household, YearRow } from '../engine/types.ts'
+import { benefitsOfYear } from '../engine/benefitsOf.ts'
 import { selectionAge, type Selection } from './resultsModel.ts'
 import { CONCEPTS, FAMILY_HUE, type ConceptId } from './concepts.ts'
 
@@ -35,7 +36,7 @@ export function metricValue(row: YearRow, metric: Metric): number {
   if (metric === 'netWorth') return row.household.netWorthEnd
   let sum = 0
   for (const p of Object.values(row.persons)) sum += p.employment + (p.otherIncome ?? 0) + p.db + p.rrq + p.oas + p.allowance + p.gis
-  return sum + (row.household.groceriesBenefit ?? 0)
+  return sum + benefitsOfYear(row.household)
 }
 
 /** The factor that turns a dollar of `year` into a dollar of `todayYear`. */
@@ -101,12 +102,12 @@ export function fanBasis<R extends { selection: Selection; result: AgeResult }>(
 /** The chart's choices: the two single-line measures, or the detail (bars). */
 export type ChartMetric = Metric | 'detail'
 
-export const SOURCE_SEGMENTS = ['work', 'db', 'rrq', 'oas', 'nest'] as const
+export const SOURCE_SEGMENTS = ['work', 'db', 'rrq', 'oas', 'credits', 'nest'] as const
 export type SourceSegment = (typeof SOURCE_SEGMENTS)[number]
 /** Work and the employer's pension are the work family (berry), the QPP and the OAS the public pensions (sage), what is drawn from savings the nest. */
 /** The concept each segment stands for: its colour comes from it, and its legend wears its pip (components/charts). */
-export const SOURCE_CONCEPT: Record<SourceSegment, ConceptId> = { work: 'salaire', db: 'employeur', rrq: 'rrq', oas: 'psv', nest: 'nid' }
-export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: seriesFor(SOURCE_CONCEPT.work), db: seriesFor(SOURCE_CONCEPT.db, 'soft'), rrq: seriesFor(SOURCE_CONCEPT.rrq), oas: seriesFor(SOURCE_CONCEPT.oas, 'soft'), nest: seriesFor(SOURCE_CONCEPT.nest) }
+export const SOURCE_CONCEPT: Record<SourceSegment, ConceptId> = { work: 'salaire', db: 'employeur', rrq: 'rrq', oas: 'psv', credits: 'srg', nest: 'nid' }
+export const SOURCE_COLOUR: Record<SourceSegment, SeriesColour> = { work: seriesFor(SOURCE_CONCEPT.work), db: seriesFor(SOURCE_CONCEPT.db, 'soft'), rrq: seriesFor(SOURCE_CONCEPT.rrq), oas: seriesFor(SOURCE_CONCEPT.oas, 'soft'), credits: seriesFor(SOURCE_CONCEPT.credits, 'mid'), nest: seriesFor(SOURCE_CONCEPT.nest) }
 
 export const BALANCE_SEGMENTS = ['rrsp', 'tfsa', 'nonReg'] as const
 export type BalanceSegment = (typeof BALANCE_SEGMENTS)[number]
@@ -148,10 +149,10 @@ export function sourceBars(rows: readonly YearRow[], who: string | null, s: Scal
       oas += p.oas + p.allowance + p.gis
       nest += p.withdrawals.rrsp + p.withdrawals.tfsa + p.withdrawals.nonReg
     }
-    // The Canada Groceries and Essentials Benefit is the household's: it rides in the « PSV et suppléments » bar (the other income-tested federal transfer), in the household's view and — so that the two
-    // people's bars still add up to it — in the first person's, as the child benefits do.
-    if (who === null || who === Object.keys(row.persons)[0]) oas += row.household.groceriesBenefit ?? 0
-    return { x: row.year, need: who === null ? (row.household.spending + row.household.tax) / k : 0, work: work / k, db: db / k, rrq: rrq / k, oas: oas / k, nest: nest / k }
+    // What the State pays the household apart from its pensions (the child benefits, the groceries benefit, Québec's two credits) is the household's, not a person's, like the spending: its own
+    // « Crédits et allocations » bar in the household's view, and nothing in a person's (their bars are the money that is theirs, and a stretch with none of their own is still empty).
+    const credits = who === null ? benefitsOfYear(row.household) : 0
+    return { x: row.year, need: who === null ? (row.household.spending + row.household.tax) / k : 0, work: work / k, db: db / k, rrq: rrq / k, oas: oas / k, credits: credits / k, nest: nest / k }
   })
 }
 

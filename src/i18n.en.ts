@@ -390,7 +390,7 @@ export const EN: typeof FR = {
       sourcesTitle: 'Where the money comes from, year by year',
       sourcesHint: 'Each bar is a year, by source of income.',
       needHint: 'The dashed line is what is needed (spending + tax): bars that reach it cover the year.',
-      source: { work: 'Work', workOther: 'Work and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS and supplements', nest: 'Drawn from the nest egg' },
+      source: { work: 'Work', workOther: 'Work and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS and supplements', credits: 'Credits and benefits', nest: 'Drawn from the nest egg' },
       need: 'Spending + tax',
       balancesTitle: 'What the accounts hold',
       balancesHint: 'Year-end balances. What is left of a year is saved: the TFSA first, then the non-registered account.',

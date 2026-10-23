@@ -95,8 +95,22 @@ describe('the cards of the fourteen examples', { timeout: 300_000 }, () => {
     expect(cards('golden', 'en').find((c) => c.id === 'crash')!.text).toContain('from 60 to 61')
   })
 
-  it('no example ever finds a lever that leaves LESS money at the end (if one does, the « less » wording is read by a person before it ships)', () => {
-    for (const id of EXAMPLE_IDS) for (const l of factsOf(id).f.levers) if (l.id === 'spend10' || l.id === 'pensions70') expect(l.endGain ?? 0, `${id} ${l.id}`).toBeGreaterThanOrEqual(0)
+  // The levers that leave LESS money at the end, each read by a person (the wording says « il reste N $ de moins » / « $N less is left », which is what the engine found). Starting the pensions at 70 can do it
+  // for a household that Québec's income-tested credits (5,4 % senior assistance, 6 % solidarity, 5 % groceries benefit, on top of the GIS) already carry: the pension it defers is clawed back at those
+  // rates once it is paid. The list only shrinks; an entry that now leaves more is stale.
+  const LESS_READ: Record<string, string> = {
+    'newcomer pensions70': 'read 2026-10-23: -18 000 $ at the end, the earliest age unchanged; the card says « 18 000 $ de moins » / « $18,000 less is left »',
+    'early pensions70': 'read 2026-10-23: -21 000 $ at the end, the earliest age unchanged; the card says « 21 000 $ de moins » / « $21,000 less is left »',
+  }
+  it('no example ever finds a lever that leaves LESS money at the end unless a person has read its wording', () => {
+    const found = new Set<string>()
+    for (const id of EXAMPLE_IDS)
+      for (const l of factsOf(id).f.levers)
+        if (l.id === 'spend10' || l.id === 'pensions70') {
+          if ((l.endGain ?? 0) < 0) found.add(`${id} ${l.id}`)
+          else expect(Object.keys(LESS_READ), `${id} ${l.id} no longer leaves less: take it off the list`).not.toContain(`${id} ${l.id}`)
+        }
+    expect([...found].sort()).toEqual(Object.keys(LESS_READ).sort())
   })
 })
 

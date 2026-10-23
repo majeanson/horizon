@@ -1,3 +1,4 @@
+import { benefitsOfYear } from './benefitsOf.ts'
 import { PRESET_KEYS, withPreset, type PresetKey } from './assumptionPresets.ts'
 import { oasStart } from './oas.ts'
 import { paramsFor } from './params/index.ts'
@@ -62,8 +63,8 @@ export interface BridgeYear {
   rrq: number
   oas: number
   gis: number
-  /** The Canada Groceries and Essentials Benefit (the GST/HST credit) the household was paid, tax-free: 0 once its income is past the phase-out. Part of `guaranteed`. */
-  groceries: number
+  /** What the State paid the household apart from its pensions, tax-free (the child benefits, the groceries benefit, Québec's senior assistance and solidarity credits): 0 once its income is past the phase-outs. Part of `guaranteed`. */
+  credits: number
   /** The QPP + OAS of the person being looked at alone (the household sums above also hold a spouse's). */
   ownPension: number
   /** The two halves of `ownPension`. */
@@ -71,7 +72,7 @@ export interface BridgeYear {
   /** The QPP surviving spouse's pension the household received (0 while both are alive), today's dollars. */
   survivor: number
   ownOas: number
-  /** DB + QPP + OAS + GIS + the Canada Groceries and Essentials Benefit: income that needs no decision once begun. */
+  /** DB + QPP + OAS + GIS + the credits and benefits: income that needs no decision once begun. */
   guaranteed: number
   /** What was drawn from each account (the RRIF minimum is part of the RRSP/RRIF draw). */
   draws: Record<AccountKind, number>
@@ -203,8 +204,8 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
   const pick = (f: (p: NonNullable<(typeof people)[number]>) => number) => sum(people.map((p) => f(p!))) / d
   const draws = Object.fromEntries(KINDS.map((k) => [k, pick((p) => p.withdrawals[k])])) as Record<AccountKind, number>
   const nestParts = Object.fromEntries(KINDS.map((k) => [k, pick((p) => p.balancesEnd[k])])) as Record<AccountKind, number>
-  const groceries = (r.household.groceriesBenefit ?? 0) / d
-  const guaranteed = pick((p) => p.db + p.rrq + p.oas + p.gis + p.allowance) + groceries
+  const credits = benefitsOfYear(r.household) / d
+  const guaranteed = pick((p) => p.db + p.rrq + p.oas + p.gis + p.allowance) + credits
   const drawn = sum(KINDS.map((k) => draws[k]))
   const me = r.persons[id]
   const ownRrq = me === undefined ? 0 : me.rrq - me.survivorPension - me.deathBenefit
@@ -221,7 +222,7 @@ function yearOf(r: YearRow, id: PersonId, deflate: (year: number) => number, bir
     oas: pick((p) => p.oas),
     // The income-tested supplements together: the GIS, and the Allowance a 60–64 spouse gets beside it.
     gis: pick((p) => p.gis + p.allowance),
-    groceries,
+    credits,
     // The person's OWN QPP: `rrq` also carries the surviving spouse's pension and the death benefit after a death (shown apart in `survivor`); neither is the start age's doing.
     ownPension: (ownRrq + (r.persons[id]?.oas ?? 0)) / d,
     ownRrq: ownRrq / d,

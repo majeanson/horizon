@@ -32,6 +32,9 @@ const CCB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benef
 const CGEB_AMOUNTS = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit/how-much/payment-amounts.html'
 const CGEB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit.html'
 const ITA_122_5 = 'https://laws-lois.justice.gc.ca/eng/acts/I-3.3/section-122.5.html'
+const QC_PARAMS_PDF = 'https://cdn-contenu.quebec.ca/cdn-contenu/adm/min/finances/publications-adm/parametres/AUTFR_RegimeImpot2026.pdf'
+const RQ_SOLIDARITY_RULE = 'https://www.revenuquebec.ca/fr/citoyens/declaration-de-revenus/produire-votre-declaration-de-revenus/comment-remplir-votre-declaration-de-revenus/aide-par-ligne/credit-dimpot-pour-solidarite/'
+const RQ_SENIOR = 'https://www.revenuquebec.ca/fr/citoyens/credits-dimpot/credit-dimpot-pour-soutien-aux-aines/montant-du-credit-dimpot-pour-soutien-aux-aines/'
 const FAMILY_ALLOWANCE = `${RQ}/en/citizens/children/family-allowance`
 const FAMILY_ALLOWANCE_TABLE = `${RQ}/en/citizens/children/amounts-family-allowance-payments-based-family-income`
 const LINES = `${CRA}/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses`
@@ -212,6 +215,21 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'childBenefits.familyAllowance.thresholdCouple': [60_000, FAMILY_ALLOWANCE],
   'childBenefits.familyAllowance.thresholdSingle': [44_000, FAMILY_ALLOWANCE],
   // The Canada Groceries and Essentials Benefit (the GST/HST credit renamed): the CRA's table for July 2026 to June 2027 and the Income Tax Act, s. 122.5(3.005).
+  // Québec's senior assistance credit (Revenu Québec, tax year 2025) and solidarity credit (Finance Québec, TABLEAU 4, July 2026 to June 2027).
+  'qcCredits.seniorAssistance.maxPerPerson': [2_000, RQ_SENIOR],
+  'qcCredits.seniorAssistance.minAge': [70, RQ_SENIOR],
+  'qcCredits.seniorAssistance.thresholdSingle': [27_835, RQ_SENIOR],
+  'qcCredits.seniorAssistance.thresholdCouple': [45_270, RQ_SENIOR],
+  'qcCredits.seniorAssistance.reductionRate': [0.054, RQ_SENIOR],
+  'qcCredits.solidarity.tvqBase': [363, QC_PARAMS_PDF],
+  'qcCredits.solidarity.tvqSpouse': [363, QC_PARAMS_PDF],
+  'qcCredits.solidarity.tvqAlone': [172, QC_PARAMS_PDF],
+  'qcCredits.solidarity.housingCouple': [906, QC_PARAMS_PDF],
+  'qcCredits.solidarity.housingSingle': [746, QC_PARAMS_PDF],
+  'qcCredits.solidarity.housingChild': [158, QC_PARAMS_PDF],
+  'qcCredits.solidarity.threshold': [43_195, QC_PARAMS_PDF],
+  'qcCredits.solidarity.rateWithHousing': [0.06, RQ_SOLIDARITY_RULE],
+  'qcCredits.solidarity.rateTvqOnly': [0.03, RQ_SOLIDARITY_RULE],
   'groceriesBenefit.adult': [445, CGEB_AMOUNTS],
   'groceriesBenefit.child': [234, CGEB_AMOUNTS],
   'groceriesBenefit.singleExtra': [234, CGEB_AMOUNTS],

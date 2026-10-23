@@ -148,6 +148,7 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
   const showRrq = some((r) => r.rrq)
   const showOas = some((r) => r.oas)
   const showGis = some((r) => r.gis)
+  const showCredits = some((r) => r.credits)
   const showNonReg = some((r) => r.draws.nonReg)
   const showRrsp = some((r) => r.draws.rrsp)
   const showTfsa = some((r) => r.draws.tfsa)
@@ -164,6 +165,7 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
             {showRrq && <th scope="col">{copy.colRrq}</th>}
             {showOas && <th scope="col">{copy.colOas}</th>}
             {showGis && <th scope="col">{copy.colGis}</th>}
+            {showCredits && <th scope="col">{copy.colCredits}</th>}
             <th scope="col">{copy.colDraw}</th>
             {showNonReg && <th scope="col">{copy.colNonReg}</th>}
             {showRrsp && <th scope="col">{copy.colRrsp}</th>}
@@ -188,6 +190,7 @@ function YearTable({ view, span, levers, copy }: { view: BridgeView; span: Bridg
               {showRrq && <td>{money(r.rrq)}</td>}
               {showOas && <td>{money(r.oas)}</td>}
               {showGis && <td>{money(r.gis)}</td>}
+              {showCredits && <td>{money(r.credits)}</td>}
               <td>{money(r.drawn)}</td>
               {showNonReg && <td>{money(r.draws.nonReg)}</td>}
               {showRrsp && <td>{money(r.draws.rrsp)}</td>}

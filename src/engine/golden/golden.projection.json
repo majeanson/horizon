@@ -4195,12 +4195,12 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 56179.24
+     "tfsa": 53818.56
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
@@ -4212,19 +4212,20 @@
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1241460.77
+     "tfsa": 1243873.97
     },
     "rrspLockedEnd": 0
    }
   },
   "household": {
-   "grossIncome": 188900.39,
+   "grossIncome": 188900.38,
    "tax": 14478.12,
    "spending": 174422.26,
    "shortfall": 0,
-   "netWorthEnd": 1241460.77,
+   "netWorthEnd": 1243873.97,
    "mortgagePayment": 0,
    "groceriesBenefit": 1360.99,
+   "solidarityCredit": 2360.67,
    "homeValueEnd": 0,
    "mortgageBalanceEnd": 0
   },
@@ -4247,12 +4248,12 @@
     "withdrawals": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 57406.4
+     "tfsa": 54827
     },
     "contributions": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 0.01
+     "tfsa": 0
     },
     "rrqContribution": 0,
     "payrollContribution": 0,
@@ -4264,19 +4265,20 @@
     "balancesEnd": {
      "nonReg": 0,
      "rrsp": 0,
-     "tfsa": 1238642.68
+     "tfsa": 1243801.26
     },
     "rrspLockedEnd": 0
    }
   },
   "household": {
-   "grossIncome": 192793.32,
+   "grossIncome": 192793.31,
    "tax": 14708.18,
    "spending": 178085.13,
    "shortfall": 0,
-   "netWorthEnd": 1238642.68,
+   "netWorthEnd": 1243801.26,
    "mortgagePayment": 0,
    "groceriesBenefit": 1529.79,
+   "solidarityCredit": 2579.39,
    "homeValueEnd": 0,
    "mortgageBalanceEnd": 0
   },

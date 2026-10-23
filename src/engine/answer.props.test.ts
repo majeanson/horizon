@@ -169,6 +169,9 @@ describe('asking is repeatable and harmless', { timeout: 300_000 }, () => {
       const base = ex(id)
       if (base.h.persons.length < 2) continue
       const flipped = ex(id)
+      // The sale of the home happens when the FIRST person reaches an age — keyed to the first person by design (lib/metamorphic.test.ts says the same) — so a sale is taken out of both runs:
+      // it is the one place the order of the household may move the answer, and where it falls inside a one-year step depends on the money around it.
+      for (const x of [base, flipped]) if (x.h.home) x.h.home = { ...x.h.home, sale: null }
       flipped.h.persons.reverse()
       expect(earliest(flipped.h, flipped.a), id).toBe(earliest(base.h, base.a))
     }

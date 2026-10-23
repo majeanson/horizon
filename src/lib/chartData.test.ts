@@ -86,7 +86,8 @@ describe('the detail view says what the rows say', () => {
     const a = sourceBars(rows, first.id, scale)
     const b = second ? sourceBars(rows, second.id, scale) : null
     rows.forEach((_, i) => {
-      for (const k of SOURCE_SEGMENTS) expect(a[i][k] + (b ? b[i][k] : 0)).toBeCloseTo(all[i][k], 6)
+      // The credits are the household's, not a person's: they are in the household's bars only.
+      for (const k of SOURCE_SEGMENTS) if (k !== 'credits') expect(a[i][k] + (b ? b[i][k] : 0)).toBeCloseTo(all[i][k], 6)
     })
   })
 
@@ -103,7 +104,7 @@ describe('the detail view says what the rows say', () => {
 })
 
 describe('a stretch of years with no bar for one person', () => {
-  const bar = (x: number, nest = 0) => ({ x, work: 0, db: 0, rrq: 0, oas: 0, nest })
+  const bar = (x: number, nest = 0) => ({ x, work: 0, db: 0, rrq: 0, oas: 0, credits: 0, nest })
   it('is found between two years that have bars, two years or more', () => {
     const bars = [bar(2050, 10), bar(2051), bar(2052), bar(2053), bar(2054, 5)]
     expect(idleStretch(bars)).toEqual({ from: 2051, to: 2053 })

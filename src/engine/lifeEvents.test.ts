@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD } from './golden/household.fixture.ts'
 import { childAdd, childStage, childStepDown, costBandOf, DEPENDENT_AGE, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor, workingBudget } from './lifeEvents.ts'
+import { benefitsOfYear } from './benefitsOf.ts'
 import { project } from './projection.ts'
 import type { Flow, Household, YearRow } from './types.ts'
 
@@ -112,7 +113,7 @@ describe('the projection — dated flows', () => {
       const putAway = people(r).reduce((s, p) => s + p.rrqContribution + p.payrollContribution + p.pensionContribution + p.contributions.nonReg + p.contributions.rrsp + p.contributions.tfsa, 0)
       expect(received - r.household.tax - putAway, `${r.year}`).toBeCloseTo(r.household.spending - r.household.shortfall, 1)
       const sum = people(r).reduce((s, p) => s + p.employment + p.rrq + p.oas + p.allowance + p.gis + p.db + (p.otherIncome ?? 0) + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
-      expect(sum, `${r.year} gross`).toBeCloseTo(r.household.grossIncome, 1)
+      expect(sum + benefitsOfYear(r.household), `${r.year} gross`).toBeCloseTo(r.household.grossIncome, 1)
     }
   })
 })

@@ -409,7 +409,7 @@ export const FR = {
       sourcesTitle: 'D’où vient l’argent, année par année',
       sourcesHint: 'Chaque barre est une année, par source de revenu.',
       needHint: 'La ligne pointillée est ce qu’il faut (dépenses + impôt) : les barres qui l’atteignent couvrent l’année.',
-      source: { work: 'Travail', workOther: 'Travail et autres revenus', db: 'Rente d’employeur', rrq: 'RRQ', oas: 'PSV et suppléments', nest: 'Tiré du nid' },
+      source: { work: 'Travail', workOther: 'Travail et autres revenus', db: 'Rente d’employeur', rrq: 'RRQ', oas: 'PSV et suppléments', credits: 'Crédits et allocations', nest: 'Tiré du nid' },
       need: 'Dépenses + impôt',
       balancesTitle: 'Ce que contiennent les comptes',
       balancesHint: 'Les soldes de fin d’année. Ce qui reste d’une année est épargné : CELI d’abord, puis non enregistré.',

@@ -4,6 +4,7 @@ import { allowanceMonthly, gisCategory, gisCountedIncome, gisMonthly, gisWithAll
 import { homeYear, initialHome, type HomeState } from './home.ts'
 import { childBenefitsFor } from './childBenefits.ts'
 import { groceriesBenefitFor } from './groceriesBenefit.ts'
+import { qcCreditsFor } from './qcCredits.ts'
 import { leaveBenefit, leaveOf, leaveRulesOf } from './parentalLeave.ts'
 import { childAdd, childCost, flowExpenses, flowIncome, flowWindfalls, partTimePay, retiredDriftFactor, workingBudget } from './lifeEvents.ts'
 import { memberContribution } from './memberContribution.ts'
@@ -224,6 +225,8 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
   let survivorOf: Survivorship | null = null
   // The family's net income of the year before: the benefits for a child follow the last return filed. The first year reads today's earnings.
   let lastIncome = h.persons.reduce((sum, p) => sum + p.salaryToday, 0)
+  // How many were alive at the end of the year before: the credits read the household as that 31 December left it.
+  let aliveLastYear = h.persons.length
   for (let year = a.today.year; year <= endYear; year++) {
     if (alive.length === 2) {
       const gone = alive.findIndex((r) => year > r.deathYear)
@@ -250,13 +253,34 @@ export function project(h: Household, a: Assumptions, scenario: Scenario = {}): 
     if (lump > 0) states = states.map((s, i) => (i === 0 ? { ...s, nonReg: { balance: s.nonReg.balance + lump, acb: s.nonReg.acb + lump } } : s))
     const kidsBenefit = childBenefitsFor(h, year, lastIncome, alive.length === 1, paramsOf(year).childBenefits)
     const groceries = groceriesBenefitFor(h, year, lastIncome, alive.length === 1, paramsOf(year).groceriesBenefit)
-    const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, housing, returnsOf(year), rrqRules, qppIndex, survivorOf, kidsBenefit, groceries)
+    const P = paramsOf(year)
+    const qc = qcCreditsFor(
+      { year, births: alive.map((r) => r.p.birth.year), aliveLastYear, lastYearIncome: lastIncome, children: h.kidsEffects?.benefits ? (h.children ?? []) : [], livesAlone: h.livesAlone !== false },
+      P.qcCredits,
+      P.childBenefits.familyAllowance.untilAge,
+    )
+    const benefits: YearBenefits = { child: kidsBenefit, groceries, seniorAssistance: qc.seniorAssistance, solidarity: qc.solidarity }
+    const out = simulateYear(year, survivorOf ? { ...h, livesAlone: true } : h, a, alive, states, paramsOf, housing, returnsOf(year), rrqRules, qppIndex, survivorOf, benefits)
     rows.push(out.row)
     states = out.next
+    aliveLastYear = alive.length
     lastIncome = Object.values(out.row.persons).reduce((sum, t) => sum + t.netIncome, 0)
   }
   return rows
 }
+
+/**
+ * The money the State pays the household in a year, apart from its pensions: the child benefits (CCB, Allocation famille), the Canada Groceries and Essentials Benefit, and Québec's senior assistance
+ * and solidarity credits. All tax-free, all the HOUSEHOLD's: they ride in the first person's cash so that the books balance, but never as that person's work or dated income.
+ */
+interface YearBenefits {
+  child: number
+  groceries: number
+  seniorAssistance: number
+  solidarity: number
+}
+const NO_BENEFITS: YearBenefits = { child: 0, groceries: 0, seniorAssistance: 0, solidarity: 0 }
+const benefitsTotal = (b: YearBenefits): number => b.child + b.groceries + b.seniorAssistance + b.solidarity
 
 /** What the house adds to a year: the mortgage paid, anything a dearer replacement home costs, and where the house ends the year. */
 interface Housing {
@@ -330,8 +354,7 @@ function simulateYear(
   rrqRules: RrqRules,
   qppIndex: (fromYear: number, toYear: number) => number,
   survivorOf: Survivorship | null,
-  kidsBenefit = 0,
-  groceries = 0,
+  benefits: YearBenefits = NO_BENEFITS,
 ): { row: YearRow; next: PersonState[] } {
   const P = paramsOf(year)
   const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, livesAlone: h.livesAlone }
@@ -421,7 +444,7 @@ function simulateYear(
     const tfsaC = working ? Math.min(acct.tfsa.annualContribution * inflate, states[i].tfsaRoom) : 0
     const nonRegC = working ? acct.nonReg.annualContribution * inflate : 0
 
-    return { age, employment, planPay: salaryAt(r.p, year, a) * (worked - offShare), rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate + leavePay, otherFree: dated[i].free * inflate + (i === 0 ? kidsBenefit + groceries : 0) }
+    return { age, employment, planPay: salaryAt(r.p, year, a) * (worked - offShare), rrq: roundTo(rrq + survivorRrq + deathBenefit, 0.01), survivorRrq, deathBenefit, oas: oasY.pension, oasMonths: oasY.months, db, rrifMin: Math.min(rrifMin, maxWithdraw(states[i].rrsp, returns.rrsp)), rrqC: { base: rrqC.base, enhanced: rrqC.additionalFirst + rrqC.additionalSecond, total: rrqC.total }, payrollC, rppC, rrspC, employerC, lockedJan1, freeAvail, lockedAvail, tfsaC, nonRegC, other: dated[i].taxable * inflate + leavePay, otherFree: dated[i].free * inflate + benefitsTotal(benefits) / people.length }
   })
 
   const retiredAll = people.every((r) => year >= r.leaving.year)
@@ -851,8 +874,8 @@ function simulateYear(
       allowance: finalAllowance[i],
       gis: finalGis[i],
       db: fixed[i].db,
-      // The Canada Groceries and Essentials Benefit rides in person 0's `otherFree` so the cash and the gross income take it, but it is the HOUSEHOLD's (`household.groceriesBenefit`), never a person's work or dated income.
-      ...(fixed[i].other + fixed[i].otherFree - (i === 0 ? groceries : 0) > 0.005 ? { otherIncome: roundTo(fixed[i].other + fixed[i].otherFree - (i === 0 ? groceries : 0), 0.01) } : {}),
+      // The State's payments are the HOUSEHOLD's (`household.childBenefit` …), never a person's work or dated income: they ride in the people's `otherFree` in equal shares (so that who is listed first changes nothing) and come out of it here.
+      ...(fixed[i].other + fixed[i].otherFree - benefitsTotal(benefits) / people.length > 0.005 ? { otherIncome: roundTo(fixed[i].other + fixed[i].otherFree - benefitsTotal(benefits) / people.length, 0.01) } : {}),
       rrifMinimum: fixed[i].rrifMin,
       withdrawals: { nonReg: roundTo(draw.nonReg[i], 0.01), rrsp: roundTo(rrspOut, 0.01), tfsa: roundTo(draw.tfsa[i], 0.01) },
       contributions: { nonReg: roundTo(nonRegIn, 0.01), rrsp: roundTo(fixed[i].rrspC, 0.01), tfsa: roundTo(tfsaIn, 0.01) },
@@ -879,8 +902,10 @@ function simulateYear(
       shortfall,
       netWorthEnd: roundTo(sum(next.map((s) => s.rrsp + s.tfsa + s.nonReg.balance)), 0.01),
       mortgagePayment: roundTo(housing.payment, 0.01),
-      ...(kidsBenefit > 0 ? { childBenefit: roundTo(kidsBenefit, 0.01) } : {}),
-      ...(groceries > 0 ? { groceriesBenefit: roundTo(groceries, 0.01) } : {}),
+      ...(benefits.child > 0 ? { childBenefit: roundTo(benefits.child, 0.01) } : {}),
+      ...(benefits.groceries > 0 ? { groceriesBenefit: roundTo(benefits.groceries, 0.01) } : {}),
+      ...(benefits.seniorAssistance > 0 ? { seniorAssistance: roundTo(benefits.seniorAssistance, 0.01) } : {}),
+      ...(benefits.solidarity > 0 ? { solidarityCredit: roundTo(benefits.solidarity, 0.01) } : {}),
       ...(kidsCost > 0.005 ? { childCost: roundTo(kidsCost, 0.01) } : {}),
       ...(eventsCost > 0.005 ? { eventCost: roundTo(eventsCost, 0.01) } : {}),
       homeValueEnd: roundTo(housing.valueEnd, 0.01),

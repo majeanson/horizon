@@ -25,8 +25,8 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //             children (one at home, one due), the state's benefits, a parental leave and a mortgage — what the children cost, and what
 //             the benefits give back
 //
-//   couple62  a couple retiring at 62 on 150 000 $ and a paid-off home, spending 48 000 $: the money runs out three years after the pensions
-//             start; working to 64 or spending less fixes it, taking the QPP at 62 only pushes it back (modelled on a public planner demo)
+//   couple62  a couple retiring at 62 on 150 000 $ and a paid-off home, spending 50 000 $: the money runs out two years after the pensions
+//             start (48 000 $ until Québec's credits were counted: they carry a plan this modest); working to 64 or spending less fixes it, taking the QPP at 62 only pushes it back (modelled on a public planner demo)
 //
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs
 // out, the newcomer's OAS is the share her residence earns…) and `lib/fixtureSanity.test.ts` to what life allows.
@@ -263,7 +263,8 @@ const couple62: Household = {
   ],
   // Owned outright: the home is a safety net, not liquid money.
   home: { value: 450_000, mortgage: { balance: 0, rate: 0.05, monthlyPayment: 0 }, sale: null },
-  spending: { workingToday: 48_000, retiredToday: 48_000 },
+  // 50 000 $: with Québec's senior assistance and solidarity credits and the groceries benefit counted, the 48 000 $ of the original demo holds, and this example exists to show a plan that runs short.
+  spending: { workingToday: 50_000, retiredToday: 50_000 },
 }
 
 const downsizer: Household = {
@@ -291,7 +292,8 @@ const downsizer: Household = {
   // The family house is most of what they own. Sold when Nadia is 58 (2029), a 360 000 $ home replaces it and the rest of the
   // equity goes to their savings: that is what lets them stop at 58 — keep it for life and the accounts alone run out in 2042.
   home: { value: 880_000, mortgage: { balance: 70_000, rate: 0.045, monthlyPayment: 1_300 }, sale: { age: 58, replacementCost: 360_000 } },
-  spending: { workingToday: 92_000, retiredToday: 80_000 },
+  // 93 000 $ / 81 000 $ (92 000 $ / 80 000 $ before Québec's credits were counted: they let her stop a year sooner, and this example is about the sale being what makes 58 work).
+  spending: { workingToday: 93_000, retiredToday: 81_000 },
 }
 
 /** The planner's life events, each one switchable so the test (and a reader) can see what it is worth. */

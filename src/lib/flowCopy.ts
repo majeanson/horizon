@@ -50,7 +50,7 @@ const FR: FlowWords = {
     goesOut: 'Ce qui sort',
     total: (amount, perMonth) => `${amount} ${perMonth ? 'par mois' : 'par année'}`,
     none: 'rien cette année',
-    source: { work: 'Salaire et autres revenus', db: 'Rente d’employeur', rrq: 'RRQ', oas: 'PSV et SRG', nest: 'Retiré de l’épargne' },
+    source: { work: 'Salaire et autres revenus', db: 'Rente d’employeur', rrq: 'RRQ', oas: 'PSV et SRG', credits: 'Crédits et allocations', nest: 'Retiré de l’épargne' },
     unmet: (amount, perMonth) => `Les dépenses ne sont pas toutes couvertes : il manque ${amount} ${perMonth ? 'par mois' : 'par année'}.`,
   },
 }
@@ -79,7 +79,7 @@ const EN: FlowWords = {
     goesOut: 'What goes out',
     total: (amount, perMonth) => `${amount} ${perMonth ? 'a month' : 'a year'}`,
     none: 'nothing this year',
-    source: { work: 'Pay and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS and GIS', nest: 'Drawn from savings' },
+    source: { work: 'Pay and other income', db: 'Employer pension', rrq: 'QPP', oas: 'OAS and GIS', credits: 'Credits and benefits', nest: 'Drawn from savings' },
     unmet: (amount, perMonth) => `Spending is not all covered: ${amount} ${perMonth ? 'a month' : 'a year'} is missing.`,
   },
 }
