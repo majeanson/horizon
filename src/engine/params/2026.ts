@@ -135,6 +135,24 @@ const RQ_FAMILY_ALLOWANCE = src(
     note: '2026: maximum 3 068 $ and minimum 1 221 $ per child; a single-parent family adds 1 077 $ (at the maximum) and 430 $ (at the minimum); indexed 2,05 % on 2026-01-01. « Two-parent family: 60 000 $ or less 3 068 $, 107 000 $ or more 1 221 $ — single-parent family: 44 000 $ or less 4 145 $, 107 000 $ or more 1 651 $ » (the page prints the thresholds to the nearest 1 000 $). Family income is the one of the return filed for the previous year.',
   },
 )
+// The GST/HST credit, renamed the Canada Groceries and Essentials Benefit in July 2026 (read 2026-10-23). The Act fixes the dollar amounts for the payments of July 2026 to April 2031.
+const ITA_122_5 = src('https://laws-lois.justice.gc.ca/eng/acts/I-3.3/section-122.5.html', 'Income Tax Act, section 122.5', {
+  retrieved: '2026-10-23',
+  note: 'Subsection (3.005), « Additional deemed payment — July 2026 to April 2031 »: A is the total of « (a) $445, (b) $445 for the qualified relation, (c) … $445 [a single parent, in respect of a qualified dependant], (d) $234 times the number of qualified dependants [other than the one in (c)], (e) … $234 [no qualified relation and one or more qualified dependants], and (f) … the lesser of $234 and 2% of the amount, if any, by which the individual’s income … exceeds $11,564 », less B, « 5% of the amount, if any, by which the individual’s adjusted income … exceeds $46,432 »; a payment is 1/4 of that, in July, October, January and April, on the income of the preceding taxation year (s. (4.5)). Amounts indexed for a taxation year after 2026 (s. 117.1(1)(m.1)). Act current to 2026-09-30.',
+})
+const CRA_CGEB_AMOUNTS = src(
+  'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit/how-much/payment-amounts.html',
+  'Payment amounts - Canada Groceries and Essentials Benefit - Canada.ca',
+  {
+    retrieved: '2026-10-23',
+    note: 'Row « 2025 (July 2026 - June 2027) »: eligible individual $445 · eligible spouse $445 · each eligible child under 19 $234 · first eligible child in a single parent family $445 · additional amount for single individual $234 · phase-in threshold $11,564 · phase-out threshold $46,432 (2024 base: 349 / 349 / 184 / 349 / 184 / 11,337 / 45,521). The payments chart on the same site (…/how-much/payments-chart.html) prints the worked results: single, no child, $50,000 → $500.60; couple, no child, $48,000 → $811.60; single, $15,000 → $513.72.',
+  },
+)
+const CRA_CGEB = src(
+  'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit.html',
+  'Canada Groceries and Essentials Benefit (CGEB) - Canada.ca',
+  { retrieved: '2026-10-23', note: '« In July 2026, there was a 25% increase to the benefit amount which will remain for 5 years from 2026 to 2031. » The payments of the five years start in July 2026, 2027, 2028, 2029 and 2030 (the Act’s last month is April 2031).' },
+)
 const RQ_FAMILY_ALLOWANCE_TABLE = src(
   'https://www.retraitequebec.gouv.qc.ca/en/citizens/children/amounts-family-allowance-payments-based-family-income',
   'Amounts of Family Allowance payments based on family income - Retraite Québec',
@@ -415,6 +433,19 @@ export const P2026 = {
       thresholdCouple: c(60_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Two-parent family: $60 000 or less » — the maximum is paid up to this family income (the page prints it to the nearest 1 000 $; the exact figure, a few hundred dollars higher, moves a payment by under 16 $ a year).' }, 100),
       thresholdSingle: c(44_000, 'cpi', { ...RQ_FAMILY_ALLOWANCE, note: '« Single-parent family: $44 000 or less » — the maximum plus the supplement is paid up to this family income (printed to the nearest 1 000 $).' }, 100),
     },
+  },
+
+  groceriesBenefit: {
+    adult: c(445, 'cpi', { ...CRA_CGEB_AMOUNTS, note: CRA_CGEB_AMOUNTS.note + ' Act: s. 122.5(3.005)(a), (b), (c).' }, 1),
+    child: c(234, 'cpi', { ...CRA_CGEB_AMOUNTS, note: CRA_CGEB_AMOUNTS.note + ' Act: s. 122.5(3.005)(d).' }, 1),
+    singleExtra: c(234, 'cpi', { ...CRA_CGEB_AMOUNTS, note: CRA_CGEB_AMOUNTS.note + ' Act: s. 122.5(3.005)(e) (a single parent) and (f) (a single person with no child, phased in).' }, 1),
+    phaseInThreshold: c(11_564, 'cpi', CRA_CGEB_AMOUNTS, 1),
+    phaseOutThreshold: c(46_432, 'cpi', CRA_CGEB_AMOUNTS, 1),
+    phaseInRate: c(0.02, 'fixed', { ...ITA_122_5, note: '« 2% of the amount, if any, by which the individual’s income for the taxation year exceeds $11,564 » (s. 122.5(3.005)(f)); reproduces the CRA chart: single, $15,000 → 445 + 0,02 × (15 000 − 11 564) = $513.72.' }),
+    phaseOutRate: c(0.05, 'fixed', { ...ITA_122_5, note: '« 5% of the amount, if any, by which the individual’s adjusted income … exceeds $46,432 » (s. 122.5(3.005), B); reproduces the CRA chart: couple, no child, $48,000 → 890 − 0,05 × (48 000 − 46 432) = $811.60.' }),
+    childUntilAge: c(19, 'fixed', { ...ITA_122_5, note: '« qualified dependant … is under the age of 19 years » (s. 122.5(1)); the CRA page: « $234 for each eligible child under the age of 19 ».' }),
+    bumpShare: c(0.25, 'fixed', CRA_CGEB),
+    bumpLastYear: c(2030, 'fixed', { ...ITA_122_5, note: 'Subsection (4.5): the months specified run from « July 2026 » to « April 2031 »; the last payment year therefore starts in July 2030. After it, subsection (3) applies again, at its own (25 % lower) dollar amounts.' }),
   },
 
   accounts: {

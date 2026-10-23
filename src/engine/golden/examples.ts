@@ -25,7 +25,7 @@ import { GOLDEN_ASSUMPTIONS, GOLDEN_HOUSEHOLD, GOLDEN_TODAY, history } from './h
 //             children (one at home, one due), the state's benefits, a parental leave and a mortgage — what the children cost, and what
 //             the benefits give back
 //
-//   couple62  a couple retiring at 62 on 150 000 $ and a paid-off home, spending 48 000 $: the money runs out two years after the pensions
+//   couple62  a couple retiring at 62 on 150 000 $ and a paid-off home, spending 48 000 $: the money runs out three years after the pensions
 //             start; working to 64 or spending less fixes it, taking the QPP at 62 only pushes it back (modelled on a public planner demo)
 //
 // `engine/golden/examples.test.ts` holds each one to what its story says (the modest one gets a GIS, the one behind runs

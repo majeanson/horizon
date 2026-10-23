@@ -35,7 +35,7 @@ export function metricValue(row: YearRow, metric: Metric): number {
   if (metric === 'netWorth') return row.household.netWorthEnd
   let sum = 0
   for (const p of Object.values(row.persons)) sum += p.employment + (p.otherIncome ?? 0) + p.db + p.rrq + p.oas + p.allowance + p.gis
-  return sum
+  return sum + (row.household.groceriesBenefit ?? 0)
 }
 
 /** The factor that turns a dollar of `year` into a dollar of `todayYear`. */
@@ -148,6 +148,9 @@ export function sourceBars(rows: readonly YearRow[], who: string | null, s: Scal
       oas += p.oas + p.allowance + p.gis
       nest += p.withdrawals.rrsp + p.withdrawals.tfsa + p.withdrawals.nonReg
     }
+    // The Canada Groceries and Essentials Benefit is the household's: it rides in the « PSV et suppléments » bar (the other income-tested federal transfer), in the household's view and — so that the two
+    // people's bars still add up to it — in the first person's, as the child benefits do.
+    if (who === null || who === Object.keys(row.persons)[0]) oas += row.household.groceriesBenefit ?? 0
     return { x: row.year, need: who === null ? (row.household.spending + row.household.tax) / k : 0, work: work / k, db: db / k, rrq: rrq / k, oas: oas / k, nest: nest / k }
   })
 }

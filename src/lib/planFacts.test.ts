@@ -12,18 +12,18 @@ const nowOf = (id: ExampleId) => EXAMPLES[id].assumptions.today
 const PINNED: Record<ExampleId, ['now' | 'at', number, boolean, number | null]> = {
   golden: ['at', 60, true, null],
   average: ['at', 60, true, null],
-  modest: ['at', 64, true, null],
+  modest: ['at', 63, true, null],
   rich: ['at', 57, true, null],
-  behind: ['at', 70, false, 2036],
+  behind: ['at', 69, false, 2036],
   retired: ['now', 68, true, null],
-  newcomer: ['at', 63, true, null],
+  newcomer: ['at', 62, true, null],
   heir: ['now', 27, true, null],
   downsizer: ['at', 58, true, null],
   planner: ['at', 57, true, null],
-  family: ['at', 60, true, null],
+  family: ['at', 59, true, null],
   melter: ['now', 60, true, null],
-  couple62: ['at', 64, false, 2031],
-  early: ['at', 46, true, null],
+  couple62: ['at', 64, false, 2032],
+  early: ['at', 45, true, null],
 }
 
 describe('the facts of the fourteen examples', { timeout: 300_000 }, () => {

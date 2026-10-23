@@ -146,7 +146,10 @@ describe('more spent can only hurt; more saved can only help', { timeout: 300_00
         const out: string[] = []
         base.forEach((r, i) => {
           if (rich[i].household.netWorthEnd < r.household.netWorthEnd - 1 - i) out.push(`${r.year}: net worth ${rich[i].household.netWorthEnd.toFixed(0)} with more, ${r.household.netWorthEnd.toFixed(0)} with less`)
-          if (rich[i].household.shortfall > r.household.shortfall + 0.01) out.push(`${r.year}: a shortfall of ${rich[i].household.shortfall.toFixed(2)} appears with more money`)
+          // More money can add a shortfall in one way only: it raises next year's income and an income-tested benefit (the Canada Groceries and Essentials Benefit) pays less. The shortfall may then
+          // grow by at most what the benefit lost, never more (a plan whose money is gone anyway shows it, down to the cent).
+          const lostBenefit = Math.max(0, (r.household.groceriesBenefit ?? 0) - (rich[i].household.groceriesBenefit ?? 0))
+          if (rich[i].household.shortfall > r.household.shortfall + 0.01 + lostBenefit) out.push(`${r.year}: a shortfall of ${rich[i].household.shortfall.toFixed(2)} appears with more money`)
         })
         return out.slice(0, 6)
       }),

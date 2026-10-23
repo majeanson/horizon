@@ -105,7 +105,7 @@ describe('a household that lives on the OAS alone', () => {
       expect(p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, `${r.year}`).toBe(0)
       expect(p.oas, `${r.year}`).toBeGreaterThan(0)
       expect(p.gis, `${r.year}: a pensioner with no other income gets the GIS`).toBeGreaterThan(0)
-      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(p.oas + p.gis, 2)
+      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(p.oas + p.gis + (r.household.groceriesBenefit ?? 0), 2)
     }
   })
 
@@ -113,7 +113,7 @@ describe('a household that lives on the OAS alone', () => {
     for (const r of rows) {
       const p = at(r)
       expect(p.netIncome, `${r.year}: the GIS never enters the net income`).toBeCloseTo(p.oas, 2)
-      const afterTax = p.oas + p.gis - r.household.tax
+      const afterTax = p.oas + p.gis + (r.household.groceriesBenefit ?? 0) - r.household.tax
       expect(r.household.shortfall, `${r.year}`).toBeCloseTo(Math.max(0, r.household.spending - afterTax), 1)
     }
   })
@@ -240,7 +240,7 @@ describe('a household with a pension in pay and no work at all', () => {
       expect(p.payrollContribution, `${r.year}`).toBe(0)
       expect(p.rrqContribution, `${r.year}`).toBe(0)
       expect(p.contributions.rrsp, `${r.year}: no RRSP deduction without pay (what is saved is only the surplus, in a TFSA or non-registered account)`).toBe(0)
-      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 2)
+      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa + (r.household.groceriesBenefit ?? 0), 2)
     }
   })
 
@@ -325,7 +325,7 @@ describe('over many households: whoever has retired earns nothing and every acco
       for (const row of project(h, A, {})) {
         const ps = Object.values(row.persons)
         const gross = ps.reduce((s, p) => s + p.employment + p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
-        expect(row.household.grossIncome, `${label} ${row.year}`).toBeCloseTo(gross, 1)
+        expect(row.household.grossIncome, `${label} ${row.year}`).toBeCloseTo(gross + (row.household.groceriesBenefit ?? 0), 1)
         for (const p of ps) {
           for (const k of ['nonReg', 'rrsp', 'tfsa'] as const) {
             expect(p.balancesEnd[k], `${label} ${row.year} ${k}`).toBeGreaterThanOrEqual(0)

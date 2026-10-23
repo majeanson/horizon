@@ -43,7 +43,7 @@ describe('projection — the books always balance', () => {
   it('gross income is exactly the sum of what each person received, withdrawals included', () => {
     for (const r of rows) {
       const sum = people(r).reduce((s, p) => s + p.employment + p.rrq + p.oas + p.allowance + p.gis + p.db + p.withdrawals.nonReg + p.withdrawals.rrsp + p.withdrawals.tfsa, 0)
-      expect(sum, `${r.year}`).toBeCloseTo(r.household.grossIncome, 1)
+      expect(sum + (r.household.groceriesBenefit ?? 0), `${r.year}`).toBeCloseTo(r.household.grossIncome, 1)
     }
   })
 
@@ -172,7 +172,7 @@ describe('projection — a household living on pensions alone, checked against t
       const tax = householdTax([{ age: r.persons.self!.age, employment: 0, rrq: 0, oas: 0, db, registered: 0, capitalGains: 0, rrqBase: 0, rrqEnhanced: 0, payrollPremiums: 0, rrspDeduction: 0 }], { federal: P.federal, quebec: P.quebec, oas: P.oas })
       expect(r.household.tax).toBeGreaterThan(0)
       expect(r.household.tax, `${r.year}`).toBeCloseTo(tax.total, 1)
-      expect(r.household.shortfall, `${r.year}`).toBeCloseTo(Math.max(0, r.household.spending - (db + r.persons.self!.gis - r.household.tax)), 1)
+      expect(r.household.shortfall, `${r.year}`).toBeCloseTo(Math.max(0, r.household.spending - (db + r.persons.self!.gis + (r.household.groceriesBenefit ?? 0) - r.household.tax)), 1)
     }
   })
 

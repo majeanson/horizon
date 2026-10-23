@@ -94,7 +94,7 @@ describe('the Allowance in the projection', () => {
   it('the books balance with it: everything received less tax and spending is what was saved or what was short', () => {
     for (const r of rows.slice(0, 6)) {
       const gross = Object.values(r.persons).reduce((s, p) => s + p!.employment + p!.rrq + p!.oas + p!.allowance + p!.gis + p!.db + p!.withdrawals.nonReg + p!.withdrawals.rrsp + p!.withdrawals.tfsa, 0)
-      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(gross, 1)
+      expect(r.household.grossIncome, `${r.year}`).toBeCloseTo(gross + (r.household.groceriesBenefit ?? 0), 1)
     }
   })
 })

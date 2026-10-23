@@ -276,6 +276,31 @@ export interface YearParams {
     }
   }
 
+  /**
+   * The Canada Groceries and Essentials Benefit (engine/groceriesBenefit.ts) — the GST/HST credit under its new name from July 2026 — Canada Revenue Agency and the Income Tax Act, s. 122.5.
+   * The year is the one the payments START in (the July 2026 to June 2027 period is « 2026 »). From July 2026 to April 2031 the Act sets the dollar amounts of subsection (3.005), 25 % above
+   * what subsection (3) gave before: `bumpShare` is that increase, and `bumpLastYear` the last payment year it covers.
+   */
+  groceriesBenefit: {
+    /** Paid to an adult, to their spouse or common-law partner, and — for a single parent — in respect of the first child (« $445 » three times in the Act). */
+    adult: Cited
+    /** For each child under `childUntilAge`; and, for a single parent, once more. */
+    child: Cited
+    /** The extra a single person without a child can get, phased in. */
+    singleExtra: Cited
+    /** The income above which the single person's extra starts to build up, and the adjusted family net income above which the whole benefit is reduced. */
+    phaseInThreshold: Cited
+    phaseOutThreshold: Cited
+    /** The share of the income over `phaseInThreshold` added to the single person's extra (« 2% »), and the share of the adjusted family net income over `phaseOutThreshold` taken off (« 5% »). */
+    phaseInRate: Cited
+    phaseOutRate: Cited
+    /** A child counts while under this age (« is under the age of 19 years »). */
+    childUntilAge: Cited
+    /** The 25 % increase, and the last payment year (the one that starts in July) it is written into the Act for: payments run to April 2031, so the last such year starts in 2030. */
+    bumpShare: Cited
+    bumpLastYear: Cited
+  }
+
   /** Registered accounts — Canada Revenue Agency. */
   accounts: {
     rrspLimit: Cited

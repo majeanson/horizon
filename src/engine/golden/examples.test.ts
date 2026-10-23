@@ -232,10 +232,10 @@ describe('each story', () => {
     const earliest = (events: Partial<Parameters<typeof familyHousehold>[0]>) =>
       retireAt(familyHousehold({ kids: true, benefits: true, exclusion: true, ...events }), assumptions, { stopAtFirstOk: true }).earliestOk!
     const all = earliest({})
-    expect(all).toBe(60)
-    // two children: the cost of raising them, net of what the state pays — without them, two years sooner
+    expect(all).toBe(59)
+    // two children: the cost of raising them, net of what the state pays (the Canada Child Benefit, Allocation famille and the groceries benefit) — without them, a year sooner
     expect(earliest({ kids: false, benefits: false, exclusion: false })).toBe(58)
-    // the Canada Child Benefit and Allocation famille: without them, a year later
+    // the state's benefits for the children: without them, two years later
     expect(earliest({ benefits: false })).toBe(61)
     const worth = (events: Partial<Parameters<typeof familyHousehold>[0]>) => planGlance(familyHousehold({ kids: true, benefits: true, exclusion: true, ...events }), assumptions).netWorthEnd
     expect(worth({})).toBeGreaterThan(worth({ benefits: false }) + 100_000)

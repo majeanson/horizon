@@ -29,6 +29,9 @@ const OGP = 'https://ouvert.canada.ca/data/dataset/dfa4daf1-669e-4514-82cd-982f2
 const ESDC_2023Q1 = 'https://www.canada.ca/fr/emploi-developpement-social/programmes/pensions/pension/statistiques/rapport-trimestriel/2023-trimestriel-janvier-mars.html'
 const CRA = 'https://www.canada.ca/en/revenue-agency/services/tax/individuals'
 const CCB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/how-much.html'
+const CGEB_AMOUNTS = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit/how-much/payment-amounts.html'
+const CGEB = 'https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit.html'
+const ITA_122_5 = 'https://laws-lois.justice.gc.ca/eng/acts/I-3.3/section-122.5.html'
 const FAMILY_ALLOWANCE = `${RQ}/en/citizens/children/family-allowance`
 const FAMILY_ALLOWANCE_TABLE = `${RQ}/en/citizens/children/amounts-family-allowance-payments-based-family-income`
 const LINES = `${CRA}/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses`
@@ -208,6 +211,17 @@ const EXPECTED: Record<string, readonly [unknown, string]> = {
   'childBenefits.familyAllowance.reductionRate': [0.04, FAMILY_ALLOWANCE_TABLE],
   'childBenefits.familyAllowance.thresholdCouple': [60_000, FAMILY_ALLOWANCE],
   'childBenefits.familyAllowance.thresholdSingle': [44_000, FAMILY_ALLOWANCE],
+  // The Canada Groceries and Essentials Benefit (the GST/HST credit renamed): the CRA's table for July 2026 to June 2027 and the Income Tax Act, s. 122.5(3.005).
+  'groceriesBenefit.adult': [445, CGEB_AMOUNTS],
+  'groceriesBenefit.child': [234, CGEB_AMOUNTS],
+  'groceriesBenefit.singleExtra': [234, CGEB_AMOUNTS],
+  'groceriesBenefit.phaseInThreshold': [11_564, CGEB_AMOUNTS],
+  'groceriesBenefit.phaseOutThreshold': [46_432, CGEB_AMOUNTS],
+  'groceriesBenefit.phaseInRate': [0.02, ITA_122_5],
+  'groceriesBenefit.phaseOutRate': [0.05, ITA_122_5],
+  'groceriesBenefit.childUntilAge': [19, ITA_122_5],
+  'groceriesBenefit.bumpShare': [0.25, CGEB],
+  'groceriesBenefit.bumpLastYear': [2030, ITA_122_5],
 
   // ── Registered accounts ─────────────────────────────────────────────────────────────────────
   'accounts.rrspLimit': [33_810, 'https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html'],
