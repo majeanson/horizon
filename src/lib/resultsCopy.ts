@@ -44,7 +44,7 @@ const FR_RESULTS = {
   /** Over the year-by-year table: the average rate of the first year without a salary against the cost of one more REER dollar. The rates are passed in, never typed here. */
   rates: {
     line: (yearAge: string, average: string, marginal: string, couple: boolean) =>
-      `${yearAge}, première année sans salaire : le ménage paie en moyenne ${average} de son revenu en impôt, mais un dollar de plus retiré du REER en coûterait ${marginal} (impôt, récupération de la PSV et SRG perdu)${couple ? ', compté pour la personne dont le revenu est le plus bas, celle qui retire en premier' : ''}.`,
+      `${yearAge}, première année sans salaire : le ménage paie en moyenne ${average} de son revenu en impôt, mais un dollar de plus retiré du REER en coûterait ${marginal} (impôt, récupération de la PSV, SRG perdu et crédits perdus l’an prochain)${couple ? ', compté pour la personne dont le revenu est le plus bas, celle qui retire en premier' : ''}.`,
     gloss: 'Taux moyen et taux marginal',
   },
   /** Under one person's « d'où vient l'argent » bars: a stretch of years with no bar is not missing data — it says who pays then. */
@@ -293,10 +293,10 @@ const EN_RESULTS: typeof FR_RESULTS = {
   },
   rates: {
     line: (yearAge: string, average: string, marginal: string, couple: boolean) =>
-      `${yearAge}, the first year without a salary: the household pays ${average} of its income in tax on average, but one more RRSP dollar would cost ${marginal} (tax, OAS recovery and lost GIS)${couple ? ', counted for the person with the lower income, who draws first' : ''}.`,
+      `${yearAge}, the first year without a salary: the household pays ${average} of its income in tax on average, but one more RRSP dollar would cost ${marginal} (tax, OAS recovery, lost GIS and credits lost next year)${couple ? ', counted for the person with the lower income, who draws first' : ''}.`,
     gloss: 'Average and marginal rate',
   },
-  idle: (name: string, from: string, to: string) => `From${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
+  idle: (name: string, from: string, to: string) => `From ${from} to ${to}, nothing comes from ${name}: the household then lives on the other person’s accounts and income. Empty bars here are expected.`,
   tabs: { label: 'Results views', answer: 'Answer', decide: 'Decide', proof: 'Proof' },
   proofHint: 'Whether the answer holds, and where each figure comes from.',
   subtitle: 'Your answer, and the proof behind every figure.',

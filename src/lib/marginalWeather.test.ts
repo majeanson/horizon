@@ -24,7 +24,11 @@ describe('every example household', () => {
         expect(p.rate).toBeGreaterThanOrEqual(0)
         expect(p.rate, `${id} ${p.year}`).toBeLessThan(1.5)
         expect(p.age).toBe(p.year - h.persons[0].birth.year)
-        expect(p.rate).toBeCloseTo(p.tax + p.oasRecovery + p.gisLost, 1)
+        // The parts are clamped at nought one by one (the tax part dips below nought where the pension credit steps in, and another part can then cancel it): the rate is never more than they add up to,
+        // and never more than a dollar's step (0,1) under it.
+        const parts = p.tax + p.oasRecovery + p.gisLost + p.creditsLost
+        expect(p.rate, `${id} ${p.year}`).toBeLessThanOrEqual(parts + 0.05)
+        expect(parts - p.rate, `${id} ${p.year}`).toBeLessThan(0.1)
       }
     })
   }
@@ -40,7 +44,7 @@ describe('every example household', () => {
 })
 
 describe('the summary', () => {
-  const pt = (year: number, rate: number) => ({ year, age: year - 1960, rate, tax: rate, oasRecovery: 0, gisLost: 0 })
+  const pt = (year: number, rate: number) => ({ year, age: year - 1960, rate, tax: rate, oasRecovery: 0, gisLost: 0, creditsLost: 0 })
   it('names the cheapest and the dearest year, the earlier on a tie', () => {
     const s = weatherSummary([pt(2030, 0.3), pt(2031, 0.2), pt(2032, 0.2), pt(2033, 0.5), pt(2034, 0.5)])!
     expect(s.lowest.year).toBe(2031)

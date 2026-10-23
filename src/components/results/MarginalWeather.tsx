@@ -38,9 +38,9 @@ function Body({ m }: { m: ResultsModel }) {
   const household = profile.household
   // The household's own plan, not whichever comparison the table above is showing: the question is about the plan one lives.
   const rows = (runs.find((r) => r.selection === 'plan') ?? runs[0])?.result.rows
-  const points = useMemo(() => (rows === undefined ? [] : marginalWeather(rows, assumptions, household.persons[0].id, household.livesAlone)), [rows, assumptions, household])
+  const points = useMemo(() => (rows === undefined ? [] : marginalWeather(rows, assumptions, household.persons[0].id, household.livesAlone, household.kidsEffects?.benefits ? (household.children ?? []) : [])), [rows, assumptions, household])
   const summary = weatherSummary(points)
-  const data = useMemo(() => points.map((p) => ({ x: p.age, tax: p.tax * PER, oas: p.oasRecovery * PER, gis: p.gisLost * PER })), [points])
+  const data = useMemo(() => points.map((p) => ({ x: p.age, tax: p.tax * PER, oas: p.oasRecovery * PER, gis: p.gisLost * PER, credits: p.creditsLost * PER })), [points])
   if (summary === null) return <p className="answer__note">{c.none}</p>
   const money = (x: number) => formatMoney(x, lang)
   const per = money(PER)
@@ -51,7 +51,9 @@ function Body({ m }: { m: ResultsModel }) {
   // The case told in words: the dearest year, or the first when the cost hardly moves.
   const shown = flat ? points[0] : summary.highest
   // Steps exist only where a benefit is touched somewhere: otherwise the bars are the tax bracket alone.
-  const benefits = points.some((p) => p.oasRecovery > 0.005 || p.gisLost > 0.005)
+  const benefits = points.some((p) => p.oasRecovery > 0.005 || p.gisLost > 0.005 || p.creditsLost > 0.005)
+  // The credits paid NEXT year on this year's income: a fourth part, only when some year loses some.
+  const credits = points.some((p) => p.creditsLost > 0.005)
   const name = names[0] ?? ''
   return (
     <div className="marginal-weather__body">
@@ -64,6 +66,7 @@ function Body({ m }: { m: ResultsModel }) {
             { id: 'tax', label: c.tax, colour: 'clay' },
             { id: 'oas', label: c.oas, colour: 'sun' },
             { id: 'gis', label: c.gis, colour: 'berry' },
+            ...(credits ? [{ id: 'credits', label: c.credits, colour: 'sky' as const }] : []),
           ]}
           yFormat={money}
           yDetail={money}
@@ -76,6 +79,7 @@ function Body({ m }: { m: ResultsModel }) {
       <p className="field-row__hint">{c.reading}</p>
       <p className="answer__note">{flat ? c.flat(lost(lo), per) : `${c.lowest(lost(lo), per, summary.lowest.age)} ${c.highest(lost(hi), per, summary.highest.age)}`}</p>
       <p className="field-row__hint">{benefits ? c.steps : c.taxOnly}</p>
+      {credits && <p className="field-row__hint">{c.creditsNext}</p>}
       {lo < 0.01 && <p className="field-row__hint">{c.zero}</p>}
       <p className="field-row__hint">{c.who}</p>
     </div>

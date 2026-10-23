@@ -1,7 +1,7 @@
 import type { Assumptions, YearRow } from '../engine/types.ts'
 import { ratesOfRow } from './retiredRates.ts'
 
-// THE WEATHER OF A DOLLAR — what the next RRSP dollar costs, year after year of the plan (engine/marginalRate.ts: the tax bracket, the OAS recovery tax and the GIS lost, together),
+// THE WEATHER OF A DOLLAR — what the next RRSP dollar costs, year after year of the plan (engine/marginalRate.ts: the tax bracket, the OAS recovery tax, the GIS lost and the credits lost next year, together),
 // read at every retired year of one run. The rate is not a smooth line: the recovery tax and the supplement's phase-out make steps, and a household that never looks sees none of
 // them. Same function as the one sentence « le coût d'un dollar de plus » of the year table, asked of every row instead of the first. Pure arithmetic on the rows; nothing runs again.
 
@@ -15,6 +15,8 @@ export interface WeatherPoint {
   tax: number
   oasRecovery: number
   gisLost: number
+  /** The credits (Québec's senior assistance and solidarity, the groceries benefit) paid NEXT year that this dollar of income shrinks. */
+  creditsLost: number
 }
 
 export interface WeatherSummary {
@@ -22,15 +24,15 @@ export interface WeatherSummary {
   highest: WeatherPoint
 }
 
-export function marginalWeather(rows: readonly YearRow[], a: Pick<Assumptions, 'inflation' | 'wageGrowth' | 'pensionSplitting'>, firstId: string, livesAlone = true): WeatherPoint[] {
+export function marginalWeather(rows: readonly YearRow[], a: Pick<Assumptions, 'inflation' | 'wageGrowth' | 'pensionSplitting'>, firstId: string, livesAlone = true, children: readonly number[] = []): WeatherPoint[] {
   const out: WeatherPoint[] = []
   for (const row of rows) {
-    const rates = ratesOfRow(row, a, livesAlone)
+    const rates = ratesOfRow(row, a, livesAlone, children)
     const first = row.persons[firstId as keyof typeof row.persons]
     if (rates === null || first === undefined) continue
     const m = rates.marginal
     // A rate is a share of a dollar: the recovery tax and the supplement can push it past the bracket, and a hair below nought is the pension credit's step, not a refund.
-    out.push({ year: row.year, age: first.age, rate: Math.max(0, m.rate), tax: Math.max(0, m.tax), oasRecovery: m.oasRecovery, gisLost: m.gisLost })
+    out.push({ year: row.year, age: first.age, rate: Math.max(0, m.rate), tax: Math.max(0, m.tax), oasRecovery: m.oasRecovery, gisLost: m.gisLost, creditsLost: Math.max(0, m.creditsLost) })
   }
   return out
 }

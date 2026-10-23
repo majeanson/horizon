@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { marginalRate } from './marginalRate.ts'
-import { knownYear } from './params/index.ts'
+import { marginalRate, type CreditsContext } from './marginalRate.ts'
+import { knownYear, paramsFor } from './params/index.ts'
 import { householdTax, type PersonIncome, type TaxRules } from './tax.ts'
 
 // THE MARGINAL RATE OF ONE MORE RRSP DOLLAR: the tax of the band reached, plus the OAS recovery above its threshold, plus the GIS lost where it is paid — the three
@@ -78,5 +78,54 @@ describe('the step is read', () => {
   it('refuses a person-less household and a step that is not positive', () => {
     expect(() => marginalRate({ persons: [], rules: RULES, splitting: false })).toThrow()
     expect(() => marginalRate({ persons: [pensioner({})], rules: RULES, splitting: false, delta: 0 })).toThrow()
+  })
+})
+
+// THE CREDITS A DOLLAR OF THIS YEAR'S INCOME SHRINKS NEXT YEAR: Québec's senior assistance credit (5,40 % over 27 835 $, 70 and over), the solidarity credit (6 % over 43 195 $) and the groceries
+// benefit (5 % over 46 432 $) all read this year's income and pay next year. Held to the rates the official pages state, inside the range of each.
+describe('the credits paid next year on this year’s income', () => {
+  const next = paramsFor(2027, { inflation: 0.02, wageGrowth: 0.03 })
+  const ctx = (births: number[]): CreditsContext => ({
+    year: 2027,
+    births,
+    children: [],
+    livesAlone: true,
+    qc: next.qcCredits,
+    groceries: next.groceriesBenefit,
+    childUntilAge: next.childBenefits.familyAllowance.untilAge,
+  })
+
+  it('a single person aged 72 with 36 000 $ of net income loses the senior credit (5,40 %) and the solidarity credit (6 %) on the next dollar, and not yet the groceries benefit', () => {
+    // 22 000 $ of pensions and 14 000 $ of RRSP: net income 36 000 $, inside 27 835 $–64 873 $ (senior) and 43 195 $ (solidarity starts there): senior only
+    const persons = [pensioner({ age: 72, oas: 8_800, rrq: 13_200, registered: 14_000 })]
+    const m = marginalRate({ persons, rules: RULES, splitting: false, credits: ctx([1954]) })
+    expect(m.creditsLost).toBeCloseTo(0.054, 3)
+    expect(m.rate).toBeCloseTo(m.tax + m.oasRecovery + m.gisLost + m.creditsLost, 10)
+  })
+
+  it('at 50 000 $ all three read: 5,40 % + 6 % + 5 %', () => {
+    const persons = [pensioner({ age: 72, oas: 8_800, rrq: 13_200, registered: 28_000 })]
+    const m = marginalRate({ persons, rules: RULES, splitting: false, credits: ctx([1954]) })
+    // net income here is a little under the 50 000 $ nominal (the OAS recovery starts later), so the range of each credit is the same three
+    expect(m.creditsLost).toBeCloseTo(0.054 + 0.06 + 0.05, 2)
+  })
+
+  it('without a context the credits are not counted: the same three parts as before, and nothing is lost', () => {
+    const persons = [pensioner({ age: 72, oas: 8_800, rrq: 13_200, registered: 28_000 })]
+    const m = marginalRate({ persons, rules: RULES, splitting: false })
+    expect(m.creditsLost).toBe(0)
+    expect(m.rate).toBeCloseTo(m.tax + m.oasRecovery + m.gisLost, 10)
+  })
+
+  it('a high income loses none: it gets none', () => {
+    const persons = [pensioner({ age: 72, oas: 8_800, rrq: 16_000, db: 70_000, registered: 30_000 })]
+    expect(marginalRate({ persons, rules: RULES, splitting: false, credits: ctx([1954]) }).creditsLost).toBe(0)
+  })
+
+  it('a person of 60 has no senior credit to lose', () => {
+    const persons = [pensioner({ age: 60, rrq: 20_000, registered: 18_000, oas: 0 })]
+    const m = marginalRate({ persons, rules: RULES, splitting: false, credits: ctx([1966]) })
+    // solidarity only (and the groceries benefit above 46 432 $): never the 5,40 %
+    expect(m.creditsLost).toBeLessThan(0.054 + 0.06)
   })
 })

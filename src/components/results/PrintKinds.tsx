@@ -143,7 +143,7 @@ export function PrintYears({ m }: { m: ResultsModel }) {
   return (
     <div className="print-plan print-kind print-kind--years">
       <PrintHead m={m} title={PRINT_MENU_COPY[lang].headings.years} />
-      <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={runsAssumptions} livesAlone={runsProfile.household.livesAlone} births={runsBirths} />
+      <YearTables runs={runs} label={label} dollars={dollars} todayYear={year} assumptions={runsAssumptions} livesAlone={runsProfile.household.livesAlone} kids={runsProfile.household.kidsEffects?.benefits ? (runsProfile.household.children ?? []) : []} births={runsBirths} />
       <PrintFoot m={m} />
     </div>
   )

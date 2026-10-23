@@ -39,6 +39,7 @@ export function YearTables({
   todayYear,
   assumptions,
   livesAlone,
+  kids,
   births,
   names,
 }: {
@@ -50,6 +51,8 @@ export function YearTables({
   assumptions: Assumptions
   /** Whether a one-adult household lives alone (Québec's living-alone amount); a couple never does. */
   livesAlone?: boolean
+  /** The birth years of the children the household counts the benefits of (none when it does not), for the credits paid next year that a dollar drawn this year shrinks. */
+  kids?: readonly number[]
   /** The birth years of the household, for the « year (ages) » of the first year that falls short. */
   births: readonly number[]
   /** The household's names, by person: given where the page can say which years stand out and why (a pension starting part-way through a year, a survivor's pension changing rule). Left out for print. */
@@ -78,7 +81,7 @@ export function YearTables({
   // The rows of the table, already in the dollars shown (lib/yearTable.ts — the same model the spreadsheet is written from).
   const model = useMemo(() => (shown ? yearTableModel(shown.result.rows, factor) : null), [shown, dollars, todayYear, inflation]) // eslint-disable-line react-hooks/exhaustive-deps
   // The average rate against the cost of one more REER dollar, in the first year without a salary (rates, not dollars: the unit does not matter).
-  const rates = useMemo(() => (shown ? retiredRates(shown.result.rows, assumptions, livesAlone) : null), [shown, assumptions, livesAlone])
+  const rates = useMemo(() => (shown ? retiredRates(shown.result.rows, assumptions, livesAlone, kids) : null), [shown, assumptions, livesAlone, kids])
   // The years that look different for a reason, read off these very rows (lib/yearNotes.ts).
   const notes = useMemo(() => (shown && names ? yearNotes(shown.result.rows) : []), [shown, names])
   if (!shown || !model) return null

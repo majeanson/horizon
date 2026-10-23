@@ -16,7 +16,9 @@ test('closed, nothing is drawn; opened, a real case in words, a stacked chart by
   await expect(fold.getByText('l’État en garde une part')).toBeVisible()
   await expect(fold.getByText(/Un exemple\s: à \d+ ans, retirer/)).toBeVisible()
   await expect(fold.locator('figure.chart')).toBeVisible({ timeout: 60_000 })
-  await expect(fold.locator('.chart__legend-item')).toHaveCount(3)
+  // tax, OAS recovery, GIS lost — and a fourth, the credits lost next year, only when some year of this plan loses some
+  const legend = await fold.locator('.chart__legend-item').count()
+  expect([3, 4]).toContain(legend)
   await expect(fold.getByText(/Le plus bas —|Le coût ne bouge presque pas/)).toBeVisible()
 })
 

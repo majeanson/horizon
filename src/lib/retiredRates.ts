@@ -1,4 +1,4 @@
-import { marginalRate, type MarginalRate } from '../engine/marginalRate.ts'
+import { marginalRate, type CreditsContext, type MarginalRate } from '../engine/marginalRate.ts'
 import { paramsFor } from '../engine/params/index.ts'
 import type { PersonIncome, TaxRules } from '../engine/tax.ts'
 import type { Assumptions, YearRow } from '../engine/types.ts'
@@ -19,7 +19,7 @@ export interface RetiredRates {
 }
 
 /** The two rates of ONE year, or null when somebody still earns a salary in it (the year is not a retired one) or it has no net income to read a rate against. */
-export function ratesOfRow(row: YearRow, a: Pick<Assumptions, 'inflation' | 'wageGrowth' | 'pensionSplitting'>, livesAlone = true): RetiredRates | null {
+export function ratesOfRow(row: YearRow, a: Pick<Assumptions, 'inflation' | 'wageGrowth' | 'pensionSplitting'>, livesAlone = true, children: readonly number[] = []): RetiredRates | null {
   const people = Object.values(row.persons).filter((p): p is NonNullable<typeof p> => p !== undefined)
   if (people.length === 0 || people.some((p) => p.employment > 0)) return null
   const average = averageRateOf(row)
@@ -45,12 +45,23 @@ export function ratesOfRow(row: YearRow, a: Pick<Assumptions, 'inflation' | 'wag
   })
   const P = paramsFor(row.year, { inflation: a.inflation, wageGrowth: a.wageGrowth })
   const rules: TaxRules = { federal: P.federal, quebec: P.quebec, oas: P.oas, livesAlone: people.length === 1 && livesAlone }
-  return { year: row.year, average, marginal: marginalRate({ persons: incomes, rules, splitting: a.pensionSplitting }) }
+  // The credits paid NEXT year on this year's income (Québec's two and the groceries benefit): the year after the row, with that year's figures. `children` are the birth years the household counts benefits for.
+  const next = paramsFor(row.year + 1, { inflation: a.inflation, wageGrowth: a.wageGrowth })
+  const credits: CreditsContext = {
+    year: row.year + 1,
+    births: people.map((p) => row.year - p.age),
+    children,
+    livesAlone: livesAlone,
+    qc: next.qcCredits,
+    groceries: next.groceriesBenefit,
+    childUntilAge: next.childBenefits.familyAllowance.untilAge,
+  }
+  return { year: row.year, average, marginal: marginalRate({ persons: incomes, rules, splitting: a.pensionSplitting, credits }) }
 }
 
-export function retiredRates(rows: readonly YearRow[], a: Pick<Assumptions, 'inflation' | 'wageGrowth' | 'pensionSplitting'>, livesAlone = true): RetiredRates | null {
+export function retiredRates(rows: readonly YearRow[], a: Pick<Assumptions, 'inflation' | 'wageGrowth' | 'pensionSplitting'>, livesAlone = true, children: readonly number[] = []): RetiredRates | null {
   for (const row of rows) {
-    const rates = ratesOfRow(row, a, livesAlone)
+    const rates = ratesOfRow(row, a, livesAlone, children)
     if (rates !== null) return rates
   }
   return null

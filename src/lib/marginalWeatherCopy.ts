@@ -13,6 +13,10 @@ interface MarginalWeatherCopy {
   tax: string
   oas: string
   gis: string
+  /** The fourth, only when some year loses some: the credits paid next year on this year's income. */
+  credits: string
+  /** Why that part belongs to this year's dollar though it is lost next year. */
+  creditsNext: string
   /** One real case: at this age, this much more taken out, this much leaves, this much stays. */
   example: (age: number, taken: string, lost: string) => string
   kept: (kept: string) => string
@@ -38,6 +42,8 @@ export const MARGINAL_WEATHER_COPY: { fr: MarginalWeatherCopy; en: MarginalWeath
     tax: 'Impôt',
     oas: 'Récupération de la PSV',
     gis: 'SRG perdu',
+    credits: 'Crédits perdus l’an prochain',
+    creditsNext: 'Les crédits du Québec (soutien aux aînés, solidarité) et l’allocation canadienne pour l’épicerie sont calculés sur le revenu de cette année et versés l’an prochain : ce qu’un dollar retiré maintenant leur fait perdre se paie l’an prochain.',
     example: (age, taken, lost) => `Un exemple : à ${age} ans, retirer ${taken} de plus du REER fait repartir ${lost}.`,
     kept: (kept) => `Il vous en reste ${kept}.`,
     lowest: (lost, per, age) => `Le plus bas — ${lost} sur ${per}, vers ${age} ans.`,
@@ -57,6 +63,8 @@ export const MARGINAL_WEATHER_COPY: { fr: MarginalWeatherCopy; en: MarginalWeath
     tax: 'Income tax',
     oas: 'OAS recovery tax',
     gis: 'GIS lost',
+    credits: 'Credits lost next year',
+    creditsNext: 'Québec’s credits (senior assistance, solidarity) and the Canada Groceries and Essentials Benefit are worked out on this year’s income and paid next year: what a dollar drawn now makes them lose is lost next year.',
     example: (age, taken, lost) => `An example: at ${age}, taking ${taken} more out of the RRSP sends ${lost} away.`,
     kept: (kept) => `You keep ${kept}.`,
     lowest: (lost, per, age) => `The lowest — ${lost} out of ${per}, around ${age}.`,
