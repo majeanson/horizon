@@ -10,6 +10,7 @@ import { formatMoney } from '../../lib/money'
 import { RESULTS_COPY } from '../../lib/resultsCopy'
 import { useNotice } from '../../lib/toast'
 import { useParamChoice } from '../../lib/useParamChoice'
+import { SubTabs } from '../SubTabs'
 import { csvLabel, yearCsv } from '../../lib/yearCsv'
 import { yearTableModel } from '../../lib/yearTable'
 import { yearNotes } from '../../lib/yearNotes'
@@ -68,6 +69,8 @@ export function YearTables({
   const keys = runs.map((x) => String(x.selection))
   const [key, setKey] = useParamChoice('table', keys, keys[0] ?? '')
   const shown = runs[Math.max(0, keys.indexOf(key))]
+  // Amounts a year or a month (`?par=month`), as in the sources chart above: the flows of the table are divided by twelve; what the accounts hold is not.
+  const [per, setPer] = useParamChoice('par', ['year', 'month'] as const, 'year')
   const { inflation } = assumptions
   const factor = (year: number) => (dollars === 'today' ? deflator(year, todayYear, inflation) : 1)
   const money = (n: number) => formatMoney(n, lang)
@@ -79,7 +82,7 @@ export function YearTables({
     notice(out.csvDone)
   }
   // The rows of the table, already in the dollars shown (lib/yearTable.ts — the same model the spreadsheet is written from).
-  const model = useMemo(() => (shown ? yearTableModel(shown.result.rows, factor) : null), [shown, dollars, todayYear, inflation]) // eslint-disable-line react-hooks/exhaustive-deps
+  const model = useMemo(() => (shown ? yearTableModel(shown.result.rows, factor, per === 'month') : null), [shown, dollars, todayYear, inflation, per]) // eslint-disable-line react-hooks/exhaustive-deps
   // The average rate against the cost of one more REER dollar, in the first year without a salary (rates, not dollars: the unit does not matter).
   const rates = useMemo(() => (shown ? retiredRates(shown.result.rows, assumptions, livesAlone, kids) : null), [shown, assumptions, livesAlone, kids])
   // The years that look different for a reason, read off these very rows (lib/yearNotes.ts).
@@ -101,7 +104,8 @@ export function YearTables({
         }
       />
       <h3 className="year-table__title">{r.scenario.retireAt(label(shown.selection))}</h3>
-      <p className="field-row__hint year-table__unit">{unit}.</p>
+      <SubTabs size="mini" ariaLabel={c.per} value={per} onSelect={setPer} options={[{ key: 'year', label: c.perYear }, { key: 'month', label: c.perMonth }]} />
+      <p className="field-row__hint year-table__unit">{per === 'month' ? `${unit}, ${c.perMonth.toLowerCase()}` : unit}.</p>
       {firstShortYear !== null && <p className="year-table__short">{RESULTS_COPY[lang].shortage.from(formatYearAge(firstShortYear, births, lang), r.table.shortfall)}</p>}
       {/* The cost of a dollar is shown as at least nought: where the first 2 000 $ of RRIF income earn the pension credit, the engine's step is a hair NEGATIVE, which a sentence about a « cost » cannot say. */}
       {rates && (
@@ -112,7 +116,7 @@ export function YearTables({
           </Link>
         </p>
       )}
-      <div className="table-wrap table-wrap--pinned" role="region" aria-label={`${r.table.title} — ${label(shown.selection)} (${unit})`} tabIndex={0}>
+      <div className="table-wrap table-wrap--pinned" role="region" aria-label={`${r.table.title} — ${label(shown.selection)} (${per === 'month' ? `${unit}, ${c.perMonth.toLowerCase()}` : unit})`} tabIndex={0}>
         <table>
           <thead>
             <tr>

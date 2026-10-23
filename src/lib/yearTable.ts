@@ -53,25 +53,30 @@ interface YearTableModel {
   firstShortYear: number | null
 }
 
-/** @param factor what a dollar of `year` is divided by to be in the dollars shown (the chart's deflator for today's dollars; 1 for the year's own). */
-export function yearTableModel(rows: readonly YearRow[], factor: (year: number) => number = () => 1): YearTableModel {
+/**
+ * @param factor what a dollar of `year` is divided by to be in the dollars shown (the chart's deflator for today's dollars; 1 for the year's own).
+ * @param perMonth the flows of the year (income, credits, tax, spending, what falls short, the mortgage) in dollars a MONTH — the way a household lives with money; what the accounts and the home hold at the
+ * end of the year are a stock, not a flow, and are never divided.
+ */
+export function yearTableModel(rows: readonly YearRow[], factor: (year: number) => number = () => 1, perMonth = false): YearTableModel {
   const out = rows.map((row): YearTableRow => {
     const k = factor(row.year)
+    const f = k * (perMonth ? 12 : 1)
     const h = row.household
     return {
       year: row.year,
       ages: Object.values(row.persons).map((p) => p.age),
       projected: row.projected === true,
       short: h.shortfall > 0,
-      income: h.grossIncome / k,
-      credits: benefitsOfYear(h) / k,
-      tax: h.tax / k,
+      income: h.grossIncome / f,
+      credits: benefitsOfYear(h) / f,
+      tax: h.tax / f,
       avgRate: averageRateOf(row),
-      spending: h.spending / k,
-      shortfall: h.shortfall / k,
+      spending: h.spending / f,
+      shortfall: h.shortfall / f,
       netWorth: h.netWorthEnd / k,
       rrspLocked: lockedOf(row) / k,
-      mortgage: h.mortgagePayment / k,
+      mortgage: h.mortgagePayment / f,
       homeEquity: (h.homeValueEnd - h.mortgageBalanceEnd) / k,
     }
   })

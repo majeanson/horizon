@@ -98,6 +98,24 @@ test('the year-by-year table is ONE table; the scenario is chosen in its header 
   expect((await download).suggestedFilename()).toMatch(/[a-z]/i) // a readable name, not a row of dashes
 })
 
+test('the year-by-year table can be read by the month: the flows are a twelfth, what the accounts hold is not, and it is in the address', async ({ page }) => {
+  await page.goto('/resultats?v=verify&bloc=tableau&ages=plan,60,65')
+  const block = page.locator('.year-table')
+  await expect(block.locator('table')).toHaveCount(1, { timeout: 30_000 })
+  const cell = (col: number) => block.locator('tbody tr').first().locator('td').nth(col)
+  const num = async (col: number) => Number((await cell(col).innerText()).replace(/[^0-9,-]/g, '').replace(',', '.'))
+  const incomeYear = await num(0)
+  const worthColumn = (await block.locator('thead th').allInnerTexts()).findIndex((t) => /Valeur nette/.test(t)) - 1
+  const worthYear = await num(worthColumn)
+  await block.getByRole('tab', { name: 'Par mois' }).click()
+  await expect(page).toHaveURL(/par=month/)
+  await expect(block.locator('.year-table__unit')).toContainText('par mois')
+  expect(Math.abs((await num(0)) * 12 - incomeYear) / Math.max(1, incomeYear), 'income a month × 12 is the year\u2019s, to the rounding').toBeLessThan(0.01)
+  expect(await num(worthColumn), 'net worth is the same: a stock is never divided').toBe(worthYear)
+  await block.getByRole('tab', { name: 'Par année' }).click()
+  await expect(page).not.toHaveURL(/par=/)
+})
+
 test('what a table shows lives in the address: a link opens on the same set, the default writes nothing', async ({ page }) => {
   // The retirement age of the year-by-year table.
   await page.goto('/resultats?v=verify&bloc=tableau&ages=plan,60,65&table=65')

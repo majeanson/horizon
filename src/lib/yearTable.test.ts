@@ -240,3 +240,27 @@ describe('the credits column: what the State paid, inside the income', { timeout
     expect(yearCsv(without.result, heads, 'fr')).not.toContain('dont crédits')
   })
 })
+
+describe('the table by the month: the flows of the year divided by twelve, what the accounts hold left alone', { timeout: 120_000 }, () => {
+  it('income, credits, tax, spending, shortfall and the mortgage are a twelfth of the year’s; net worth, the locked REER, the home’s equity and the average rate are the same', () => {
+    for (const r of runs) {
+      const year = yearTableModel(r.result.rows, factorOf(r.id))
+      const month = yearTableModel(r.result.rows, factorOf(r.id), true)
+      expect(month.rows.length, label(r)).toBe(year.rows.length)
+      month.rows.forEach((m, i) => {
+        const y = year.rows[i]
+        for (const k of ['income', 'credits', 'tax', 'spending', 'shortfall', 'mortgage'] as const) expect(m[k] * 12, `${label(r)} ${y.year} ${k}`).toBeCloseTo(y[k], 6)
+        for (const k of ['netWorth', 'rrspLocked', 'homeEquity'] as const) expect(m[k], `${label(r)} ${y.year} ${k}`).toBe(y[k])
+        expect(m.avgRate).toBe(y.avgRate)
+        expect(m.short).toBe(y.short)
+      })
+      expect(month.hasCredits).toBe(year.hasCredits)
+      expect(month.firstShortYear).toBe(year.firstShortYear)
+    }
+  })
+
+  it('the spreadsheet stays a year’s figures whatever the page shows (it is written from the yearly model)', () => {
+    const r = runs[0]
+    expect(yearCsv(r.result, HEADS, 'fr')).toBe(yearCsv(r.result, HEADS, 'fr', { factor: undefined }))
+  })
+})
