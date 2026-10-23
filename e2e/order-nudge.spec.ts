@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, seedProfile } from './seed'
+import { trackJobs } from './jobs'
 
 // « UN AUTRE ORDRE VAUT LE COUP » on the answer. A retiree with a large REER and a non-registered account, who stops at 55 and starts the QPP and the OAS at 70: the default order
 // (non-registered first) lets the REER grow untouched for years and pays much more tax later; drawing the REER first costs about a quarter less tax over the plan. The sentence on the answer
@@ -50,13 +51,12 @@ test('a household whose own order is already the best hears nothing', async ({ p
 
 test('the six orders are not asked until the block is scrolled into view', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 })
-  const workers: string[] = []
-  page.on('worker', (w) => workers.push(w.url()))
+  const jobs = await trackJobs(page)
   await seedProfile(page, rrspHeavy() as never)
   await page.goto('/resultats?cartes=all')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await page.waitForTimeout(4_000)
-  expect(workers.some((u) => u.includes('withdrawalOrders')), 'no order search while the block is far below').toBe(false)
+  expect(await jobs.asked('withdrawalOrders'), 'no order search while the block is far below').toBe(false)
   await page.locator('#annee').scrollIntoViewIfNeeded()
-  await expect.poll(() => workers.some((u) => u.includes('withdrawalOrders')), { timeout: 20_000 }).toBe(true)
+  await expect.poll(() => jobs.asked('withdrawalOrders'), { timeout: 20_000 }).toBe(true)
 })

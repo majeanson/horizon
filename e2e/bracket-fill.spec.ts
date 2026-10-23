@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, savedProfile, seedProfile } from './seed'
+import { trackJobs } from './jobs'
 
 // « JUSQU’OÙ FONDRE LE REER ? » on Stratégies, and its sentence on the answer. A single retiree of 60 with a large REER, a small CELI and modest spending, whose pensions start at 70: for
 // years the only income is what the REER gives, far under the first bracket's top — the case the habit is made for. The three ways are tabs (the choice is in the address), one table sets them
@@ -57,13 +58,12 @@ test('on a phone the panel fits the screen: no sideways scroll but the table’s
 
 test('the answer says so when melting the REER clearly wins, and not before the block is in view', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 })
-  const workers: string[] = []
-  page.on('worker', (w) => workers.push(w.url()))
+  const jobs = await trackJobs(page)
   await seedProfile(page, melter() as never)
   await page.goto('/resultats?cartes=all')
   await expect(page.locator('#verdict')).toBeVisible({ timeout: 60_000 })
   await page.waitForTimeout(3_000)
-  expect(workers.some((u) => u.includes('bracketFill')), 'nothing asked while the block is far below').toBe(false)
+  expect(await jobs.asked('bracketFill'), 'nothing asked while the block is far below').toBe(false)
   await page.locator('#annee').scrollIntoViewIfNeeded()
   await expect(page.locator('#annee .fill-nudge')).toContainText('Fondre le REER', { timeout: 90_000 })
 })

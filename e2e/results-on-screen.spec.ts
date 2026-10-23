@@ -1,20 +1,14 @@
 import { expect, test } from '@playwright/test'
 import { EXAMPLE, PROFILE_KEY, seedProfile } from './seed'
+import { trackJobs } from './jobs'
 
 // RESULTS ON SCREEN (the review of 2026-10-19): a nudge says nothing before the answer is in, and a link inside the proof never closes the blocks the reader opened.
 
 test('the spouses’ balance nudge is not asked before the answer is in — even with its block in view from the start', async ({ page }) => {
   test.slow()
-  // The answer held back on purpose (its worker's script answered 6 s late): on a phone or CI's runner it is slow anyway, and the year section — open by
+  // The answer held back on purpose (its request reaches the worker 6 s late): on a phone or CI's runner it is slow anyway, and the year section — open by
   // default, its block « seen » the moment it scrolls into view — is on screen long before it. Deterministic, not a race on this machine's speed.
-  await page.route(/answer\.worker\.ts/, async (route) => {
-    await new Promise((r) => setTimeout(r, 6_000))
-    await route.continue()
-  })
-  let balanceAsked = false
-  page.on('worker', (w) => {
-    if (w.url().includes('spouseBalance')) balanceAsked = true
-  })
+  const jobs = await trackJobs(page, { answer: 6_000 })
   await seedProfile(page, EXAMPLE) // a couple: the nudge applies
   await page.goto('/resultats?cartes=all')
   const year = page.locator('#annee')
@@ -25,13 +19,13 @@ test('the spouses’ balance nudge is not asked before the answer is in — even
   // the whole time the answer is pending, no balance search may start (it would compute for the plan's own age, then change its sentence)
   let askedWhilePending = false
   while ((await pending.count()) > 0) {
-    if (balanceAsked) askedWhilePending = true
+    if (await jobs.asked('spouseBalance')) askedWhilePending = true
     await page.waitForTimeout(100)
   }
   expect(askedWhilePending, 'the balance search started before the answer was in').toBe(false)
   // once the answer is in, it is asked
   await year.scrollIntoViewIfNeeded()
-  await expect.poll(() => balanceAsked, { timeout: 120_000 }).toBe(true)
+  await expect.poll(() => jobs.asked('spouseBalance'), { timeout: 120_000 }).toBe(true)
 })
 
 test('« Voir les pages officielles » inside « Précision » keeps every block the reader opened, and lands on the parameters', async ({ page }) => {

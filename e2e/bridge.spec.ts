@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoHorizontalOverflow } from './overflow'
 import { EXAMPLE, savedProfile, seedProfile } from './seed'
+import { trackJobs } from './jobs'
 
 // « Mes années 60 à 70 » in a real browser: the strategy view sits on the results page, always visible, computed
 // off the page's thread, keeps every choice in the address, and shows each year of the bridge as text beside the
@@ -200,14 +201,13 @@ test('« Quand commencer mes rentes ? » is one panel with four views — the wa
 })
 
 test('the thirty projections of « Si l’un décède » are not run until that view is opened', async ({ page }) => {
-  const workers: string[] = []
-  page.on('worker', (w) => workers.push(w.url()))
+  const jobs = await trackJobs(page)
   await page.goto('/decider?bt=cards')
   await expect(page.locator('.bridge__verdict')).toBeVisible({ timeout: 60_000 })
   await expect(page.locator('.dots__dot.is-pending')).toHaveCount(0, { timeout: 60_000 }) // the cards' scenarios are in: the sweep used to start now
   await page.waitForTimeout(3_000)
-  expect(workers.some((u) => u.includes('deathSweep')), 'no death sweep before its view').toBe(false)
+  expect(await jobs.asked('deathSweep'), 'no death sweep before its view').toBe(false)
   await page.getByRole('tab', { name: 'Si l’un décède' }).click()
-  await expect.poll(() => workers.some((u) => u.includes('deathSweep')), { timeout: 30_000 }).toBe(true)
+  await expect.poll(() => jobs.asked('deathSweep'), { timeout: 30_000 }).toBe(true)
   await expect(page.locator('.sweep table')).toBeVisible({ timeout: 90_000 })
 })
