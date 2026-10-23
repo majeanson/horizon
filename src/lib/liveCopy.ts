@@ -17,8 +17,9 @@ export interface LiveCopy {
   lost: string
   see: string
   working: string
-  /** The top bar: room for two words, and the link's full name for a screen reader. */
-  bar: { none: string; aria: (said: string) => string }
+  /** The top bar: room for two words, and the link's full name for a screen reader. `short` is the label that stays on a narrow phone, where `label` goes:
+   *  a bare « 59 ans » beside the name reads as the visitor's own age. */
+  bar: { short: string; none: string; aria: (said: string) => string }
 }
 
 const FR: LiveCopy = {
@@ -26,13 +27,13 @@ const FR: LiveCopy = {
   at: (age) => `${age} ans`,
   now: 'dès maintenant',
   none: (max) => `aucun âge jusqu’à ${max} ans`,
-  earlier: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tôt qu’à votre arrivée`,
-  later: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tard qu’à votre arrivée`,
+  earlier: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tôt qu’à votre première réponse`,
+  later: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tard qu’à votre première réponse`,
   found: 'un âge existe maintenant',
   lost: 'plus aucun âge ne fonctionne',
   see: 'Voir',
   working: '…',
-  bar: { none: 'aucun âge', aria: (said) => `Votre réponse : ${said}. Voir les résultats` },
+  bar: { short: 'Retraite', none: 'aucun âge', aria: (said) => `Votre réponse : ${said}. Voir les résultats` },
 }
 
 const EN: LiveCopy = {
@@ -40,13 +41,13 @@ const EN: LiveCopy = {
   at: (age) => `age ${age}`,
   now: 'right now',
   none: (max) => `no age up to ${max}`,
-  earlier: (years) => `${years} ${years === 1 ? 'year' : 'years'} earlier than when you arrived`,
-  later: (years) => `${years} ${years === 1 ? 'year' : 'years'} later than when you arrived`,
+  earlier: (years) => `${years} ${years === 1 ? 'year' : 'years'} earlier than your first answer`,
+  later: (years) => `${years} ${years === 1 ? 'year' : 'years'} later than your first answer`,
   found: 'an age works now',
   lost: 'no age works any more',
   see: 'See',
   working: '…',
-  bar: { none: 'no age', aria: (said) => `Your answer: ${said}. See the results` },
+  bar: { short: 'Retire', none: 'no age', aria: (said) => `Your answer: ${said}. See the results` },
 }
 
 export const LIVE_COPY: Record<Lang, LiveCopy> = { fr: FR, en: EN }

@@ -21,7 +21,7 @@ test('Ma fiche ranks the unconfirmed figures, and each one opens its own field, 
 })
 
 // While figures are estimates the verdict carries the computed range (every estimated figure moved at once); once all are confirmed it is the exact-confidence sentence.
-const RANGE = /^Entre (\d+) (?:et (\d+) ans|ans et peut-être aucun âge avant \d+),? selon vos chiffres estimés — \d+ sur \d+ confirmés\./
+const RANGE = /^(?:Entre|De) (\d+) (?:et (\d+) ans|ans à plus de \d+ ans) selon vos chiffres estimés — \d+ sur \d+ confirmés\./
 
 test('the verdict carries a range while figures are estimates', async ({ page }) => {
   await seedProfile(page)

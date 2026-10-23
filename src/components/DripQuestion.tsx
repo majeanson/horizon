@@ -43,7 +43,7 @@ export function DripQuestion({ impact, facts }: { impact: FactImpactAnswer | und
         <SkeletonStatus />
         {/* the sentence it will most likely say: the first figure still estimated (the top one is not known before the search), and a stand-in swing */}
         <p>
-          <SkeletonText>{`${nameOf(facts[0])} ${c.swing(2)}`}</SkeletonText>
+          <SkeletonText>{`${nameOf(facts[0])}. ${c.swing(2)}`}</SkeletonText>
         </p>
         <div className="install-card__actions" aria-hidden="true">
           <span className="skeleton-as-btn skeleton-as-btn--primary skeleton-as-btn--sm skeleton__ghost" data-placeholder="">{c.go}</span>
@@ -59,7 +59,7 @@ export function DripQuestion({ impact, facts }: { impact: FactImpactAnswer | und
     <section className="surface install-card drip" aria-label={c.title}>
       <h2 className="welcome__card-title">{c.title}</h2>
       <p>
-        <strong>{name}</strong> {c.swing(impact.swings[top.id].years)}
+        <strong>{`${name}.`}</strong> {c.swing(impact.swings[top.id].years)}
       </p>
       <div className="install-card__actions">
         <Link className="btn btn--primary btn--sm" to={`/profil?fact=${encodeURIComponent(top.id)}`}>

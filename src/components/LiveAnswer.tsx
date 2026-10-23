@@ -25,7 +25,7 @@ export function LiveAnswer() {
   const ready = profileGaps(profile).length === 0 && !request.everyoneRetired
   const answer = useAnswer(request, ready)
   const got = ready ? answer.value : null
-  // The first answer seen is the reference: « since you arrived ». null = it was « no age », the only value that is not a number.
+  // The first answer seen is the reference: « since your first answer ». null = it was « no age », the only value that is not a number.
   const first = useRef<{ earliest: number | null } | null>(null)
   if (got !== null && first.current === null) first.current = { earliest: got.earliest }
   if (!ready) first.current = null

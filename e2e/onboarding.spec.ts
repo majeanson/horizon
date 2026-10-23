@@ -463,3 +463,73 @@ test('the spending screen says that no figure means no answer yet', async ({ pag
   await fill(page, 'Dépenses par année', '50000')
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('C’est assez pour une première réponse')
 })
+
+// THE TAP THAT WAS SWALLOWED: typing a figure and tapping « Suivant » once. The tap blurs the box, the box commits, and the screen under the button used to
+// reflow (« Sans chiffre, on suppose 0 $ » left, « Votre réponse » arrived), moving the button between pointer-down and pointer-up.
+test('the quick path: a savings figure typed and ONE tap on « Suivant » moves to question 5, and the button does not move', async ({ page }) => {
+  const seed = blankSeed() as { household: { spending: Record<string, number> } }
+  seed.household.spending = { workingToday: 50000, retiredToday: 50000 }
+  // the file-wide seed has run: let this one replace it (seedProfile keeps the first profile it stored in a tab)
+  await page.addInitScript(() => sessionStorage.removeItem('e2e-seeded'))
+  await seedProfile(page, seed as never)
+  await page.goto('/profil?bloc=tout&debut=rapide')
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  await fill(page, 'Revenu de travail par année', '70000')
+  await expect(progress(page)).toHaveText('Question 4 sur 5')
+  const button = page.getByRole('button', { name: 'Suivant', exact: true })
+  await box(page, 'REER (épargne-retraite)').fill('45000')
+  await button.click()
+  await expect(progress(page)).toHaveText('Question 5 sur 5')
+})
+
+test('« Suivant » keeps a figure typed without a blur (a keyboard or screen-reader activation)', async ({ page }) => {
+  await page.goto('/profil?bloc=tout&debut=rapide')
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  await fill(page, 'Revenu de travail par année', '70000')
+  await box(page, 'REER (épargne-retraite)').fill('45000')
+  await page.getByRole('button', { name: 'Suivant', exact: true }).evaluate((b) => (b as HTMLButtonElement).click())
+  await expect(progress(page)).toHaveText('Question 5 sur 5')
+  await fill(page, 'Dépenses par année', '50000')
+  await expect(page.locator('.onboard__summary')).toContainText('45 000')
+})
+
+test('the income box opens with its 0 selected: typing replaces it (« 70000 », never « 070000 »)', async ({ page }) => {
+  await page.goto('/profil?bloc=tout&debut=rapide')
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  const income = box(page, 'Revenu de travail par année')
+  await expect(income).toBeFocused()
+  await page.keyboard.type('70000')
+  await expect(income).toHaveValue(/^70[\s  ]?000$/)
+})
+
+test('the reserved slot holds: the button is where it was before and after the typed figure commits and the answer arrives', async ({ page }) => {
+  const seed = blankSeed() as { household: { spending: Record<string, number> } }
+  seed.household.spending = { workingToday: 50000, retiredToday: 50000 }
+  // the file-wide seed has run: let this one replace it (seedProfile keeps the first profile it stored in a tab)
+  await page.addInitScript(() => sessionStorage.removeItem('e2e-seeded'))
+  await seedProfile(page, seed as never)
+  await page.goto('/profil?bloc=tout&debut=rapide')
+  await next(page)
+  await fill(page, 'Année de naissance', '1985')
+  await fill(page, 'Revenu de travail par année', '70000')
+  const button = page.getByRole('button', { name: 'Suivant', exact: true })
+  // the y once it has held for three samples: the screen's own entrance is over, only a reflow may move the button from here
+  const settledY = async () => {
+    let last = -1
+    for (let held = 0; held < 3; ) {
+      await page.waitForTimeout(100)
+      const y = (await button.boundingBox())!.y
+      held = y === last ? held + 1 : 0
+      last = y
+    }
+    return last
+  }
+  const before = await settledY()
+  await box(page, 'REER (épargne-retraite)').fill('45000')
+  await box(page, 'REER (épargne-retraite)').blur()
+  await expect(page.locator('.live-answer')).toContainText('Votre réponse')
+  expect(Math.abs((await settledY()) - before)).toBeLessThan(1)
+})

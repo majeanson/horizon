@@ -1,9 +1,9 @@
 import { expect, test, type Page } from '@playwright/test'
 import { EXAMPLE, blankSeed, seedProfile } from './seed'
 
-// THE FRONT DOOR (pages/Accueil.tsx): a first visit reads, in this order and before anything covers it, what Horizon is in one sentence, how to read
-// the page (the language, day / night, the contrast, the size — in view, no tap), « Commencer » (on the first screen of the smallest phone), then the
-// question, what it does and the two promises it keeps. Nothing opens by itself. « Commencer » opens ONE full-screen dialog (components/WelcomeDialog.tsx): how much time there is, each answer a
+// THE FRONT DOOR (pages/Accueil.tsx): a first visit reads, in this order and before anything covers it, what Horizon is in one sentence, the question,
+// how to read the page (the language, day / night, the contrast, the size — in view, no tap), « Commencer » (on the first screen of the smallest phone), then
+// what it does and the two promises it keeps. Nothing opens by itself. « Commencer » opens ONE full-screen dialog (components/WelcomeDialog.tsx): how much time there is, each answer a
 // link into its own path that also keeps the choice. The settings page keeps the same reading controls for good.
 // Every spec starts from a device that has seen nothing (the config seeds only the first answer's flourish).
 
@@ -22,14 +22,14 @@ test('a first visit sees, in view and with nothing over it: what Horizon is, how
   await expect(hero(page)).toContainText('page officielle')
   // the mark of the brand, and the first button, inside the first screen of a phone
   await expect(hero(page).locator('.brand-mark')).toBeVisible()
-  // in this order: the sentence of what it is, the reading controls, the way in, the question
+  // in this order: the sentence of what it is, the question (the one H1), the reading controls, the way in
   const what = (await hero(page).locator('.welcome__what').boundingBox())!
   const read = (await reading(page).boundingBox())!
   const go = (await hero(page).locator('.welcome__go').boundingBox())!
   const h1 = (await page.getByRole('heading', { level: 1 }).boundingBox())!
-  expect(what.y + what.height).toBeLessThanOrEqual(read.y)
+  expect(what.y + what.height).toBeLessThanOrEqual(h1.y)
+  expect(h1.y + h1.height).toBeLessThanOrEqual(read.y)
   expect(read.y + read.height).toBeLessThanOrEqual(go.y)
-  expect(go.y + go.height).toBeLessThanOrEqual(h1.y)
   await expect(hero(page).locator('.welcome__what')).toContainText('Horizon calcule')
   const begin = page.getByRole('button', { name: 'Commencer', exact: true })
   const box = (await begin.boundingBox())!
@@ -59,7 +59,9 @@ for (const [w, h, scale] of [[320, 568, 'normal'], [360, 640, 'normal'], [360, 6
     const tabs = (await page.getByRole('navigation', { name: 'Navigation principale' }).boundingBox())!
     expect(box.y + box.height).toBeLessThanOrEqual(tabs.y)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    // the two shared-row controls still say what they set, to a screen reader
+    // on a phone the reading panel is ONE row (the question and « Commencer » keep the first screen): a tap opens it, and its two shared-row controls still say what they set
+    await expect(reading(page).getByRole('tablist', { name: 'Langue' })).toBeHidden()
+    await reading(page).getByText(/^Lire plus confortablement/).click()
     await expect(reading(page).getByRole('tablist', { name: 'Langue' })).toBeVisible()
   })
 }
@@ -77,6 +79,7 @@ test('the reading controls on the front door: the sizes in words, and each choic
   await seedProfile(page, blankSeed())
   await page.goto('/')
   const r = reading(page)
+  await r.getByText(/^Lire plus confortablement/).click() // a phone folds the panel to one row
   await r.getByRole('tab', { name: 'Grand', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-text-scale', 'large')
   await r.getByRole('tab', { name: 'Très grand' }).click()

@@ -4,6 +4,7 @@ import { FirmPrint } from './views/FirmSection'
 import { PrintComfort, PrintFigures, PrintFoot, PrintHead, PrintSentence } from './PrintFrame'
 import { TimelineStrip } from './TimelineStrip'
 import { formatPct, formatYearAge } from '../../lib/format'
+import { stopLines } from '../../lib/stopLines'
 
 // THE PRINTED PLAN — one short page (two at most), the same whichever view is open: what the household asked, what the answer is, in dates, what it can spend, the assumptions it stands on, the
 // plan in one line, the ages that were compared and how firm the answer is. NOT the year-by-year table, NOT the 140 cited figures, NOT the other views: they stay on the screen (and in the
@@ -25,9 +26,9 @@ export function PrintPlan({ m }: { m: ResultsModel }) {
               {stop.years.map((y, i) => (
                 <li key={y.id}>{rc.questions.stop.when(names[i] ?? '', formatYearAge(y.year, births[i] === undefined ? [] : [births[i]], lang))}</li>
               ))}
-              <li>{stop.pensionsStarted ? rc.questions.stop.share(pct(stop.pensionShare), at(stop.firstYear)) : rc.questions.stop.shareNone(at(stop.firstYear))}</li>
-              {stop.allStarted !== null && <li>{rc.questions.stop.shareAll(pct(stop.allStarted.share), at(stop.allStarted.year))}</li>}
-              <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
+              {stopLines(stop, rc.questions.stop, at, pct).map((line) => (
+                <li key={line}>{line}</li>
+              ))}
             </ul>
           </>
         )}

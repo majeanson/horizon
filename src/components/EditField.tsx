@@ -121,6 +121,11 @@ export function EditField({
   // A field that auto-focuses is a field someone just OPENED. Bring it on screen if it
   // is not; `block: 'nearest'` means an already-visible field never moves.
   useEffect(() => (autoFocus ? revealOnOpen(inputRef.current) : undefined), [autoFocus])
+  // React's `autoFocus` focuses the box without raising onFocus, so the select-on-focus below never ran for a box that opened focused: its « 0 » stayed
+  // unselected and the first digits landed after it (« 070000 »).
+  useEffect(() => {
+    if (autoFocus && selectOnFocus) inputRef.current?.select()
+  }, [autoFocus, selectOnFocus])
   const isForm = as === 'form'
   const justFocused = useRef(false)
 

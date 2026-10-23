@@ -139,7 +139,11 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
     setMoved(true)
     setAt(Math.max(0, Math.min(last, i)))
   }
-  const next = () => goTo(at + 1)
+  // A figure still in its box is committed before the screen moves: a tap blurs the box first, but a keyboard or screen-reader activation may not.
+  const next = () => {
+    if (document.activeElement instanceof HTMLInputElement) document.activeElement.blur()
+    goTo(at + 1)
+  }
   // Enter in a box commits it (the box's own handler), then moves on — unless the box refused what was typed.
   const onKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Enter' || !(e.target instanceof HTMLInputElement)) return
@@ -456,12 +460,21 @@ export default function Onboarding({ onSkip, mode = 'full' }: { onSkip: () => vo
         <span>{question}</span>
       </h2>
       <p className="onboard__why">{why}</p>
-      {skipped && <p className="field-row__hint">{skipped}</p>}
-      <div className="onboard__body" onKeyUp={onKeyUp}>
+      {/* Keyed by the screen: each question mounts its OWN boxes. One input reused from the screen before is already focused, so its autoFocus never fires and its text is never selected. */}
+      <div key={step} className="onboard__body" onKeyUp={onKeyUp}>
         {body}
       </div>
-      {/* Once the answer can be computed, it forms under the question: a passive line (a status, no box, no focus) that moves as the figures are typed. Not on the landing screen. */}
-      {at > 0 && gaps.length === 0 && <LiveAnswer />}
+      {/* What is assumed if the box stays as it is, and — once the answer can be computed — the answer itself: a passive line (a status, no box, no focus) that moves
+          as the figures are typed. Under a question they share ONE slot of reserved height: the note leaves and the answer arrives on the blur that « Suivant » itself
+          causes, and a button that moves between pointer-down and pointer-up loses the tap. Not on the landing screen, which has neither. */}
+      {at > 0 && step !== 'done' ? (
+        <div className="onboard__slot">
+          {skipped && <p className="field-row__hint">{skipped}</p>}
+          {gaps.length === 0 && <LiveAnswer />}
+        </div>
+      ) : (
+        at > 0 && gaps.length === 0 && <LiveAnswer />
+      )}
       <div className="onboard__nav">
         {at > 0 && (
           <button type="button" className="btn btn--ghost" onClick={() => goTo(at - 1)}>

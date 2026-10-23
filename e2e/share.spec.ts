@@ -41,6 +41,22 @@ test.describe('golden couple', () => {
     await fresh.close()
   })
 
+  test('the page speaks the language the link was written in, whatever the reader had chosen, with the pitch above the button and a switch to the other language', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
+    await page.goto('/partage?age=62&foyer=couple&l=fr')
+    await expect(page.getByRole('heading', { level: 1, name: 'Un scénario partagé' })).toBeVisible()
+    await expect(page.locator('.verdict__age')).toContainText('62 ans')
+    const pitch = page.getByText(/^Horizon trouve l’âge le plus tôt/)
+    await expect(pitch).toBeVisible()
+    const cta = page.getByRole('link', { name: 'Faire mon calcul' })
+    expect((await pitch.boundingBox())!.y).toBeLessThan((await cta.boundingBox())!.y)
+    await page.getByRole('link', { name: 'Read in English' }).click()
+    await expect(page).toHaveURL(/l=en/)
+    await expect(page.getByRole('heading', { level: 1, name: 'A shared scenario' })).toBeVisible()
+    await expect(page.getByText(/^Horizon finds the earliest age/)).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Lire en français' })).toBeVisible()
+  })
+
   test('a link with no readable scenario says so and still offers the way in', async ({ page }) => {
     await page.goto('/partage?age=999&foyer=trio')
     await expect(page.getByRole('heading', { level: 1, name: 'Ce lien est incomplet' })).toBeVisible()

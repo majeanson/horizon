@@ -60,8 +60,8 @@ describe('the results-page copy, in both languages', () => {
   it('carries the answer’s range while figures are estimates, and the open end says so', () => {
     expect(fr.headline.confidenceRange(58, 63, 3, 20)).toMatch(/Entre 58 et 63 ans.*3 sur 20 confirmés/)
     expect(en.headline.confidenceRange(58, 63, 3, 20)).toMatch(/Between age 58 and 63.*3 of 20 confirmed/)
-    expect(fr.headline.confidenceRangeOpen(58, 70, 3, 20)).toContain('peut-être aucun âge avant 70')
-    expect(en.headline.confidenceRangeOpen(58, 70, 3, 20)).toContain('possibly no age before 70')
+    expect(fr.headline.confidenceRangeOpen(58, 70, 3, 20)).toContain('à plus de 70 ans')
+    expect(en.headline.confidenceRangeOpen(58, 70, 3, 20)).toContain('to over 70')
   })
 
   it('never hard-codes the engine’s nudge size: it arrives as an argument', () => {

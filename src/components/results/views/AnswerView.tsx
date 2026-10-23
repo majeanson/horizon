@@ -19,8 +19,6 @@ import { SkeletonChips, SkeletonText } from '../../SkeletonShapes'
 import { agesLedger } from '../../../engine/ledger'
 import { formatYearAge } from '../../../lib/format'
 import { longDate } from '../../../lib/months'
-import { answerSpread } from '../../../lib/answerSpread'
-import { ANSWER_SPREAD_COPY } from '../../../lib/answerSpreadCopy'
 import { TOUR_COPY } from '../../../lib/tourCopy'
 import { MAX_AGE, MAX_SELECTIONS, isSplit, pairSelection, worthAtHorizon } from '../../../lib/resultsModel'
 import { SERIES_CLASS, milestoneAges } from '../../../lib/useResultsPage'
@@ -29,6 +27,7 @@ import { AnswerGlance, answerAtGlance } from '../AnswerGlance'
 import { CARDS_COPY } from '../../../lib/cardsCopy'
 import { AGE_TOKEN } from '../../../lib/resultsCopy'
 import { SHARE_COPY } from '../../../lib/shareCopy'
+import { stopLines } from '../../../lib/stopLines'
 import { ShareChip } from '../ShareChip'
 import { Cascade } from '../../Cascade'
 import { useChangePulse } from '../../../lib/useChangePulse'
@@ -156,9 +155,9 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                         {stop.years.map((y, i) => (
                           <li key={y.id}>{rc.questions.stop.when(names[i] ?? '', formatYearAge(y.year, births[i] === undefined ? [] : [births[i]], lang))}</li>
                         ))}
-                        <li>{stop.pensionsStarted ? rc.questions.stop.share(pct(stop.pensionShare), at(stop.firstYear)) : rc.questions.stop.shareNone(at(stop.firstYear))}</li>
-                        {stop.allStarted !== null && <li>{rc.questions.stop.shareAll(pct(stop.allStarted.share), at(stop.allStarted.year))}</li>}
-                        <li>{stop.pensionsCoverFrom === null ? rc.questions.stop.neverCovers : rc.questions.stop.coversFrom(at(stop.pensionsCoverFrom))}</li>
+                        {stopLines(stop, rc.questions.stop, at, pct).map((line) => (
+                          <li key={line}>{line}</li>
+                        ))}
                       </ul>
                       {stop.coverage.length > 1 && (
                         <Fold summary={rc.questions.stop.chartTitle} open={datesFold === '1'} onToggle={(o) => setDatesFold(o ? '1' : '0')} mountOnOpen>
@@ -196,8 +195,6 @@ export function AnswerView({ m }: { m: ResultsModel }) {
             )}
             {/* How much of the answer stands on the person's own documents belongs WITH the answer, not three sections down. */}
             {confidenceLine}
-            {/* …and how far it moves when the future is kinder or harsher than assumed: the scenarios and the market paths, already out for the page below. */}
-            {!answerPending && !retiredNow && headline.kind === 'at' && headline.age !== null && <AnswerSpreadLine age={headline.age} m={m} />}
             {/* The answer is an estimate under stated assumptions, and it says so where it is read — quietly: it must
                 be present, not compete with the answer. */}
             <p className="verdict__note verdict__note--caveat">{r.verdict.caveat}</p>
@@ -333,14 +330,6 @@ export function AnswerView({ m }: { m: ResultsModel }) {
         </section>
     </>
   )
-}
-
-/** « Selon les trois scénarios et les parcours de marché : de 57 à 64 ans » — only once both searches are in, and only when it says something the big age does not. */
-function AnswerSpreadLine({ age, m }: { age: number; m: ResultsModel }) {
-  const spread = answerSpread(age, m.range, m.stress)
-  if (spread === null) return null
-  const c = ANSWER_SPREAD_COPY[m.lang]
-  return <p className="verdict__note">{spread.high === null ? c.open(spread.low, MAX_AGE) : c.range(spread.low, spread.high)}</p>
 }
 
 /** The answer's card while its first answer is worked out: the common answer (an age, the glance, the note, the dates, the doors) in its own elements, its words written

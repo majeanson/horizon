@@ -64,7 +64,7 @@
   gap: 0.4rem;
 }
 /* The answer in the bar (components/BarAnswer.tsx): « Votre réponse · 60 ans », a pill between the name and the buttons, a link to Résultats. Absent until
-   there is one. On a narrow phone the label goes and the age stays: the bar must hold the name, the pill and three buttons at 360 px. */
+   there is one. On a narrow phone the label shrinks to one word (« Retraite 59 ans »; a bare age beside the name reads as the visitor's own): the bar must hold the name, the pill and three buttons at 360 px. */
 .shell__answer {
   display: flex;
   min-width: 0;
@@ -87,8 +87,12 @@
   background: var(--accent-soft);
   border-color: var(--accent);
 }
-.shell__answer-label {
+.shell__answer-label,
+.shell__answer-short {
   color: var(--ink-soft);
+}
+.shell__answer-short {
+  display: none;
 }
 .shell__answer-age {
   font-size: var(--text-md, 1rem);
@@ -96,6 +100,17 @@
 @media (max-width: 479px) {
   .shell__answer-label {
     display: none;
+  }
+  .shell__answer-short {
+    display: inline;
+    font-size: var(--text-xs);
+  }
+  .shell__answer-link {
+    gap: 0.2rem;
+    padding-inline: 0.35rem;
+  }
+  .shell__answer-age {
+    font-size: var(--text-sm);
   }
 }
 /* The skip link: the FIRST tab stop of every page, parked above the viewport until the
@@ -1566,6 +1581,24 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+}
+/* On a phone the reading panel is one row, a fold (pages/Accueil.tsx): its summary is the row, the controls open under it. */
+.welcome__reading--fold {
+  padding-block: 0;
+}
+.welcome__reading--fold .fold {
+  margin: 0;
+}
+.welcome__reading--fold summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target, 44px);
+  font-weight: 600;
+}
+.welcome__reading--fold .fold__body {
+  display: grid;
+  gap: 0.35rem;
+  padding-bottom: 0.6rem;
 }
 /* The zoom tip is the one line a very narrow phone does without: the size row above it already says how to read bigger. */
 @media (max-width: 399px) {

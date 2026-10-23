@@ -19,6 +19,10 @@ export interface ShareCopy {
   frame: string
   holds: string
   cta: string
+  /** One line above the button: what Horizon is, how long it takes, where the figures stay (a recipient has never heard of it). */
+  pitch: string
+  /** The switch to the OTHER language's edition of this page (written in that language). */
+  otherLang: string
   /** A link that carries no readable scenario. */
   brokenTitle: string
   brokenBody: string
@@ -48,6 +52,8 @@ export const SHARE_COPY: { fr: ShareCopy; en: ShareCopy } = {
     frame: 'Ces chiffres viennent du lien, pas de vos données. Refaites le calcul avec vos vrais montants pour savoir ce qui vaut pour vous.',
     holds: 'Le lien ne contient que l’âge et le type de foyer. Aucun revenu, aucun compte, aucun nom.',
     cta: 'Faire mon calcul',
+    pitch: 'Horizon trouve l’âge le plus tôt où l’argent suffit pour un ménage du Québec : environ 2 minutes, avec vos propres chiffres, qui restent sur votre appareil.',
+    otherLang: 'Read in English',
     brokenTitle: 'Ce lien est incomplet',
     brokenBody: 'Il ne contient pas de scénario lisible. Vous pouvez quand même faire votre propre calcul.',
     ogTitle: (age) => `Retraite possible à ${age} ans`,
@@ -71,6 +77,8 @@ export const SHARE_COPY: { fr: ShareCopy; en: ShareCopy } = {
     frame: 'These numbers come from the link, not from your data. Run the calculation with your own amounts to see what holds for you.',
     holds: 'The link holds only the age and the household type. No income, no account, no name.',
     cta: 'Run my own numbers',
+    pitch: 'Horizon finds the earliest age at which the money lasts for a Québec household: about 2 minutes, with your own figures, which stay on your device.',
+    otherLang: 'Lire en français',
     brokenTitle: 'This link is incomplete',
     brokenBody: 'There is no readable scenario in it. You can still run your own numbers.',
     ogTitle: (age) => `Retirement works at ${age}`,

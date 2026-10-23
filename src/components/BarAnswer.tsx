@@ -38,6 +38,10 @@ export default function BarAnswer() {
       <NavLink to="/resultats" className={({ isActive }) => 'shell__answer-link' + (isActive ? ' is-active' : '')} aria-label={copy.bar.aria(text)} title={copy.bar.aria(text)}>
         {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir ?? undefined} aria-hidden="true" />}
         <span className="shell__answer-label">{copy.label}</span>
+        {/* On a narrow phone the full label goes; this one word stays, so the age is not read as the visitor's own (the link's aria-label already says it all). */}
+        <span className="shell__answer-short" aria-hidden="true">
+          {copy.bar.short}
+        </span>
         {/* Keyed on the age said, not on the busy suffix: the figure settles into place (styles/motion.css) when it CHANGES, and sits still while it is being worked out again. */}
         <strong key={said} className="shell__answer-age">
           {text}

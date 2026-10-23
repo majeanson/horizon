@@ -49,12 +49,14 @@ test.describe('the answer in the bar', () => {
     await expect(page.getByText('Votre réponse', { exact: true })).toHaveCount(0)
   })
 
-  test('fits the bar on a small phone: the label goes, the age stays, nothing runs past the edge', async ({ page }) => {
+  test('fits the bar on a small phone: the label shrinks to one word, the age stays (never a bare age), nothing runs past the edge', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 780 })
     await seedProfile(page)
     await page.goto('/profil?bloc=tout')
     await expect(bar(page)).toContainText('ans', { timeout: 30_000 })
     await expect(bar(page).locator('.shell__answer-label')).toBeHidden()
+    await expect(bar(page).locator('.shell__answer-short')).toBeVisible()
+    await expect(bar(page).locator('.shell__answer-short')).toHaveText('Retraite')
     await expectNoHorizontalOverflow(page)
     const pill = (await bar(page).getByRole('link').boundingBox())!
     const actions = (await page.locator('.shell__actions').boundingBox())!

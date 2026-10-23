@@ -154,7 +154,7 @@ test('the results say how much of the answer stands on confirmed figures, and po
   await page.goto('/resultats?cartes=all')
   // With unconfirmed figures the line is the answer’s range (every estimated figure moved at once), still counting the confirmed ones.
   const note = page.locator('.verdict .refine__confidence')
-  await expect(note).toContainText(/Entre \d+ (?:et \d+ ans|ans et peut-être aucun âge avant \d+),? selon vos chiffres estimés — 0 sur \d+ confirmés\./, { timeout: 60_000 })
+  await expect(note).toContainText(/(?:Entre|De) \d+ (?:et \d+ ans|ans à plus de \d+ ans) selon vos chiffres estimés — 0 sur \d+ confirmés\./, { timeout: 60_000 })
   await note.getByRole('link', { name: 'Rendre mon profil exact' }).click()
   await expect(page).toHaveURL(/\/profil\?bloc=exact$/)
   // the figure itself sits in the person's block: open that one

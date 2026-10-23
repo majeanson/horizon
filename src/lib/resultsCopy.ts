@@ -205,6 +205,7 @@ const FR_RESULTS = {
       shareNone: (year: string) => `En ${year}, aucune rente n’a encore commencé : tout vient de votre épargne.`,
       shareAll: (pct: string, year: string) => `Une fois toutes vos rentes commencées, en ${year}, elles couvrent ${pct} de vos dépenses, après impôt.`,
       coversFrom: (year: string) => `Dès ${year}, vos rentes seules, après impôt, couvrent vos dépenses.`,
+      coversAll: (covers: string, all: string) => `Dès ${covers}, vos rentes seules, après impôt, couvrent vos dépenses ; toutes sont commencées en ${all}.`,
       neverCovers: 'Vos rentes ne couvrent jamais seules vos dépenses : vous puisez dans l’épargne jusqu’à la fin.',
       /** The fold under the dates: the same story as a picture, year by year. */
       chartTitle: 'Rentes et dépenses, année par année',
@@ -222,7 +223,7 @@ const FR_RESULTS = {
     toAssumptions: 'Ouvrir les hypothèses',
     /** While figures are estimates: the answer's range when every estimated figure is off at once (ages already formatted by the caller; `max` is the oldest age tried). */
     confidenceRange: (low: number, high: number, confirmed: number, total: number) => `Entre ${low} et ${high} ans selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
-    confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `Entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
+    confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `De ${low} ans à plus de ${max} ans selon vos chiffres estimés — ${confirmed} sur ${total} confirmés.`,
     now: 'Vous pouvez déjà prendre votre retraite.',
     retired: (together: boolean): string => (together ? 'Vous êtes déjà tous les deux à la retraite.' : 'Vous êtes déjà à la retraite.'),
     runsOut: (year: string) => `Mais l’argent ne durerait que jusqu’en ${year}.`,
@@ -431,6 +432,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
       shareNone: (year: string) => `In ${year}, no pension has started yet: everything comes from your savings.`,
       shareAll: (pct: string, year: string) => `Once all your pensions have started, in ${year}, they cover ${pct} of your spending, after tax.`,
       coversFrom: (year: string) => `From ${year}, your pensions alone, after tax, cover your spending.`,
+      coversAll: (covers: string, all: string) => `From ${covers}, your pensions alone, after tax, cover your spending; all of them have started by ${all}.`,
       neverCovers: 'Your pensions never cover your spending on their own: you draw on savings to the end.',
       chartTitle: 'Pensions and spending, year by year',
       chartHint: 'The gap between the two lines is what your savings pay each year.',
@@ -446,7 +448,7 @@ const EN_RESULTS: typeof FR_RESULTS = {
     confidenceSheet: 'See what would sharpen the answer',
     toAssumptions: 'Open the assumptions',
     confidenceRange: (low: number, high: number, confirmed: number, total: number) => `Between age ${low} and ${high}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
-    confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `Between age ${low} and possibly no age before ${max}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
+    confidenceRangeOpen: (low: number, max: number, confirmed: number, total: number) => `From age ${low} to over ${max}, depending on your estimated figures — ${confirmed} of ${total} confirmed.`,
     now: 'You can already retire.',
     retired: (together: boolean): string => (together ? 'You are both already retired.' : 'You are already retired.'),
     runsOut: (year: string) => `But the money would only last until ${year}.`,

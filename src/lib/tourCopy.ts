@@ -16,7 +16,7 @@ export interface TourCopy {
   step: (n: string, total: string) => string
   /** 1 — the answer restated. `answer` is the formatted age (null when everyone can already stop); `range` the formatted range, or null when every figure is confirmed. */
   verdict: (answer: string | null, range: string | null) => string
-  /** …the range, closed (« entre 58 et 63 ans… ») and open (« …peut-être aucun âge avant 70 »). */
+  /** …the range, closed (« entre 58 et 63 ans… ») and open (« …de 58 ans à plus de 70 ans »). */
   range: (low: string, high: string) => string
   rangeOpen: (low: string, max: string) => string
   /** 2 — the two outermost compared departures (their labels) and what is left at the end of the plan with each. */
@@ -38,7 +38,7 @@ export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
       return range === null ? `${head}.` : `${head} — ${range}.`
     },
     range: (low, high) => `entre ${low} et ${high} ans selon vos chiffres estimés`,
-    rangeOpen: (low, max) => `entre ${low} ans et peut-être aucun âge avant ${max}, selon vos chiffres estimés`,
+    rangeOpen: (low, max) => `de ${low} ans à plus de ${max} ans selon vos chiffres estimés`,
     compare: (low, high, horizonAge, worthLow, worthHigh) => `Comparer : de « ${low} » à « ${high} ». À ${horizonAge} ans, il reste ${worthLow} avec le premier départ, ${worthHigh} avec le second.`,
     compareOne: 'Un seul départ est comparé pour l’instant. Ajoutez-en un autre pour voir ce que change l’âge de départ.',
   },
@@ -54,7 +54,7 @@ export const TOUR_COPY: { fr: TourCopy; en: TourCopy } = {
       return range === null ? `${head}.` : `${head} — ${range}.`
     },
     range: (low, high) => `between age ${low} and ${high}, depending on your estimated figures`,
-    rangeOpen: (low, max) => `from age ${low} to possibly no age before ${max}, depending on your estimated figures`,
+    rangeOpen: (low, max) => `from age ${low} to over ${max}, depending on your estimated figures`,
     compare: (low, high, horizonAge, worthLow, worthHigh) => `Comparing: from “${low}” to “${high}”. At age ${horizonAge}, ${worthLow} is left with the first departure, ${worthHigh} with the second.`,
     compareOne: 'Only one departure is compared for now. Add another to see what the departure age changes.',
   },

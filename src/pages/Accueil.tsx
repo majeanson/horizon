@@ -15,6 +15,7 @@ import { answerRequest } from '../lib/answerRequest'
 import { factsOf } from '../lib/facts'
 import { scrollToSection } from '../lib/motion'
 import { profileGaps } from '../lib/profileGaps'
+import { useNarrow } from '../lib/useNarrow'
 import { READING_HELP_COPY } from '../lib/readingHelpCopy'
 import { useProfile } from '../lib/store'
 import { setTimeBudget, useTimeBudget } from '../lib/timeBudget'
@@ -52,6 +53,7 @@ export function Accueil() {
   const impact = useFactImpact(slow.household, request.assumptions, unconfirmed, asking)
   const [starting, setStarting] = useState(false)
   const budget = useTimeBudget()
+  const narrow = useNarrow()
 
   return (
     <section className="page-body welcome">
@@ -63,13 +65,25 @@ export function Accueil() {
             <BrandMark size={32} />
             <span>{c.subtitle}</span>
           </p>
-          <section className="surface welcome__reading" aria-labelledby="welcome-reading">
-            <p id="welcome-reading" className="welcome__title">
-              {rc.title}
-            </p>
-            <DisplayControls sizeLabels={rc.sizes} />
-            <p className="field-row__hint">{rc.zoomTip}</p>
-          </section>
+          {/* The question leads (a stranger read the panel and the buttons before it, and the title under them read upside down); the reading preferences follow it. */}
+          <PageHead title={c.title} />
+          {narrow ? (
+            // On a phone the panel is ONE row (the question and « Commencer » keep the first screen); a tap opens the controls.
+            <section className="surface welcome__reading welcome__reading--fold" aria-label={rc.title}>
+              <Fold summary={rc.title}>
+                <DisplayControls sizeLabels={rc.sizes} />
+                <p className="field-row__hint">{rc.zoomTip}</p>
+              </Fold>
+            </section>
+          ) : (
+            <section className="surface welcome__reading" aria-labelledby="welcome-reading">
+              <p id="welcome-reading" className="welcome__title">
+                {rc.title}
+              </p>
+              <DisplayControls sizeLabels={rc.sizes} />
+              <p className="field-row__hint">{rc.zoomTip}</p>
+            </section>
+          )}
           {/* The way in sits right under the preferences, above the question (Marc, 2026-10-20): on the smallest phone it is still on the first screen. */}
           <div className="welcome__go">
             <button type="button" className="btn btn--primary" onClick={() => setStarting(true)}>
@@ -79,7 +93,6 @@ export function Accueil() {
               {c.example}
             </button>
           </div>
-          <PageHead title={c.title} />
           <ul className="welcome__promises">
             {c.promises.map((p) => (
               <li key={p}>

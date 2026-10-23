@@ -6,6 +6,8 @@ import { SectionHeader } from '../../SectionHeader'
 import { Fold } from '../../Fold'
 import { Skeleton } from '../../Skeleton'
 import { SkeletonChips, SkeletonText } from '../../SkeletonShapes'
+import { answerSpread } from '../../../lib/answerSpread'
+import { ANSWER_SPREAD_COPY } from '../../../lib/answerSpreadCopy'
 import { STRESS_PRESETS } from '../../../lib/marketRange'
 import { MAX_AGE } from '../../../lib/resultsModel'
 import type { ResultsModel } from '../../../lib/useResultsPage'
@@ -17,10 +19,23 @@ import type { ResultsModel } from '../../../lib/useResultsPage'
 // The grids ride their own chunk: only a reader who opens the second depth pays for them.
 const SensitivityPanel = lazy(() => import('../SensitivityPanel').then((m) => ({ default: m.SensitivityPanel })))
 
+/** « Selon les trois scénarios et les parcours de marché : de 57 à 64 ans » — one sentence over the two blocks that hold it: only once both searches are in, and only when it says something the big age does not.
+ *  (It sat on the answer's card beside the range "depending on your estimated figures": two ranges under one age, and nothing to say which to believe.) */
+function AnswerSpreadLine({ m }: { m: ResultsModel }) {
+  const age = m.headline.age
+  if (m.retiredNow || m.headline.kind !== 'at' || age === null) return null
+  const spread = answerSpread(age, m.range, m.stress)
+  if (spread === null) return null
+  const c = ANSWER_SPREAD_COPY[m.lang]
+  return <p className="verdict__note">{spread.high === null ? c.open(spread.low, MAX_AGE) : c.range(spread.low, spread.high)}</p>
+}
+
 /** The two blocks of « En bref »: the three scenarios and a hard market side by side. Rows from the first paint. */
 function Brief({ m }: { m: ResultsModel }) {
   const { t, rc, activePreset, range, stress, mc, goTo, pathName, prudentGap } = m
   return (
+    <>
+    <AnswerSpreadLine m={m} />
     <div className="firm__pair">
       <div className="verdict__range">
         <p className="verdict__range-title">{rc.headline.rangeTitle}</p>
@@ -69,6 +84,7 @@ function Brief({ m }: { m: ResultsModel }) {
         </p>
       </div>
     </div>
+    </>
   )
 }
 

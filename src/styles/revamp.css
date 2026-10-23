@@ -623,6 +623,15 @@
   gap: 0.9rem;
   min-width: 0;
 }
+.onboard__slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-height: 7.5rem;
+}
+.onboard__slot > .live-answer {
+  margin-top: 0;
+}
 .onboard__nav {
   display: flex;
   flex-wrap: wrap;
