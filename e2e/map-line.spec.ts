@@ -3,7 +3,7 @@ import { EXAMPLE, seedProfile } from './seed'
 import { expectNoHorizontalOverflow } from './overflow'
 
 // (2026-10-14: the glossary's map holds 8 chips — six family groups, the documents and the places to go next — after the groups were regrouped one family each;
-// 2026-10-19: 9 — the legend of the colours, first on the page, joined the map.)
+// 2026-10-19: 9 — the legend of the colours, first on the page, joined the map; 2026-10-23: 10 — « Le Québec et ses services » (CHSLD, RAMQ, RQAP) is a group of its own.)
 // THE MAP OF A LONG PAGE IS ONE LINE. The glossary's and the results page's map of sections (SectionNav) used to wrap: on a phone four lines of chips
 // ate the first screen. It is a Rail now — one line that scrolls sideways, like the view tabs, with the soft edge fade saying there is more — and
 // the chip of the section in view is brought into the line as the page scrolls.
@@ -28,7 +28,7 @@ async function oneLine(page: Page, expected: number) {
 test('glossary on a phone: the map is one scrolling line, the last chip can be reached, and nothing pushes the page sideways', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
   await page.goto('/glossaire')
-  const { chips, rail } = await oneLine(page, 9)
+  const { chips, rail } = await oneLine(page, 10)
   expect(await rail.evaluate((el) => el.scrollWidth > el.clientWidth), 'eight chips do not fit 390 px: the line scrolls').toBe(true)
   await rail.evaluate((el) => el.scrollTo({ left: el.scrollWidth }))
   const last = (await chips.last().boundingBox())!
@@ -39,7 +39,7 @@ test('glossary on a phone: the map is one scrolling line, the last chip can be r
 test('glossary: a tap on a far chip goes to its section, and the marked chip comes into view in the line', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
   await page.goto('/glossaire')
-  const { chips, rail } = await oneLine(page, 9)
+  const { chips, rail } = await oneLine(page, 10)
   await chips.last().scrollIntoViewIfNeeded()
   await chips.last().click()
   await expect.poll(async () => chips.evaluateAll((els) => els.findIndex((e) => e.getAttribute('aria-current') !== null)), { timeout: 10_000 }).toBeGreaterThanOrEqual(4)
@@ -72,7 +72,7 @@ test('results on a phone: the map is one line too, and a wide screen keeps it on
 test('the map is still a set of real buttons: Tab reaches the chips, and the line itself can be driven by the keyboard when it overflows', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
   await page.goto('/glossaire')
-  const { chips, rail } = await oneLine(page, 9)
+  const { chips, rail } = await oneLine(page, 10)
   await expect(rail).toHaveAttribute('tabindex', '0') // a scrolling region that overflows is reachable by keyboard (axe: scrollable-region-focusable)
   await chips.first().focus()
   await expect(chips.first()).toBeFocused()
