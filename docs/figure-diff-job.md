@@ -1,7 +1,8 @@
-# A weekly figure-diff job — design note (not built)
+# A weekly figure-diff job — design note (built 2026-10-23: the mechanical ones)
 
-> Status: **a design, no code.** Written for the day the project is bored enough to build it. Nothing
-> here is promised, and nothing in the app depends on it.
+> Status: **built, small.** `npm run figures:check` (`scripts/check-figures.ts`, the list and the readers in `scripts/figureWatch.ts`, held by `scripts/figureWatch.test.mjs` against saved
+> excerpts in `scripts/fixtures/figures/`) and `.github/workflows/figures.yml` (weekly, one digest issue) watch the CCB (3 figures), the OAS (2, plus a probe for the next quarter's page) and the
+> CHSLD rates (3). Not watched, and why: Revenu Québec and the RAMQ refuse bots (the human list in `STATE.md`); the QPP maxima (no page read mechanically yet). Nothing in the app depends on it.
 
 ## The problem
 
@@ -68,4 +69,4 @@ the human list in `STATE.md`.
 - Whether the extractors are brittle enough to cost more than a yearly human check. A plausible
   answer is to ship the three mechanical ones and keep the rest on the checklist in `ENGINE.md §4`
   (« Adding a tax year »).
-- Whether one issue per figure or one weekly digest reads better.
+- Decided: ONE open issue (a digest) that later findings comment on — per-figure issues would be six at once every January.

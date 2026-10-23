@@ -27,6 +27,7 @@
     "examples": "node scripts/gen-examples.ts",
     "og": "node scripts/gen-og.ts",
     "sources:check": "node scripts/check-sources.ts",
+    "figures:check": "node scripts/check-figures.ts",
     "knip": "knip",
     "deploy": "npm run build && wrangler deploy"
   },

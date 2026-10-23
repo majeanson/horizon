@@ -1,0 +1,47 @@
+name: Figures (a number moved on its cited page)
+
+# `sources.yml` asks whether each cited page still EXISTS. This asks whether the few figures that move on a schedule still read the same on it: the CCB each July, the OAS each quarter (and whether
+# the next quarter's page is up), the CHSLD rates each January. It never edits the repository — a moved figure is a human decision, since the new number may belong to next year's params file.
+# One open issue, « Figures moved on their cited pages », collects what is found: a new finding is a comment on it, not a second issue. docs/figure-diff-job.md is the design.
+# Also runnable on demand from the Actions tab.
+
+on:
+  schedule:
+    - cron: '41 11 * * 1' # Mondays, 11:41 UTC — after sources.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  figures:
+    name: Figures read the same on their pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      # Exits 1 when a figure CHANGED or a newer OAS quarter is up (and writes the digest); a figure that could not be read is listed, never fatal.
+      - id: check
+        run: npm run figures:check -- --report "$RUNNER_TEMP/figures-report.md"
+        continue-on-error: true
+      - name: Open or update the one issue
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Figures moved on their cited pages
+        run: |
+          if [ ! -s "$RUNNER_TEMP/figures-report.md" ]; then
+            echo "the check failed without a digest: an error in the script itself, not a moved figure" >&2
+            exit 1
+          fi
+          open=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body-file "$RUNNER_TEMP/figures-report.md"
+          else
+            gh issue create --title "$TITLE" --body-file "$RUNNER_TEMP/figures-report.md"
+          fi
