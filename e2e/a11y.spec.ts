@@ -184,7 +184,7 @@ test('the whole shell is reachable by keyboard, in a sensible order', async ({ p
   // The skip link first — the whole point of one — then the top bar (the name, the answer's age, the sheet, the glossary, the settings gear), then the four destinations.
   // (The language and theme buttons left the bar for the settings page; the answer pill took their place, components/BarAnswer.tsx.)
   expect(order.slice(0, 2)).toEqual(['Aller au contenu', 'Horizon'])
-  expect(order[2]).toMatch(/^Votre réponse\d+ ans$/) // the label and the age, two spans with no space between their texts
+  expect(order[2]).toMatch(/^Votre réponseRetraite\d+/) // the label, the short label (hidden on a narrow phone) and the age: spans with no space between their texts (cut at 24 characters)
   expect(order.slice(3, 6)).toEqual(['Fiche', 'Glossaire', 'Réglages'])
   expect(order.slice(6, 10)).toEqual(['Profil', 'Résultats', 'Décider', 'Hypothèses'])
 })
