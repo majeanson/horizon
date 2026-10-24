@@ -1,4 +1,5 @@
 import { CARDS_COPY } from '../../lib/cardsCopy'
+import { formatSignedMoney } from '../../lib/money'
 import type { ResultsModel } from '../../lib/useResultsPage'
 
 // « En un coup d’œil » — three tiles under the sentence of the answer: when to start, how long the money lasts, and the monthly margin the plan has against what it is asked to fund. They say nothing the card
@@ -14,11 +15,10 @@ export function answerAtGlance(m: ResultsModel): { start: string; lasts: string;
   const asked = ten(profile.household.spending.retiredToday)
   const funds = comfort == null ? null : ten(comfort)
   const margin = funds === null ? null : funds - asked
-  const signed = (n: number) => (n >= 0 ? '+' : '−') + money(Math.abs(n))
   return {
     start: headline.age === null ? c.now : rc.headline.ageText(headline.age),
     lasts: c.holdsTo(assumptions.horizonAge),
-    margin: margin === null ? null : signed(margin),
+    margin: margin === null ? null : formatSignedMoney(margin, lang),
     short: margin !== null && margin < 0,
     fundsOf: funds === null ? null : c.fundsOf(money(funds), money(asked)),
   }

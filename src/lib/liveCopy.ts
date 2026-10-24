@@ -12,6 +12,9 @@ export interface LiveCopy {
   /** Against the answer on arrival: how an edit moved it. */
   earlier: (years: number) => string
   later: (years: number) => string
+  /** The whole years the answer moved, signed, for the badge that flies off the pill (components/DeltaBadge.tsx): « −1 an », « +2 ans ». The money beside it
+   *  needs no words (`formatSignedCompactMoney`). Not named `earlier` / `later`: those keys promise a direction word (directionWords.test.ts), this one is a figure. */
+  deltaYears: (years: number) => string
   /** From « no age » to an age, and back. */
   found: string
   lost: string
@@ -29,6 +32,7 @@ const FR: LiveCopy = {
   none: (max) => `aucun âge jusqu’à ${max} ans`,
   earlier: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tôt qu’à votre première réponse`,
   later: (years) => `${years} ${years === 1 ? 'an' : 'ans'} plus tard qu’à votre première réponse`,
+  deltaYears: (years) => `${years < 0 ? '−' : '+'}${Math.abs(years)} ${Math.abs(years) === 1 ? 'an' : 'ans'}`,
   found: 'un âge existe maintenant',
   lost: 'plus aucun âge ne fonctionne',
   see: 'Voir',
@@ -43,6 +47,7 @@ const EN: LiveCopy = {
   none: (max) => `no age up to ${max}`,
   earlier: (years) => `${years} ${years === 1 ? 'year' : 'years'} earlier than your first answer`,
   later: (years) => `${years} ${years === 1 ? 'year' : 'years'} later than your first answer`,
+  deltaYears: (years) => `${years < 0 ? '−' : '+'}${Math.abs(years)} ${Math.abs(years) === 1 ? 'year' : 'years'}`,
   found: 'an age works now',
   lost: 'no age works any more',
   see: 'See',

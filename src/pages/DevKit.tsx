@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Accordion, AccordionItem, AccordionMode, type AccordionOpen } from '../components/Accordion'
 import { Cascade } from '../components/Cascade'
 import { CountUp } from '../components/CountUp'
+import { DeltaBadge } from '../components/DeltaBadge'
 import { Chip, ChipGroup } from '../components/Chip'
 import { ConceptPip, FamilyPip } from '../components/ConceptPip'
 import { HouseholdGlyphs } from '../components/HouseholdGlyphs'
@@ -453,8 +454,11 @@ function MotionSpecimen() {
   const [age, setAge] = useState(62)
   const [pulse, setPulse] = useState({ count: 0, dir: 'earlier' as 'earlier' | 'later' })
   const [answer, setAnswer] = useState(62)
+  // The badge off the age (DeltaBadge): the years with a made-up change at the horizon (an earlier age leaves less), or the money alone when the age holds.
+  const [delta, setDelta] = useState<{ take: number; years: number; money: number | null } | null>(null)
   const move = (to: number) => {
     setPulse((p) => ({ count: p.count + 1, dir: to < answer ? 'earlier' : 'later' }))
+    setDelta((d) => ({ take: (d?.take ?? 0) + 1, years: to - answer, money: (to - answer) * 38_000 }))
     setAnswer(to)
   }
   return (
@@ -500,12 +504,14 @@ function MotionSpecimen() {
                   <Cascade>{answer + ' ans'}</Cascade>
                 </strong>
                 {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir} aria-hidden="true" />}
+                {delta && <DeltaBadge take={delta.take} years={delta.years} money={delta.money} lang="fr" />}
               </span>
             </span>
           </p>
           <Cluster>
             <Chip onClick={() => move(Math.max(55, answer - 2))}>Plus tôt (anneau vert)</Chip>
             <Chip onClick={() => move(Math.min(70, answer + 2))}>Plus tard (anneau doré)</Chip>
+            <Chip onClick={() => setDelta((d) => ({ take: (d?.take ?? 0) + 1, years: 0, money: 12_000 }))}>Même âge, plus d’argent (badge seul)</Chip>
           </Cluster>
         </div>
         <EmptyState tone="calm" icon="chart-line-up-bold">
@@ -687,6 +693,7 @@ function ENTRIES(): Entry[] {
     { cat: 'Affichage', name: 'Figure', file: 'src/components/Figure.tsx', kw: 'chiffre calculé d’où vient formule source provenance trace rente pension', render: () => <Figure trace={FIGURE_SPECIMEN} after="par mois, en dollars d’aujourd’hui" /> },
     { cat: 'Affichage', name: 'SectionNav', file: 'src/components/SectionNav.tsx', kw: 'sections ancre carte navigation page longue', render: () => <SectionNav ariaLabel="Sections (exemple)" links={[{ id: 'devkit-nav-a', label: 'La réponse' }, { id: 'devkit-nav-b', label: 'Comparer' }, { id: 'devkit-nav-c', label: 'Paramètres', arc: 'Vérifier' }]} /> },
     { cat: 'Affichage', name: 'LiveAnswer', file: 'src/components/LiveAnswer.tsx', kw: 'réponse en direct âge bandeau', render: () => <LiveAnswer /> },
+    { cat: 'Affichage', name: 'DeltaBadge', file: 'src/components/DeltaBadge.tsx', kw: 'écart badge réponse bougé années argent horizon animation', render: () => <MotionSpecimen /> },
     { cat: 'Affichage', name: 'DemoAnswer', file: 'src/components/DemoAnswer.tsx', kw: 'exemple démo première visite accueil réponse ménage', render: () => <DemoAnswer /> },
     {
       cat: 'Affichage',

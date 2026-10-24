@@ -4,7 +4,7 @@ import { LIVE_COPY, type LiveCopy } from './liveCopy.ts'
 // The words of the live answer live outside the eager dictionaries (liveCopy.ts), so the dictionary parity test cannot see
 // them: both languages, every text non-empty, the two languages different, the plural right.
 
-const texts = (c: LiveCopy): string[] => [c.label, c.at(59), c.now, c.none(70), c.earlier(1), c.earlier(3), c.later(1), c.later(2), c.found, c.lost, c.see, c.working]
+const texts = (c: LiveCopy): string[] => [c.label, c.at(59), c.now, c.none(70), c.earlier(1), c.earlier(3), c.later(1), c.later(2), c.deltaYears(-1), c.deltaYears(2), c.found, c.lost, c.see, c.working]
 
 describe('the live answer copy', () => {
   it('has every text in both languages, none empty, none shared between them', () => {
@@ -22,5 +22,11 @@ describe('the live answer copy', () => {
     expect(LIVE_COPY.fr.earlier(3)).toContain('3 ans ')
     expect(LIVE_COPY.en.later(1)).toContain('1 year ')
     expect(LIVE_COPY.en.later(2)).toContain('2 years ')
+  })
+  it('the badge says the years signed — a true minus (U+2212), the plural by the size, never the sign', () => {
+    expect(LIVE_COPY.fr.deltaYears(-1)).toBe('−1 an')
+    expect(LIVE_COPY.fr.deltaYears(2)).toBe('+2 ans')
+    expect(LIVE_COPY.en.deltaYears(1)).toBe('+1 year')
+    expect(LIVE_COPY.en.deltaYears(-3)).toBe('−3 years')
   })
 })

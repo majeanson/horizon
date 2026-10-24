@@ -9,6 +9,7 @@ import { today } from '../lib/today'
 import { useAnswer } from '../lib/useAnswer'
 import { useChangePulse } from '../lib/useChangePulse'
 import { useSettled } from '../lib/useSettled'
+import { DeltaBadge } from './DeltaBadge'
 
 // « 60 ans » IN THE TOP BAR — the answer one glance away on every page, where the language and the theme buttons used to be (both live on the
 // settings page and on a first visit's front door). The SAME job as the results page (`useAnswer`: the earliest age, in a worker, from a profile that has
@@ -29,7 +30,8 @@ export default function BarAnswer() {
   const answer = useAnswer(request, ready)
   const got = ready ? answer.value : null
   // A ring around the pill when the age MOVES (not when it first arrives): sage if earlier, accent if later (styles/motion.css). Decoration — the live region says the age.
-  const pulse = useChangePulse(got === null ? null : got.nowOk ? null : got.earliest)
+  // And under the pill, what the edit changed in figures (DeltaBadge): the years, and the money left at the horizon — the latter on every move, the age held or not.
+  const pulse = useChangePulse(got === null ? null : got.nowOk ? null : got.earliest, got?.headline.netWorthAtHorizon ?? null)
   if (got === null) return null
   const said = got.earliest === null ? copy.bar.none : got.nowOk ? copy.now : copy.at(got.earliest)
   const text = answer.busy ? `${said} ${copy.working}` : said
@@ -37,6 +39,7 @@ export default function BarAnswer() {
     <div className={'shell__answer' + (answer.busy ? ' is-busy' : '')} role="status" aria-live="polite">
       <NavLink to="/resultats" className={({ isActive }) => 'shell__answer-link' + (isActive ? ' is-active' : '')} aria-label={copy.bar.aria(text)} title={copy.bar.aria(text)}>
         {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir ?? undefined} aria-hidden="true" />}
+        {pulse.delta && <DeltaBadge take={pulse.delta.take} years={pulse.delta.years} money={pulse.delta.money} lang={lang} />}
         <span className="shell__answer-label">{copy.label}</span>
         {/* On a narrow phone the full label goes; this one word stays, so the age is not read as the visitor's own (the link's aria-label already says it all). */}
         <span className="shell__answer-short" aria-hidden="true">

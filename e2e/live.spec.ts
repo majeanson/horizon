@@ -64,6 +64,44 @@ test.describe('the answer in the bar', () => {
     expect(pill.height).toBeGreaterThanOrEqual(44)
   })
 
+  // What the edit changed floats off the pill (components/DeltaBadge.tsx): the years the age moved and the money left at the horizon, signed — outside the live
+  // region's words (aria-hidden), never a control, inside the screen on a phone, and gone by itself.
+  test('an edit that moves the age floats what changed off the pill, then the badge leaves by itself', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 })
+    await seedProfile(page)
+    await page.goto('/profil?bloc=tout&form=1')
+    await expect(bar(page)).toContainText('60 ans', { timeout: 30_000 })
+    const spend = page.getByRole('textbox', { name: 'Dépenses par année, une fois tout le monde à la retraite', exact: true })
+    await spend.fill('70000')
+    await spend.press('Enter')
+    const badge = bar(page).locator('.answer-delta')
+    await expect(badge).toBeVisible({ timeout: 30_000 })
+    await expect(badge).toHaveAttribute('aria-hidden', 'true')
+    await expect(badge.locator('.answer-delta__years')).toHaveText(/^−\d+ ans?$/)
+    await expect(badge.locator('.answer-delta__money')).toHaveText(/^[+−]/)
+    await expect(page.locator('.shell__bar').getByRole('button')).toHaveCount(0)
+    await expect(bar(page).getByRole('link')).toHaveAccessibleName(/^Votre réponse.*\d+ ans\. Voir les résultats$/)
+    await expectNoHorizontalOverflow(page)
+    await expect(badge).toHaveCount(0, { timeout: 8_000 })
+  })
+
+  test.describe('under reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' })
+    test('the badge is still shown — still — for the same while', async ({ page }) => {
+      await seedProfile(page)
+      await page.goto('/profil?bloc=tout&form=1')
+      await expect(bar(page)).toContainText('60 ans', { timeout: 30_000 })
+      const spend = page.getByRole('textbox', { name: 'Dépenses par année, une fois tout le monde à la retraite', exact: true })
+      await spend.fill('70000')
+      await spend.press('Enter')
+      const badge = bar(page).locator('.answer-delta')
+      await expect(badge).toBeVisible({ timeout: 30_000 })
+      await page.waitForTimeout(800)
+      await expect(badge).toBeVisible()
+      await expect(badge).toHaveCount(0, { timeout: 8_000 })
+    })
+  })
+
   test('English', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('horizon-lang', 'en'))
     await seedProfile(page)

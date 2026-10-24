@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatCompactMoney, formatMoney, parseMoney, parseDecimal } from './money'
+import { formatCompactMoney, formatMoney, formatSignedCompactMoney, formatSignedMoney, parseMoney, parseDecimal } from './money'
 
 // Plain, narrow and non-breaking spaces all print as a space: the Intl data uses U+00A0 / U+202F
 // between groups and before « $ », and a test full of invisible characters is a test nobody can
@@ -115,5 +115,19 @@ describe('formatCompactMoney (the chart axis)', () => {
     expect(formatCompactMoney(950, 'en')).toBe('$950')
     expect(formatCompactMoney(null, 'fr')).toBe('')
     expect(formatCompactMoney(Number.NaN, 'en')).toBe('')
+  })
+})
+
+describe('a CHANGE in money, signed (the badge off the answer, a lever’s gain, the glance’s margin)', () => {
+  it('types the sign itself — a true minus, never a hyphen — and the amount through the cached formatters', () => {
+    expect(formatSignedCompactMoney(12_000, 'fr')).toBe('+' + formatCompactMoney(12_000, 'fr'))
+    expect(formatSignedCompactMoney(-8_500, 'en')).toBe('−$8.5K')
+    expect(formatSignedCompactMoney(-8_500, 'en')).not.toMatch(/^-/)
+    expect(visible(formatSignedMoney(-300, 'fr'))).toBe('−300 $')
+    expect(formatSignedMoney(1_507.65, 'en')).toBe('+$1,508')
+  })
+
+  it('zero is « +0 » — callers floor a change away before saying it', () => {
+    expect(formatSignedMoney(0, 'en')).toBe('+$0')
   })
 })

@@ -42,6 +42,13 @@ export function formatCompactMoney(dollars: number | null | undefined, lang: Lan
   return f.format(dollars)
 }
 
+// A CHANGE in money, signed: « +12 000 $ » / « −8 500 $ », and compact, « +12 k$ » / « −$8.5K ». The sign is typed here — a true minus
+// (U+2212), never a hyphen — and the amount by the cached formatters above. Zero prints « +0 $ »: callers floor a change away before they
+// say it (`DELTA_MONEY_FLOOR` in lib/useChangePulse.ts; Décider's `endGain`).
+const sign = (n: number): string => (n < 0 ? '−' : '+')
+export const formatSignedMoney = (dollars: number, lang: Lang): string => sign(dollars) + formatMoney(Math.abs(dollars), lang)
+export const formatSignedCompactMoney = (dollars: number, lang: Lang): string => sign(dollars) + formatCompactMoney(Math.abs(dollars), lang)
+
 // A free-typed number → a number. The workhorse behind parseMoney and every other typed field (a
 // percentage, a count of years): tolerates spaces (plain and non-breaking), a leading "$", and either
 // separator. Empty/invalid → null; a negative number is refused unless `negative` is set.

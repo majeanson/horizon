@@ -608,6 +608,70 @@ textarea.input:focus {
   animation: tip-pop var(--dur-fast) var(--ease-out);
 }
 
+/* ── What an edit changed floats off the answer (components/DeltaBadge.tsx): the years the age moved, and the money left at the horizon ──────────────
+   Rises with --ease-out, rests --delta-dwell (set by the component from DELTA_DWELL_MS), then shrinks back toward the age — the component removes it a
+   beat after. Transform only: the words are whole ink from the first frame. `translate` centres it, so the animated `transform` need not carry that. */
+@keyframes delta-rise {
+  from { transform: translateY(var(--delta-from)) scale(0.85); }
+  to { transform: none; }
+}
+@keyframes delta-away {
+  to { transform: translateY(var(--delta-to)) scale(0.6); }
+}
+.answer-delta {
+  --pulse: var(--accent);
+  --delta-from: 0.6em; /* the verdict: from the age, upward */
+  --delta-to: -0.5em;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.15em);
+  z-index: 1;
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  display: grid;
+  justify-items: center;
+  gap: 0.05em;
+  padding: 0.18em 0.6em;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--pulse) 55%, var(--line));
+  box-shadow: 0 0.2rem 0.7rem color-mix(in srgb, var(--pulse) 28%, transparent);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: nowrap;
+  color: var(--ink);
+  pointer-events: none;
+  user-select: none;
+  animation:
+    delta-rise var(--dur-slow) var(--ease-out) backwards,
+    delta-away var(--dur-base) var(--ease-out) calc(var(--delta-dwell) - var(--dur-base)) forwards;
+}
+/* Good news wears sage — an earlier age, or, when the age held, more money at the horizon; the rest wears the accent. */
+.answer-delta:has(.answer-delta__years[data-dir='earlier']),
+.answer-delta:has(.answer-delta__money.is-signed[data-sign='up']) {
+  --pulse: var(--sage-deep);
+}
+/* The hues are deepened toward ink: alone, neither holds 4.5:1 at this size. */
+.answer-delta__years {
+  color: color-mix(in srgb, var(--pulse) 60%, var(--ink));
+}
+.answer-delta__money.is-signed[data-sign='up'] {
+  color: color-mix(in srgb, var(--sage-deep) 60%, var(--ink));
+}
+.answer-delta__money.is-signed[data-sign='down'] {
+  color: color-mix(in srgb, var(--accent) 60%, var(--ink));
+}
+/* The bar is pinned to the top of the screen — above the pill is off-screen — so there the badge hangs UNDER the pill and drops out of it. */
+.shell__answer-link > .answer-delta {
+  --delta-from: -0.6em;
+  --delta-to: 0.5em;
+  bottom: auto;
+  top: calc(100% + 0.2rem);
+  transform-origin: 50% 0;
+  font-size: var(--text-xs);
+}
+
 /* ── Reduced motion: none of the above ─────────────────────────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .page-body > *,
@@ -642,6 +706,7 @@ textarea.input:focus {
   .slider__value,
   .empty-state__mark,
   .answer-pulse,
+  .answer-delta,
   .cascade__d,
   .section-nav.is-celebrating .chip .pip,
   .fact-btn__tick path,

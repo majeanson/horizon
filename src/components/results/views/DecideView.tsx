@@ -18,7 +18,7 @@ import { SkeletonLines, SkeletonStatus } from '../../Skeleton'
 import { SkeletonChips, SkeletonText, SliderSkeleton } from '../../SkeletonShapes'
 import { BRACKET_FILL_COPY } from '../../../lib/bracketFillCopy'
 import { FUTURE_COPY } from '../../../lib/futureCopy'
-import { formatCompactMoney, formatMoney } from '../../../lib/money'
+import { formatMoney, formatSignedCompactMoney } from '../../../lib/money'
 import { MAX_AGE } from '../../../lib/resultsModel'
 import { balanceRelevant, fonteRelevant, leverPruned, orderRelevant } from '../../../lib/relevance'
 import { REVERSE_COPY } from '../../../lib/reverseCopy'
@@ -124,7 +124,7 @@ export function DecideView({ m }: { m: ResultsModel }) {
                   ? lc.same(l.earliest)
                   : lc.later(-l.yearsGained, l.earliest)}
         {levers !== undefined && l.endGain !== null && Math.abs(l.endGain) >= 1000 && (
-          <span className="levers__end">{lc.end((l.endGain > 0 ? '+' : '−') + formatCompactMoney(Math.abs(l.endGain), lang))}</span>
+          <span className="levers__end">{lc.end(formatSignedCompactMoney(l.endGain, lang))}</span>
         )}
       </span>
     </li>

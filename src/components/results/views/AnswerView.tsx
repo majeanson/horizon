@@ -30,6 +30,7 @@ import { SHARE_COPY } from '../../../lib/shareCopy'
 import { stopLines } from '../../../lib/stopLines'
 import { ShareChip } from '../ShareChip'
 import { Cascade } from '../../Cascade'
+import { DeltaBadge } from '../../DeltaBadge'
 import { useChangePulse } from '../../../lib/useChangePulse'
 
 // « À faire cette année » rides with the care copy, outside the page's own chunk.
@@ -62,7 +63,8 @@ export function AnswerView({ m }: { m: ResultsModel }) {
   }, [verdictOpen, datesFold, setDatesFold])
   const cc = CARDS_COPY[lang]
   // A ring around the big age when it MOVES (not on arrival): sage if earlier, accent if later. The age itself arrives digit by digit (Cascade).
-  const pulse = useChangePulse(headline.age ?? null)
+  // Above it, what the edit changed in figures (DeltaBadge): the years, and the money left at the horizon.
+  const pulse = useChangePulse(headline.age ?? null, headline.netWorthAtHorizon)
   useEffect(() => {
     if (!answerPending && !retiredNow) lastShape = headline.kind === 'none' ? 'none' : 'at'
   }, [answerPending, retiredNow, headline.kind])
@@ -115,6 +117,7 @@ export function AnswerView({ m }: { m: ResultsModel }) {
                           <Cascade>{rc.headline.ageText(headline.age!)}</Cascade>
                         </strong>
                         {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir ?? undefined} aria-hidden="true" />}
+                        {pulse.delta && <DeltaBadge take={pulse.delta.take} years={pulse.delta.years} money={pulse.delta.money} lang={lang} />}
                       </span>
                       {sentenceAfter}
                     </span>
