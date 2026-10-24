@@ -59,6 +59,20 @@ test('the year is picked with the slider (and the keyboard): the readout follows
   expect(last, 'a retired year does not read like a working one').not.toBeCloseTo(first, -2)
 })
 
+test('the year being read is marked on all three charts, and the mark follows the slider', async ({ page }) => {
+  await open(page)
+  const marks = page.locator('.chart-detail .chart__highlight')
+  await expect(marks).toHaveCount(3) // where the money comes from, where it goes, what the accounts hold
+  const x = async () => Math.round((await marks.first().boundingBox())!.x)
+  const slider = page.getByRole('slider', { name: 'Année' })
+  await slider.focus()
+  await slider.press('Home')
+  await expect.poll(x).toBeLessThan(400) // the first year: the left edge of the plot
+  const early = await x()
+  await slider.press('End')
+  await expect.poll(x).toBeGreaterThan(early + 300) // the last year: the right edge
+})
+
 test('with one person picked the sources are theirs and the spending stays the household’s: the second chart says so and the « goes out » column steps aside', async ({ page }) => {
   await open(page)
   await page.locator('.chart-detail').getByRole('tab', { name: 'Camille' }).click()

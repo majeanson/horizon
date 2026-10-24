@@ -211,6 +211,9 @@ function DetailView({
   if (personId === null && rows.some((r) => r.household.homeValueEnd > 0)) balanceSegments.push('home')
   const first = rows[0].year
   const last = rows[rows.length - 1].year
+  // The year « Une année en détail » reads (the slider's), marked on the three charts: it opens on the first year nobody earns (the first year of living on pensions and savings), else the first year.
+  const [pickedYear, setPickedYear] = useState<number | null>(null)
+  const readoutYear = Math.min(last, Math.max(first, pickedYear ?? sources.find((b) => b.work < 0.5)?.x ?? first))
   const xTitle = (x: number) => c.tooltip(x, agesByYear.get(x) ?? '')
   const xTick = (x: number) => [String(x), agesByYear.get(x) ?? '']
   const yFormat = (y: number) => formatCompactMoney(y, lang)
@@ -260,13 +263,14 @@ function DetailView({
             xTitle={xTitle}
             xTick={xTick}
             markers={[]}
+            highlightX={readoutYear}
             ariaLabel={c.sourcesFigure(first, last)}
           />
         </Suspense>
       </div>
 
       <Suspense fallback={<FlowSkeleton />}>
-        <FlowSection rows={rows} sources={sources} personId={personId} births={household.persons.map((p) => p.birth.year)} scale={flowScale} agesByYear={agesByYear} />
+        <FlowSection year={readoutYear} onPick={setPickedYear} rows={rows} sources={sources} personId={personId} births={household.persons.map((p) => p.birth.year)} scale={flowScale} agesByYear={agesByYear} />
       </Suspense>
 
       <h4 className="chart-detail__heading">{c.balancesTitle}</h4>
@@ -282,6 +286,7 @@ function DetailView({
             xTitle={xTitle}
             xTick={xTick}
             markers={[]}
+            highlightX={readoutYear}
             ariaLabel={c.balancesFigure(first, last)}
           />
         </Suspense>

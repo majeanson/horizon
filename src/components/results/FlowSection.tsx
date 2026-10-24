@@ -1,4 +1,4 @@
-import { Fragment, lazy, Suspense, useMemo, useState } from 'react'
+import { Fragment, lazy, Suspense, useMemo } from 'react'
 import type { YearRow } from '../../engine/types'
 import { useLang, useT } from '../../i18n'
 import { EXPENSE_COLOUR, EXPENSE_CONCEPT, EXPENSE_SEGMENTS, SOURCE_SEGMENTS, creditParts as creditPartsOf, expenseBars, type ExpenseSegment, type Per, type SourceSegment, type sourceBars } from '../../lib/chartData'
@@ -25,7 +25,12 @@ export function FlowSection({
   births,
   scale,
   agesByYear,
+  year,
+  onPick,
 }: {
+  /** The year the reading is about, and the way to move it (the slider). Held by the panel, which marks it on the charts too. */
+  year: number
+  onPick: (year: number) => void
   rows: readonly YearRow[]
   /** The sources bars of the chart above, in the same unit (a year or a month). */
   sources: Sources
@@ -50,10 +55,7 @@ export function FlowSection({
   const present = EXPENSE_SEGMENTS.filter((id) => spent.some((b) => b[id] > 0.005))
   const unmetYears = spent.filter((b) => b.unmet > 0.5).length
 
-  // The year the reading opens on: the first year nobody earns (the first year of living on pensions and savings), else the first year.
-  const [picked, setPicked] = useState<number | null>(null)
-  const retiredYear = sources.find((b) => b.work < 0.5)?.x ?? first
-  const year = Math.min(last, Math.max(first, picked ?? retiredYear))
+  // The year of the reading is the panel's (it marks the same year on the three charts): see `readoutYear`.
   const at = Math.max(0, year - first)
   const src = sources[at]
   const out = spent[at]
@@ -84,6 +86,7 @@ export function FlowSection({
                 xTitle={(x) => c.tooltip(x, agesByYear.get(x) ?? '')}
                 xTick={(x) => [String(x), agesByYear.get(x) ?? '']}
                 markers={[]}
+                highlightX={year}
                 ariaLabel={f.figure(first, last, perMonth)}
               />
             </Suspense>
@@ -103,8 +106,8 @@ export function FlowSection({
             max={last}
             step={1}
             valueText={(v) => formatYearAge(v, births, lang)}
-            onPreview={setPicked}
-            onCommit={setPicked}
+            onPreview={onPick}
+            onCommit={onPick}
             describedBy={undefined}
           />
         </Suspense>

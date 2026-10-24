@@ -65,6 +65,8 @@ export interface StackedBarChartProps {
   xTitle: (x: number) => string
   xTick?: (x: number) => readonly string[]
   markers?: readonly ChartMarker[]
+  /** The year a reading beside the chart is about (« Une année en détail »): a line runs through its bar, so the charts and the words point at the same year. */
+  highlightX?: number
   ariaLabel: string
   height?: number
 }

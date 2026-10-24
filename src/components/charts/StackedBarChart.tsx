@@ -14,7 +14,7 @@ import { ConceptPip } from '../ConceptPip'
 
 const COLOUR = SERIES_CSS
 
-export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], ariaLabel, height = 300 }: StackedBarChartProps) {
+export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat, xTitle, xTick, markers = [], highlightX, ariaLabel, height = 300 }: StackedBarChartProps) {
   const bottom = xTick ? 18 : 4
   return (
     <figure className="chart" role="img" aria-label={ariaLabel}>
@@ -65,6 +65,7 @@ export function StackedBarChart({ data, series, line, yFormat, yDetail = yFormat
                 ) : null
               }
             />
+            {highlightX !== undefined && <ReferenceLine x={highlightX} stroke="var(--ink)" strokeWidth={3} strokeOpacity={0.75} className="chart__highlight" />}
             {markers.map((m) => (
               <ReferenceLine
                 key={`${m.colour}-${m.x}-${m.label}`}
