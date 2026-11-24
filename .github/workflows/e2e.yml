@@ -19,7 +19,11 @@ concurrency:
 jobs:
   e2e:
     name: E2E (Playwright) ${{ matrix.shard }}
-    runs-on: ubuntu-latest
+    # Pinned to 24.04: ubuntu-latest moved to 26.04 and the pinned Playwright
+    # (1.63) host-installs Chromium, which can fail there. Deploy (ci.yml) is
+    # browser-free and unaffected; this keeps the decoupled e2e off the 26.04
+    # roulette. Lift once Playwright is bumped.
+    runs-on: ubuntu-24.04
     # The suite is split in four parallel runners (Playwright's own --shard): the same shape in each — one worker, no retries — so a flake still FAILS and still names the test,
     # but the wall time is a quarter of the whole. A shard that fails does not cancel the others: every failure is reported in one pass.
     strategy:
@@ -60,7 +64,11 @@ jobs:
   # own job, so a failure here is attributable and never waits behind the main suite.
   sw:
     name: E2E (service worker)
-    runs-on: ubuntu-latest
+    # Pinned to 24.04: ubuntu-latest moved to 26.04 and the pinned Playwright
+    # (1.63) host-installs Chromium, which can fail there. Deploy (ci.yml) is
+    # browser-free and unaffected; this keeps the decoupled e2e off the 26.04
+    # roulette. Lift once Playwright is bumped.
+    runs-on: ubuntu-24.04
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v7
