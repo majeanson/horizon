@@ -39,14 +39,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - uses: actions/setup-node@v7
+      # Node 26, `npm ci`, and Chromium only (playwright.config.ts) with the Linux system libs the
+      # browser needs — the DevHub kit's one setup step (.github/actions/setup).
+      - uses: ./.github/actions/setup
         with:
-          node-version: 26
-          cache: npm
-      - run: npm ci
-      # Only chromium is configured (playwright.config.ts); --with-deps pulls the Linux system
-      # libs the browser needs on the runner.
-      - run: npx playwright install --with-deps chromium
+          playwright: 'true'
       # CI's authoritative shape: one worker, no retries — a flake FAILS, and which test flaked
       # is the whole signal. Playwright boots the Vite dev server itself (webServer config);
       # there is no backend to stub.
@@ -74,12 +71,9 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - uses: actions/setup-node@v7
+      - uses: ./.github/actions/setup
         with:
-          node-version: 26
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          playwright: 'true'
       - run: npm run e2e:sw
       - name: Upload SW harness results
         if: ${{ !cancelled() }}
