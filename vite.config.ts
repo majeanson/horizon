@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { execFileSync } from 'node:child_process'
@@ -295,6 +296,31 @@ self.addEventListener('fetch', (e) => {
 })
 `
 
+// /version.json: the commit this bundle was built from, so DevHub can tell
+// whether production serves the last deploy. A 'post' hook, and the last
+// plugin, so it runs after anything that lists the bundle (a service
+// worker's precache): the file must never be served from a cache.
+function versionJson(): Plugin {
+  return {
+    name: 'version-json',
+    apply: 'build',
+    generateBundle: {
+      order: 'post',
+      handler() {
+        let sha = process.env.GITHUB_SHA ?? ''
+        if (!sha) {
+          try {
+            sha = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim()
+          } catch {
+            sha = 'unknown'
+          }
+        }
+        this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ sha, builtAt: new Date().toISOString() }) })
+      },
+    },
+  }
+}
+
 export default defineConfig({
   // Stamp the build moment and the commit into the bundle so « Données » can show which build
   // is running — useful when someone says "it did X yesterday". Evaluated once when the build
@@ -303,7 +329,7 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __BUILD_SHA__: JSON.stringify(buildSha()),
   },
-  plugins: [react(), serviceWorker(), securityHeadersFile(), preloadFirstFaces()],
+  plugins: [react(), serviceWorker(), securityHeadersFile(), preloadFirstFaces(), versionJson()],
   build: {
     // The build manifest lets scripts/check-bundle.mjs walk the ENTRY'S STATIC CLOSURE —
     // every chunk the browser fetches before it can run a line of the app — rather than guess
