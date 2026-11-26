@@ -40,12 +40,14 @@ export default function BarAnswer() {
       <NavLink to="/resultats" className={({ isActive }) => 'shell__answer-link' + (isActive ? ' is-active' : '')} aria-label={copy.bar.aria(text)} title={copy.bar.aria(text)}>
         {pulse.count > 0 && <span key={pulse.count} className="answer-pulse" data-dir={pulse.dir ?? undefined} aria-hidden="true" />}
         {pulse.delta && <DeltaBadge take={pulse.delta.take} years={pulse.delta.years} money={pulse.delta.money} lang={lang} />}
-        <span className="shell__answer-label">{copy.label}</span>
+        <span className="shell__answer-label">{copy.label}</span>{' '}
         {/* On a narrow phone the full label goes; this one word stays, so the age is not read as the visitor's own (the link's aria-label already says it all). */}
         <span className="shell__answer-short" aria-hidden="true">
           {copy.bar.short}
-        </span>
-        {/* Keyed on the age said, not on the busy suffix: the figure settles into place (styles/motion.css) when it CHANGES, and sits still while it is being worked out again. */}
+        </span>{' '}
+        {/* Keyed on the age said, not on the busy suffix: the figure settles into place (styles/motion.css) when it CHANGES, and sits still while it is being worked out again.
+            The spaces between the words are real text (a flex row draws none; the `gap` does): the link's text must read « Votre réponse 60 ans », a phrase
+            its aria-label contains, never « Votre réponse60 ans » (axe's label-content-name-mismatch, WCAG 2.5.3 Label in Name). */}
         <strong key={said} className="shell__answer-age">
           {text}
         </strong>
