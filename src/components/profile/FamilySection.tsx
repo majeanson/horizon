@@ -98,7 +98,7 @@ export function FamilySection({ withKids = true }: { /** The children and what e
         ) : (
           <ChipGroup label={f.children}>
             {(profile.household.children ?? []).map((y, i) => (
-              <Chip key={`${y}-${i}`} onRemove={() => updateProfile((p) => removeChild(p, i))} removeLabel={f.removeChild(y)}>
+              <Chip key={`${y}-${i}`} onRemove={() => updateProfile((p) => removeChild(p, i))} removeLabel={`${y} · ${kc.stage[stageOf(y)]} — ${f.removeChild(y)}`}>
                 {y} · {kc.stage[stageOf(y)]}
               </Chip>
             ))}
