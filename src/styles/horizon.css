@@ -1592,8 +1592,22 @@
 .welcome__reading--fold summary {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
   min-height: var(--touch-target, 44px);
   font-weight: 600;
+  list-style: none;
+}
+/* Safari keeps its own marker on a flex summary: one caret, ours. */
+.welcome__reading--fold summary::-webkit-details-marker {
+  display: none;
+}
+/* display:flex drops the native marker, so the row reads as a box to type in: the accordion's caret (kit.css) at the far end says « it opens ». */
+.welcome__reading--fold summary > svg {
+  color: var(--ink-soft);
+}
+.welcome__reading--fold .fold[open] > summary > svg {
+  transform: rotate(180deg);
 }
 .welcome__reading--fold .fold__body {
   display: grid;

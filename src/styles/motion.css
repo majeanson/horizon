@@ -779,3 +779,14 @@ textarea.input:focus {
 .household-glyphs .pip:nth-child(3) { animation-delay: 120ms; }
 .household-glyphs .pip:nth-child(4) { animation-delay: 180ms; }
 .household-glyphs .pip:nth-child(n + 5) { animation-delay: 240ms; }
+
+/* The front door's reading fold on a phone (pages/Accueil.tsx): its caret turns over as the fold opens and back as it shuts, like the accordion's
+   (horizon.css holds the turned state). Transform only. */
+.welcome__reading--fold summary > svg {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome__reading--fold summary > svg {
+    transition: none;
+  }
+}

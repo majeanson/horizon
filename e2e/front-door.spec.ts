@@ -61,7 +61,15 @@ for (const [w, h, scale] of [[320, 568, 'normal'], [360, 640, 'normal'], [360, 6
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     // on a phone the reading panel is ONE row (the question and « Commencer » keep the first screen): a tap opens it, and its two shared-row controls still say what they set
     await expect(reading(page).getByRole('tablist', { name: 'Langue' })).toBeHidden()
+    // the row is not a box to type in: a caret at its far end says it opens (a flex summary loses the native marker)
+    const fold = reading(page).locator('details.fold')
+    const caret = fold.locator('> summary > svg')
+    await expect(caret).toBeVisible()
+    const row = (await fold.locator('> summary').boundingBox())!
+    const mark = (await caret.boundingBox())!
+    expect(row.x + row.width - (mark.x + mark.width)).toBeLessThan(24)
     await reading(page).getByText(/^Lire plus confortablement/).click()
+    await expect(fold).toHaveAttribute('open', '')
     await expect(reading(page).getByRole('tablist', { name: 'Langue' })).toBeVisible()
   })
 }

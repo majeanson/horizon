@@ -70,7 +70,15 @@ export function Accueil() {
           {narrow ? (
             // On a phone the panel is ONE row (the question and « Commencer » keep the first screen); a tap opens the controls.
             <section className="surface welcome__reading welcome__reading--fold" aria-label={rc.title}>
-              <Fold summary={rc.title}>
+              {/* display:flex on the summary drops the native marker: the row's caret is the accordion's, at the far end, turning over when open (horizon.css). */}
+              <Fold
+                summary={
+                  <>
+                    <span>{rc.title}</span>
+                    <Icon name="caret-down-bold" size={16} />
+                  </>
+                }
+              >
                 <DisplayControls sizeLabels={rc.sizes} />
                 <p className="field-row__hint">{rc.zoomTip}</p>
               </Fold>
