@@ -17,10 +17,10 @@
 | | |
 | --- | --- |
 | **What it is** | A Québec retirement-date planner: manual entry of the government's own numbers → a cited, unit-tested engine → a chart of when the money lasts. Local-only data. |
-| **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 4 · Playwright · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
-| **Phase** | **10 — every phase is built** (the app, the three questions, the bridge years). What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below), and the GitHub secrets that turn on deploy-on-push. The parameters (100 cited figures for 2026, 17 plan rules) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
+| **Stack** | Vite 8 · React 19 · TypeScript 7 · React Router 7 · Vitest 5 · Playwright 1 · one Cloudflare Worker (static assets). Charts: Recharts, in its own lazy chunk. |
+| **Phase** | **17 — the front door** (2026-10-19), and since then the delta badge, the Québec credits and the one worker script for every heavy job. What remains is not code: the unconfirmed figures and statement wordings that need a human with a browser (below). Deploy-on-push is live: CI on `main` deploys, then `scripts/verify-deploy.mjs` waits for the site's `/version.json` to name the commit. The parameters (180 cited figures for 2026, 23 plan rules, 15 historical series, as `npm run sources` prints them) and every engine module are verified against official worked examples, with a committed golden household; the pages drive the engine and keep everything on the device. |
 | **Live** | https://retraite.marcportal.com · https://github.com/majeanson/horizon |
-| **Health** | `npm run typecheck && npm test && npm run build && npm run check:bundle && npm run knip` |
+| **Health** | `npm run verify` before every push; `npm run knip` runs in CI. |
 
 ## 2. The document map
 
